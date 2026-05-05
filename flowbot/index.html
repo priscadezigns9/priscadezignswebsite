@@ -3,172 +3,239 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlowBot — WhatsApp AI for Your Business</title>
-<meta name="description" content="FlowBot — A real AI assistant on your WhatsApp number. Takes orders, books appointments, answers questions, and escalates to you when needed. 24/7.">
+<title>FlowBot — Business Automation for Caribbean SMEs</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-  :root {
-    --accent: #25D366;
-    --accent2: #128C7E;
-    --bg: #030F08;
-    --card: #071A0F;
-    --border: #0F3020;
-    --text: #E8FFF3;
-    --muted: #5A9A72;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#030B05;--layer:#071009;--card:#0B1A0E;--border:#152B18;
+  --text:#C8FAD6;--muted:#4A7A58;--green:#00FF5E;--green-dim:#00CC4B;
+  --green-glow:rgba(0,255,94,0.08);--green-border:rgba(0,255,94,0.15);
+  --code:#A8FFB8;--comment:#3D6B4A;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;overflow-x:hidden;}
 
-  nav { display:flex; justify-content:space-between; align-items:center; padding:20px 40px; border-bottom:1px solid var(--border); }
-  .logo { font-size:1.4rem; font-weight:800; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:8px; }
-  .logo span { color:var(--accent); }
-  .nav-cta { background:var(--accent); color:#000; padding:10px 22px; border-radius:50px; text-decoration:none; font-size:0.85rem; font-weight:700; }
+/* SCANLINES */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,94,0.01) 2px,rgba(0,255,94,0.01) 4px);pointer-events:none;z-index:999;}
 
-  .hero { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; padding:80px 60px; max-width:1200px; margin:0 auto; }
-  .hero-text .badge { display:inline-block; background:rgba(37,211,102,0.1); color:var(--accent); border:1px solid rgba(37,211,102,0.25); border-radius:50px; padding:6px 18px; font-size:0.75rem; letter-spacing:2px; text-transform:uppercase; margin-bottom:24px; }
-  .hero-text h1 { font-size:clamp(2.2rem,4vw,3.8rem); font-weight:800; line-height:1.1; margin-bottom:20px; }
-  .hero-text h1 span { color:var(--accent); }
-  .hero-text p { color:var(--muted); font-size:1.05rem; line-height:1.7; margin-bottom:36px; }
-  .hero-btns { display:flex; gap:14px; flex-wrap:wrap; }
-  .btn-primary { background:var(--accent); color:#000; padding:14px 32px; border-radius:50px; text-decoration:none; font-weight:700; font-size:0.95rem; }
-  .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); padding:14px 32px; border-radius:50px; text-decoration:none; font-size:0.95rem; }
-  .btn-ghost:hover { border-color:var(--accent); }
+nav{background:rgba(3,11,5,0.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 6%;display:flex;justify-content:space-between;align-items:center;height:60px;position:sticky;top:0;z-index:200;}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.logo-bracket{font-family:'JetBrains Mono',monospace;color:var(--green);font-size:1.1rem;}
+.logo-name{font-family:'JetBrains Mono',monospace;font-size:0.95rem;font-weight:700;color:var(--text);}
+.cursor{display:inline-block;width:2px;height:14px;background:var(--green);animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.nav-links{display:flex;gap:24px;align-items:center;}
+.nav-links a{text-decoration:none;color:var(--muted);font-size:0.85rem;font-family:'JetBrains Mono',monospace;transition:color 0.2s;}
+.nav-links a:hover{color:var(--green);}
+.btn{padding:8px 20px;font-size:0.83rem;font-weight:600;cursor:pointer;border:none;font-family:'JetBrains Mono',monospace;text-decoration:none;display:inline-block;transition:all 0.2s;}
+.btn-primary{background:var(--green);color:var(--bg);border-radius:3px;}
+.btn-primary:hover{background:var(--green-dim);box-shadow:0 0 20px rgba(0,255,94,0.3);}
+.btn-outline{background:transparent;color:var(--green);border:1px solid var(--green-border);}
+.btn-outline:hover{background:var(--green-glow);}
 
-  /* WhatsApp Chat Mock */
-  .chat-mock { background:var(--card); border:1px solid var(--border); border-radius:20px; overflow:hidden; }
-  .chat-header { background:#0F3020; padding:16px 20px; display:flex; align-items:center; gap:12px; }
-  .chat-avatar { width:40px; height:40px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
-  .chat-info h4 { font-size:0.95rem; font-weight:600; }
-  .chat-info p { font-size:0.75rem; color:var(--accent); }
-  .chat-body { padding:20px; display:flex; flex-direction:column; gap:12px; }
-  .msg { max-width:80%; padding:10px 14px; border-radius:12px; font-size:0.85rem; line-height:1.5; }
-  .msg.customer { background:#1A3A28; color:var(--text); border-bottom-left-radius:4px; align-self:flex-start; }
-  .msg.bot { background:rgba(37,211,102,0.15); border:1px solid rgba(37,211,102,0.2); border-bottom-right-radius:4px; align-self:flex-end; color:var(--text); }
-  .msg-time { font-size:0.7rem; color:var(--muted); margin-top:4px; text-align:right; }
-  .typing { display:flex; gap:4px; align-items:center; padding:10px 14px; background:rgba(37,211,102,0.08); border-radius:12px; width:60px; }
-  .dot { width:6px; height:6px; background:var(--accent); border-radius:50%; animation:bounce 1.2s infinite; }
-  .dot:nth-child(2){ animation-delay:0.2s; } .dot:nth-child(3){ animation-delay:0.4s; }
-  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+/* HERO */
+.hero{padding:90px 6% 70px;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.1fr 0.9fr;gap:60px;align-items:center;}
+.hero-tag{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--green);margin-bottom:20px;}
+.hero-tag::before{content:'> ';color:var(--muted);}
+.hero h1{font-size:clamp(2.2rem,4vw,3.6rem);font-weight:700;line-height:1.1;margin-bottom:20px;letter-spacing:-0.02em;}
+.hero h1 .green{color:var(--green);text-shadow:0 0 20px rgba(0,255,94,0.3);}
+.hero p{color:var(--muted);font-size:1rem;margin-bottom:30px;line-height:1.75;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
 
-  .features { padding:80px 40px; background:var(--card); }
-  .features-inner { max-width:1100px; margin:0 auto; }
-  .label { color:var(--accent); font-size:0.75rem; letter-spacing:3px; text-transform:uppercase; margin-bottom:10px; }
-  h2 { font-size:clamp(1.8rem,4vw,2.6rem); font-weight:700; margin-bottom:12px; }
-  .sub { color:var(--muted); font-size:1rem; line-height:1.7; margin-bottom:48px; }
-  .feat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; }
-  .feat { background:var(--bg); border:1px solid var(--border); border-radius:16px; padding:28px; transition:border-color 0.2s; }
-  .feat:hover { border-color:var(--accent); }
-  .feat-icon { font-size:2rem; margin-bottom:14px; }
-  .feat h3 { font-size:1rem; font-weight:600; margin-bottom:8px; }
-  .feat p { color:var(--muted); font-size:0.9rem; line-height:1.6; }
+/* TERMINAL */
+.terminal{background:var(--layer);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 0 40px rgba(0,255,94,0.05);}
+.term-bar{background:var(--card);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+.term-dot{width:10px;height:10px;border-radius:50%;}
+.term-dot.r{background:#FF5F57;}.term-dot.y{background:#FFBD2E;}.term-dot.g{background:#28CA41;}
+.term-title{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);margin-left:8px;}
+.term-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:2;}
+.prompt{color:var(--green);}
+.cmd{color:var(--code);}
+.comment{color:var(--comment);}
+.output{color:var(--muted);padding-left:16px;}
+.output.success{color:var(--green);}
 
-  .pricing { padding:80px 40px; text-align:center; }
-  .plans { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; max-width:900px; margin:48px auto 0; }
-  .plan { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:32px 28px; position:relative; }
-  .plan.featured { border-color:var(--accent); }
-  .plan-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:var(--accent); color:#000; padding:4px 16px; border-radius:50px; font-size:0.75rem; font-weight:700; white-space:nowrap; }
-  .plan-name { font-size:0.85rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
-  .plan-price { font-size:2.5rem; font-weight:800; margin-bottom:4px; }
-  .plan-price span { font-size:1rem; font-weight:400; color:var(--muted); }
-  .plan ul { list-style:none; text-align:left; margin:16px 0 28px; }
-  .plan ul li { padding:6px 0; font-size:0.9rem; color:var(--muted); border-bottom:1px solid var(--border); }
-  .plan ul li::before { content:"✓ "; color:var(--accent); font-weight:700; }
-  .plan-btn { display:block; text-align:center; background:var(--accent); color:#000; padding:12px; border-radius:50px; text-decoration:none; font-weight:700; font-size:0.9rem; }
-  .plan.basic .plan-btn { background:transparent; border:1px solid var(--border); color:var(--text); }
+/* FLOW DIAGRAM */
+.flows{padding:80px 6%;max-width:1200px;margin:0 auto;}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--green);margin-bottom:14px;}
+.section-title{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:700;margin-bottom:12px;letter-spacing:-0.02em;}
+.section-sub{color:var(--muted);max-width:520px;margin-bottom:52px;line-height:1.75;}
+.flow-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);}
+.flow-card{background:var(--bg);padding:30px 26px;border-top:2px solid transparent;transition:border-color 0.3s,background 0.3s;}
+.flow-card:hover{background:var(--layer);border-top-color:var(--green);}
+.flow-trigger{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--green);margin-bottom:12px;opacity:0.7;}
+.flow-title{font-weight:700;font-size:0.95rem;margin-bottom:8px;}
+.flow-desc{font-size:0.85rem;color:var(--muted);line-height:1.7;}
+.flow-arrow{color:var(--green);font-family:'JetBrains Mono',monospace;font-size:0.75rem;margin-top:14px;opacity:0.5;}
 
-  .cta-strip { background:linear-gradient(135deg,#064E3B,#065F46); padding:60px 40px; text-align:center; }
-  .cta-strip h2 { font-size:2rem; font-weight:800; margin-bottom:12px; }
-  .cta-strip p { color:rgba(255,255,255,0.75); margin-bottom:28px; }
-  .cta-strip a { background:var(--accent); color:#000; padding:14px 36px; border-radius:50px; text-decoration:none; font-weight:700; }
+/* INTEGRATIONS */
+.integrations{background:var(--layer);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:70px 6%;}
+.int-inner{max-width:1100px;margin:0 auto;}
+.int-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:48px;}
+.int-item{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;text-align:center;transition:border-color 0.3s;}
+.int-item:hover{border-color:var(--green-border);}
+.int-icon{font-size:1.8rem;margin-bottom:10px;}
+.int-name{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);}
 
-  footer { text-align:center; padding:28px 40px; border-top:1px solid var(--border); color:var(--muted); font-size:0.85rem; }
-  @media(max-width:768px){ .hero{grid-template-columns:1fr; padding:60px 24px; gap:40px;} }
-  @media(max-width:600px){ nav{padding:16px 20px;} .features,.pricing{padding:60px 20px;} }
+/* PRICING */
+.pricing{padding:80px 6%;max-width:1000px;margin:0 auto;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;}
+.p-card{background:var(--layer);border:1px solid var(--border);border-radius:6px;padding:30px;}
+.p-card.active{border-color:var(--green-border);box-shadow:0 0 30px rgba(0,255,94,0.05);}
+.p-label{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--green);margin-bottom:10px;}
+.p-price{font-size:2.2rem;font-weight:700;margin-bottom:4px;color:var(--text);}
+.p-per{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--muted);}
+.p-features{list-style:none;margin:20px 0 24px;display:flex;flex-direction:column;gap:9px;}
+.p-features li{font-size:0.84rem;color:var(--muted);display:flex;gap:8px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;}
+.p-features li::before{content:'# ';color:var(--green);}
+
+/* CTA */
+.cta{padding:90px 6%;text-align:center;border-top:1px solid var(--border);}
+.cta h2{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:700;margin-bottom:14px;letter-spacing:-0.02em;}
+.cta h2 .green{color:var(--green);}
+.cta p{color:var(--muted);margin-bottom:32px;}
+.cta-sub{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--comment);margin-top:16px;}
+
+footer{background:var(--layer);border-top:1px solid var(--border);text-align:center;padding:24px;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--comment);}
+footer a{color:var(--muted);text-decoration:none;}
+
+@media(max-width:768px){.hero{grid-template-columns:1fr;}.terminal{display:none;}.flow-cards,.int-grid,.pricing-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:480px){.flow-cards,.int-grid,.pricing-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
+
 <nav>
-  <a href="#" class="logo">🤖 Flow<span>Bot</span></a>
-  <a href="#pricing" class="nav-cta">Get FlowBot</a>
+  <div class="nav-logo">
+    <div class="logo-bracket">[</div>
+    <div class="logo-name">FlowBot<div class="cursor"></div></div>
+    <div class="logo-bracket">]</div>
+  </div>
+  <div class="nav-links">
+    <a href="#flows">./flows</a>
+    <a href="#integrations">./integrations</a>
+    <a href="#pricing">./pricing</a>
+    <a href="#" class="btn btn-outline">log_in</a>
+    <a href="#" class="btn btn-primary">start_free()</a>
+  </div>
 </nav>
 
-<div style="max-width:1200px;margin:0 auto;">
-  <div class="hero">
-    <div class="hero-text">
-      <div class="badge">WhatsApp AI · Caribbean</div>
-      <h1>Your business on<br><span>autopilot.</span></h1>
-      <p>FlowBot is a real AI assistant that lives on your WhatsApp number. It reads customer messages, responds naturally, takes orders, books appointments, and only escalates to you when it actually needs to.</p>
-      <div class="hero-btns">
-        <a href="#pricing" class="btn-primary">Get FlowBot — $79/mo</a>
-        <a href="#features" class="btn-ghost">See Features</a>
-      </div>
-    </div>
-    <div class="chat-mock">
-      <div class="chat-header">
-        <div class="chat-avatar">🤖</div>
-        <div class="chat-info"><h4>FlowBot · Your Business</h4><p>● Online</p></div>
-      </div>
-      <div class="chat-body">
-        <div class="msg customer">Hi, do you still have the black dress in size M?<div class="msg-time">2:14 PM</div></div>
-        <div class="msg bot">Hey! 👋 Yes, we still have the black bodycon in size M — $180 TTD. Want me to reserve it for you? Just confirm your name and I'll hold it for 24 hours 🙌<div class="msg-time">2:14 PM ✓✓</div></div>
-        <div class="msg customer">Yes please! I'm Sarah<div class="msg-time">2:15 PM</div></div>
-        <div class="msg bot">Done, Sarah! ✅ Reserved for 24 hours. You can pick up at our store or we deliver islandwide for $50 TTD. Which would you prefer?<div class="msg-time">2:15 PM ✓✓</div></div>
-      </div>
+<section class="hero">
+  <div>
+    <div class="hero-tag">automate_your_business.sh --no-code</div>
+    <h1>Your business,<br>running on <span class="green">autopilot.</span></h1>
+    <p>FlowBot connects your apps and automates the repetitive work — invoices, reminders, follow-ups, reports — without writing a single line of code.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn btn-primary">Deploy your first flow →</a>
+      <a href="#flows" class="btn btn-outline">See flows</a>
     </div>
   </div>
-</div>
+  <div class="terminal">
+    <div class="term-bar">
+      <div class="term-dot r"></div><div class="term-dot y"></div><div class="term-dot g"></div>
+      <div class="term-title">flowbot ~ automation engine</div>
+    </div>
+    <div class="term-body">
+      <div><span class="prompt">$ </span><span class="cmd">flowbot deploy invoice-reminder</span></div>
+      <div class="output">Loading workflow... ████████ 100%</div>
+      <div class="output success">✓ Trigger: New invoice created</div>
+      <div class="output success">✓ Wait: 7 days if unpaid</div>
+      <div class="output success">✓ Action: Send WhatsApp reminder</div>
+      <div class="output success">✓ Action: Log to Google Sheet</div>
+      <div class="output success">✓ Flow active · Running 24/7</div>
+      <div><span class="prompt">$ </span><span class="cmd">flowbot list --active</span></div>
+      <div class="output">5 flows running · 0 errors</div>
+      <div class="output success">💸 $4,200 TTD recovered this month</div>
+    </div>
+  </div>
+</section>
 
-<section class="features" id="features">
-  <div class="features-inner">
-    <p class="label">Features</p>
-    <h2>More than a chatbot. A real AI assistant.</h2>
-    <p class="sub">FlowBot understands context, remembers conversations, and handles complex requests — not just FAQs.</p>
-    <div class="feat-grid">
-      <div class="feat"><div class="feat-icon">💬</div><h3>Natural Conversations</h3><p>Understands real messages — slang, typos, incomplete sentences. Responds like a real person.</p></div>
-      <div class="feat"><div class="feat-icon">📦</div><h3>Order Taking</h3><p>Captures order details, confirms availability, collects delivery info — all automatically.</p></div>
-      <div class="feat"><div class="feat-icon">📅</div><h3>Appointment Booking</h3><p>Checks your availability and books appointments directly in your calendar. No back and forth.</p></div>
-      <div class="feat"><div class="feat-icon">❓</div><h3>FAQ Answering</h3><p>Handles prices, hours, location, returns — trained on your specific business information.</p></div>
-      <div class="feat"><div class="feat-icon">🚨</div><h3>Smart Escalation</h3><p>Knows when to hand off to a human. Complex issues or unhappy customers get transferred immediately.</p></div>
-      <div class="feat"><div class="feat-icon">📊</div><h3>Conversation Analytics</h3><p>See what customers ask most, peak hours, response times, and conversion rates.</p></div>
+<section class="flows" id="flows">
+  <div class="eyebrow"># automation_templates</div>
+  <h2 class="section-title">Ready-to-deploy flows</h2>
+  <p class="section-sub">Pre-built automations for Caribbean businesses. Turn on in one click.</p>
+  <div class="flow-cards">
+    <div class="flow-card"><div class="flow-trigger">trigger: new_order</div><div class="flow-title">Order confirmation</div><div class="flow-desc">Automatically send a WhatsApp confirmation when a new order comes in. Include order details and estimated time.</div><div class="flow-arrow">→ WhatsApp + Email</div></div>
+    <div class="flow-card"><div class="flow-trigger">trigger: invoice.age > 7d</div><div class="flow-title">Invoice follow-up</div><div class="flow-desc">Unpaid invoice? FlowBot sends a polite reminder at day 7, day 14, and day 21 — automatically.</div><div class="flow-arrow">→ WhatsApp + Email</div></div>
+    <div class="flow-card"><div class="flow-trigger">trigger: schedule.daily_8am</div><div class="flow-title">Daily digest</div><div class="flow-desc">Get a morning summary of orders, appointments, and tasks for the day — sent to your phone every morning.</div><div class="flow-arrow">→ WhatsApp + SMS</div></div>
+    <div class="flow-card"><div class="flow-trigger">trigger: appointment.booked</div><div class="flow-title">Appointment reminders</div><div class="flow-desc">Remind clients 24h and 1h before their appointment. Reduce no-shows without lifting a finger.</div><div class="flow-arrow">→ WhatsApp</div></div>
+    <div class="flow-card"><div class="flow-trigger">trigger: form.submitted</div><div class="flow-title">Lead nurturing</div><div class="flow-desc">New lead fills a form? Automatically add to CRM, send a welcome message, and schedule a follow-up.</div><div class="flow-arrow">→ CRM + WhatsApp</div></div>
+    <div class="flow-card"><div class="flow-trigger">trigger: schedule.weekly_friday</div><div class="flow-title">Weekly report</div><div class="flow-desc">Sales, expenses, and KPIs compiled and sent to you every Friday afternoon. No manual spreadsheets.</div><div class="flow-arrow">→ Google Sheets + Email</div></div>
+  </div>
+</section>
+
+<section class="integrations" id="integrations">
+  <div class="int-inner">
+    <div class="eyebrow"># connected_apps</div>
+    <h2 class="section-title" style="text-align:center;">Plug in. Automate. Done.</h2>
+    <div class="int-grid">
+      <div class="int-item"><div class="int-icon">💬</div><div class="int-name">WhatsApp</div></div>
+      <div class="int-item"><div class="int-icon">📊</div><div class="int-name">Google Sheets</div></div>
+      <div class="int-item"><div class="int-icon">📧</div><div class="int-name">Gmail</div></div>
+      <div class="int-item"><div class="int-icon">📅</div><div class="int-name">Google Calendar</div></div>
+      <div class="int-item"><div class="int-icon">🛒</div><div class="int-name">WooCommerce</div></div>
+      <div class="int-item"><div class="int-icon">💳</div><div class="int-name">PayPal</div></div>
+      <div class="int-item"><div class="int-icon">📋</div><div class="int-name">Google Forms</div></div>
+      <div class="int-item"><div class="int-icon">🗓️</div><div class="int-name">Calendly</div></div>
     </div>
   </div>
 </section>
 
 <section class="pricing" id="pricing">
-  <div style="max-width:900px;margin:0 auto;">
-    <p class="label">Pricing</p>
-    <h2>One flat monthly price</h2>
-    <p class="sub" style="max-width:440px;margin:0 auto;">No per-message fees. No surprises. Just FlowBot running 24/7.</p>
-    <div class="plans">
-      <div class="plan basic">
-        <p class="plan-name">Starter</p>
-        <div class="plan-price">$79<span>/mo</span></div>
-        <ul><li>1 WhatsApp number</li><li>500 conversations/mo</li><li>FAQ + order taking</li><li>Email escalation</li></ul>
-        <a href="https://wa.me/18683424101" class="plan-btn">Get Started</a>
-      </div>
-      <div class="plan featured">
-        <div class="plan-badge">Most Popular</div>
-        <p class="plan-name">Business</p>
-        <div class="plan-price">$149<span>/mo</span></div>
-        <ul><li>2 WhatsApp numbers</li><li>Unlimited conversations</li><li>Appointment booking</li><li>CRM integration</li><li>Analytics dashboard</li><li>Priority support</li></ul>
-        <a href="https://wa.me/18683424101" class="plan-btn">Start Free Trial</a>
-      </div>
-      <div class="plan">
-        <p class="plan-name">Enterprise</p>
-        <div class="plan-price">Custom</div>
-        <ul><li>Unlimited numbers</li><li>Custom AI training</li><li>Multi-agent setup</li><li>API + integrations</li><li>Dedicated support</li></ul>
-        <a href="https://wa.me/18683424101" class="plan-btn">Contact Us</a>
-      </div>
+  <div class="eyebrow"># pricing.config</div>
+  <h2 class="section-title">Simple pricing</h2>
+  <div class="pricing-grid">
+    <div class="p-card">
+      <div class="p-label">// free_tier</div>
+      <div class="p-price">$0</div>
+      <div class="p-per">forever</div>
+      <ul class="p-features">
+        <li>3 active flows</li>
+        <li>100 tasks/month</li>
+        <li>5 integrations</li>
+        <li>Email support</li>
+      </ul>
+      <a href="#" class="btn btn-outline" style="width:100%;text-align:center;">deploy_free()</a>
+    </div>
+    <div class="p-card active">
+      <div class="p-label">// pro_tier ← recommended</div>
+      <div class="p-price">$129</div>
+      <div class="p-per">TTD / month</div>
+      <ul class="p-features">
+        <li>Unlimited flows</li>
+        <li>5,000 tasks/month</li>
+        <li>All integrations</li>
+        <li>WhatsApp flows</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="#" class="btn btn-primary" style="width:100%;text-align:center;">deploy_pro()</a>
+    </div>
+    <div class="p-card">
+      <div class="p-label">// business_tier</div>
+      <div class="p-price">$299</div>
+      <div class="p-per">TTD / month</div>
+      <ul class="p-features">
+        <li>Unlimited everything</li>
+        <li>Custom integrations</li>
+        <li>Team workspaces</li>
+        <li>API access</li>
+        <li>SLA support</li>
+      </ul>
+      <a href="#" class="btn btn-outline" style="width:100%;text-align:center;">contact_sales()</a>
     </div>
   </div>
 </section>
 
-<div class="cta-strip">
-  <h2>Never miss a customer message again.</h2>
-  <p>FlowBot replies in seconds, 24 hours a day, 7 days a week. Even when you're sleeping.</p>
-  <a href="https://wa.me/18683424101">Chat with Us on WhatsApp</a>
-</div>
+<section class="cta">
+  <h2>Stop doing the work<br>that <span class="green">bots should do.</span></h2>
+  <p>Deploy your first automation in under 5 minutes. No code. No engineers. No excuses.</p>
+  <a href="#" class="btn btn-primary">Start automating free →</a>
+  <div class="cta-sub">// no credit card required · cancel_anytime() · made_in_tt</div>
+</section>
 
-<footer>© 2025 FlowBot · Caribbean · A Prisca Dezigns product</footer>
+<footer>
+  <p>/* © 2025 FlowBot · A <a href="https://priscadezigns.org">Prisca Dezigns</a> product · Trinidad & Tobago */</p>
+</footer>
+
 </body>
 </html>
