@@ -4,415 +4,160 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Filio — Document Tools That Actually Work</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<meta name="description" content="Edit, convert, merge and analyse Word and Excel files instantly. No installs. No limits on what matters."/>
+<meta property="og:title" content="Filio — Document Tools"/>
+<meta property="og:url" content="https://priscadezigns.org/filio/"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#FAFAFA;
-  --white:#FFFFFF;
-  --dark:#1A1A1A;
-  --mid:#666666;
-  --light:#999999;
-  --line:#E5E5E5;
-  --blue:#0066FF;
-  --blue-light:#E8F0FF;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--dark);font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#000;--surface:#080808;--border:rgba(255,255,255,0.07);--primary:#6C47FF;--glow:rgba(108,71,255,0.12);--text:#f5f5f7;--muted:#86868b;--dim:#3d3d3f;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(0,0,0,0.75);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--border);}
+.nav-logo{font-size:1.05rem;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:-0.3px;}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{font-size:0.78rem;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover{color:var(--text);}
+.nav-cta{font-size:0.78rem;font-weight:500;color:#fff;background:var(--primary);padding:7px 18px;border-radius:980px;text-decoration:none;transition:opacity 0.2s;}
+.nav-cta:hover{opacity:0.85;}
 
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--line);padding:0 60px;height:64px;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.nav-logo-icon{font-size:18px}
-.nav-logo-text{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--dark)}
-.nav-links{display:flex;align-items:center;gap:36px}
-.nav-links a{color:var(--mid);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:0.02em;transition:color .15s}
-.nav-links a:hover{color:var(--dark)}
-.nav-cta{background:var(--blue);color:#fff;padding:9px 22px;font-size:13px;font-weight:600;text-decoration:none;border-radius:4px;transition:opacity .15s}
-.nav-cta:hover{opacity:0.85}
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;gap:0;position:relative;}
+.hero-left{display:flex;flex-direction:column;justify-content:center;padding:130px 6% 80px;border-right:1px solid var(--border);}
+.hero-tag{font-size:0.7rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--primary);margin-bottom:28px;}
+.hero h1{font-size:clamp(3rem,5vw,5.5rem);font-weight:800;letter-spacing:-2.5px;line-height:1.0;margin-bottom:28px;background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,0.45) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:1rem;color:var(--muted);max-width:400px;line-height:1.8;margin-bottom:44px;font-weight:300;}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-p{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;font-size:0.88rem;font-weight:700;padding:14px 28px;border-radius:980px;text-decoration:none;transition:all 0.2s;}
+.btn-p:hover{opacity:0.85;transform:translateY(-1px);}
+.btn-g{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);font-size:0.88rem;font-weight:500;padding:14px 28px;border-radius:980px;border:1px solid var(--border);text-decoration:none;transition:all 0.2s;}
+.btn-g:hover{border-color:rgba(255,255,255,0.2);}
+.hero-right{background:var(--surface);display:flex;align-items:center;justify-content:center;padding:130px 6% 80px;position:relative;overflow:hidden;}
+.hero-right::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,var(--glow),transparent);pointer-events:none;}
+.doc-stack{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;position:relative;z-index:1;}
+.doc-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:14px;transition:all 0.3s;}
+.doc-card:hover{background:rgba(108,71,255,0.08);border-color:rgba(108,71,255,0.2);transform:translateX(4px);}
+.doc-icon{font-size:1.4rem;}
+.doc-info{flex:1;}
+.doc-name{font-size:0.82rem;font-weight:600;letter-spacing:-0.2px;}
+.doc-type{font-size:0.72rem;color:var(--muted);}
+.doc-arrow{font-size:0.8rem;color:var(--primary);}
 
-/* CONTAINER */
-.container{max-width:1100px;margin:0 auto;padding:0 60px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stat{padding:44px 6%;text-align:center;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-n{font-size:2.5rem;font-weight:800;letter-spacing:-2px;color:var(--text);display:block;line-height:1;margin-bottom:6px;}
+.stat-l{font-size:0.75rem;color:var(--muted);}
 
-/* HERO */
-.hero{padding:100px 0 80px}
-.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--blue);margin-bottom:24px;display:flex;align-items:center;gap:12px}
-.hero-eyebrow::after{content:'';flex:1;max-width:40px;height:1px;background:var(--blue)}
-.hero h1{font-family:'Playfair Display',serif;font-size:clamp(48px,5.5vw,80px);font-weight:800;line-height:1.05;letter-spacing:-1px;color:var(--dark);margin-bottom:28px;max-width:700px}
-.hero h1 em{font-style:italic;color:var(--blue)}
-.hero p{font-size:18px;color:var(--mid);max-width:520px;line-height:1.8;margin-bottom:44px;font-weight:300}
-.hero-btns{display:flex;gap:16px;align-items:center}
-.btn-primary{background:var(--blue);color:#fff;padding:14px 32px;font-size:14px;font-weight:600;text-decoration:none;border-radius:4px;letter-spacing:0.01em;transition:opacity .15s}
-.btn-primary:hover{opacity:0.85}
-.btn-link{color:var(--dark);font-size:14px;font-weight:500;text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;transition:border-color .15s}
-.btn-link:hover{border-color:var(--dark)}
+.wrap{padding:120px 6%;}
+.label{font-size:0.7rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--primary);margin-bottom:20px;display:block;}
+.title{font-size:clamp(2.2rem,4.5vw,4rem);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:20px;}
+.sub{font-size:1rem;color:var(--muted);max-width:480px;line-height:1.8;font-weight:300;}
 
-/* DROP ZONE */
-.drop-zone{margin-top:64px;background:var(--white);border:1px solid var(--line);border-radius:8px;padding:48px;text-align:center}
-.drop-inner{border:2px dashed var(--line);border-radius:6px;padding:48px;transition:border-color .15s}
-.drop-inner:hover{border-color:var(--blue)}
-.drop-icon{font-size:32px;margin-bottom:16px;display:block}
-.drop-text{font-size:16px;font-weight:500;color:var(--dark);margin-bottom:8px}
-.drop-sub{font-size:13px;color:var(--light)}
-.drop-formats{display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap}
-.fmt-badge{font-size:11px;font-weight:600;color:var(--mid);background:var(--bg);border:1px solid var(--line);padding:4px 12px;border-radius:3px;letter-spacing:0.04em}
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);margin-top:72px;}
+.tool{background:var(--bg);padding:48px 36px;transition:background 0.3s;}
+.tool:hover{background:var(--surface);}
+.tool-icon{font-size:2rem;margin-bottom:20px;display:block;}
+.tool-title{font-size:1rem;font-weight:700;letter-spacing:-0.2px;margin-bottom:10px;}
+.tool-desc{font-size:0.85rem;color:var(--muted);line-height:1.75;}
 
-/* DIVIDER */
-.editorial-divider{height:1px;background:var(--line);margin:0}
-.section-num{font-size:11px;font-weight:600;letter-spacing:0.15em;color:var(--light);font-family:'Inter',sans-serif}
+.formats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;background:var(--border);margin-top:72px;}
+.fmt{background:var(--bg);padding:28px 16px;text-align:center;transition:background 0.3s;}
+.fmt:hover{background:var(--surface);}
+.fmt-name{font-size:0.75rem;font-weight:700;color:var(--text);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.fmt-desc{font-size:0.68rem;color:var(--muted);}
 
-/* SECTIONS */
-.section{padding:100px 0;border-top:1px solid var(--line)}
-.section-header{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:start;margin-bottom:64px}
-.section-numeral{font-family:'Playfair Display',serif;font-size:80px;font-weight:800;color:var(--line);line-height:1;flex-shrink:0;user-select:none}
-.section-title-block{}
-.section-tag{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--blue);margin-bottom:12px}
-.section-title{font-family:'Playfair Display',serif;font-size:clamp(32px,3.5vw,52px);font-weight:800;letter-spacing:-0.5px;line-height:1.1;margin-bottom:16px}
-.section-sub{font-size:16px;color:var(--mid);max-width:500px;line-height:1.8;font-weight:300}
-
-/* TOOLS GRID */
-.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line)}
-.tool-card{padding:32px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);position:relative;transition:background .15s}
-.tool-card:hover{background:var(--white)}
-.tool-card:nth-child(3n){border-right:none}
-.tool-card:nth-last-child(-n+3){border-bottom:none}
-.tool-icon{font-size:22px;margin-bottom:14px;display:block}
-.tool-title{font-size:15px;font-weight:600;color:var(--dark);margin-bottom:8px}
-.tool-desc{font-size:13px;color:var(--mid);line-height:1.6}
-.tool-badge{position:absolute;top:16px;right:16px;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:3px 10px;border-radius:3px}
-.tool-badge.free{background:var(--blue-light);color:var(--blue)}
-.tool-badge.pro{background:#FFF3E0;color:#E65100}
-
-/* HOW IT WORKS */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:60px;margin-top:0}
-.step-num{font-family:'Playfair Display',serif;font-size:52px;font-weight:800;color:var(--blue);line-height:1;margin-bottom:16px}
-.step-title{font-size:16px;font-weight:600;color:var(--dark);margin-bottom:10px}
-.step-desc{font-size:14px;color:var(--mid);line-height:1.7}
-
-/* PRICING */
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line)}
-.price-card{padding:40px;border-right:1px solid var(--line);position:relative}
-.price-card:last-child{border-right:none}
-.price-card.featured{background:var(--dark)}
-.price-name{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--light);margin-bottom:20px}
-.price-card.featured .price-name{color:rgba(255,255,255,0.4)}
-.price-amount{font-family:'Playfair Display',serif;font-size:56px;font-weight:800;color:var(--dark);letter-spacing:-2px;line-height:1}
-.price-card.featured .price-amount{color:#fff}
-.price-period{font-size:13px;color:var(--light);margin-top:8px;margin-bottom:28px}
-.price-card.featured .price-period{color:rgba(255,255,255,0.4)}
-.price-divider{height:1px;background:var(--line);margin-bottom:24px}
-.price-card.featured .price-divider{background:rgba(255,255,255,0.1)}
-.price-features{list-style:none;margin-bottom:32px}
-.price-features li{font-size:13px;color:var(--mid);padding:8px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
-.price-card.featured .price-features li{color:rgba(255,255,255,0.7);border-bottom-color:rgba(255,255,255,0.08)}
-.price-features li:last-child{border:none}
-.price-features li::before{content:'';width:5px;height:5px;background:var(--blue);flex-shrink:0;border-radius:50%}
-.price-features li.off{opacity:0.3}
-.price-features li.off::before{background:var(--light)}
-.price-btn{display:block;text-align:center;padding:13px;font-size:13px;font-weight:600;text-decoration:none;border:1px solid var(--line);color:var(--dark);border-radius:4px;transition:all .15s}
-.price-btn:hover{background:var(--dark);color:#fff;border-color:var(--dark)}
-.price-card.featured .price-btn{background:var(--blue);border-color:var(--blue);color:#fff}
-.price-card.featured .price-btn:hover{opacity:0.85}
-.featured-label{position:absolute;top:0;left:0;right:0;background:var(--blue);color:#fff;text-align:center;font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:8px}
-.price-card.featured{padding-top:52px}
-
-/* CTA */
-.cta-section{padding:100px 0;border-top:1px solid var(--line)}
-.cta-inner{display:grid;grid-template-columns:1fr auto;gap:60px;align-items:center}
-.cta-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:var(--blue);margin-bottom:16px}
-.cta-title{font-family:'Playfair Display',serif;font-size:clamp(36px,4vw,56px);font-weight:800;letter-spacing:-1px;line-height:1.1;margin-bottom:16px}
-.cta-sub{font-size:15px;color:var(--mid);line-height:1.8;font-weight:300}
-.cta-btn{background:var(--blue);color:#fff;padding:16px 36px;font-size:14px;font-weight:600;text-decoration:none;border-radius:4px;white-space:nowrap;flex-shrink:0;transition:opacity .15s}
-.cta-btn:hover{opacity:0.85}
-
-/* FOOTER */
-footer{border-top:1px solid var(--line);padding:40px 0}
-.footer-inner{display:flex;justify-content:space-between;align-items:center}
-.footer-logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--dark);text-decoration:none;display:flex;align-items:center;gap:8px}
-.footer-links{display:flex;gap:28px}
-.footer-links a{font-size:12px;color:var(--light);text-decoration:none;letter-spacing:0.04em;transition:color .15s}
-.footer-links a:hover{color:var(--dark)}
-.footer-copy{font-size:12px;color:var(--light)}
-
-@media(max-width:900px){
-  nav{padding:0 24px}
-  .container{padding:0 24px}
-  .section-header{grid-template-columns:1fr;gap:8px}
-  .section-numeral{font-size:48px}
-  .tools-grid{grid-template-columns:1fr 1fr}
-  .steps{grid-template-columns:1fr}
-  .pricing-grid{grid-template-columns:1fr;border:none}
-  .price-card{border-right:none;border-bottom:1px solid var(--line);border:1px solid var(--line);margin-bottom:16px}
-  .cta-inner{grid-template-columns:1fr}
-  .footer-inner{flex-direction:column;gap:20px;text-align:center}
-}
-@media(max-width:600px){
-  .tools-grid{grid-template-columns:1fr}
-}
+.cta{padding:140px 6%;text-align:center;border-top:1px solid var(--border);position:relative;overflow:hidden;}
+.cta::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,var(--glow),transparent 70%);pointer-events:none;}
+.cta h2{font-size:clamp(2.5rem,6vw,5.5rem);font-weight:800;letter-spacing:-2.5px;line-height:1.05;margin-bottom:20px;background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,0.4) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.cta p{font-size:1rem;color:var(--muted);margin-bottom:44px;font-weight:300;}
+footer{border-top:1px solid var(--border);padding:36px 6%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+.f-l{font-size:0.8rem;color:var(--dim);}
+.f-l a{color:var(--dim);text-decoration:none;}
+.f-r{display:flex;gap:24px;}
+.f-r a{font-size:0.8rem;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.f-r a:hover{color:var(--text);}
+@media(max-width:768px){.nav-links{display:none;}.hero{grid-template-columns:1fr;}.hero-right{display:none;}.stats{grid-template-columns:repeat(2,1fr);}.stat:nth-child(2){border-right:none;}.stat:nth-child(3){border-right:1px solid var(--border);}.tools-grid{grid-template-columns:1fr;}.formats-grid{grid-template-columns:repeat(3,1fr);}footer{flex-direction:column;text-align:center;}}
 </style>
 </head>
 <body>
-
 <nav>
-  <a href="#" class="nav-logo">
-    <span class="nav-logo-icon">📄</span>
-    <span class="nav-logo-text">Filio</span>
-  </a>
+  <a href="#" class="nav-logo">Filio</a>
   <div class="nav-links">
     <a href="#tools">Tools</a>
-    <a href="#how">How it works</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#pricing" class="nav-cta">Get Started Free</a>
+    <a href="#formats">Formats</a>
+    <a href="https://priscadezigns.org">Prisca Dezigns</a>
   </div>
+  <a href="https://wa.me/18683424101?text=Hi!%20I'd%20like%20to%20know%20more%20about%20Filio" class="nav-cta">Get access</a>
 </nav>
 
 <section class="hero">
-  <div class="container">
-    <div class="hero-eyebrow">Now live — no account needed to try</div>
-    <h1>Documents done.<br/>Your way, <em>instantly.</em></h1>
-    <p>Convert, merge, edit, analyse — Word and Excel files handled in seconds. No installs. No confusion. Just results.</p>
-    <div class="hero-btns">
-      <a href="#pricing" class="btn-primary">Start for Free →</a>
-      <a href="#how" class="btn-link">See how it works</a>
+  <div class="hero-left">
+    <div class="hero-tag">Document Tools</div>
+    <h1>Documents.<br/>Done<br/>instantly.</h1>
+    <p>Edit, convert, merge, split and analyse your Word and Excel files in seconds. No installs. No subscriptions for the basics. Just results.</p>
+    <div class="hero-actions">
+      <a href="https://wa.me/18683424101?text=Hi!%20I'd%20like%20to%20know%20more%20about%20Filio" class="btn-p">Get access →</a>
+      <a href="#tools" class="btn-g">See tools</a>
     </div>
-
-    <div class="drop-zone">
-      <div class="drop-inner">
-        <span class="drop-icon">📂</span>
-        <div class="drop-text">Drop your file here, or click to browse</div>
-        <div class="drop-sub">We'll figure out what you can do with it</div>
-        <div class="drop-formats">
-          <span class="fmt-badge">.docx</span>
-          <span class="fmt-badge">.xlsx</span>
-          <span class="fmt-badge">.xls</span>
-          <span class="fmt-badge">.doc</span>
-          <span class="fmt-badge">.csv</span>
-          <span class="fmt-badge">.pdf</span>
-        </div>
-      </div>
+  </div>
+  <div class="hero-right">
+    <div class="doc-stack">
+      <div class="doc-card"><span class="doc-icon">📄</span><div class="doc-info"><div class="doc-name">Report_Final.docx</div><div class="doc-type">Word Document → PDF</div></div><span class="doc-arrow">→</span></div>
+      <div class="doc-card"><span class="doc-icon">📊</span><div class="doc-info"><div class="doc-name">Sales_Q1.xlsx</div><div class="doc-type">Excel → Analysis</div></div><span class="doc-arrow">→</span></div>
+      <div class="doc-card"><span class="doc-icon">📑</span><div class="doc-info"><div class="doc-name">Contract_v3.pdf</div><div class="doc-type">Merge + Sign</div></div><span class="doc-arrow">→</span></div>
+      <div class="doc-card"><span class="doc-icon">📋</span><div class="doc-info"><div class="doc-name">Invoice_Bundle.pdf</div><div class="doc-type">Split into pages</div></div><span class="doc-arrow">→</span></div>
     </div>
   </div>
 </section>
 
-<section class="section" id="tools">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-numeral">01</div>
-      <div class="section-title-block">
-        <div class="section-tag">What Filio does</div>
-        <h2 class="section-title">Every document tool<br/>in one place</h2>
-        <p class="section-sub">Built for the work you actually do — not the edge cases textbooks cover.</p>
-      </div>
-    </div>
-    <div class="tools-grid">
-      <div class="tool-card">
-        <div class="tool-badge free">Free</div>
-        <span class="tool-icon">🔄</span>
-        <div class="tool-title">Convert Formats</div>
-        <div class="tool-desc">Word → PDF, Excel → CSV, PDF → Word. Instant, clean output with formatting preserved.</div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-badge free">Free</div>
-        <span class="tool-icon">🔗</span>
-        <div class="tool-title">Merge Documents</div>
-        <div class="tool-desc">Combine multiple Word or Excel files into one. Reorder pages, pick what to include.</div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-badge free">Free</div>
-        <span class="tool-icon">🖨️</span>
-        <div class="tool-title">Format for Print</div>
-        <div class="tool-desc">Set margins, page size, headers, footers. Get a pixel-perfect PDF ready for the printer.</div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-badge pro">Pro</div>
-        <span class="tool-icon">📊</span>
-        <div class="tool-title">Analyse Data</div>
-        <div class="tool-desc">Upload a spreadsheet and get instant summaries, totals, averages, and trend charts.</div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-badge free">Free</div>
-        <span class="tool-icon">✂️</span>
-        <div class="tool-title">Split Documents</div>
-        <div class="tool-desc">Extract specific pages, sheets, or sections from large files. Download only what you need.</div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-badge free">Free</div>
-        <span class="tool-icon">🔢</span>
-        <div class="tool-title">Number Conversion</div>
-        <div class="tool-desc">Convert currencies, units, date formats, numbering systems across your entire spreadsheet at once.</div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-badge pro">Pro</div>
-        <span class="tool-icon">📦</span>
-        <div class="tool-title">Batch Process</div>
-        <div class="tool-desc">Upload 20 files, apply the same operation to all of them, download as a zip. One click.</div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-badge pro">Pro</div>
-        <span class="tool-icon">🔍</span>
-        <div class="tool-title">Compare Files</div>
-        <div class="tool-desc">See exactly what changed between two versions of a Word doc or spreadsheet. Highlighted diffs.</div>
-      </div>
-      <div class="tool-card">
-        <div class="tool-badge free">Free</div>
-        <span class="tool-icon">🧹</span>
-        <div class="tool-title">Clean & Dedupe</div>
-        <div class="tool-desc">Remove duplicate rows, fix formatting, standardise column names. Your data, actually usable.</div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-top:none;margin-top:0">
-      <div style="padding:24px 28px;border-right:1px solid var(--line);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:800;color:var(--dark)">9+</div>
-        <div style="font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Document Tools</div>
-      </div>
-      <div style="padding:24px 28px;border-right:1px solid var(--line);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:800;color:var(--dark)">0</div>
-        <div style="font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Installs Required</div>
-      </div>
-      <div style="padding:24px 28px;border-right:1px solid var(--line);text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:800;color:var(--blue)">&lt;5s</div>
-        <div style="font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Avg Processing Time</div>
-      </div>
-      <div style="padding:24px 28px;text-align:center">
-        <div style="font-family:'Playfair Display',serif;font-size:36px;font-weight:800;color:var(--dark)">100%</div>
-        <div style="font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px">Private — Files Deleted</div>
-      </div>
-    </div>
-  </div>
-</section>
+<div class="stats">
+  <div class="stat"><span class="stat-n">10+</span><span class="stat-l">Document tools</span></div>
+  <div class="stat"><span class="stat-n">0</span><span class="stat-l">Installs needed</span></div>
+  <div class="stat"><span class="stat-n">5s</span><span class="stat-l">Average processing</span></div>
+  <div class="stat"><span class="stat-n">100%</span><span class="stat-l">Files deleted after use</span></div>
+</div>
 
-<section class="section" id="how">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-numeral">02</div>
-      <div class="section-title-block">
-        <div class="section-tag">How it works</div>
-        <h2 class="section-title">Three steps.<br/>That's literally it.</h2>
-      </div>
-    </div>
-    <div class="steps">
-      <div>
-        <div class="step-num">1</div>
-        <div class="step-title">Upload your file</div>
-        <div class="step-desc">Drag and drop or click to browse. Word, Excel, CSV, PDF — we take them all.</div>
-      </div>
-      <div>
-        <div class="step-num">2</div>
-        <div class="step-title">Pick your tool</div>
-        <div class="step-desc">Convert it, merge it, format it for print, analyse the data — you choose what happens next.</div>
-      </div>
-      <div>
-        <div class="step-num">3</div>
-        <div class="step-title">Download the result</div>
-        <div class="step-desc">Your processed file is ready instantly. We delete the original — your data stays yours.</div>
-      </div>
-    </div>
+<div class="wrap" id="tools">
+  <span class="label">Tools</span>
+  <h2 class="title">Everything<br/>your docs need.</h2>
+  <p class="sub">A full suite of document tools. No separate apps. No juggling tabs.</p>
+  <div class="tools-grid">
+    <div class="tool"><span class="tool-icon">🔄</span><div class="tool-title">Convert</div><p class="tool-desc">Word to PDF, Excel to CSV, PDF to Word. Any format, instant conversion.</p></div>
+    <div class="tool"><span class="tool-icon">✏️</span><div class="tool-title">Edit</div><p class="tool-desc">Edit Word and Excel files directly in your browser. No Microsoft Office needed.</p></div>
+    <div class="tool"><span class="tool-icon">🔗</span><div class="tool-title">Merge</div><p class="tool-desc">Combine multiple documents into one. PDFs, Word files, spreadsheets.</p></div>
+    <div class="tool"><span class="tool-icon">✂️</span><div class="tool-title">Split</div><p class="tool-desc">Extract specific pages or sheets from any document.</p></div>
+    <div class="tool"><span class="tool-icon">🔍</span><div class="tool-title">Analyse</div><p class="tool-desc">AI-powered document analysis. Summarise, extract data, find key info fast.</p></div>
+    <div class="tool"><span class="tool-icon">🔒</span><div class="tool-title">Secure</div><p class="tool-desc">Password-protect and encrypt your documents. Files deleted immediately after processing.</p></div>
   </div>
-</section>
+</div>
 
-<section class="section" id="pricing">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-numeral">03</div>
-      <div class="section-title-block">
-        <div class="section-tag">Pricing</div>
-        <h2 class="section-title">Start free.<br/>Scale when you're ready.</h2>
-        <p class="section-sub">No credit card needed to get started. Upgrade when you need more.</p>
-      </div>
-    </div>
-    <div class="pricing-grid">
-      <div class="price-card">
-        <div class="price-name">Free</div>
-        <div class="price-amount">$0</div>
-        <div class="price-period">forever</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>3 files per day</li>
-          <li>Convert (Word, Excel, PDF, CSV)</li>
-          <li>Merge up to 3 files</li>
-          <li>Split documents</li>
-          <li>Format for print</li>
-          <li>Number conversion</li>
-          <li>Max 5MB per file</li>
-          <li class="off">Data analysis &amp; charts</li>
-          <li class="off">Batch processing</li>
-          <li class="off">File comparison</li>
-        </ul>
-        <a href="#" class="price-btn">Get Started Free</a>
-      </div>
-      <div class="price-card featured">
-        <div class="featured-label">Most Popular</div>
-        <div class="price-name">Pro</div>
-        <div class="price-amount">$9</div>
-        <div class="price-period">per month</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>Unlimited files</li>
-          <li>All Free tools</li>
-          <li>Data analysis &amp; charts</li>
-          <li>Batch processing (20 files)</li>
-          <li>File comparison &amp; diff</li>
-          <li>Clean &amp; deduplicate data</li>
-          <li>Max 50MB per file</li>
-          <li>Priority processing</li>
-          <li class="off">API access</li>
-          <li class="off">Team sharing</li>
-        </ul>
-        <a href="#" class="price-btn">Start Pro — $9/mo</a>
-      </div>
-      <div class="price-card">
-        <div class="price-name">Business</div>
-        <div class="price-amount">$29</div>
-        <div class="price-period">per month</div>
-        <div class="price-divider"></div>
-        <ul class="price-features">
-          <li>Everything in Pro</li>
-          <li>API access</li>
-          <li>Team sharing (5 seats)</li>
-          <li>Batch up to 100 files</li>
-          <li>Max 200MB per file</li>
-          <li>Custom print templates</li>
-          <li>Usage analytics</li>
-          <li>Priority support</li>
-          <li>SLA guarantee</li>
-          <li>Custom branding on exports</li>
-        </ul>
-        <a href="#" class="price-btn">Start Business — $29/mo</a>
-      </div>
-    </div>
+<div class="wrap" id="formats" style="border-top:1px solid var(--border);">
+  <span class="label">Formats</span>
+  <h2 class="title">Works with<br/>everything.</h2>
+  <p class="sub">All major document formats. If you've got it, Filio handles it.</p>
+  <div class="formats-grid">
+    <div class="fmt"><div class="fmt-name">PDF</div><div class="fmt-desc">Read, edit, merge</div></div>
+    <div class="fmt"><div class="fmt-name">DOCX</div><div class="fmt-desc">Word documents</div></div>
+    <div class="fmt"><div class="fmt-name">XLSX</div><div class="fmt-desc">Excel sheets</div></div>
+    <div class="fmt"><div class="fmt-name">CSV</div><div class="fmt-desc">Data files</div></div>
+    <div class="fmt"><div class="fmt-name">PPTX</div><div class="fmt-desc">Presentations</div></div>
+    <div class="fmt"><div class="fmt-name">TXT</div><div class="fmt-desc">Plain text</div></div>
   </div>
-</section>
+</div>
 
-<section class="cta-section">
-  <div class="container">
-    <div class="cta-inner">
-      <div>
-        <div class="cta-eyebrow">📄 Ready to start</div>
-        <div class="cta-title">Ready to stop fighting<br/>with your documents?</div>
-        <div class="cta-sub">Free to start. No credit card. No installs.<br/>Just upload and go.</div>
-      </div>
-      <a href="#pricing" class="cta-btn">Upload Your First File →</a>
-    </div>
-  </div>
+<section class="cta">
+  <h2>Your documents.<br/>Finally under control.</h2>
+  <p>Get access to Filio and stop wrestling with your files.</p>
+  <a href="https://wa.me/18683424101?text=Hi!%20I'd%20like%20to%20get%20access%20to%20Filio" class="btn-p">Get access →</a>
 </section>
 
 <footer>
-  <div class="container">
-    <div class="footer-inner">
-      <a href="#" class="footer-logo">
-        <span>📄</span>
-        <span>Filio</span>
-      </a>
-      <div class="footer-links">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Contact</a>
-      </div>
-      <div class="footer-copy">© 2026 Filio. All files deleted after processing.</div>
-    </div>
+  <div class="f-l">© 2026 Filio · A <a href="https://priscadezigns.org">Prisca Dezigns</a> brand</div>
+  <div class="f-r">
+    <a href="#tools">Tools</a>
+    <a href="#formats">Formats</a>
+    <a href="https://wa.me/18683424101">WhatsApp</a>
   </div>
 </footer>
-
 </body>
 </html>
