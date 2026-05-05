@@ -4,413 +4,187 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Veelo — Know Where Your Vehicle Is. Always.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<meta name="description" content="Real-time vehicle tracking for personal and business use. Know where your car is, where it's been, and get instant alerts — from your phone."/>
+<meta property="og:title" content="Veelo — Vehicle GPS Tracking"/>
+<meta property="og:url" content="https://priscadezigns.org/veelo/"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#0A0A0A;
-  --card:#111111;
-  --border:#1E1E1E;
-  --text:#FFFFFF;
-  --muted:#888888;
-  --accent:#FF3B00;
-  --dim:#444444;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#000;--surface:#080808;--border:rgba(255,255,255,0.07);--primary:#00C6FF;--glow:rgba(0,198,255,0.1);--text:#f5f5f7;--muted:#86868b;--dim:#3d3d3f;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(0,0,0,0.75);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid var(--border);}
+.nav-logo{font-size:1.05rem;font-weight:700;color:var(--text);text-decoration:none;letter-spacing:-0.3px;}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{font-size:0.78rem;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+.nav-links a:hover{color:var(--text);}
+.nav-cta{font-size:0.78rem;font-weight:500;color:#000;background:var(--primary);padding:7px 18px;border-radius:980px;text-decoration:none;transition:opacity 0.2s;}
+.nav-cta:hover{opacity:0.85;}
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:var(--bg);border-bottom:1px solid var(--border)}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.nav-logo-dot{width:8px;height:8px;background:var(--accent);display:inline-block}
-.nav-logo-text{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
-.nav-links{display:flex;align-items:center;gap:32px}
-.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:0.02em;text-transform:uppercase;transition:color .15s}
-.nav-links a:hover{color:var(--text)}
-.nav-cta{background:var(--accent);color:#fff;padding:8px 20px;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:0.02em;text-transform:uppercase;transition:opacity .15s}
-.nav-cta:hover{opacity:0.85}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:130px 24px 80px;position:relative;overflow:hidden;}
+.hero-map{position:absolute;inset:0;background:radial-gradient(ellipse 90% 60% at 50% 60%,var(--glow),transparent 65%);pointer-events:none;}
+.map-grid{position:absolute;inset:0;opacity:0.03;background-image:linear-gradient(var(--primary) 1px,transparent 1px),linear-gradient(90deg,var(--primary) 1px,transparent 1px);background-size:60px 60px;}
+.ping{position:absolute;top:42%;left:55%;width:12px;height:12px;}
+.ping::before,.ping::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--primary);}
+.ping::before{animation:ping 2s ease-out infinite;}
+.ping::after{width:6px;height:6px;top:3px;left:3px;}
+@keyframes ping{0%{transform:scale(1);opacity:0.8;}100%{transform:scale(4);opacity:0;}}
+.hero-tag{display:inline-block;font-size:0.72rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--primary);border:1px solid rgba(0,198,255,0.2);padding:5px 14px;border-radius:980px;margin-bottom:28px;position:relative;z-index:1;}
+.hero h1{font-size:clamp(3rem,8vw,7.5rem);font-weight:800;line-height:0.95;letter-spacing:-3.5px;margin-bottom:28px;position:relative;z-index:1;background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,0.4) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero p{font-size:clamp(1rem,2vw,1.2rem);color:var(--muted);max-width:500px;line-height:1.8;margin-bottom:48px;font-weight:300;position:relative;z-index:1;}
+.hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;}
+.btn-p{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#000;font-size:0.88rem;font-weight:700;padding:14px 30px;border-radius:980px;text-decoration:none;transition:all 0.2s;}
+.btn-p:hover{opacity:0.85;transform:translateY(-1px);}
+.btn-g{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);font-size:0.88rem;font-weight:500;padding:14px 30px;border-radius:980px;border:1px solid var(--border);text-decoration:none;transition:all 0.2s;}
+.btn-g:hover{border-color:rgba(255,255,255,0.2);}
 
-/* GRID SYSTEM */
-.container{max-width:1200px;margin:0 auto;padding:0 40px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stat{padding:44px 4%;text-align:center;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-n{font-size:2.5rem;font-weight:800;letter-spacing:-2px;color:var(--text);display:block;line-height:1;margin-bottom:6px;}
+.stat-l{font-size:0.75rem;color:var(--muted);}
 
-/* HERO */
-.hero{padding-top:140px;padding-bottom:100px;border-bottom:1px solid var(--border)}
-.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-.hero-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:24px;border:1px solid var(--accent);padding:6px 14px}
-.hero h1{font-size:clamp(48px,5vw,72px);font-weight:900;line-height:1.0;letter-spacing:-2px;color:var(--text);margin-bottom:24px}
-.hero h1 span{color:var(--accent)}
-.hero p{font-size:17px;color:var(--muted);line-height:1.7;margin-bottom:36px;max-width:440px}
-.hero-btns{display:flex;gap:16px;align-items:center}
-.btn-primary{background:var(--accent);color:#fff;padding:14px 28px;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;transition:opacity .15s}
-.btn-primary:hover{opacity:0.85}
-.btn-secondary{color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;border-bottom:1px solid var(--dim);padding-bottom:2px;transition:color .15s,border-color .15s}
-.btn-secondary:hover{color:var(--text);border-color:var(--text)}
+.wrap{padding:120px 6%;}
+.label{font-size:0.7rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--primary);margin-bottom:20px;display:block;}
+.title{font-size:clamp(2.2rem,4.5vw,4rem);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:20px;}
+.sub{font-size:1rem;color:var(--muted);max-width:480px;line-height:1.8;font-weight:300;}
 
-/* MOCK CARD */
-.hero-card{background:var(--card);border:1px solid var(--border);padding:24px}
-.hc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.hc-title{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
-.hc-live{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--accent)}
-.hc-live::before{content:'';width:6px;height:6px;background:var(--accent);display:block;border-radius:50%}
-.hc-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
-.hc-stat{background:var(--card);padding:16px;text-align:center}
-.hc-stat-val{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-1px}
-.hc-stat-label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-top:4px}
-.hc-location{margin-top:16px;padding:14px;background:var(--bg);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.hc-loc-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim)}
-.hc-loc-val{font-size:13px;font-weight:600;color:var(--text)}
-.hc-update{font-size:10px;color:var(--dim);text-align:right;margin-top:10px;letter-spacing:0.05em}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);margin-top:72px;}
+.feat{background:var(--bg);padding:48px 36px;transition:background 0.3s;}
+.feat:hover{background:var(--surface);}
+.feat-icon{font-size:1.8rem;margin-bottom:20px;display:block;}
+.feat-title{font-size:1rem;font-weight:700;letter-spacing:-0.2px;margin-bottom:10px;}
+.feat-desc{font-size:0.85rem;color:var(--muted);line-height:1.75;}
 
-/* STATS BAR */
-.stats-bar{border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr)}
-.stat-item{padding:32px 40px;border-right:1px solid var(--border)}
-.stat-item:last-child{border-right:none}
-.stat-num{font-size:36px;font-weight:900;letter-spacing:-2px;color:var(--text)}
-.stat-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);margin-top:4px}
+.plans-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:var(--border);margin-top:72px;}
+.plan{background:var(--bg);padding:52px 44px;transition:background 0.3s;}
+.plan:hover,.plan.feat{background:var(--surface);}
+.plan-tag{font-size:0.68rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--primary);margin-bottom:16px;display:block;}
+.plan-name{font-size:1.5rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;}
+.plan-price{font-size:3.5rem;font-weight:800;letter-spacing:-2px;line-height:1;margin-bottom:6px;}
+.plan-price span{font-size:1.1rem;font-weight:400;color:var(--muted);vertical-align:super;}
+.plan-billing{font-size:0.8rem;color:var(--muted);margin-bottom:32px;}
+.plan-div{height:1px;background:var(--border);margin-bottom:28px;}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:36px;}
+.plan ul li{font-size:0.85rem;color:var(--muted);display:flex;gap:10px;}
+.plan ul li::before{content:'—';color:var(--dim);}
+.plan-btn{display:block;text-align:center;padding:14px;border-radius:980px;font-size:0.88rem;font-weight:600;text-decoration:none;transition:all 0.2s;}
+.plan-btn.solid{background:var(--primary);color:#000;}
+.plan-btn.solid:hover{opacity:0.85;}
+.plan-btn.out{border:1px solid var(--border);color:var(--text);}
+.plan-btn.out:hover{border-color:rgba(255,255,255,0.2);}
 
-/* SECTION */
-.section{padding:100px 0;border-bottom:1px solid var(--border)}
-.section-tag{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
-.section-title{font-size:clamp(32px,3.5vw,48px);font-weight:900;letter-spacing:-1.5px;line-height:1.05;margin-bottom:16px}
-.section-sub{font-size:16px;color:var(--muted);max-width:500px;line-height:1.7}
-
-/* FEATURES GRID */
-.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:60px}
-.feat-card{background:var(--card);padding:32px;transition:background .15s}
-.feat-card:hover{background:#161616}
-.feat-icon{font-size:20px;margin-bottom:16px;display:block}
-.feat-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:-0.2px}
-.feat-desc{font-size:13px;color:var(--muted);line-height:1.6}
-
-/* WHO IT'S FOR */
-.who-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);margin-top:60px}
-.who-card{background:var(--card);padding:40px}
-.who-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);padding:4px 12px;margin-bottom:16px}
-.who-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.5px}
-.who-sub{font-size:13px;color:var(--dim);margin-bottom:24px}
-.who-list{list-style:none}
-.who-list li{font-size:13px;color:var(--muted);padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.who-list li:last-child{border:none}
-.who-list li::before{content:'→';color:var(--accent);font-size:11px;font-weight:700;flex-shrink:0}
-
-/* PRICING */
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:60px}
-.price-card{background:var(--card);padding:36px;position:relative}
-.price-card.featured{background:#131313}
-.price-card.featured::before{content:'MOST POPULAR';position:absolute;top:0;left:0;right:0;background:var(--accent);color:#fff;text-align:center;font-size:10px;font-weight:700;letter-spacing:0.1em;padding:6px 0}
-.price-card.featured{padding-top:48px}
-.price-name{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-bottom:16px}
-.price-amount{font-size:48px;font-weight:900;letter-spacing:-2px;color:var(--text);line-height:1}
-.price-period{font-size:13px;color:var(--dim);font-weight:500;margin-top:6px;margin-bottom:28px}
-.price-features{list-style:none;margin-bottom:32px}
-.price-features li{font-size:13px;color:var(--muted);padding:9px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
-.price-features li:last-child{border:none}
-.price-features li::before{content:'✓';color:var(--accent);font-weight:700;font-size:11px;flex-shrink:0}
-.price-features li.off{opacity:0.35}
-.price-features li.off::before{content:'—';color:var(--dim)}
-.price-btn{display:block;text-align:center;padding:12px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:1px solid var(--border);color:var(--muted);transition:all .15s}
-.price-btn:hover{border-color:var(--text);color:var(--text)}
-.price-card.featured .price-btn{background:var(--accent);border-color:var(--accent);color:#fff}
-.price-card.featured .price-btn:hover{opacity:0.85}
-
-/* CTA */
-.cta-section{padding:100px 0}
-.cta-inner{display:grid;grid-template-columns:1fr auto;align-items:center;gap:60px;padding:60px;background:var(--card);border:1px solid var(--border)}
-.cta-icon{font-size:24px;margin-bottom:8px}
-.cta-title{font-size:clamp(28px,3vw,40px);font-weight:900;letter-spacing:-1.5px;line-height:1.1;margin-bottom:12px}
-.cta-sub{font-size:15px;color:var(--muted)}
-.cta-btn{background:var(--accent);color:#fff;padding:16px 32px;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;transition:opacity .15s}
-.cta-btn:hover{opacity:0.85}
-
-/* FOOTER */
-footer{border-top:1px solid var(--border);padding:32px 0}
-.footer-inner{display:flex;justify-content:space-between;align-items:center}
-.footer-logo{display:flex;align-items:center;gap:8px}
-.footer-logo-dot{width:6px;height:6px;background:var(--accent);display:inline-block}
-.footer-logo-text{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-0.3px}
-.footer-links{display:flex;gap:24px}
-.footer-links a{font-size:12px;color:var(--dim);text-decoration:none;text-transform:uppercase;letter-spacing:0.08em;transition:color .15s}
-.footer-links a:hover{color:var(--muted)}
-.footer-copy{font-size:12px;color:var(--dim);letter-spacing:0.02em}
-
-@media(max-width:900px){
-  nav{padding:0 20px}
-  .nav-links{display:none}
-  .container{padding:0 20px}
-  .hero{padding-top:100px;padding-bottom:60px}
-  .hero-inner{grid-template-columns:1fr;gap:40px}
-  .stats-bar{grid-template-columns:1fr 1fr}
-  .stat-item{padding:24px 20px}
-  .features-grid{grid-template-columns:1fr 1fr}
-  .who-grid{grid-template-columns:1fr}
-  .pricing-grid{grid-template-columns:1fr}
-  .cta-inner{grid-template-columns:1fr;gap:32px}
-  .footer-inner{flex-direction:column;gap:16px;text-align:center}
-}
-@media(max-width:600px){
-  .features-grid{grid-template-columns:1fr}
-  .stats-bar{grid-template-columns:1fr 1fr}
-}
+.cta{padding:140px 6%;text-align:center;border-top:1px solid var(--border);position:relative;overflow:hidden;}
+.cta::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,var(--glow),transparent 70%);pointer-events:none;}
+.cta h2{font-size:clamp(2.5rem,6vw,5.5rem);font-weight:800;letter-spacing:-2.5px;line-height:1.05;margin-bottom:20px;background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,0.4) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.cta p{font-size:1rem;color:var(--muted);margin-bottom:44px;font-weight:300;}
+footer{border-top:1px solid var(--border);padding:36px 6%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+.f-l{font-size:0.8rem;color:var(--dim);}
+.f-l a{color:var(--dim);text-decoration:none;}
+.f-r{display:flex;gap:24px;}
+.f-r a{font-size:0.8rem;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.f-r a:hover{color:var(--text);}
+@media(max-width:768px){.nav-links{display:none;}.stats{grid-template-columns:repeat(2,1fr);}.stat:nth-child(2){border-right:none;}.stat:nth-child(3){border-right:1px solid var(--border);border-top:1px solid var(--border);}.stat:nth-child(4){border-top:1px solid var(--border);border-right:none;}.feat-grid{grid-template-columns:1fr;}.plans-grid{grid-template-columns:1fr;}footer{flex-direction:column;text-align:center;}}
 </style>
 </head>
 <body>
-
 <nav>
-  <a href="#" class="nav-logo">
-    <span class="nav-logo-dot"></span>
-    <span class="nav-logo-text">Veelo</span>
-  </a>
+  <a href="#" class="nav-logo">Veelo</a>
   <div class="nav-links">
     <a href="#features">Features</a>
     <a href="#pricing">Pricing</a>
-    <a href="#pricing" class="nav-cta">Track Free →</a>
+    <a href="https://priscadezigns.org">Prisca Dezigns</a>
   </div>
+  <a href="https://wa.me/18683424101?text=Hi!%20I'd%20like%20to%20know%20more%20about%20Veelo" class="nav-cta">Get started</a>
 </nav>
 
 <section class="hero">
-  <div class="container">
-    <div class="hero-inner">
-      <div>
-        <div class="hero-tag">📍 Live GPS Tracking</div>
-        <h1>Know where<br/>your vehicle<br/>is. <span>Always.</span></h1>
-        <p>Real-time GPS tracking for your car, fleet, or family. Get instant alerts, view history, and stay in control — from anywhere.</p>
-        <div class="hero-btns">
-          <a href="#pricing" class="btn-primary">Start Tracking Free →</a>
-          <a href="#features" class="btn-secondary">See Features</a>
-        </div>
-      </div>
-      <div class="hero-card">
-        <div class="hc-header">
-          <span class="hc-title">My Vehicles</span>
-          <span class="hc-live">Live</span>
-        </div>
-        <div class="hc-stats">
-          <div class="hc-stat">
-            <div class="hc-stat-val">47</div>
-            <div class="hc-stat-label">km/h Speed</div>
-          </div>
-          <div class="hc-stat">
-            <div class="hc-stat-val">2.4</div>
-            <div class="hc-stat-label">km From Home</div>
-          </div>
-          <div class="hc-stat">
-            <div class="hc-stat-val">8:42</div>
-            <div class="hc-stat-label">Last Update</div>
-          </div>
-          <div class="hc-stat" style="border-left:2px solid var(--accent)">
-            <div class="hc-stat-val" style="color:var(--accent)">ON</div>
-            <div class="hc-stat-label">Engine</div>
-          </div>
-        </div>
-        <div class="hc-location">
-          <div>
-            <div class="hc-loc-label">Location</div>
-            <div class="hc-loc-val">Port of Spain</div>
-          </div>
-          <div style="font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.08em">Vehicle Moving →</div>
-        </div>
-        <div class="hc-update">Updated 10s ago</div>
-      </div>
-    </div>
+  <div class="hero-map"></div>
+  <div class="map-grid"></div>
+  <div class="ping"></div>
+  <div class="hero-tag">Vehicle GPS Tracking</div>
+  <h1>Know where<br/>it is.<br/>Always.</h1>
+  <p>Real-time vehicle tracking for personal and business fleets. Live location, trip history, instant theft alerts — all from your phone.</p>
+  <div class="hero-actions">
+    <a href="https://wa.me/18683424101?text=Hi!%20I'd%20like%20to%20know%20more%20about%20Veelo" class="btn-p">Get started →</a>
+    <a href="#features" class="btn-g">See features</a>
   </div>
 </section>
 
-<div class="stats-bar">
-  <div class="stat-item container" style="padding:32px 40px">
-    <div class="stat-num">10s</div>
-    <div class="stat-label">Location Update Interval</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">90d</div>
-    <div class="stat-label">Route History Stored</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num">24/7</div>
-    <div class="stat-label">Live Monitoring</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-num" style="color:var(--accent)">$0</div>
-    <div class="stat-label">To Start — No Hardware</div>
+<div class="stats">
+  <div class="stat"><span class="stat-n">Live</span><span class="stat-l">Real-time tracking</span></div>
+  <div class="stat"><span class="stat-n">30s</span><span class="stat-l">Alert response time</span></div>
+  <div class="stat"><span class="stat-n">90d</span><span class="stat-l">Trip history stored</span></div>
+  <div class="stat"><span class="stat-n">24/7</span><span class="stat-l">Monitoring</span></div>
+</div>
+
+<div class="wrap" id="features">
+  <span class="label">Features</span>
+  <h2 class="title">Total visibility.<br/>Total control.</h2>
+  <p class="sub">Everything you need to know where your vehicles are and what they're doing.</p>
+  <div class="feat-grid">
+    <div class="feat"><span class="feat-icon">📍</span><div class="feat-title">Live tracking</div><p class="feat-desc">See your vehicle's exact location in real-time, updated every 10 seconds.</p></div>
+    <div class="feat"><span class="feat-icon">🔔</span><div class="feat-title">Instant alerts</div><p class="feat-desc">Get notified immediately when your vehicle moves, leaves a zone, or is driven after hours.</p></div>
+    <div class="feat"><span class="feat-icon">🗺️</span><div class="feat-title">Trip history</div><p class="feat-desc">Full route playback for the last 90 days. See everywhere it's been.</p></div>
+    <div class="feat"><span class="feat-icon">🚧</span><div class="feat-title">Geofencing</div><p class="feat-desc">Draw zones on a map. Get alerted the moment your vehicle enters or exits.</p></div>
+    <div class="feat"><span class="feat-icon">🚗</span><div class="feat-title">Fleet management</div><p class="feat-desc">Track multiple vehicles from one dashboard. Driver reports, mileage, idle time.</p></div>
+    <div class="feat"><span class="feat-icon">🔋</span><div class="feat-title">Battery alerts</div><p class="feat-desc">Know when your tracker's battery is low before it becomes a problem.</p></div>
   </div>
 </div>
 
-<section class="section" id="features">
-  <div class="container">
-    <div class="section-tag">Features</div>
-    <h2 class="section-title">Everything you need.<br/>Nothing you don't.</h2>
-    <p class="section-sub">Built for real life — whether you're tracking your own car or managing a fleet of 50.</p>
-    <div class="features-grid">
-      <div class="feat-card">
-        <span class="feat-icon">🗺️</span>
-        <div class="feat-title">Live Map Tracking</div>
-        <div class="feat-desc">See your vehicle's exact location in real time. Updates every 10 seconds. Works anywhere with signal.</div>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">📜</span>
-        <div class="feat-title">Route History</div>
-        <div class="feat-desc">Replay every trip your vehicle made — where it went, how fast, how long it stopped. Up to 90 days back.</div>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">🔔</span>
-        <div class="feat-title">Instant Alerts</div>
-        <div class="feat-desc">Get notified the moment your car moves, leaves a zone, exceeds a speed limit, or arrives somewhere.</div>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">📍</span>
-        <div class="feat-title">Geofencing</div>
-        <div class="feat-desc">Draw a zone on the map — get an alert whenever your vehicle enters or exits it. Perfect for school runs.</div>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">📱</span>
-        <div class="feat-title">Phone or Device</div>
-        <div class="feat-desc">Use your phone as the tracker (free) or pair with a dedicated GPS device for always-on tracking.</div>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">👥</span>
-        <div class="feat-title">Share Live Location</div>
-        <div class="feat-desc">Share a live tracking link with family, clients, or dispatch — no app install needed on their end.</div>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">🚦</span>
-        <div class="feat-title">Speed Monitoring</div>
-        <div class="feat-desc">Set speed limits and get alerts when they're broken. Great for parents or monitoring new drivers.</div>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">🔋</span>
-        <div class="feat-title">Battery & Engine Status</div>
-        <div class="feat-desc">Know if the engine is on or off. Get low battery alerts for tracker devices. Always know the status.</div>
-      </div>
-      <div class="feat-card">
-        <span class="feat-icon">📊</span>
-        <div class="feat-title">Trip Reports</div>
-        <div class="feat-desc">Weekly summaries of mileage, trips, idle time and fuel estimates. Exportable for business use.</div>
-      </div>
+<div class="wrap" id="pricing" style="border-top:1px solid var(--border);">
+  <span class="label">Pricing</span>
+  <h2 class="title">Track more.<br/>Pay less.</h2>
+  <p class="sub">Simple monthly plans. No contracts. Cancel anytime.</p>
+  <div class="plans-grid">
+    <div class="plan">
+      <span class="plan-tag">Personal</span>
+      <div class="plan-name">Solo</div>
+      <div class="plan-price"><span>$</span>15</div>
+      <div class="plan-billing">per vehicle / month</div>
+      <div class="plan-div"></div>
+      <ul>
+        <li>1 vehicle</li>
+        <li>Real-time tracking</li>
+        <li>Trip history (30 days)</li>
+        <li>Theft alerts</li>
+        <li>Mobile app</li>
+      </ul>
+      <a href="https://wa.me/18683424101?text=Hi!%20I'm%20interested%20in%20Veelo%20Solo%20plan" class="plan-btn out">Get started →</a>
+    </div>
+    <div class="plan feat">
+      <span class="plan-tag">Business</span>
+      <div class="plan-name">Fleet</div>
+      <div class="plan-price"><span>$</span>12</div>
+      <div class="plan-billing">per vehicle / month (5+ vehicles)</div>
+      <div class="plan-div"></div>
+      <ul>
+        <li>Unlimited vehicles</li>
+        <li>Real-time tracking</li>
+        <li>Trip history (90 days)</li>
+        <li>Geofencing + alerts</li>
+        <li>Driver reports</li>
+        <li>Fleet dashboard</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="https://wa.me/18683424101?text=Hi!%20I'm%20interested%20in%20Veelo%20Fleet%20plan" class="plan-btn solid">Get started →</a>
     </div>
   </div>
-</section>
+</div>
 
-<section class="section">
-  <div class="container">
-    <div class="section-tag">Who It's For</div>
-    <h2 class="section-title">Personal or business —<br/>Veelo fits both.</h2>
-    <div class="who-grid">
-      <div class="who-card">
-        <div class="who-badge">Personal</div>
-        <div class="who-title">Peace of mind for<br/>you and your family</div>
-        <div class="who-sub">Track your own car from your phone</div>
-        <ul class="who-list">
-          <li>Track your own car from your phone</li>
-          <li>Know when your teen gets home safely</li>
-          <li>Get alerts if your car is moved without you</li>
-          <li>Replay where your car went last night</li>
-          <li>Share live location with family</li>
-          <li>Free for 1 vehicle — no hardware needed</li>
-        </ul>
-      </div>
-      <div class="who-card">
-        <div class="who-badge" style="color:var(--text);border-color:var(--text)">Business</div>
-        <div class="who-title">Full visibility over<br/>your entire fleet</div>
-        <div class="who-sub">Manage every vehicle from one dashboard</div>
-        <ul class="who-list">
-          <li>Track every vehicle on one dashboard</li>
-          <li>Assign drivers and monitor routes</li>
-          <li>Spot unauthorized use instantly</li>
-          <li>Automated trip reports for billing</li>
-          <li>Speed &amp; zone alerts for all drivers</li>
-          <li>Scale from 2 to 50+ vehicles</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="pricing">
-  <div class="container">
-    <div class="section-tag">Pricing</div>
-    <h2 class="section-title">Start free.<br/>Upgrade as you grow.</h2>
-    <div class="pricing-grid">
-      <div class="price-card">
-        <div class="price-name">Personal</div>
-        <div class="price-amount">$0</div>
-        <div class="price-period">forever free</div>
-        <ul class="price-features">
-          <li>1 vehicle</li>
-          <li>Live map tracking</li>
-          <li>24hr route history</li>
-          <li>Basic alerts (moved, parked)</li>
-          <li>Phone GPS mode</li>
-          <li class="off">Geofencing</li>
-          <li class="off">90-day history</li>
-          <li class="off">Trip reports</li>
-        </ul>
-        <a href="#" class="price-btn">Get Started Free</a>
-      </div>
-      <div class="price-card featured">
-        <div class="price-name">Pro</div>
-        <div class="price-amount">$5</div>
-        <div class="price-period">per month · up to 3 vehicles</div>
-        <ul class="price-features">
-          <li>Up to 3 vehicles</li>
-          <li>Live map tracking</li>
-          <li>90-day route history</li>
-          <li>All alert types</li>
-          <li>Geofencing (5 zones)</li>
-          <li>Speed monitoring</li>
-          <li>Share live location</li>
-          <li>Trip reports (weekly)</li>
-        </ul>
-        <a href="#" class="price-btn">Start Pro — $5/mo</a>
-      </div>
-      <div class="price-card">
-        <div class="price-name">Fleet</div>
-        <div class="price-amount">$15</div>
-        <div class="price-period">per month · unlimited vehicles</div>
-        <ul class="price-features">
-          <li>Unlimited vehicles</li>
-          <li>Everything in Pro</li>
-          <li>Driver assignment</li>
-          <li>Unlimited geofences</li>
-          <li>Export trip reports</li>
-          <li>Multi-user access</li>
-          <li>Device pairing support</li>
-          <li>Priority support</li>
-        </ul>
-        <a href="#" class="price-btn">Start Fleet — $15/mo</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="cta-section">
-  <div class="container">
-    <div class="cta-inner">
-      <div>
-        <div class="cta-icon">📍</div>
-        <div class="cta-title">Your vehicle is moving.<br/>Are you watching?</div>
-        <div class="cta-sub">Start tracking for free — no hardware, no credit card. Add a device when you're ready.</div>
-      </div>
-      <a href="#pricing" class="cta-btn">Track My Vehicle Free →</a>
-    </div>
-  </div>
+<section class="cta">
+  <h2>Your vehicle.<br/>Always found.</h2>
+  <p>Set up in minutes. Track from anywhere.</p>
+  <a href="https://wa.me/18683424101?text=Hi!%20I'd%20like%20to%20get%20started%20with%20Veelo" class="btn-p">Get started →</a>
 </section>
 
 <footer>
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-logo">
-        <span class="footer-logo-dot"></span>
-        <span class="footer-logo-text">Veelo</span>
-      </div>
-      <div class="footer-links">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Contact</a>
-      </div>
-      <div class="footer-copy">© 2026 Veelo. Built for the Caribbean.</div>
-    </div>
+  <div class="f-l">© 2026 Veelo · A <a href="https://priscadezigns.org">Prisca Dezigns</a> brand</div>
+  <div class="f-r">
+    <a href="#features">Features</a>
+    <a href="#pricing">Pricing</a>
+    <a href="https://wa.me/18683424101">WhatsApp</a>
   </div>
 </footer>
-
 </body>
 </html>
