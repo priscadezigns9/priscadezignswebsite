@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitalora — AI-Powered Clinic Management for the Caribbean</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #FFFFFF;
+    --alt: #F8FAFF;
+    --card: #FFFFFF;
+    --border: #E2E8F0;
+    --accent: #0D9488;
+    --accent-light: #14B8A6;
+    --accent-pale: rgba(13,148,136,0.08);
+    --secondary: #F59E0B;
+    --secondary-pale: rgba(245,158,11,0.1);
+    --text: #0F172A;
+    --muted: #64748B;
+    --shadow: 0 1px 12px rgba(15,23,42,0.06);
+    --shadow-md: 0 4px 24px rgba(15,23,42,0.09);
+    --shadow-lg: 0 12px 48px rgba(15,23,42,0.12);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 70px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.45rem; font-weight: 900; letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .nav-logo span.accent { color: var(--accent); }
+  .nav-links {
+    display: flex; align-items: center; gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.9rem; font-weight: 500;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, transform 0.1s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; }
+
+  /* HERO */
+  .hero-section {
+    background: var(--bg);
+    padding: 90px 5% 80px;
+  }
+  .hero {
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 64px; align-items: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent-pale);
+    border: 1px solid rgba(13,148,136,0.2);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 0.78rem; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .hero h1 .highlight { color: var(--accent); }
+  .hero p {
+    font-size: 1.08rem; color: var(--muted);
+    margin-bottom: 36px; line-height: 1.75;
+    max-width: 520px;
+  }
+  .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-stats {
+    display: flex; gap: 32px; margin-top: 36px; flex-wrap: wrap;
+  }
+  .hero-stat-val { font-size: 1.8rem; font-weight: 900; color: var(--accent); letter-spacing: -1px; }
+  .hero-stat-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; }
+
+  /* DASHBOARD MOCKUP */
+  .dashboard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .dash-header {
+    background: var(--accent);
+    padding: 16px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .dash-header-left { display: flex; align-items: center; gap: 12px; }
+  .dash-title { font-size: 0.88rem; font-weight: 700; color: rgba(255,255,255,0.95); }
+  .dash-date { font-size: 0.72rem; color: rgba(255,255,255,0.65); margin-top: 1px; }
+  .dash-live {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.15);
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .dash-live::before { content: '●'; font-size: 0.5rem; color: #86EFAC; }
+  .dash-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .dash-stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .dash-stat {
+    background: var(--alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .dash-stat-val { font-size: 1.3rem; font-weight: 900; color: var(--text); }
+  .dash-stat-val.teal { color: var(--accent); }
+  .dash-stat-val.amber { color: var(--secondary); }
+  .dash-stat-val.red { color: #EF4444; }
+  .dash-stat-lbl { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 3px; }
+  .ai-noshow {
+    background: linear-gradient(135deg, var(--secondary-pale), rgba(245,158,11,0.05));
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 10px;
+    padding: 13px 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .ai-noshow-text { font-size: 0.8rem; color: var(--text); }
+  .ai-noshow-title { font-size: 0.72rem; font-weight: 800; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .appt-list { display: flex; flex-direction: column; gap: 7px; }
+  .appt-row {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--alt);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 13px;
+  }
+  .appt-time { font-size: 0.72rem; font-weight: 700; color: var(--muted); min-width: 52px; }
+  .appt-patient { flex: 1; font-size: 0.8rem; font-weight: 600; }
+  .appt-type { font-size: 0.7rem; color: var(--muted); }
+  .risk-badge {
+    font-size: 0.65rem; font-weight: 800;
+    padding: 3px 9px; border-radius: 20px;
+    white-space: nowrap;
+  }
+  .risk-low { background: var(--accent-pale); color: var(--accent); }
+  .risk-high { background: rgba(239,68,68,0.1); color: #DC2626; }
+  .risk-med { background: var(--secondary-pale); color: #B45309; }
+
+  /* SECTIONS */
+  section { padding: 90px 5%; }
+  .section-inner { max-width: 1280px; margin: 0 auto; }
+  .section-tag {
+    display: inline-block;
+    font-size: 0.75rem; font-weight: 800;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .section-h2 {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  /* PROBLEMS */
+  .problems-section { background: var(--alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+  }
+  .problem-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  }
+  .problem-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(239,68,68,0.3); }
+  .problem-icon { font-size: 2.2rem; margin-bottom: 14px; }
+  .problem-title { font-size: 1rem; font-weight: 800; margin-bottom: 10px; }
+  .problem-desc { font-size: 0.87rem; color: var(--muted); line-height: 1.65; }
+
+  /* FEATURES */
+  .features-section { background: var(--bg); }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--accent); }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-icon { font-size: 2.2rem; margin-bottom: 16px; }
+  .feature-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; gap: 10px; }
+  .feature-title { font-size: 1.05rem; font-weight: 800; }
+  .feature-ai {
+    background: var(--accent-pale);
+    color: var(--accent);
+    font-size: 0.6rem; font-weight: 800;
+    padding: 3px 8px; border-radius: 5px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border: 1px solid rgba(13,148,136,0.2);
+    white-space: nowrap; flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .feature-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+
+  /* AI SECTION */
+  .ai-section { background: var(--alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .ai-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+  }
+  .ai-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: var(--shadow);
+    border-top: 3px solid var(--accent);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .ai-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .ai-card-icon { font-size: 2.2rem; margin-bottom: 16px; }
+  .ai-card-tag {
+    display: inline-block;
+    background: var(--accent-pale);
+    color: var(--accent);
+    font-size: 0.68rem; font-weight: 800;
+    padding: 4px 10px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border: 1px solid rgba(13,148,136,0.2);
+    margin-bottom: 12px;
+  }
+  .ai-card-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; }
+  .ai-card-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; }
+
+  /* TRUST SECTION */
+  .trust-section { background: var(--accent); color: #fff; }
+  .trust-section .section-tag { color: rgba(255,255,255,0.7); }
+  .trust-section .section-h2 { color: #fff; }
+  .trust-section .section-sub { color: rgba(255,255,255,0.75); }
+  .trust-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .trust-card {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-align: center;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .trust-card:hover { background: rgba(255,255,255,0.18); transform: translateY(-3px); }
+  .trust-card-icon { font-size: 2.4rem; margin-bottom: 14px; }
+  .trust-card-title { font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .trust-card-desc { font-size: 0.84rem; color: rgba(255,255,255,0.72); line-height: 1.6; }
+
+  /* PRICING */
+  .pricing-section { background: var(--bg); }
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 20px; align-items: start;
+  }
+  .pricing-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 18px;
+    padding: 36px 30px;
+    position: relative;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .pricing-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  .pricing-card.popular {
+    border-color: var(--accent);
+    border-top: 4px solid var(--accent);
+  }
+  .popular-badge {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.72rem; font-weight: 800;
+    padding: 5px 16px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .pricing-tier { font-size: 0.8rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .pricing-price { font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin-bottom: 4px; }
+  .pricing-price span { font-size: 1rem; font-weight: 600; color: var(--muted); }
+  .pricing-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 26px; line-height: 1.6; }
+  .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+  .pricing-features li { font-size: 0.87rem; display: flex; align-items: flex-start; gap: 10px; }
+  .pricing-features li::before { content: '✓'; color: var(--accent); font-weight: 800; flex-shrink: 0; }
+  .btn-outline {
+    display: block; text-align: center;
+    padding: 12px; border-radius: 8px;
+    font-weight: 700; font-size: 0.9rem;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-accent {
+    display: block; text-align: center;
+    padding: 12px; border-radius: 8px;
+    font-weight: 700; font-size: 0.9rem;
+    background: var(--accent);
+    color: #fff;
+    transition: background 0.2s;
+  }
+  .btn-accent:hover { background: var(--accent-light); }
+
+  /* CARIBBEAN */
+  .caribbean-section { background: var(--alt); border-top: 1px solid var(--border); }
+  .islands-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .island-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--muted);
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .island-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* CTA */
+  .cta-section {
+    background: var(--bg);
+    text-align: center;
+    padding: 100px 5%;
+    border-top: 1px solid var(--border);
+  }
+  .cta-inner { max-width: 720px; margin: 0 auto; }
+  .cta-inner h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+    line-height: 1.15;
+  }
+  .cta-inner p { color: var(--muted); font-size: 1.05rem; margin-bottom: 36px; line-height: 1.7; }
+  .cta-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  /* FOOTER */
+  footer {
+    background: var(--text);
+    color: rgba(255,255,255,0.6);
+    padding: 44px 5%;
+  }
+  .footer-inner {
+    max-width: 1280px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px;
+  }
+  .footer-logo { font-size: 1.3rem; font-weight: 900; color: #fff; }
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+  .footer-links a { font-size: 0.85rem; color: rgba(255,255,255,0.55); transition: color 0.2s; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { font-size: 0.82rem; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 50px; }
+    .hero-section { padding: 60px 5%; }
+    .hero p { max-width: 100%; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .dash-stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .pricing-grid { grid-template-columns: 1fr; }
+    .footer-inner { flex-direction: column; }
+    .trust-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span>🏥</span>
+    <span>Vital<span class="accent">ora</span></span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#trust">Security</a></li>
+    <li><a href="#caribbean">Caribbean</a></li>
+  </ul>
+  <a href="#contact" class="btn-primary">Book a Demo</a>
+  <div class="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">AI Clinic Management Platform</div>
+      <h1>Run your clinic.<br><span class="highlight">Not your paperwork.</span></h1>
+      <p>Appointments, patient records, billing, and lab results — all in one place. AI reduces no-shows and helps doctors see more patients, faster.</p>
+      <div class="hero-buttons">
+        <a href="#contact" class="btn-primary">Book a Demo</a>
+        <a href="#features" class="btn-secondary">See Features</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-val">40%</div>
+          <div class="hero-stat-label">fewer no-shows</div>
+        </div>
+        <div>
+          <div class="hero-stat-val">3×</div>
+          <div class="hero-stat-label">faster patient intake</div>
+        </div>
+        <div>
+          <div class="hero-stat-val">90%</div>
+          <div class="hero-stat-label">less billing admin</div>
+        </div>
+      </div>
+    </div>
+    <!-- Dashboard Mockup -->
+    <div class="dashboard">
+      <div class="dash-header">
+        <div class="dash-header-left">
+          <div>
+            <div class="dash-title">Vitalora Clinic Dashboard</div>
+            <div class="dash-date">Tuesday, 6 May 2026 — Dr. Williams' Schedule</div>
+          </div>
+        </div>
+        <div class="dash-live">LIVE</div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-stats-row">
+          <div class="dash-stat">
+            <div class="dash-stat-val teal">24</div>
+            <div class="dash-stat-lbl">Today's Appts</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-val amber">6</div>
+            <div class="dash-stat-lbl">No-Show Risk</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-val teal">18</div>
+            <div class="dash-stat-lbl">Confirmed</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-val red">2</div>
+            <div class="dash-stat-lbl">Overdue Billing</div>
+          </div>
+        </div>
+        <div class="ai-noshow">
+          <span style="font-size: 1.3rem; margin-top: 2px;">🤖</span>
+          <div class="ai-noshow-text">
+            <div class="ai-noshow-title">AI No-Show Prediction Alert</div>
+            3 patients flagged as HIGH risk for today. Auto-reminders sent. Recommended: call Marcus D. directly — 2 consecutive no-shows in last 30 days.
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 9px;">Today's Appointments</div>
+          <div class="appt-list">
+            <div class="appt-row">
+              <div class="appt-time">9:00 AM</div>
+              <div>
+                <div class="appt-patient">Sarah Chen</div>
+                <div class="appt-type">General Consultation</div>
+              </div>
+              <div class="risk-badge risk-low">LOW RISK</div>
+            </div>
+            <div class="appt-row">
+              <div class="appt-time">9:30 AM</div>
+              <div>
+                <div class="appt-patient">Marcus D.</div>
+                <div class="appt-type">Follow-up — Hypertension</div>
+              </div>
+              <div class="risk-badge risk-high">HIGH RISK</div>
+            </div>
+            <div class="appt-row">
+              <div class="appt-time">10:00 AM</div>
+              <div>
+                <div class="appt-patient">Diana Rowe</div>
+                <div class="appt-type">Lab Results Review</div>
+              </div>
+              <div class="risk-badge risk-low">LOW RISK</div>
+            </div>
+            <div class="appt-row">
+              <div class="appt-time">10:30 AM</div>
+              <div>
+                <div class="appt-patient">Kevin Baptiste</div>
+                <div class="appt-type">Annual Physical</div>
+              </div>
+              <div class="risk-badge risk-med">MED RISK</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMS -->
+<section class="problems-section" id="problems">
+  <div class="section-inner">
+    <div class="section-tag">The Problem</div>
+    <h2 class="section-h2">Caribbean private clinics<br>are buried in admin work.</h2>
+    <p class="section-sub">Your doctors trained to heal patients — not fill out forms, chase insurance, and manage a spreadsheet. Here's what's eating your clinic's time.</p>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <div class="problem-icon">⏱️</div>
+        <div class="problem-title">Long Waiting Times</div>
+        <div class="problem-desc">Manual scheduling causes bottlenecks. Patients wait 40+ minutes. They don't come back — or worse, they tell others.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🚪</div>
+        <div class="problem-title">Missed Appointments</div>
+        <div class="problem-desc">No-shows without warning. No automated reminders. Empty appointment slots that cost you revenue every single week.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📂</div>
+        <div class="problem-title">Paperwork Overload</div>
+        <div class="problem-desc">Staff spend hours on intake forms, filing, and finding records. Doctors spend the first 5 minutes of every consultation looking for the patient's history.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">💰</div>
+        <div class="problem-title">Billing Chaos</div>
+        <div class="problem-desc">Invoices get lost. Insurance claims are filed late or incorrectly. You're leaving thousands on the table every month without realizing it.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-inner">
+    <div class="section-tag">Platform Features</div>
+    <h2 class="section-h2">Everything your clinic<br>needs. In one place.</h2>
+    <p class="section-sub">Four core modules built for Caribbean private clinics. No unnecessary complexity — just tools that work from day one.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <div class="feature-header">
+          <div class="feature-title">Appointment Booking</div>
+          <div class="feature-ai">AI</div>
+        </div>
+        <div class="feature-desc">Online booking with smart scheduling that fills gaps intelligently. Patients book via link or WhatsApp. Automated SMS and email reminders reduce no-shows by up to 40%. AI detects double-booking before it happens.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗃️</div>
+        <div class="feature-header">
+          <div class="feature-title">Patient Records</div>
+          <div class="feature-ai">AI</div>
+        </div>
+        <div class="feature-desc">Complete digital patient profiles with consultation history, medications, allergies, and lab results. AI generates a patient summary before each appointment so doctors walk in informed, not catching up.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧾</div>
+        <div class="feature-header">
+          <div class="feature-title">Billing & Insurance</div>
+          <div class="feature-ai">AUTO</div>
+        </div>
+        <div class="feature-desc">Automated invoicing, payment collection, and insurance claim submission. Track payments, follow up on outstanding balances automatically, and see revenue analytics in real time. Stop chasing invoices manually.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔬</div>
+        <div class="feature-header">
+          <div class="feature-title">Lab Result Tracking</div>
+          <div class="feature-ai">AI</div>
+        </div>
+        <div class="feature-desc">Lab results delivered directly into the patient's file. Doctors get notified of critical values instantly. Patients can access their results securely via the patient portal. No more result-chasing phone calls.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI HIGHLIGHTS -->
+<section class="ai-section">
+  <div class="section-inner">
+    <div class="section-tag">AI Intelligence</div>
+    <h2 class="section-h2">AI that makes your<br>clinic run smarter.</h2>
+    <p class="section-sub">Three AI systems embedded in every Vitalora clinic — working quietly in the background to reduce admin, predict problems, and help doctors deliver better care.</p>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="ai-card-icon">📊</div>
+        <div class="ai-card-tag">AI Module</div>
+        <div class="ai-card-title">AI No-Show Prediction</div>
+        <div class="ai-card-desc">Vitalora AI analyzes booking patterns, patient history, and appointment type to predict which patients are likely to no-show. Automated reminders are sent based on risk level — SMS, WhatsApp, or email — reducing empty slots and lost revenue before they happen.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-icon">🩺</div>
+        <div class="ai-card-tag">AI Module</div>
+        <div class="ai-card-title">Auto-Triage</div>
+        <div class="ai-card-desc">When patients book online, AI asks structured intake questions and automatically categorizes urgency. Urgent cases are flagged for same-day slots. Routine checkups are routed appropriately. Your reception staff spend less time triaging and more time with patients.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-icon">📋</div>
+        <div class="ai-card-tag">AI Module</div>
+        <div class="ai-card-title">Patient History Summary</div>
+        <div class="ai-card-desc">Before every appointment, Vitalora AI generates a concise summary of the patient's last 5 visits, current medications, outstanding tests, and key risk flags. Doctors start every consultation fully briefed — in seconds, not by scrolling through pages of old notes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST SECTION -->
+<section class="trust-section" id="trust">
+  <div class="section-inner">
+    <div class="section-tag">Data Security & Compliance</div>
+    <h2 class="section-h2">Patient data stays safe.<br>Always.</h2>
+    <p class="section-sub">Vitalora is built with healthcare-grade security standards so you can focus on patients, not compliance.</p>
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="trust-card-icon">🔒</div>
+        <div class="trust-card-title">HIPAA-Aware Architecture</div>
+        <div class="trust-card-desc">Built with HIPAA-aligned data handling practices — the standard for healthcare data privacy and patient confidentiality.</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-card-icon">🔐</div>
+        <div class="trust-card-title">End-to-End Encryption</div>
+        <div class="trust-card-desc">All patient data is encrypted in transit and at rest. Nobody — not even Vitalora staff — can read your patient records without authorization.</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-card-icon">👤</div>
+        <div class="trust-card-title">Role-Based Access</div>
+        <div class="trust-card-desc">Doctors, nurses, receptionists, and billing staff each see only what they need. Granular permissions ensure data access is appropriate and auditable.</div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-card-icon">☁️</div>
+        <div class="trust-card-title">Automatic Backups</div>
+        <div class="trust-card-desc">Your data is automatically backed up every hour and stored in geographically redundant servers. You'll never lose a patient record.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-inner">
+    <div class="section-tag">Pricing</div>
+    <h2 class="section-h2">Clear pricing for<br>every clinic size.</h2>
+    <p class="section-sub">All plans include full onboarding, data migration assistance, and Caribbean business-hours support. 30-day free trial — no card required.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-tier">Solo</div>
+        <div class="pricing-price">$49<span>/mo</span></div>
+        <div class="pricing-desc">For solo practitioners and small private practices — one doctor, one location.</div>
+        <ul class="pricing-features">
+          <li>1 doctor, 1 location</li>
+          <li>Online appointment booking</li>
+          <li>Digital patient records</li>
+          <li>Automated reminders</li>
+          <li>Basic billing & invoicing</li>
+          <li>Lab result uploads</li>
+          <li>Patient portal</li>
+        </ul>
+        <a href="#contact" class="btn-outline">Start Free Trial</a>
+      </div>
+      <div class="pricing-card popular">
+        <div class="popular-badge">Most Popular</div>
+        <div class="pricing-tier">Clinic</div>
+        <div class="pricing-price">$129<span>/mo</span></div>
+        <div class="pricing-desc">For multi-doctor clinics with up to 10 staff members.</div>
+        <ul class="pricing-features">
+          <li>Up to 10 doctors/staff</li>
+          <li>Everything in Solo</li>
+          <li>AI No-Show Prediction</li>
+          <li>AI Auto-Triage</li>
+          <li>Patient History AI Summary</li>
+          <li>Insurance claim management</li>
+          <li>Revenue analytics dashboard</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#contact" class="btn-accent">Book a Demo</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-tier">Multi-Location</div>
+        <div class="pricing-price">$299<span>/mo</span></div>
+        <div class="pricing-desc">For clinic groups and multi-location healthcare organizations.</div>
+        <ul class="pricing-features">
+          <li>Unlimited doctors & staff</li>
+          <li>Multiple locations</li>
+          <li>Everything in Clinic</li>
+          <li>Consolidated reporting</li>
+          <li>Custom workflows</li>
+          <li>API access</li>
+          <li>Dedicated account manager</li>
+          <li>Custom SLA & onboarding</li>
+        </ul>
+        <a href="#contact" class="btn-outline">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CARIBBEAN COVERAGE -->
+<section class="caribbean-section" id="caribbean">
+  <div class="section-inner">
+    <div class="section-tag">Caribbean Coverage</div>
+    <h2 class="section-h2">Built for Caribbean<br>healthcare realities.</h2>
+    <p class="section-sub">Vitalora understands Caribbean insurance schemes, local payment methods, and the unique challenges of private healthcare in our region.</p>
+    <div class="islands-grid">
+      <div class="island-chip">🇹🇹 Trinidad & Tobago</div>
+      <div class="island-chip">🇯🇲 Jamaica</div>
+      <div class="island-chip">🇧🇧 Barbados</div>
+      <div class="island-chip">🇬🇾 Guyana</div>
+      <div class="island-chip">🇬🇩 Grenada</div>
+      <div class="island-chip">🇱🇨 Saint Lucia</div>
+      <div class="island-chip">🇻🇨 St. Vincent</div>
+      <div class="island-chip">🇦🇬 Antigua</div>
+      <div class="island-chip">🇩🇲 Dominica</div>
+      <div class="island-chip">🇰🇳 St. Kitts & Nevis</div>
+      <div class="island-chip">🇧🇿 Belize</div>
+      <div class="island-chip">🇸🇷 Suriname</div>
+      <div class="island-chip">🇨🇼 Curaçao</div>
+      <div class="island-chip">🇧🇸 Bahamas</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="cta-inner">
+    <div class="section-tag">Get Started</div>
+    <h2>Give your patients better care.<br>Give your staff less paperwork.</h2>
+    <p>Join Caribbean clinics already running on Vitalora. Setup takes less than 48 hours. Your patients will notice the difference immediately.</p>
+    <div class="cta-buttons">
+      <a href="mailto:demo@vitalora.io" class="btn-primary" style="padding: 14px 32px; font-size: 1rem;">Book a Demo</a>
+      <a href="tel:+18684000000" class="btn-secondary" style="padding: 14px 32px; font-size: 1rem;">Talk to Us</a>
+    </div>
+    <p style="color: var(--muted); font-size: 0.82rem; margin-top: 18px;">30-day free trial · No credit card required · Setup in 48 hours · Caribbean support</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">🏥 Vital<span style="color: var(--accent);">ora</span></div>
+    <div class="footer-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#trust">Security</a>
+      <a href="#caribbean">Caribbean</a>
+      <a href="mailto:hello@vitalora.io">Contact</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <div class="footer-copy">© 2026 Vitalora. Built for Caribbean healthcare.</div>
+  </div>
+</footer>
+
+</body>
+</html>
