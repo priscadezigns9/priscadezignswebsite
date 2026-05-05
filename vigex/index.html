@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vigex — AI-Powered Security Management for the Caribbean</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0A0A0F;
+    --card: #12121A;
+    --border: #1E1E2E;
+    --accent: #6C47FF;
+    --accent-light: #8B6BFF;
+    --secondary: #00D4AA;
+    --alert: #FF4444;
+    --text: #F0F0FF;
+    --muted: #8888AA;
+    --surface: #16162A;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,15,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 72px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px;
+  }
+  .nav-logo span.accent { color: var(--accent); }
+  .nav-links {
+    display: flex; align-items: center; gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.9rem; font-weight: 500;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none; cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.1s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: var(--text); border-radius: 2px; }
+
+  /* HERO */
+  .hero {
+    padding: 100px 5% 80px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+    max-width: 1280px; margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(108,71,255,0.15);
+    border: 1px solid rgba(108,71,255,0.3);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 0.78rem; font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .hero-badge::before { content: '●'; color: var(--secondary); font-size: 0.6rem; }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+  }
+  .hero h1 .highlight { color: var(--accent); }
+  .hero p {
+    font-size: 1.1rem; color: var(--muted);
+    margin-bottom: 36px; line-height: 1.7;
+    max-width: 520px;
+  }
+  .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* DASHBOARD MOCKUP */
+  .dashboard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(108,71,255,0.1);
+  }
+  .dash-header {
+    background: #0E0E1A;
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dash-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dash-title { font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-left: 6px; }
+  .dash-status {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.75rem; font-weight: 700; color: var(--secondary);
+  }
+  .dash-status::before { content: '●'; font-size: 0.55rem; }
+  .dash-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .dash-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .dash-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .dash-stat-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .dash-stat-value { font-size: 1.3rem; font-weight: 800; }
+  .dash-stat-value.green { color: var(--secondary); }
+  .dash-stat-value.purple { color: var(--accent); }
+  .dash-stat-value.alert { color: var(--alert); }
+  .dash-map {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    position: relative; overflow: hidden;
+  }
+  .dash-map-label { font-size: 0.7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px; }
+  .map-visual {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    height: 80px; align-content: flex-start;
+  }
+  .officer-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 800;
+  }
+  .officer-dot.active { background: rgba(0,212,170,0.2); border: 1.5px solid var(--secondary); color: var(--secondary); }
+  .officer-dot.patrol { background: rgba(108,71,255,0.2); border: 1.5px solid var(--accent); color: var(--accent); }
+  .officer-dot.alert { background: rgba(255,68,68,0.2); border: 1.5px solid var(--alert); color: var(--alert); }
+  .incident-list { display: flex; flex-direction: column; gap: 7px; }
+  .incident-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.78rem;
+  }
+  .severity { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .sev-high { background: var(--alert); }
+  .sev-med { background: #FFA500; }
+  .sev-low { background: var(--secondary); }
+  .incident-text { flex: 1; color: var(--text); font-weight: 500; }
+  .incident-time { color: var(--muted); font-size: 0.7rem; }
+  .ai-tag {
+    background: rgba(108,71,255,0.2);
+    color: var(--accent);
+    font-size: 0.65rem; font-weight: 800;
+    padding: 2px 7px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+
+  /* SECTION COMMON */
+  section { padding: 90px 5%; }
+  .section-inner { max-width: 1280px; margin: 0 auto; }
+  .section-tag {
+    display: inline-block;
+    font-size: 0.75rem; font-weight: 800;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .section-h2 {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 50px;
+  }
+
+  /* PROBLEMS */
+  .problems-section { background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+  }
+  .problem-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .problem-card:hover { border-color: var(--alert); }
+  .problem-icon { font-size: 2rem; margin-bottom: 14px; }
+  .problem-title { font-size: 0.95rem; font-weight: 800; margin-bottom: 8px; }
+  .problem-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    transition: border-color 0.25s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--secondary));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .feature-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon { font-size: 2rem; margin-bottom: 14px; }
+  .feature-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .feature-title { font-size: 1.05rem; font-weight: 800; }
+  .feature-ai {
+    background: rgba(108,71,255,0.2);
+    color: var(--accent);
+    font-size: 0.6rem; font-weight: 800;
+    padding: 3px 8px; border-radius: 5px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border: 1px solid rgba(108,71,255,0.3);
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .feature-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+  /* AI HIGHLIGHTS */
+  .ai-section { background: linear-gradient(135deg, #0A0A1A 0%, #0F0A1F 100%); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .ai-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .ai-card {
+    background: rgba(108,71,255,0.07);
+    border: 1px solid rgba(108,71,255,0.2);
+    border-radius: 16px;
+    padding: 32px;
+    transition: border-color 0.2s;
+  }
+  .ai-card:hover { border-color: rgba(108,71,255,0.5); }
+  .ai-card-icon { font-size: 2.2rem; margin-bottom: 16px; }
+  .ai-card-tag {
+    display: inline-block;
+    background: rgba(108,71,255,0.25);
+    color: var(--accent);
+    font-size: 0.68rem; font-weight: 800;
+    padding: 4px 10px; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 14px;
+  }
+  .ai-card-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 10px; }
+  .ai-card-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px; align-items: start;
+  }
+  .pricing-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 32px;
+    position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .pricing-card:hover { transform: translateY(-4px); }
+  .pricing-card.popular {
+    border-color: var(--accent);
+    background: linear-gradient(160deg, #16122A, #12121A);
+  }
+  .popular-badge {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.72rem; font-weight: 800;
+    padding: 5px 16px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .pricing-tier { font-size: 0.8rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .pricing-price { font-size: 3rem; font-weight: 900; letter-spacing: -2px; margin-bottom: 4px; }
+  .pricing-price span { font-size: 1rem; font-weight: 600; color: var(--muted); }
+  .pricing-desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 28px; }
+  .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+  .pricing-features li { font-size: 0.88rem; display: flex; align-items: center; gap: 10px; }
+  .pricing-features li::before { content: '✓'; color: var(--secondary); font-weight: 800; flex-shrink: 0; }
+  .btn-outline {
+    display: block; text-align: center;
+    padding: 12px; border-radius: 8px;
+    font-weight: 700; font-size: 0.9rem;
+    border: 1px solid var(--border);
+    color: var(--text);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); background: rgba(108,71,255,0.08); }
+  .btn-accent {
+    display: block; text-align: center;
+    padding: 12px; border-radius: 8px;
+    font-weight: 700; font-size: 0.9rem;
+    background: var(--accent);
+    color: #fff;
+    transition: background 0.2s;
+  }
+  .btn-accent:hover { background: var(--accent-light); }
+
+  /* CARIBBEAN GRID */
+  .caribbean-section { background: var(--card); border-top: 1px solid var(--border); }
+  .islands-grid {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .island-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--muted);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .island-chip:hover { border-color: var(--secondary); color: var(--secondary); }
+
+  /* CTA SECTION */
+  .cta-section {
+    background: linear-gradient(135deg, #0D0A1F 0%, #0A0A0F 100%);
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding: 100px 5%;
+  }
+  .cta-section h2 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+    max-width: 700px; margin-left: auto; margin-right: auto;
+  }
+  .cta-section p { color: var(--muted); font-size: 1.05rem; margin-bottom: 36px; }
+  .cta-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  /* FOOTER */
+  footer {
+    background: #070710;
+    border-top: 1px solid var(--border);
+    padding: 40px 5%;
+  }
+  .footer-inner {
+    max-width: 1280px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px;
+  }
+  .footer-logo { font-size: 1.3rem; font-weight: 900; }
+  .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+  .footer-links a { font-size: 0.85rem; color: var(--muted); transition: color 0.2s; }
+  .footer-links a:hover { color: var(--text); }
+  .footer-copy { font-size: 0.82rem; color: var(--muted); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 50px; padding: 70px 5% 60px; }
+    .hero p { max-width: 100%; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+  }
+  @media (max-width: 600px) {
+    .pricing-grid { grid-template-columns: 1fr; }
+    .dash-row { grid-template-columns: 1fr 1fr; }
+    .footer-inner { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span>🛡️</span>
+    <span>Vig<span class="accent">ex</span></span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#caribbean">Caribbean</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="btn-primary">Request Demo</a>
+  <div class="hamburger" onclick="this.classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section style="padding: 0;">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Enterprise Security Intelligence</div>
+      <h1>Security management<br>that <span class="highlight">never sleeps.</span></h1>
+      <p>AI scheduling, GPS patrol tracking, incident reporting, and real-time monitoring — built for Caribbean security companies.</p>
+      <div class="hero-buttons">
+        <a href="#contact" class="btn-primary">Request Demo</a>
+        <a href="#features" class="btn-secondary">See Features</a>
+      </div>
+    </div>
+    <!-- Dashboard Mockup -->
+    <div class="dashboard">
+      <div class="dash-header">
+        <div class="dash-dot" style="background:#FF5F57"></div>
+        <div class="dash-dot" style="background:#FFBD2E"></div>
+        <div class="dash-dot" style="background:#28C840"></div>
+        <span class="dash-title">Vigex Command Center</span>
+        <div class="dash-status">LIVE</div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-row">
+          <div class="dash-stat">
+            <div class="dash-stat-label">Active Officers</div>
+            <div class="dash-stat-value green">47</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">On Patrol</div>
+            <div class="dash-stat-value purple">23</div>
+          </div>
+          <div class="dash-stat">
+            <div class="dash-stat-label">Alerts</div>
+            <div class="dash-stat-value alert">2</div>
+          </div>
+        </div>
+        <div class="dash-map">
+          <div class="dash-map-label">Active Patrol Routes — Trinidad Zone A</div>
+          <div class="map-visual">
+            <div class="officer-dot active">O1</div>
+            <div class="officer-dot patrol">O2</div>
+            <div class="officer-dot active">O3</div>
+            <div class="officer-dot patrol">O4</div>
+            <div class="officer-dot alert">O5</div>
+            <div class="officer-dot active">O6</div>
+            <div class="officer-dot patrol">O7</div>
+            <div class="officer-dot active">O8</div>
+          </div>
+        </div>
+        <div style="background: rgba(108,71,255,0.1); border: 1px solid rgba(108,71,255,0.2); border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.2rem;">🤖</span>
+          <div>
+            <div style="font-size: 0.72rem; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.4px;">AI Shift Optimizer</div>
+            <div style="font-size: 0.8rem; color: var(--muted);">Tomorrow's schedule generated — 3 conflicts resolved automatically</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px;">Recent Incidents</div>
+          <div class="incident-list">
+            <div class="incident-item">
+              <div class="severity sev-high"></div>
+              <span class="incident-text">Unauthorized access — Gate 3, Port of Spain</span>
+              <span class="incident-time">2 min ago</span>
+            </div>
+            <div class="incident-item">
+              <div class="severity sev-med"></div>
+              <span class="incident-text">Patrol checkpoint missed — Officer O5</span>
+              <span class="ai-tag">AI FLAG</span>
+            </div>
+            <div class="incident-item">
+              <div class="severity sev-low"></div>
+              <span class="incident-text">Shift handover complete — Zone B</span>
+              <span class="incident-time">18 min ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMS -->
+<section class="problems-section" id="problems">
+  <div class="section-inner">
+    <div class="section-tag">The Problem</div>
+    <h2 class="section-h2">Caribbean security companies run on<br>WhatsApp and spreadsheets.</h2>
+    <p class="section-sub">It's costing you clients, incidents, and credibility. Here's what's really happening on the ground.</p>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <div class="problem-icon">📡</div>
+        <div class="problem-title">No Real-Time Visibility</div>
+        <div class="problem-desc">You have no idea where your officers are or if they're actually doing their rounds. Clients know it too.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📋</div>
+        <div class="problem-title">Manual Scheduling Chaos</div>
+        <div class="problem-desc">Spreadsheets, WhatsApp groups, and phone calls to cover shifts. One resignation breaks everything.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📝</div>
+        <div class="problem-title">Incident Reports Lost or Faked</div>
+        <div class="problem-desc">Paper reports get lost, altered, or simply never filed. When something goes wrong, there's no audit trail.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📍</div>
+        <div class="problem-title">No GPS Patrol Verification</div>
+        <div class="problem-desc">Officers say they did the rounds. Did they? Without GPS data, you're trusting their word — and so is your client.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📊</div>
+        <div class="problem-title">Zero Performance Analytics</div>
+        <div class="problem-desc">No data on guard performance, incident frequency, or patrol compliance. You can't improve what you can't measure.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-inner">
+    <div class="section-tag">Platform Modules</div>
+    <h2 class="section-h2">Everything you need.<br>Nothing you don't.</h2>
+    <p class="section-sub">Nine powerful modules, built specifically for Caribbean security operations. Fully integrated, fully real-time.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🗓️</div>
+        <div class="feature-header">
+          <div class="feature-title">AI Shift Scheduling</div>
+          <div class="feature-ai">AI</div>
+        </div>
+        <div class="feature-desc">Automatically builds optimal shift schedules based on availability, compliance rules, and client requirements. Resolves conflicts before they happen.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📍</div>
+        <div class="feature-header">
+          <div class="feature-title">GPS Patrol Tracking</div>
+          <div class="feature-ai">LIVE</div>
+        </div>
+        <div class="feature-desc">Real-time GPS tracking with geofenced checkpoints. Verify patrol routes were completed and prove it to your clients with automated reports.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚨</div>
+        <div class="feature-header">
+          <div class="feature-title">Incident Reporting</div>
+          <div class="feature-ai">AI</div>
+        </div>
+        <div class="feature-desc">Digital incident reports with photo evidence, timestamps, and GPS location. AI flags inconsistencies and auto-notifies supervisors.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖥️</div>
+        <div class="feature-header">
+          <div class="feature-title">Client Portal</div>
+          <div class="feature-ai">LIVE</div>
+        </div>
+        <div class="feature-desc">Give your clients a live dashboard showing patrol activity, incidents, and compliance stats. Build trust and justify your fees.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <div class="feature-header">
+          <div class="feature-title">Guard Performance Analytics</div>
+          <div class="feature-ai">AI</div>
+        </div>
+        <div class="feature-desc">Track response times, patrol completion rates, and incident handling per officer. Identify top performers and problems before clients do.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🪪</div>
+        <div class="feature-header">
+          <div class="feature-title">Visitor Management</div>
+          <div class="feature-ai">AI</div>
+        </div>
+        <div class="feature-desc">Digital visitor logbooks with ID scanning, pre-registration, and blacklist alerts. Replace paper logs with a searchable audit trail.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <div class="feature-header">
+          <div class="feature-title">Payroll Integration</div>
+          <div class="feature-ai">AUTO</div>
+        </div>
+        <div class="feature-desc">Sync attendance, overtime, and shift data directly to your payroll system. Reduce admin time and payroll disputes.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔧</div>
+        <div class="feature-header">
+          <div class="feature-title">Equipment Tracking</div>
+          <div class="feature-ai">IOT</div>
+        </div>
+        <div class="feature-desc">Track radios, firearms, and vehicles assigned to each officer per shift. Know exactly what's deployed, where, and when it's returned.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🆘</div>
+        <div class="feature-header">
+          <div class="feature-title">Emergency SOS</div>
+          <div class="feature-ai">LIVE</div>
+        </div>
+        <div class="feature-desc">One-touch SOS button sends GPS location, officer ID, and alert to supervisors instantly. Panic alarms trigger automatic escalation protocols.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI HIGHLIGHTS -->
+<section class="ai-section">
+  <div class="section-inner">
+    <div class="section-tag">AI Intelligence Layer</div>
+    <h2 class="section-h2">Built-in AI that works<br>while you sleep.</h2>
+    <p class="section-sub">Vigex's AI doesn't just display data — it acts on it. Three core AI systems that prevent problems before they become incidents.</p>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <div class="ai-card-icon">🤖</div>
+        <div class="ai-card-tag">AI Module</div>
+        <div class="ai-card-title">AI Schedule Optimizer</div>
+        <div class="ai-card-desc">Our AI analyzes historical patterns, guard availability, client site requirements, and labor laws to build the optimal schedule every time. Automatically resolves conflicts, distributes hours fairly, and alerts you to coverage gaps before the shift starts.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-icon">🗺️</div>
+        <div class="ai-card-tag">AI Module</div>
+        <div class="ai-card-title">Patrol Verification AI</div>
+        <div class="ai-card-desc">Cross-references GPS data, checkpoint scans, and time logs to verify every patrol actually happened as reported. Automatically generates compliance reports for clients and flags deviations in real time — before clients notice them.</div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-card-icon">🚩</div>
+        <div class="ai-card-tag">AI Module</div>
+        <div class="ai-card-title">Fraud Detection</div>
+        <div class="ai-card-desc">Vigex AI flags suspicious patterns — report times that don't match GPS data, patrol scans done in impossible timeframes, and duplicate incident entries. Eliminate fake patrol reports and protect your company's liability before it becomes a lawsuit.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <div class="section-tag">Pricing</div>
+    <h2 class="section-h2">Transparent pricing.<br>No hidden fees.</h2>
+    <p class="section-sub">Choose the plan that fits your operation. All plans include full onboarding, Caribbean support, and a 30-day free trial.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-tier">Starter</div>
+        <div class="pricing-price">$99<span>/mo</span></div>
+        <div class="pricing-desc">Perfect for small security companies — up to 20 guards</div>
+        <ul class="pricing-features">
+          <li>Up to 20 guards</li>
+          <li>GPS Patrol Tracking</li>
+          <li>AI Shift Scheduling</li>
+          <li>Digital Incident Reports</li>
+          <li>Client Portal (1 client)</li>
+          <li>Email & WhatsApp support</li>
+        </ul>
+        <a href="#contact" class="btn-outline">Get Started</a>
+      </div>
+      <div class="pricing-card popular">
+        <div class="popular-badge">Most Popular</div>
+        <div class="pricing-tier">Professional</div>
+        <div class="pricing-price">$249<span>/mo</span></div>
+        <div class="pricing-desc">For growing companies managing up to 100 guards</div>
+        <ul class="pricing-features">
+          <li>Up to 100 guards</li>
+          <li>Everything in Starter</li>
+          <li>Guard Performance Analytics</li>
+          <li>Visitor Management</li>
+          <li>Payroll Integration</li>
+          <li>Unlimited client portals</li>
+          <li>Emergency SOS module</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#contact" class="btn-accent">Request Demo</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-tier">Enterprise</div>
+        <div class="pricing-price">$499<span>/mo</span></div>
+        <div class="pricing-desc">Unlimited guards, multiple locations, white-label option</div>
+        <ul class="pricing-features">
+          <li>Unlimited guards</li>
+          <li>Everything in Professional</li>
+          <li>Equipment Tracking (IoT)</li>
+          <li>AI Fraud Detection</li>
+          <li>White-label branding</li>
+          <li>API access</li>
+          <li>Dedicated account manager</li>
+          <li>Custom SLA</li>
+        </ul>
+        <a href="#contact" class="btn-outline">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CARIBBEAN COVERAGE -->
+<section class="caribbean-section" id="caribbean">
+  <div class="section-inner">
+    <div class="section-tag">Caribbean Coverage</div>
+    <h2 class="section-h2">Built for the Caribbean.<br>Deployed across the region.</h2>
+    <p class="section-sub">Vigex is live and operational across 14 Caribbean territories, with local support, local compliance, and Caribbean-time response times.</p>
+    <div class="islands-grid">
+      <div class="island-chip">🇹🇹 Trinidad & Tobago</div>
+      <div class="island-chip">🇯🇲 Jamaica</div>
+      <div class="island-chip">🇧🇧 Barbados</div>
+      <div class="island-chip">🇬🇾 Guyana</div>
+      <div class="island-chip">🇹🇹 Grenada</div>
+      <div class="island-chip">🇱🇨 Saint Lucia</div>
+      <div class="island-chip">🇻🇨 St. Vincent</div>
+      <div class="island-chip">🇦🇬 Antigua</div>
+      <div class="island-chip">🇩🇲 Dominica</div>
+      <div class="island-chip">🇰🇳 St. Kitts & Nevis</div>
+      <div class="island-chip">🇧🇿 Belize</div>
+      <div class="island-chip">🇸🇷 Suriname</div>
+      <div class="island-chip">🇨🇼 Curaçao</div>
+      <div class="island-chip">🇧🇸 Bahamas</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="section-inner" style="text-align: center;">
+    <div class="section-tag">Get Started</div>
+    <h2 style="font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 16px; max-width: 700px; margin-left: auto; margin-right: auto;">Stop managing security<br>with WhatsApp.</h2>
+    <p style="color: var(--muted); font-size: 1.05rem; margin-bottom: 36px;">Your competitors are upgrading. Don't let them win your next contract because they have a better dashboard than you.</p>
+    <div class="cta-buttons">
+      <a href="mailto:demo@vigex.io" class="btn-primary" style="padding: 14px 32px; font-size: 1rem;">Request Your Demo</a>
+      <a href="tel:+18684000000" class="btn-secondary" style="padding: 14px 32px; font-size: 1rem;">Talk to Sales</a>
+    </div>
+    <p style="color: var(--muted); font-size: 0.82rem; margin-top: 20px;">30-day free trial · No credit card required · Setup in under 48 hours</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">🛡️ Vig<span style="color: var(--accent);">ex</span></div>
+    <div class="footer-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#caribbean">Caribbean</a>
+      <a href="mailto:hello@vigex.io">Contact</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+    <div class="footer-copy">© 2026 Vigex. Securing the Caribbean.</div>
+  </div>
+</footer>
+
+</body>
+</html>
