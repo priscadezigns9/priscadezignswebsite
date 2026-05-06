@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ledra — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#1A8C5B;--bg:#060A08;--surface:#0D1A11;--border:#1A8C5B18;--text:#EBF5EE;--muted:#EBF5EE55;--danger:#E74C3C;--warning:#F39C12;--info:#3498DB;--purple:#9B59B6}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+
+.sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;transition:transform 0.3s}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--accent);letter-spacing:-0.5px}
+.logo-sub{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+.nav-section{padding:20px 0;flex:1;overflow-y:auto}
+.nav-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 20px 8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;font-size:0.85rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{color:var(--text);background:#1A8C5B08;border-left-color:#1A8C5B44}
+.nav-item.active{color:var(--accent);background:#1A8C5B11;border-left-color:var(--accent)}
+.nav-item .icon{width:18px;height:18px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px}
+.user-avatar{width:34px;height:34px;background:var(--accent);color:#060A08;font-weight:700;font-size:0.78rem;display:flex;align-items:center;justify-content:center}
+.user-name{font-size:0.82rem;font-weight:600}
+.user-role{font-size:0.7rem;color:var(--muted)}
+
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text)}
+.fiscal-chip{font-size:0.73rem;color:var(--muted);background:#1A8C5B11;border:1px solid var(--border);padding:5px 12px}
+.content{padding:28px;flex:1}
+.page-header{margin-bottom:24px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.page-sub{font-size:0.83rem;color:var(--muted)}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;right:0;bottom:0;width:3px}
+.stat-card.green::after{background:var(--accent)}
+.stat-card.red::after{background:var(--danger)}
+.stat-card.yellow::after{background:var(--warning)}
+.stat-card.blue::after{background:var(--info)}
+.stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:700;line-height:1;margin-bottom:6px}
+.stat-card.green .stat-value{color:var(--accent)}
+.stat-card.red .stat-value{color:var(--danger)}
+.stat-card.yellow .stat-value{color:var(--warning)}
+.stat-card.blue .stat-value{color:var(--info)}
+.stat-change{font-size:0.73rem;color:var(--muted)}
+
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.widget{background:var(--surface);border:1px solid var(--border);overflow:hidden}
+.widget.full-width{grid-column:1/-1}
+.widget-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.widget-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--text)}
+.widget-badge{font-size:0.65rem;font-weight:700;padding:3px 10px;text-transform:uppercase;letter-spacing:0.5px}
+.badge-green{background:#1A8C5B22;color:var(--accent);border:1px solid #1A8C5B44}
+.badge-red{background:#E74C3C22;color:var(--danger);border:1px solid #E74C3C44}
+.badge-yellow{background:#F39C1222;color:var(--warning);border:1px solid #F39C1244}
+.badge-blue{background:#3498DB22;color:var(--info);border:1px solid #3498DB44}
+.widget-body{padding:16px 20px}
+.view-all{font-size:0.73rem;color:var(--accent);cursor:pointer;font-weight:600}
+
+/* Cash Flow Chart */
+.chart-area{height:100px;display:flex;align-items:flex-end;gap:6px;padding:0 4px}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.chart-bar{width:100%;background:var(--accent);opacity:0.7;transition:opacity 0.2s;min-height:4px;border-radius:2px 2px 0 0}
+.chart-bar.positive{background:var(--accent)}
+.chart-bar.negative{background:var(--danger)}
+.chart-bar:hover{opacity:1}
+.chart-label{font-size:0.62rem;color:var(--muted);text-align:center}
+.chart-summary{display:flex;justify-content:space-between;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.chart-summary-item{text-align:center}
+.chart-summary-val{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700}
+.chart-summary-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:2px}
+
+/* Invoices */
+.invoice-item{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border)}
+.invoice-item:last-child{border-bottom:none}
+.inv-num{font-size:0.75rem;font-weight:700;color:var(--accent);font-family:'Cormorant Garamond',serif;font-size:0.9rem;width:68px;flex-shrink:0}
+.inv-info{flex:1}
+.inv-client{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.inv-due{font-size:0.71rem;color:var(--muted)}
+.inv-amount{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:var(--text);margin-right:10px;white-space:nowrap}
+.inv-status{font-size:0.62rem;font-weight:700;padding:2px 8px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}
+.status-overdue{color:var(--danger);background:#E74C3C22;border:1px solid #E74C3C44}
+.status-pending{color:var(--warning);background:#F39C1222;border:1px solid #F39C1233}
+.status-sent{color:var(--info);background:#3498DB22;border:1px solid #3498DB44}
+
+/* Transactions */
+.txn-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.txn-item:last-child{border-bottom:none}
+.txn-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0}
+.txn-info{flex:1}
+.txn-desc{font-size:0.83rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.txn-date{font-size:0.7rem;color:var(--muted)}
+.txn-amount{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;white-space:nowrap}
+.txn-in{color:var(--accent)}
+.txn-out{color:var(--danger)}
+
+/* Tax Summary */
+.tax-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.tax-row:last-child{border-bottom:none}
+.tax-label{font-size:0.83rem;color:var(--muted)}
+.tax-value{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;color:var(--text)}
+.tax-period{font-size:0.7rem;color:var(--muted);font-family:'Inter',sans-serif}
+.tax-highlight{color:var(--accent)}
+
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:45}
+@media(max-width:960px){.dashboard-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.hamburger{display:flex}.overlay.show{display:block}}
+@media(max-width:440px){.stats-row{grid-template-columns:1fr}.content{padding:16px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Ledra</div>
+    <div class="logo-sub">Accounting Platform</div>
+  </div>
+  <nav class="nav-section">
+    <div class="nav-label">Accounting</div>
+    <div class="nav-item active" onclick="setPage(this,'Dashboard')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Invoices')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Invoices
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Expenses')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Expenses
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Payroll')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Payroll
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Reports')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Reports
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Clients')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Clients
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Settings')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">CR</div>
+      <div>
+        <div class="user-name" id="user-name">Cheryl Ramchand</div>
+        <div class="user-role">Senior Accountant</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+      <span class="topbar-title" id="page-title">Financial Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="fiscal-chip">FY 2025–2026</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="page-title">Financial Overview</div>
+      <div class="page-sub">Ledra Accounts TT · April–May 2026</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card green">
+        <div class="stat-label">Total Revenue (MTD)</div>
+        <div class="stat-value">$284,500</div>
+        <div class="stat-change">TTD · ↑ 12% vs April</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Outstanding Invoices</div>
+        <div class="stat-value">$67,200</div>
+        <div class="stat-change">TTD · 5 invoices pending</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-label">Expenses (MTD)</div>
+        <div class="stat-value">$118,300</div>
+        <div class="stat-change">TTD · Within budget</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">VAT Collected (MTD)</div>
+        <div class="stat-value">$42,675</div>
+        <div class="stat-change">TTD · 15% rate</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Cash Flow — Last 7 Days</span>
+          <span class="widget-badge badge-green">Net Positive</span>
+        </div>
+        <div class="widget-body" id="cashflow-widget"></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Tax Summary</span>
+          <span class="widget-badge badge-blue">FY 2025–26</span>
+        </div>
+        <div class="widget-body" id="tax-widget"></div>
+      </div>
+
+      <div class="widget full-width">
+        <div class="widget-header">
+          <span class="widget-title">Outstanding Invoices</span>
+          <span class="view-all">Create Invoice +</span>
+        </div>
+        <div class="widget-body" id="invoices-widget"></div>
+      </div>
+
+      <div class="widget full-width">
+        <div class="widget-header">
+          <span class="widget-title">Recent Transactions</span>
+          <span class="view-all">View All →</span>
+        </div>
+        <div class="widget-body" id="transactions-widget"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cashflow = [
+  {day:'Mon', val:32400, positive:true},
+  {day:'Tue', val:18600, positive:true},
+  {day:'Wed', val:-8200, positive:false},
+  {day:'Thu', val:45000, positive:true},
+  {day:'Fri', val:38700, positive:true},
+  {day:'Sat', val:12100, positive:true},
+  {day:'Sun', val:9800, positive:true},
+];
+
+const invoices = [
+  {num:'INV-2089', client:'Bharath Construction Ltd', due:'May 10, 2026', amount:'$18,400', status:'overdue'},
+  {num:'INV-2091', client:'Caribbean Foods Co.', due:'May 15, 2026', amount:'$12,800', status:'pending'},
+  {num:'INV-2093', client:'Alpha Shipping TT', due:'May 18, 2026', amount:'$9,500', status:'sent'},
+  {num:'INV-2094', client:'Tropic Beverages Ltd', due:'May 22, 2026', amount:'$14,200', status:'pending'},
+  {num:'INV-2096', client:'Premier Auto Parts', due:'May 28, 2026', amount:'$12,300', status:'sent'},
+];
+
+const transactions = [
+  {icon:'💰', desc:'Payment Received — Ramsaran & Co.', date:'May 5, 2026', amount:'+$24,500', type:'in'},
+  {icon:'🧾', desc:'Office Rent — Q2 2026', date:'May 1, 2026', amount:'-$8,000', type:'out'},
+  {icon:'💰', desc:'Payment Received — DeLeon Industries', date:'Apr 30, 2026', amount:'+$41,200', type:'in'},
+  {icon:'📦', desc:'Software Subscriptions', date:'Apr 30, 2026', amount:'-$2,340', type:'out'},
+  {icon:'💰', desc:'Payment Received — Tropic Beverages', date:'Apr 28, 2026', amount:'+$18,700', type:'in'},
+  {icon:'💼', desc:'Payroll — April 2026', date:'Apr 25, 2026', amount:'-$62,400', type:'out'},
+];
+
+// Cash Flow Chart
+const maxVal = Math.max(...cashflow.map(d => Math.abs(d.val)));
+document.getElementById('cashflow-widget').innerHTML = `
+  <div class="chart-area">
+    ${cashflow.map(d => `
+      <div class="chart-bar-wrap">
+        <div class="chart-bar ${d.positive ? 'positive' : 'negative'}" style="height:${Math.round(Math.abs(d.val)/maxVal*90)}px" title="${d.positive ? '+' : '-'}TTD $${d.val.toLocaleString()}"></div>
+        <div class="chart-label">${d.day}</div>
+      </div>
+    `).join('')}
+  </div>
+  <div class="chart-summary">
+    <div class="chart-summary-item">
+      <div class="chart-summary-val" style="color:var(--accent)">$148,400</div>
+      <div class="chart-summary-label">Total In</div>
+    </div>
+    <div class="chart-summary-item">
+      <div class="chart-summary-val" style="color:var(--text)">$140,200</div>
+      <div class="chart-summary-label">Net Cash Flow</div>
+    </div>
+    <div class="chart-summary-item">
+      <div class="chart-summary-val" style="color:var(--danger)">-$8,200</div>
+      <div class="chart-summary-label">Total Out</div>
+    </div>
+  </div>
+`;
+
+// Invoices
+document.getElementById('invoices-widget').innerHTML = invoices.map(i => `
+  <div class="invoice-item">
+    <span class="inv-num">${i.num}</span>
+    <div class="inv-info">
+      <div class="inv-client">${i.client}</div>
+      <div class="inv-due">Due: ${i.due}</div>
+    </div>
+    <span class="inv-amount">TTD ${i.amount}</span>
+    <span class="inv-status status-${i.status}">${i.status}</span>
+  </div>
+`).join('');
+
+// Transactions
+document.getElementById('transactions-widget').innerHTML = transactions.map(t => `
+  <div class="txn-item">
+    <div class="txn-icon" style="background:${t.type==='in'?'#1A8C5B22':'#E74C3C22'}">${t.icon}</div>
+    <div class="txn-info">
+      <div class="txn-desc">${t.desc}</div>
+      <div class="txn-date">${t.date}</div>
+    </div>
+    <span class="txn-amount txn-${t.type}">TTD ${t.amount}</span>
+  </div>
+`).join('');
+
+// Tax Summary
+document.getElementById('tax-widget').innerHTML = `
+  <div class="tax-row">
+    <div><div class="tax-label">VAT Collected (Apr–May)</div><div class="tax-period">15% standard rate</div></div>
+    <div class="tax-value tax-highlight">$85,350</div>
+  </div>
+  <div class="tax-row">
+    <div><div class="tax-label">Corporation Tax (YTD)</div><div class="tax-period">FY 2025–2026</div></div>
+    <div class="tax-value">$142,800</div>
+  </div>
+  <div class="tax-row">
+    <div><div class="tax-label">NIS Contributions</div><div class="tax-period">April 2026 payroll</div></div>
+    <div class="tax-value">$8,640</div>
+  </div>
+  <div class="tax-row">
+    <div><div class="tax-label">PAYE Deductions</div><div class="tax-period">April 2026</div></div>
+    <div class="tax-value">$18,200</div>
+  </div>
+  <div class="tax-row" style="border-top:2px solid var(--accent);margin-top:4px;padding-top:14px">
+    <div><div class="tax-label" style="color:var(--accent);font-weight:600">Next Filing Deadline</div><div class="tax-period">VAT Return · Q1 2026</div></div>
+    <div class="tax-value tax-highlight">Jun 30</div>
+  </div>
+`;
+
+const user = JSON.parse(localStorage.getItem('ledra_user') || '{}');
+if(user.name) document.getElementById('user-name').textContent = user.name;
+
+function setPage(el, name){ document.getElementById('page-title').textContent = name; document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active'); closeSidebar(); }
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
+</body>
+</html>
