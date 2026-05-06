@@ -372,18 +372,28 @@ def is_safe_image_url(url):
     return not any(b in url for b in blocked)
 
 def get_ai_image_url(niche_keyword, style="product"):
-    """Get a high-quality image from Picsum (deterministic, always works, no Unsplash).
-    For branded content we use specific curated image seeds per niche."""
-    # Curated Picsum seeds per niche — deterministic, always same image per brand
-    seeds = {
-        "eco": "1062", "watches": "1048", "sneakers": "1040", "gaming": "1038",
-        "fashion": "1041", "fragrance": "1043", "skincare": "1047", "fitness": "1049",
-        "anime": "1051", "travel": "1053", "pets": "1055", "luxury": "1057",
-        "food": "1059", "real estate": "1061", "tech": "1063", "workspace": "1065",
-        "automotive": "1067", "christian": "1069", "design": "1071", "sewing": "1073", "custom fashion": "1041",
-    }
-    seed = seeds.get(niche_keyword.lower(), "1044")
-    return f"https://picsum.photos/seed/{seed}/1080/1080"
+    try:
+        import json as _json
+        with open("photo_library.json") as f:
+            library = _json.load(f)
+        niche_map = {
+            "eco": "verdant-co", "watches": "the-watch-list", "sneakers": "sole-prestige",
+            "gaming": "atelier-gaming", "fashion": "couture-gallery", "fragrance": "essence-elite",
+            "skincare": "glow-protocol", "fitness": "peak-fit", "travel": "the-escapist",
+            "pets": "paw-vault", "luxury": "quiet-luxury", "realestate": "prime-land-network",
+            "tech": "tech-scout", "automotive": "the-autodrome", "christian": "the-way-made-known",
+            "selfcare": "nehneh", "food": "pantriq", "workspace": "selfly",
+        }
+        slug = niche_map.get(niche_keyword.lower(), niche_keyword)
+        photos = library.get(slug, [])
+        if photos:
+            from datetime import datetime
+            idx = datetime.now().timetuple().tm_yday % len(photos)
+            return photos[idx]["url"]
+    except Exception:
+        pass
+    return "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_1280.jpg"
+
 
 def get_dreaming_anime_video():
     """Pull next video from Dreaming Anime Google Drive folder.
