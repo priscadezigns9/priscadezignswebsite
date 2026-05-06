@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Trovrix Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#6C63FF;--bg:#07070F;--surface:#0D0D18;--surface2:#12121E;--border:#6C63FF1A;--text:#EEECf8;--muted:#EEECf860}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+.sidebar{width:230px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform 0.3s}
+.sidebar-brand{padding:20px 18px;border-bottom:1px solid var(--border)}
+.brand-name{font-size:1.35rem;font-weight:700;color:var(--accent);letter-spacing:-0.5px}
+.brand-sub{font-size:0.64rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.nav-section{padding:16px 14px 5px;font-size:0.6rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:5px;cursor:pointer;margin:2px 8px;transition:all 0.15s;font-size:0.87rem;font-weight:500;color:var(--muted)}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:#6C63FF18;color:var(--accent)}
+.nav-icon{width:16px;height:16px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:9px}
+.avatar{width:30px;height:30px;background:#6C63FF25;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.user-name{font-size:0.82rem;font-weight:600}
+.user-role{font-size:0.68rem;color:var(--muted)}
+.logout-btn{margin-top:9px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px;font-family:'DM Sans',sans-serif;font-size:0.74rem;cursor:pointer;border-radius:4px;transition:all 0.2s}
+.logout-btn:hover{border-color:var(--accent);color:var(--accent)}
+.main{margin-left:230px;flex:1}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;color:var(--text)}
+.page-title{font-size:1.1rem;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge{background:#6C63FF18;color:var(--accent);padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600}
+.date-chip{font-size:0.76rem;color:var(--muted)}
+.content{padding:22px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:19px;border-radius:6px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.stat-card:hover{border-color:#6C63FF44}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0.5}
+.stat-label{font-size:0.67rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;font-weight:600}
+.stat-val{font-size:2rem;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:0.74rem;color:var(--muted);margin-top:5px}
+.stat-icon{position:absolute;top:14px;right:14px;font-size:1.3rem;opacity:0.2}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid-main{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;margin-bottom:18px}
+.widget{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:0.97rem;font-weight:700}
+.view-all{font-size:0.74rem;color:var(--accent);cursor:pointer}
+
+/* Headcount */
+.dept-list{display:flex;flex-direction:column;gap:10px}
+.dept-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.dept-item:last-child{border-bottom:none}
+.dept-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.dept-name{font-size:0.87rem;font-weight:600}
+.dept-count{font-size:0.83rem;color:var(--accent);font-weight:700}
+.dept-bar{height:5px;background:#6C63FF15;border-radius:3px;overflow:hidden}
+.dept-fill{height:100%;background:var(--accent);border-radius:3px}
+
+/* Leave requests */
+.leave-list{display:flex;flex-direction:column;gap:9px}
+.leave-item{background:var(--surface2);border-radius:5px;padding:12px 14px;border-left:3px solid var(--accent)}
+.leave-emp{font-size:0.86rem;font-weight:600}
+.leave-meta{font-size:0.72rem;color:var(--muted);margin-top:2px}
+.leave-dates{font-size:0.78rem;color:var(--text);margin-top:4px}
+.leave-actions{display:flex;gap:6px;margin-top:8px}
+.btn-approve{background:#22C55E18;color:#22C55E;border:1px solid #22C55E30;padding:4px 12px;border-radius:3px;font-size:0.72rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.btn-approve:hover{background:#22C55E28}
+.btn-decline{background:#FF6B6B18;color:#FF6B6B;border:1px solid #FF6B6B30;padding:4px 12px;border-radius:3px;font-size:0.72rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.btn-decline:hover{background:#FF6B6B28}
+
+/* Payroll */
+.payroll-info{background:var(--surface2);border-radius:5px;padding:16px;margin-bottom:12px;text-align:center}
+.payroll-days{font-size:2.5rem;font-weight:700;color:var(--accent);line-height:1}
+.payroll-days-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+.payroll-date{font-size:0.85rem;color:var(--text);margin-top:6px;font-weight:500}
+.payroll-breakdown{display:flex;flex-direction:column;gap:8px}
+.pb-row{display:flex;justify-content:space-between;align-items:center;font-size:0.83rem;padding:8px 0;border-bottom:1px solid var(--border)}
+.pb-row:last-child{border-bottom:none}
+.pb-label{color:var(--muted)}
+.pb-val{font-weight:600;color:var(--text)}
+
+/* New hires */
+.hires-list{display:flex;flex-direction:column;gap:9px}
+.hire-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:4px}
+.hire-avatar{width:30px;height:30px;border-radius:50%;background:#6C63FF20;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.hire-name{font-size:0.85rem;font-weight:600}
+.hire-role{font-size:0.71rem;color:var(--muted)}
+.hire-dept{font-size:0.68rem;font-weight:600;padding:2px 7px;border-radius:3px;background:#6C63FF18;color:var(--accent)}
+.hire-date{font-size:0.68rem;color:var(--muted);margin-top:2px}
+
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:90}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}.hamburger{display:block}
+  .stats-row{grid-template-columns:1fr 1fr}.grid-2,.grid-main{grid-template-columns:1fr}
+  .overlay.show{display:block}
+}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr 1fr}.content{padding:13px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">Trovrix</div>
+    <div class="brand-sub">HR Platform</div>
+  </div>
+  <div class="nav-section">Menu</div>
+  <div class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Employees</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>Recruitment</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Payroll</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Leave</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Performance</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</div>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">TM</div>
+      <div><div class="user-name">Tricia Mohammed</div><div class="user-role">HR Director</div></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="page-title">HR Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="badge">47 Employees</span>
+      <span class="date-chip" id="dateChip"></span>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total Headcount</div><div class="stat-val">47</div><div class="stat-sub">+3 this month</div><div class="stat-icon">👥</div></div>
+      <div class="stat-card"><div class="stat-label">Leave Pending</div><div class="stat-val">3</div><div class="stat-sub">Needs approval</div><div class="stat-icon">📅</div></div>
+      <div class="stat-card"><div class="stat-label">Payroll Due</div><div class="stat-val">8 days</div><div class="stat-sub">May 30, 2025</div><div class="stat-icon">💵</div></div>
+      <div class="stat-card"><div class="stat-label">New Hires</div><div class="stat-val">3</div><div class="stat-sub">This month</div><div class="stat-icon">🆕</div></div>
+    </div>
+
+    <div class="grid-main">
+      <!-- Headcount by Department -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Headcount by Department</span><span class="view-all">Full Report →</span></div>
+        <div class="dept-list" id="deptList"></div>
+      </div>
+      <!-- Leave Requests -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Leave Pending (3)</span><span class="view-all">All →</span></div>
+        <div class="leave-list" id="leaveList"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Payroll -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Payroll Overview</span><span class="view-all">Process →</span></div>
+        <div class="payroll-info">
+          <div class="payroll-days">8</div>
+          <div class="payroll-days-label">Days Until Payroll</div>
+          <div class="payroll-date">Friday, May 30, 2025</div>
+        </div>
+        <div class="payroll-breakdown" id="payrollBreakdown"></div>
+      </div>
+      <!-- New Hires -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">New Hires This Month</span><span class="view-all">Onboarding →</span></div>
+        <div class="hires-list" id="hiresList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+if(!localStorage.getItem('trovrix_auth')){window.location.href='../';}
+document.getElementById('dateChip').textContent=new Date().toLocaleDateString('en-TT',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+// Departments
+const depts=[
+  {name:'Operations',count:12,pct:100},{name:'Sales & Marketing',count:9,pct:75},
+  {name:'Technology',count:8,pct:67},{name:'Finance',count:6,pct:50},
+  {name:'Human Resources',count:4,pct:33},{name:'Customer Service',count:5,pct:42},
+  {name:'Legal & Compliance',count:3,pct:25},
+];
+const dl=document.getElementById('deptList');
+depts.forEach(d=>{
+  dl.innerHTML+=`<div class="dept-item">
+    <div class="dept-row"><span class="dept-name">${d.name}</span><span class="dept-count">${d.count} staff</span></div>
+    <div class="dept-bar"><div class="dept-fill" style="width:${d.pct}%"></div></div>
+  </div>`;
+});
+
+// Leave
+const leaves=[
+  {emp:'Kezia Williams',role:'Sales Executive',type:'Annual Leave',dates:'May 19 – 23, 2025'},
+  {emp:'Marcus Joseph',role:'IT Support',type:'Sick Leave',dates:'May 14 – 15, 2025'},
+  {emp:'Donna Ramoutar',role:'Finance Officer',type:'Maternity Leave',dates:'Jun 1 – Aug 31, 2025'},
+];
+const ll=document.getElementById('leaveList');
+leaves.forEach(l=>{
+  ll.innerHTML+=`<div class="leave-item">
+    <div class="leave-emp">${l.emp}</div>
+    <div class="leave-meta">${l.role} · <strong>${l.type}</strong></div>
+    <div class="leave-dates">📅 ${l.dates}</div>
+    <div class="leave-actions">
+      <button class="btn-approve">✓ Approve</button>
+      <button class="btn-decline">✗ Decline</button>
+    </div>
+  </div>`;
+});
+
+// Payroll breakdown
+const payItems=[
+  {label:'Total Gross Pay',val:'TTD 284,500'},
+  {label:'Total Deductions',val:'TTD 46,200'},
+  {label:'Net Payroll',val:'TTD 238,300'},
+  {label:'Employees Processing',val:'47'},
+];
+const pb=document.getElementById('payrollBreakdown');
+payItems.forEach(p=>{
+  pb.innerHTML+=`<div class="pb-row"><span class="pb-label">${p.label}</span><span class="pb-val">${p.val}</span></div>`;
+});
+
+// New hires
+const hires=[
+  {name:'Anika Seeram',role:'Marketing Coordinator',dept:'Sales & Marketing',date:'May 3, 2025'},
+  {name:'Trevor Mahabir',role:'DevOps Engineer',dept:'Technology',date:'May 7, 2025'},
+  {name:'Chantelle Phillip',role:'Accounts Payable',dept:'Finance',date:'May 12, 2025'},
+];
+const hl=document.getElementById('hiresList');
+hires.forEach(h=>{
+  const i=h.name.split(' ').map(x=>x[0]).join('');
+  hl.innerHTML+=`<div class="hire-item">
+    <div class="hire-avatar">${i}</div>
+    <div style="flex:1"><div class="hire-name">${h.name}</div><div class="hire-role">${h.role}</div><div class="hire-date">Joined ${h.date}</div></div>
+    <span class="hire-dept">${h.dept.split(' ')[0]}</span>
+  </div>`;
+});
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+function logout(){localStorage.removeItem('trovrix_auth');window.location.href='../';}
+</script>
+</body>
+</html>
