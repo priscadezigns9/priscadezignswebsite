@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Varen — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#C9A96E;--bg:#0A0A0A;--surface:#141410;--border:#C9A96E18;--text:#F0EDE8;--muted:#F0EDE855;--success:#4CAF50;--danger:#E74C3C;--info:#3498DB}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+
+.sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;transition:transform 0.3s}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--accent)}
+.logo-sub{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+.nav-section{padding:20px 0;flex:1;overflow-y:auto}
+.nav-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 20px 8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;font-size:0.85rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{color:var(--text);background:#C9A96E08;border-left-color:#C9A96E44}
+.nav-item.active{color:var(--accent);background:#C9A96E11;border-left-color:var(--accent)}
+.nav-item .icon{width:18px;height:18px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px}
+.user-avatar{width:34px;height:34px;background:var(--accent);color:#0A0A0A;font-weight:700;font-size:0.78rem;display:flex;align-items:center;justify-content:center}
+.user-name{font-size:0.82rem;font-weight:600}
+.user-role{font-size:0.7rem;color:var(--muted)}
+
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text)}
+.content{padding:28px;flex:1}
+.page-header{margin-bottom:24px}
+.page-title{font-family:'Playfair Display',serif;font-size:2rem;color:var(--text);margin-bottom:4px}
+.page-sub{font-size:0.83rem;color:var(--muted)}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0.4}
+.stat-card.highlight::before{opacity:1}
+.stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+.stat-value{font-family:'Playfair Display',serif;font-size:2rem;color:var(--accent);line-height:1;margin-bottom:6px}
+.stat-change{font-size:0.73rem;color:var(--muted)}
+.stat-change.up{color:var(--success)}
+.stat-change.down{color:var(--danger)}
+
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.widget{background:var(--surface);border:1px solid var(--border);overflow:hidden}
+.widget.full-width{grid-column:1/-1}
+.widget-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.widget-title{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--text)}
+.widget-badge{font-size:0.65rem;font-weight:700;padding:3px 10px;text-transform:uppercase;letter-spacing:0.5px}
+.badge-gold{background:#C9A96E22;color:var(--accent);border:1px solid #C9A96E44}
+.badge-green{background:#4CAF5022;color:var(--success);border:1px solid #4CAF5044}
+.badge-blue{background:#3498DB22;color:var(--info);border:1px solid #3498DB44}
+.widget-body{padding:16px 20px}
+.view-all{font-size:0.73rem;color:var(--accent);cursor:pointer;font-weight:600}
+
+/* Listings */
+.listing-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.listing-item:last-child{border-bottom:none}
+.listing-thumb{width:56px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.listing-info{flex:1}
+.listing-title{font-size:0.87rem;font-weight:600;color:var(--text);margin-bottom:3px}
+.listing-loc{font-size:0.73rem;color:var(--muted);margin-bottom:5px}
+.listing-price{font-size:0.9rem;font-weight:700;color:var(--accent);font-family:'Playfair Display',serif}
+.listing-type{font-size:0.65rem;font-weight:700;padding:2px 8px;text-transform:uppercase;letter-spacing:0.5px;margin-left:8px}
+.type-res{background:#3498DB22;color:var(--info);border:1px solid #3498DB44}
+.type-com{background:#C9A96E22;color:var(--accent);border:1px solid #C9A96E44}
+.type-land{background:#4CAF5022;color:var(--success);border:1px solid #4CAF5044}
+
+/* Leads */
+.lead-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.lead-item:last-child{border-bottom:none}
+.lead-avatar{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#0A0A0A;flex-shrink:0}
+.lead-info{flex:1}
+.lead-name{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.lead-interest{font-size:0.72rem;color:var(--muted)}
+.lead-score{font-size:0.75rem;font-weight:700;padding:3px 10px}
+.score-hot{color:var(--danger);background:#E74C3C22;border:1px solid #E74C3C44}
+.score-warm{color:var(--accent);background:#C9A96E22;border:1px solid #C9A96E44}
+.score-cold{color:var(--muted);background:#F0EDE811;border:1px solid #F0EDE822}
+
+/* Viewings */
+.viewing-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.viewing-item:last-child{border-bottom:none}
+.viewing-date{text-align:center;flex-shrink:0;width:44px}
+.viewing-day{font-size:1.2rem;font-weight:700;color:var(--accent);font-family:'Playfair Display',serif;line-height:1}
+.viewing-month{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.viewing-info{flex:1}
+.viewing-prop{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.viewing-client{font-size:0.72rem;color:var(--muted)}
+.viewing-time{font-size:0.78rem;color:var(--accent);font-weight:600}
+
+/* Pipeline */
+.pipeline-bar{margin:12px 0}
+.pipeline-label{display:flex;justify-content:space-between;font-size:0.78rem;color:var(--muted);margin-bottom:6px}
+.pipeline-label span:last-child{color:var(--accent);font-weight:600}
+.bar-track{height:8px;background:#F0EDE811;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,#C9A96E,#8B6914);transition:width 1s}
+
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:45}
+@media(max-width:960px){.dashboard-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.hamburger{display:flex}.overlay.show{display:block}}
+@media(max-width:440px){.stats-row{grid-template-columns:1fr}.content{padding:16px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Varen</div>
+    <div class="logo-sub">Real Estate Platform</div>
+  </div>
+  <nav class="nav-section">
+    <div class="nav-label">Navigation</div>
+    <div class="nav-item active" onclick="setPage(this,'Dashboard')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Listings')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Listings
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Leads')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Leads
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Viewings')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Viewings
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Clients')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Clients
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Reports')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Reports
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Settings')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">SM</div>
+      <div>
+        <div class="user-name" id="user-name">Sandra Maharaj</div>
+        <div class="user-role">Senior Agent</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+      <span class="topbar-title" id="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size:0.78rem;color:var(--muted)">Varen Realty TT</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="page-title">Property Dashboard</div>
+      <div class="page-sub" id="date-sub">May 2026 · Trinidad & Tobago</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card highlight">
+        <div class="stat-label">Active Listings</div>
+        <div class="stat-value">12</div>
+        <div class="stat-change up">↑ 3 added this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Listing Value</div>
+        <div class="stat-value">$18.4M</div>
+        <div class="stat-change">TTD · Residential + Commercial</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">New Leads This Week</div>
+        <div class="stat-value">7</div>
+        <div class="stat-change up">↑ 2 vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Commission Pipeline</div>
+        <div class="stat-value">$620k</div>
+        <div class="stat-change">TTD · 4 deals in progress</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Active Listings</span>
+          <span class="view-all">View All 12 →</span>
+        </div>
+        <div class="widget-body" id="listings-widget"></div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="widget">
+          <div class="widget-header">
+            <span class="widget-title">New Leads</span>
+            <span class="widget-badge badge-gold">7 This Week</span>
+          </div>
+          <div class="widget-body" id="leads-widget"></div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Upcoming Viewings</span>
+          <span class="widget-badge badge-green">5 Scheduled</span>
+        </div>
+        <div class="widget-body" id="viewings-widget"></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Commission Pipeline</span>
+          <span class="widget-badge badge-gold">4 Active Deals</span>
+        </div>
+        <div class="widget-body" id="pipeline-widget"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const listings = [
+  {emoji:'🏡', title:'3-Bed House — Westmoorings', loc:'Diego Martin, TT', price:'$2,800,000', type:'res'},
+  {emoji:'🏢', title:'Commercial Office Suite', loc:'Port of Spain, TT', price:'$4,500,000', type:'com'},
+  {emoji:'🏡', title:'4-Bed Luxury Villa', loc:'Maraval, TT', price:'$5,200,000', type:'res'},
+  {emoji:'🌿', title:'0.75-Acre Development Land', loc:'Chaguanas, TT', price:'$980,000', type:'land'},
+  {emoji:'🏠', title:'2-Bed Apartment — City View', loc:'Newtown, POS', price:'$1,450,000', type:'res'},
+];
+
+const leads = [
+  {name:'Jerome Phillip', initials:'JP', color:'#E74C3C', interest:'Residential, 3+ bed, Diego Martin', score:'hot'},
+  {name:'Tessa Williams', initials:'TW', color:'#C9A96E', interest:'Commercial, POS, under $5M', score:'warm'},
+  {name:'Darryl Baptiste', initials:'DB', color:'#3498DB', interest:'Land, Chaguanas area', score:'warm'},
+  {name:'Christine Narine', initials:'CN', color:'#4CAF50', interest:'Apartment, city centre', score:'cold'},
+];
+
+const viewings = [
+  {day:'8', month:'May', prop:'3-Bed House — Westmoorings', client:'Jerome Phillip', time:'10:00 AM'},
+  {day:'9', month:'May', prop:'Commercial Office Suite, POS', client:'Tessa Williams', time:'2:00 PM'},
+  {day:'11', month:'May', prop:'4-Bed Luxury Villa, Maraval', client:'Private Buyer', time:'11:30 AM'},
+  {day:'12', month:'May', prop:'0.75-Acre Land, Chaguanas', client:'Darryl Baptiste', time:'9:00 AM'},
+  {day:'14', month:'May', prop:'2-Bed Apartment, Newtown', client:'Christine Narine', time:'3:30 PM'},
+];
+
+const pipeline = [
+  {label:'3-Bed House — Westmoorings', val:'$2,800,000', pct:80},
+  {label:'Commercial Suite — POS', val:'$4,500,000', pct:55},
+  {label:'Maraval Villa', val:'$5,200,000', pct:30},
+  {label:'Chaguanas Land', val:'$980,000', pct:65},
+];
+
+document.getElementById('listings-widget').innerHTML = listings.map(l => `
+  <div class="listing-item">
+    <div class="listing-thumb">${l.emoji}</div>
+    <div class="listing-info">
+      <div class="listing-title">${l.title} <span class="listing-type type-${l.type}">${l.type === 'res' ? 'Residential' : l.type === 'com' ? 'Commercial' : 'Land'}</span></div>
+      <div class="listing-loc">📍 ${l.loc}</div>
+      <div class="listing-price">TTD ${l.price}</div>
+    </div>
+  </div>
+`).join('');
+
+document.getElementById('leads-widget').innerHTML = leads.map(l => `
+  <div class="lead-item">
+    <div class="lead-avatar" style="background:${l.color}">${l.initials}</div>
+    <div class="lead-info">
+      <div class="lead-name">${l.name}</div>
+      <div class="lead-interest">${l.interest}</div>
+    </div>
+    <span class="lead-score score-${l.score}">${l.score}</span>
+  </div>
+`).join('');
+
+document.getElementById('viewings-widget').innerHTML = viewings.map(v => `
+  <div class="viewing-item">
+    <div class="viewing-date">
+      <div class="viewing-day">${v.day}</div>
+      <div class="viewing-month">${v.month}</div>
+    </div>
+    <div class="viewing-info">
+      <div class="viewing-prop">${v.prop}</div>
+      <div class="viewing-client">${v.client}</div>
+    </div>
+    <span class="viewing-time">${v.time}</span>
+  </div>
+`).join('');
+
+document.getElementById('pipeline-widget').innerHTML = `
+  <div style="margin-bottom:16px">
+    <div style="font-size:1.8rem;font-weight:700;color:var(--accent);font-family:'Playfair Display',serif">$620,000</div>
+    <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">TTD · Estimated commissions (5%)</div>
+  </div>
+  ${pipeline.map(p => `
+    <div class="pipeline-bar">
+      <div class="pipeline-label"><span>${p.label}</span><span>${p.val}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${p.pct}%"></div></div>
+    </div>
+  `).join('')}
+`;
+
+const user = JSON.parse(localStorage.getItem('varen_user') || '{}');
+if(user.name) document.getElementById('user-name').textContent = user.name;
+
+function setPage(el, name){ document.getElementById('page-title').textContent = name; document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active'); closeSidebar(); }
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
+</body>
+</html>
