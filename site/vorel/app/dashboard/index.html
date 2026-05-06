@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vorel Dashboard — Call Centre Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--accent:#00D4AA;--accent2:#00a88a;--bg:#050C0A;--surface:rgba(255,255,255,0.04);--border:rgba(0,212,170,0.15);--text:#e0f2f1;--muted:#3d7a72;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;display:flex;min-height:100vh;}
+.sidebar{width:240px;background:rgba(0,0,0,0.5);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform 0.3s;}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border);}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.brand-icon svg{width:18px;height:18px;fill:white;}
+.brand h2{font-size:18px;font-weight:700;color:var(--accent);}
+.brand p{font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto;}
+.nav-section{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:12px 8px 6px;font-family:'Inter',sans-serif;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:#5a9a92;transition:all 0.2s;margin-bottom:2px;}
+.nav-item:hover,.nav-item.active{background:rgba(0,212,170,0.1);color:var(--accent);}
+.nav-item svg{width:16px;height:16px;fill:currentColor;flex-shrink:0;}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border);}
+.user-pill{display:flex;align-items:center;gap:10px;}
+.avatar{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#050C0A;}
+.user-info p{font-size:12px;font-weight:600;}
+.user-info span{font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;}
+/* Live indicator */
+.live-dot{width:8px;height:8px;border-radius:50%;background:#00D4AA;display:inline-block;margin-right:6px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.4);position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px;}
+.hamburger span{width:20px;height:2px;background:var(--text);border-radius:2px;}
+.page-title h1{font-size:18px;font-weight:700;}
+.page-title p{font-size:12px;color:var(--muted);font-family:'Inter',sans-serif;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.live-badge{background:rgba(0,212,170,0.12);border:1px solid rgba(0,212,170,0.3);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--accent);display:flex;align-items:center;}
+.btn-sm{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;color:var(--text);}
+.content{padding:28px;flex:1;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;}
+.stat-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-family:'Inter',sans-serif;}
+.stat-value{font-size:30px;font-weight:700;line-height:1;}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:6px;font-family:'Inter',sans-serif;}
+.stat-trend{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;display:inline-flex;align-items:center;gap:3px;margin-top:8px;}
+.trend-up{background:rgba(0,212,170,0.12);color:#00D4AA;}
+.trend-down{background:rgba(239,68,68,0.12);color:#ef4444;}
+.trend-warn{background:rgba(251,191,36,0.12);color:#fbbf24;}
+/* Agent board */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-title{font-size:15px;font-weight:700;}
+.section-sub{font-size:12px;color:var(--muted);font-family:'Inter',sans-serif;}
+.tag{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:rgba(0,212,170,0.1);color:var(--accent);font-family:'Inter',sans-serif;}
+.agent-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px;margin-bottom:24px;}
+.agent-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;}
+.agent-card.available{border-color:rgba(0,212,170,0.3);}
+.agent-card.busy{border-color:rgba(239,68,68,0.3);}
+.agent-card.break{border-color:rgba(251,191,36,0.3);}
+.agent-card.offline{border-color:rgba(100,100,100,0.3);}
+.agent-status{position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%;}
+.s-available{background:#00D4AA;}
+.s-busy{background:#ef4444;}
+.s-break{background:#fbbf24;}
+.s-offline{background:#555;}
+.agent-avatar{width:40px;height:40px;border-radius:12px;background:rgba(0,212,170,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent);margin-bottom:10px;}
+.agent-name{font-size:13px;font-weight:600;margin-bottom:3px;}
+.agent-ext{font-size:11px;color:var(--muted);font-family:'Inter',sans-serif;}
+.agent-stat{font-size:11px;font-weight:600;margin-top:8px;font-family:'Inter',sans-serif;}
+.agent-card.available .agent-stat{color:#00D4AA;}
+.agent-card.busy .agent-stat{color:#ef4444;}
+.agent-card.break .agent-stat{color:#fbbf24;}
+/* Queue + Call metrics */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.widget{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;}
+.widget-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.widget-title{font-size:14px;font-weight:700;}
+/* Queue table */
+.q-table{width:100%;border-collapse:collapse;}
+.q-table th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:0 0 10px;text-align:left;border-bottom:1px solid var(--border);font-family:'Inter',sans-serif;}
+.q-table td{padding:10px 0;border-bottom:1px solid rgba(0,212,170,0.06);font-size:13px;font-family:'Inter',sans-serif;}
+.q-table tr:last-child td{border-bottom:none;}
+.q-len{font-size:20px;font-weight:700;color:var(--accent);}
+.wait-bar{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;margin-top:4px;}
+.wait-fill{height:100%;border-radius:2px;background:var(--accent);}
+/* Hourly calls chart */
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:80px;margin-top:8px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.bar{width:100%;border-radius:3px 3px 0 0;background:rgba(0,212,170,0.3);transition:background 0.2s;}
+.bar.active{background:var(--accent);}
+.bar-lbl{font-size:9px;color:var(--muted);font-family:'Inter',sans-serif;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .overlay.show{display:block;}
+  .main{margin-left:0;}
+  .hamburger{display:flex;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .grid-2{grid-template-columns:1fr;}
+  .agent-board{grid-template-columns:repeat(2,1fr);}
+  .content{padding:16px;}
+}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg></div>
+      <div><h2>Vorel</h2><p>Call Centre Platform</p></div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Agents</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>Queues</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z"/></svg>Scripts</div>
+    <div class="nav-section">Reports</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Recordings</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Reports</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>Settings</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">SV</div>
+      <div class="user-info"><p>Supervisor</p><span id="userEmail">supervisor@vorel.app</span></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+      <div class="page-title"><h1>Call Centre Dashboard</h1><p id="todayDate">Loading...</p></div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge"><span class="live-dot"></span>Live — <span id="liveTime">--:--:--</span></div>
+      <div class="btn-sm" onclick="logout()">Sign Out</div>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Calls Today</div>
+        <div class="stat-value" id="callCount">347</div>
+        <div class="stat-sub">vs 312 yesterday</div>
+        <div class="stat-trend trend-up">↑ +11.2%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Handle Time</div>
+        <div class="stat-value">4:23</div>
+        <div class="stat-sub">Target: under 5:00</div>
+        <div class="stat-trend trend-up">✓ On target</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Queue Length</div>
+        <div class="stat-value" id="queueLen">7</div>
+        <div class="stat-sub">Avg wait: 2m 14s</div>
+        <div class="stat-trend trend-warn">⚠ Moderate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Abandon Rate</div>
+        <div class="stat-value">3.8%</div>
+        <div class="stat-sub">Target: under 5%</div>
+        <div class="stat-trend trend-up">✓ Within SLA</div>
+      </div>
+    </div>
+
+    <!-- Agent Board -->
+    <div class="section-header">
+      <div><div class="section-title">Live Agent Status Board</div><div class="section-sub">Real-time agent availability — 12 agents</div></div>
+      <span class="tag">Updated live</span>
+    </div>
+    <div class="agent-board" id="agentBoard"></div>
+
+    <!-- Queues + Hourly Calls -->
+    <div class="grid-2">
+      <div class="widget">
+        <div class="widget-header">
+          <div><div class="widget-title">Active Queues</div></div>
+          <span class="tag">3 Queues</span>
+        </div>
+        <table class="q-table">
+          <thead><tr><th>Queue</th><th>Waiting</th><th>Avg Wait</th><th>SLA</th></tr></thead>
+          <tbody id="queueTable"></tbody>
+        </table>
+      </div>
+      <div class="widget">
+        <div class="widget-header">
+          <div><div class="widget-title">Calls by Hour</div><div style="font-size:11px;color:var(--muted);font-family:'Inter',sans-serif">Today's call volume</div></div>
+        </div>
+        <div class="chart-bars" id="chartBars"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;" id="chartLabels"></div>
+      </div>
+    </div>
+
+    <!-- Recent calls -->
+    <div class="widget">
+      <div class="widget-header">
+        <div><div class="widget-title">Recent Calls</div></div>
+        <span class="tag">Last 8 calls</span>
+      </div>
+      <table class="q-table">
+        <thead><tr><th>Agent</th><th>Caller ID</th><th>Queue</th><th>Duration</th><th>Result</th><th>Time</th></tr></thead>
+        <tbody id="recentCalls"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+if(!localStorage.getItem('vorel_auth')){window.location.href='../';}
+document.getElementById('userEmail').textContent=localStorage.getItem('vorel_user')||'supervisor@vorel.app';
+const now=new Date();
+document.getElementById('todayDate').textContent=now.toLocaleDateString('en-TT',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// Live clock
+function updateClock(){document.getElementById('liveTime').textContent=new Date().toLocaleTimeString('en-TT');}
+updateClock();setInterval(updateClock,1000);
+
+// Agents
+const agents=[
+  {name:'Alicia Ramsaran',ext:'301',status:'busy',stat:'On call — 3:42',init:'AR'},
+  {name:'Brandon Moses',ext:'302',status:'available',stat:'Available',init:'BM'},
+  {name:'Celine Phillip',ext:'303',status:'busy',stat:'On call — 1:18',init:'CP'},
+  {name:'David Singh',ext:'304',status:'break',stat:'On break — 8m',init:'DS'},
+  {name:'Emma Williams',ext:'305',status:'available',stat:'Available',init:'EW'},
+  {name:'Farid Ali',ext:'306',status:'busy',stat:'On call — 5:01',init:'FA'},
+  {name:'Grace Joseph',ext:'307',status:'available',stat:'Available',init:'GJ'},
+  {name:'Hector Charles',ext:'308',status:'busy',stat:'On call — 2:55',init:'HC'},
+  {name:'Irene Baptiste',ext:'309',status:'break',stat:'On break — 3m',init:'IB'},
+  {name:'James Noel',ext:'310',status:'available',stat:'Available',init:'JN'},
+  {name:'Karen Henry',ext:'311',status:'busy',stat:'On call — 0:47',init:'KH'},
+  {name:'Leon Persad',ext:'312',status:'offline',stat:'Offline',init:'LP'},
+];
+const ab=document.getElementById('agentBoard');
+agents.forEach(a=>{
+  ab.innerHTML+=`<div class="agent-card ${a.status}">
+    <div class="agent-status s-${a.status}"></div>
+    <div class="agent-avatar">${a.init}</div>
+    <div class="agent-name">${a.name}</div>
+    <div class="agent-ext">Ext. ${a.ext}</div>
+    <div class="agent-stat">${a.stat}</div>
+  </div>`;
+});
+
+// Queues
+const queues=[
+  {name:'General Support',waiting:4,wait:'2m 05s',sla:'94%',slaOk:true},
+  {name:'Billing & Accounts',waiting:2,wait:'1m 30s',sla:'97%',slaOk:true},
+  {name:'Technical Issues',waiting:1,wait:'4m 12s',sla:'78%',slaOk:false},
+];
+const qt=document.getElementById('queueTable');
+queues.forEach(q=>{
+  const slaColor=q.slaOk?'#00D4AA':'#ef4444';
+  qt.innerHTML+=`<tr>
+    <td><strong>${q.name}</strong></td>
+    <td><span class="q-len">${q.waiting}</span></td>
+    <td style="font-family:'Inter',sans-serif">${q.wait}</td>
+    <td style="color:${slaColor};font-weight:600">${q.sla}</td>
+  </tr>`;
+});
+
+// Hourly chart
+const hours=['8a','9a','10a','11a','12p','1p','2p','3p','4p','5p'];
+const vals=[18,32,45,52,38,41,56,48,35,22];
+const maxVal=Math.max(...vals);
+const cb=document.getElementById('chartBars');
+const cl=document.getElementById('chartLabels');
+const currentHour=now.getHours()-8;
+hours.forEach((h,i)=>{
+  const pct=Math.round((vals[i]/maxVal)*80);
+  cb.innerHTML+=`<div class="bar-col"><div class="bar${i===currentHour?' active':''}" style="height:${pct}px" title="${vals[i]} calls"></div></div>`;
+  cl.innerHTML+=`<div style="font-size:9px;color:var(--muted);font-family:'Inter',sans-serif">${h}</div>`;
+});
+
+// Recent calls
+const results=['Resolved','Escalated','Resolved','Voicemail','Resolved','Resolved','Callback','Resolved'];
+const resultColors={'Resolved':'#00D4AA','Escalated':'#fbbf24','Voicemail':'#60a5fa','Callback':'#a78bfa'};
+const recCalls=[
+  {agent:'Alicia R.',caller:'+1-868-472-XXXX',queue:'General',dur:'4:12',result:'Resolved',time:'5:41 PM'},
+  {agent:'Brandon M.',caller:'+1-868-335-XXXX',queue:'Billing',dur:'6:33',result:'Escalated',time:'5:38 PM'},
+  {agent:'Celine P.',caller:'+1-868-291-XXXX',queue:'General',dur:'3:07',result:'Resolved',time:'5:36 PM'},
+  {agent:'Emma W.',caller:'+1-868-674-XXXX',queue:'Technical',dur:'2:51',result:'Voicemail',time:'5:34 PM'},
+  {agent:'Farid A.',caller:'+1-868-503-XXXX',queue:'General',dur:'5:18',result:'Resolved',time:'5:31 PM'},
+  {agent:'Grace J.',caller:'+1-868-442-XXXX',queue:'Billing',dur:'3:45',result:'Resolved',time:'5:28 PM'},
+  {agent:'Hector C.',caller:'+1-868-197-XXXX',queue:'General',dur:'4:02',result:'Callback',time:'5:25 PM'},
+  {agent:'James N.',caller:'+1-868-308-XXXX',queue:'Technical',dur:'7:11',result:'Resolved',time:'5:22 PM'},
+];
+const rc=document.getElementById('recentCalls');
+recCalls.forEach(c=>{
+  const col=resultColors[c.result]||'#e0f2f1';
+  rc.innerHTML+=`<tr>
+    <td style="font-weight:600">${c.agent}</td>
+    <td style="font-family:'Inter',sans-serif">${c.caller}</td>
+    <td>${c.queue}</td>
+    <td style="font-family:'Inter',sans-serif">${c.dur}</td>
+    <td><span style="color:${col};font-weight:600;font-size:12px">${c.result}</span></td>
+    <td style="color:var(--muted);font-size:12px;font-family:'Inter',sans-serif">${c.time}</td>
+  </tr>`;
+});
+
+// Simulate live updates
+setInterval(()=>{
+  const curr=parseInt(document.getElementById('callCount').textContent);
+  if(Math.random()>0.7) document.getElementById('callCount').textContent=curr+1;
+  const q=parseInt(document.getElementById('queueLen').textContent);
+  document.getElementById('queueLen').textContent=Math.max(0,q+(Math.random()>0.5?1:-1));
+},5000);
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function logout(){localStorage.removeItem('vorel_auth');window.location.href='../';}
+</script>
+</body>
+</html>
