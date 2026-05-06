@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Builven Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#F5A623;--bg:#0D0A05;--surface:#131008;--surface2:#1A1509;--border:#F5A62320;--text:#F5EDD8;--muted:#F5EDD866}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+
+/* Sidebar */
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform 0.3s}
+.sidebar-brand{padding:22px 20px;border-bottom:1px solid var(--border)}
+.brand-name{font-family:'Barlow Condensed',sans-serif;font-size:1.4rem;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:-0.5px}
+.brand-sub{font-size:0.68rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.nav-section{padding:20px 12px 8px;font-size:0.62rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:3px;cursor:pointer;margin:2px 8px;transition:all 0.15s;font-size:0.9rem;font-weight:500;color:var(--muted)}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:#F5A62318;color:var(--accent);font-weight:600}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:0.8}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border)}
+.user-info{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;background:#F5A62330;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.user-name{font-size:0.85rem;font-weight:600}
+.user-role{font-size:0.72rem;color:var(--muted)}
+.logout-btn{margin-top:10px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px;font-family:'Barlow',sans-serif;font-size:0.78rem;cursor:pointer;border-radius:3px;transition:all 0.2s}
+.logout-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Main */
+.main{margin-left:240px;flex:1;min-height:100vh;overflow-x:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:var(--text)}
+.page-title{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.badge{background:#F5A62318;color:var(--accent);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:0.5px}
+.date-chip{font-size:0.78rem;color:var(--muted)}
+.content{padding:28px}
+
+/* Widgets */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:22px;border-radius:4px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.stat-card:hover{border-color:#F5A62244}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent);opacity:0.4}
+.stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:10px;font-weight:600}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:800;color:var(--text);line-height:1}
+.stat-sub{font-size:0.77rem;color:var(--muted);margin-top:6px}
+.stat-icon{position:absolute;top:18px;right:18px;font-size:1.6rem;opacity:0.25}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.view-all{font-size:0.78rem;color:var(--accent);cursor:pointer}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.grid-3{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px}
+.widget{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:22px}
+
+/* Projects */
+.project-item{padding:16px 0;border-bottom:1px solid var(--border)}
+.project-item:last-child{border-bottom:none;padding-bottom:0}
+.project-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.project-name{font-weight:600;font-size:0.92rem}
+.project-meta{font-size:0.75rem;color:var(--muted)}
+.project-pct{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;color:var(--accent)}
+.progress-bar{height:6px;background:#F5A62215;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width 1s ease}
+.project-tags{display:flex;gap:6px;margin-top:8px}
+.tag{font-size:0.65rem;padding:2px 8px;border-radius:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.tag-green{background:#22C55E20;color:#22C55E}
+.tag-yellow{background:#F5A62320;color:var(--accent)}
+.tag-red{background:#FF6B6B20;color:#FF6B6B}
+.tag-blue{background:#60A5FA20;color:#60A5FA}
+
+/* Workers */
+.worker-list{display:flex;flex-direction:column;gap:10px}
+.worker-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface2);border-radius:3px}
+.w-avatar{width:32px;height:32px;border-radius:50%;background:#F5A62325;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.w-name{font-size:0.87rem;font-weight:600;flex:1}
+.w-role{font-size:0.72rem;color:var(--muted)}
+.w-status{font-size:0.7rem;font-weight:600;padding:3px 8px;border-radius:2px}
+.on-site{background:#22C55E20;color:#22C55E}
+.off-site{background:#F5A62320;color:var(--accent)}
+
+/* Equipment */
+.equip-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.equip-item{background:var(--surface2);border-radius:3px;padding:14px}
+.equip-name{font-size:0.85rem;font-weight:600;margin-bottom:4px}
+.equip-status{font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:2px;display:inline-block}
+.equip-loc{font-size:0.72rem;color:var(--muted);margin-top:4px}
+.status-active{background:#22C55E20;color:#22C55E}
+.status-idle{background:#F5A62320;color:var(--accent)}
+.status-maint{background:#FF6B6B20;color:#FF6B6B}
+
+/* Invoices */
+.invoice-list{display:flex;flex-direction:column;gap:0}
+.invoice-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.invoice-item:last-child{border-bottom:none}
+.inv-client{font-size:0.87rem;font-weight:600}
+.inv-num{font-size:0.72rem;color:var(--muted)}
+.inv-amount{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:700;color:var(--accent)}
+.inv-due{font-size:0.72rem;color:var(--muted);text-align:right}
+.inv-badge{font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:2px;display:inline-block;margin-top:3px}
+.overdue{background:#FF6B6B20;color:#FF6B6B}
+.due-soon{background:#F5A62320;color:var(--accent)}
+.paid{background:#22C55E20;color:#22C55E}
+
+/* Mobile */
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:90}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger{display:block}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .equip-grid{grid-template-columns:1fr}
+  .overlay.show{display:block}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .content{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">Builven</div>
+    <div class="brand-sub">Construction Mgmt</div>
+  </div>
+  <div class="nav-section">Main</div>
+  <div class="nav-item active">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Dashboard
+  </div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+    Projects
+  </div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    Workers
+  </div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+    Equipment
+  </div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+    Materials
+  </div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Invoices
+  </div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Reports
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="avatar">RJ</div>
+      <div>
+        <div class="user-name">Ravi James</div>
+        <div class="user-role">Site Manager</div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="badge">4 Active Projects</span>
+      <span class="date-chip" id="dateChip"></span>
+    </div>
+  </div>
+  <div class="content">
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Active Projects</div>
+        <div class="stat-val">4</div>
+        <div class="stat-sub">2 on schedule</div>
+        <div class="stat-icon">🏗️</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Workers on Site</div>
+        <div class="stat-val">28</div>
+        <div class="stat-sub">Today, all sites</div>
+        <div class="stat-icon">👷</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Equipment Active</div>
+        <div class="stat-val">11</div>
+        <div class="stat-sub">3 in maintenance</div>
+        <div class="stat-icon">🔧</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Invoices Due</div>
+        <div class="stat-val">TTD 284K</div>
+        <div class="stat-sub">5 outstanding</div>
+        <div class="stat-icon">💰</div>
+      </div>
+    </div>
+
+    <!-- Projects + Workers -->
+    <div class="grid-3">
+      <div class="widget">
+        <div class="section-header">
+          <span class="section-title">Active Projects</span>
+          <span class="view-all">View All →</span>
+        </div>
+        <div id="projects-list"></div>
+      </div>
+      <div class="widget">
+        <div class="section-header">
+          <span class="section-title">Workers on Site</span>
+          <span class="view-all">All →</span>
+        </div>
+        <div class="worker-list" id="worker-list"></div>
+      </div>
+    </div>
+
+    <!-- Equipment + Invoices -->
+    <div class="grid-2">
+      <div class="widget">
+        <div class="section-header">
+          <span class="section-title">Equipment Status</span>
+          <span class="view-all">Manage →</span>
+        </div>
+        <div class="equip-grid" id="equip-grid"></div>
+      </div>
+      <div class="widget">
+        <div class="section-header">
+          <span class="section-title">Invoices Due</span>
+          <span class="view-all">View All →</span>
+        </div>
+        <div class="invoice-list" id="invoice-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// Auth check
+if(!localStorage.getItem('builven_auth')){window.location.href='../';}
+
+// Date
+const now=new Date();
+document.getElementById('dateChip').textContent=now.toLocaleDateString('en-TT',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+// Projects data
+const projects=[
+  {name:'Andalusia Heights Phase 2',location:'Maraval, POS',pct:72,status:'On Track',type:'Residential',contractor:'Maxwell Builds Ltd',budget:'TTD 2.1M'},
+  {name:'Chaguaramas Bay Villas',location:'Chaguaramas',pct:45,status:'On Track',type:'Residential',contractor:'Premier Construction',budget:'TTD 3.8M'},
+  {name:'Valencia Green Residences',location:'Valencia',pct:88,status:'Near Completion',type:'Residential',contractor:'BuildRight TT',budget:'TTD 1.6M'},
+  {name:'Arima East Town Houses',location:'Arima',pct:23,status:'Delayed',type:'Residential',contractor:'Sunrise Builders',budget:'TTD 4.2M'},
+];
+const statusColors={
+  'On Track':'tag-green',
+  'Near Completion':'tag-blue',
+  'Delayed':'tag-red',
+};
+const pl=document.getElementById('projects-list');
+projects.forEach(p=>{
+  pl.innerHTML+=`<div class="project-item">
+    <div class="project-row">
+      <div><div class="project-name">${p.name}</div><div class="project-meta">${p.location} · ${p.contractor}</div></div>
+      <div class="project-pct">${p.pct}%</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${p.pct}%"></div></div>
+    <div class="project-tags"><span class="tag ${statusColors[p.status]}">${p.status}</span><span class="tag tag-yellow">${p.type}</span><span class="tag tag-blue">${p.budget}</span></div>
+  </div>`;
+});
+
+// Workers
+const workers=[
+  {name:'Kevin Rampersad',role:'Foreman',site:'Maraval',status:'on-site'},
+  {name:'Derrick Thomas',role:'Mason',site:'Chaguaramas',status:'on-site'},
+  {name:'Andre Baptiste',role:'Carpenter',site:'Valencia',status:'on-site'},
+  {name:'Curtis Alleyne',role:'Electrician',site:'Arima',status:'on-site'},
+  {name:'Leon Phillip',role:'Plumber',site:'Maraval',status:'off-site'},
+];
+const wl=document.getElementById('worker-list');
+workers.forEach(w=>{
+  const initials=w.name.split(' ').map(x=>x[0]).join('');
+  wl.innerHTML+=`<div class="worker-item">
+    <div class="w-avatar">${initials}</div>
+    <div><div class="w-name">${w.name}</div><div class="w-role">${w.role} · ${w.site}</div></div>
+    <span class="w-status ${w.status}">${w.status==='on-site'?'On Site':'Off Site'}</span>
+  </div>`;
+});
+
+// Equipment
+const equip=[
+  {name:'Excavator JD310',status:'Active',statusCls:'status-active',loc:'Maraval'},
+  {name:'Tower Crane TC40',status:'Active',statusCls:'status-active',loc:'Chaguaramas'},
+  {name:'Concrete Mixer CM3',status:'Idle',statusCls:'status-idle',loc:'Valencia'},
+  {name:'Bulldozer CAT D6',status:'Maintenance',statusCls:'status-maint',loc:'Yard'},
+  {name:'Dump Truck TT01',status:'Active',statusCls:'status-active',loc:'Arima'},
+  {name:'Scissor Lift SL2',status:'Maintenance',statusCls:'status-maint',loc:'Yard'},
+];
+const eg=document.getElementById('equip-grid');
+equip.forEach(e=>{
+  eg.innerHTML+=`<div class="equip-item">
+    <div class="equip-name">${e.name}</div>
+    <span class="equip-status ${e.statusCls}">${e.status}</span>
+    <div class="equip-loc">📍 ${e.loc}</div>
+  </div>`;
+});
+
+// Invoices
+const invoices=[
+  {client:'Maxwell Builds Ltd',num:'INV-2024-041',amount:'TTD 84,500',due:'May 10',badge:'overdue',badgeText:'Overdue'},
+  {client:'Premier Construction',num:'INV-2024-039',amount:'TTD 120,000',due:'May 15',badge:'due-soon',badgeText:'Due Soon'},
+  {client:'BuildRight TT',num:'INV-2024-037',amount:'TTD 46,200',due:'May 20',badge:'due-soon',badgeText:'Due Soon'},
+  {client:'Sunrise Builders',num:'INV-2024-036',amount:'TTD 33,800',due:'Apr 28',badge:'overdue',badgeText:'Overdue'},
+  {client:'CemCo Supplies',num:'INV-2024-035',amount:'TTD 18,700',due:'May 30',badge:'paid',badgeText:'Paid'},
+];
+const il=document.getElementById('invoice-list');
+invoices.forEach(i=>{
+  il.innerHTML+=`<div class="invoice-item">
+    <div><div class="inv-client">${i.client}</div><div class="inv-num">${i.num}</div></div>
+    <div style="text-align:right"><div class="inv-amount">${i.amount}</div><div class="inv-due">Due ${i.due}</div><span class="inv-badge ${i.badge}">${i.badgeText}</span></div>
+  </div>`;
+});
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+function logout(){
+  localStorage.removeItem('builven_auth');
+  window.location.href='../';
+}
+</script>
+</body>
+</html>
