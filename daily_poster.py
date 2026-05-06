@@ -22,7 +22,7 @@ BRAND_TO_SLUG = {
     "The Escapist":       "the-escapist",
     "Paw Vault":          "paw-vault",
     "Quiet Luxury":       "quiet-luxury",
-    "The Way Made Known": "nehneh",  # Christian content
+    "The Way Made Known": "the-way-made-known",  # Christian content
     "Prime Land Network": "prime-land-network",
     "The Tech Scout HQ":  "tech-scout",       # fixed: was "Tech Scout"
     "NehNeh":             "nehneh",
@@ -364,6 +364,13 @@ def make_square_crop(local_path):
     except Exception:
         return None
 
+def is_safe_image_url(url):
+    """Reject YouTube thumbnails and other non-original image sources."""
+    if not url:
+        return False
+    blocked = ['ytimg.com', 'youtube.com', 'youtu.be', 'emg1', 'external-ord']
+    return not any(b in url for b in blocked)
+
 def get_ai_image_url(niche_keyword, style="product"):
     """Get a high-quality image from Picsum (deterministic, always works, no Unsplash).
     For branded content we use specific curated image seeds per niche."""
@@ -373,7 +380,7 @@ def get_ai_image_url(niche_keyword, style="product"):
         "fashion": "1041", "fragrance": "1043", "skincare": "1047", "fitness": "1049",
         "anime": "1051", "travel": "1053", "pets": "1055", "luxury": "1057",
         "food": "1059", "real estate": "1061", "tech": "1063", "workspace": "1065",
-        "automotive": "1067", "christian": "1069", "design": "1071",
+        "automotive": "1067", "christian": "1069", "design": "1071", "sewing": "1073", "custom fashion": "1041",
     }
     seed = seeds.get(niche_keyword.lower(), "1044")
     return f"https://picsum.photos/seed/{seed}/1080/1080"
@@ -480,7 +487,7 @@ def find_ig_safe_image(brand_name, preferred_url):
         except Exception:
             pass
         # If no product images, use preferred (Amazon product) URL only
-        if preferred_url and preferred_url.startswith("http") and "amazon" not in preferred_url.lower():
+        if preferred_url and preferred_url.startswith("http") and "amazon" not in preferred_url.lower() and is_safe_image_url(preferred_url):
             return preferred_url
         return preferred_url  # Amazon product image — best we have
 
