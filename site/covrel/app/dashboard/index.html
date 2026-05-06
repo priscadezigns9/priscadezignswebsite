@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Covrel Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#2563EB;--accent-light:#60A5FA;--bg:#050810;--surface:#090D18;--surface2:#0E1220;--border:#2563EB1A;--text:#E8EFF8;--muted:#E8EFF860}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+.sidebar{width:235px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform 0.3s}
+.sidebar-brand{padding:20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.brand-icon{width:30px;height:30px;background:#2563EB18;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--accent-light);letter-spacing:-0.3px}
+.nav-section{padding:16px 14px 5px;font-size:0.6rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:4px;cursor:pointer;margin:2px 8px;transition:all 0.15s;font-size:0.86rem;font-weight:500;color:var(--muted)}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:#2563EB18;color:var(--accent-light)}
+.nav-icon{width:16px;height:16px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:9px}
+.avatar{width:30px;height:30px;background:#2563EB22;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--accent-light);flex-shrink:0}
+.user-name{font-size:0.82rem;font-weight:600}
+.user-role{font-size:0.68rem;color:var(--muted)}
+.logout-btn{margin-top:9px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px;font-family:'Inter',sans-serif;font-size:0.74rem;cursor:pointer;border-radius:4px;transition:all 0.2s}
+.logout-btn:hover{border-color:var(--accent-light);color:var(--accent-light)}
+.main{margin-left:235px;flex:1}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;color:var(--text)}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;letter-spacing:-0.3px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge{background:#2563EB18;color:var(--accent-light);padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600}
+.date-chip{font-size:0.76rem;color:var(--muted)}
+.content{padding:22px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:20px;border-radius:5px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.stat-card:hover{border-color:#2563EB44}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0.6}
+.stat-label{font-size:0.67rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;font-weight:600}
+.stat-val{font-size:1.9rem;font-weight:700;color:var(--text);line-height:1;font-family:'Cormorant Garamond',serif;font-weight:600}
+.stat-sub{font-size:0.74rem;color:var(--muted);margin-top:5px}
+.stat-icon{position:absolute;top:14px;right:14px;font-size:1.3rem;opacity:0.2}
+.grid-main{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;margin-bottom:18px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.widget{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:20px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:0.97rem;font-weight:600;font-family:'Cormorant Garamond',serif;letter-spacing:-0.2px;font-size:1.05rem}
+.view-all{font-size:0.74rem;color:var(--accent-light);cursor:pointer}
+
+/* Policies table */
+.policy-table{width:100%;border-collapse:collapse}
+.policy-table th{font-size:0.67rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);font-weight:600;padding:0 0 10px;text-align:left;border-bottom:1px solid var(--border)}
+.policy-table td{font-size:0.83rem;padding:10px 0;border-bottom:1px solid var(--border)}
+.policy-table tr:last-child td{border-bottom:none}
+.pol-num{font-family:'Inter',monospace;font-size:0.78rem;color:var(--accent-light)}
+.pol-type{font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:3px}
+.pol-auto{background:#2563EB18;color:var(--accent-light)}
+.pol-health{background:#22C55E18;color:#22C55E}
+.pol-home{background:#F59E0B18;color:#F59E0B}
+.pol-life{background:#EC489918;color:#EC4899}
+.pol-status-active{font-size:0.7rem;font-weight:600;color:#22C55E}
+.pol-status-review{font-size:0.7rem;font-weight:600;color:#F59E0B}
+
+/* Claims */
+.claims-list{display:flex;flex-direction:column;gap:9px}
+.claim-item{background:var(--surface2);border-radius:4px;padding:12px 14px;border-left:2px solid var(--accent)}
+.claim-num{font-size:0.72rem;color:var(--accent-light);font-family:'Inter',monospace;margin-bottom:2px}
+.claim-client{font-size:0.87rem;font-weight:600}
+.claim-type{font-size:0.72rem;color:var(--muted)}
+.claim-amount{font-size:0.85rem;font-weight:600;color:var(--text);margin-top:4px}
+.claim-status{font-size:0.68rem;font-weight:600;padding:2px 7px;border-radius:3px;display:inline-block;margin-top:4px}
+.cs-review{background:#F59E0B18;color:#F59E0B}
+.cs-processing{background:#2563EB18;color:var(--accent-light)}
+.cs-approved{background:#22C55E18;color:#22C55E}
+
+/* Renewals */
+.renewal-list{display:flex;flex-direction:column;gap:0}
+.renewal-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.renewal-item:last-child{border-bottom:none}
+.ren-client{font-size:0.85rem;font-weight:600}
+.ren-policy{font-size:0.72rem;color:var(--muted);font-family:'Inter',monospace}
+.ren-date{font-size:0.8rem;font-weight:600;color:var(--accent-light);text-align:right}
+.ren-days{font-size:0.68rem;color:var(--muted);text-align:right;margin-top:2px}
+.ren-urgent{color:#F59E0B}
+
+/* Premium */
+.premium-big{text-align:center;padding:20px 0}
+.premium-amount{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:600;color:var(--text);letter-spacing:-1px}
+.premium-sub{font-size:0.77rem;color:var(--muted);margin-top:4px}
+.premium-breakdown{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.pb-row{display:flex;justify-content:space-between;font-size:0.82rem;padding:8px 0;border-bottom:1px solid var(--border)}
+.pb-row:last-child{border-bottom:none}
+.pb-label{color:var(--muted)}
+.pb-val{font-weight:600}
+
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:90}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}.hamburger{display:block}
+  .stats-row{grid-template-columns:1fr 1fr}.grid-main,.grid-2{grid-template-columns:1fr}
+  .overlay.show{display:block}
+}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr 1fr}.content{padding:13px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🛡️</div>
+    <div class="brand-name">Covrel</div>
+  </div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Policies</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Claims</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Renewals</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clients</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>Settings</div>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">VC</div>
+      <div><div class="user-name">Victor Charles</div><div class="user-role">Senior Agent</div></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="badge">145 Active Policies</span>
+      <span class="date-chip" id="dateChip"></span>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Active Policies</div><div class="stat-val">145</div><div class="stat-sub">+8 this month</div><div class="stat-icon">📋</div></div>
+      <div class="stat-card"><div class="stat-label">Claims in Progress</div><div class="stat-val">8</div><div class="stat-sub">3 under review</div><div class="stat-icon">⚖️</div></div>
+      <div class="stat-card"><div class="stat-label">Renewals (30 days)</div><div class="stat-val">12</div><div class="stat-sub">4 urgent</div><div class="stat-icon">🔄</div></div>
+      <div class="stat-card"><div class="stat-label">Premium (May)</div><div class="stat-val">TTD 84K</div><div class="stat-sub">↑ 6% vs last mo.</div><div class="stat-icon">💰</div></div>
+    </div>
+
+    <div class="grid-main">
+      <!-- Policies Table -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Recent Policies</span><span class="view-all">All 145 →</span></div>
+        <table class="policy-table">
+          <thead><tr><th>Policy #</th><th>Client</th><th>Type</th><th>Premium</th><th>Status</th></tr></thead>
+          <tbody id="policyTable"></tbody>
+        </table>
+      </div>
+      <!-- Claims -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Active Claims (8)</span><span class="view-all">All →</span></div>
+        <div class="claims-list" id="claimsList"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Renewals -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Renewals Due (30 days)</span><span class="view-all">Process →</span></div>
+        <div class="renewal-list" id="renewalList"></div>
+      </div>
+      <!-- Premium Collected -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Premium Collected</span><span class="view-all">Report →</span></div>
+        <div class="premium-big">
+          <div class="premium-amount">TTD 84,200</div>
+          <div class="premium-sub">May 2025 — as of today</div>
+        </div>
+        <div class="premium-breakdown" id="premBreakdown"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+if(!localStorage.getItem('covrel_auth')){window.location.href='../';}
+document.getElementById('dateChip').textContent=new Date().toLocaleDateString('en-TT',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+const policies=[
+  {num:'COV-2401',client:'Marcus Williams',type:'Auto','pol-auto':'pol-auto',premium:'TTD 420/mo',status:'Active',stCls:'pol-status-active'},
+  {num:'COV-2398',client:'Kezia Ramoutar',type:'Health',tCls:'pol-health',premium:'TTD 680/mo',status:'Active',stCls:'pol-status-active'},
+  {num:'COV-2395',client:'Tony Clarke',type:'Home',tCls:'pol-home',premium:'TTD 290/mo',status:'Active',stCls:'pol-status-active'},
+  {num:'COV-2391',client:'Sandra Phillip',type:'Life',tCls:'pol-life',premium:'TTD 180/mo',status:'Active',stCls:'pol-status-active'},
+  {num:'COV-2388',client:'Derrick Singh',type:'Auto',tCls:'pol-auto',premium:'TTD 510/mo',status:'Review',stCls:'pol-status-review'},
+  {num:'COV-2385',client:'Marcia Thomas',type:'Health',tCls:'pol-health',premium:'TTD 720/mo',status:'Active',stCls:'pol-status-active'},
+];
+const pt=document.getElementById('policyTable');
+policies.forEach(p=>{
+  pt.innerHTML+=`<tr>
+    <td><span class="pol-num">${p.num}</span></td>
+    <td>${p.client}</td>
+    <td><span class="pol-type ${p.tCls||'pol-auto'}">${p.type}</span></td>
+    <td>${p.premium}</td>
+    <td><span class="${p.stCls}">${p.status}</span></td>
+  </tr>`;
+});
+
+const claims=[
+  {num:'CLM-0841',client:'Andre Mahabir',type:'Auto Collision',amount:'TTD 18,400',status:'cs-processing',txt:'Processing'},
+  {num:'CLM-0839',client:'Lisa Ramkissoon',type:'Medical Claim',amount:'TTD 9,200',status:'cs-review',txt:'Under Review'},
+  {num:'CLM-0836',client:'Curtis Joseph',type:'Property Damage',amount:'TTD 34,000',status:'cs-review',txt:'Under Review'},
+  {num:'CLM-0831',client:'Kim Williams',type:'Auto Theft',amount:'TTD 62,000',status:'cs-approved',txt:'Approved'},
+];
+const cl=document.getElementById('claimsList');
+claims.forEach(c=>{
+  cl.innerHTML+=`<div class="claim-item">
+    <div class="claim-num">${c.num}</div>
+    <div class="claim-client">${c.client}</div>
+    <div class="claim-type">${c.type}</div>
+    <div class="claim-amount">${c.amount}</div>
+    <span class="claim-status ${c.status}">${c.txt}</span>
+  </div>`;
+});
+
+const renewals=[
+  {client:'Marcus Williams',policy:'COV-2401',date:'May 20',days:14,urgent:true},
+  {client:'Tony Clarke',policy:'COV-2395',date:'May 24',days:18,urgent:true},
+  {client:'Sandra Phillip',policy:'COV-2391',date:'May 29',days:23,urgent:false},
+  {client:'Devon Baptiste',policy:'COV-2380',date:'Jun 3',days:28,urgent:false},
+  {client:'Alicia Prescott',policy:'COV-2377',date:'Jun 6',days:31,urgent:false},
+];
+const rl=document.getElementById('renewalList');
+renewals.forEach(r=>{
+  rl.innerHTML+=`<div class="renewal-item">
+    <div><div class="ren-client">${r.client}</div><div class="ren-policy">${r.policy}</div></div>
+    <div><div class="ren-date ${r.urgent?'ren-urgent':''}">${r.date}</div><div class="ren-days ${r.urgent?'ren-urgent':''}">${r.days} days</div></div>
+  </div>`;
+});
+
+const premBreak=[
+  {label:'Auto Policies (52)',val:'TTD 24,800'},
+  {label:'Health Policies (38)',val:'TTD 28,400'},
+  {label:'Home Policies (31)',val:'TTD 18,600'},
+  {label:'Life Policies (24)',val:'TTD 12,400'},
+];
+const pb=document.getElementById('premBreakdown');
+premBreak.forEach(p=>{
+  pb.innerHTML+=`<div class="pb-row"><span class="pb-label">${p.label}</span><span class="pb-val">${p.val}</span></div>`;
+});
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+function logout(){localStorage.removeItem('covrel_auth');window.location.href='../';}
+</script>
+</body>
+</html>
