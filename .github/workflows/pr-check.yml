@@ -1,0 +1,47 @@
+name: PR Preview Check
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check HTML files exist
+        run: |
+          echo "=== Checking key pages exist ==="
+          pages=(
+            "site/index.html"
+            "site/stores/index.html"
+            "site/nehneh/index.html"
+          )
+          for p in "${pages[@]}"; do
+            if [ -f "$p" ]; then
+              echo "✅ $p"
+            else
+              echo "❌ MISSING: $p"
+              exit 1
+            fi
+          done
+
+      - name: Count affiliate store pages
+        run: |
+          count=$(find site -name "index.html" -path "*/app/*" | wc -l)
+          echo "App pages found: $count"
+          
+          stores=$(find site -maxdepth 2 -name "index.html" | wc -l)
+          echo "Total pages: $stores"
+
+      - name: Check no broken internal links pattern
+        run: |
+          echo "Scanning for obviously broken href patterns..."
+          if grep -r 'href="/start/?ref=' site/ --include="*.html" -l; then
+            echo "⚠️ Found old /start/?ref= links — should be /slug/start/"
+          else
+            echo "✅ No old-style CTA links found"
+          fi
