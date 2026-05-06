@@ -22,12 +22,12 @@ BRAND_TO_SLUG = {
     "The Escapist":       "the-escapist",
     "Paw Vault":          "paw-vault",
     "Quiet Luxury":       "quiet-luxury",
-    "Selfly":             "selfly",
+    "The Way Made Known": "nehneh",  # Christian content
     "Prime Land Network": "prime-land-network",
     "The Tech Scout HQ":  "tech-scout",       # fixed: was "Tech Scout"
-    "Pantriq":            "pantriq",
+    "NehNeh":             "nehneh",
     "The Autodrome":      "the-autodrome",
-    "Deskwell":           "deskwell",
+    "Prisca Dezigns":     "prisca-dezigns",
 }
 
 # Instagram Business Account IDs (loaded from ig_accounts.json)
@@ -131,9 +131,9 @@ BRANDS = {
     "Prime Land Network":{"id":"1131532363373441","token":"EAASyc3W8qO4BRbLibHwGekwT0cRRC39KveflpPAPZCpIyMqQnadRLnqZBZBFUFPx1nUnW9Q9tp7ZCFvCXwEWjNxdr5zvt8WpTAUbZCm6pznFZCJ2ZBXFrg0mnIvXeZCfEBNOfEKUyYyGj2ZBbGpQ8Ss88PV64c8e4NzLKZBDYJyeG2h6JRvpP9xJwFaWenHN6pP1LXLyJ8hxee","niche":"realestate","tag":"PrimeLandNetwork","aff":"priscadezigns-20"},
     "The Tech Scout HQ": {"id":"1124620534060229","token":"EAASyc3W8qO4BRQAYXZBgBD1MyhAyQZAdNGHMi8d09EakYwsF4LPG9dxq6X1R3pxR4JZAd7a4C15J8ZAUBGzoOcBgIIkddZB4gSMffOO5JjZC9iEPDPhycTaO7IHgPwamAUPJuVpHljtp1OBWFTeGEfu4h0QE62VWmxxjqUettdcV1eGsYWbed5xXxhgp1oG7kkJP1KVKxY","niche":"tech","tag":"TechScoutHQ","aff":"priscadezigns-20"},
     "Dreaming Anime":    {"id":"294045870456760", "token":"EAASyc3W8qO4BRe36VPYHcmqe1nZB9QVe6fxRVpM8fKO5vkZCsUGymVNmnf0U427BTx72c4CAZB86uCEZA95V52QkhS7W26KWmN7MWtRwFGENz1R1ZBQ6FsI3Lvaoq71TyZA7gWOXNgntENPudUSgxyY5pTnMD6sHEg76mJHITlFwfUVoeGxWPsjB7pyCTnNIqNlhYkx4bp","niche":"anime","tag":"DreamingAnime","aff":"dreaminganime-20"},
-    "Selfly":            {"id":"","token":"","niche":"selfcare","tag":"Selfly","aff":"priscadezigns-20"},
-    "Deskwell":          {"id":"","token":"","niche":"workspace","tag":"Deskwell","aff":"priscadezigns-20"},
-    "Pantriq":           {"id":"","token":"","niche":"food","tag":"Pantriq","aff":"priscadezigns-20"},
+        "The Way Made Known": {"id":"1142116855643947","token":"EAASyc3W8qO4BRYZAFcSxx1ZBmmcFOViM8ZC38xziDQ5hC7J2VZA8QVmivNWV0seMdIWisZA0j7yN2ZCMIzaxlZB3ezrhnVHL6VlLwGcHJ0rXd0HN6HMFdEJDBxxN42ploTWWEE2xy5XBVr903wUBg4gSPHlPBUDUAsTVcHP7xAErOu9VgEQo4CZCkRZBPwuE6zvfDcy4ZClwGb","niche":"christian","tag":"WayMadeKnown","aff":"priscadezigns-20"},
+        "Prisca Dezigns": {"id":"106662059098517","token":"EAASyc3W8qO4BRbKjjVESnDECWFMQhHbzicElw0YnvOZBDEIZBHA7Qduj98k4gO1rFdm7Bi5klTo03hPg8w6sxhhThxl2K7L8i2A3nZCe63DFQZC8QmiVWQumDtxlQcB00Xv0j7jhhMumGGuC7AZBQxUZCOsqZAnluTArVZC8pqh9USyrOeWnUrhFZAMD6HXzZAo63SF4jB7X0ZD","niche":"design","tag":"PriscaDezigns","aff":"priscadezigns-20"},
+        "NehNeh": {"id":"2455413671137234","token":"EAASyc3W8qO4BRVQnaq7X0jOZBoEQkKQ8gOhEvY6ow95JZAMgZA75X6SfZCyuNFlszpZCobuDZC0Qzf9bAcoeZA9wkqJv4QXPlGTbf69ysZA2ZByOfDtulRPzuV4jijtYvRYW5WZB0MOQ0DGu4uN9ZCcqk5Br6xUNmZCkZBCJI6dDvFj5j6oN4mEZAaZACIgLR9e75EWfPU02LZASEuvH","niche":"fashion","tag":"NehNeh","aff":"priscadezigns-20"},
 }
 
 # ── CAPTION TEMPLATES BY NICHE ──
@@ -529,7 +529,10 @@ def find_ig_safe_image(brand_name, preferred_url):
 
 def run_post(brand_name, post_type):
     """Execute one post for a brand."""
-    brand = BRANDS.get(brand_name)
+    brand = BRANDS.get(brand_name) or BRANDS.get(brand_name.strip())
+    if not brand:
+        # Try case-insensitive match
+        brand = next((v for k, v in BRANDS.items() if k.strip().lower() == brand_name.strip().lower()), None)
     if not brand:
         return f"Brand not found: {brand_name}"
 
