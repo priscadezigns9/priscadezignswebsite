@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Drovon Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#FF6B35;--bg:#080808;--surface:#0F0F0F;--surface2:#151515;--border:#FF6B3518;--text:#F0ECE8;--muted:#F0ECE860}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform 0.3s}
+.sidebar-brand{padding:20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.brand-icon{width:32px;height:32px;background:#FF6B3520;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.brand-name{font-size:1.25rem;font-weight:700;color:var(--accent);letter-spacing:-0.5px}
+.nav-section{padding:18px 14px 6px;font-size:0.62rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;font-family:'Inter',sans-serif;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:5px;cursor:pointer;margin:2px 8px;transition:all 0.15s;font-size:0.88rem;font-weight:500;color:var(--muted)}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:#FF6B3518;color:var(--accent)}
+.nav-icon{width:17px;height:17px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:16px 18px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;background:#FF6B3525;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.user-name{font-size:0.83rem;font-weight:600}
+.user-role{font-size:0.7rem;color:var(--muted);font-family:'Inter',sans-serif}
+.logout-btn{margin-top:10px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px;font-family:'Space Grotesk',sans-serif;font-size:0.76rem;cursor:pointer;border-radius:4px;transition:all 0.2s}
+.logout-btn:hover{border-color:var(--accent);color:var(--accent)}
+.main{margin-left:240px;flex:1}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 26px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;color:var(--text)}
+.page-title{font-size:1.15rem;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.live-badge{background:#22C55E18;color:#22C55E;padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;display:flex;align-items:center;gap:5px}
+.live-dot{width:6px;height:6px;background:#22C55E;border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.date-chip{font-size:0.77rem;color:var(--muted);font-family:'Inter',sans-serif}
+.content{padding:24px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:20px;border-radius:6px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.stat-card:hover{border-color:#FF6B3540}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0.5}
+.stat-label{font-size:0.69rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;font-weight:600;font-family:'Inter',sans-serif}
+.stat-val{font-size:2rem;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:0.75rem;color:var(--muted);margin-top:5px;font-family:'Inter',sans-serif}
+.stat-icon{position:absolute;top:16px;right:16px;font-size:1.4rem;opacity:0.2}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
+.grid-map{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-bottom:20px}
+.widget{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:1rem;font-weight:700}
+.view-all{font-size:0.76rem;color:var(--accent);cursor:pointer;font-family:'Inter',sans-serif}
+
+/* Map simulation */
+.map-area{background:#0A0A0A;border:1px solid #FF6B3515;border-radius:4px;height:200px;position:relative;overflow:hidden;margin-bottom:14px}
+.map-grid{position:absolute;inset:0;background-image:linear-gradient(#FF6B3508 1px,transparent 1px),linear-gradient(90deg,#FF6B3508 1px,transparent 1px);background-size:30px 30px}
+.map-road-h{position:absolute;background:#FF6B3518;height:2px;left:0;right:0}
+.map-road-v{position:absolute;background:#FF6B3518;width:2px;top:0;bottom:0}
+.vehicle-dot{position:absolute;width:10px;height:10px;border-radius:50%;cursor:pointer;transition:all 2s}
+.vehicle-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid currentColor;opacity:0.4;animation:ripple 2s infinite}
+@keyframes ripple{0%{transform:scale(1);opacity:0.4}100%{transform:scale(2.5);opacity:0}}
+.vehicle-dot.moving{background:#22C55E;color:#22C55E}
+.vehicle-dot.idle{background:#FF6B35;color:#FF6B35}
+.vehicle-dot.service{background:#F59E0B;color:#F59E0B}
+.map-legend{display:flex;gap:14px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);font-family:'Inter',sans-serif}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+
+/* Driver list */
+.driver-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
+.driver-list::-webkit-scrollbar{width:4px}.driver-list::-webkit-scrollbar-track{background:transparent}.driver-list::-webkit-scrollbar-thumb{background:#FF6B3530;border-radius:2px}
+.driver-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:4px}
+.d-avatar{width:30px;height:30px;border-radius:50%;background:#FF6B3520;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.d-name{font-size:0.85rem;font-weight:600;flex:1}
+.d-vehicle{font-size:0.7rem;color:var(--muted);font-family:'Inter',sans-serif}
+.d-status{font-size:0.68rem;font-weight:600;padding:2px 7px;border-radius:3px}
+.d-on{background:#22C55E18;color:#22C55E}
+.d-off{background:#FF6B3518;color:#FF6B35}
+.d-break{background:#F59E0B18;color:#F59E0B}
+
+/* Deliveries */
+.delivery-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.del-stat{background:var(--surface2);border-radius:4px;padding:14px;text-align:center}
+.del-num{font-size:1.6rem;font-weight:700;color:var(--accent);line-height:1}
+.del-label{font-size:0.68rem;color:var(--muted);font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+.delivery-list{display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto}
+.del-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface2);border-radius:4px}
+.del-id{font-size:0.72rem;font-weight:600;color:var(--accent);width:60px;flex-shrink:0;font-family:'Inter',monospace}
+.del-dest{font-size:0.83rem;font-weight:500;flex:1}
+.del-time{font-size:0.7rem;color:var(--muted);font-family:'Inter',sans-serif}
+.del-badge{font-size:0.65rem;font-weight:600;padding:2px 6px;border-radius:3px}
+.db-delivered{background:#22C55E18;color:#22C55E}
+.db-transit{background:#FF6B3518;color:#FF6B35}
+.db-pending{background:#F59E0B18;color:#F59E0B}
+
+/* Fuel */
+.fuel-bar-area{margin-bottom:16px}
+.fuel-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fuel-label{font-size:0.8rem;font-weight:500;width:90px;flex-shrink:0}
+.fuel-bar{flex:1;height:8px;background:#FF6B3515;border-radius:4px;overflow:hidden}
+.fuel-fill{height:100%;background:linear-gradient(90deg,#FF6B35,#FF9A6B);border-radius:4px}
+.fuel-val{font-size:0.78rem;color:var(--muted);font-family:'Inter',sans-serif;width:65px;text-align:right;flex-shrink:0}
+.fuel-total{background:var(--surface2);border-radius:4px;padding:14px;display:flex;justify-content:space-between;align-items:center}
+.fuel-total-label{font-size:0.8rem;color:var(--muted);font-family:'Inter',sans-serif}
+.fuel-total-val{font-size:1.3rem;font-weight:700;color:var(--accent)}
+
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:90}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}.hamburger{display:block}
+  .stats-row{grid-template-columns:1fr 1fr}.grid-2,.grid-map{grid-template-columns:1fr}
+  .overlay.show{display:block}
+}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr 1fr}.content{padding:14px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🚛</div>
+    <div class="brand-name">Drovon</div>
+  </div>
+  <div class="nav-section">Navigation</div>
+  <div class="nav-item active">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Fleet</div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Drivers</div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>Routes</div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Deliveries</div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Fuel</div>
+  <div class="nav-item">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</div>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">DM</div>
+      <div><div class="user-name">Damien Morris</div><div class="user-role">Fleet Manager</div></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="live-badge"><span class="live-dot"></span>Live Tracking</span>
+      <span class="date-chip" id="dateChip"></span>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Vehicles on Route</div><div class="stat-val">14</div><div class="stat-sub">3 due for service</div><div class="stat-icon">🚛</div></div>
+      <div class="stat-card"><div class="stat-label">Deliveries Today</div><div class="stat-val">23</div><div class="stat-sub">16 completed</div><div class="stat-icon">📦</div></div>
+      <div class="stat-card"><div class="stat-label">Active Drivers</div><div class="stat-val">8</div><div class="stat-sub">2 on break</div><div class="stat-icon">👤</div></div>
+      <div class="stat-card"><div class="stat-label">Fuel This Week</div><div class="stat-val">TTD 4,820</div><div class="stat-sub">↑ 8% vs last week</div><div class="stat-icon">⛽</div></div>
+    </div>
+
+    <!-- Map + Drivers -->
+    <div class="grid-map">
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Live Fleet Map</span><span class="view-all">Full Map →</span></div>
+        <div class="map-area" id="mapArea">
+          <div class="map-grid"></div>
+          <div class="map-road-h" style="top:30%"></div>
+          <div class="map-road-h" style="top:60%"></div>
+          <div class="map-road-h" style="top:80%"></div>
+          <div class="map-road-v" style="left:25%"></div>
+          <div class="map-road-v" style="left:55%"></div>
+          <div class="map-road-v" style="left:75%"></div>
+        </div>
+        <div class="map-legend">
+          <div class="leg-item"><div class="leg-dot" style="background:#22C55E"></div>Moving</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#FF6B35"></div>Idle</div>
+          <div class="leg-item"><div class="leg-dot" style="background:#F59E0B"></div>Service Due</div>
+        </div>
+      </div>
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Driver Status</span><span class="view-all">All →</span></div>
+        <div class="driver-list" id="driverList"></div>
+      </div>
+    </div>
+
+    <!-- Deliveries + Fuel -->
+    <div class="grid-2">
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Deliveries Today</span><span class="view-all">All Deliveries →</span></div>
+        <div class="delivery-stats">
+          <div class="del-stat"><div class="del-num">16</div><div class="del-label">Delivered</div></div>
+          <div class="del-stat"><div class="del-num">5</div><div class="del-label">In Transit</div></div>
+          <div class="del-stat"><div class="del-num">2</div><div class="del-label">Pending</div></div>
+        </div>
+        <div class="delivery-list" id="deliveryList"></div>
+      </div>
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Fuel Cost This Week</span><span class="view-all">Report →</span></div>
+        <div class="fuel-bar-area" id="fuelBars"></div>
+        <div class="fuel-total">
+          <span class="fuel-total-label">Weekly Total</span>
+          <span class="fuel-total-val">TTD 4,820</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+if(!localStorage.getItem('drovon_auth')){window.location.href='../';}
+document.getElementById('dateChip').textContent=new Date().toLocaleDateString('en-TT',{weekday:'short',day:'numeric',month:'short'});
+
+// Map vehicles
+const vehicles=[
+  {top:'25%',left:'20%',cls:'moving'},{top:'55%',left:'50%',cls:'moving'},{top:'15%',left:'60%',cls:'idle'},
+  {top:'70%',left:'30%',cls:'moving'},{top:'40%',left:'80%',cls:'service'},{top:'60%',left:'70%',cls:'moving'},
+  {top:'30%',left:'45%',cls:'idle'},{top:'80%',left:'60%',cls:'moving'},{top:'10%',left:'35%',cls:'moving'},
+];
+const map=document.getElementById('mapArea');
+vehicles.forEach((v,i)=>{
+  const dot=document.createElement('div');
+  dot.className=`vehicle-dot ${v.cls}`;
+  dot.style.cssText=`top:${v.top};left:${v.left}`;
+  dot.title=`Vehicle ${i+1}`;
+  map.appendChild(dot);
+});
+
+// Animate vehicles
+setInterval(()=>{
+  document.querySelectorAll('.vehicle-dot.moving').forEach(d=>{
+    const top=parseFloat(d.style.top)+((Math.random()-0.5)*3);
+    const left=parseFloat(d.style.left)+((Math.random()-0.5)*3);
+    d.style.top=Math.max(5,Math.min(90,top))+'%';
+    d.style.left=Math.max(5,Math.min(90,left))+'%';
+  });
+},3000);
+
+// Drivers
+const drivers=[
+  {name:'Marcus Williams',vehicle:'TT-3401',status:'on',statusText:'On Route'},
+  {name:'Jerome Phillip',vehicle:'TT-2278',status:'on',statusText:'On Route'},
+  {name:'Damion Clarke',vehicle:'TT-5510',status:'break',statusText:'On Break'},
+  {name:'Sheldon Thomas',vehicle:'TT-1893',status:'on',statusText:'On Route'},
+  {name:'Andre Ramkissoon',vehicle:'TT-4402',status:'on',statusText:'Delivering'},
+  {name:'Kevin Lynch',vehicle:'TT-6631',status:'break',statusText:'On Break'},
+  {name:'Chris Mahabir',vehicle:'TT-7744',status:'on',statusText:'On Route'},
+  {name:'Daniel Prescott',vehicle:'TT-0982',status:'off',statusText:'Off Duty'},
+];
+const dl=document.getElementById('driverList');
+drivers.forEach(d=>{
+  const i=d.name.split(' ').map(x=>x[0]).join('');
+  const cls=d.status==='on'?'d-on':d.status==='break'?'d-break':'d-off';
+  dl.innerHTML+=`<div class="driver-item"><div class="d-avatar">${i}</div><div><div class="d-name">${d.name}</div><div class="d-vehicle">${d.vehicle}</div></div><span class="d-status ${cls}">${d.statusText}</span></div>`;
+});
+
+// Deliveries
+const deliveries=[
+  {id:'DEL-091',dest:'Chaguanas Depot',time:'08:14',status:'db-delivered',txt:'Delivered'},
+  {id:'DEL-092',dest:'San Fernando Hub',time:'09:30',status:'db-delivered',txt:'Delivered'},
+  {id:'DEL-093',dest:'Arima Warehouse',time:'10:05',status:'db-transit',txt:'In Transit'},
+  {id:'DEL-094',dest:'Point Fortin Store',time:'11:20',status:'db-transit',txt:'In Transit'},
+  {id:'DEL-095',dest:'Couva Retail Park',time:'12:40',status:'db-pending',txt:'Pending'},
+  {id:'DEL-096',dest:'Tobago Express',time:'13:00',status:'db-pending',txt:'Pending'},
+];
+const delivL=document.getElementById('deliveryList');
+deliveries.forEach(d=>{
+  delivL.innerHTML+=`<div class="del-item"><span class="del-id">${d.id}</span><span class="del-dest">${d.dest}</span><span class="del-time">${d.time}</span><span class="del-badge ${d.status}">${d.txt}</span></div>`;
+});
+
+// Fuel bars
+const fuelData=[
+  {day:'Mon',val:680,pct:71},{day:'Tue',val:720,pct:75},{day:'Wed',val:850,pct:89},
+  {day:'Thu',val:960,pct:100},{day:'Fri',val:750,pct:78},{day:'Sat',val:520,pct:54},{day:'Sun',val:340,pct:35},
+];
+const fb=document.getElementById('fuelBars');
+fuelData.forEach(f=>{
+  fb.innerHTML+=`<div class="fuel-row"><span class="fuel-label">${f.day}</span><div class="fuel-bar"><div class="fuel-fill" style="width:${f.pct}%"></div></div><span class="fuel-val">TTD ${f.val}</span></div>`;
+});
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+function logout(){localStorage.removeItem('drovon_auth');window.location.href='../';}
+</script>
+</body>
+</html>
