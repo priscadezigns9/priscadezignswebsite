@@ -137,187 +137,246 @@ BRANDS = {
 }
 
 # ── CAPTION TEMPLATES BY NICHE ──
+# 10+ per niche, product-specific placeholders supported via {name} and {price}
 CAPTIONS = {
-    "eco":        ["🌿 Every small choice matters. Shop sustainable today — link in bio 🔗 #VerdantCo #EcoLiving #Sustainable","♻️ Your home. Your values. Shop the green edit now. #VerdantCo #GreenLiving","🌱 Because the planet deserves better — and so do you. Shop now 🔗 #VerdantCo #EcoFriendly","💚 Swap smarter. Live greener. See what's trending in eco living this week 🔗 #VerdantCo"],
-    "watches":    ["⌚ Timeless. Iconic. Built to outlast trends. Shop luxury timepieces — link in bio 🔗 #TheWatchList #LuxuryWatch","👑 The right watch says everything without saying a word. Shop now 🔗 #TheWatchList #WatchOfTheDay","🏆 Investment pieces that never go out of style. Shop the edit 🔗 #TheWatchList #WatchCollector","✨ Crafted for those who appreciate the art of time. #TheWatchList #LuxuryTimepieces"],
-    "sneakers":   ["👟 Fresh drops just landed. Shop now before they sell out — link in bio 🔗 #SolePrestige #Sneakers","🔥 The heat is real. New kicks just dropped 👟 Shop via link in bio #SolePrestige #SneakerHead","💎 Exclusive. Limited. Yours. Grab your pair now 🔗 #SolePrestige #PremiumSneakers","🚀 Step up your game. The freshest sneakers, curated for you 🔗 #SolePrestige"],
-    "gaming":     ["🎮 Level up your setup. Shop gaming gear — link in bio 🔗 #AtelierGaming #GamingSetup","⚡ Your gear should match your skill. Shop now 🔗 #AtelierGaming #GamerLife","🏆 Dominate every session. Premium gaming gear curated for champions 🔗 #AtelierGaming","🎯 Play harder. Play smarter. Shop the Atelier Gaming collection 🔗 #AtelierGaming #Gaming"],
-    "purses_bags": ["👜 The bag that says everything without a word. Shop luxury purses — link in bio 🔗 #CoutureGallery #LuxuryBags","💎 A great bag is an investment. Shop the Couture Gallery edit now 🔗 #CoutureGallery #DesignerBags","✨ New arrivals just dropped — purses worth every penny. Shop now 🔗 #CoutureGallery #Handbags","👛 From totes to clutches — the edit for those who know. Shop now 🔗 #CoutureGallery #LuxuryFashion"],
-    "automotive": ["🏎️ Built for the road. Built for you. Shop car accessories — link in bio 🔗 #TheAutodrome #CarCulture","⚡ Your car deserves the best. Shop premium auto gear 🔗 #TheAutodrome #AutoLovers","🚗 Drive in style. Shop the latest automotive finds 🔗 #TheAutodrome #CarLife","🔧 Upgrade your ride today. Best gear, best prices 🔗 #TheAutodrome"],
-    "fitness":    ["💪 No excuses. Just results. Shop fitness gear — link in bio 🔗 #PeakFit #Fitness","🏋️ Your grind deserves the best equipment. Shop now 🔗 #PeakFit #WorkoutGear","🔥 Train harder. Recover faster. Live better. Shop PeakFit 🔗 #PeakFit #GymLife","⚡ Elite performance starts with elite gear. Shop now 🔗 #PeakFit #FitnessGoals"],
-    "travel":     ["✈️ The world is waiting. Shop travel essentials — link in bio 🔗 #TheEscapist #TravelLife","🌍 Adventure doesn't wait. Pack smart, travel light 🔗 #TheEscapist #Wanderlust","🏖️ Your next escape is one click away. Shop travel gear 🔗 #TheEscapist #TravelGram","🗺️ Luxury travel deals, curated just for you. Explore now 🔗 #TheEscapist"],
-    "pets":       ["🐾 Your pet deserves the best. Shop premium pet products — link in bio 🔗 #PawVault #PetLovers","🐶 Because they give you everything. Give them the best 🔗 #PawVault #DogsOfInstagram","🐱 Spoil them a little (or a lot). Shop Paw Vault 🔗 #PawVault #CatsOfInstagram","❤️ Happy pets, happy home. Shop the full collection 🔗 #PawVault #PetCare"],
-    "homedecor":  ["🏡 Your home should feel like a luxury retreat. Shop now — link in bio 🔗 #QuietLuxury #HomeDecor","✨ Understated elegance for every room. Shop the collection 🔗 #QuietLuxury #InteriorDesign","🕯️ Create your sanctuary. Shop Quiet Luxury home essentials 🔗 #QuietLuxury #HomeInspo","🏠 Less is more. Shop minimal luxury decor now 🔗 #QuietLuxury #MinimalistHome"],
-    "skincare":   ["✨ Glow from within. Shop premium skincare — link in bio 🔗 #GlowProtocol #Skincare","💆 Your skin deserves a ritual, not a routine. Shop now 🔗 #GlowProtocol #SkinCareRoutine","🌟 Science-backed. Results-driven. Shop Glow Protocol 🔗 #GlowProtocol #GlowUp","💎 Luxury skincare that actually works. Shop now 🔗 #GlowProtocol #BeautyRoutine"],
-    "fragrance":  ["🌸 A scent that leaves a lasting impression. Shop now — link in bio 🔗 #EssenceElite #Fragrance","✨ Wear confidence. Shop premium fragrances 🔗 #EssenceElite #Perfume","💎 Your signature scent is waiting. Shop the collection 🔗 #EssenceElite #LuxuryFragrance","🌹 Because how you smell is how you're remembered. Shop now 🔗 #EssenceElite"],
-    "realestate": ["🏡 Your next investment starts here. Browse listings — link in bio 🔗 #PrimeLandNetwork #RealEstate","💰 Smart investors act early. See today's best property deals 🔗 #PrimeLandNetwork","🔑 Find your dream property. Verified listings, real opportunities 🔗 #PrimeLandNetwork #PropertyInvestment","🏘️ Land is the one thing they stopped making. Invest smart 🔗 #PrimeLandNetwork"],
-    "tech":       ["📱 The best tech, curated. Shop now — link in bio 🔗 #TechScoutHQ #TechGadgets","⚡ Smarter tools for smarter people. Shop the latest tech 🔗 #TechScoutHQ #Technology","🔬 Innovation that fits in your hands. Shop now 🔗 #TechScoutHQ #Gadgets","💻 Level up your tech game. The best gadgets reviewed and linked 🔗 #TechScoutHQ"],
-    "anime":      ["⚡ The culture never sleeps. Shop anime merch — link in bio 🔗 #DreamingAnime #Anime","🎌 Wear your passion. Shop exclusive anime collections 🔗 #DreamingAnime #AnimeLife","🌸 For the ones who bleed the culture. Shop now 🔗 #DreamingAnime #OtakuLife","🔥 New drops just hit. Shop the Dreaming Anime collection 🔗 #DreamingAnime #AnimeMerch"],
-    "selfcare":   ["💆 You deserve to feel your best. Shop self-care essentials — link in bio 🔗 #Selfly #SelfCare","🌸 Invest in yourself daily. Shop now 🔗 #Selfly #WellBeing","✨ Glow up, inside and out. Shop Selfly 🔗 #Selfly #PersonalDevelopment","💪 Self-care isn't selfish. It's essential. Shop now 🔗 #Selfly"],
-    "workspace":  ["🖥️ Build the workspace of your dreams. Shop now — link in bio 🔗 #Deskwell #HomeOffice","⚡ Your environment shapes your output. Upgrade your desk setup 🔗 #Deskwell #WorkFromHome","💼 Work smarter. Look better doing it. Shop Deskwell 🔗 #Deskwell #DeskSetup","✨ The best setups start here. Shop premium workspace gear 🔗 #Deskwell"],
-    "food":       ["🍽️ Caribbean flavours, global reach. Shop Pantriq — link in bio 🔗 #Pantriq #CaribbeanFood","🌶️ Cook with confidence. Get the best Caribbean ingredients & recipes 🔗 #Pantriq #FoodLovers","🥘 Your kitchen deserves the best. Shop Pantriq now 🔗 #Pantriq #HomeCooking","🍳 From our kitchen to yours. Shop Caribbean essentials 🔗 #Pantriq"],
+    "eco": [
+        "🌿 {name} — because sustainable living shouldn’t mean sacrificing quality. Link in bio 🔗 #VerdantCo #EcoLiving",
+        "♻️ Swap one thing. Make it count. {name} is the smarter choice for your home. #VerdantCo #GreenHome",
+        "🌱 Your home reflects your values. {name} — shop the eco edit. Link in bio 🔗 #VerdantCo #Sustainable",
+        "💪 Good for you. Better for the planet. {name} — shop now. #VerdantCo #EcoFriendly",
+        "🌍 Every small switch adds up. Today’s pick: {name}. Shop via link in bio 🔗 #VerdantCo",
+        "🍃 We curated it so you don’t have to. {name} — live greener, feel better. #VerdantCo #EcoLiving",
+        "💰 Eco-friendly AND budget-smart? Yes. {name} at ${price}. Shop now 🔗 #VerdantCo",
+        "✨ {name} — the kind of upgrade your home AND the planet will thank you for. #VerdantCo",
+        "🏡 Thoughtful living starts here. {name} — link in bio. #VerdantCo #GreenLiving",
+        "♻️ This one’s for the intentional ones. {name} — shop sustainable today. #VerdantCo",
+    ],
+    "watches": [
+        "⌚ {name} — because the right watch speaks before you do. Shop now 🔗 #TheWatchList",
+        "👑 Timeless. Iconic. {name} — investment pieces that never go out of style. #TheWatchList",
+        "🏆 {name} — crafted for those who understand the art of time. Link in bio 🔗 #TheWatchList",
+        "✨ The wrist never lies. {name} at ${price} — shop the edit. #TheWatchList #LuxuryWatch",
+        "💼 A great watch is worth more than it costs. {name} — shop now. #TheWatchList",
+        "👑 Dress the wrist right. {name} — curated luxury, real prices. Link in bio 🔗 #TheWatchList",
+        "⌚ Today’s pick: {name}. If you know, you know. Shop now. #TheWatchList #WatchCollector",
+        "💪 Built to outlast trends. {name} — a piece worth wearing every day. #TheWatchList",
+        "✨ Legacy on your wrist. {name} — shop the collection. #TheWatchList #LuxuryTimepieces",
+        "🏆 This is the one. {name} at ${price}. Shop before it’s gone. 🔗 #TheWatchList",
+    ],
+    "sneakers": [
+        "👟 {name} just landed. Clean, fresh, yours. Shop now 🔗 #SolePrestige",
+        "🔥 {name} — the heat is real. Grab your pair before they’re gone. #SolePrestige",
+        "💡 Every step matters. Step in {name}. Shop via link in bio 🔗 #SolePrestige",
+        "💰 {name} at ${price}. Premium kicks, real price. Link in bio. #SolePrestige #Sneakers",
+        "👑 Curated for those who take their sole seriously. Today: {name}. #SolePrestige",
+        "🔥 New drop: {name}. First come, first served. Shop now 🔗 #SolePrestige #SneakerHead",
+        "⚡ Your outfit needs the right foundation. {name} — shop it. #SolePrestige",
+        "👟 Not just sneakers. A statement. {name} — link in bio. #SolePrestige #PremiumSneakers",
+        "🏆 The best pairs sell out fast. {name} is live — act now. 🔗 #SolePrestige",
+        "💪 {name} — comfort, style, culture. Shop the full collection. #SolePrestige",
+    ],
+    "gaming": [
+        "🎮 {name} — your setup deserves better. Shop now 🔗 #AtelierGaming",
+        "⚡ Elite gear for elite players. {name} at ${price}. Link in bio. #AtelierGaming",
+        "🏆 Winners don’t settle for average gear. {name} — shop it. #AtelierGaming",
+        "🎯 Play harder. Play smarter. {name} — upgrade your station today. 🔗 #AtelierGaming",
+        "💥 {name} just dropped into the collection. Your setup will never be the same. #AtelierGaming",
+        "🖥️ The right gear makes the difference. Today’s pick: {name}. #AtelierGaming #GamingSetup",
+        "🎮 Gear check. {name} at ${price} — worth every cent. Shop now. 🔗 #AtelierGaming",
+        "⚡ Built for performance. {name} — dominate every session. #AtelierGaming #GamerLife",
+        "👑 We curate so you can focus on the game. Today: {name}. #AtelierGaming",
+        "🏆 No excuses when your setup is this good. {name} — link in bio. #AtelierGaming",
+    ],
+    "automotive": [
+        "🏎️ {name} — because your car deserves the same attention you give it. Shop now 🔗 #TheAutodrome",
+        "⚡ Upgrade your ride. {name} at ${price}. Link in bio. #TheAutodrome #CarCulture",
+        "🚗 The best cars have the best accessories. Today: {name}. Shop it. #TheAutodrome",
+        "🔧 {name} — quality gear for serious drivers. Shop now 🔗 #TheAutodrome",
+        "🏆 Drive it. Love it. Equip it right. {name} — link in bio. #TheAutodrome #AutoLovers",
+        "💥 New in the collection: {name}. Your car will thank you. 🔗 #TheAutodrome",
+        "⚡ {name} — performance-grade, daily-driver approved. Shop now. #TheAutodrome",
+        "🚗 Every great ride starts with great gear. {name} at ${price}. #TheAutodrome #CarLife",
+        "🏎️ Built for the road. Built for you. {name} — shop the edit. 🔗 #TheAutodrome",
+        "🔧 Serious drivers shop serious gear. Today’s pick: {name}. #TheAutodrome",
+    ],
+    "fitness": [
+        "💪 {name} — the gear that matches your grind. Shop now 🔗 #PeakFit",
+        "🔥 No excuses. Just results. {name} at ${price}. Link in bio. #PeakFit",
+        "🏋️ Train harder. Recover faster. {name} — shop it. #PeakFit #WorkoutGear",
+        "⚡ Elite performance starts with the right equipment. {name} — link in bio. 🔗 #PeakFit",
+        "🏆 Your body puts in the work. Give it the best tools. {name}. #PeakFit",
+        "💪 {name} — because average gear gets average results. Shop now. #PeakFit #GymLife",
+        "🔥 Today’s pick: {name} at ${price}. Add it to your gym bag. 🔗 #PeakFit",
+        "🏋️ Built for people who take fitness seriously. {name} — shop the collection. #PeakFit",
+        "⚡ The best workouts start before you even hit the gym. {name} — link in bio. #PeakFit",
+        "💪 {name} — curated for every level, every goal. Shop now. 🔗 #PeakFit",
+    ],
+    "travel": [
+        "✈️ {name} — pack smart, travel light. Shop now 🔗 #TheEscapist",
+        "🌍 Adventure-ready. {name} at ${price}. Link in bio. #TheEscapist #TravelLife",
+        "🏖️ Your next trip deserves the right gear. {name} — shop it. #TheEscapist",
+        "🧳 The explorers who pack smart, travel better. {name} — link in bio. 🔗 #TheEscapist",
+        "✨ {name} — because great travel starts with great prep. Shop now. #TheEscapist",
+        "🌍 New in the collection: {name}. Whether you’re near or far, this one’s worth it. #TheEscapist",
+        "✈️ Every escape starts here. {name} at ${price}. Shop the edit. 🔗 #TheEscapist",
+        "🧳 We scout the best travel gear so you don’t have to. Today: {name}. #TheEscapist",
+        "🏖️ Wanderlust approved. {name} — link in bio. #TheEscapist #Wanderlust",
+        "🌍 {name} — built for the ones who’d rather explore than stay. Shop now. 🔗 #TheEscapist",
+    ],
+    "pets": [
+        "🐾 {name} — because your pet gives you everything. Give them the best. Shop now 🔗 #PawVault",
+        "🐶 Spoil them a little. {name} at ${price}. Link in bio. #PawVault #DogsOfInstagram",
+        "🐱 Premium pet care, curated. {name} — shop it. #PawVault #CatsOfInstagram",
+        "❤️ Happy pets, happy home. {name} — link in bio. 🔗 #PawVault",
+        "🐾 They can’t shop for themselves. You can. {name} — shop now. #PawVault #PetCare",
+        "🐶 Today’s pick for your best friend: {name} at ${price}. Shop it. 🔗 #PawVault",
+        "🐱 Because they deserve the same quality you do. {name} — link in bio. #PawVault",
+        "🐾 The best pet products, all in one place. Today: {name}. Shop now. #PawVault",
+        "❤️ {name} — trusted, reviewed, and pet-approved. Shop the full collection. 🔗 #PawVault",
+        "🐶 Premium care for every breed, every size. {name} — shop now. #PawVault #PetLovers",
+    ],
+    "homedecor": [
+        "🏡 {name} — understated elegance for every room. Shop now 🔗 #QuietLuxury",
+        "✨ Less is more. {name} at ${price}. The minimal luxury edit. #QuietLuxury",
+        "🕯️ Create your sanctuary. {name} — link in bio. #QuietLuxury #HomeDecor",
+        "🏠 Your home should feel like a retreat. {name} — shop it. #QuietLuxury #InteriorDesign",
+        "✨ {name} — refined, intentional, beautiful. Shop now. 🔗 #QuietLuxury",
+        "🏡 The details make the space. Today’s pick: {name}. #QuietLuxury #HomeInspo",
+        "🕯️ Quiet luxury isn’t a trend — it’s a standard. {name} at ${price}. #QuietLuxury",
+        "✨ {name} — because your home deserves the same care you put into yourself. Shop now. #QuietLuxury",
+        "🏠 Curated for the ones who live with intention. {name} — link in bio. 🔗 #QuietLuxury",
+        "🕯️ {name} — elevate any room, effortlessly. Shop the collection. #QuietLuxury",
+    ],
+    "skincare": [
+        "✨ {name} — your skin deserves a ritual, not just a routine. Shop now 🔗 #GlowProtocol",
+        "🌟 Science-backed. Results-driven. {name} at ${price}. Link in bio. #GlowProtocol",
+        "💦 Glow from within. {name} — shop it. #GlowProtocol #Skincare",
+        "💎 Luxury skincare that actually works. {name} — link in bio. 🔗 #GlowProtocol",
+        "✨ Your skin is an investment. {name} — invest right. Shop now. #GlowProtocol",
+        "🌟 Today’s protocol pick: {name} at ${price}. Add it to your routine. 🔗 #GlowProtocol",
+        "💦 The glow-up starts here. {name} — shop the full routine. #GlowProtocol #SkinCareRoutine",
+        "✨ {name} — because healthy skin is always in. Shop now. #GlowProtocol #GlowUp",
+        "🌟 Real ingredients. Real results. {name} — link in bio. 🔗 #GlowProtocol",
+        "💦 Skincare that speaks for itself. Today: {name}. Shop now. #GlowProtocol #BeautyRoutine",
+    ],
+    "fragrance": [
+        "🌸 {name} — a scent that stays. Shop now 🔗 #EssenceElite",
+        "✨ Wear confidence. {name} at ${price}. Link in bio. #EssenceElite #Perfume",
+        "🌹 Your signature scent is waiting. {name} — shop it. #EssenceElite",
+        "💎 {name} — because how you smell is part of how you’re remembered. Link in bio. 🔗 #EssenceElite",
+        "🌸 Premium fragrance, premium impression. {name} — shop now. #EssenceElite #LuxuryFragrance",
+        "✨ Today’s pick: {name} at ${price}. Smell like you mean it. 🔗 #EssenceElite",
+        "🌹 A great scent is the invisible accessory. {name} — shop the collection. #EssenceElite",
+        "💎 {name} — curated for those with a taste for the finer things. Shop now. #EssenceElite",
+        "🌸 The right fragrance changes everything. Today: {name}. Link in bio. 🔗 #EssenceElite",
+        "✨ {name} — wear it like a second skin. Shop now. #EssenceElite #Fragrance",
+    ],
+    "realestate": [
+        "🏡 {name} — your next investment starts here. Shop now 🔗 #PrimeLandNetwork",
+        "💰 Smart investors act early. {name} at ${price}. Link in bio. #PrimeLandNetwork",
+        "🔑 {name} — land is the one thing they stopped making. Invest smart. #PrimeLandNetwork",
+        "🏘️ {name} — verified listings, real opportunities. Link in bio. 🔗 #PrimeLandNetwork",
+        "🏡 Build wealth one property at a time. Today’s pick: {name}. #PrimeLandNetwork",
+        "💰 {name} — the right tools for the right investment. Shop now. 🔗 #PrimeLandNetwork",
+        "🔑 The best investments aren’t on the stock market. {name} — explore it. #PrimeLandNetwork",
+        "🏘️ Your empire starts with the right land. Today: {name}. Link in bio. 🔗 #PrimeLandNetwork",
+        "🏡 {name} — built for those who think long-term. Shop the edit. #PrimeLandNetwork",
+        "💰 Property is power. {name} — take the first step. Link in bio. 🔗 #PrimeLandNetwork",
+    ],
+    "tech": [
+        "📱 {name} — the best tech, no noise. Shop now 🔗 #TechScoutHQ",
+        "⚡ Smarter tools for smarter people. {name} at ${price}. Link in bio. #TechScoutHQ",
+        "🔬 {name} — reviewed, curated, linked. Shop it. #TechScoutHQ #Gadgets",
+        "💻 Innovation that fits in your hands. {name} — link in bio. 🔗 #TechScoutHQ",
+        "⚡ Level up your tech game. Today’s pick: {name}. #TechScoutHQ #TechGadgets",
+        "📱 {name} at ${price} — worth every dollar. Shop now. 🔗 #TechScoutHQ",
+        "🔬 We scout so you don’t have to. {name} — shop the collection. #TechScoutHQ",
+        "💻 {name} — because great tech makes everything easier. Link in bio. 🔗 #TechScoutHQ",
+        "⚡ The gadget your setup is missing. {name} — shop now. #TechScoutHQ #Technology",
+        "📱 Today from the Scout: {name} at ${price}. Don’t sleep on this one. 🔗 #TechScoutHQ",
+    ],
+    "anime": [
+        "{name} just dropped. The culture never waits. Shop now #DreamingAnime #Anime",
+        "Wear your passion. {name} — shop the collection. #DreamingAnime #AnimeLife",
+        "For the ones who live and breathe it. {name} at ${price}. Shop now #DreamingAnime",
+        "New in the collection: {name}. Link in bio #DreamingAnime #AnimeMerch",
+        "{name} — because the culture deserves representation. Shop it. #DreamingAnime #OtakuLife",
+        "The grail is real. {name} — shop before it’s gone. #DreamingAnime",
+        "{name} — carry the culture everywhere you go. Shop now. #DreamingAnime #Anime",
+        "Built for fans, by fans. Today’s pick: {name}. Link in bio #DreamingAnime",
+        "{name} at ${price}. The collection grows. Shop the edit. #DreamingAnime #AnimeFan",
+        "Your collection isn’t complete. {name} just changed that. Shop now. #DreamingAnime",
+    ],
+    "selfcare": [
+        "🌼 {name} — invest in yourself daily. Shop now 🔗 #Shelfly",
+        "🌸 You deserve to feel your best. {name} at ${price}. Link in bio. #Shelfly",
+        "✨ Self-care isn’t selfish — it’s essential. {name} — shop it. #Shelfly #SelfCare",
+        "💪 {name} — glow up, inside and out. Link in bio. 🔗 #Shelfly",
+        "🌼 The best version of you starts here. Today’s pick: {name}. #Shelfly",
+        "🌸 {name} at ${price} — worth it. Every single time. Shop now. 🔗 #Shelfly",
+        "✨ When you take care of yourself, everything else follows. {name} — link in bio. #Shelfly",
+        "💪 {name} — curated for the ones who prioritise themselves. Shop now. #Shelfly",
+        "🌼 Small rituals. Big results. Today: {name}. Link in bio. 🔗 #Shelfly #WellBeing",
+        "🌸 {name} — because you’re worth the investment. Shop the collection. #Shelfly",
+    ],
+    "workspace": [
+        "🖥️ {name} — because your environment shapes your output. Shop now 🔗 #Deskwell",
+        "⚡ Build the workspace of your dreams. {name} at ${price}. Link in bio. #Deskwell",
+        "💼 {name} — work smarter, look better doing it. Shop it. #Deskwell #HomeOffice",
+        "🖥️ The right setup changes everything. {name} — link in bio. 🔗 #Deskwell",
+        "⚡ Upgrade your desk. Upgrade your output. Today: {name}. #Deskwell #DeskSetup",
+        "💼 {name} at ${price} — the piece your setup was missing. Shop now. 🔗 #Deskwell",
+        "🖥️ {name} — premium workspace gear for people who take their work seriously. #Deskwell",
+        "⚡ Less clutter. More focus. {name} — shop the edit. Link in bio. 🔗 #Deskwell",
+        "💼 Great work starts with a great space. Today’s pick: {name}. #Deskwell #WorkFromHome",
+        "🖥️ {name} — your desk should inspire you. Shop now. 🔗 #Deskwell",
+    ],
+    "food": [
+        "🍴 {name} — Caribbean flavours, no compromise. Shop now 🔗 #Pantriq",
+        "🌶️ Cook with confidence. {name} at ${price}. Link in bio. #Pantriq #CaribbeanFood",
+        "🍚 {name} — from our kitchen to yours. Shop it. #Pantriq #HomeCooking",
+        "🍴 Your kitchen deserves the best. {name} — link in bio. 🔗 #Pantriq",
+        "🌶️ Good food starts with good ingredients. Today: {name}. #Pantriq #FoodLovers",
+        "🍚 {name} at ${price} — the pantry essential you didn’t know you needed. Shop now. 🔗 #Pantriq",
+        "🍴 {name} — because Caribbean cooking deserves Caribbean-quality tools. #Pantriq",
+        "🌶️ Stock the pantry right. {name} — shop the collection. Link in bio. 🔗 #Pantriq",
+        "🍚 Today’s kitchen pick: {name}. Cook better, eat better. #Pantriq #CaribbeanKitchen",
+        "🍴 {name} — the staple your kitchen has been missing. Shop now. 🔗 #Pantriq",
+    ],
+    "purses_bags": [
+        "👜 {name} — the bag that says everything without a word. Shop now 🔗 #CoutureGallery",
+        "💎 A great bag is an investment. {name} at ${price}. Link in bio. #CoutureGallery",
+        "✨ {name} — from totes to clutches, the edit for those who know. #CoutureGallery #LuxuryBags",
+        "👛 New arrivals: {name} — shop now before it’s gone. 🔗 #CoutureGallery",
+        "👜 {name} — carry luxury everywhere you go. Shop the collection. #CoutureGallery",
+        "💎 Designer curation done right. Today: {name} at ${price}. Link in bio. 🔗 #CoutureGallery",
+        "✨ {name} — because the right bag completes every look. Shop now. #CoutureGallery #DesignerBags",
+        "👛 {name} — timeless pieces for the woman who knows her worth. 🔗 #CoutureGallery",
+        "👜 Today’s pick: {name}. The investment your wardrobe needs. #CoutureGallery #Handbags",
+        "✨ {name} at ${price} — curated luxury, real prices. Shop now. 🔗 #CoutureGallery",
+    ],
 }
 
-# ── POST TYPES ──
-# post_type: "text" | "photo" | "video"
-SCHEDULE = [
-    {"hour": 8,  "type": "text"},
-    {"hour": 11, "type": "photo"},
-    {"hour": 14, "type": "photo"},
-    {"hour": 19, "type": "video"},
-]
-
-def post_to_facebook(page_id, token, message, link=None, photo_url=None):
-    """Post text or photo to a Facebook page."""
-    if not page_id or not token:
-        return {"error": "No page ID or token"}
-
-    if photo_url:
-        # Photo post
-        endpoint = f"https://graph.facebook.com/v19.0/{page_id}/photos"
-        payload = {"url": photo_url, "caption": message, "access_token": token}
+def get_caption(niche, product=None):
+    """Return a caption rotated by day-of-year so it never repeats within 10 days.
+    Injects {name} and {price} from the product dict if provided."""
+    from datetime import date
+    caps = CAPTIONS.get(niche, ["Check out our latest pick — link in bio 🔗"])
+    idx = date.today().timetuple().tm_yday % len(caps)
+    cap = caps[idx]
+    if product:
+        name  = product.get("name", "").strip()
+        price = product.get("price", "")
+        # Truncate very long product names
+        if len(name) > 60:
+            name = name[:57] + "..."
+        cap = cap.replace("{name}", name).replace("{price}", str(price))
     else:
-        # Text/link post
-        endpoint = f"https://graph.facebook.com/v19.0/{page_id}/feed"
-        payload = {"message": message, "access_token": token}
-        if link:
-            payload["link"] = link
-
-    data = urllib.parse.urlencode(payload).encode()
-    req = urllib.request.Request(endpoint, data=data, method="POST")
-    req.add_header("Content-Type", "application/x-www-form-urlencoded")
-
-    try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            resp = json.loads(r.read())
-            return resp
-    except urllib.error.HTTPError as e:
-        return {"error": e.read().decode()[:200]}
-    except Exception as e:
-        return {"error": str(e)}
-
-def post_to_instagram(ig_id, token, caption, image_url):
-    """Post a photo to Instagram Business account via Graph API (two-step: create container → publish)."""
-    if not ig_id or not token or not image_url:
-        return {"error": "Missing ig_id, token, or image_url"}
-
-    try:
-        # Step 1: Create media container
-        container_url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
-        payload1 = urllib.parse.urlencode({
-            "image_url": image_url,
-            "caption": caption,
-            "access_token": token,
-        }).encode()
-        req1 = urllib.request.Request(container_url, data=payload1, method="POST")
-        req1.add_header("Content-Type", "application/x-www-form-urlencoded")
-        with urllib.request.urlopen(req1, timeout=30) as r:
-            container = json.loads(r.read())
-
-        container_id = container.get("id")
-        if not container_id:
-            return {"error": f"Container failed: {container}"}
-
-        # Step 2: Publish the container
-        publish_url = f"https://graph.facebook.com/v19.0/{ig_id}/media_publish"
-        payload2 = urllib.parse.urlencode({
-            "creation_id": container_id,
-            "access_token": token,
-        }).encode()
-        req2 = urllib.request.Request(publish_url, data=payload2, method="POST")
-        req2.add_header("Content-Type", "application/x-www-form-urlencoded")
-        with urllib.request.urlopen(req2, timeout=30) as r:
-            result = json.loads(r.read())
-        return result
-
-    except urllib.error.HTTPError as e:
-        return {"error": e.read().decode()[:300]}
-    except Exception as e:
-        return {"error": str(e)}
-
-def post_reel_to_instagram(ig_id, token, video_path, caption):
-    """Post a video as an Instagram Reel (two-step: upload container → publish).
-    Requires a publicly accessible video URL — we upload to a temp host first.
-    For Drive videos, we use the Facebook video upload endpoint to get a public URL.
-    """
-    try:
-        import subprocess
-
-        # Step 1: Get a public URL for the video via Facebook's resumable upload
-        # Upload video to FB as unpublished to get a shareable URL
-        upload_url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
-
-        # For IG Reels we need a public video_url
-        # Upload file to a temp endpoint using multipart
-        with open(video_path, "rb") as vf:
-            video_data = vf.read()
-
-        # Use Facebook's video upload to get hosted URL
-        boundary = "IGReelBoundary"
-        body = (
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="media_type"\r\n\r\nREELS\r\n'
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="caption"\r\n\r\n{caption}\r\n'
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="access_token"\r\n\r\n{token}\r\n'
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="video_url"\r\n\r\n'
-        ).encode()
-
-        # For local files, we need to upload via multipart
-        # IG Reels API requires video_url (public) or upload_type=resumable
-        # Use resumable upload protocol
-        init_url = f"https://graph.facebook.com/v19.0/{ig_id}/media"
-        init_payload = urllib.parse.urlencode({
-            "media_type": "REELS",
-            "upload_type": "resumable",
-            "caption": caption,
-            "access_token": token,
-        }).encode()
-        req_init = urllib.request.Request(init_url, data=init_payload, method="POST")
-        req_init.add_header("Content-Type", "application/x-www-form-urlencoded")
-        with urllib.request.urlopen(req_init, timeout=30) as r:
-            init_result = json.loads(r.read())
-
-        container_id = init_result.get("id")
-        upload_endpoint = init_result.get("uri")
-
-        if not container_id or not upload_endpoint:
-            return {"error": f"Reel init failed: {init_result}"}
-
-        # Step 2: Upload video bytes to the upload endpoint
-        req_upload = urllib.request.Request(upload_endpoint, data=video_data, method="POST")
-        req_upload.add_header("Authorization", f"OAuth {token}")
-        req_upload.add_header("Content-Type", "video/mp4")
-        req_upload.add_header("offset", "0")
-        req_upload.add_header("file_size", str(len(video_data)))
-        with urllib.request.urlopen(req_upload, timeout=120) as r:
-            upload_result = json.loads(r.read())
-
-        if not upload_result.get("success"):
-            return {"error": f"Reel upload failed: {upload_result}"}
-
-        # Step 3: Publish the reel
-        pub_url = f"https://graph.facebook.com/v19.0/{ig_id}/media_publish"
-        pub_payload = urllib.parse.urlencode({
-            "creation_id": container_id,
-            "access_token": token,
-        }).encode()
-        req_pub = urllib.request.Request(pub_url, data=pub_payload, method="POST")
-        req_pub.add_header("Content-Type", "application/x-www-form-urlencoded")
-        with urllib.request.urlopen(req_pub, timeout=30) as r:
-            result = json.loads(r.read())
-        return result
-
-    except urllib.error.HTTPError as e:
-        return {"error": e.read().decode()[:300]}
-    except Exception as e:
-        return {"error": str(e)}
-
-def get_caption(niche):
-    caps = CAPTIONS.get(niche, ["Check out our latest collection — link in bio 🔗"])
-    return random.choice(caps)
+        # Strip placeholders if no product passed
+        import re as _re
+        cap = _re.sub(r"\{name\}", "our latest pick", cap)
+        cap = _re.sub(r"\\${price}", "", cap).strip()
+    return cap
 
 def get_affiliate_link(aff_tag, keyword):
     query = urllib.parse.quote(keyword)
@@ -371,29 +430,76 @@ def is_safe_image_url(url):
     blocked = ['ytimg.com', 'youtube.com', 'youtu.be', 'emg1', 'external-ord']
     return not any(b in url for b in blocked)
 
-def get_ai_image_url(niche_keyword, style="product"):
+def get_product_for_brand(brand_name):
+    """Return a product dict {name, image, link, price} for the brand,
+    rotating through the real products scraped from the live site.
+    Day-of-year based rotation so each day features a different product."""
+    from datetime import date
+    NICHE_PRODUCTS_FILE = "niche_products.json"
+    slug = BRAND_TO_SLUG.get(brand_name, "")
+    if not slug:
+        slug = brand_name.lower().replace(" ", "-").replace(".", "").replace("&", "and")
     try:
-        import json as _json
-        with open("photo_library.json") as f:
-            library = _json.load(f)
-        niche_map = {
+        with open(NICHE_PRODUCTS_FILE) as f:
+            all_products = json.load(f)
+        products = [p for p in all_products.get(slug, []) if p.get("image")]
+        if not products:
+            products = all_products.get(slug, [])
+        if not products:
+            return None
+        idx = date.today().timetuple().tm_yday % len(products)
+        return products[idx]
+    except Exception:
+        return None
+
+def get_ai_image_url(niche_keyword, style="product"):
+    """DEPRECATED fallback — only used if niche_products.json is unavailable.
+    Tries to return any product image for the niche rather than Picsum."""
+    NICHE_PRODUCTS_FILE = "niche_products.json"
+    try:
+        with open(NICHE_PRODUCTS_FILE) as f:
+            all_products = json.load(f)
+        # Map niche keyword to a slug
+        slug_map = {
             "eco": "verdant-co", "watches": "the-watch-list", "sneakers": "sole-prestige",
             "gaming": "atelier-gaming", "fashion": "couture-gallery", "fragrance": "essence-elite",
-            "skincare": "glow-protocol", "fitness": "peak-fit", "travel": "the-escapist",
-            "pets": "paw-vault", "luxury": "quiet-luxury", "realestate": "prime-land-network",
-            "tech": "tech-scout", "automotive": "the-autodrome", "christian": "the-way-made-known",
-            "selfcare": "nehneh", "food": "pantriq", "workspace": "selfly",
+            "skincare": "glow-protocol", "fitness": "peak-fit", "anime": "dreaming-anime",
+            "travel": "the-escapist", "pets": "paw-vault", "luxury": "quiet-luxury",
+            "food": "pantriq", "real estate": "prime-land-network", "tech": "tech-scout",
+            "workspace": "deskwell", "automotive": "the-autodrome", "selfcare": "shelfly",
         }
-        slug = niche_map.get(niche_keyword.lower(), niche_keyword)
-        photos = library.get(slug, [])
-        if photos:
-            from datetime import datetime
-            idx = datetime.now().timetuple().tm_yday % len(photos)
-            return photos[idx]["url"]
+        slug = slug_map.get(niche_keyword.lower(), "")
+        if slug:
+            from datetime import date
+            products = [p for p in all_products.get(slug, []) if p.get("image")]
+            if products:
+                idx = date.today().timetuple().tm_yday % len(products)
+                return products[idx]["image"]
     except Exception:
         pass
-    return "https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_1280.jpg"
+    return ""
 
+def find_ig_safe_image(brand_name, preferred_url):
+    """Return the real product image for this brand (day-rotated from niche_products.json).
+    Falls back to preferred_url only if no scraped products exist.
+    Zero Picsum, zero stock photos — always niche-specific real product images."""
+    # Always try to get a real product image first
+    product = get_product_for_brand(brand_name)
+    if product and product.get("image"):
+        return product["image"]
+
+    # Fall back to preferred_url (Amazon product image passed in by caller)
+    if preferred_url and preferred_url.startswith("http"):
+        # Validate ratio
+        try:
+            ratio = get_image_ratio(preferred_url)
+            if ratio and 0.5 <= ratio <= 1.91:
+                return preferred_url
+        except Exception:
+            pass
+        return preferred_url
+
+    return ""
 
 def get_dreaming_anime_video():
     """Pull next video from Dreaming Anime Google Drive folder.
@@ -470,80 +576,6 @@ def get_prisca_brand_image():
     import random
     return random.choice(purple_images)
 
-def find_ig_safe_image(brand_name, preferred_url):
-    """Return a reliable Instagram-safe image URL.
-    Brand-specific rules:
-    - Dreaming Anime: anime merch product images only, NO stock photos
-    - Prisca Dezigns: purple brand images (Pexels design/tech)
-    - All others: Amazon product image first, Picsum niche fallback — NO Unsplash
-    """
-    brand_lower = brand_name.lower().strip()
-
-    # PRISCA DEZIGNS — purple brand images only
-    if "prisca" in brand_lower:
-        return get_prisca_brand_image()
-
-    # DREAMING ANIME — anime product images only, no stock
-    if "dreaming anime" in brand_lower or "anime" in brand_lower:
-        # Only use actual anime product images from catalog
-        slug = BRAND_TO_SLUG.get(brand_name, "dreaming-anime")
-        try:
-            with open("product_data.json") as f:
-                pdata = json.load(f)
-            products = [p for p in pdata.get(slug, []) if p.get("image","").startswith("http")]
-            if products:
-                import random
-                return random.choice(products)["image"]
-        except Exception:
-            pass
-        # If no product images, use preferred (Amazon product) URL only
-        if preferred_url and preferred_url.startswith("http") and "amazon" not in preferred_url.lower() and is_safe_image_url(preferred_url):
-            return preferred_url
-        return preferred_url  # Amazon product image — best we have
-
-    # ALL OTHER BRANDS — Amazon product image first, Picsum fallback (NO Unsplash)
-    slug = BRAND_TO_SLUG.get(brand_name, "")
-
-    candidates = []
-    if preferred_url and preferred_url.startswith("http"):
-        candidates.append(preferred_url)
-
-    if slug:
-        try:
-            with open("product_data.json") as f:
-                pdata = json.load(f)
-            for p in pdata.get(slug, []):
-                img = p.get("image", "")
-                if img and img.startswith("http") and img not in candidates:
-                    candidates.append(img)
-        except Exception:
-            pass
-
-    # Try each candidate — accept IG ratio range (0.5–1.91)
-    for url in candidates:
-        try:
-            ratio = get_image_ratio(url)
-            if ratio and 0.5 <= ratio <= 1.91:
-                return url
-        except Exception:
-            continue
-
-    # Picsum fallback by niche (deterministic, reliable, NO Unsplash)
-    niche_map = {
-        "verdant": "eco", "watch": "watches", "sole": "sneakers",
-        "atelier": "gaming", "couture": "fashion", "essence": "fragrance",
-        "glow": "skincare", "peak": "fitness", "escapist": "travel",
-        "paw": "pets", "quiet": "luxury", "selfly": "skincare",
-        "prime land": "real estate", "tech scout": "tech",
-        "pantriq": "food", "autodrome": "automotive", "deskwell": "workspace",
-        "way made known": "christian", "nehneh": "fashion",
-    }
-    for key, niche in niche_map.items():
-        if key in brand_lower:
-            return get_ai_image_url(niche)
-
-    return get_ai_image_url("luxury")
-
 def run_post(brand_name, post_type):
     """Execute one post for a brand."""
     brand = BRANDS.get(brand_name) or BRANDS.get(brand_name.strip())
@@ -562,55 +594,24 @@ def run_post(brand_name, post_type):
     if not page_id or not token:
         return f"Skipping {brand_name} — no page token"
 
-    caption = get_caption(niche)
-    aff_link = get_affiliate_link(aff, niche)
+    # Get today's product for this brand from the live site (niche_products.json)
+    product_used = get_product_for_brand(brand_name)
+    if product_used:
+        aff_link  = product_used.get("link") or get_affiliate_link(aff, niche)
+        photo_url = product_used.get("image", "")
+    else:
+        aff_link  = get_affiliate_link(aff, niche)
+        photo_url = ""
+
+    caption   = get_caption(niche, product_used)
     ig_result = ""  # populated for photo posts that hit Instagram
 
     if post_type == "text":
-        # Plain text post with affiliate link
         message = caption + f"\n\nShop here: {aff_link}"
         result = post_to_facebook(page_id, token, message)
 
     elif post_type == "photo":
-        # Post with caption — photo posting requires an actual image URL
-        # Using a relevant placeholder from Unsplash (free, no auth needed)
-        photo_keywords = {
-            "eco": "sustainable+living", "watches": "luxury+watch", "sneakers": "sneakers",
-            "gaming": "gaming+setup", "fashion": "fashion+style", "automotive": "luxury+car",
-            "fitness": "gym+workout", "travel": "travel+adventure", "pets": "cute+pet",
-            "homedecor": "home+decor", "skincare": "skincare", "fragrance": "perfume+bottle",
-            "realestate": "luxury+home", "tech": "technology+gadget", "anime": "anime+art",
-            "selfcare": "self+care", "workspace": "desk+setup", "food": "caribbean+food",
-        }
-        kw = photo_keywords.get(niche, niche)
-
-        # Try to use a real product from product_data.json
-        product_used = None
-        try:
-            with open("product_data.json") as pf:
-                pdata = json.load(pf)
-            slug = BRAND_TO_SLUG.get(brand_name, "")
-            products = pdata.get(slug, [])
-            # Pick a product with a real image; rotate by day
-            day_idx = datetime.now().timetuple().tm_yday
-            real_products = [p for p in products if p.get("image") and p.get("link")]
-            if real_products:
-                product_used = real_products[day_idx % len(real_products)]
-                photo_url = product_used["image"]
-                aff_link = product_used["link"]
-                caption = (
-                    f"✨ {product_used['name']}\n\n"
-                    f"💵 ${product_used.get('price', 0):.2f} USD  |  "
-                    f"TT${round(product_used.get('price', 0) * RATE, 2):.2f} TTD\n\n"
-                    f"🛒 Shop now → {aff_link}\n\n"
-                    f"#{''.join(tag.split())} #AmazonFinds #ShopNow"
-                )
-            else:
-                # NO Unsplash — use Picsum niche fallback
-                photo_url = get_ai_image_url(niche)
-        except Exception:
-            photo_url = get_ai_image_url(niche)
-
+        # photo_url already set above from the real product image
         # DREAMING ANIME — override: try video first, then anime merch product image
         if "dreaming" in brand_name.lower() or "anime" in brand_name.lower():
             video_path = get_dreaming_anime_video()
@@ -656,9 +657,9 @@ def run_post(brand_name, post_type):
     elif post_type == "video":
         # Video post — for now post as text with video emoji (real video upload needs file)
         video_caption = (
-            f"🎬 Watch this and tell us what you think!\n\n"
+            f"Watch this and tell us what you think!\n\n"
             f"{caption}\n\n"
-            f"👉 Shop now: {aff_link}\n\n"
+            f"Shop now: {aff_link}\n\n"
             f"#{''.join(tag.split())} #Reels #Video"
         )
         result = post_to_facebook(page_id, token, video_caption)
