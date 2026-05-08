@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trogon — Admin Dashboard</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',sans-serif;background:#0a0a0f;color:#e8eaf6;min-height:100vh}
+
+  /* LOGIN */
+  #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0a0a0f}
+  .login-box{background:#13131a;border:1px solid #1e1e2e;border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center}
+  .login-logo{font-size:1.6rem;font-weight:800;letter-spacing:-1px;color:#fff;margin-bottom:8px}
+  .login-logo span{color:#e63946}
+  .login-sub{color:#8b8fa8;font-size:0.85rem;margin-bottom:32px}
+  .login-box input{width:100%;padding:14px 16px;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:10px;color:#e8eaf6;font-size:0.95rem;margin-bottom:12px;outline:none}
+  .login-box input:focus{border-color:#e63946}
+  .login-btn{width:100%;padding:14px;background:#e63946;border:none;border-radius:10px;color:#fff;font-size:0.95rem;font-weight:600;cursor:pointer;margin-top:8px}
+  .login-btn:hover{background:#c1121f}
+  .login-error{color:#e63946;font-size:0.8rem;margin-top:8px;display:none}
+
+  /* DASHBOARD */
+  #dashboard{display:none}
+  .topbar{background:#13131a;border-bottom:1px solid #1e1e2e;padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-logo{font-size:1.2rem;font-weight:800;letter-spacing:-0.5px}
+  .topbar-logo span{color:#e63946}
+  .topbar-badge{background:#1e1e2e;padding:6px 14px;border-radius:20px;font-size:0.75rem;color:#8b8fa8}
+  .logout-btn{background:none;border:1px solid #1e1e2e;color:#8b8fa8;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.8rem}
+  .logout-btn:hover{border-color:#e63946;color:#e63946}
+
+  .main{padding:32px}
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}
+  .stat-card{background:#13131a;border:1px solid #1e1e2e;border-radius:12px;padding:24px}
+  .stat-label{font-size:0.72rem;color:#8b8fa8;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+  .stat-value{font-size:2rem;font-weight:700;color:#fff}
+  .stat-value.green{color:#4ade80}
+  .stat-value.red{color:#e63946}
+  .stat-value.blue{color:#60a5fa}
+
+  .section-title{font-size:0.75rem;letter-spacing:2px;color:#8b8fa8;text-transform:uppercase;margin-bottom:16px}
+  .table-wrap{background:#13131a;border:1px solid #1e1e2e;border-radius:12px;overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  th{padding:14px 20px;text-align:left;font-size:0.72rem;letter-spacing:1.5px;color:#8b8fa8;text-transform:uppercase;border-bottom:1px solid #1e1e2e}
+  td{padding:16px 20px;border-bottom:1px solid #0d0d14;font-size:0.88rem}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#0d0d14}
+  .plan-badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;text-transform:uppercase}
+  .plan-basic{background:rgba(96,165,250,0.15);color:#60a5fa}
+  .plan-growth{background:rgba(74,222,128,0.15);color:#4ade80}
+  .plan-empire{background:rgba(230,57,70,0.15);color:#e63946}
+  .no-clients{text-align:center;padding:60px;color:#8b8fa8}
+  .refresh-btn{background:#1e1e2e;border:none;color:#8b8fa8;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.8rem;margin-bottom:16px}
+  .refresh-btn:hover{background:#2a2a3e;color:#e8eaf6}
+  .loading{text-align:center;padding:40px;color:#8b8fa8}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">T<span>.</span></div>
+    <div class="login-sub">Trogon Admin — Prisca Dezigns</div>
+    <input type="email" id="admin-email" placeholder="Admin email" autocomplete="username"/>
+    <input type="password" id="admin-pass" placeholder="Password" autocomplete="current-password"/>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error">Invalid credentials</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-logo">T<span>.</span>rogon Admin</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="topbar-badge" id="admin-email-display"></div>
+      <button class="logout-btn" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Clients</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Basic Plan</div>
+        <div class="stat-value blue" id="stat-basic">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Growth Plan</div>
+        <div class="stat-value green" id="stat-growth">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Empire Plan</div>
+        <div class="stat-value red" id="stat-empire">—</div>
+      </div>
+    </div>
+
+    <div class="section-title">All Clients</div>
+    <button class="refresh-btn" onclick="loadClients()">↻ Refresh</button>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Plan</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody id="clients-tbody">
+          <tr><td colspan="4" class="loading">Loading clients...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// Admin email whitelist
+const ADMIN_EMAIL = 'priscadezigns9@gmail.com';
+
+async function doLogin() {
+  const email = document.getElementById('admin-email').value.trim();
+  const pass = document.getElementById('admin-pass').value;
+  document.getElementById('login-error').style.display = 'none';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error || !data.user) {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-error').textContent = error?.message || 'Invalid credentials';
+    return;
+  }
+  if (email !== ADMIN_EMAIL) {
+    await sb.auth.signOut();
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-error').textContent = 'Access denied — admin only';
+    return;
+  }
+  showDashboard(email);
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+function showDashboard(email) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('admin-email-display').textContent = email;
+  loadClients();
+}
+
+async function loadClients() {
+  const tbody = document.getElementById('clients-tbody');
+  tbody.innerHTML = '<tr><td colspan="4" class="loading">Loading...</td></tr>';
+
+  const { data: clients, error } = await sb
+    .from('profiles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    tbody.innerHTML = `<tr><td colspan="4" class="no-clients">Error: ${error.message}</td></tr>`;
+    return;
+  }
+
+  // Stats
+  const total = clients.length;
+  const basic = clients.filter(c => c.plan === 'basic').length;
+  const growth = clients.filter(c => c.plan === 'growth').length;
+  const empire = clients.filter(c => c.plan === 'empire').length;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-basic').textContent = basic;
+  document.getElementById('stat-growth').textContent = growth;
+  document.getElementById('stat-empire').textContent = empire;
+
+  if (!clients.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="no-clients">No clients yet — share your Trogon link to get started!</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = clients.map(c => {
+    const joined = c.created_at ? new Date(c.created_at).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : '—';
+    const planClass = c.plan === 'empire' ? 'plan-empire' : c.plan === 'growth' ? 'plan-growth' : 'plan-basic';
+    const plan = c.plan || 'basic';
+    return `<tr>
+      <td>${c.full_name || '—'}</td>
+      <td>${c.email || '—'}</td>
+      <td><span class="plan-badge ${planClass}">${plan}</span></td>
+      <td>${joined}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Auto-login if session exists
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (session && session.user.email === ADMIN_EMAIL) {
+    showDashboard(session.user.email);
+  }
+});
+</script>
+</body>
+</html>
