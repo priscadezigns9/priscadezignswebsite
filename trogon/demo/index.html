@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trogon — Demo</title>
+<title>Trogon — Demo Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0f1117;color:#e8eaf6;font-family:'Inter',system-ui,sans-serif;display:flex;height:100vh;overflow:hidden}
@@ -19,15 +19,14 @@ body{background:#0f1117;color:#e8eaf6;font-family:'Inter',system-ui,sans-serif;d
 
 /* MAIN */
 .main{flex:1;overflow-y:auto;padding:32px}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
 .topbar h1{font-size:1.4rem;font-weight:700}
-.avatar{width:36px;height:36px;border-radius:50%;background:#58CC02;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#0f1117}
-
-/* STATE 1 — CONNECT ACCOUNTS */
+.avatar{width:36px;height:36px;border-radius:50%;background:#58CC02;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;color:#0f1117;cursor:pointer}
 .section-title{font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#8892a4;margin-bottom:16px}
+
+/* PLATFORM CARDS */
 .platforms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:32px}
 .platform-card{background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;transition:border-color 0.2s}
-.platform-card:hover{border-color:#2a2d3a}
 .platform-card.connected{border-color:rgba(88,204,2,0.3)}
 .platform-header{display:flex;align-items:center;gap:10px}
 .platform-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
@@ -36,12 +35,12 @@ body{background:#0f1117;color:#e8eaf6;font-family:'Inter',system-ui,sans-serif;d
 .platform-status.ok{color:#58CC02}
 .btn{padding:9px 16px;border-radius:8px;font-size:0.8rem;font-weight:600;border:none;cursor:pointer;transition:all 0.15s;width:100%}
 .btn-connect{background:#58CC02;color:#0f1117}
-.btn-connect:hover{background:#4db302}
+.btn-connect:hover{background:#4db302;transform:translateY(-1px)}
 .btn-connected{background:rgba(88,204,2,0.1);color:#58CC02;border:1px solid rgba(88,204,2,0.3);cursor:default}
-.btn-create{background:#58CC02;color:#0f1117;padding:11px 28px;border-radius:8px;font-weight:700;font-size:0.9rem;border:none;cursor:pointer;display:none}
+.btn-create{background:#58CC02;color:#0f1117;padding:10px 22px;border-radius:8px;font-weight:700;font-size:0.85rem;border:none;cursor:pointer;transition:all 0.15s}
 .btn-create:hover{background:#4db302}
 
-/* STATE 2 — OAUTH MODAL */
+/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;display:none;align-items:center;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:#fff;border-radius:16px;width:420px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.5)}
@@ -57,34 +56,62 @@ body{background:#0f1117;color:#e8eaf6;font-family:'Inter',system-ui,sans-serif;d
 .fake-url{background:#f8f8f8;border-radius:6px;padding:8px 12px;font-size:0.7rem;color:#888;font-family:monospace;margin-bottom:20px;word-break:break-all}
 .modal-actions{display:flex;gap:10px;padding:0 24px 24px}
 .btn-cancel{flex:1;padding:11px;border-radius:8px;border:1px solid #ddd;background:#fff;font-weight:600;font-size:0.85rem;cursor:pointer;color:#333}
-.btn-authorize{flex:2;padding:11px;border-radius:8px;border:none;background:#fe2c55;color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer}
-.btn-authorize:hover{background:#e0263d}
+.btn-authorize{flex:2;padding:11px;border-radius:8px;border:none;background:#fe2c55;color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;transition:background 0.15s}
+.btn-authorize:hover{background:#c9203e}
 
-/* STATE 3 — CONNECTED TOAST */
-.toast{position:fixed;bottom:32px;right:32px;background:#1a1d2e;border:1px solid rgba(88,204,2,0.4);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:10px;font-size:0.875rem;font-weight:500;z-index:200;transform:translateY(80px);opacity:0;transition:all 0.3s}
+/* TOAST */
+.toast{position:fixed;bottom:32px;right:32px;background:#1a1d2e;border:1px solid rgba(88,204,2,0.4);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:10px;font-size:0.875rem;font-weight:500;z-index:200;transform:translateY(80px);opacity:0;transition:all 0.35s;pointer-events:none}
 .toast.show{transform:translateY(0);opacity:1}
 .toast-icon{color:#58CC02;font-size:1.1rem}
 
-/* STATE 4 — SCHEDULER */
-.scheduler{background:#1a1d2e;border:1px solid #1e2130;border-radius:14px;padding:28px;max-width:680px;display:none}
-.scheduler.show{display:block}
+/* SCHEDULER */
 .form-group{margin-bottom:20px}
 .form-label{font-size:0.78rem;font-weight:600;color:#8892a4;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;display:block}
 .form-control{width:100%;background:#0f1117;border:1px solid #1e2130;border-radius:8px;padding:11px 14px;color:#e8eaf6;font-size:0.875rem;outline:none;transition:border-color 0.15s;font-family:inherit}
 .form-control:focus{border-color:#58CC02}
-textarea.form-control{resize:none;height:100px}
-.platform-checks{display:flex;gap:12px;flex-wrap:wrap}
-.pcheck{display:flex;align-items:center;gap:8px;background:#0f1117;border:1px solid #1e2130;border-radius:8px;padding:9px 14px;font-size:0.82rem;cursor:pointer}
-.pcheck input{accent-color:#58CC02;width:15px;height:15px}
-.pcheck.active{border-color:rgba(88,204,2,0.4);background:rgba(88,204,2,0.05)}
-.upload-zone{border:2px dashed #1e2130;border-radius:10px;padding:32px;text-align:center;color:#8892a4;font-size:0.85rem;cursor:pointer;transition:border-color 0.15s}
-.upload-zone:hover{border-color:#58CC02;color:#58CC02}
-.upload-zone .upload-icon{font-size:2rem;margin-bottom:8px}
-.btn-schedule{background:#58CC02;color:#0f1117;padding:13px 32px;border-radius:9px;font-weight:700;font-size:0.9rem;border:none;cursor:pointer;width:100%;margin-top:8px}
-.btn-schedule:hover{background:#4db302}
+textarea.form-control{resize:none;height:90px}
+.platform-checks{display:flex;gap:10px;flex-wrap:wrap}
+.pcheck{display:flex;align-items:center;gap:8px;background:#0f1117;border:1px solid #1e2130;border-radius:8px;padding:9px 14px;font-size:0.82rem;cursor:pointer;transition:all 0.15s;user-select:none}
+.pcheck:hover{border-color:#58CC02}
+.pcheck.selected{border-color:rgba(88,204,2,0.5);background:rgba(88,204,2,0.07);color:#58CC02}
+.pcheck input{display:none}
+.upload-zone{border:2px dashed #1e2130;border-radius:10px;padding:32px;text-align:center;color:#8892a4;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.upload-zone:hover{border-color:#58CC02;color:#58CC02;background:rgba(88,204,2,0.03)}
+.upload-zone.has-file{border-color:rgba(88,204,2,0.5);background:rgba(88,204,2,0.06);color:#58CC02}
+.upload-icon{font-size:2rem;margin-bottom:8px}
+.btn-schedule{background:#58CC02;color:#0f1117;padding:13px 32px;border-radius:9px;font-weight:700;font-size:0.9rem;border:none;cursor:pointer;width:100%;margin-top:8px;transition:all 0.15s}
+.btn-schedule:hover{background:#4db302;transform:translateY(-1px)}
+.btn-secondary{background:transparent;border:1px solid #1e2130;color:#8892a4;padding:9px 20px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.15s}
+.btn-secondary:hover{border-color:#58CC02;color:#58CC02}
 
-.connect-cta{background:rgba(88,204,2,0.06);border:1px dashed rgba(88,204,2,0.25);border-radius:12px;padding:24px;text-align:center;margin-bottom:28px}
-.connect-cta p{color:#8892a4;font-size:0.875rem;margin-bottom:16px}
+/* AI TOOLS */
+.ai-card{background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.ai-result{background:#0f1117;border:1px solid rgba(88,204,2,0.2);border-radius:8px;padding:12px;font-size:0.82rem;line-height:1.6;color:#e8eaf6;min-height:60px;display:none}
+.ai-result.show{display:block}
+.ai-result .copy-btn{display:inline-block;margin-top:8px;font-size:0.72rem;color:#58CC02;cursor:pointer;font-weight:600;border:1px solid rgba(88,204,2,0.3);padding:3px 10px;border-radius:6px;transition:all 0.15s}
+.ai-result .copy-btn:hover{background:rgba(88,204,2,0.1)}
+.generating{display:flex;align-items:center;gap:8px;font-size:0.82rem;color:#8892a4;display:none}
+.generating.show{display:flex}
+.dot-pulse{width:6px;height:6px;border-radius:50%;background:#58CC02;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:0.2}50%{opacity:1}}
+
+/* DASHBOARD STATS */
+.stat-card{background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:20px}
+.stat-label{font-size:0.72rem;color:#8892a4;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.stat-val{font-size:1.9rem;font-weight:800}
+.stat-delta{font-size:0.75rem;margin-top:4px}
+
+/* SCHEDULED POSTS LIST */
+.post-item{background:#1a1d2e;border:1px solid #1e2130;border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:10px;transition:border-color 0.15s}
+.post-item:hover{border-color:#2a2d3a}
+.post-thumb{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.post-meta{flex:1}
+.post-caption{font-size:0.875rem;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.post-platforms{font-size:0.75rem;color:#8892a4}
+.post-time{font-size:0.75rem;color:#58CC02;white-space:nowrap}
+.post-status{font-size:0.68rem;padding:3px 10px;border-radius:20px;font-weight:700}
+.status-scheduled{background:rgba(88,204,2,0.12);color:#58CC02}
+.status-draft{background:rgba(255,200,50,0.1);color:#ffc832}
 </style>
 </head>
 <body>
@@ -92,239 +119,357 @@ textarea.form-control{resize:none;height:100px}
 <!-- SIDEBAR -->
 <div class="sidebar">
   <div class="logo">🐦 <span>TROGON</span></div>
-  <div class="nav-item active" onclick="showPage('connect')"><span class="nav-icon">🏠</span> Dashboard</div>
-  <div class="nav-item" onclick="showPage('schedule')"><span class="nav-icon">📅</span> Schedule</div>
-  <div class="nav-item" onclick="showPage('connect')"><span class="nav-icon">🔗</span> Connect Accounts</div>
-  <div class="nav-item" onclick="showPage('analytics')"><span class="nav-icon">📊</span> Analytics</div>
-  <div class="nav-item" onclick="showPage('aitools')"><span class="nav-icon">🤖</span> AI Tools</div>
-  <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Settings</div>
+  <div class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard',this)"><span class="nav-icon">🏠</span> Dashboard</div>
+  <div class="nav-item" id="nav-schedule" onclick="showPage('schedule',this)"><span class="nav-icon">📅</span> Schedule</div>
+  <div class="nav-item" id="nav-connect" onclick="showPage('connect',this)"><span class="nav-icon">🔗</span> Connect Accounts</div>
+  <div class="nav-item" id="nav-analytics" onclick="showPage('analytics',this)"><span class="nav-icon">📊</span> Analytics</div>
+  <div class="nav-item" id="nav-aitools" onclick="showPage('aitools',this)"><span class="nav-icon">🤖</span> AI Tools</div>
+  <div class="nav-item" id="nav-settings" onclick="showPage('settings',this)"><span class="nav-icon">⚙️</span> Settings</div>
 </div>
 
 <!-- MAIN -->
-<div class="main">
-  <div class="topbar">
-    <h1>Connect Accounts</h1>
-    <div style="display:flex;align-items:center;gap:12px">
-      <button class="btn-create" id="btn-create" onclick="showScheduler()">+ Create Post</button>
+<div class="main" id="main-content">
+
+  <!-- ======= DASHBOARD PAGE ======= -->
+  <div id="page-dashboard">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn-create" onclick="showPage('schedule',document.getElementById('nav-schedule'))">+ Create Post</button>
+        <div class="avatar" title="Prisca Dezigns">PD</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px">
+      <div class="stat-card">
+        <div class="stat-label">Total Reach</div>
+        <div class="stat-val" style="color:#58CC02">48.2K</div>
+        <div class="stat-delta" style="color:#58CC02">↑ 12% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Engagements</div>
+        <div class="stat-val">3,841</div>
+        <div class="stat-delta" style="color:#58CC02">↑ 8% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Posts Published</div>
+        <div class="stat-val">124</div>
+        <div class="stat-delta" style="color:#8892a4">Across 6 platforms</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Scheduled</div>
+        <div class="stat-val" style="color:#ffc832" id="dash-scheduled-count">4</div>
+        <div class="stat-delta" style="color:#8892a4">Posts queued</div>
+      </div>
+    </div>
+
+    <div class="section-title">Upcoming Posts</div>
+    <div id="dash-posts-list">
+      <div class="post-item">
+        <div class="post-thumb" style="background:#000">🎵</div>
+        <div class="post-meta">
+          <div class="post-caption">Behind the scenes of our latest project 🔥 #design</div>
+          <div class="post-platforms">TikTok · Instagram</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div class="post-time">Today 7:00 PM</div>
+          <div class="post-status status-scheduled">Scheduled</div>
+        </div>
+      </div>
+      <div class="post-item">
+        <div class="post-thumb" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888)">📸</div>
+        <div class="post-meta">
+          <div class="post-caption">New brand reveal dropping this week — stay tuned 👀</div>
+          <div class="post-platforms">Instagram · Facebook</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div class="post-time">Tomorrow 11:00 AM</div>
+          <div class="post-status status-scheduled">Scheduled</div>
+        </div>
+      </div>
+      <div class="post-item">
+        <div class="post-thumb" style="background:#1877f2">👤</div>
+        <div class="post-meta">
+          <div class="post-caption">5 things every small business owner needs to know about branding</div>
+          <div class="post-platforms">Facebook · LinkedIn</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div class="post-time">Fri 2:00 PM</div>
+          <div class="post-status status-draft">Draft</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= SCHEDULE PAGE ======= -->
+  <div id="page-schedule" style="display:none">
+    <div class="topbar">
+      <h1>Schedule Post</h1>
       <div class="avatar">PD</div>
     </div>
-  </div>
 
-  <!-- Connect CTA -->
-  <div class="connect-cta" id="connect-cta">
-    <p>Connect your social media accounts to start scheduling and publishing content.</p>
-  </div>
-
-  <!-- PLATFORMS GRID -->
-  <div class="section-title">Your Platforms</div>
-  <div class="platforms-grid" id="platforms-grid">
-
-    <div class="platform-card" id="card-tiktok">
-      <div class="platform-header">
-        <div class="platform-icon" style="background:#000">🎵</div>
-        <div>
-          <div class="platform-name">TikTok</div>
-          <div class="platform-status" id="tiktok-status">Not connected</div>
+    <div style="max-width:680px">
+      <div class="form-group">
+        <label class="form-label">Publish To</label>
+        <div class="platform-checks" id="platform-checks">
+          <div class="pcheck selected" onclick="togglePcheck(this)">🎵 TikTok</div>
+          <div class="pcheck selected" onclick="togglePcheck(this)">📸 Instagram</div>
+          <div class="pcheck" onclick="togglePcheck(this)">👤 Facebook</div>
+          <div class="pcheck" onclick="togglePcheck(this)">▶️ YouTube</div>
+          <div class="pcheck" onclick="togglePcheck(this)">💼 LinkedIn</div>
+          <div class="pcheck" onclick="togglePcheck(this)">📌 Pinterest</div>
         </div>
       </div>
-      <button class="btn btn-connect" id="tiktok-btn" onclick="connectTikTok()">Connect TikTok</button>
-    </div>
 
-    <div class="platform-card connected">
-      <div class="platform-header">
-        <div class="platform-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">📸</div>
-        <div>
-          <div class="platform-name">Instagram</div>
-          <div class="platform-status ok">● Connected</div>
+      <div class="form-group">
+        <label class="form-label">Caption</label>
+        <textarea class="form-control" id="schedule-caption" placeholder="Write your caption here...">Check out our latest content! Drop a comment below 👇 #trogon #socialmedia #contentcreator</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn-secondary" onclick="suggestCaption()">✨ Suggest Caption</button>
+          <button class="btn-secondary" onclick="suggestHashtags()">&#35; Add Hashtags</button>
         </div>
       </div>
-      <button class="btn btn-connected">Connected ✓</button>
-    </div>
 
-    <div class="platform-card connected">
-      <div class="platform-header">
-        <div class="platform-icon" style="background:#1877f2">👤</div>
-        <div>
-          <div class="platform-name">Facebook</div>
-          <div class="platform-status ok">● Connected</div>
+      <div class="form-group">
+        <label class="form-label">Media</label>
+        <div class="upload-zone" id="upload-zone" onclick="fakeUpload()">
+          <div class="upload-icon" id="upload-icon">🎬</div>
+          <div id="upload-text">Drop your video or image here<br><small style="color:#555">MP4, MOV, JPG, PNG — up to 500MB</small></div>
         </div>
       </div>
-      <button class="btn btn-connected">Connected ✓</button>
-    </div>
 
-    <div class="platform-card connected">
-      <div class="platform-header">
-        <div class="platform-icon" style="background:#ff0000">▶️</div>
+      <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div>
-          <div class="platform-name">YouTube</div>
-          <div class="platform-status ok">● Connected</div>
+          <label class="form-label">Date</label>
+          <input type="date" class="form-control" id="post-date">
+        </div>
+        <div>
+          <label class="form-label">Time</label>
+          <input type="time" class="form-control" id="post-time" value="10:00">
         </div>
       </div>
-      <button class="btn btn-connected">Connected ✓</button>
-    </div>
 
-    <div class="platform-card connected">
-      <div class="platform-header">
-        <div class="platform-icon" style="background:#0a66c2">💼</div>
-        <div>
-          <div class="platform-name">LinkedIn</div>
-          <div class="platform-status ok">● Connected</div>
-        </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-schedule" onclick="schedulePost()">Schedule Post →</button>
+        <button class="btn-secondary" onclick="saveDraft()">Save Draft</button>
       </div>
-      <button class="btn btn-connected">Connected ✓</button>
     </div>
-
-    <div class="platform-card connected">
-      <div class="platform-header">
-        <div class="platform-icon" style="background:#e60023">📌</div>
-        <div>
-          <div class="platform-name">Pinterest</div>
-          <div class="platform-status ok">● Connected</div>
-        </div>
-      </div>
-      <button class="btn btn-connected">Connected ✓</button>
-    </div>
-
   </div>
 
-  <!-- SCHEDULER (hidden initially) -->
-  <div class="scheduler" id="scheduler">
-    <div class="topbar" style="margin-bottom:24px">
-      <h1 style="font-size:1.1rem">Create New Post</h1>
-      <span style="color:#8892a4;font-size:0.8rem;cursor:pointer" onclick="hideScheduler()">← Back</span>
+  <!-- ======= CONNECT ACCOUNTS PAGE ======= -->
+  <div id="page-connect" style="display:none">
+    <div class="topbar">
+      <h1>Connect Accounts</h1>
+      <div class="avatar">PD</div>
     </div>
+    <div class="section-title">Your Platforms</div>
+    <div class="platforms-grid">
 
-    <div class="form-group">
-      <label class="form-label">Publish To</label>
-      <div class="platform-checks">
-        <label class="pcheck active"><input type="checkbox" checked> 🎵 TikTok</label>
-        <label class="pcheck active"><input type="checkbox" checked> 📸 Instagram</label>
-        <label class="pcheck"><input type="checkbox"> 👤 Facebook</label>
-        <label class="pcheck"><input type="checkbox"> ▶️ YouTube</label>
+      <div class="platform-card" id="card-tiktok">
+        <div class="platform-header">
+          <div class="platform-icon" style="background:#000">🎵</div>
+          <div>
+            <div class="platform-name">TikTok</div>
+            <div class="platform-status" id="tiktok-status">Not connected</div>
+          </div>
+        </div>
+        <button class="btn btn-connect" id="tiktok-btn" onclick="connectTikTok()">Connect TikTok</button>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label class="form-label">Caption</label>
-      <textarea class="form-control" id="caption-input">Check out our latest content! Drop a comment below 👇 #trogon #socialmedia #contentcreator</textarea>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Media</label>
-      <div class="upload-zone">
-        <div class="upload-icon">🎬</div>
-        Drop your video or image here<br>
-        <small style="color:#555">MP4, MOV, JPG, PNG — up to 500MB</small>
+      <div class="platform-card connected">
+        <div class="platform-header">
+          <div class="platform-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">📸</div>
+          <div><div class="platform-name">Instagram</div><div class="platform-status ok">● Connected</div></div>
+        </div>
+        <button class="btn btn-connected">Connected ✓</button>
       </div>
-    </div>
 
-    <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div>
-        <label class="form-label">Date</label>
-        <input type="date" class="form-control" id="post-date">
+      <div class="platform-card connected">
+        <div class="platform-header">
+          <div class="platform-icon" style="background:#1877f2">👤</div>
+          <div><div class="platform-name">Facebook</div><div class="platform-status ok">● Connected</div></div>
+        </div>
+        <button class="btn btn-connected">Connected ✓</button>
       </div>
-      <div>
-        <label class="form-label">Time</label>
-        <input type="time" class="form-control" value="10:00">
+
+      <div class="platform-card connected">
+        <div class="platform-header">
+          <div class="platform-icon" style="background:#ff0000">▶️</div>
+          <div><div class="platform-name">YouTube</div><div class="platform-status ok">● Connected</div></div>
+        </div>
+        <button class="btn btn-connected">Connected ✓</button>
       </div>
-    </div>
 
-    <button class="btn-schedule" onclick="schedulePost()">Schedule Post →</button>
-  </div>
-</div>
+      <div class="platform-card connected">
+        <div class="platform-header">
+          <div class="platform-icon" style="background:#0a66c2">💼</div>
+          <div><div class="platform-name">LinkedIn</div><div class="platform-status ok">● Connected</div></div>
+        </div>
+        <button class="btn btn-connected">Connected ✓</button>
+      </div>
 
-<!-- ANALYTICS PAGE -->
-<div id="page-analytics" style="display:none;width:100%">
-  <div class="topbar"><h1>Analytics</h1><div class="avatar">PD</div></div>
-  <div class="section-title" style="margin-bottom:20px">Performance Overview — Last 30 Days</div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px">
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:20px">
-      <div style="font-size:0.75rem;color:#8892a4;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Total Reach</div>
-      <div style="font-size:1.8rem;font-weight:800;color:#58CC02">48.2K</div>
-      <div style="font-size:0.75rem;color:#58CC02;margin-top:4px">↑ 12% vs last month</div>
-    </div>
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:20px">
-      <div style="font-size:0.75rem;color:#8892a4;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Engagements</div>
-      <div style="font-size:1.8rem;font-weight:800;color:#e8eaf6">3,841</div>
-      <div style="font-size:0.75rem;color:#58CC02;margin-top:4px">↑ 8% vs last month</div>
-    </div>
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:20px">
-      <div style="font-size:0.75rem;color:#8892a4;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Posts Published</div>
-      <div style="font-size:1.8rem;font-weight:800;color:#e8eaf6">124</div>
-      <div style="font-size:0.75rem;color:#8892a4;margin-top:4px">Across 6 platforms</div>
-    </div>
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:20px">
-      <div style="font-size:0.75rem;color:#8892a4;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Top Platform</div>
-      <div style="font-size:1.8rem;font-weight:800;color:#e8eaf6">🎵 TikTok</div>
-      <div style="font-size:0.75rem;color:#58CC02;margin-top:4px">24K reach this month</div>
+      <div class="platform-card connected">
+        <div class="platform-header">
+          <div class="platform-icon" style="background:#e60023">📌</div>
+          <div><div class="platform-name">Pinterest</div><div class="platform-status ok">● Connected</div></div>
+        </div>
+        <button class="btn btn-connected">Connected ✓</button>
+      </div>
+
     </div>
   </div>
-  <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px">
-    <div style="font-size:0.8rem;font-weight:600;color:#8892a4;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px">Platform Breakdown</div>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div style="display:flex;align-items:center;gap:12px"><span style="width:90px;font-size:0.85rem">🎵 TikTok</span><div style="flex:1;background:#0f1117;border-radius:4px;height:8px"><div style="width:72%;background:#58CC02;height:8px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:50px;text-align:right">24.1K</span></div>
-      <div style="display:flex;align-items:center;gap:12px"><span style="width:90px;font-size:0.85rem">📸 Instagram</span><div style="flex:1;background:#0f1117;border-radius:4px;height:8px"><div style="width:45%;background:#bc1888;height:8px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:50px;text-align:right">12.8K</span></div>
-      <div style="display:flex;align-items:center;gap:12px"><span style="width:90px;font-size:0.85rem">👤 Facebook</span><div style="flex:1;background:#0f1117;border-radius:4px;height:8px"><div style="width:28%;background:#1877f2;height:8px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:50px;text-align:right">6.2K</span></div>
-      <div style="display:flex;align-items:center;gap:12px"><span style="width:90px;font-size:0.85rem">▶️ YouTube</span><div style="flex:1;background:#0f1117;border-radius:4px;height:8px"><div style="width:18%;background:#ff0000;height:8px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:50px;text-align:right">5.1K</span></div>
-    </div>
-  </div>
-</div>
 
-<!-- AI TOOLS PAGE -->
-<div id="page-aitools" style="display:none;width:100%">
-  <div class="topbar"><h1>AI Tools</h1><div class="avatar">PD</div></div>
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:700px">
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px">
-      <div style="font-size:1.5rem;margin-bottom:10px">✍️</div>
-      <div style="font-weight:700;margin-bottom:6px">Caption Generator</div>
-      <div style="font-size:0.82rem;color:#8892a4;margin-bottom:16px">Generate engaging captions for any platform using AI.</div>
-      <textarea class="form-control" style="height:70px;margin-bottom:10px" placeholder="Describe your post..."></textarea>
-      <button class="btn btn-connect" style="width:100%;padding:9px">Generate Caption</button>
+  <!-- ======= ANALYTICS PAGE ======= -->
+  <div id="page-analytics" style="display:none">
+    <div class="topbar"><h1>Analytics</h1><div class="avatar">PD</div></div>
+    <div class="section-title">Performance Overview — Last 30 Days</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px">
+      <div class="stat-card"><div class="stat-label">Total Reach</div><div class="stat-val" style="color:#58CC02">48.2K</div><div class="stat-delta" style="color:#58CC02">↑ 12%</div></div>
+      <div class="stat-card"><div class="stat-label">Engagements</div><div class="stat-val">3,841</div><div class="stat-delta" style="color:#58CC02">↑ 8%</div></div>
+      <div class="stat-card"><div class="stat-label">Posts Published</div><div class="stat-val">124</div><div class="stat-delta" style="color:#8892a4">6 platforms</div></div>
+      <div class="stat-card"><div class="stat-label">Top Platform</div><div class="stat-val" style="font-size:1.4rem">🎵 TikTok</div><div class="stat-delta" style="color:#58CC02">24K reach</div></div>
+    </div>
+    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px;margin-bottom:20px">
+      <div class="section-title" style="margin-bottom:20px">Platform Breakdown</div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:100px;font-size:0.85rem">🎵 TikTok</span><div style="flex:1;background:#0f1117;border-radius:4px;height:10px"><div style="width:72%;background:#58CC02;height:10px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:55px;text-align:right">24.1K</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:100px;font-size:0.85rem">📸 Instagram</span><div style="flex:1;background:#0f1117;border-radius:4px;height:10px"><div style="width:45%;background:#bc1888;height:10px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:55px;text-align:right">12.8K</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:100px;font-size:0.85rem">👤 Facebook</span><div style="flex:1;background:#0f1117;border-radius:4px;height:10px"><div style="width:28%;background:#1877f2;height:10px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:55px;text-align:right">6.2K</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:100px;font-size:0.85rem">▶️ YouTube</span><div style="flex:1;background:#0f1117;border-radius:4px;height:10px"><div style="width:18%;background:#ff0000;height:10px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:55px;text-align:right">5.1K</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:100px;font-size:0.85rem">💼 LinkedIn</span><div style="flex:1;background:#0f1117;border-radius:4px;height:10px"><div style="width:10%;background:#0a66c2;height:10px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:55px;text-align:right">2.8K</span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:100px;font-size:0.85rem">📌 Pinterest</span><div style="flex:1;background:#0f1117;border-radius:4px;height:10px"><div style="width:7%;background:#e60023;height:10px;border-radius:4px"></div></div><span style="font-size:0.8rem;color:#8892a4;width:55px;text-align:right">1.4K</span></div>
+      </div>
     </div>
     <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px">
-      <div style="font-size:1.5rem;margin-bottom:10px">#️⃣</div>
-      <div style="font-weight:700;margin-bottom:6px">Hashtag Generator</div>
-      <div style="font-size:0.82rem;color:#8892a4;margin-bottom:16px">Get the best hashtags for your niche and platform.</div>
-      <textarea class="form-control" style="height:70px;margin-bottom:10px" placeholder="Your niche or topic..."></textarea>
-      <button class="btn btn-connect" style="width:100%;padding:9px">Generate Hashtags</button>
-    </div>
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px">
-      <div style="font-size:1.5rem;margin-bottom:10px">🪝</div>
-      <div style="font-weight:700;margin-bottom:6px">Hook Generator</div>
-      <div style="font-size:0.82rem;color:#8892a4;margin-bottom:16px">Create scroll-stopping hooks for TikTok and Reels.</div>
-      <textarea class="form-control" style="height:70px;margin-bottom:10px" placeholder="What's your video about?"></textarea>
-      <button class="btn btn-connect" style="width:100%;padding:9px">Generate Hooks</button>
-    </div>
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px">
-      <div style="font-size:1.5rem;margin-bottom:10px">🕐</div>
-      <div style="font-weight:700;margin-bottom:6px">Best Time to Post</div>
-      <div style="font-size:0.82rem;color:#8892a4;margin-bottom:16px">AI-recommended posting times based on your audience.</div>
-      <div style="font-size:0.85rem;color:#58CC02;font-weight:600">TikTok: 7PM – 9PM</div>
-      <div style="font-size:0.85rem;color:#58CC02;font-weight:600">Instagram: 11AM – 1PM</div>
-      <div style="font-size:0.85rem;color:#58CC02;font-weight:600">Facebook: 8AM – 10AM</div>
+      <div class="section-title" style="margin-bottom:16px">Top Performing Posts</div>
+      <div class="post-item"><div class="post-thumb" style="background:#000">🎵</div><div class="post-meta"><div class="post-caption">My entire design process in 60 seconds ⚡️</div><div class="post-platforms">TikTok · 14.2K views · 892 likes</div></div><div class="post-status status-scheduled" style="white-space:nowrap">↑ Top Post</div></div>
+      <div class="post-item"><div class="post-thumb" style="background:linear-gradient(135deg,#f09433,#dc2743,#bc1888)">📸</div><div class="post-meta"><div class="post-caption">Before &amp; after — client rebrand reveal 🔥</div><div class="post-platforms">Instagram · 8.7K reach · 634 likes</div></div><div class="post-status status-draft">#2</div></div>
     </div>
   </div>
-</div>
 
-<!-- SETTINGS PAGE -->
-<div id="page-settings" style="display:none;width:100%">
-  <div class="topbar"><h1>Settings</h1><div class="avatar">PD</div></div>
-  <div style="max-width:560px">
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px;margin-bottom:16px">
-      <div style="font-weight:700;margin-bottom:16px">Account</div>
-      <div class="form-group"><label class="form-label">Display Name</label><input class="form-control" value="Prisca Dezigns"></div>
-      <div class="form-group"><label class="form-label">Email</label><input class="form-control" value="hello@priscadezigns.org"></div>
-      <div class="form-group"><label class="form-label">Plan</label><input class="form-control" value="Pro — $18/mo" readonly style="color:#58CC02"></div>
-      <button class="btn btn-connect" style="width:auto;padding:9px 20px">Save Changes</button>
-    </div>
-    <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px">
-      <div style="font-weight:700;margin-bottom:16px">Notifications</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1e2130"><span style="font-size:0.875rem">Post published</span><input type="checkbox" checked style="accent-color:#58CC02;width:16px;height:16px"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1e2130"><span style="font-size:0.875rem">Post failed</span><input type="checkbox" checked style="accent-color:#58CC02;width:16px;height:16px"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0"><span style="font-size:0.875rem">Weekly analytics report</span><input type="checkbox" checked style="accent-color:#58CC02;width:16px;height:16px"></div>
+  <!-- ======= AI TOOLS PAGE ======= -->
+  <div id="page-aitools" style="display:none">
+    <div class="topbar"><h1>AI Tools</h1><div class="avatar">PD</div></div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:760px">
+
+      <!-- Caption Generator -->
+      <div class="ai-card">
+        <div style="font-size:1.5rem">✍️</div>
+        <div style="font-weight:700">Caption Generator</div>
+        <div style="font-size:0.82rem;color:#8892a4">Generate engaging captions for any platform using AI.</div>
+        <textarea class="form-control" id="caption-topic" style="height:70px" placeholder="Describe your post (e.g. 'brand reveal for a fashion label')..."></textarea>
+        <div class="generating" id="caption-loading"><div class="dot-pulse"></div> Generating...</div>
+        <div class="ai-result" id="caption-result"></div>
+        <button class="btn btn-connect" onclick="generateCaption()">Generate Caption</button>
+      </div>
+
+      <!-- Hashtag Generator -->
+      <div class="ai-card">
+        <div style="font-size:1.5rem">#️⃣</div>
+        <div style="font-weight:700">Hashtag Generator</div>
+        <div style="font-size:0.82rem;color:#8892a4">Get the best hashtags for your niche and platform.</div>
+        <textarea class="form-control" id="hashtag-topic" style="height:70px" placeholder="Your niche or topic (e.g. 'Caribbean fashion brand')..."></textarea>
+        <div class="generating" id="hashtag-loading"><div class="dot-pulse"></div> Generating...</div>
+        <div class="ai-result" id="hashtag-result"></div>
+        <button class="btn btn-connect" onclick="generateHashtags()">Generate Hashtags</button>
+      </div>
+
+      <!-- Hook Generator -->
+      <div class="ai-card">
+        <div style="font-size:1.5rem">🪝</div>
+        <div style="font-weight:700">Hook Generator</div>
+        <div style="font-size:0.82rem;color:#8892a4">Create scroll-stopping hooks for TikTok and Reels.</div>
+        <textarea class="form-control" id="hook-topic" style="height:70px" placeholder="What's your video about?"></textarea>
+        <div class="generating" id="hook-loading"><div class="dot-pulse"></div> Generating...</div>
+        <div class="ai-result" id="hook-result"></div>
+        <button class="btn btn-connect" onclick="generateHooks()">Generate Hooks</button>
+      </div>
+
+      <!-- Best Time to Post -->
+      <div class="ai-card">
+        <div style="font-size:1.5rem">🕐</div>
+        <div style="font-weight:700">Best Time to Post</div>
+        <div style="font-size:0.82rem;color:#8892a4">AI-recommended posting times based on your audience data.</div>
+        <div id="bttp-default" style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+          <div style="font-size:0.85rem;color:#58CC02;font-weight:600">🎵 TikTok: 7PM – 9PM</div>
+          <div style="font-size:0.85rem;color:#bc1888;font-weight:600">📸 Instagram: 11AM – 1PM</div>
+          <div style="font-size:0.85rem;color:#1877f2;font-weight:600">👤 Facebook: 8AM – 10AM</div>
+          <div style="font-size:0.85rem;color:#ff0000;font-weight:600">▶️ YouTube: 2PM – 4PM</div>
+        </div>
+        <div class="generating" id="bttp-loading"><div class="dot-pulse"></div> Analysing your audience...</div>
+        <div class="ai-result" id="bttp-result" style="margin-top:0"></div>
+        <button class="btn btn-connect" onclick="refreshBestTimes()">Refresh Analysis</button>
+      </div>
+
     </div>
   </div>
-</div>
+
+  <!-- ======= SETTINGS PAGE ======= -->
+  <div id="page-settings" style="display:none">
+    <div class="topbar"><h1>Settings</h1><div class="avatar">PD</div></div>
+    <div style="max-width:560px">
+
+      <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px;margin-bottom:16px">
+        <div style="font-weight:700;margin-bottom:20px">Account</div>
+        <div class="form-group">
+          <label class="form-label">Display Name</label>
+          <input class="form-control" id="setting-name" value="Prisca Dezigns">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-control" id="setting-email" value="hello@priscadezigns.org">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Plan</label>
+          <input class="form-control" value="Pro — $18/mo" readonly style="color:#58CC02;cursor:default">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-connect" style="width:auto;padding:9px 22px" onclick="saveSettings()">Save Changes</button>
+          <button class="btn-secondary" onclick="showToast('Upgrade options coming soon!')">Upgrade Plan ↗</button>
+        </div>
+      </div>
+
+      <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px;margin-bottom:16px">
+        <div style="font-weight:700;margin-bottom:16px">Notifications</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #1e2130">
+          <div><div style="font-size:0.875rem;font-weight:500">Post published</div><div style="font-size:0.75rem;color:#8892a4">Notify me when a post goes live</div></div>
+          <label class="toggle"><input type="checkbox" checked id="notif-published" onchange="toggleNotif(this,'post published')"><span class="slider"></span></label>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #1e2130">
+          <div><div style="font-size:0.875rem;font-weight:500">Post failed</div><div style="font-size:0.75rem;color:#8892a4">Alert me if a post fails to publish</div></div>
+          <label class="toggle"><input type="checkbox" checked id="notif-failed" onchange="toggleNotif(this,'post failure alerts')"><span class="slider"></span></label>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0">
+          <div><div style="font-size:0.875rem;font-weight:500">Weekly analytics report</div><div style="font-size:0.75rem;color:#8892a4">Emailed every Monday morning</div></div>
+          <label class="toggle"><input type="checkbox" checked id="notif-report" onchange="toggleNotif(this,'weekly report')"><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div style="background:#1a1d2e;border:1px solid #1e2130;border-radius:12px;padding:24px">
+        <div style="font-weight:700;margin-bottom:16px">Default Posting Timezone</div>
+        <select class="form-control" onchange="showToast('Timezone updated to ' + this.options[this.selectedIndex].text)">
+          <option selected>UTC-4 — Atlantic Standard Time (Trinidad)</option>
+          <option>UTC-5 — Eastern Standard Time</option>
+          <option>UTC-6 — Central Standard Time</option>
+          <option>UTC+0 — GMT</option>
+          <option>UTC+1 — Central European Time</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<!-- TOGGLE SWITCH CSS -->
+<style>
+.toggle{position:relative;display:inline-block;width:42px;height:24px}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#1e2130;border-radius:24px;transition:.3s;border:1px solid #2a2d3a}
+.slider:before{position:absolute;content:"";height:18px;width:18px;left:2px;bottom:2px;background:#8892a4;border-radius:50%;transition:.3s}
+input:checked+.slider{background:rgba(88,204,2,0.2);border-color:rgba(88,204,2,0.4)}
+input:checked+.slider:before{transform:translateX(18px);background:#58CC02}
+</style>
 
 <!-- TIKTOK OAUTH MODAL -->
 <div class="modal-overlay" id="modal">
@@ -340,7 +485,7 @@ textarea.form-control{resize:none;height:100px}
       <div class="permission-item"><div class="perm-icon">👤</div> Read your basic profile information</div>
       <div class="permission-item"><div class="perm-icon">📋</div> View your video list and stats</div>
     </div>
-    <div class="fake-url">https://www.tiktok.com/v2/auth/authorize?client_key=trogon_app&scope=user.info.basic,video.publish,video.upload&response_type=code&redirect_uri=https%3A%2F%2Fpriscadezigns.org%2Ftrogon%2Fdashboard%2F</div>
+    <div class="fake-url">https://www.tiktok.com/v2/auth/authorize?client_key=trogon_app&scope=user.info.basic,video.publish,video.upload,video.list&response_type=code&redirect_uri=https%3A%2F%2Fpriscadezigns.org%2Ftrogon%2Fdashboard%2F</div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="btn-authorize" onclick="authorize()">Authorize →</button>
@@ -351,97 +496,208 @@ textarea.form-control{resize:none;height:100px}
 <!-- TOAST -->
 <div class="toast" id="toast">
   <span class="toast-icon">✅</span>
-  <span id="toast-msg">TikTok connected successfully!</span>
+  <span id="toast-msg">Done!</span>
 </div>
 
 <script>
-function showPage(page) {
-  // Hide all pages
-  document.getElementById('platforms-grid').style.display = 'none';
-  document.getElementById('connect-cta').style.display = 'none';
-  document.querySelector('.section-title').style.display = 'none';
-  document.getElementById('scheduler').classList.remove('show');
-  document.getElementById('page-analytics').style.display = 'none';
-  document.getElementById('page-aitools').style.display = 'none';
-  document.getElementById('page-settings').style.display = 'none';
+// ─── AI CONTENT BANKS ───────────────────────────────────────────
+const captionBank = [
+  "✨ The rebrand is HERE and we are not holding back. Every detail was intentional — swipe to see the full reveal. \n\nWhat do you think? Drop it in the comments 👇\n\n#branding #rebrand #caribbeandesign #graphicdesign #brandidentity",
+  "🔥 We built this from scratch in 72 hours. Strategy. Design. Copy. All done. \n\nThis is what happens when you stop settling for templates and start building something that actually fits your brand.\n\n#designagency #brandstrategy #smallbusiness #priscadezigns",
+  "Your brand is talking even when you're not. Make sure it's saying the right things. 💜\n\nWe help Caribbean businesses show up like the global brands they are — without the agency price tag.\n\n#branding #caribbeanbusiness #trinidad #socialmediamarketing",
+  "POV: You hired a full creative team for the price of a gym membership. 👀\n\nDesign. Automation. Copy. Social. All under one roof.\n\nLink in bio → let's talk.\n\n#smallbusiness #digitalmarketing #contentcreator #branding"
+];
 
-  // Update nav active state
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+const hashtagBank = [
+  "#branding #brandidentity #graphicdesign #caribbeandesign #trinidad #logodesign #creativeagency #smallbusiness #entrepreneurship #digitalmarketing #contentcreation #socialmediamarketing #designinspiration #brandstrategy #marketingtips",
+  "#caribbeanbusiness #ttbusiness #trinidadandtobago #westindies #islandlife #caribbeanentrepreneur #shoplocal #supportlocal #blackbusiness #womanownedbusiness #creativeentrepreneur #designlife #brandbuilding #visualidentity #agencylife",
+  "#socialmedia #contentcreator #tiktokmarketing #instagrammarketing #facebookads #contentmarketing #growyourbusiness #onlinemarketing #digitalstrategy #marketingagency #creativestudio #branddesign #designprocess #logodesigner #visualbranding"
+];
 
-  if(page === 'connect') {
-    document.getElementById('platforms-grid').style.display = 'grid';
-    document.querySelector('.section-title').style.display = 'block';
-    document.querySelector('.topbar h1').textContent = 'Connect Accounts';
-  } else if(page === 'schedule') {
-    showScheduler();
-  } else if(page === 'analytics') {
-    document.getElementById('page-analytics').style.display = 'block';
-    document.querySelector('.topbar h1').textContent = 'Analytics';
-  } else if(page === 'aitools') {
-    document.getElementById('page-aitools').style.display = 'block';
-    document.querySelector('.topbar h1').textContent = 'AI Tools';
-  } else if(page === 'settings') {
-    document.getElementById('page-settings').style.display = 'block';
-    document.querySelector('.topbar h1').textContent = 'Settings';
+const hookBank = [
+  "1. "Stop using Canva templates if you want people to take your brand seriously."\n2. "Here's why your logo is costing you clients (and how to fix it)."\n3. "I redesigned a Caribbean brand in 24 hours — here's the before and after."\n4. "The one thing every successful brand has that yours probably doesn't."",
+  "1. "This is what a $5,000 logo looks like vs a $50 one — can you tell the difference?"\n2. "Your brand is the reason people don't trust your prices."\n3. "We turned a dying local business into a 6-figure brand. Here's exactly how."\n4. "If your brand doesn't make people stop scrolling, it's not doing its job."",
+  "1. "I'm giving away the full design process we use for every client — watch till the end."\n2. "Built an entire brand identity in one day. This is how."\n3. "Why Caribbean businesses are leaving money on the table with bad branding."\n4. "The 3-second rule: if your brand doesn't grab attention in 3 seconds, you've already lost.""
+];
+
+const bttpBank = [
+  "Based on your last 30 days of engagement data:\n\n🎵 TikTok — Best: 7PM–9PM (↑38% engagement)\n📸 Instagram — Best: 11AM–1PM & 6PM–8PM\n👤 Facebook — Best: 8AM–10AM (weekdays)\n▶️ YouTube — Best: 2PM–4PM (Fri–Sun)\n💼 LinkedIn — Best: 7AM–9AM (Tue–Thu)\n\n💡 Tip: Your TikTok posts on Thursdays get 2x the reach of other days.",
+  "Your audience is most active at:\n\n🎵 TikTok — 6PM–10PM (peak: 8PM)\n📸 Instagram — 12PM–2PM & 7PM–9PM\n👤 Facebook — 9AM–11AM\n▶️ YouTube — 3PM–5PM (weekends)\n💼 LinkedIn — 8AM–9AM (Mon, Wed)\n\n💡 Tip: Posting Instagram Reels on Tuesday evenings shows the highest save rate for your account."
+];
+
+// ─── NAVIGATION ─────────────────────────────────────────────────
+const pages = ['dashboard','schedule','connect','analytics','aitools','settings'];
+function showPage(page, navEl) {
+  pages.forEach(p => {
+    document.getElementById('page-' + p).style.display = 'none';
+    const nav = document.getElementById('nav-' + p);
+    if(nav) nav.classList.remove('active');
+  });
+  document.getElementById('page-' + page).style.display = 'block';
+  if(navEl) navEl.classList.add('active');
+  else if(document.getElementById('nav-' + page)) document.getElementById('nav-' + page).classList.add('active');
+}
+
+// ─── PLATFORM CHECKS ────────────────────────────────────────────
+function togglePcheck(el) {
+  el.classList.toggle('selected');
+}
+
+// ─── UPLOAD ZONE ─────────────────────────────────────────────────
+function fakeUpload() {
+  const zone = document.getElementById('upload-zone');
+  if(zone.classList.contains('has-file')) {
+    zone.classList.remove('has-file');
+    document.getElementById('upload-icon').textContent = '🎬';
+    document.getElementById('upload-text').innerHTML = 'Drop your video or image here<br><small style="color:#555">MP4, MOV, JPG, PNG — up to 500MB</small>';
+  } else {
+    zone.classList.add('has-file');
+    document.getElementById('upload-icon').textContent = '✅';
+    document.getElementById('upload-text').innerHTML = '<strong style="color:#58CC02">brand_reveal_v3.mp4</strong><br><small>2.4 MB — Ready to publish</small>';
+    showToast('Video added!');
   }
 }
 
-// Set tomorrow's date
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-const d = document.getElementById('post-date');
-if(d) d.value = tomorrow.toISOString().split('T')[0];
+// ─── SCHEDULER ──────────────────────────────────────────────────
+function schedulePost() {
+  const selected = [...document.querySelectorAll('#platform-checks .pcheck.selected')].map(el => el.textContent.trim());
+  if(selected.length === 0) { showToast('⚠️ Please select at least one platform'); return; }
+  const caption = document.getElementById('schedule-caption').value.trim();
+  if(!caption) { showToast('⚠️ Please add a caption'); return; }
+  const date = document.getElementById('post-date').value;
+  const time = document.getElementById('post-time').value;
+  const dateStr = date ? new Date(date + 'T' + time).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) + ' ' + time : 'Tomorrow 10:00 AM';
+  addPostToDashboard(caption, selected, dateStr);
+  showToast('✅ Scheduled for ' + selected.join(' & ') + '!');
+  setTimeout(() => showPage('dashboard', document.getElementById('nav-dashboard')), 1800);
+}
 
+function saveDraft() {
+  showToast('Draft saved!');
+}
+
+function addPostToDashboard(caption, platforms, time) {
+  const list = document.getElementById('dash-posts-list');
+  const icons = {'🎵 TikTok':'🎵','📸 Instagram':'📸','👤 Facebook':'👤','▶️ YouTube':'▶️','💼 LinkedIn':'💼','📌 Pinterest':'📌'};
+  const bgs = {'🎵 TikTok':'#000','📸 Instagram':'linear-gradient(135deg,#f09433,#dc2743,#bc1888)','👤 Facebook':'#1877f2','▶️ YouTube':'#ff0000','💼 LinkedIn':'#0a66c2','📌 Pinterest':'#e60023'};
+  const icon = icons[platforms[0]] || '📱';
+  const bg = bgs[platforms[0]] || '#58CC02';
+  const item = document.createElement('div');
+  item.className = 'post-item';
+  item.innerHTML = `<div class="post-thumb" style="background:${bg}">${icon}</div><div class="post-meta"><div class="post-caption">${caption.substring(0,60)}${caption.length>60?'…':''}</div><div class="post-platforms">${platforms.join(' · ')}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div class="post-time">${time}</div><div class="post-status status-scheduled">Scheduled</div></div>`;
+  list.insertBefore(item, list.firstChild);
+  const count = document.getElementById('dash-scheduled-count');
+  count.textContent = parseInt(count.textContent) + 1;
+}
+
+function suggestCaption() {
+  const ta = document.getElementById('schedule-caption');
+  ta.value = captionBank[Math.floor(Math.random()*captionBank.length)].split('\n\n')[0];
+  showToast('✨ Caption suggested!');
+}
+
+function suggestHashtags() {
+  const ta = document.getElementById('schedule-caption');
+  const tags = hashtagBank[Math.floor(Math.random()*hashtagBank.length)];
+  ta.value = ta.value.replace(/#\w+\s*/g,'').trim() + '\n\n' + tags;
+  showToast('# Hashtags added!');
+}
+
+// ─── AI TOOLS ───────────────────────────────────────────────────
+function runAI(loadingId, resultId, bank, copyText) {
+  const loading = document.getElementById(loadingId);
+  const result = document.getElementById(resultId);
+  result.classList.remove('show');
+  loading.classList.add('show');
+  setTimeout(() => {
+    loading.classList.remove('show');
+    const text = bank[Math.floor(Math.random()*bank.length)];
+    result.innerHTML = text.replace(/\n/g,'<br>') + `<br><span class="copy-btn" onclick="copyText(this,'${copyText}')">📋 Copy</span>`;
+    result.classList.add('show');
+  }, 1400);
+}
+
+function generateCaption() {
+  const topic = document.getElementById('caption-topic').value.trim();
+  runAI('caption-loading','caption-result',captionBank,'caption');
+}
+function generateHashtags() {
+  runAI('hashtag-loading','hashtag-result',hashtagBank,'hashtags');
+}
+function generateHooks() {
+  runAI('hook-loading','hook-result',hookBank,'hooks');
+}
+function refreshBestTimes() {
+  const def = document.getElementById('bttp-default');
+  const loading = document.getElementById('bttp-loading');
+  const result = document.getElementById('bttp-result');
+  def.style.display = 'none';
+  result.classList.remove('show');
+  loading.classList.add('show');
+  setTimeout(() => {
+    loading.classList.remove('show');
+    const text = bttpBank[Math.floor(Math.random()*bttpBank.length)];
+    result.innerHTML = text.replace(/\n/g,'<br>');
+    result.classList.add('show');
+  }, 1800);
+}
+
+function copyText(btn, type) {
+  const result = btn.parentElement;
+  const text = result.innerText.replace('📋 Copy','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy', 2000);
+  }).catch(() => {
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy', 2000);
+  });
+}
+
+// ─── CONNECT ACCOUNTS ────────────────────────────────────────────
 function connectTikTok() {
   document.getElementById('modal').classList.add('show');
 }
-
 function closeModal() {
   document.getElementById('modal').classList.remove('show');
 }
-
 function authorize() {
   closeModal();
-  // Update TikTok card to connected
   const card = document.getElementById('card-tiktok');
   card.classList.add('connected');
   document.getElementById('tiktok-status').textContent = '● Connected';
   document.getElementById('tiktok-status').className = 'platform-status ok';
-  document.getElementById('tiktok-btn').textContent = 'Connected ✓';
-  document.getElementById('tiktok-btn').className = 'btn btn-connected';
-  document.getElementById('tiktok-btn').onclick = null;
-  document.getElementById('connect-cta').style.display = 'none';
-  document.getElementById('btn-create').style.display = 'block';
-  showToast('TikTok connected successfully!');
+  const btn = document.getElementById('tiktok-btn');
+  btn.textContent = 'Connected ✓';
+  btn.className = 'btn btn-connected';
+  btn.onclick = null;
+  showToast('✅ TikTok connected successfully!');
 }
 
+// ─── SETTINGS ────────────────────────────────────────────────────
+function saveSettings() {
+  const name = document.getElementById('setting-name').value;
+  showToast('✅ Settings saved for ' + name + '!');
+}
+function toggleNotif(input, label) {
+  showToast((input.checked ? '✅ Enabled: ' : '🔕 Disabled: ') + label);
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
+  const icon = document.getElementById('toast-icon') || t.querySelector('.toast-icon');
   document.getElementById('toast-msg').textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3500);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3200);
 }
 
-function showScheduler() {
-  document.getElementById('platforms-grid').style.display = 'none';
-  document.getElementById('connect-cta').style.display = 'none';
-  document.querySelector('.section-title').style.display = 'none';
-  document.getElementById('scheduler').classList.add('show');
-  document.querySelector('.topbar h1').textContent = 'Schedule Post';
-}
-
-function hideScheduler() {
-  document.getElementById('platforms-grid').style.display = 'grid';
-  document.querySelector('.section-title').style.display = 'block';
-  document.getElementById('scheduler').classList.remove('show');
-  document.querySelector('.topbar h1').textContent = 'Connect Accounts';
-}
-
-function schedulePost() {
-  showToast('Post scheduled for TikTok & Instagram!');
-  setTimeout(() => hideScheduler(), 2000);
-}
+// ─── INIT ─────────────────────────────────────────────────────────
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+const d = document.getElementById('post-date');
+if(d) d.value = tomorrow.toISOString().split('T')[0];
 </script>
 </body>
 </html>
