@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #050508; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+</style>
+</head>
+<body>
+<canvas id="c" width="500" height="500"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+// Background
+ctx.fillStyle = '#0A0A0F';
+roundRect(ctx, 0, 0, 500, 500, 80);
+ctx.fill();
+
+const cx = 250, cy = 250;
+
+ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+ctx.lineWidth = 1.8;
+ctx.lineCap = 'round';
+ctx.lineJoin = 'round';
+
+ctx.beginPath();
+
+/*
+  ONE continuous spiral from outer edge inward.
+  Total turns: ~14
+  Outer radius: 205
+  Inner radius (where R forms): ~55
+  
+  The spiral goes clockwise from outside in.
+  
+  For each point on the spiral at angle θ and radius r:
+  - If we're in the OUTER zone (r > 110): pure Archimedean spiral, no deviation
+  - If we're in the INNER zone (r <= 110): the x,y position is pulled toward
+    the R letterform contour at the matching vertical position
+  
+  R letterform (centered at cx=250, cy=250):
+  The R fits in a box roughly:
+    left: cx-40 = 210
+    right: cx+60 = 310  
+    top: cy-80 = 170
+    bottom: cy+80 = 330
+  
+  Stem: x=210..222, y=170..330
+  Bowl outer arc: from (222,170) → peak (305,230) → back (222,285)
+  Leg: from (235,285) diagonal → (310,325) with outward tail
+  
+  The spiral, as it winds inward, when r < 110:
+  The RIGHT side of the spiral (where x > cx) gets pulled to follow
+  the R outline. The LEFT side stays normal spiral.
+  
+  Blend factor: smooth interpolation from r=120 (0%) to r=55 (100%)
+*/
+
+const totalTurns = 14;
+const rOuter = 205;
+const rInner = 28;
+const rTransitionStart = 120;
+const rTransitionEnd = 55;
+const steps = 8000;
+
+// R outline function: given a y position (relative to cy),
+// returns the x position of the R's right outline at that y
+function rOutlineX(y) {
+  // y is absolute canvas coordinate
+  const relY = y - cy; // relative to center, -80 to +80
+  
+  // Top of R (stem top cap)
+  if (relY < -78) return cx - 38; // above R — stem left
+  
+  // Stem top to bowl top
+  if (relY >= -80 && relY < -60) {
+    // transitioning into bowl top
+    return cx - 28 + (relY + 80) * 0.5;
+  }
+  
+  // Bowl (y from -60 to +35 relative)
+  if (relY >= -60 && relY < 35) {
+    // Bowl is a half-circle arc on the right
+    // Center of bowl arc: (cx+18, cy-12) radius ~56
+    const bowlCy = cy - 12;
+    const bowlR = 58;
+    const bowlCx = cx + 20;
+    const dy = y - bowlCy;
+    if (Math.abs(dy) <= bowlR) {
+      const bx = bowlCx + Math.sqrt(bowlR * bowlR - dy * dy);
+      return bx;
+    }
+    return cx + 62;
+  }
+  
+  // Leg junction (y from +35 to +45 relative)
+  if (relY >= 35 && relY < 45) {
+    return cx - 28 + (relY - 35) * 6; // transitions from bowl bottom to leg start
+  }
+  
+  // Leg (y from +45 to +80 relative) — diagonal going right
+  if (relY >= 45 && relY < 80) {
+    const t = (relY - 45) / 35;
+    return cx - 10 + t * 75; // starts center-ish, flows right
+  }
+  
+  // Below R
+  return cx - 38;
+}
+
+// Stem left outline
+function rStemLeftX(y) {
+  const relY = y - cy;
+  if (relY >= -80 && relY <= 80) return cx - 38;
+  return cx - 38;
+}
+
+let firstPoint = true;
+
+for (let i = 0; i <= steps; i++) {
+  const t = i / steps;
+  const angle = t * totalTurns * Math.PI * 2 - Math.PI / 2; // start from top
+  
+  // Radius decreases from outer to inner
+  const r = rOuter - t * (rOuter - rInner);
+  
+  // Pure spiral position
+  const sx = cx + r * Math.cos(angle);
+  const sy = cy + r * Math.sin(angle);
+  
+  let x = sx, y = sy;
+  
+  // In the transition/inner zone, blend toward R outline
+  if (r <= rTransitionStart) {
+    // blend factor 0→1 as r goes from rTransitionStart→rTransitionEnd
+    const blend = Math.min(1, (rTransitionStart - r) / (rTransitionStart - rTransitionEnd));
+    
+    // Only affect the right side of the spiral (where cos(angle) > 0)
+    // and where y is within the R's vertical range
+    const inRHeight = sy >= cy - 85 && sy <= cy + 85;
+    
+    if (inRHeight) {
+      // Right side — pull toward R right outline
+      if (Math.cos(angle) > 0.1) {
+        const targetX = rOutlineX(sy);
+        x = sx + (targetX - sx) * blend * 0.85;
+        y = sy;
+      }
+      // Left side — pull toward stem left
+      else if (Math.cos(angle) < -0.1) {
+        const targetX = rStemLeftX(sy);
+        x = sx + (targetX - sx) * blend * 0.6;
+        y = sy;
+      }
+    }
+  }
+  
+  if (firstPoint) {
+    ctx.moveTo(x, y);
+    firstPoint = false;
+  } else {
+    ctx.lineTo(x, y);
+  }
+}
+
+ctx.stroke();
+
+// Center hole
+ctx.beginPath();
+ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+ctx.fillStyle = '#0A0A0F';
+ctx.fill();
+ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+ctx.lineWidth = 1.5;
+ctx.stroke();
+
+// Center dot
+ctx.beginPath();
+ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+ctx.fillStyle = 'rgba(255,255,255,0.5)';
+ctx.fill();
+
+// Outer ring
+ctx.beginPath();
+ctx.arc(cx, cy, 213, 0, Math.PI * 2);
+ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+ctx.lineWidth = 2;
+ctx.stroke();
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+</script>
+</body>
+</html>
