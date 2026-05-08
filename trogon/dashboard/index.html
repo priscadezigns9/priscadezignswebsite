@@ -89,6 +89,22 @@ nav{background:#1a1d2e;padding:1rem 1.5rem;display:flex;align-items:center;justi
   .stats{padding:.75rem 1rem}
 }
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const _sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
+    // Auth gate — redirect to login if not signed in
+    (async () => {
+      const { data: { session } } = await _sb.auth.getSession();
+      if (!session) {
+        window.location.href = '/trogon/login/';
+        return;
+      }
+      // Store user info for dashboard use
+      window._trogonUser = session.user;
+      sessionStorage.setItem('trogon_auth', '1');
+      sessionStorage.setItem('trogon_email', session.user.email);
+    })();
+  </script>
 </head>
 <body>
 
@@ -255,7 +271,7 @@ function enterPin(n) {
   updateDots();
   if (pinEntry.length === 4) {
     if (pinEntry === PIN) {
-      sessionStorage.setItem('trogon_auth','1');
+      // Auth handled by Supabase — see head script
       unlock();
     } else {
       document.getElementById('pin-error').textContent = 'Incorrect PIN';
@@ -377,5 +393,20 @@ function postCard(p) {
 // PWA
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/trogon/sw.js');
 </script>
+
+  <script>
+    // Sign out handler
+    async function trogonSignOut() {
+      await _sb.auth.signOut();
+      window.location.href = '/trogon/login/';
+    }
+    // Show user email in dashboard if element exists
+    document.addEventListener('DOMContentLoaded', () => {
+      const emailEl = document.getElementById('user-email-display');
+      if (emailEl && window._trogonUser) {
+        emailEl.textContent = window._trogonUser.email;
+      }
+    });
+  </script>
 </body>
 </html>
