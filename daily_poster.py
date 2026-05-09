@@ -343,6 +343,20 @@ CAPTIONS = {
         "🍚 Today’s kitchen pick: {name}. Cook better, eat better. #Pantriq #CaribbeanKitchen",
         "🍴 {name} — the staple your kitchen has been missing. Shop now. 🔗 #Pantriq",
     ],
+    "design": [
+        "Your brand deserves more than a logo. It deserves a presence. Let us build it. priscadezigns.org #PriscaDezigns #WebDesign",
+        "We build digital empires. Websites, platforms, automation — all under one roof. #PriscaDezigns #DigitalMarketing",
+        "From concept to launch. We design, build, and grow your brand online. priscadezigns.org #PriscaDezigns",
+        "Your website is your storefront. Make it count. priscadezigns.org #PriscaDezigns #WebDevelopment",
+        "Social media management that actually moves the needle. Ask us how. #PriscaDezigns #SocialMedia",
+        "We do not just build websites — we build businesses. priscadezigns.org #PriscaDezigns",
+        "Branding. Web design. Automation. Everything your business needs to grow online. #PriscaDezigns",
+        "The empire is being built, one brand at a time. Are you next? priscadezigns.org #PriscaDezigns",
+        "Stop blending in. Start standing out. Bold brands built for the world. #PriscaDezigns #BrandDesign",
+        "Caribbean roots. Global ambitions. We build brands that go the distance. #PriscaDezigns",
+        "Your brand is your legacy. Let us build it right. priscadezigns.org #PriscaDezigns",
+        "Design that converts. Development that performs. Results that matter. #PriscaDezigns",
+    ],
     "purses_bags": [
         "👜 {name} — the bag that says everything without a word. Shop now 🔗 #CoutureGallery",
         "💎 A great bag is an investment. {name} at ${price}. Link in bio. #CoutureGallery",
@@ -356,6 +370,25 @@ CAPTIONS = {
         "✨ {name} at ${price} — curated luxury, real prices. Shop now. 🔗 #CoutureGallery",
     ],
 }
+
+
+PRISCA_DEZIGNS_IMAGES = [
+    "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1080&q=80",
+    "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=1080&q=80",
+    "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=1080&q=80",
+    "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1080&q=80",
+    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1080&q=80",
+    "https://images.unsplash.com/photo-1509395176047-4a66953fd231?w=1080&q=80",
+    "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=1080&q=80",
+    "https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?w=1080&q=80",
+]
+
+def get_prisca_image():
+    """Return a rotating purple-aesthetic image for Prisca Dezigns posts."""
+    from datetime import date
+    imgs = PRISCA_DEZIGNS_IMAGES
+    idx = date.today().timetuple().tm_yday % len(imgs)
+    return imgs[idx]
 
 def get_caption(niche, product=None):
     """Return a caption rotated by day-of-year so it never repeats within 10 days.
