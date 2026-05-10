@@ -748,6 +748,74 @@ def run_post(brand_name, post_type):
     else:
         return f"❌ {brand_name} [{post_type}] FAILED — {result.get('error','unknown')}"
 
+def purge_duplicate_posts():
+    """Scan all brand FB pages for duplicate posts within the last 2 hours.
+    Deletes the newer duplicate automatically. Logs every deletion.
+    Called at the END of every posting session as a safety sweep."""
+    import time as _t
+    from datetime import datetime, timedelta, timezone
+
+    deleted_total = 0
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=2)
+
+    for brand_name, brand in BRANDS.items():
+        page_id = brand.get("id")
+        token   = brand.get("token")
+        if not page_id or not token:
+            continue
+        try:
+            import urllib.request as _ur, urllib.parse as _up
+            params = _up.urlencode({
+                "fields": "id,message,created_time",
+                "limit": "15",
+                "access_token": token
+            })
+            url = f"https://graph.facebook.com/v19.0/{page_id}/posts?{params}"
+            with _ur.urlopen(_ur.Request(url, headers={"User-Agent":"Mozilla/5.0"}), timeout=10) as r:
+                posts = json.loads(r.read()).get("data", [])
+        except Exception:
+            continue
+
+        seen = {}
+        for post in posts:
+            # Only check posts from the last 2 hours
+            try:
+                created = datetime.fromisoformat(post["created_time"].replace("Z", "+00:00"))
+            except Exception:
+                continue
+            if created < cutoff:
+                continue
+
+            key = (post.get("message") or "")[:80].strip()
+            pid = post["id"]
+            if key in seen:
+                # Duplicate found — delete the newer one (current iteration)
+                try:
+                    del_params = _up.urlencode({"access_token": token})
+                    del_req = _ur.Request(
+                        f"https://graph.facebook.com/v19.0/{pid}",
+                        method="DELETE",
+                        headers={"User-Agent":"Mozilla/5.0"}
+                    )
+                    del_req.full_url = f"https://graph.facebook.com/v19.0/{pid}?{del_params}"
+                    with _ur.urlopen(del_req, timeout=10) as dr:
+                        result = json.loads(dr.read())
+                    if result.get("success"):
+                        deleted_total += 1
+                        print(f"[DEDUP-SWEEP] Deleted duplicate on {brand_name}: {pid}")
+                except Exception as e:
+                    print(f"[DEDUP-SWEEP] Failed to delete {pid} on {brand_name}: {e}")
+                _t.sleep(0.3)
+            else:
+                seen[key] = pid
+
+    if deleted_total:
+        print(f"[DEDUP-SWEEP] Total duplicates deleted: {deleted_total}")
+    else:
+        print(f"[DEDUP-SWEEP] No duplicates found.")
+    return deleted_total
+
+
 def run_all(post_type):
     """Post to all brands for a given post type slot."""
     results = []
@@ -758,6 +826,8 @@ def run_all(post_type):
         result = run_post(brand_name, post_type)
         results.append(result)
         print(result)
+    # Safety sweep — purge any duplicates that slipped through
+    purge_duplicate_posts()
     return results
 
 def run_group(post_type, group_index):
@@ -774,6 +844,8 @@ def run_group(post_type, group_index):
         result = run_post(brand_name, post_type)
         results.append(result)
         print(result)
+    # Safety sweep after each group
+    purge_duplicate_posts()
     return results
 
 if __name__ == "__main__":
