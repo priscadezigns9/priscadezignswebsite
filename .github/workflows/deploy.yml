@@ -24,13 +24,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Sync assets into site/
+        run: |
+          # Copy root logos into site/logos/
+          mkdir -p site/logos
+          cp -rn logos/. site/logos/ 2>/dev/null || true
+          # Copy favicon
+          cp -n favicon.png site/favicon.png 2>/dev/null || true
+          # Copy product logos into each app subfolder
+          for app in orbyt karjov writx trogon vela; do
+            if [ -d "$app" ] && [ -d "site/$app" ]; then
+              find "$app" -maxdepth 1 -name "*.png" -o -name "*.jpg" -o -name "*.svg" | xargs -I{} cp -n {} "site/$app/" 2>/dev/null || true
+            fi
+          done
+          # Copy assets/logos if exists
+          if [ -d "assets/logos" ]; then
+            mkdir -p site/assets/logos
+            cp -rn assets/logos/. site/assets/logos/ 2>/dev/null || true
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './site'
+          path: ./site
 
       - name: Deploy to GitHub Pages
         id: deployment
