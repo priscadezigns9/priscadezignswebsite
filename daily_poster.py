@@ -551,22 +551,30 @@ def get_ai_image_url(niche_keyword, style="product"):
 def find_ig_safe_image(brand_name, preferred_url):
     """Return the real product image for this brand (day-rotated from niche_products.json).
     Falls back to preferred_url only if no scraped products exist.
-    Zero Picsum, zero stock photos — always niche-specific real product images."""
+    Zero Picsum, zero stock photos — always niche-specific real product images.
+    GUARD: never use a non-Amazon image for affiliate/niche brands."""
     # Always try to get a real product image first
     product = get_product_for_brand(brand_name)
     if product and product.get("image"):
-        return product["image"]
+        img = product["image"]
+        # Hard guard: must be an Amazon image for niche brands
+        if "amazon.com" in img or "media-amazon" in img:
+            return img
 
-    # Fall back to preferred_url (Amazon product image passed in by caller)
+    # Fall back to preferred_url only if it's a real Amazon product image
     if preferred_url and preferred_url.startswith("http"):
-        # Validate ratio
-        try:
-            ratio = get_image_ratio(preferred_url)
-            if ratio and 0.5 <= ratio <= 1.91:
-                return preferred_url
-        except Exception:
-            pass
-        return preferred_url
+        # HARD GUARD: only allow Amazon product images for niche pages
+        if "amazon.com" in preferred_url or "media-amazon" in preferred_url:
+            try:
+                ratio = get_image_ratio(preferred_url)
+                if ratio and 0.5 <= ratio <= 1.91:
+                    return preferred_url
+            except Exception:
+                pass
+            return preferred_url
+        # Non-Amazon URLs are blocked for niche/affiliate brands
+        print(f"[GUARD] Blocked non-Amazon image for {brand_name}: {preferred_url[:60]}")
+        return ""
 
     return ""
 
