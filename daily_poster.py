@@ -25,7 +25,7 @@ BRAND_TO_SLUG = {
     "The Way Made Known": "the-way-made-known",  # Christian content
     "Prime Land Network": "prime-land-network",
     "The Tech Scout HQ":  "tech-scout",       # fixed: was "Tech Scout"
-    "NehNeh":             "nehneh",
+    "Seamrite Designs":             "seamrite-designs",
     "The Autodrome":      "the-autodrome",
     "Prisca Dezigns":     "prisca-dezigns",
 }
@@ -133,7 +133,7 @@ BRANDS = {
     "Dreaming Anime":    {"id":"294045870456760", "token":"EAASyc3W8qO4BRe36VPYHcmqe1nZB9QVe6fxRVpM8fKO5vkZCsUGymVNmnf0U427BTx72c4CAZB86uCEZA95V52QkhS7W26KWmN7MWtRwFGENz1R1ZBQ6FsI3Lvaoq71TyZA7gWOXNgntENPudUSgxyY5pTnMD6sHEg76mJHITlFwfUVoeGxWPsjB7pyCTnNIqNlhYkx4bp","niche":"anime","tag":"DreamingAnime","aff":"dreaminganime-20"},
         "The Way Made Known": {"id":"1142116855643947","token":"EAASyc3W8qO4BRYZAFcSxx1ZBmmcFOViM8ZC38xziDQ5hC7J2VZA8QVmivNWV0seMdIWisZA0j7yN2ZCMIzaxlZB3ezrhnVHL6VlLwGcHJ0rXd0HN6HMFdEJDBxxN42ploTWWEE2xy5XBVr903wUBg4gSPHlPBUDUAsTVcHP7xAErOu9VgEQo4CZCkRZBPwuE6zvfDcy4ZClwGb","niche":"christian","tag":"WayMadeKnown","aff":"priscadezigns-20"},
         "Prisca Dezigns": {"id":"106662059098517","token":"EAASyc3W8qO4BRbKjjVESnDECWFMQhHbzicElw0YnvOZBDEIZBHA7Qduj98k4gO1rFdm7Bi5klTo03hPg8w6sxhhThxl2K7L8i2A3nZCe63DFQZC8QmiVWQumDtxlQcB00Xv0j7jhhMumGGuC7AZBQxUZCOsqZAnluTArVZC8pqh9USyrOeWnUrhFZAMD6HXzZAo63SF4jB7X0ZD","niche":"design","tag":"PriscaDezigns","aff":"priscadezigns-20"},
-        "NehNeh": {"id":"2455413671137234","token":"EAASyc3W8qO4BRVQnaq7X0jOZBoEQkKQ8gOhEvY6ow95JZAMgZA75X6SfZCyuNFlszpZCobuDZC0Qzf9bAcoeZA9wkqJv4QXPlGTbf69ysZA2ZByOfDtulRPzuV4jijtYvRYW5WZB0MOQ0DGu4uN9ZCcqk5Br6xUNmZCkZBCJI6dDvFj5j6oN4mEZAaZACIgLR9e75EWfPU02LZASEuvH","niche":"fashion","tag":"NehNeh","aff":"priscadezigns-20"},
+        "Seamrite Designs": {"id":"2455413671137234","token":"EAASyc3W8qO4BRVQnaq7X0jOZBoEQkKQ8gOhEvY6ow95JZAMgZA75X6SfZCyuNFlszpZCobuDZC0Qzf9bAcoeZA9wkqJv4QXPlGTbf69ysZA2ZByOfDtulRPzuV4jijtYvRYW5WZB0MOQ0DGu4uN9ZCcqk5Br6xUNmZCkZBCJI6dDvFj5j6oN4mEZAaZACIgLR9e75EWfPU02LZASEuvH","niche":"fashion","tag":"Seamrite Designs","aff":"priscadezigns-20"},
 }
 
 # ── CAPTION TEMPLATES BY NICHE ──
@@ -507,8 +507,6 @@ def get_product_for_brand(brand_name, advance_photo=True):
     """
     from datetime import date
     PHOTOS_FILE = "niche_products_photos.json"
-    PHOTO_STATE_FILE = "photo_rotation_state.json"
-
     slug = BRAND_TO_SLUG.get(brand_name, "")
     if not slug:
         slug = brand_name.lower().replace(" ", "-").replace(".", "").replace("&", "and")
@@ -516,8 +514,6 @@ def get_product_for_brand(brand_name, advance_photo=True):
     try:
         with open(PHOTOS_FILE) as f:
             photos_data = json.load(f)
-        with open(PHOTO_STATE_FILE) as f:
-            state = json.load(f)
     except Exception as e:
         print(f"Photo rotation load error: {e}")
         return None
@@ -531,25 +527,17 @@ def get_product_for_brand(brand_name, advance_photo=True):
     product_idx = day_num % len(products)
     product = products[product_idx]
 
-    # Which photo is next for this product
-    photo_indices = state.get(slug, [0] * len(products))
-    if len(photo_indices) < len(products):
-        photo_indices = [0] * len(products)
-
-    photo_idx = photo_indices[product_idx] % max(1, len(product.get("images", [1])))
+    # Which photo — stateless: driven by day + hour so it varies each post slot
+    from datetime import datetime as _dt
     images = product.get("images", [])
 
     if not images:
         return product  # fallback — return product without image override
 
+    hour_slot = _dt.now().hour
+    photo_idx = (day_num * 7 + hour_slot) % len(images)
     image_url = images[photo_idx]
-
-    # Advance the index for next cycle
-    if advance_photo:
-        photo_indices[product_idx] = (photo_idx + 1) % len(images)
-        state[slug] = photo_indices
-        with open(PHOTO_STATE_FILE, "w") as f:
-            json.dump(state, f, indent=2)
+    # advance_photo param kept for API compatibility but no longer writes state
 
     # Return a product dict compatible with existing code
     result = dict(product)
