@@ -115,26 +115,58 @@ def add_product_to_niche_page(slug, product, deploy=False):
     return True
 
 # ── BRAND DATA ──
-BRANDS = {
-    "Verdant Co.":       {"id":"1140265212494782","token":"EAASyc3W8qO4BRW1e8wVa8X2GYUazKZBe737aKfBd1WRDNBNceum1iSCPcF0UtuiKTNTSPvjkWygHiQ30qcwzLa8GZAROoUaCS5ozqWcfF1zIC6TnY8dJW4WgRtlvhRjApwCbZCAOdoQDjZBmjoma5DlyZAUnOYPdwxC4RthnmUFzo5jjzYJE6NfMzOQjNhYHgiqQOzcCC","niche":"eco","tag":"VerdantCo","aff":"priscadezigns-20"},
-    "The Watch List":    {"id":"1072926889242673","token":"EAASyc3W8qO4BRTmOzkTn0QDRV2xQK1JnEJDvCz02MpGeIRi2eqpNPIpE2PO73W3mXdOd0hFIQdgJe0GwOEBs6PKG5WrI9947gTmHsKWpeJG2gz0WcwmYBsjdEVhZBsm2ZAxY39liGBKy4wEhNfAzwZBsSjjZBm6lPL5jBq1NlOjtMmbZC1zTfTT7G7rUaGXKHD1ZCYhZCON","niche":"watches","tag":"TheWatchList","aff":"priscadezigns-20"},
-    "Sole Prestige":     {"id":"1094645483734682","token":"EAASyc3W8qO4BRQfYn9XWkX7ZCtyWSe5j0LTabrpGwEnSpF2zurItyxkpLnI6FYJjncvMdoTuFHXfOm4bZBhgqyQaluY3Ipv5XYpFpNWzjLVZCgWZBoMofo0lowVb1eEVgVMXLEpEhgvPWtV6zNZBQ9wgRnmkXolfRN4jz2LNXVDsGCVltO0h9mAGbWdPbU8OpbEsBgsA3","niche":"sneakers","tag":"SolePrestige","aff":"priscadezigns-20"},
-    "Atelier Gaming":    {"id":"1046777931860791","token":"EAASyc3W8qO4BRUX1ay5Y9wIrZCS6M882TtbqUkYdFB8HRr0mL2ZAAZA8sE5h2JWBaQGdq4S3PV9jWKCTTOuzPabGFUbZBfWv65I9FFD6gJn95p1Dv8118oIeqDsrHJD3FgGCERdhUK8XyweM8gGR5WndtGSjSEyqAlg7LozOgMtuMgrIl856plFnnzqomA9ZCuunYmRZCD","niche":"gaming","tag":"AtelierGaming","aff":"priscadezigns-20"},
-    "Couture Gallery":   {"id":"1100955549767016","token":"EAASyc3W8qO4BRTgeinNcjAkQiBMmPvjImZAL8cW2BUvoGi82r9hkq64Wvn664cAVZAwShZCrZBPTj3pSUL4nrqxsbRZCpbRbl5uaXLAUKaOamx8ZA1i4nZCZBg3ZCVXaGQ3P3nHZCEHzxvDUBCjjtk4TzhHWs3SK9ToDFZB9sG9GTtnlaioEqQ52pJVa70lSnA06CkvVA5SiDYo","niche":"purses_bags","tag":"CoutureGallery","aff":"priscadezigns-20"},  # PURSES & BAGS STRICTLY
-    "The Autodrome":     {"id":"1124569194075808","token":"EAASyc3W8qO4BReQuThEdKst1liUVm00DCxZC0EVadLkywrNZB1yeSMsZBhVmZCvyquqgc5pYhuxLBSoTRwEN2bJZAhLJmNVmgBWcHWMDPyKg5qnP1CW6VbXVvtfQoEMzTq0hkzfChZA2ryKWc8MuRjbKEWClJdidgnsbht8Gtmi3s8pVYPPtwcQUebMkjvTbzUK1K47tss","niche":"automotive","tag":"TheAutodrome","aff":"priscadezigns-20"},
-    "Peak Fit":          {"id":"1164177383439575","token":"EAASyc3W8qO4BRdaTOp0I8UBeXIafjoYml8xd4O2jm6vVHV4hKdiWtnhUmtUkx5eR2RkicnwQ3s5rPvdDrzCvzgZAkX0eCCHt04US0sLStIWS3Gt1pGZASAhIVMzu3N4u7izmIHJEy5CFSIZB4jVIHDIOVk9vKzV1jffd7qcHYJw3zqlgEPHb6BJPQweEJP5MvxKh8A3","niche":"fitness","tag":"PeakFit","aff":"priscadezigns-20"},
-    "The Escapist":      {"id":"1057947180740345","token":"EAASyc3W8qO4BRZASlKcNRGBRSphyb8otSqyjwPZBi3Wfu0MEILR2ZA42DfParVfbL2261otPRhySZBQm4WYkPByOCJSGce8Bq1dtet7Kx4QBttAtYYLPW4HjHPZBP4sN9MhqFKuI7cIB3F1ChxPzIHAOqbJnBdBGoMSY9wEs16VrcCI84GOt3jnWC9VseuW3hQD7GQNye","niche":"travel","tag":"TheEscapist","aff":"priscadezigns-20"},
-    "Paw Vault":         {"id":"1159923583861215","token":"EAASyc3W8qO4BRb0b2j91C9MfDYb9cWYEKeqFYz0lJewNXnbb4uOO8pu6lf2fumH9TuoMC8M8HI0AhTZBhDftpmbWLSmYONyRuzTMPpXiIwl3xAB7m163MhLkNC3MyVo0VxlOzbaw1hFnJ8ZCwwq0nIJ0ILk1KQSjgSPos1EGEM3i5cNQZB1Jrlwrs1rFEJI347y9vZCI","niche":"pets","tag":"PawVault","aff":"priscadezigns-20"},
-    "Quiet Luxury":      {"id":"1116678858189788","token":"EAASyc3W8qO4BRRYCr1UgDsGhZCgsHviO3sXYrEsyJuiAEWWS2CYkxGulxn35mHSsZBn8nXq3dQxSuio3aKA6HJiDQKRF0DplVamSif4tZC2gBns5hf6NIBj1ZALX2AZAOWES9xtOCt4ZBITEJTonmbrvWkkXeY43s72t8uDjZBmRZCCL8PlOqD2ZBK6yJbdAO66JcTN3wI6kh","niche":"homedecor","tag":"QuietLuxury","aff":"priscadezigns-20"},  # HOME DECOR STRICTLY
-    "Glow Protocol":     {"id":"1127727907088536","token":"EAASyc3W8qO4BRVRRAHTI8Leea9OZCsTv8iYnOh07PMh2wTwrFdAcRDhNZB89omC7ui3w0GxBgP3YRxd5aXwuO0OAam1eWwS2gCZCoFoRHvLUQLO7a10rwlzTqUIiaIWo5kqRwgpoZBFJgYVhS0uXgad10JZADWhOot6ZCKTYwptf3aZBu0vKCRqUn7BG25Ey8TsZBYmJbxS3","niche":"skincare","tag":"GlowProtocol","aff":"priscadezigns-20"},
-    "Essence Elite":     {"id":"1096637680199435","token":"EAASyc3W8qO4BRe4rg11WGv9JRGmHFs3T99o9ZCpPKFdP4OEvQFD60AZBjFufsTWArfURaWMIHqZBY75LxNoLXtef4IuRT4W1lUXwBbSZAVtZChWYlwmqSskDgbUZBGoefUsDL3v0fzBOZBSCzq9vgHAs6fTO9ziOZA388OLOCRgxGmY0Pxc5NfqvA4ThjTqn4ftMjnBfhIxr","niche":"fragrance","tag":"EssenceElite","aff":"priscadezigns-20"},
-    "Prime Land Network":{"id":"1131532363373441","token":"EAASyc3W8qO4BRbLibHwGekwT0cRRC39KveflpPAPZCpIyMqQnadRLnqZBZBFUFPx1nUnW9Q9tp7ZCFvCXwEWjNxdr5zvt8WpTAUbZCm6pznFZCJ2ZBXFrg0mnIvXeZCfEBNOfEKUyYyGj2ZBbGpQ8Ss88PV64c8e4NzLKZBDYJyeG2h6JRvpP9xJwFaWenHN6pP1LXLyJ8hxee","niche":"realestate","tag":"PrimeLandNetwork","aff":"priscadezigns-20"},
-    "The Tech Scout HQ": {"id":"1124620534060229","token":"EAASyc3W8qO4BRQAYXZBgBD1MyhAyQZAdNGHMi8d09EakYwsF4LPG9dxq6X1R3pxR4JZAd7a4C15J8ZAUBGzoOcBgIIkddZB4gSMffOO5JjZC9iEPDPhycTaO7IHgPwamAUPJuVpHljtp1OBWFTeGEfu4h0QE62VWmxxjqUettdcV1eGsYWbed5xXxhgp1oG7kkJP1KVKxY","niche":"tech","tag":"TechScoutHQ","aff":"priscadezigns-20"},
-    "Dreaming Anime":    {"id":"294045870456760", "token":"EAASyc3W8qO4BRe36VPYHcmqe1nZB9QVe6fxRVpM8fKO5vkZCsUGymVNmnf0U427BTx72c4CAZB86uCEZA95V52QkhS7W26KWmN7MWtRwFGENz1R1ZBQ6FsI3Lvaoq71TyZA7gWOXNgntENPudUSgxyY5pTnMD6sHEg76mJHITlFwfUVoeGxWPsjB7pyCTnNIqNlhYkx4bp","niche":"anime","tag":"DreamingAnime","aff":"dreaminganime-20"},
-        "The Way Made Known": {"id":"1142116855643947","token":"EAASyc3W8qO4BRYZAFcSxx1ZBmmcFOViM8ZC38xziDQ5hC7J2VZA8QVmivNWV0seMdIWisZA0j7yN2ZCMIzaxlZB3ezrhnVHL6VlLwGcHJ0rXd0HN6HMFdEJDBxxN42ploTWWEE2xy5XBVr903wUBg4gSPHlPBUDUAsTVcHP7xAErOu9VgEQo4CZCkRZBPwuE6zvfDcy4ZClwGb","niche":"christian","tag":"WayMadeKnown","aff":"priscadezigns-20"},
-        "Prisca Dezigns": {"id":"106662059098517","token":"EAASyc3W8qO4BRbKjjVESnDECWFMQhHbzicElw0YnvOZBDEIZBHA7Qduj98k4gO1rFdm7Bi5klTo03hPg8w6sxhhThxl2K7L8i2A3nZCe63DFQZC8QmiVWQumDtxlQcB00Xv0j7jhhMumGGuC7AZBQxUZCOsqZAnluTArVZC8pqh9USyrOeWnUrhFZAMD6HXzZAo63SF4jB7X0ZD","niche":"design","tag":"PriscaDezigns","aff":"priscadezigns-20"},
-        "Seamrite Designs": {"id":"2455413671137234","token":"EAASyc3W8qO4BRVQnaq7X0jOZBoEQkKQ8gOhEvY6ow95JZAMgZA75X6SfZCyuNFlszpZCobuDZC0Qzf9bAcoeZA9wkqJv4QXPlGTbf69ysZA2ZByOfDtulRPzuV4jijtYvRYW5WZB0MOQ0DGu4uN9ZCcqk5Br6xUNmZCkZBCJI6dDvFj5j6oN4mEZAaZACIgLR9e75EWfPU02LZASEuvH","niche":"fashion","tag":"Seamrite Designs","aff":"priscadezigns-20"},
-}
+def _load_brands():
+    """Load brand configs from fb_page_tokens.json at runtime (tokens never hardcoded)."""
+    try:
+        with open('fb_page_tokens.json') as f:
+            raw = json.load(f)
+    except Exception:
+        return {}
+    brands = {}
+    for name, v in raw.items():
+        if not isinstance(v, dict):
+            continue
+        page_id = v.get('id', '')
+        token = v.get('access_token', '')
+        # Derive niche from brand name
+        niche_map = {
+            'Verdant Co': 'eco', 'The Way Made Known': 'faith', 'The Watch List': 'watches',
+            'Sole Prestige': 'sneakers', 'Atelier Gaming': 'gaming', 'Couture Gallery': 'fashion',
+            'The Autodrome': 'cars', 'Peak Fit': 'fitness', 'The Escapist': 'travel',
+            'Paw Vault': 'pets', 'Quiet Luxury': 'luxury', 'Glow Protocol': 'skincare',
+            'Essence Elite': 'beauty', 'Prime Land Network': 'realestate',
+            'The Tech Scout HQ': 'tech', 'Dreaming Anime': 'anime',
+            'Prisca Dezigns': 'agency', 'Seamrite Designs': 'fashion_art',
+        }
+        tag_map = {
+            'Verdant Co': 'VerdantCo', 'The Way Made Known': 'TheWayMadeKnown',
+            'The Watch List': 'TheWatchList', 'Sole Prestige': 'SolePrestige',
+            'Atelier Gaming': 'AtelierGaming', 'Couture Gallery': 'CoutureGallery',
+            'The Autodrome': 'TheAutodrome', 'Peak Fit': 'PeakFit',
+            'The Escapist': 'TheEscapist', 'Paw Vault': 'PawVault',
+            'Quiet Luxury': 'QuietLuxury', 'Glow Protocol': 'GlowProtocol',
+            'Essence Elite': 'EssenceElite', 'Prime Land Network': 'PrimeLandNetwork',
+            'The Tech Scout HQ': 'TechScout', 'Dreaming Anime': 'DreamingAnime',
+            'Prisca Dezigns': 'PriscaDezigns', 'Seamrite Designs': 'SeamriteDesigns',
+        }
+        # Match by partial name
+        matched_name = None
+        for k in niche_map:
+            if k.lower() in name.lower() or name.lower() in k.lower():
+                matched_name = k
+                break
+        if not matched_name:
+            matched_name = name
+        niche = niche_map.get(matched_name, 'general')
+        tag = tag_map.get(matched_name, name.replace(' ',''))
+        brands[matched_name] = {
+            'id': page_id, 'token': token,
+            'niche': niche, 'tag': tag, 'aff': 'priscadezigns-20'
+        }
+    return brands
+
+BRANDS = _load_brands()
+
 
 # ── CAPTION TEMPLATES BY NICHE ──
 # 10+ per niche, product-specific placeholders supported via {name} and {price}
@@ -356,6 +388,18 @@ CAPTIONS = {
         "✨ {name} at ${price} — curated luxury, real prices. Shop now. 🔗 #CoutureGallery",
     ],
 }
+
+
+# Editorial/niche tip content — rotated daily, no product name/price
+# Used for text posts to provide VALUE, not just product dumps
+def _load_niche_tips():
+    try:
+        with open("niche_tips.json") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+NICHE_TIPS = _load_niche_tips()
+
 
 def get_caption(niche, product=None):
     """Return a caption rotated by day-of-year so it never repeats within 10 days.
@@ -707,8 +751,14 @@ def run_post(brand_name, post_type):
     ig_result = ""  # populated for photo posts that hit Instagram
 
     if post_type == "text":
-        message = caption + f"\n\nShop here: {aff_link}"
-        result = post_to_facebook(page_id, token, message)
+        # Text posts use NICHE_TIPS (editorial value content, not product promotion)
+        from datetime import date as _date
+        tips = NICHE_TIPS.get(niche, NICHE_TIPS.get("eco", ["Follow for daily niche content."]))
+        tip_idx = _date.today().timetuple().tm_yday % len(tips)
+        # Rotate through different tips for each of the 3 text posts per day
+        hour_offset = datetime.now().hour // 4  # shifts tip index by time of day
+        tip_text = tips[(tip_idx + hour_offset) % len(tips)]
+        result = post_to_facebook(page_id, token, tip_text)
 
     elif post_type == "photo":
         # photo_url already set above from the real product image
