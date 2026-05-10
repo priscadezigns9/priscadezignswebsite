@@ -499,27 +499,62 @@ def is_safe_image_url(url):
     blocked = ['ytimg.com', 'youtube.com', 'youtu.be', 'emg1', 'external-ord']
     return not any(b in url for b in blocked)
 
-def get_product_for_brand(brand_name):
-    """Return a product dict {name, image, link, price} for the brand,
-    rotating through the real products scraped from the live site.
-    Day-of-year based rotation so each day features a different product."""
+def get_product_for_brand(brand_name, advance_photo=True):
+    """Return (product_dict, image_url) for the brand using the photo rotation system.
+    - Product cycles on a N-day basis (N = products in niche)
+    - Photo for each product cycles through all available Amazon images, one per cycle
+    - advance_photo=True increments the photo counter (call once per actual post)
+    """
     from datetime import date
-    NICHE_PRODUCTS_FILE = "niche_products.json"
+    PHOTOS_FILE = "niche_products_photos.json"
+    PHOTO_STATE_FILE = "photo_rotation_state.json"
+
     slug = BRAND_TO_SLUG.get(brand_name, "")
     if not slug:
         slug = brand_name.lower().replace(" ", "-").replace(".", "").replace("&", "and")
+
     try:
-        with open(NICHE_PRODUCTS_FILE) as f:
-            all_products = json.load(f)
-        products = [p for p in all_products.get(slug, []) if p.get("image")]
-        if not products:
-            products = all_products.get(slug, [])
-        if not products:
-            return None
-        idx = date.today().timetuple().tm_yday % len(products)
-        return products[idx]
-    except Exception:
+        with open(PHOTOS_FILE) as f:
+            photos_data = json.load(f)
+        with open(PHOTO_STATE_FILE) as f:
+            state = json.load(f)
+    except Exception as e:
+        print(f"Photo rotation load error: {e}")
         return None
+
+    products = photos_data.get(slug, [])
+    if not products:
+        return None
+
+    # Which product is up today
+    day_num = date.today().timetuple().tm_yday
+    product_idx = day_num % len(products)
+    product = products[product_idx]
+
+    # Which photo is next for this product
+    photo_indices = state.get(slug, [0] * len(products))
+    if len(photo_indices) < len(products):
+        photo_indices = [0] * len(products)
+
+    photo_idx = photo_indices[product_idx] % max(1, len(product.get("images", [1])))
+    images = product.get("images", [])
+
+    if not images:
+        return product  # fallback — return product without image override
+
+    image_url = images[photo_idx]
+
+    # Advance the index for next cycle
+    if advance_photo:
+        photo_indices[product_idx] = (photo_idx + 1) % len(images)
+        state[slug] = photo_indices
+        with open(PHOTO_STATE_FILE, "w") as f:
+            json.dump(state, f, indent=2)
+
+    # Return a product dict compatible with existing code
+    result = dict(product)
+    result["image"] = image_url
+    return result
 
 def get_ai_image_url(niche_keyword, style="product"):
     """DEPRECATED fallback — only used if niche_products.json is unavailable.
