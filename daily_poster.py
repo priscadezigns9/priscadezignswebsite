@@ -343,20 +343,6 @@ CAPTIONS = {
         "🍚 Today’s kitchen pick: {name}. Cook better, eat better. #Pantriq #CaribbeanKitchen",
         "🍴 {name} — the staple your kitchen has been missing. Shop now. 🔗 #Pantriq",
     ],
-    "design": [
-        "Your brand deserves more than a logo. It deserves a presence. Let us build it. priscadezigns.org #PriscaDezigns #WebDesign",
-        "We build digital empires. Websites, platforms, automation — all under one roof. #PriscaDezigns #DigitalMarketing",
-        "From concept to launch. We design, build, and grow your brand online. priscadezigns.org #PriscaDezigns",
-        "Your website is your storefront. Make it count. priscadezigns.org #PriscaDezigns #WebDevelopment",
-        "Social media management that actually moves the needle. Ask us how. #PriscaDezigns #SocialMedia",
-        "We do not just build websites — we build businesses. priscadezigns.org #PriscaDezigns",
-        "Branding. Web design. Automation. Everything your business needs to grow online. #PriscaDezigns",
-        "The empire is being built, one brand at a time. Are you next? priscadezigns.org #PriscaDezigns",
-        "Stop blending in. Start standing out. Bold brands built for the world. #PriscaDezigns #BrandDesign",
-        "Caribbean roots. Global ambitions. We build brands that go the distance. #PriscaDezigns",
-        "Your brand is your legacy. Let us build it right. priscadezigns.org #PriscaDezigns",
-        "Design that converts. Development that performs. Results that matter. #PriscaDezigns",
-    ],
     "purses_bags": [
         "👜 {name} — the bag that says everything without a word. Shop now 🔗 #CoutureGallery",
         "💎 A great bag is an investment. {name} at ${price}. Link in bio. #CoutureGallery",
@@ -370,25 +356,6 @@ CAPTIONS = {
         "✨ {name} at ${price} — curated luxury, real prices. Shop now. 🔗 #CoutureGallery",
     ],
 }
-
-
-PRISCA_DEZIGNS_IMAGES = [
-    "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1080&q=80",
-    "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=1080&q=80",
-    "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=1080&q=80",
-    "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=1080&q=80",
-    "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1080&q=80",
-    "https://images.unsplash.com/photo-1509395176047-4a66953fd231?w=1080&q=80",
-    "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=1080&q=80",
-    "https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?w=1080&q=80",
-]
-
-def get_prisca_image():
-    """Return a rotating purple-aesthetic image for Prisca Dezigns posts."""
-    from datetime import date
-    imgs = PRISCA_DEZIGNS_IMAGES
-    idx = date.today().timetuple().tm_yday % len(imgs)
-    return imgs[idx]
 
 def get_caption(niche, product=None):
     """Return a caption rotated by day-of-year so it never repeats within 10 days.
@@ -410,6 +377,75 @@ def get_caption(niche, product=None):
         cap = _re.sub(r"\{name\}", "our latest pick", cap)
         cap = _re.sub(r"\\${price}", "", cap).strip()
     return cap
+
+def post_to_facebook(page_id, token, message, photo_url=None, video_path=None):
+    """Post to a Facebook page. Returns dict with 'id' on success or 'error' on failure."""
+    base = "https://graph.facebook.com/v19.0"
+    if photo_url:
+        url = f"{base}/{page_id}/photos"
+        payload = urllib.parse.urlencode({"url": photo_url, "caption": message, "access_token": token}).encode()
+    else:
+        url = f"{base}/{page_id}/feed"
+        payload = urllib.parse.urlencode({"message": message, "access_token": token}).encode()
+    try:
+        req = urllib.request.Request(url, data=payload, method="POST")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        try:
+            return json.loads(body)
+        except Exception:
+            return {"error": {"message": body[:200]}}
+    except Exception as ex:
+        return {"error": {"message": str(ex)}}
+
+
+def post_to_instagram(ig_id, token, caption, image_url):
+    """Post a photo to Instagram via Graph API. Returns dict with 'id' on success."""
+    base = "https://graph.facebook.com/v19.0"
+    # Step 1: create media container
+    container_url = f"{base}/{ig_id}/media"
+    payload = urllib.parse.urlencode({
+        "image_url": image_url,
+        "caption": caption,
+        "access_token": token
+    }).encode()
+    try:
+        req = urllib.request.Request(container_url, data=payload, method="POST")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            container = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        try:
+            return json.loads(body)
+        except Exception:
+            return {"error": {"message": body[:200]}}
+    except Exception as ex:
+        return {"error": {"message": str(ex)}}
+
+    if "id" not in container:
+        return container
+
+    # Step 2: publish container
+    publish_url = f"{base}/{ig_id}/media_publish"
+    pub_payload = urllib.parse.urlencode({
+        "creation_id": container["id"],
+        "access_token": token
+    }).encode()
+    try:
+        req2 = urllib.request.Request(publish_url, data=pub_payload, method="POST")
+        with urllib.request.urlopen(req2, timeout=30) as resp2:
+            return json.loads(resp2.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        try:
+            return json.loads(body)
+        except Exception:
+            return {"error": {"message": body[:200]}}
+    except Exception as ex:
+        return {"error": {"message": str(ex)}}
+
 
 def get_affiliate_link(aff_tag, keyword):
     query = urllib.parse.quote(keyword)
@@ -738,6 +774,44 @@ if __name__ == "__main__":
 
     post_type = sys.argv[1] if len(sys.argv) > 1 else "text"
     group_index = int(sys.argv[2]) if len(sys.argv) > 2 else None
+
+    # ── DEDUPLICATION LOCK ──────────────────────────────────────────────────
+    # Prevent the same slot from posting twice within a 20-minute window.
+    import time as _time
+    slot_key = f"{post_type}_{group_index}_{datetime.now().strftime('%Y-%m-%d_%H')}"
+    lock_file = f"/tmp/poster_lock_{slot_key}.lock"
+    run_log   = "poster_run_log.json"
+
+    # Load run log
+    try:
+        with open(run_log) as _f:
+            _runs = json.load(_f)
+    except Exception:
+        _runs = {}
+
+    # Check if this exact slot already ran in the last 20 minutes
+    _last_run = _runs.get(slot_key, 0)
+    if _time.time() - _last_run < 1200:  # 20 minutes
+        print(f"⚠️  DUPLICATE RUN BLOCKED — slot '{slot_key}' already ran {int(_time.time()-_last_run)}s ago. Exiting.")
+        sys.exit(0)
+
+    # Check lockfile (belt-and-suspenders)
+    if os.path.exists(lock_file):
+        lock_age = _time.time() - os.path.getmtime(lock_file)
+        if lock_age < 1200:
+            print(f"⚠️  LOCK FILE EXISTS — slot '{slot_key}' is already running or ran {int(lock_age)}s ago. Exiting.")
+            sys.exit(0)
+
+    # Acquire lock
+    open(lock_file, 'w').close()
+    _runs[slot_key] = _time.time()
+    try:
+        with open(run_log, 'w') as _f:
+            json.dump(_runs, _f)
+    except Exception:
+        pass
+    # ── END DEDUPLICATION LOCK ──────────────────────────────────────────────
+
     if group_index is not None:
         print(f"\n=== Running {post_type.upper()} posts — Group {group_index} ===")
         print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M AST')}\n")
