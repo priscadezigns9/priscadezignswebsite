@@ -126,7 +126,7 @@ def _load_brands():
     for name, v in raw.items():
         if not isinstance(v, dict):
             continue
-        page_id = v.get('id', '')
+        page_id = v.get('id', '') or v.get('page_id', '')
         token = v.get('access_token', '')
         # Derive niche from brand name
         niche_map = {
@@ -559,8 +559,7 @@ def get_product_for_brand(brand_name, advance_photo=True):
         with open(PHOTOS_FILE) as f:
             photos_data = json.load(f)
     except Exception as e:
-        print(f"Photo rotation load error: {e}")
-        return None
+        return None  # photo rotation file not present — skip silently
 
     products = photos_data.get(slug, [])
     if not products:
