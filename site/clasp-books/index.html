@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Clasp — Send your receipts. We'll handle the rest.</title>
+<meta name="description" content="Clasp organises your receipts and expenses into a clean, tax-ready Google Sheet. Send us your photos via WhatsApp — we do the rest. Flat fees, fast turnaround."/>
+<link rel="canonical" href="https://priscadezigns.org/clasp-books/"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#ffffff;color:#1A1A1A;font-family:'Calibri','Segoe UI','Inter',sans-serif;overflow-x:hidden;line-height:1.6}
+a{text-decoration:none;color:inherit}
+
+/* ── ANIMATED BACKGROUND ── */
+.bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.grid-line{position:absolute;background:#1D6F4208;animation:drift linear infinite}
+.grid-line.h{height:1px;width:100%;animation-name:driftY}
+.grid-line.v{width:1px;height:100%;animation-name:driftX}
+@keyframes driftY{0%{transform:translateY(-100px)}100%{transform:translateY(110vh)}}
+@keyframes driftX{0%{transform:translateX(-100px)}100%{transform:translateX(110vw)}}
+
+.receipt{position:absolute;opacity:0;animation:floatReceipt linear infinite}
+@keyframes floatReceipt{
+  0%{opacity:0;transform:translateY(100vh) rotate(-8deg)}
+  10%{opacity:0.07}
+  90%{opacity:0.07}
+  100%{opacity:0;transform:translateY(-120px) rotate(8deg)}
+}
+.receipt svg{width:32px;height:40px}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:#ffffffee;backdrop-filter:blur(20px);border-bottom:1px solid #1D6F4220}
+.nav-logo{font-family:'Calibri','Segoe UI',sans-serif;font-size:1.3rem;font-weight:700;color:#1D6F42;letter-spacing:-0.5px}
+.nav-logo span{color:#F5C842}
+.nav-cta{background:#1D6F42;color:#fff;padding:8px 22px;font-size:0.78rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;transition:opacity 0.2s;border-radius:2px}
+.nav-cta:hover{opacity:0.85}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;padding:140px 6% 90px;max-width:1100px;margin:0 auto}
+.tag{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#1D6F42;margin-bottom:20px}
+h1{font-family:'Calibri','Segoe UI',sans-serif;font-size:clamp(3rem,7vw,5.8rem);font-weight:700;line-height:1.0;letter-spacing:-2px;margin-bottom:22px;color:#1A1A1A}
+h1 .green{color:#1D6F42}
+.hero-sub{font-size:1.05rem;color:#1A1A1A88;max-width:500px;margin-bottom:44px;line-height:1.8}
+.btn-main{background:#1D6F42;color:#fff;padding:15px 36px;font-weight:700;font-size:0.85rem;letter-spacing:0.5px;text-transform:uppercase;display:inline-block;transition:all 0.2s;border-radius:2px}
+.btn-main:hover{background:#217346;transform:translateY(-2px)}
+.btn-ghost{border:2px solid #1D6F4244;color:#1A1A1A99;padding:14px 28px;font-size:0.85rem;letter-spacing:0.5px;text-transform:uppercase;margin-left:14px;display:inline-block;transition:all 0.2s;border-radius:2px}
+.btn-ghost:hover{border-color:#1D6F42;color:#1D6F42}
+
+/* ── SECTION BASE ── */
+section{position:relative;z-index:1}
+.sec-inner{max-width:1100px;margin:0 auto;padding:0 6%}
+.sec-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#1D6F42;margin-bottom:12px}
+h2{font-family:'Calibri','Segoe UI',sans-serif;font-size:clamp(1.9rem,3.5vw,3rem);font-weight:700;letter-spacing:-1px;margin-bottom:48px;line-height:1.1;color:#1A1A1A}
+
+/* ── HOW IT WORKS ── */
+.how{background:#f8fbf9;border-top:1px solid #1D6F4215;border-bottom:1px solid #1D6F4215;padding:80px 0}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1D6F4218;margin-top:44px}
+.step{background:#f8fbf9;padding:40px 32px}
+.step-num{font-family:'Calibri','Segoe UI',sans-serif;font-size:3rem;font-weight:700;color:#1D6F4222;line-height:1;margin-bottom:16px}
+.step h3{font-size:1rem;font-weight:700;margin-bottom:10px;color:#1A1A1A}
+.step p{font-size:0.84rem;color:#1A1A1A77;line-height:1.75}
+
+/* ── PRICING ── */
+.pricing{padding:80px 0}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1D6F4218;margin-top:44px}
+.plan{background:#fff;padding:40px 32px;position:relative;border:1px solid #1D6F4218}
+.plan.featured{background:#1D6F42;border-color:#1D6F42}
+.plan-name{font-family:'Calibri','Segoe UI',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:6px}
+.plan.featured .plan-name,.plan.featured .plan-price,.plan.featured .plan-note,.plan.featured li{color:#fff}
+.plan-price{font-family:'Calibri','Segoe UI',sans-serif;font-size:3rem;font-weight:700;color:#1D6F42;line-height:1;margin:16px 0 4px;letter-spacing:-2px}
+.plan-note{font-size:0.75rem;color:#1A1A1A66;margin-bottom:28px;text-transform:uppercase;letter-spacing:1px}
+.plan.featured .plan-price{color:#fff}
+.plan ul{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.plan li{font-size:0.84rem;color:#1A1A1A;padding-left:18px;position:relative;line-height:1.5}
+.plan li::before{content:"✓";position:absolute;left:0;color:#1D6F42;font-weight:700}
+.plan.featured li::before{color:#7FCC87}
+.badge{position:absolute;top:16px;right:16px;background:#F5C842;color:#1A1A1A;font-size:0.62rem;font-weight:800;padding:4px 10px;text-transform:uppercase;letter-spacing:1px}
+.plan-cta{display:block;text-align:center;padding:13px;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border:2px solid #1D6F42;color:#1D6F42;transition:all 0.2s;border-radius:2px}
+.plan-cta:hover{background:#1D6F42;color:#fff}
+.plan.featured .plan-cta{border-color:#ffffff88;color:#fff}
+.plan.featured .plan-cta:hover{background:#fff;color:#1D6F42}
+
+/* ── WHY ── */
+.why{background:#f8fbf9;border-top:1px solid #1D6F4215;border-bottom:1px solid #1D6F4215;padding:80px 0}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1D6F4218;margin-top:44px}
+.why-cell{background:#f8fbf9;padding:36px 32px}
+.why-accent{color:#1D6F42;font-family:'Calibri','Segoe UI',sans-serif;font-size:1.5rem;font-weight:700;margin-bottom:10px}
+.why-cell h3{font-size:0.95rem;font-weight:700;margin-bottom:8px;color:#1A1A1A}
+.why-cell p{font-size:0.83rem;color:#1A1A1A77;line-height:1.75}
+
+/* ── CTA ── */
+.cta-band{background:#1D6F42;padding:90px 6%;text-align:center;position:relative;z-index:1;overflow:hidden}
+.cta-band::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#ffffff08 0,#ffffff08 1px,transparent 1px,transparent 60px),repeating-linear-gradient(0deg,#ffffff08 0,#ffffff08 1px,transparent 1px,transparent 60px)}
+.cta-band h2{color:#fff;margin-bottom:14px;position:relative}
+.cta-band p{color:#ffffff99;margin-bottom:36px;font-size:0.95rem;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.7;position:relative}
+.btn-white{background:#fff;color:#1D6F42;padding:15px 36px;font-weight:700;font-size:0.85rem;letter-spacing:0.5px;text-transform:uppercase;display:inline-block;transition:all 0.2s;border-radius:2px;position:relative}
+.btn-white:hover{opacity:0.92;transform:translateY(-2px)}
+
+/* ── FOOTER ── */
+footer{padding:28px 6%;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #1D6F4218;flex-wrap:wrap;gap:12px;position:relative;z-index:1}
+.foot-logo{font-family:'Calibri','Segoe UI',sans-serif;font-size:1rem;font-weight:700;color:#1D6F42}
+.foot-copy{font-size:0.72rem;color:#1A1A1A55}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){.steps,.plans,.why-grid{grid-template-columns:1fr}}
+@media(max-width:480px){h1{letter-spacing:-1px}.btn-ghost{margin-left:0;margin-top:12px;display:block}}
+</style>
+</head>
+<body>
+
+<!-- Animated background -->
+<div class="bg-canvas" id="bgCanvas"></div>
+
+<nav>
+  <span class="nav-logo">Clasp<span>.</span></span>
+  <a class="nav-cta" href="https://wa.me/447576505652?text=Hi%2C%20I%27m%20interested%20in%20Clasp" target="_blank">Get Started</a>
+</nav>
+
+<section>
+  <div class="hero">
+    <div class="tag">Receipt &amp; Expense Organisation</div>
+    <h1>Send your receipts.<br/><span class="green">We'll handle<br/>the rest.</span></h1>
+    <p class="hero-sub">Snap photos of your receipts, send them to us on WhatsApp, and get back a clean, categorised, tax-ready Google Sheet. No software. No subscriptions. Just done.</p>
+    <a class="btn-main" href="#pricing">See packages</a>
+    <a class="btn-ghost" href="#how">How it works ↓</a>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="sec-inner">
+    <p class="sec-label">The Process</p>
+    <h2>Three steps.<br/>Zero stress.</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Send your receipts</h3>
+        <p>Take photos of all your receipts — old, crumpled, faded — and send them to us via WhatsApp or email. No app needed.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>We sort everything</h3>
+        <p>We rename, categorise, and log every receipt into a clean Google Sheet — organised by date, vendor, category, and amount.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Get your report</h3>
+        <p>Receive a fully organised income and expense tracker — tax-ready, clean, and easy to hand straight to your accountant.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="sec-inner">
+    <p class="sec-label">Packages</p>
+    <h2>Simple, flat pricing.<br/>No surprises.</h2>
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-name">Basic</div>
+        <div class="plan-price">$75</div>
+        <div class="plan-note">USD &middot; One-time</div>
+        <ul>
+          <li>Up to 50 receipts</li>
+          <li>Categorised Google Sheet</li>
+          <li>Delivered in 48 hours</li>
+          <li>WhatsApp or email delivery</li>
+        </ul>
+        <a class="plan-cta" href="https://wa.me/447576505652?text=Hi%2C%20I%27m%20interested%20in%20the%20Clasp%20Basic%20package" target="_blank">Get started</a>
+      </div>
+      <div class="plan featured">
+        <div class="badge">Most Popular</div>
+        <div class="plan-name">Standard</div>
+        <div class="plan-price">$149</div>
+        <div class="plan-note">USD &middot; One-time</div>
+        <ul>
+          <li>Up to 150 receipts</li>
+          <li>Categorised Google Sheet</li>
+          <li>Income &amp; expense summary</li>
+          <li>Delivered in 72 hours</li>
+          <li>WhatsApp or email delivery</li>
+        </ul>
+        <a class="plan-cta" href="https://wa.me/447576505652?text=Hi%2C%20I%27m%20interested%20in%20the%20Clasp%20Standard%20package" target="_blank">Get started</a>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Full Year Cleanup</div>
+        <div class="plan-price">$299</div>
+        <div class="plan-note">USD &middot; One-time</div>
+        <ul>
+          <li>Unlimited receipts</li>
+          <li>Full year organised</li>
+          <li>Tax-ready expense report</li>
+          <li>Profit &amp; loss summary</li>
+          <li>Priority 5-day delivery</li>
+        </ul>
+        <a class="plan-cta" href="https://wa.me/447576505652?text=Hi%2C%20I%27m%20interested%20in%20the%20Clasp%20Full%20Year%20package" target="_blank">Get started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="why" id="why">
+  <div class="sec-inner">
+    <p class="sec-label">Why Clasp</p>
+    <h2>Built for businesses<br/>too busy for admin.</h2>
+    <div class="why-grid">
+      <div class="why-cell">
+        <div class="why-accent">No software</div>
+        <h3>Nothing to download or learn</h3>
+        <p>Just send your photos via WhatsApp or email. We do all the work and return a Google Sheet you can open anywhere, on any device.</p>
+      </div>
+      <div class="why-cell">
+        <div class="why-accent">Tax-ready</div>
+        <h3>Hand it straight to your accountant</h3>
+        <p>Every report is categorised and formatted so your accountant can use it immediately — no extra work, no explanations needed.</p>
+      </div>
+      <div class="why-cell">
+        <div class="why-accent">Fast</div>
+        <h3>Delivered in days, not weeks</h3>
+        <p>Basic packages back in 48 hours. No back-and-forth, no delays. You send the pile, we return the report.</p>
+      </div>
+      <div class="why-cell">
+        <div class="why-accent">Flat fee</div>
+        <h3>No surprises, ever</h3>
+        <p>Pay once and you're done. No subscriptions, no hourly billing, no scope creep. What you see on the page is what you pay.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="cta-band">
+  <h2>Stop drowning in receipts.</h2>
+  <p>Send us your pile today and have clean, organised books by the end of the week.</p>
+  <a class="btn-white" href="https://wa.me/447576505652?text=Hi%2C%20I%27m%20interested%20in%20Clasp" target="_blank">Message us on WhatsApp</a>
+</div>
+
+<footer>
+  <span class="foot-logo">Clasp.</span>
+  <span class="foot-copy">© 2026 Clasp. A Prisca Dezigns service.</span>
+</footer>
+
+<script>
+// Generate animated background — floating grid lines + receipt icons
+const canvas = document.getElementById('bgCanvas');
+
+// Horizontal grid lines
+for(let i = 0; i < 8; i++){
+  const el = document.createElement('div');
+  el.className = 'grid-line h';
+  el.style.top = (Math.random() * 100) + '%';
+  el.style.animationDuration = (18 + Math.random() * 20) + 's';
+  el.style.animationDelay = (-Math.random() * 20) + 's';
+  canvas.appendChild(el);
+}
+// Vertical grid lines
+for(let i = 0; i < 6; i++){
+  const el = document.createElement('div');
+  el.className = 'grid-line v';
+  el.style.left = (Math.random() * 100) + '%';
+  el.style.animationDuration = (22 + Math.random() * 18) + 's';
+  el.style.animationDelay = (-Math.random() * 20) + 's';
+  canvas.appendChild(el);
+}
+// Floating receipt shapes
+const receiptSVG = `<svg viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="28" height="36" rx="2" fill="#1D6F42" opacity="0.15"/>
+  <rect x="6" y="8" width="16" height="2" rx="1" fill="#1D6F42" opacity="0.3"/>
+  <rect x="6" y="13" width="20" height="2" rx="1" fill="#1D6F42" opacity="0.3"/>
+  <rect x="6" y="18" width="12" height="2" rx="1" fill="#1D6F42" opacity="0.3"/>
+  <rect x="6" y="23" width="18" height="2" rx="1" fill="#1D6F42" opacity="0.3"/>
+  <rect x="6" y="29" width="10" height="2" rx="1" fill="#1D6F42" opacity="0.5"/>
+</svg>`;
+
+for(let i = 0; i < 10; i++){
+  const el = document.createElement('div');
+  el.className = 'receipt';
+  el.innerHTML = receiptSVG;
+  el.style.left = (Math.random() * 95) + '%';
+  el.style.animationDuration = (25 + Math.random() * 20) + 's';
+  el.style.animationDelay = (-Math.random() * 30) + 's';
+  canvas.appendChild(el);
+}
+</script>
+</body>
+</html>
