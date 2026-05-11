@@ -1,1 +1,168 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/clarev/"><title>Redirecting...</title></head><body><script>window.location="/clarev/";</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Clarev — Dashboard</title>
+<meta name="description" content="Your Clarev client dashboard — track your Prisca Dezigns project in real time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0D0F1A;--surface:#111827;--surface2:#1a2234;--border:#1f2937;--teal:#00D4C8;--teal-dim:rgba(0,212,200,0.1);--text:#f9fafb;--dim:#6b7280;--dim2:#9ca3af;--sidebar-w:240px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:10}
+.sidebar-logo{padding:24px 20px;font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:500;color:var(--teal);border-bottom:1px solid var(--border)}
+.sidebar-nav{padding:16px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;color:var(--dim2);font-size:0.87rem;text-decoration:none;transition:all 0.2s;cursor:pointer;border-left:2px solid transparent}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,0.03)}
+.nav-item.active{color:var(--teal);border-left-color:var(--teal);background:var(--teal-dim)}
+.nav-icon{width:16px;text-align:center;font-size:0.9rem}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);font-size:0.78rem;color:var(--dim)}
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.topbar-left h2{font-size:1rem;font-weight:600}
+.topbar-left p{font-size:0.78rem;color:var(--dim);margin-top:2px}
+.logout{font-size:0.8rem;color:var(--dim);text-decoration:none;transition:color 0.2s}
+.logout:hover{color:var(--teal)}
+.content{padding:28px;flex:1}
+/* STATS ROW */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color 0.2s}
+.stat-card:hover{border-color:rgba(0,212,200,0.3)}
+.stat-num{font-size:1.8rem;font-weight:700;color:var(--teal);line-height:1;margin-bottom:6px}
+.stat-label{font-size:0.76rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px}
+/* PROJECT PROGRESS */
+.section-title{font-size:0.72rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px}
+.project-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px}
+.project-name{font-size:1.05rem;font-weight:600;margin-bottom:4px}
+.project-sub{font-size:0.82rem;color:var(--dim);margin-bottom:24px}
+.stages{display:flex;gap:0;margin-bottom:16px;position:relative}
+.stages::before{content:'';position:absolute;top:12px;left:0;right:0;height:2px;background:var(--border);z-index:0}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:1}
+.stage-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:0.65rem;transition:all 0.3s}
+.stage.done .stage-dot{background:var(--teal);border-color:var(--teal);color:#0D0F1A;font-weight:700}
+.stage.active .stage-dot{background:var(--bg);border-color:var(--teal);box-shadow:0 0 0 4px rgba(0,212,200,0.15);animation:pulse 2s infinite}
+.stage-label{font-size:0.7rem;color:var(--dim);text-align:center;white-space:nowrap}
+.stage.done .stage-label,.stage.active .stage-label{color:var(--text)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(0,212,200,0.15)}50%{box-shadow:0 0 0 8px rgba(0,212,200,0.05)}}
+.stage-status{font-size:0.8rem;color:var(--teal);font-weight:500}
+/* ACTIVITY */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.panel-title{font-size:0.72rem;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);margin-top:5px;flex-shrink:0}
+.activity-text{font-size:0.84rem;line-height:1.4}
+.activity-time{font-size:0.73rem;color:var(--dim);margin-top:2px}
+/* DELIVERABLES */
+.deliverable-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.deliverable-item:last-child{border-bottom:none}
+.file-icon{width:36px;height:36px;background:var(--teal-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.file-info{flex:1}
+.file-name{font-size:0.85rem;font-weight:500}
+.file-meta{font-size:0.73rem;color:var(--dim);margin-top:2px}
+.badge{display:inline-block;font-size:0.65rem;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px}
+.badge.pending{background:rgba(251,191,36,0.12);color:#fbbf24}
+.badge.approved{background:rgba(0,212,200,0.12);color:var(--teal)}
+.btn-review{font-size:0.75rem;color:var(--teal);border:1px solid rgba(0,212,200,0.3);background:transparent;border-radius:6px;padding:5px 12px;cursor:pointer;transition:all 0.2s;font-family:'Inter',sans-serif;white-space:nowrap}
+.btn-review:hover{background:var(--teal-dim)}
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform 0.3s}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:1fr}
+  .stages{overflow-x:auto}
+  .topbar{padding:16px}
+  .content{padding:16px}
+}
+</style>
+</head>
+<body>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">Clarev</div>
+  <div class="sidebar-nav">
+    <a class="nav-item active" href="/clarev/dashboard/"><span class="nav-icon">⊞</span> Dashboard</a>
+    <a class="nav-item" href="/clarev/dashboard/"><span class="nav-icon">📋</span> My Project</a>
+    <a class="nav-item" href="/clarev/deliverables/"><span class="nav-icon">📁</span> Deliverables</a>
+    <a class="nav-item" href="#"><span class="nav-icon">💬</span> Messages</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⚙</span> Settings</a>
+  </div>
+  <div class="sidebar-footer">A Prisca Dezigns product</div>
+</nav>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h2>Welcome back, Anya</h2>
+      <p id="currentDate"></p>
+    </div>
+    <a href="/clarev/login/" class="logout">Log out →</a>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <p class="section-title">Overview</p>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num">12</div><div class="stat-label">Days Active</div></div>
+      <div class="stat-card"><div class="stat-num">3</div><div class="stat-label">Deliverables Pending</div></div>
+      <div class="stat-card"><div class="stat-num">2</div><div class="stat-label">Unread Messages</div></div>
+    </div>
+
+    <!-- PROJECT PROGRESS -->
+    <p class="section-title">Project Progress</p>
+    <div class="project-card">
+      <div class="project-name">Anya's Boutique — Website Redesign</div>
+      <div class="project-sub">Started May 1, 2026 · Est. completion: May 28, 2026</div>
+      <div class="stages">
+        <div class="stage done"><div class="stage-dot">✓</div><div class="stage-label">Discovery</div></div>
+        <div class="stage done"><div class="stage-dot">✓</div><div class="stage-label">Design</div></div>
+        <div class="stage active"><div class="stage-dot">3</div><div class="stage-label">Development</div></div>
+        <div class="stage"><div class="stage-dot">4</div><div class="stage-label">Review</div></div>
+        <div class="stage"><div class="stage-dot">5</div><div class="stage-label">Live</div></div>
+      </div>
+      <div class="stage-status">Stage 3 of 5 — Development in Progress</div>
+    </div>
+
+    <!-- ACTIVITY + DELIVERABLES -->
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-title">Recent Activity</div>
+        <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">Homepage wireframe uploaded for review</div><div class="activity-time">2 hours ago</div></div></div>
+        <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">Your feedback requested on logo concepts</div><div class="activity-time">Yesterday</div></div></div>
+        <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">Design phase marked complete</div><div class="activity-time">May 9</div></div></div>
+        <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">Project kick-off call completed</div><div class="activity-time">May 8</div></div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Deliverables</div>
+        <div class="deliverable-item">
+          <div class="file-icon">📄</div>
+          <div class="file-info"><div class="file-name">Homepage_Wireframe_v2.pdf</div><div class="file-meta">Uploaded today · <span class="badge pending">Pending Review</span></div></div>
+          <button class="btn-review" onclick="location.href='/clarev/deliverables/'">Review</button>
+        </div>
+        <div class="deliverable-item">
+          <div class="file-icon">🎨</div>
+          <div class="file-info"><div class="file-name">Logo_Concepts_v1.png</div><div class="file-meta">Uploaded yesterday · <span class="badge pending">Pending Review</span></div></div>
+          <button class="btn-review" onclick="location.href='/clarev/deliverables/'">Review</button>
+        </div>
+        <div class="deliverable-item">
+          <div class="file-icon">📄</div>
+          <div class="file-info"><div class="file-name">Brand_Guidelines.pdf</div><div class="file-meta">May 9 · <span class="badge approved">Approved</span></div></div>
+          <button class="btn-review" onclick="location.href='/clarev/deliverables/'">View</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+</script>
+</body>
+</html>
