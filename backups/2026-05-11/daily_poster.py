@@ -171,6 +171,20 @@ BRANDS = _load_brands()
 # ── CAPTION TEMPLATES BY NICHE ──
 # 10+ per niche, product-specific placeholders supported via {name} and {price}
 CAPTIONS = {
+    "agency": [
+        "Your brand is your first impression. Make it count.\n\nWe design websites, build brand identities and manage social media for businesses ready to grow.\n\nVisit priscadezigns.org\n\n#PriscaDezigns #Branding #WebDesign #DigitalAgency",
+        "Behind every successful brand is a strategy.\n\nAt Prisca Dezigns, we build brands that attract the right clients and convert them.\n\nServices: Web Design · Branding · Social Media\n\npriscadezigns.org\n\n#PriscaDezigns #BrandStrategy #WebDesign",
+        "Your website should work for you 24/7.\n\nWe build fast, professional websites that turn visitors into clients.\n\nReady to elevate your brand? Visit priscadezigns.org\n\n#PriscaDezigns #WebDesign #DigitalMarketing #Branding",
+        "Consistency builds trust. Trust builds clients.\n\nWe manage your social media so your brand shows up professionally every single day.\n\npriscadezigns.org\n\n#PriscaDezigns #SocialMediaManagement #ContentStrategy",
+        "A strong brand identity sets you apart from everyone else in your industry.\n\nLogos · Colour palettes · Typography · Brand guidelines — we handle it all.\n\npriscadezigns.org\n\n#PriscaDezigns #BrandIdentity #LogoDesign",
+        "Your competitors are online. Your clients are online. Your brand should be too.\n\nPrisca Dezigns — full-service digital agency.\n\npriscadezigns.org\n\n#PriscaDezigns #DigitalAgency #BusinessGrowth #Branding",
+        "We don't just build websites. We build businesses.\n\nEvery site we deliver is fast, mobile-ready and designed to convert.\n\npriscadezigns.org\n\n#PriscaDezigns #WebDesign #ConversionDesign #DigitalAgency",
+        "Social media done right takes time, strategy and consistency.\n\nLet us handle it. You focus on running your business.\n\npriscadezigns.org\n\n#PriscaDezigns #SocialMediaManagement #DigitalMarketing",
+        "From logo to launch — we take your brand from idea to execution.\n\nBranding · Web Design · Social Media · Content\n\npriscadezigns.org\n\n#PriscaDezigns #BrandLaunch #DigitalAgency #Branding",
+        "Professional branding isn't a luxury. It's what separates businesses that grow from ones that stay stuck.\n\npriscadezigns.org\n\n#PriscaDezigns #Branding #WebDesign #BusinessGrowth",
+        "Your brand story matters. We help you tell it.\n\nWebsite design and social media management that reflects who you really are.\n\npriscadezigns.org\n\n#PriscaDezigns #BrandStorytelling #DigitalAgency",
+        "Great design builds credibility before you say a word.\n\nLet Prisca Dezigns build your brand the right way.\n\npriscadezigns.org\n\n#PriscaDezigns #LogoDesign #Branding #WebDesign",
+    ],
     "eco": [
         "🌿 {name} — because sustainable living shouldn’t mean sacrificing quality. Link in bio 🔗 #VerdantCo #EcoLiving",
         "♻️ Swap one thing. Make it count. {name} is the smarter choice for your home. #VerdantCo #GreenHome",
@@ -858,13 +872,20 @@ def run_post(brand_name, post_type):
         aff_link  = get_affiliate_link(aff, niche)
         photo_url = ""
 
-    caption   = get_caption(niche, product_used)
+    # GUARD: Prisca Dezigns and Seamrite Designs NEVER use product/niche captions
+    if niche in ("agency", "fashion_art"):
+        caption = get_caption(niche, None)
+    else:
+        caption = get_caption(niche, product_used)
     ig_result = ""  # populated for photo posts that hit Instagram
 
     if post_type == "text":
-        # Text posts use NICHE_TIPS (editorial value content, not product promotion)
+        # AGENCY/FASHION_ART pages use their own CAPTIONS, not NICHE_TIPS
+        if niche in ("agency", "fashion_art"):
+            tips = CAPTIONS.get(niche, ["Visit priscadezigns.org"])
+        else:
+            tips = NICHE_TIPS.get(niche, NICHE_TIPS.get("eco", ["Follow for daily niche content."]))
         from datetime import date as _date
-        tips = NICHE_TIPS.get(niche, NICHE_TIPS.get("eco", ["Follow for daily niche content."]))
         tip_idx = _date.today().timetuple().tm_yday % len(tips)
         # Rotate through different tips for each of the 3 text posts per day
         hour_offset = datetime.now().hour // 4  # shifts tip index by time of day
