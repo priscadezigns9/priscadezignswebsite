@@ -548,6 +548,326 @@ def get_pd_post(slot):
     return "Check out our latest services at priscadezigns.org #PriscaDezigns", None
 
 
+
+def get_caption(niche, product=None):
+    """Return a caption rotated by day-of-year so it never repeats within 10 days.
+    Injects {name} and {price} from the product dict if provided."""
+    from datetime import date
+    caps = CAPTIONS.get(niche, ["Check out our latest pick — link in bio 🔗"])
+    idx = date.today().timetuple().tm_yday % len(caps)
+    cap = caps[idx]
+    if product:
+        name  = product.get("name", "").strip()
+        price = product.get("price", "")
+        # Truncate very long product names
+        if len(name) > 60:
+            name = name[:57] + "..."
+        cap = cap.replace("{name}", name).replace("{price}", str(price))
+    else:
+        # Strip placeholders if no product passed
+        import re as _re
+        cap = _re.sub(r"\{name\}", "our latest pick", cap)
+        cap = _re.sub(r"\\${price}", "", cap).strip()
+    return cap
+
+def post_to_facebook(page_id, token, message, photo_url=None, video_path=None):
+    """Post to a Facebook page. Returns dict with 'id' on success or 'error' on failure."""
+    base = "https://graph.facebook.com/v19.0"
+    if photo_url:
+        url = f"{base}/{page_id}/photos"
+        payload = urllib.parse.urlencode({"url": photo_url, "caption": message, "access_token": token}).encode()
+    else:
+        url = f"{base}/{page_id}/feed"
+        payload = urllib.parse.urlencode({"message": message, "access_token": token}).encode()
+    try:
+        req = urllib.request.Request(url, data=payload, method="POST")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        try:
+            return json.loads(body)
+        except Exception:
+            return {"error": {"message": body[:200]}}
+    except Exception as ex:
+        return {"error": {"message": str(ex)}}
+
+
+def post_to_instagram(ig_id, token, caption, image_url):
+    """Post a photo to Instagram via Graph API. Returns dict with 'id' on success."""
+    base = "https://graph.facebook.com/v19.0"
+    # Step 1: create media container
+    container_url = f"{base}/{ig_id}/media"
+    payload = urllib.parse.urlencode({
+        "image_url": image_url,
+        "caption": caption,
+        "access_token": token
+    }).encode()
+    try:
+        req = urllib.request.Request(container_url, data=payload, method="POST")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            container = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        try:
+            return json.loads(body)
+        except Exception:
+            return {"error": {"message": body[:200]}}
+    except Exception as ex:
+        return {"error": {"message": str(ex)}}
+
+    if "id" not in container:
+        return container
+
+    # Step 2: publish container
+    publish_url = f"{base}/{ig_id}/media_publish"
+    pub_payload = urllib.parse.urlencode({
+        "creation_id": container["id"],
+        "access_token": token
+    }).encode()
+    try:
+        req2 = urllib.request.Request(publish_url, data=pub_payload, method="POST")
+        with urllib.request.urlopen(req2, timeout=30) as resp2:
+            return json.loads(resp2.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        try:
+            return json.loads(body)
+        except Exception:
+            return {"error": {"message": body[:200]}}
+    except Exception as ex:
+        return {"error": {"message": str(ex)}}
+
+
+def get_affiliate_link(aff_tag, keyword):
+    query = urllib.parse.quote(keyword)
+    return f"https://www.amazon.com/s?k={query}&tag={aff_tag}"
+
+def get_image_ratio(url):
+    """Return width/height ratio for a JPEG/PNG, or None on failure. Reads minimal bytes."""
+    try:
+        import struct
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=8) as r:
+            header = r.read(512)
+        # JPEG: find SOF0/SOF2 marker (FF C0 / FF C2)
+        for i in range(len(header) - 8):
+            if header[i] == 0xFF and header[i+1] in (0xC0, 0xC2):
+                h = struct.unpack(">H", header[i+5:i+7])[0]
+                w = struct.unpack(">H", header[i+7:i+9])[0]
+                if h > 0:
+                    return w / h
+        # PNG: 8-byte sig + IHDR (4+4+4+4=16 bytes)
+        if header[:8] == b'\x89PNG\r\n\x1a\n':
+            w = struct.unpack(">I", header[16:20])[0]
+            h = struct.unpack(">I", header[20:24])[0]
+            if h > 0:
+                return w / h
+    except Exception:
+        pass
+    return None
+
+def make_square_crop(local_path):
+    """Crop image to square (center crop) and save as _ig.jpg. Returns new local path or None."""
+    try:
+        from PIL import Image
+        import io
+        img = Image.open(local_path).convert("RGB")
+        w, h = img.size
+        s = min(w, h)
+        left = (w - s) // 2
+        top = (h - s) // 2
+        cropped = img.crop((left, top, left + s, top + s))
+        out_path = local_path.replace(".jpg", "_ig.jpg")
+        cropped.save(out_path, "JPEG", quality=85)
+        return out_path
+    except Exception:
+        return None
+
+def is_safe_image_url(url):
+    """Reject YouTube thumbnails and other non-original image sources."""
+    if not url:
+        return False
+    blocked = ['ytimg.com', 'youtube.com', 'youtu.be', 'emg1', 'external-ord']
+    return not any(b in url for b in blocked)
+
+def get_product_for_brand(brand_name, advance_photo=True):
+    """Return (product_dict, image_url) for the brand using the photo rotation system.
+    - Product cycles on a N-day basis (N = products in niche)
+    - Photo for each product cycles through all available Amazon images, one per cycle
+    - advance_photo=True increments the photo counter (call once per actual post)
+    """
+    from datetime import date
+    PHOTOS_FILE = "niche_products_photos.json"
+    slug = BRAND_TO_SLUG.get(brand_name, "")
+    if not slug:
+        slug = brand_name.lower().replace(" ", "-").replace(".", "").replace("&", "and")
+
+    try:
+        with open(PHOTOS_FILE) as f:
+            photos_data = json.load(f)
+    except Exception as e:
+        return None  # photo rotation file not present — skip silently
+
+    products = photos_data.get(slug, [])
+    if not products:
+        return None
+
+    # Which product is up today
+    day_num = date.today().timetuple().tm_yday
+    product_idx = day_num % len(products)
+    product = products[product_idx]
+
+    # Which photo — stateless: driven by day + hour so it varies each post slot
+    from datetime import datetime as _dt
+    images = product.get("images", [])
+
+    if not images:
+        return product  # fallback — return product without image override
+
+    hour_slot = _dt.now().hour
+    photo_idx = (day_num * 7 + hour_slot) % len(images)
+    image_url = images[photo_idx]
+    # advance_photo param kept for API compatibility but no longer writes state
+
+    # Return a product dict compatible with existing code
+    result = dict(product)
+    result["image"] = image_url
+    return result
+
+def get_ai_image_url(niche_keyword, style="product"):
+    """DEPRECATED fallback — only used if niche_products.json is unavailable.
+    Tries to return any product image for the niche rather than Picsum."""
+    NICHE_PRODUCTS_FILE = "niche_products.json"
+    try:
+        with open(NICHE_PRODUCTS_FILE) as f:
+            all_products = json.load(f)
+        # Map niche keyword to a slug
+        slug_map = {
+            "eco": "verdant-co", "watches": "the-watch-list", "sneakers": "sole-prestige",
+            "gaming": "atelier-gaming", "fashion": "couture-gallery", "fragrance": "essence-elite",
+            "skincare": "glow-protocol", "fitness": "peak-fit", "anime": "dreaming-anime",
+            "travel": "the-escapist", "pets": "paw-vault", "luxury": "quiet-luxury",
+            "food": "pantriq", "real estate": "prime-land-network", "tech": "tech-scout",
+            "workspace": "deskwell", "automotive": "the-autodrome", "selfcare": "shelfly",
+        }
+        slug = slug_map.get(niche_keyword.lower(), "")
+        if slug:
+            from datetime import date
+            products = [p for p in all_products.get(slug, []) if p.get("image")]
+            if products:
+                idx = date.today().timetuple().tm_yday % len(products)
+                return products[idx]["image"]
+    except Exception:
+        pass
+    return ""
+
+def find_ig_safe_image(brand_name, preferred_url):
+    """Return the real product image for this brand (day-rotated from niche_products.json).
+    Falls back to preferred_url only if no scraped products exist.
+    Zero Picsum, zero stock photos — always niche-specific real product images.
+    GUARD: never use a non-Amazon image for affiliate/niche brands."""
+    # Always try to get a real product image first
+    product = get_product_for_brand(brand_name)
+    if product and product.get("image"):
+        img = product["image"]
+        # Hard guard: must be an Amazon image for niche brands
+        if "amazon.com" in img or "media-amazon" in img:
+            return img
+
+    # Fall back to preferred_url only if it's a real Amazon product image
+    if preferred_url and preferred_url.startswith("http"):
+        # HARD GUARD: only allow Amazon product images for niche pages
+        if "amazon.com" in preferred_url or "media-amazon" in preferred_url:
+            try:
+                ratio = get_image_ratio(preferred_url)
+                if ratio and 0.5 <= ratio <= 1.91:
+                    return preferred_url
+            except Exception:
+                pass
+            return preferred_url
+        # Non-Amazon URLs are blocked for niche/affiliate brands
+        print(f"[GUARD] Blocked non-Amazon image for {brand_name}: {preferred_url[:60]}")
+        return ""
+
+    return ""
+
+def get_dreaming_anime_video():
+    """Pull next video from Dreaming Anime Google Drive folder.
+    Drive folder ID: 1jRm7LZV7H_ZMFYDThO-zsNakAL75nWVO
+    Downloads the next unposted video to local cache and returns path.
+    Tracks which videos have been posted in dreaming_anime_posted.json.
+    """
+    import subprocess
+
+    DRIVE_FOLDER = "1jRm7LZV7H_ZMFYDThO-zsNakAL75nWVO"
+    POSTED_LOG = "dreaming_anime_posted.json"
+    CACHE_DIR = "dreaming_anime/cache"
+    os.makedirs(CACHE_DIR, exist_ok=True)
+
+    # Load posted log
+    try:
+        with open(POSTED_LOG) as f:
+            posted = json.load(f)
+    except Exception:
+        posted = []
+
+    # List videos in Drive folder
+    try:
+        result = subprocess.run(
+            ["gog", "drive", "ls", "--parent", DRIVE_FOLDER, "--max", "50", "--json"],
+            capture_output=True, text=True, timeout=15
+        )
+        files = json.loads(result.stdout)
+        if isinstance(files, dict):
+            files = files.get("files", files.get("data", []))
+        videos = [f for f in files if isinstance(f, dict) and f.get("name", "").endswith(".mp4") and f.get("id") not in posted]
+    except Exception:
+        videos = []
+
+    if not videos:
+        return None
+
+    # Pick next video (oldest first)
+    video = videos[0]
+    file_id = video["id"]
+    file_name = video["name"].split("/")[-1]  # handle full path names
+    local_path = os.path.join(CACHE_DIR, file_name)
+
+    # Download if not already cached
+    if not os.path.exists(local_path):
+        try:
+            dl = subprocess.run(
+                ["gog", "drive", "download", file_id, "--output", local_path],
+                capture_output=True, text=True, timeout=120
+            )
+            if dl.returncode != 0:
+                return None
+        except Exception:
+            return None
+
+    # Mark as posted
+    posted.append(file_id)
+    with open(POSTED_LOG, "w") as f:
+        json.dump(posted, f)
+
+    return local_path
+
+def get_prisca_brand_image():
+    """Return a purple-branded Prisca Dezigns image URL.
+    Uses brand-consistent purple gradient image hosted reliably."""
+    # Prisca Dezigns brand purple images — curated from reliable sources
+    purple_images = [
+        "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?w=1080",
+        "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?w=1080",
+        "https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?w=1080",
+        "https://images.pexels.com/photos/574071/pexels-photo-574071.jpeg?w=1080",
+        "https://images.pexels.com/photos/270404/pexels-photo-270404.jpeg?w=1080",
+    ]
+    import random
+    return random.choice(purple_images)
+
+
 def run_post(brand_name, post_type):
     """Execute one post for a brand."""
     brand = BRANDS.get(brand_name) or BRANDS.get(brand_name.strip())
