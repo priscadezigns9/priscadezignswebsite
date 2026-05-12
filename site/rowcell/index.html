@@ -261,6 +261,81 @@ footer{padding:32px 6%;display:flex;align-items:center;justify-content:space-bet
   .goog-te-banner-frame, .goog-te-balloon-frame { display: none !important; }
   body { top: 0 !important; }
   .goog-te-gadget { display: none !important; }
+
+/* ── PREMIUM ANIMATIONS — Prisca Dezigns Empire ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideLeft{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmerAccent{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 0 24px rgba(123,53,212,0.3)}50%{box-shadow:0 0 48px rgba(176,106,255,0.6)}}
+@keyframes borderFlow{0%{border-color:rgba(176,106,255,0.12)}50%{border-color:rgba(176,106,255,0.42)}100%{border-color:rgba(176,106,255,0.12)}}
+@keyframes typewriter{from{width:0}to{width:100%}}
+
+/* Scroll reveal */
+.anim-ready{opacity:0;will-change:transform,opacity}
+.anim-ready.anim-visible{animation:fadeUp 0.72s cubic-bezier(.22,1,.36,1) forwards}
+.anim-left.anim-visible{animation:slideLeft 0.72s cubic-bezier(.22,1,.36,1) forwards}
+.anim-right.anim-visible{animation:slideRight 0.72s cubic-bezier(.22,1,.36,1) forwards}
+.anim-scale.anim-visible{animation:scaleIn 0.6s cubic-bezier(.34,1.56,.64,1) forwards}
+
+/* Accent shimmer */
+.accent,h1 .accent,h2 .accent,h3 .accent{
+  background:linear-gradient(90deg,#B06AFF,#7B35D4,#e040fb,#B06AFF);
+  background-size:300% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmerAccent 4s ease infinite;
+}
+
+/* Card hover lift */
+[class*="card"],[class*="plan-card"],[class*="service-card"],[class*="feature-card"],[class*="pricing-card"],[class*="brand-card"]{
+  transition:transform 0.32s cubic-bezier(.34,1.56,.64,1),box-shadow 0.32s!important;
+}
+[class*="card"]:not(nav):not(header):not(footer):hover,[class*="plan-card"]:hover{
+  transform:translateY(-9px) scale(1.015)!important;
+  box-shadow:0 28px 64px rgba(123,53,212,0.2)!important;
+}
+
+/* CTA / button hover */
+a[class*="cta"],a[class*="-btn"],button[class*="cta"],button[class*="-btn"],
+[class*="plan-cta"],[class*="hero-btn"],[class*="hero-cta"]{
+  transition:transform 0.2s,box-shadow 0.2s!important;
+}
+a[class*="cta"]:hover,a[class*="-btn"]:hover,button[class*="cta"]:hover,button[class*="-btn"]:hover,
+[class*="plan-cta"]:hover,[class*="hero-btn"]:hover,[class*="hero-cta"]:hover{
+  transform:translateY(-4px)!important;
+  box-shadow:0 10px 32px rgba(123,53,212,0.42)!important;
+}
+
+/* Hero logo / icon float */
+[class*="hero-logo"] img,[class*="hero"] > div > img,[class*="hero"] > img{
+  animation:floatY 4.5s ease-in-out infinite;
+}
+
+/* Stat numbers */
+[class*="stat-num"],[class*="counter-"],[class*="-count"]{
+  text-shadow:0 0 22px rgba(176,106,255,0.5);
+  animation:glowPulse 3s ease infinite;
+}
+
+/* Nav entrance */
+nav,header{animation:fadeIn 0.45s ease both}
+
+/* Feature icons on hover */
+[class*="feature"]:hover [class*="icon"],
+[class*="feature"]:hover svg,
+[class*="app-icon"]:hover{
+  transform:scale(1.18) rotate(-6deg);
+  transition:transform 0.25s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* Continuous border shimmer on cards */
+[class*="plan-card"],[class*="brand-card"]{animation:borderFlow 5s ease infinite}
+
+/* Section dividers fade-in */
+[class*="divider"],[class*="section-glow"]{animation:fadeIn 1s ease both}
 </style>
 <div id="lang-bar">
   <span class="lang-globe">&#127760;</span>
@@ -748,6 +823,45 @@ el.style.transform = 'translateY(0)';
 });
 });
 });
+</script>
+
+<script>
+/* Prisca Dezigns — Premium Scroll Animations v2 */
+(function(){
+  var sel = 'h2,h3,p.lead,[class*="card"],[class*="plan-"],[class*="feature-"],[class*="stat-"],[class*="service-"],[class*="benefit"],[class*="step-"],[class*="price-"],[class*="pkg"],[class*="brand-card"],[class*="app-card"]';
+  document.querySelectorAll(sel).forEach(function(el,i){
+    if(el.closest('nav')||el.closest('header')||el.closest('footer')) return;
+    el.classList.add('anim-ready');
+    el.style.animationDelay = (Math.min(i%5,4)*0.1)+'s';
+  });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('anim-visible');io.unobserve(e.target);}
+    });
+  },{threshold:0.08,rootMargin:'0px 0px -30px 0px'});
+  document.querySelectorAll('.anim-ready').forEach(function(el){io.observe(el);});
+
+  /* Smooth counter */
+  document.querySelectorAll('[class*="stat-num"],[class*="counter-"]').forEach(function(el){
+    var raw = el.textContent.trim();
+    var num = parseInt(raw.replace(/[^0-9]/g,''));
+    if(!num) return;
+    var sfx = raw.replace(/[0-9,]/g,'');
+    var dur = 1400, start = null;
+    var io2 = new IntersectionObserver(function(es){
+      if(!es[0].isIntersecting) return;
+      io2.unobserve(el);
+      requestAnimationFrame(function step(ts){
+        if(!start) start=ts;
+        var p = Math.min((ts-start)/dur,1);
+        var e2 = 1-Math.pow(1-p,3);
+        el.textContent = Math.round(e2*num).toLocaleString()+sfx;
+        if(p<1) requestAnimationFrame(step);
+      });
+    },{threshold:0.5});
+    io2.observe(el);
+  });
+})();
 </script>
 </body>
 </html>
