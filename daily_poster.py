@@ -6,6 +6,14 @@ Schedule: 8AM, 11AM, 2PM, 7PM AST
 import json, sys, random, urllib.request, urllib.parse, urllib.error, re, os
 from datetime import datetime
 
+import os as _os_
+_SCRIPT_DIR = _os_.path.dirname(_os_.path.abspath(__file__))
+
+def _path(fname):
+    """Resolve a filename relative to the script directory (works from any cwd)."""
+    p = _os_.path.join(_SCRIPT_DIR, fname)
+    return p if _os_.path.exists(p) else fname
+
 RATE = 6.80
 
 # Brand name → site slug mapping  (must match keys in BRANDS exactly)
@@ -33,7 +41,7 @@ BRAND_TO_SLUG = {
 # Instagram Business Account IDs (loaded from ig_accounts.json)
 def _load_ig_ids():
     try:
-        with open("ig_accounts.json") as f:
+        with open(_path("ig_accounts.json")) as f:
             accounts = json.load(f)
         return {a["page_name"].strip(): a["ig_id"] for a in accounts}
     except Exception:
@@ -58,17 +66,17 @@ def refresh_tokens_from_credential():
         updated = {}
         for p in pages:
             updated[p["name"]] = {"id": p["id"], "access_token": p["access_token"]}
-        with open("fb_page_tokens.json", "w") as f:
+        with open(_path("fb_page_tokens.json"), "w") as f:
             json.dump(updated, f, indent=2)
         # Reload IG accounts with fresh tokens
         if os.path.exists("ig_accounts.json"):
-            with open("ig_accounts.json") as f:
+            with open(_path("ig_accounts.json")) as f:
                 ig = json.load(f)
             for acc in ig:
                 pname = acc["page_name"].strip()
                 if pname in updated:
                     acc["token"] = updated[pname]["access_token"]
-            with open("ig_accounts.json", "w") as f:
+            with open(_path("ig_accounts.json"), "w") as f:
                 json.dump(ig, f, indent=2)
         return True
     except Exception:
@@ -118,7 +126,7 @@ def add_product_to_niche_page(slug, product, deploy=False):
 def _load_brands():
     """Load brand configs from fb_page_tokens.json at runtime (tokens never hardcoded)."""
     try:
-        with open('fb_page_tokens.json') as f:
+        with open(_path('fb_page_tokens.json')) as f:
             raw = json.load(f)
     except Exception:
         return {}
@@ -394,7 +402,14 @@ CAPTIONS = {
 # Used for text posts to provide VALUE, not just product dumps
 def _load_niche_tips():
     try:
-        with open("niche_tips.json") as f:
+        # Use absolute path relative to this script so it works from any working directory
+        import os as _os
+        _script_dir = _os.path.dirname(_os.path.abspath(__file__))
+        _tips_path = _os.path.join(_script_dir, "niche_tips.json")
+        # Fallback: also try cwd
+        if not _os.path.exists(_tips_path):
+            _tips_path = "niche_tips.json"
+        with open(_tips_path) as f:
             return json.load(f)
     except Exception:
         return {}
