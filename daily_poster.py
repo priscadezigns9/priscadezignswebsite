@@ -410,7 +410,7 @@ NICHE_TIPS = _load_niche_tips()
 # The sub-brand rotates every day: Vela→Writx→Karjov→Orbyt→Clasp→Clarev→repeat
 # ═══════════════════════════════════════════════════════════════════════════════
 
-PD_SUB_BRANDS = ["Vela", "Writx", "Karjov", "Orbyt", "Clasp", "Clarev"]
+PD_SUB_BRANDS = ["Vela", "Writx", "Karjov", "Orbyt", "Clasp"]  # Clarev excluded — still building
 
 # Promo image Drive direct-download links (one per sub-brand)
 PD_PROMO_IMAGES = {
