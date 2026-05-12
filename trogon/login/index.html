@@ -20,7 +20,7 @@
   .error{color:#e63946;font-size:0.8rem;margin-top:10px;display:none}
   .success{color:#4ade80;font-size:0.8rem;margin-top:10px;display:none}
   .divider{border:none;border-top:1px solid #1e1e2e;margin:24px 0}
-  .forgot{color:#8b8fa8;font-size:0.8rem;cursor:pointer;text-decoration:underline}
+  .forgot{color:#8b8fa8;font-size:0.8rem;cursor:pointer;text-decoration:underline;background:none;border:none;margin-top:12px;display:inline-block}
   .forgot:hover{color:#e8eaf6}
   .back{display:block;margin-top:20px;color:#8b8fa8;font-size:0.8rem;text-decoration:none}
   .back:hover{color:#e8eaf6}
@@ -32,10 +32,11 @@
 <body>
 <div class="box">
   <div class="logo"><img src="/trogon/trogon_logo.png" alt="Trogon"></div>
-  <div class="title">Welcome to Trogon</div>
-  <div class="sub">Sign in to your account</div>
+  <div class="title" id="page-title">Welcome to Trogon</div>
+  <div class="sub" id="page-sub">Sign in to your account</div>
 
-  <div class="tab-row">
+  <!-- TAB ROW — hidden during password update -->
+  <div class="tab-row" id="tab-row">
     <button class="tab active" onclick="showTab('signin')" id="tab-signin">Sign In</button>
     <button class="tab" onclick="showTab('reset')" id="tab-reset">Forgot Password</button>
   </div>
@@ -48,7 +49,7 @@
     <div class="error" id="signin-error"></div>
   </div>
 
-  <!-- RESET PASSWORD -->
+  <!-- FORGOT PASSWORD -->
   <div id="form-reset" style="display:none">
     <input type="email" id="reset-email" placeholder="Your email address"/>
     <button class="btn" onclick="doReset()">Send Reset Link</button>
@@ -56,17 +57,66 @@
     <div class="success" id="reset-success">Check your email for a reset link!</div>
   </div>
 
+  <!-- SET NEW PASSWORD (recovery flow) -->
+  <div id="form-newpass" style="display:none">
+    <input type="password" id="new-password" placeholder="New password" autocomplete="new-password"/>
+    <input type="password" id="confirm-password" placeholder="Confirm new password" autocomplete="new-password"/>
+    <button class="btn" id="newpass-btn" onclick="doUpdatePassword()">Set New Password</button>
+    <div class="error" id="newpass-error"></div>
+    <div class="success" id="newpass-success">Password updated! Redirecting...</div>
+  </div>
+
   <a href="/trogon/" class="back">← Back to Trogon</a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
+const sb = supabase.createClient(
+  'https://sazhdnqzaqpqcralmthh.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc'
+);
 
-// Auto-redirect if already logged in
-sb.auth.getSession().then(({ data: { session } }) => {
-  if (session) window.location.href = '/trogon/dashboard/';
+// ── On load: check URL hash for recovery token ──
+window.addEventListener('load', async () => {
+  const hash = window.location.hash;
+
+  // Password recovery flow — token in hash
+  if (hash.includes('type=recovery') || hash.includes('type=email_change')) {
+    // Let Supabase process the hash token
+    const { data, error } = await sb.auth.getSession();
+    if (data.session) {
+      showNewPasswordForm();
+      return;
+    }
+  }
+
+  // Already logged in — go straight to dashboard
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    window.location.href = '/trogon/dashboard/';
+  }
 });
+
+// Listen for auth state changes (catches token exchange from hash)
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    showNewPasswordForm();
+  } else if (event === 'SIGNED_IN' && session) {
+    // Only redirect if we're NOT in recovery mode
+    if (!document.getElementById('form-newpass').style.display || document.getElementById('form-newpass').style.display === 'none') {
+      window.location.href = '/trogon/dashboard/';
+    }
+  }
+});
+
+function showNewPasswordForm() {
+  document.getElementById('form-signin').style.display = 'none';
+  document.getElementById('form-reset').style.display = 'none';
+  document.getElementById('form-newpass').style.display = 'block';
+  document.getElementById('tab-row').style.display = 'none';
+  document.getElementById('page-title').textContent = 'Set New Password';
+  document.getElementById('page-sub').textContent = 'Choose a secure password for your account';
+}
 
 function showTab(tab) {
   document.getElementById('form-signin').style.display = tab === 'signin' ? 'block' : 'none';
@@ -103,7 +153,7 @@ async function doReset() {
   sucEl.style.display = 'none';
 
   const { error } = await sb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + '/trogon/dashboard/'
+    redirectTo: window.location.origin + '/trogon/login/'
   });
   if (error) {
     errEl.textContent = error.message;
@@ -113,9 +163,48 @@ async function doReset() {
   }
 }
 
-// Allow Enter key
+async function doUpdatePassword() {
+  const newPass = document.getElementById('new-password').value;
+  const confirmPass = document.getElementById('confirm-password').value;
+  const btn = document.getElementById('newpass-btn');
+  const errEl = document.getElementById('newpass-error');
+  const sucEl = document.getElementById('newpass-success');
+
+  errEl.style.display = 'none';
+
+  if (newPass.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (newPass !== confirmPass) {
+    errEl.textContent = 'Passwords do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  const { error } = await sb.auth.updateUser({ password: newPass });
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Set New Password';
+    return;
+  }
+
+  sucEl.style.display = 'block';
+  setTimeout(() => { window.location.href = '/trogon/dashboard/'; }, 1500);
+}
+
+// Allow Enter key on sign in
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') doSignIn();
+  if (e.key === 'Enter') {
+    if (document.getElementById('form-signin').style.display !== 'none') doSignIn();
+    if (document.getElementById('form-newpass').style.display !== 'none') doUpdatePassword();
+  }
 });
 </script>
 </body>
