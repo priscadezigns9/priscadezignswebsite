@@ -243,19 +243,51 @@ footer h4{font-size:13px;font-weight:700;color:rgba(255,255,255,0.25);letter-spa
   <!-- SCAN MOCKUP -->
   <div class="scan-demo">
     <div class="phone-frame">
-      <div class="scan-img">
-        🍚
-        <div class="scan-overlay">
+      <!-- SCANNER UI -->
+      <div id="scanViewport" class="scan-img" style="cursor:pointer;flex-direction:column;gap:8px;position:relative;overflow:hidden">
+        <video id="scanVideo" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover" autoplay playsinline muted></video>
+        <canvas id="scanCanvas" style="display:none"></canvas>
+        <div id="scanIdle" style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div style="font-size:52px">📷</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;text-align:center">Tap to scan your food</div>
+          <div style="color:rgba(255,255,255,0.4);font-size:11px">or upload a photo</div>
+        </div>
+        <div id="scanActive" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center">
           <div class="scan-ring"></div>
           <div class="scan-line"></div>
         </div>
+        <div id="scanLoading" style="display:none;position:absolute;inset:0;background:rgba(26,13,0,0.85);align-items:center;justify-content:center;flex-direction:column;gap:12px">
+          <div style="width:40px;height:40px;border:3px solid rgba(232,119,34,0.3);border-top-color:#E87722;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+          <div style="color:rgba(255,255,255,0.7);font-size:13px">Identifying dish...</div>
+        </div>
       </div>
-      <div class="scan-result">
-        <div class="scan-dish">Pelau 🍚</div>
+      <div style="display:flex;gap:8px;padding:10px 12px;background:#111;border-top:1px solid rgba(255,255,255,0.06)">
+        <button onclick="startCamera()" style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:20px;padding:9px;font-size:12px;font-weight:700;cursor:pointer">📷 Camera</button>
+        <label style="flex:1;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:9px;font-size:12px;font-weight:600;cursor:pointer;text-align:center">
+          🖼 Upload<input type="file" accept="image/*" onchange="handleUpload(event)" style="display:none">
+        </label>
+      </div>
+      <!-- RESULT PANEL -->
+      <div id="scanResult" class="scan-result" style="display:none">
+        <div id="rDish" class="scan-dish"></div>
+        <div id="rTags" class="scan-tags"></div>
+        <div id="rStats" class="scan-stats">
+          <div class="stat-box"><div id="rCal" class="stat-num">—</div><div class="stat-lbl">Calories</div></div>
+          <div class="stat-box"><div id="rPro" class="stat-num">—</div><div class="stat-lbl">Protein</div></div>
+          <div class="stat-box"><div id="rCarb" class="stat-num">—</div><div class="stat-lbl">Carbs</div></div>
+        </div>
+        <div id="rIngr" class="scan-ingredients"></div>
+        <div class="scan-where">
+          <span class="scan-where-icon">📍</span>
+          <div id="rWhere" class="scan-where-text"></div>
+        </div>
+        <button onclick="resetScanner()" style="margin-top:10px;width:100%;background:rgba(232,119,34,0.15);border:1px solid rgba(232,119,34,0.3);color:var(--primary-light);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">Scan another dish</button>
+      </div>
+      <!-- DEFAULT RESULT (shown before first scan) -->
+      <div id="scanDefault" class="scan-result">
+        <div class="scan-dish">Pelau 🍚 <span style="font-size:11px;color:rgba(255,255,255,0.4);font-family:Inter,sans-serif;font-weight:400">(example)</span></div>
         <div class="scan-tags">
-          <span class="scan-tag">Sunday Lunch</span>
-          <span class="scan-tag">Caribbean</span>
-          <span class="scan-tag">Rice Dish</span>
+          <span class="scan-tag">Sunday Lunch</span><span class="scan-tag">Caribbean</span>
         </div>
         <div class="scan-stats">
           <div class="stat-box"><div class="stat-num">480</div><div class="stat-lbl">Calories</div></div>
@@ -265,7 +297,7 @@ footer h4{font-size:13px;font-weight:700;color:rgba(255,255,255,0.25);letter-spa
         <div class="scan-ingredients">🧑‍🍳 Pigeon peas · Rice · Chicken · Coconut milk · Browning · Pimento · Shadow beni</div>
         <div class="scan-where">
           <span class="scan-where-icon">📍</span>
-          <div class="scan-where-text">Ingredients found at <strong>Hi-Lo Food Stores (0.4 km)</strong> and <strong>Massy Stores (1.2 km)</strong></div>
+          <div class="scan-where-text">Tap camera or upload a photo to scan your own food</div>
         </div>
       </div>
     </div>
@@ -538,6 +570,145 @@ async function submitAuth(){const sb=getSB();if(!sb){document.getElementById('au
 function showUserInfo(user){document.getElementById('userInfo').style.display='block';document.getElementById('userEmail').textContent=user.email;document.getElementById('authSubmit').style.display='none';document.getElementById('authEmail').style.display='none';document.getElementById('authPass').style.display='none';document.getElementById('authBtn').textContent='My Account';document.getElementById('authBtn').style.background='rgba(232,119,34,0.25)';}
 async function doSignOut(){const sb=getSB();if(sb)await sb.auth.signOut();document.getElementById('authBtn').textContent='Sign In';document.getElementById('authBtn').style.background='rgba(232,119,34,0.1)';document.getElementById('userInfo').style.display='none';document.getElementById('authSubmit').style.display='block';document.getElementById('authEmail').style.display='block';document.getElementById('authPass').style.display='block';closeAuth();}
 window.addEventListener('load',()=>{const sb=getSB();if(sb)sb.auth.onAuthStateChange((e,s)=>{if(s)showUserInfo(s.user);});});
+</script>
+
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+#scanActive{display:none}
+#scanActive.active{display:flex!important}
+#scanLoading.active{display:flex!important}
+</style>
+<script>
+const _GKEY = "AIzaSyChFumNeVPEDScyq4UGHyhHnB2cbbKlZJo";
+let _stream = null;
+
+function showEl(id){document.getElementById(id).style.display='flex';}
+function hideEl(id){document.getElementById(id).style.display='none';}
+
+async function startCamera(){
+  const vp = document.getElementById('scanViewport');
+  const video = document.getElementById('scanVideo');
+  try {
+    _stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    video.srcObject = _stream;
+    video.style.display = 'block';
+    hideEl('scanIdle');
+    document.getElementById('scanActive').style.display = 'flex';
+    document.getElementById('scanDefault').style.display = 'none';
+    vp.onclick = captureAndScan;
+    setTimeout(captureAndScan, 1500);
+  } catch(e) {
+    alert('Camera access denied. Please use the Upload button instead.');
+  }
+}
+
+function captureAndScan(){
+  const video = document.getElementById('scanVideo');
+  const canvas = document.getElementById('scanCanvas');
+  if(!video.srcObject) return;
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+  stopCamera();
+  runGeminiScan(base64);
+}
+
+function handleUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  hideEl('scanIdle');
+  document.getElementById('scanDefault').style.display = 'none';
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const base64 = ev.target.result.split(',')[1];
+    // Show uploaded image as preview
+    const vp = document.getElementById('scanViewport');
+    vp.style.backgroundImage = 'url(' + ev.target.result + ')';
+    vp.style.backgroundSize = 'cover';
+    vp.style.backgroundPosition = 'center';
+    runGeminiScan(base64);
+  };
+  reader.readAsDataURL(file);
+}
+
+function stopCamera(){
+  if(_stream){_stream.getTracks().forEach(t=>t.stop());_stream=null;}
+  document.getElementById('scanVideo').style.display='none';
+  document.getElementById('scanActive').style.display='none';
+}
+
+async function runGeminiScan(base64){
+  document.getElementById('scanLoading').style.display='flex';
+  hideEl('scanIdle');
+  document.getElementById('scanDefault').style.display='none';
+  document.getElementById('scanResult').style.display='none';
+
+  const prompt = `You are a Caribbean food nutrition expert. Analyze this food image.
+Respond ONLY with valid JSON, no markdown, no extra text:
+{
+  "dish": "dish name with emoji",
+  "description": "one line description",
+  "tags": ["tag1","tag2","tag3"],
+  "calories": 000,
+  "protein_g": 00,
+  "carbs_g": 00,
+  "fat_g": 00,
+  "ingredients": ["ingredient 1","ingredient 2","ingredient 3","ingredient 4","ingredient 5"],
+  "where_to_buy": "Suggest 1-2 types of local Caribbean grocery stores or markets where these ingredients can be found"
+}
+If it is not food, set dish to "Not a food item 🤔" and zeros for nutrition.`;
+
+  try {
+    const res = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=' + _GKEY,
+      {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          contents:[{parts:[
+            {text: prompt},
+            {inline_data:{mime_type:'image/jpeg',data:base64}}
+          ]}],
+          generationConfig:{temperature:0.2,maxOutputTokens:512}
+        })
+      }
+    );
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Strip markdown code fences if present
+    const cleaned = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const result = JSON.parse(cleaned);
+    showScanResult(result);
+  } catch(err) {
+    document.getElementById('scanLoading').style.display='none';
+    document.getElementById('scanDefault').style.display='block';
+    document.getElementById('scanDefault').querySelector('.scan-dish').textContent = 'Could not identify dish — try again';
+    console.error(err);
+  }
+}
+
+function showScanResult(r){
+  document.getElementById('scanLoading').style.display='none';
+  document.getElementById('rDish').textContent = r.dish || 'Unknown dish';
+  const tagsEl = document.getElementById('rTags');
+  tagsEl.innerHTML = (r.tags||[]).map(t=>'<span class="scan-tag">'+t+'</span>').join('');
+  document.getElementById('rCal').textContent = r.calories || '—';
+  document.getElementById('rPro').textContent = (r.protein_g||'—')+'g';
+  document.getElementById('rCarb').textContent = (r.carbs_g||'—')+'g';
+  document.getElementById('rIngr').textContent = '🧑\u200d🍳 ' + (r.ingredients||[]).join(' · ');
+  document.getElementById('rWhere').innerHTML = r.where_to_buy || 'Check your local Caribbean grocery store';
+  document.getElementById('scanResult').style.display='block';
+}
+
+function resetScanner(){
+  document.getElementById('scanResult').style.display='none';
+  document.getElementById('scanDefault').style.display='block';
+  const vp = document.getElementById('scanViewport');
+  vp.style.backgroundImage='none';
+  vp.onclick=null;
+  showEl('scanIdle');
+}
 </script>
 </body>
 </html>
