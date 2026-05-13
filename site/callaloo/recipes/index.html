@@ -1,770 +1,601 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Recipes — Callaloo</title>
-  <meta name="description" content="Browse thousands of recipes from every cuisine. Filter by cuisine, occasion, and difficulty. Find every ingredient at a store near you."/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg: #0A0A0F;
-      --bg2: #111118;
-      --bg3: #16161F;
-      --green: #22C55E;
-      --green-glow: rgba(34,197,94,0.15);
-      --white: #FFFFFF;
-      --muted: #9CA3AF;
-      --border: rgba(255,255,255,0.08);
-      --card: rgba(255,255,255,0.04);
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--white); overflow-x: hidden; line-height: 1.6; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipes — Callaloo | Authentic Caribbean Recipes</title>
+<link rel="manifest" href="/callaloo/manifest.json">
+<meta name="theme-color" content="#00875A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Callaloo">
+<link rel="apple-touch-icon" href="/callaloo/icon.svg">
+<meta name="description" content="Browse authentic Caribbean recipes. From Pelau to Doubles, Callaloo Soup to Sorrel Drink — find, cook, and discover Caribbean food.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#00875A;--primary-light:#00C47A;--primary-dark:#005C3E;
+  --accent:#FFD166;--cream:#F0FFF8;--dark:#0D2B1E;--mid:#3A6B52;--light:#6B9E86;
+  --white:#fff;--border:#A8DFC4;
+}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--dark);line-height:1.6}
 
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(10,10,15,0.9); backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-logo { font-size: 1.5rem; font-weight: 900; color: var(--white); text-decoration: none; }
-    .nav-logo span { color: var(--green); }
-    .nav-links { display: flex; gap: 32px; align-items: center; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
-    .nav-links a:hover, .nav-links a.active { color: var(--white); }
-    .nav-cta { background: var(--green); color: #000 !important; font-weight: 700 !important; padding: 8px 20px; border-radius: 8px; }
-    @media (max-width: 768px) { .nav-links { display: none; } }
+/* NAV */
+nav{background:rgba(240,255,248,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:68px;border-bottom:1px solid var(--border)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-icon{width:36px;height:36px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.nav-logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;color:var(--dark)}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-links a{text-decoration:none;color:var(--mid);font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--primary);font-weight:600}
+.nav-cta{background:var(--primary)!important;color:white!important;padding:9px 20px;border-radius:50px;font-weight:600!important}
+.nav-cta:hover{background:var(--primary-dark)!important}
+.ham{display:none;background:none;border:none;cursor:pointer;padding:4px}
+.ham span{display:block;width:22px;height:2px;background:var(--dark);margin:5px 0;transition:all .3s}
+@media(max-width:768px){
+  .nav-links{display:none;position:fixed;top:68px;left:0;right:0;background:var(--white);flex-direction:column;padding:20px;gap:4px;border-bottom:1px solid var(--border);z-index:99}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:10px 0;border-bottom:1px solid var(--border);width:100%}
+  .nav-links a:last-child{border:none}
+  .ham{display:block}
+}
 
-    /* HERO */
-    .recipes-hero {
-      padding: 120px 24px 60px;
-      text-align: center;
-      background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(34,197,94,0.1) 0%, transparent 60%);
-    }
-    .recipes-hero h1 {
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-weight: 900; letter-spacing: -2px;
-      margin-bottom: 16px;
-      animation: fadeUp 0.6s ease both;
-    }
-    .recipes-hero h1 em { font-style: normal; color: var(--green); }
-    .recipes-hero p {
-      color: var(--muted); font-size: 1.1rem; max-width: 520px; margin: 0 auto;
-      animation: fadeUp 0.6s ease 0.1s both;
-    }
+/* PAGE HEADER */
+.page-header{background:linear-gradient(135deg,var(--dark) 0%,#005C3E 60%,#007A3D 100%);padding:60px 5% 50px;position:relative;overflow:hidden}
+.page-header::before{content:'🌿';position:absolute;right:3%;top:-20px;font-size:200px;opacity:0.08}
+.page-header h1{font-family:'Fraunces',serif;font-size:clamp(32px,5vw,52px);font-weight:900;color:white;line-height:1.15;margin-bottom:12px}
+.page-header p{color:rgba(255,255,255,0.75);font-size:17px;max-width:540px;line-height:1.7;margin-bottom:32px}
+.search-wrap{position:relative;max-width:520px}
+.search-wrap input{width:100%;padding:14px 50px 14px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.12);color:white;font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border .2s}
+.search-wrap input::placeholder{color:rgba(255,255,255,0.5)}
+.search-wrap input:focus{border-color:var(--accent);background:rgba(255,255,255,0.18)}
+.search-icon{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none}
 
-    /* SEARCH BAR */
-    .search-wrap {
-      max-width: 600px; margin: 32px auto 0;
-      position: relative;
-      animation: fadeUp 0.6s ease 0.2s both;
-    }
-    .search-wrap input {
-      width: 100%; padding: 16px 56px 16px 20px;
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 14px; color: var(--white);
-      font-size: 1rem; font-family: inherit;
-      outline: none; transition: border-color 0.2s;
-    }
-    .search-wrap input:focus { border-color: var(--green); }
-    .search-wrap input::placeholder { color: var(--muted); }
-    .search-wrap button {
-      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-      background: var(--green); border: none; border-radius: 10px;
-      padding: 10px 16px; color: #000; font-weight: 700; cursor: pointer;
-      font-size: 0.9rem; transition: background 0.2s;
-    }
-    .search-wrap button:hover { background: #16A34A; }
+/* FILTERS */
+.filters-bar{background:var(--white);border-bottom:1px solid var(--border);padding:0 5%;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.filters-bar::-webkit-scrollbar{display:none}
+.filters-inner{display:flex;gap:8px;padding:14px 0;white-space:nowrap;min-width:max-content}
+.filter-pill{background:none;border:1.5px solid var(--border);color:var(--mid);font-size:13px;font-weight:600;padding:7px 18px;border-radius:50px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+.filter-pill:hover{border-color:var(--primary);color:var(--primary)}
+.filter-pill.active{background:var(--primary);border-color:var(--primary);color:white}
 
-    /* FILTER BAR */
-    .filter-section {
-      max-width: 1200px; margin: 48px auto 0; padding: 0 24px;
-    }
-    .filter-group { margin-bottom: 20px; }
-    .filter-label {
-      font-size: 0.7rem; font-weight: 700; letter-spacing: 2px;
-      color: var(--muted); text-transform: uppercase;
-      margin-bottom: 10px; display: block;
-    }
-    .filter-pills { display: flex; gap: 8px; flex-wrap: wrap; }
-    .pill {
-      padding: 7px 16px; border-radius: 100px;
-      border: 1px solid var(--border);
-      font-size: 0.82rem; font-weight: 500; cursor: pointer;
-      background: transparent; color: var(--muted);
-      transition: all 0.2s; white-space: nowrap;
-    }
-    .pill:hover { border-color: var(--green); color: var(--white); }
-    .pill.active { background: var(--green); border-color: var(--green); color: #000; font-weight: 700; }
+/* RECIPE GRID */
+.recipes-section{padding:40px 5% 60px}
+.recipes-section .inner{max-width:1200px;margin:0 auto}
+.results-info{font-size:14px;color:var(--light);margin-bottom:24px}
+.results-info span{color:var(--primary);font-weight:700}
+.recipe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+@media(max-width:960px){.recipe-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:540px){.recipe-grid{grid-template-columns:1fr}}
 
-    /* RESULTS COUNT */
-    .results-header {
-      max-width: 1200px; margin: 32px auto 0; padding: 0 24px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .results-count { font-size: 0.9rem; color: var(--muted); }
-    .results-count strong { color: var(--white); }
-    .sort-select {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--white); padding: 8px 14px; border-radius: 8px;
-      font-family: inherit; font-size: 0.85rem; cursor: pointer;
-    }
+.recipe-card{background:var(--white);border-radius:20px;overflow:hidden;border:1px solid var(--border);transition:transform .25s,box-shadow .25s;cursor:pointer}
+.recipe-card:hover{transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,135,90,0.12)}
+.recipe-card.hidden{display:none}
+.rc-img{height:170px;display:flex;align-items:center;justify-content:center;font-size:60px;position:relative}
+.rc-category-badge{position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.5);color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;backdrop-filter:blur(4px)}
+.rc-body{padding:16px}
+.rc-title{font-family:'Fraunces',serif;font-size:19px;font-weight:700;color:var(--dark);margin-bottom:10px;line-height:1.25}
+.rc-meta-row{display:flex;gap:12px;font-size:12px;color:var(--light);margin-bottom:12px;flex-wrap:wrap}
+.rc-meta-item{display:flex;align-items:center;gap:4px}
+.rc-cook-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.rc-cook{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mid)}
+.rc-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;flex-shrink:0}
+.rc-rating{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:#D4872C}
+.rc-view-btn{display:block;width:100%;background:var(--cream);border:1.5px solid var(--border);color:var(--primary);font-size:13px;font-weight:700;padding:10px;border-radius:12px;cursor:pointer;text-align:center;text-decoration:none;transition:all .2s;font-family:'Inter',sans-serif}
+.rc-view-btn:hover{background:var(--primary);color:white;border-color:var(--primary)}
 
-    /* RECIPE GRID */
-    .recipe-grid {
-      max-width: 1200px; margin: 32px auto 80px; padding: 0 24px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 24px;
-    }
-    .recipe-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-    }
-    .recipe-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(34,197,94,0.4);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    }
-    .card-img {
-      width: 100%; height: 200px;
-      object-fit: cover; display: block;
-      transition: transform 0.4s;
-    }
-    .recipe-card:hover .card-img { transform: scale(1.05); }
-    .card-img-wrap { overflow: hidden; position: relative; }
-    .card-cuisine-tag {
-      position: absolute; top: 12px; left: 12px;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
-      color: var(--white); font-size: 0.72rem; font-weight: 700;
-      padding: 4px 10px; border-radius: 100px;
-      text-transform: uppercase; letter-spacing: 1px;
-    }
-    .card-save {
-      position: absolute; top: 12px; right: 12px;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem; transition: background 0.2s;
-    }
-    .card-save:hover { background: rgba(34,197,94,0.3); }
-    .card-body { padding: 20px; }
-    .card-title {
-      font-size: 1.05rem; font-weight: 700;
-      margin-bottom: 8px; line-height: 1.3;
-    }
-    .card-meta {
-      display: flex; gap: 16px; color: var(--muted); font-size: 0.8rem;
-      margin-bottom: 16px;
-    }
-    .card-meta span { display: flex; align-items: center; gap: 4px; }
-    .difficulty-dot {
-      width: 6px; height: 6px; border-radius: 50%; display: inline-block;
-    }
-    .diff-easy { background: var(--green); }
-    .diff-medium { background: #F59E0B; }
-    .diff-advanced { background: #EF4444; }
-    .card-btn {
-      display: block; width: 100%;
-      background: var(--green-glow); border: 1px solid rgba(34,197,94,0.3);
-      color: var(--green); font-weight: 700; font-size: 0.85rem;
-      padding: 12px; border-radius: 10px;
-      text-align: center; cursor: pointer;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-      font-family: inherit;
-    }
-    .card-btn:hover {
-      background: var(--green); color: #000;
-      border-color: var(--green);
-    }
+/* NO RESULTS */
+.no-results{text-align:center;padding:80px 20px;display:none}
+.no-results.show{display:block}
+.no-results p{color:var(--light);font-size:16px;margin-top:12px}
 
-    /* LOAD MORE */
-    .load-more-wrap { text-align: center; padding-bottom: 80px; }
-    .btn-load-more {
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--white); font-weight: 600; font-size: 0.95rem;
-      padding: 14px 40px; border-radius: 12px;
-      cursor: pointer; font-family: inherit;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-    .btn-load-more:hover { border-color: var(--green); transform: translateY(-2px); }
-
-    /* FOOTER */
-    footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 48px 24px; text-align: center; }
-    footer .footer-logo { font-size: 1.4rem; font-weight: 900; margin-bottom: 16px; }
-    footer .footer-logo span { color: var(--green); }
-    footer p { color: var(--muted); font-size: 0.85rem; }
-    footer nav { margin-top: 24px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
-    footer nav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
-    footer nav a:hover { color: var(--white); }
-
-    /* FLOATS */
-    .float-stack { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 12px; z-index: 999; }
-    .float-btn { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; font-size: 1.2rem; transition: transform 0.2s; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-    .float-btn:hover { transform: scale(1.1); }
-    .float-wa { background: #25D366; }
-    .float-translate { background: #4285F4; font-size: 0.7rem; font-weight: 700; color: #fff; }
-    .float-top { background: var(--bg3); border: 1px solid var(--border); color: var(--white); font-size: 1rem; }
-
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    .hidden { display: none !important; }
-  </style>
+/* FLOAT STACK */
+.sfw-wa{position:fixed;bottom:24px;right:24px;z-index:9999;width:50px;height:50px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);text-decoration:none;transition:transform .2s}
+.sfw-wa:hover{transform:scale(1.08)}
+.sfw-wa svg{width:26px;height:26px;fill:#fff}
+.sfw-tr{position:fixed;bottom:84px;right:24px;z-index:9999;background:rgba(13,43,30,0.92);border:1px solid rgba(255,255,255,0.12);border-radius:25px;padding:5px 12px;backdrop-filter:blur(10px)}
+.sfw-tr .goog-te-gadget{font-size:0!important;color:transparent!important}
+.sfw-tr select,.sfw-tr .goog-te-gadget-simple{background:transparent;border:none;color:#fff;font-size:.75rem;cursor:pointer;outline:none}
+.sfw-bt{position:fixed;bottom:148px;right:24px;z-index:9999;width:44px;height:44px;border-radius:50%;background:#00875Acc;border:none;color:#fff;cursor:pointer;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s;font-size:1.2rem;display:flex;align-items:center;justify-content:center}
+.sfw-bt.vis{opacity:1;transform:translateY(0)}
+.sfw-bt:hover{background:#00875A}
+</style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
-  <a href="/callaloo/" class="nav-logo">Call<span>aloo</span></a>
-  <div class="nav-links">
-    <a href="/callaloo/how-it-works/">How It Works</a>
-    <a href="/callaloo/recipes/" class="active" style="color:var(--white)">Recipes</a>
+  <a href="/callaloo/" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="22" height="22" fill="none">
+        <ellipse cx="16" cy="13" rx="8" ry="6" fill="#00C47A"/>
+        <ellipse cx="11" cy="15" rx="5.5" ry="3.5" fill="#005C3E" transform="rotate(-30 11 15)"/>
+        <ellipse cx="21" cy="15" rx="5.5" ry="3.5" fill="#005C3E" transform="rotate(30 21 15)"/>
+        <circle cx="16" cy="12.5" r="2.5" fill="#FFD166"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text">Callaloo</span>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="/callaloo/">Home</a>
+    <a href="/callaloo/recipes/" class="active">Recipes</a>
+    <a href="/callaloo/cooks/">Cooks</a>
     <a href="/callaloo/for-cooks/">For Cooks</a>
     <a href="/callaloo/waitlist/" class="nav-cta">Join Waitlist</a>
   </div>
+  <button class="ham" id="hamBtn" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
-<section class="recipes-hero">
-  <h1>Every recipe.<br/><em>Every ingredient found.</em></h1>
-  <p>Browse thousands of dishes from every cuisine. Tap any recipe to find its ingredients at a store near you.</p>
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Caribbean Recipes</h1>
+  <p>From Doubles to Pelau, Callaloo Soup to Sorrel Drink — browse authentic recipes from our Caribbean community.</p>
   <div class="search-wrap">
-    <input type="text" id="searchInput" placeholder="Search recipes, cuisines, or ingredients..." onkeyup="filterRecipes()"/>
-    <button onclick="filterRecipes()">Search</button>
+    <input type="text" id="searchInput" placeholder="Search recipes, cooks, ingredients..." oninput="filterRecipes()" autocomplete="off">
+    <span class="search-icon">🔍</span>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+  <div class="filters-inner">
+    <button class="filter-pill active" onclick="setCategory('all',this)">All Recipes</button>
+    <button class="filter-pill" onclick="setCategory('mains',this)">🍛 Mains</button>
+    <button class="filter-pill" onclick="setCategory('soups',this)">🥘 Soups &amp; Stews</button>
+    <button class="filter-pill" onclick="setCategory('snacks',this)">🫓 Snacks</button>
+    <button class="filter-pill" onclick="setCategory('desserts',this)">🍰 Desserts</button>
+    <button class="filter-pill" onclick="setCategory('drinks',this)">🥤 Drinks</button>
+    <button class="filter-pill" onclick="setCategory('breakfast',this)">🍳 Breakfast</button>
+    <button class="filter-pill" onclick="setCategory('seafood',this)">🦐 Seafood</button>
+    <button class="filter-pill" onclick="setCategory('vegetarian',this)">🥬 Vegetarian</button>
+  </div>
+</div>
+
+<!-- RECIPE GRID -->
+<section class="recipes-section">
+  <div class="inner">
+    <p class="results-info"><span id="resultCount">16</span> recipes found</p>
+    <div class="recipe-grid" id="recipeGrid">
+
+      <!-- 1. Pelau -->
+      <div class="recipe-card" data-name="pelau" data-category="mains">
+        <div class="rc-img" style="background:linear-gradient(135deg,#8B4513,#D4872C,#FFD166)">
+          🍚
+          <span class="rc-category-badge">Mains</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Pelau</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 75 mins</span>
+            <span class="rc-meta-item">📊 Medium</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#00875A,#00C47A)">AM</div>
+              Aunty Merle
+            </div>
+            <div class="rc-rating">★ 4.9</div>
+          </div>
+          <a href="/callaloo/recipe/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 2. Doubles -->
+      <div class="recipe-card" data-name="doubles" data-category="snacks">
+        <div class="rc-img" style="background:linear-gradient(135deg,#C17900,#FFD166,#FFF0AA)">
+          🫓
+          <span class="rc-category-badge">Snacks</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Doubles</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 30 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#C17900,#FFD166)">RK</div>
+              Ravi K
+            </div>
+            <div class="rc-rating">★ 5.0</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 3. Callaloo Soup -->
+      <div class="recipe-card" data-name="callaloo soup" data-category="soups">
+        <div class="rc-img" style="background:linear-gradient(135deg,#007A3D,#00C47A,#80FFB8)">
+          🥬
+          <span class="rc-category-badge">Soups &amp; Stews</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Callaloo Soup</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 50 mins</span>
+            <span class="rc-meta-item">📊 Medium</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#007A3D,#00C47A)">MD</div>
+              Mama Denise
+            </div>
+            <div class="rc-rating">★ 4.8</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 4. Bake and Shark -->
+      <div class="recipe-card" data-name="bake and shark" data-category="mains seafood">
+        <div class="rc-img" style="background:linear-gradient(135deg,#1A6B8A,#0EA5E9,#BAE6FD)">
+          🦈
+          <span class="rc-category-badge">Mains</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Bake and Shark</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 60 mins</span>
+            <span class="rc-meta-item">📊 Medium</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#1A6B8A,#0EA5E9)">DP</div>
+              Derek P
+            </div>
+            <div class="rc-rating">★ 4.9</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 5. Pholourie -->
+      <div class="recipe-card" data-name="pholourie" data-category="snacks">
+        <div class="rc-img" style="background:linear-gradient(135deg,#D4872C,#FFD166,#FFC107)">
+          🧆
+          <span class="rc-category-badge">Snacks</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Pholourie</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 25 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#D4872C,#FFD166)">SM</div>
+              Sonia M
+            </div>
+            <div class="rc-rating">★ 4.7</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 6. Sorrel Drink -->
+      <div class="recipe-card" data-name="sorrel drink" data-category="drinks">
+        <div class="rc-img" style="background:linear-gradient(135deg,#9B2335,#E84511,#FF6B9E)">
+          🌺
+          <span class="rc-category-badge">Drinks</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Sorrel Drink</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 20 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#9B2335,#E84511)">GT</div>
+              Grace T
+            </div>
+            <div class="rc-rating">★ 5.0</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 7. Sweet Bread -->
+      <div class="recipe-card" data-name="sweet bread sweetbread" data-category="desserts">
+        <div class="rc-img" style="background:linear-gradient(135deg,#7B4F2E,#C4813A,#FFD166)">
+          🍞
+          <span class="rc-category-badge">Desserts</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Sweet Bread</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 90 mins</span>
+            <span class="rc-meta-item">📊 Hard</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#7B4F2E,#C4813A)">ML</div>
+              Ms. Lynette
+            </div>
+            <div class="rc-rating">★ 4.8</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 8. Crab & Callaloo -->
+      <div class="recipe-card" data-name="crab callaloo crab and callaloo" data-category="mains seafood">
+        <div class="rc-img" style="background:linear-gradient(135deg,#1A6B8A,#E84511,#FF8C42)">
+          🦀
+          <span class="rc-category-badge">Mains</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Crab &amp; Callaloo</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 65 mins</span>
+            <span class="rc-meta-item">📊 Hard</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#1A6B8A,#2DD4BF)">CA</div>
+              Chef Anton
+            </div>
+            <div class="rc-rating">★ 5.0</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 9. Accra -->
+      <div class="recipe-card" data-name="accra salt fish fritters saltfish" data-category="snacks seafood">
+        <div class="rc-img" style="background:linear-gradient(135deg,#4A7C59,#00875A,#80FFB8)">
+          🐟
+          <span class="rc-category-badge">Snacks</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Accra (Salt Fish Fritters)</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 35 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#4A7C59,#00875A)">PJ</div>
+              Patrice J
+            </div>
+            <div class="rc-rating">★ 4.7</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 10. Stewed Chicken -->
+      <div class="recipe-card" data-name="stewed chicken" data-category="mains">
+        <div class="rc-img" style="background:linear-gradient(135deg,#7B2D00,#C04B0C,#FF6B35)">
+          🍗
+          <span class="rc-category-badge">Mains</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Stewed Chicken</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 55 mins</span>
+            <span class="rc-meta-item">📊 Medium</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#7B2D00,#C04B0C)">MC</div>
+              Mama C
+            </div>
+            <div class="rc-rating">★ 4.9</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 11. Shark & Bake Sauce -->
+      <div class="recipe-card" data-name="shark bake sauce shark and bake" data-category="snacks seafood">
+        <div class="rc-img" style="background:linear-gradient(135deg,#2D6A4F,#40916C,#95D5B2)">
+          🌶️
+          <span class="rc-category-badge">Snacks</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Shark &amp; Bake Sauce</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 15 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#2D6A4F,#40916C)">TC</div>
+              Trini Chef
+            </div>
+            <div class="rc-rating">★ 4.8</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 12. Pumpkin Soup -->
+      <div class="recipe-card" data-name="pumpkin soup" data-category="soups vegetarian">
+        <div class="rc-img" style="background:linear-gradient(135deg,#C17900,#E85D04,#FFBA08)">
+          🎃
+          <span class="rc-category-badge">Soups &amp; Stews</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Pumpkin Soup</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 45 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#C17900,#E85D04)">GR</div>
+              Grandma Rose
+            </div>
+            <div class="rc-rating">★ 4.9</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 13. Coconut Sweetbread -->
+      <div class="recipe-card" data-name="coconut sweetbread" data-category="desserts">
+        <div class="rc-img" style="background:linear-gradient(135deg,#5C3D11,#8B6914,#F4D03F)">
+          🥥
+          <span class="rc-category-badge">Desserts</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Coconut Sweetbread</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 80 mins</span>
+            <span class="rc-meta-item">📊 Medium</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#5C3D11,#8B6914)">AP</div>
+              Auntie Pat
+            </div>
+            <div class="rc-rating">★ 4.8</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 14. Mauby Drink -->
+      <div class="recipe-card" data-name="mauby drink" data-category="drinks">
+        <div class="rc-img" style="background:linear-gradient(135deg,#4A1942,#8B2FC9,#C77DFF)">
+          🫖
+          <span class="rc-category-badge">Drinks</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Mauby Drink</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 10 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#4A1942,#8B2FC9)">OT</div>
+              Old T
+            </div>
+            <div class="rc-rating">★ 4.6</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 15. Saltfish Buljol -->
+      <div class="recipe-card" data-name="saltfish buljol salt fish" data-category="breakfast seafood">
+        <div class="rc-img" style="background:linear-gradient(135deg,#00575B,#0E9F9F,#80FFFF)">
+          🐟
+          <span class="rc-category-badge">Breakfast</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Saltfish Buljol</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 20 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#00575B,#0E9F9F)">CB</div>
+              Carlos B
+            </div>
+            <div class="rc-rating">★ 4.8</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+      <!-- 16. Fried Bake -->
+      <div class="recipe-card" data-name="fried bake bake" data-category="breakfast">
+        <div class="rc-img" style="background:linear-gradient(135deg,#8B4513,#C4813A,#FFD166)">
+          🫓
+          <span class="rc-category-badge">Breakfast</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-title">Fried Bake</div>
+          <div class="rc-meta-row">
+            <span class="rc-meta-item">⏱ 30 mins</span>
+            <span class="rc-meta-item">📊 Easy</span>
+          </div>
+          <div class="rc-cook-row">
+            <div class="rc-cook">
+              <div class="rc-avatar" style="background:linear-gradient(135deg,#8B4513,#C4813A)">MJ</div>
+              Mama Jo
+            </div>
+            <div class="rc-rating">★ 5.0</div>
+          </div>
+          <a href="/callaloo/recipes/" class="rc-view-btn">View Recipe →</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="no-results" id="noResults">
+      <div style="font-size:60px">🍽️</div>
+      <p>No recipes found matching "<strong id="noResultsQuery"></strong>"</p>
+      <p style="margin-top:8px;font-size:14px">Try a different search term or browse by category.</p>
+    </div>
   </div>
 </section>
 
-<section class="filter-section">
-  <div class="filter-group">
-    <span class="filter-label">Cuisine</span>
-    <div class="filter-pills" id="cuisineFilters">
-      <button class="pill active" data-group="cuisine" data-value="all" onclick="setFilter('cuisine','all',this)">All</button>
-      <button class="pill" data-group="cuisine" data-value="Italian" onclick="setFilter('cuisine','Italian',this)">🍝 Italian</button>
-      <button class="pill" data-group="cuisine" data-value="Asian" onclick="setFilter('cuisine','Asian',this)">🍜 Asian</button>
-      <button class="pill" data-group="cuisine" data-value="African" onclick="setFilter('cuisine','African',this)">🌍 African</button>
-      <button class="pill" data-group="cuisine" data-value="Latin" onclick="setFilter('cuisine','Latin',this)">🌮 Latin</button>
-      <button class="pill" data-group="cuisine" data-value="Caribbean" onclick="setFilter('cuisine','Caribbean',this)">🏝️ Caribbean</button>
-      <button class="pill" data-group="cuisine" data-value="Mediterranean" onclick="setFilter('cuisine','Mediterranean',this)">🫒 Mediterranean</button>
-      <button class="pill" data-group="cuisine" data-value="American" onclick="setFilter('cuisine','American',this)">🍔 American</button>
-    </div>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">Occasion</span>
-    <div class="filter-pills">
-      <button class="pill active" data-group="occasion" data-value="all" onclick="setFilter('occasion','all',this)">All</button>
-      <button class="pill" data-group="occasion" data-value="Quick Meals" onclick="setFilter('occasion','Quick Meals',this)">⚡ Quick Meals</button>
-      <button class="pill" data-group="occasion" data-value="Weekend Feast" onclick="setFilter('occasion','Weekend Feast',this)">🥳 Weekend Feast</button>
-      <button class="pill" data-group="occasion" data-value="Date Night" onclick="setFilter('occasion','Date Night',this)">🕯️ Date Night</button>
-      <button class="pill" data-group="occasion" data-value="Meal Prep" onclick="setFilter('occasion','Meal Prep',this)">📦 Meal Prep</button>
-      <button class="pill" data-group="occasion" data-value="Healthy" onclick="setFilter('occasion','Healthy',this)">🥗 Healthy</button>
-    </div>
-  </div>
-  <div class="filter-group">
-    <span class="filter-label">Difficulty</span>
-    <div class="filter-pills">
-      <button class="pill active" data-group="difficulty" data-value="all" onclick="setFilter('difficulty','all',this)">All</button>
-      <button class="pill" data-group="difficulty" data-value="Easy" onclick="setFilter('difficulty','Easy',this)"><span class="difficulty-dot diff-easy"></span> Easy</button>
-      <button class="pill" data-group="difficulty" data-value="Medium" onclick="setFilter('difficulty','Medium',this)"><span class="difficulty-dot diff-medium"></span> Medium</button>
-      <button class="pill" data-group="difficulty" data-value="Advanced" onclick="setFilter('difficulty','Advanced',this)"><span class="difficulty-dot diff-advanced"></span> Advanced</button>
-    </div>
-  </div>
-</section>
-
-<div class="results-header">
-  <p class="results-count"><strong id="recipeCount">24</strong> recipes found</p>
-  <select class="sort-select">
-    <option>Most Popular</option>
-    <option>Quickest First</option>
-    <option>Easiest First</option>
-    <option>Newest</option>
-  </select>
-</div>
-
-<div class="recipe-grid" id="recipeGrid">
-
-  <!-- RECIPE CARDS DATA -->
-
-  <div class="recipe-card reveal" data-cuisine="Italian" data-occasion="Date Night" data-difficulty="Medium" data-name="Spaghetti Carbonara">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1612874742237-6526221588e3?w=600&q=80" alt="Spaghetti Carbonara" loading="lazy"/>
-      <span class="card-cuisine-tag">Italian</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Spaghetti Carbonara</div>
-      <div class="card-meta">
-        <span>⏱ 25 min</span>
-        <span><span class="difficulty-dot diff-medium"></span> Medium</span>
-        <span>👤 2 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Asian" data-occasion="Quick Meals" data-difficulty="Easy" data-name="Pad Thai">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1559314809-0d155014e29e?w=600&q=80" alt="Pad Thai" loading="lazy"/>
-      <span class="card-cuisine-tag">Asian</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Pad Thai</div>
-      <div class="card-meta">
-        <span>⏱ 20 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 2 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="African" data-occasion="Weekend Feast" data-difficulty="Medium" data-name="Jollof Rice">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&q=80" alt="Jollof Rice" loading="lazy"/>
-      <span class="card-cuisine-tag">African</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Jollof Rice</div>
-      <div class="card-meta">
-        <span>⏱ 55 min</span>
-        <span><span class="difficulty-dot diff-medium"></span> Medium</span>
-        <span>👤 6 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Latin" data-occasion="Weekend Feast" data-difficulty="Medium" data-name="Beef Tacos">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&q=80" alt="Beef Tacos" loading="lazy"/>
-      <span class="card-cuisine-tag">Latin</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Street-Style Beef Tacos</div>
-      <div class="card-meta">
-        <span>⏱ 35 min</span>
-        <span><span class="difficulty-dot diff-medium"></span> Medium</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Mediterranean" data-occasion="Healthy" data-difficulty="Easy" data-name="Greek Salad">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&q=80" alt="Greek Salad" loading="lazy"/>
-      <span class="card-cuisine-tag">Mediterranean</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Classic Greek Salad</div>
-      <div class="card-meta">
-        <span>⏱ 10 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 2 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="American" data-occasion="Weekend Feast" data-difficulty="Easy" data-name="BBQ Ribs">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=80" alt="BBQ Ribs" loading="lazy"/>
-      <span class="card-cuisine-tag">American</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Smoky BBQ Ribs</div>
-      <div class="card-meta">
-        <span>⏱ 3 hr</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Asian" data-occasion="Quick Meals" data-difficulty="Medium" data-name="Ramen">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=600&q=80" alt="Ramen" loading="lazy"/>
-      <span class="card-cuisine-tag">Asian</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Tonkotsu Ramen</div>
-      <div class="card-meta">
-        <span>⏱ 45 min</span>
-        <span><span class="difficulty-dot diff-medium"></span> Medium</span>
-        <span>👤 2 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Caribbean" data-occasion="Weekend Feast" data-difficulty="Advanced" data-name="Curry Goat">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=600&q=80" alt="Curry Goat" loading="lazy"/>
-      <span class="card-cuisine-tag">Caribbean</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Slow-Cooked Curry Goat</div>
-      <div class="card-meta">
-        <span>⏱ 2.5 hr</span>
-        <span><span class="difficulty-dot diff-advanced"></span> Advanced</span>
-        <span>👤 6 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Mediterranean" data-occasion="Meal Prep" data-difficulty="Easy" data-name="Hummus">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1571197119738-9726c2c74015?w=600&q=80" alt="Hummus" loading="lazy"/>
-      <span class="card-cuisine-tag">Mediterranean</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Creamy Homemade Hummus</div>
-      <div class="card-meta">
-        <span>⏱ 15 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 8 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Italian" data-occasion="Date Night" data-difficulty="Advanced" data-name="Risotto">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=600&q=80" alt="Risotto" loading="lazy"/>
-      <span class="card-cuisine-tag">Italian</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Wild Mushroom Risotto</div>
-      <div class="card-meta">
-        <span>⏱ 40 min</span>
-        <span><span class="difficulty-dot diff-advanced"></span> Advanced</span>
-        <span>👤 2 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Asian" data-occasion="Healthy" data-difficulty="Easy" data-name="Poke Bowl">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80" alt="Poke Bowl" loading="lazy"/>
-      <span class="card-cuisine-tag">Asian</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Tuna Poke Bowl</div>
-      <div class="card-meta">
-        <span>⏱ 20 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 1 serving</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Latin" data-occasion="Meal Prep" data-difficulty="Easy" data-name="Black Bean Soup">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&q=80" alt="Black Bean Soup" loading="lazy"/>
-      <span class="card-cuisine-tag">Latin</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Hearty Black Bean Soup</div>
-      <div class="card-meta">
-        <span>⏱ 40 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 6 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="African" data-occasion="Quick Meals" data-difficulty="Medium" data-name="Suya">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80" alt="Suya Skewers" loading="lazy"/>
-      <span class="card-cuisine-tag">African</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Suya Beef Skewers</div>
-      <div class="card-meta">
-        <span>⏱ 30 min</span>
-        <span><span class="difficulty-dot diff-medium"></span> Medium</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="American" data-occasion="Quick Meals" data-difficulty="Easy" data-name="Pancakes">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80" alt="Pancakes" loading="lazy"/>
-      <span class="card-cuisine-tag">American</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Fluffy Buttermilk Pancakes</div>
-      <div class="card-meta">
-        <span>⏱ 20 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Caribbean" data-occasion="Healthy" data-difficulty="Medium" data-name="Coconut Fish Stew">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Coconut Fish Stew" loading="lazy"/>
-      <span class="card-cuisine-tag">Caribbean</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Coconut Fish Stew</div>
-      <div class="card-meta">
-        <span>⏱ 35 min</span>
-        <span><span class="difficulty-dot diff-medium"></span> Medium</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Mediterranean" data-occasion="Date Night" data-difficulty="Medium" data-name="Shakshuka">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80" alt="Shakshuka" loading="lazy"/>
-      <span class="card-cuisine-tag">Mediterranean</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Spiced Shakshuka</div>
-      <div class="card-meta">
-        <span>⏱ 25 min</span>
-        <span><span class="difficulty-dot diff-medium"></span> Medium</span>
-        <span>👤 2 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Asian" data-occasion="Meal Prep" data-difficulty="Medium" data-name="Chicken Teriyaki">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=600&q=80" alt="Chicken Teriyaki" loading="lazy"/>
-      <span class="card-cuisine-tag">Asian</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Chicken Teriyaki Bowl</div>
-      <div class="card-meta">
-        <span>⏱ 30 min</span>
-        <span><span class="difficulty-dot diff-medium"></span> Medium</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Italian" data-occasion="Quick Meals" data-difficulty="Easy" data-name="Bruschetta">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=600&q=80" alt="Bruschetta" loading="lazy"/>
-      <span class="card-cuisine-tag">Italian</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Classic Tomato Bruschetta</div>
-      <div class="card-meta">
-        <span>⏱ 15 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Latin" data-occasion="Weekend Feast" data-difficulty="Advanced" data-name="Mole Chicken">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80" alt="Mole Chicken" loading="lazy"/>
-      <span class="card-cuisine-tag">Latin</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Chicken in Dark Mole</div>
-      <div class="card-meta">
-        <span>⏱ 2 hr</span>
-        <span><span class="difficulty-dot diff-advanced"></span> Advanced</span>
-        <span>👤 6 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="African" data-occasion="Healthy" data-difficulty="Easy" data-name="Vegetable Tagine">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?w=600&q=80" alt="Vegetable Tagine" loading="lazy"/>
-      <span class="card-cuisine-tag">African</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Moroccan Vegetable Tagine</div>
-      <div class="card-meta">
-        <span>⏱ 50 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="American" data-occasion="Healthy" data-difficulty="Easy" data-name="Avocado Toast">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1541519227354-08fa5d50c820?w=600&q=80" alt="Avocado Toast" loading="lazy"/>
-      <span class="card-cuisine-tag">American</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Loaded Avocado Toast</div>
-      <div class="card-meta">
-        <span>⏱ 10 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 1 serving</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Mediterranean" data-occasion="Weekend Feast" data-difficulty="Advanced" data-name="Lamb Souvlaki">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1534482421-64566f976cfa?w=600&q=80" alt="Lamb Souvlaki" loading="lazy"/>
-      <span class="card-cuisine-tag">Mediterranean</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Grilled Lamb Souvlaki</div>
-      <div class="card-meta">
-        <span>⏱ 1 hr</span>
-        <span><span class="difficulty-dot diff-advanced"></span> Advanced</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Asian" data-occasion="Date Night" data-difficulty="Advanced" data-name="Beef Pho">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1555126634-323283e090fa?w=600&q=80" alt="Beef Pho" loading="lazy"/>
-      <span class="card-cuisine-tag">Asian</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Traditional Beef Pho</div>
-      <div class="card-meta">
-        <span>⏱ 4 hr</span>
-        <span><span class="difficulty-dot diff-advanced"></span> Advanced</span>
-        <span>👤 4 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-  <div class="recipe-card reveal" data-cuisine="Caribbean" data-occasion="Quick Meals" data-difficulty="Easy" data-name="Plantain Chips">
-    <div class="card-img-wrap">
-      <img class="card-img" src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=600&q=80" alt="Plantain" loading="lazy"/>
-      <span class="card-cuisine-tag">Caribbean</span>
-      <span class="card-save">🤍</span>
-    </div>
-    <div class="card-body">
-      <div class="card-title">Crispy Fried Plantains</div>
-      <div class="card-meta">
-        <span>⏱ 15 min</span>
-        <span><span class="difficulty-dot diff-easy"></span> Easy</span>
-        <span>👤 2 servings</span>
-      </div>
-      <button class="card-btn" onclick="location.href='/callaloo/waitlist/'">📍 Find Ingredients Near You</button>
-    </div>
-  </div>
-
-</div>
-
-<div class="load-more-wrap">
-  <button class="btn-load-more" onclick="location.href='/callaloo/waitlist/'">Load More Recipes →</button>
-</div>
-
-<footer>
-  <div class="footer-logo">Call<span>aloo</span></div>
-  <p>Cook anything. Find it near you.</p>
-  <nav>
-    <a href="/callaloo/">Home</a>
-    <a href="/callaloo/how-it-works/">How It Works</a>
-    <a href="/callaloo/recipes/">Recipes</a>
-    <a href="/callaloo/for-cooks/">For Cooks</a>
-    <a href="/callaloo/waitlist/">Waitlist</a>
-  </nav>
-  <p style="margin-top:24px;font-size:0.75rem">© 2025 Callaloo. All rights reserved.</p>
-</footer>
-
-<div class="float-stack">
-  <a href="https://wa.me/447576505652" target="_blank" class="float-btn float-wa" title="WhatsApp">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  </a>
-  <div class="float-btn float-translate" title="Translate" onclick="if(document.querySelector('#gt-script')){return;}var s=document.createElement('script');s.id='gt-script';s.src='//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';document.body.appendChild(s);window.googleTranslateElementInit=function(){new google.translate.TranslateElement({pageLanguage:'en'},'gt-widget');}">
-    <span>A</span>
-  </div>
-  <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="float-btn float-top" title="Back to Top">↑</a>
-</div>
-<div id="gt-widget" style="position:fixed;bottom:80px;right:24px;z-index:1000;"></div>
+<!-- Standard Float Stack -->
+<style>
+.sfw-wa{position:fixed;bottom:24px;right:24px;z-index:9999;width:50px;height:50px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);text-decoration:none;transition:transform .2s}
+.sfw-wa:hover{transform:scale(1.08)}
+.sfw-wa svg{width:26px;height:26px;fill:#fff}
+</style>
+<a href="https://wa.me/447576505652" target="_blank" rel="noopener" class="sfw-wa" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.417A9.956 9.956 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 01-4.274-1.244l-.306-.181-3.094.881.842-3.024-.198-.314A7.95 7.95 0 014 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/></svg>
+</a>
+<div class="sfw-tr"><div id="gte_recipes"></div></div>
+<script>function gteInit_recipes(){new google.translate.TranslateElement({pageLanguage:'en',autoDisplay:false},'gte_recipes');}</script>
+<script src="//translate.google.com/translate_a/element.js?cb=gteInit_recipes"></script>
+<button class="sfw-bt" id="sbt_recipes" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+<script>window.addEventListener('scroll',function(){var b=document.getElementById('sbt_recipes');if(b)b.classList.toggle('vis',window.scrollY>400);});</script>
+<!-- /Standard Float Stack -->
 
 <script>
-  const filters = { cuisine: 'all', occasion: 'all', difficulty: 'all' };
+var activeCategory = 'all';
 
-  function setFilter(group, value, btn) {
-    filters[group] = value;
-    document.querySelectorAll(`[data-group="${group}"]`).forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    filterRecipes();
+function setCategory(cat, btn) {
+  activeCategory = cat;
+  document.querySelectorAll('.filter-pill').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  filterRecipes();
+}
+
+function filterRecipes() {
+  var query = document.getElementById('searchInput').value.toLowerCase().trim();
+  var cards = document.querySelectorAll('.recipe-card');
+  var visible = 0;
+  cards.forEach(function(card) {
+    var name = card.getAttribute('data-name') || '';
+    var cat = card.getAttribute('data-category') || '';
+    var matchSearch = !query || name.indexOf(query) > -1;
+    var matchCat = activeCategory === 'all' || cat.indexOf(activeCategory) > -1;
+    if (matchSearch && matchCat) {
+      card.classList.remove('hidden');
+      visible++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+  document.getElementById('resultCount').textContent = visible;
+  var nr = document.getElementById('noResults');
+  if (visible === 0) {
+    nr.classList.add('show');
+    document.getElementById('noResultsQuery').textContent = query || activeCategory;
+  } else {
+    nr.classList.remove('show');
   }
+}
 
-  function filterRecipes() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const cards = document.querySelectorAll('.recipe-card');
-    let count = 0;
-    cards.forEach(card => {
-      const matchCuisine = filters.cuisine === 'all' || card.dataset.cuisine === filters.cuisine;
-      const matchOccasion = filters.occasion === 'all' || card.dataset.occasion === filters.occasion;
-      const matchDiff = filters.difficulty === 'all' || card.dataset.difficulty === filters.difficulty;
-      const matchSearch = !search || card.dataset.name.toLowerCase().includes(search) || card.dataset.cuisine.toLowerCase().includes(search);
-      if (matchCuisine && matchOccasion && matchDiff && matchSearch) {
-        card.classList.remove('hidden');
-        count++;
-      } else {
-        card.classList.add('hidden');
-      }
-    });
-    document.getElementById('recipeCount').textContent = count;
-  }
-
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
-    });
-  }, { threshold: 0.1 });
-  reveals.forEach(el => observer.observe(el));
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('/callaloo/sw.js').catch(function(){});
+  });
+}
 </script>
 </body>
 </html>
