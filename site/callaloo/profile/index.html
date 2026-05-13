@@ -121,7 +121,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:16px 5
 
 <nav>
   <a href="/callaloo/" class="nav-logo">Calla<span>loo</span></a>
-  <a href="/callaloo/" class="nav-back">← Back to app</a>
+  <div style="display:flex;gap:14px;align-items:center"><a href="/callaloo/feed/" style="color:var(--primary);font-weight:700;font-size:.9rem;text-decoration:none">🍽 Feed</a><a href="/callaloo/recipes/" style="color:var(--muted);font-size:.9rem;text-decoration:none">📖 Recipes</a></div>
 </nav>
 
 <!-- AUTH GATE -->
@@ -157,11 +157,12 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:16px 5
     <div class="profile-info" style="flex:1">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <h2 id="displayName" style="color:#fff">Loading...</h2>
-        <button onclick="toggleEditBio()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:3px 10px;color:#fff;font-size:.75rem;font-weight:600;cursor:pointer">Edit</button>
+        <button onclick="toggleEditBio()" style="background:rgba(255,255,255,0.2);border:none;border-radius:20px;padding:3px 10px;color:#fff;font-size:.75rem;font-weight:600;cursor:pointer">Edit Profile</button>
       </div>
       <p id="memberSince" style="color:rgba(255,255,255,0.75);font-size:.88rem;margin-bottom:6px"></p>
       <p id="bioDisplay" style="color:rgba(255,255,255,0.85);font-size:.85rem;font-style:italic;margin-bottom:8px;display:none"></p>
       <div id="bioEditArea" style="display:none;margin-bottom:8px">
+        <input id="nameInput" placeholder="Your display name" style="width:100%;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:8px;color:#fff;font-size:.88rem;outline:none;font-family:inherit;margin-bottom:6px">
         <textarea id="bioInput" placeholder="Add a short bio..." style="width:100%;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:8px;color:#fff;font-size:.85rem;resize:none;height:60px;outline:none;font-family:inherit"></textarea>
         <div style="display:flex;gap:6px;margin-top:6px">
           <button onclick="saveBio()" style="flex:1;background:#fff;color:var(--primary);border:none;border-radius:8px;padding:6px;font-size:.8rem;font-weight:700;cursor:pointer">Save</button>
@@ -280,6 +281,7 @@ function toggleEditBio(){
   if(area.style.display==='none'){
     area.style.display='block';
     document.getElementById('bioInput').value = _userProfile.bio || '';
+    var ni=document.getElementById('nameInput'); if(ni) ni.value=document.getElementById('displayName').textContent||'';
     disp.style.display='none';
   } else {
     area.style.display='none';
@@ -289,9 +291,12 @@ function toggleEditBio(){
 
 async function saveBio(){
   const bio = document.getElementById('bioInput').value.trim();
+  const ni = document.getElementById('nameInput');
+  const newName = ni ? ni.value.trim() : '';
+  if(newName){ document.getElementById('displayName').textContent=newName; _userProfile.display_name=newName; }
   const sb = getSB();
   if(!sb||!_currentUser) return;
-  await sb.from('profiles').upsert({id: _currentUser.id, bio: bio, updated_at: new Date().toISOString()});
+  await sb.from('profiles').upsert({id: _currentUser.id, bio: bio, ...(newName && {display_name: newName}), updated_at: new Date().toISOString()});
   _userProfile.bio = bio;
   const disp = document.getElementById('bioDisplay');
   if(bio){disp.textContent = '“' + bio + '”';disp.style.display='block';}
@@ -309,12 +314,24 @@ async function uploadAvatar(e){
   const path = _currentUser.id + '/avatar.' + ext;
   const { data, error } = await sb.storage.from('avatars').upload(path, file, {upsert: true, contentType: file.type});
   if(error){
-    document.getElementById('uploadProgress').textContent = 'Upload failed. Try again.';
-    setTimeout(()=>document.getElementById('uploadProgress').style.display='none', 3000);
+    // Fallback: store as base64 in localStorage and DB
+    const reader = new FileReader();
+    reader.onload = async function(ev){
+      const b64 = ev.target.result;
+      const el2 = document.getElementById('avatarEl');
+      el2.style.backgroundImage='url('+b64+')'; el2.style.backgroundSize='cover'; el2.style.backgroundPosition='center'; el2.textContent='';
+      _userProfile.avatar_url = b64;
+      localStorage.setItem('callaloo_avatar_'+_currentUser.id, b64);
+      await sb.from('profiles').upsert({id:_currentUser.id, avatar_url:b64.substring(0,600), updated_at:new Date().toISOString()});
+      document.getElementById('uploadProgress').textContent='Photo saved!';
+      setTimeout(()=>document.getElementById('uploadProgress').style.display='none',2000);
+    };
+    reader.readAsDataURL(file);
     return;
   }
   const { data: urlData } = sb.storage.from('avatars').getPublicUrl(path);
   const avatarUrl = urlData.publicUrl + '?t=' + Date.now();
+  localStorage.setItem('callaloo_avatar_'+_currentUser.id, avatarUrl);
   // Save to profiles table
   await sb.from('profiles').upsert({id: _currentUser.id, avatar_url: avatarUrl, updated_at: new Date().toISOString()});
   // Update UI
@@ -335,6 +352,8 @@ async function doSignOut(){
 }
 
 async function loadProfile(user){
+  var cached = localStorage.getItem('callaloo_avatar_'+user.id);
+  if(cached){ var ae=document.getElementById('avatarEl'); if(ae){ae.style.backgroundImage='url('+cached+')';ae.style.backgroundSize='cover';ae.style.backgroundPosition='center';ae.textContent='';} }
   _currentUser = user;
   document.getElementById('authGate').style.display='none';
   document.getElementById('loadingState').style.display='block';
@@ -481,5 +500,14 @@ window.addEventListener('load', async ()=>{
   }
 });
 </script>
+
+<!-- BOTTOM NAV -->
+<style>.bnav-c{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-top:1px solid rgba(232,119,34,0.18);display:flex;z-index:200}.bnav-ci{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0 8px;text-decoration:none;color:rgba(26,13,0,0.45);font-size:.65rem;font-weight:600;gap:4px}.bnav-ci.on{color:#E87722}.bnav-ci .ic{font-size:22px;line-height:1}</style>
+<div class="bnav-c">
+  <a href="/callaloo/" class="bnav-ci"><span class="ic">🏠</span>Home</a>
+  <a href="/callaloo/feed/" class="bnav-ci"><span class="ic">🍽</span>Feed</a>
+  <a href="/callaloo/recipes/" class="bnav-ci"><span class="ic">📖</span>Recipes</a>
+  <a href="/callaloo/profile/" class="bnav-ci on"><span class="ic">👤</span>Profile</a>
+</div>
 </body>
 </html>
