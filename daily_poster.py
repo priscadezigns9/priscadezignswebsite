@@ -6,14 +6,6 @@ Schedule: 8AM, 11AM, 2PM, 7PM AST
 import json, sys, random, urllib.request, urllib.parse, urllib.error, re, os
 from datetime import datetime
 
-import os as _os_
-_SCRIPT_DIR = _os_.path.dirname(_os_.path.abspath(__file__))
-
-def _path(fname):
-    """Resolve a filename relative to the script directory (works from any cwd)."""
-    p = _os_.path.join(_SCRIPT_DIR, fname)
-    return p if _os_.path.exists(p) else fname
-
 RATE = 6.80
 
 # Brand name → site slug mapping  (must match keys in BRANDS exactly)
@@ -41,7 +33,7 @@ BRAND_TO_SLUG = {
 # Instagram Business Account IDs (loaded from ig_accounts.json)
 def _load_ig_ids():
     try:
-        with open(_path("ig_accounts.json")) as f:
+        with open("ig_accounts.json") as f:
             accounts = json.load(f)
         return {a["page_name"].strip(): a["ig_id"] for a in accounts}
     except Exception:
@@ -66,17 +58,17 @@ def refresh_tokens_from_credential():
         updated = {}
         for p in pages:
             updated[p["name"]] = {"id": p["id"], "access_token": p["access_token"]}
-        with open(_path("fb_page_tokens.json"), "w") as f:
+        with open("fb_page_tokens.json", "w") as f:
             json.dump(updated, f, indent=2)
         # Reload IG accounts with fresh tokens
         if os.path.exists("ig_accounts.json"):
-            with open(_path("ig_accounts.json")) as f:
+            with open("ig_accounts.json") as f:
                 ig = json.load(f)
             for acc in ig:
                 pname = acc["page_name"].strip()
                 if pname in updated:
                     acc["token"] = updated[pname]["access_token"]
-            with open(_path("ig_accounts.json"), "w") as f:
+            with open("ig_accounts.json", "w") as f:
                 json.dump(ig, f, indent=2)
         return True
     except Exception:
@@ -126,7 +118,7 @@ def add_product_to_niche_page(slug, product, deploy=False):
 def _load_brands():
     """Load brand configs from fb_page_tokens.json at runtime (tokens never hardcoded)."""
     try:
-        with open(_path('fb_page_tokens.json')) as f:
+        with open('fb_page_tokens.json') as f:
             raw = json.load(f)
     except Exception:
         return {}
@@ -134,7 +126,7 @@ def _load_brands():
     for name, v in raw.items():
         if not isinstance(v, dict):
             continue
-        page_id = v.get('id', '') or v.get('page_id', '')
+        page_id = v.get('id', '')
         token = v.get('access_token', '')
         # Derive niche from brand name
         niche_map = {
@@ -179,6 +171,34 @@ BRANDS = _load_brands()
 # ── CAPTION TEMPLATES BY NICHE ──
 # 10+ per niche, product-specific placeholders supported via {name} and {price}
 CAPTIONS = {
+    "agency": [
+        "Your brand is your first impression. Make it count.\n\nWe design websites, build brand identities and manage social media for businesses ready to grow.\n\nVisit priscadezigns.org\n\n#PriscaDezigns #Branding #WebDesign #DigitalAgency",
+        "Behind every successful brand is a strategy.\n\nAt Prisca Dezigns, we build brands that attract the right clients and convert them.\n\nServices: Web Design · Branding · Social Media\n\npriscadezigns.org\n\n#PriscaDezigns #BrandStrategy #WebDesign",
+        "Your website should work for you 24/7.\n\nWe build fast, professional websites that turn visitors into clients.\n\nReady to elevate your brand? Visit priscadezigns.org\n\n#PriscaDezigns #WebDesign #DigitalMarketing #Branding",
+        "Consistency builds trust. Trust builds clients.\n\nWe manage your social media so your brand shows up professionally every single day.\n\npriscadezigns.org\n\n#PriscaDezigns #SocialMediaManagement #ContentStrategy",
+        "A strong brand identity sets you apart from everyone else in your industry.\n\nLogos · Colour palettes · Typography · Brand guidelines — we handle it all.\n\npriscadezigns.org\n\n#PriscaDezigns #BrandIdentity #LogoDesign",
+        "Your competitors are online. Your clients are online. Your brand should be too.\n\nPrisca Dezigns — full-service digital agency.\n\npriscadezigns.org\n\n#PriscaDezigns #DigitalAgency #BusinessGrowth #Branding",
+        "We don't just build websites. We build businesses.\n\nEvery site we deliver is fast, mobile-ready and designed to convert.\n\npriscadezigns.org\n\n#PriscaDezigns #WebDesign #ConversionDesign #DigitalAgency",
+        "Social media done right takes time, strategy and consistency.\n\nLet us handle it. You focus on running your business.\n\npriscadezigns.org\n\n#PriscaDezigns #SocialMediaManagement #DigitalMarketing",
+        "From logo to launch — we take your brand from idea to execution.\n\nBranding · Web Design · Social Media · Content\n\npriscadezigns.org\n\n#PriscaDezigns #BrandLaunch #DigitalAgency #Branding",
+        "Professional branding isn't a luxury. It's what separates businesses that grow from ones that stay stuck.\n\npriscadezigns.org\n\n#PriscaDezigns #Branding #WebDesign #BusinessGrowth",
+        "Your brand story matters. We help you tell it.\n\nWebsite design and social media management that reflects who you really are.\n\npriscadezigns.org\n\n#PriscaDezigns #BrandStorytelling #DigitalAgency",
+        "Great design builds credibility before you say a word.\n\nLet Prisca Dezigns build your brand the right way.\n\npriscadezigns.org\n\n#PriscaDezigns #LogoDesign #Branding #WebDesign",
+    ],
+    "fashion_art": [
+        "Fashion is self-expression made visible. Wear what makes you feel most like yourself.\n\nSeamrite Designs — where fashion meets art.\n\n#SeamriteDesigns #FashionArt #WearableArt #StyleInspiration",
+        "The most versatile piece in any wardrobe is confidence. Everything else is a supporting act.\n\nSeamrite Designs — curated fashion for the bold.\n\n#SeamriteDesigns #FashionForward #StyleQuotes",
+        "Art in fashion: the boundary between wearable and collectible is where the most interesting things happen.\n\nExplore the collection — link in bio.\n\n#SeamriteDesigns #FashionArt #ArtisticFashion",
+        "A signature look is more powerful than a constantly shifting wardrobe. Own your aesthetic.\n\nSeamrite Designs — fashion with intention.\n\n#SeamriteDesigns #OwnYourStyle #FashionIdentity",
+        "Texture mixing is the easiest way to make a simple outfit look intentional and considered.\n\nShop the edit — link in bio.\n\n#SeamriteDesigns #FashionTips #StyleHacks",
+        "Every garment tells a story. The question is — what does yours say?\n\nSeamrite Designs — fashion as art.\n\n#SeamriteDesigns #FashionStory #WearableArt",
+        "The best outfits are the ones that feel like you even before you look in the mirror.\n\nExplore the collection at Seamrite Designs.\n\n#SeamriteDesigns #StyleAuthenticity #FashionArt",
+        "Creativity lives in the details — the stitching, the silhouette, the story behind every piece.\n\nSeamrite Designs — where craft meets culture.\n\n#SeamriteDesigns #FashionDesign #ArtisanFashion",
+        "Style is not about what you wear. It is about how you wear it.\n\nSeamrite Designs — fashion for every version of you.\n\n#SeamriteDesigns #StyleInspo #FashionArt",
+        "What you wear is how you present yourself to the world without saying a word.\n\nMake it count. Shop Seamrite Designs — link in bio.\n\n#SeamriteDesigns #FashionStatement #WearableArt",
+        "Great art makes you feel something. Great fashion does the same.\n\nSeamrite Designs — curated at the intersection of both.\n\n#SeamriteDesigns #ArtMeetsFashion #StyleCulture",
+        "Colour, cut, and confidence. The three things every great outfit needs.\n\nSeamrite Designs — shop the collection.\n\n#SeamriteDesigns #FashionTips #StyleForward",
+    ],
     "eco": [
         "🌿 {name} — because sustainable living shouldn’t mean sacrificing quality. Link in bio 🔗 #VerdantCo #EcoLiving",
         "♻️ Swap one thing. Make it count. {name} is the smarter choice for your home. #VerdantCo #GreenHome",
@@ -402,166 +422,11 @@ CAPTIONS = {
 # Used for text posts to provide VALUE, not just product dumps
 def _load_niche_tips():
     try:
-        # Use absolute path relative to this script so it works from any working directory
-        import os as _os
-        _script_dir = _os.path.dirname(_os.path.abspath(__file__))
-        _tips_path = _os.path.join(_script_dir, "niche_tips.json")
-        # Fallback: also try cwd
-        if not _os.path.exists(_tips_path):
-            _tips_path = "niche_tips.json"
-        with open(_tips_path) as f:
+        with open("niche_tips.json") as f:
             return json.load(f)
     except Exception:
         return {}
 NICHE_TIPS = _load_niche_tips()
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# PRISCA DEZIGNS — 4-POST MARKETING SYSTEM
-# Post type 1 (photo)  : Promo image for a sub-brand (rotating daily)
-# Post type 2 (text)   : Pain-point hook for a sub-brand
-# Post type 3 (text)   : Social proof / result for a sub-brand
-# Post type 4 (text)   : Direct CTA — free digital audit
-# The sub-brand rotates every day: Vela→Writx→Karjov→Orbyt→Clasp→Clarev→repeat
-# ═══════════════════════════════════════════════════════════════════════════════
-
-PD_SUB_BRANDS = ["Vela", "Writx", "Karjov", "Orbyt", "Clasp"]  # Clarev excluded — still building
-
-# Promo image Drive direct-download links (one per sub-brand)
-PD_PROMO_IMAGES = {
-    "Vela":   "https://drive.google.com/uc?export=download&id=1lnUdo9Z46YGcXFtNK9PC82qjvCxoYs1N",
-    "Writx":  "https://drive.google.com/uc?export=download&id=1t-UlkcuAwEsgy0OqPdgAW1bgyFJwaMaM",
-    "Karjov": "https://drive.google.com/uc?export=download&id=1gwMrm5S4kyBaPTsjq5l7tMWe8XKg0WKz",
-    "Orbyt":  "https://drive.google.com/uc?export=download&id=13ME0ePC_91ub1c2r1netfXhuooQJ1OTA",
-    "Clasp":  "https://drive.google.com/uc?export=download&id=1Rh3Hrxr-6Ezzelogjtg6KEnyBXmWXD5Q",
-    "Clarev": "https://drive.google.com/uc?export=download&id=1Rh3Hrxr-6Ezzelogjtg6KEnyBXmWXD5Q",  # fallback to Clasp until Clarev image is made
-}
-
-PD_PAIN_POINTS = {
-    "Vela": [
-        "Your website is your 24/7 salesperson. If it is slow, outdated or hard to navigate, it is losing you clients right now. Vela builds professional websites that convert — fast, clean, and built for your market. Link in bio. #PriscaDezigns #VelaWeb",
-        "Most small business websites look like they were built in 2015. Your competition upgraded. Have you? Vela delivers modern, high-converting websites — ready in days, not months. #PriscaDezigns #WebDesign",
-        "If a potential client can not find you online, they find your competitor instead. Vela puts you front and centre — with a website built to turn visitors into paying clients. #PriscaDezigns #VelaWeb",
-    ],
-    "Writx": [
-        "You spend hours writing captions, emails, and ad copy that nobody reads. Writx does it in 60 seconds — high-converting copy for every platform, every time. #PriscaDezigns #WritxCopy",
-        "Bad copy costs you clients. Good copy makes them buy. Writx writes the words that make your brand impossible to ignore — ads, emails, captions, landing pages. Link in bio. #PriscaDezigns #Copywriting",
-        "The difference between a post that gets ignored and one that gets clicks? The words. Writx writes copy that sells — delivered in 24 hours. #PriscaDezigns #WritxCopy",
-    ],
-    "Karjov": [
-        "Every WhatsApp message that goes unanswered for more than 5 minutes is a lead you are losing. Karjov replies instantly, 24/7 — so you never miss a client again. #PriscaDezigns #KarjovAI",
-        "You cannot be online 24 hours a day. Karjov can. WhatsApp automation that replies to leads, qualifies prospects, and books appointments while you sleep. #PriscaDezigns #WhatsAppAutomation",
-        "Your competitors are responding to clients in seconds. If you are still replying manually on WhatsApp, you are already behind. Karjov fixes that. #PriscaDezigns #KarjovAI",
-    ],
-    "Orbyt": [
-        "Your business idea deserves more than a basic website. Orbyt designs and builds mobile apps — the kind users actually open every day. From concept to App Store in 30 days. #PriscaDezigns #OrbytApp",
-        "An app puts your brand in your client's pocket. Orbyt builds mobile apps for businesses ready to go beyond social media — clean, fast, and built to scale. #PriscaDezigns #MobileApp",
-        "The brands people stay loyal to are the ones on their home screen. Orbyt builds the app that keeps your clients coming back. #PriscaDezigns #OrbytApp",
-    ],
-    "Clasp": [
-        "You are still copying data manually into spreadsheets. Clasp automates the whole thing — raw data in, clean report out, zero manual work. #PriscaDezigns #ClaspApp",
-        "Spreadsheet chaos is costing you hours every week. Clasp turns messy data into clean, automated reports — so you can focus on running your business. #PriscaDezigns #ClaspApp",
-        "If you are spending more than 30 minutes a week on spreadsheets, Clasp will give you that time back. Automated reports, zero formulas. #PriscaDezigns #ClaspApp",
-    ],
-    "Clarev": [
-        "Your client portal should not be a WhatsApp thread. Clarev gives your clients a professional dashboard — projects, invoices, files, and updates in one clean space. #PriscaDezigns #Clarev",
-        "Professional service businesses run on trust. Clarev gives your clients a branded portal where they can track everything — no more chasing you on WhatsApp. #PriscaDezigns #Clarev",
-        "Clients who can see their project progress in real time are happier clients. Clarev makes that happen. #PriscaDezigns #Clarev",
-    ],
-}
-
-PD_SOCIAL_PROOF = {
-    "Vela": [
-        "A client came to us with zero online presence. Within 7 days, Vela had their website live — and they booked 3 new clients in the first week from Google alone. Your website can do the same. Link in bio. #PriscaDezigns #VelaWeb",
-        "One of our Vela clients increased their enquiry rate by 3x within a month of launching their new site. Same business. Same offer. Better website. That is the difference. #PriscaDezigns",
-        "We built a Vela site for a local service business and within 2 weeks they stopped relying on WhatsApp to get new clients. The website does it for them now. #PriscaDezigns #WebDesign",
-    ],
-    "Writx": [
-        "A client's Facebook ad was getting zero clicks. We rewrote the copy with Writx. The next run? 4x more click-throughs, same budget. Words are the most underrated growth tool. #PriscaDezigns #WritxCopy",
-        "One email subject line rewritten by Writx took a client's open rate from 18% to 41%. The product did not change. The words did. #PriscaDezigns #Copywriting",
-        "A boutique client was posting daily with barely any engagement. We rewrote their captions with Writx. Next post hit 3x their usual reach. Copy is everything. #PriscaDezigns",
-    ],
-    "Karjov": [
-        "A client was losing leads every night because nobody was available to reply on WhatsApp after 6pm. Karjov now handles every enquiry instantly — they have not missed a lead since. #PriscaDezigns #KarjovAI",
-        "One of our Karjov clients went from manually handling 50+ WhatsApp messages a day to zero — the automation qualifies leads, answers FAQs, and books calls without them lifting a finger. #PriscaDezigns",
-        "A beauty business using Karjov booked 12 new appointments in the first weekend — all through automated WhatsApp replies while the owner was off. That is what automation does. #PriscaDezigns",
-    ],
-    "Orbyt": [
-        "We built an Orbyt app for a fitness brand and their client retention jumped 40% — because clients had a reason to open the app every day. A website visits. An app stays. #PriscaDezigns",
-        "One of our Orbyt clients went from managing everything through WhatsApp to having a fully branded app with bookings, payments, and a client feed. Same business. Completely different experience. #PriscaDezigns",
-        "An Orbyt app we built for a local service brand got 500 downloads in 30 days with zero paid ads. The product was great — we just gave it the right platform. #PriscaDezigns",
-    ],
-    "Clasp": [
-        "A client was spending 4 hours every Monday building weekly reports from scratch. Clasp automated the whole thing. Now it takes 30 seconds. Same data, zero effort. #PriscaDezigns #ClaspApp",
-        "One of our Clasp clients eliminated three manual spreadsheets and the errors that came with them. Clean data, automated weekly — and they have not touched a formula since. #PriscaDezigns",
-        "A business owner told us they used to dread Mondays because of report prep. After Clasp, they said it is the easiest part of their week. That is what automation should feel like. #PriscaDezigns",
-    ],
-    "Clarev": [
-        "A Clarev client told us their clients stopped calling to ask for project updates the week after they launched the portal. Clients had everything they needed in one place. #PriscaDezigns",
-        "One agency using Clarev reduced their back-and-forth client messages by 70% in the first month. Fewer questions, happier clients, more time to do actual work. #PriscaDezigns",
-        "A consultant we set up on Clarev said it made their business feel 10x more professional overnight. Same service, completely different client experience. #PriscaDezigns",
-    ],
-}
-
-PD_AUDIT_CTAS = [
-    "We offer a free digital audit for businesses ready to grow. No cost. No commitment. Just an honest look at what is holding your online presence back — and what we would do to fix it. DM us or tap the link in bio. #PriscaDezigns #FreeAudit",
-    "Not sure where your business stands online? We will tell you — for free. Our digital audit covers your website, social presence, and automation gaps. Book yours today. #PriscaDezigns",
-    "The brands winning online right now are not the biggest ones. They are the ones with the right tools. Start with a free audit and find out exactly what yours needs. Link in bio. #PriscaDezigns",
-    "We work with businesses across every industry to build websites, automate WhatsApp, write copy that converts, and launch apps. It all starts with a free audit. DM us. #PriscaDezigns",
-    "Free digital audit — we look at your website, your WhatsApp response rate, your content, and your online visibility. Then we tell you exactly what to fix. No charge. No catch. #PriscaDezigns",
-    "If your business is not growing as fast as it should online, the answer is usually one of three things: no website, no automation, or no copy. We fix all three. Free audit — link in bio. #PriscaDezigns",
-]
-
-def get_pd_sub_brand_today():
-    """Return today's featured sub-brand (rotates daily through 6 brands)."""
-    from datetime import date
-    idx = date.today().timetuple().tm_yday % len(PD_SUB_BRANDS)
-    return PD_SUB_BRANDS[idx]
-
-def get_pd_post(slot):
-    """
-    Return (text, photo_url) for a Prisca Dezigns post.
-    slot: 1=promo image, 2=pain point, 3=social proof, 4=audit CTA
-    """
-    from datetime import date as _d
-    day = _d.today().timetuple().tm_yday
-    sub = get_pd_sub_brand_today()
-
-    intros = {
-        "Vela":   ("Your website. Built to convert.\n\n"
-                   "Vela builds professional websites that convert visitors into clients.\n\n"
-                   "Link in bio: priscadezigns.org/vela\n#PriscaDezigns #VelaWeb #WebDesign"),
-        "Writx":  ("Words that make people buy.\n\n"
-                   "Writx delivers high-converting copy for ads, emails, captions and landing pages in 24h.\n\n"
-                   "Link in bio: priscadezigns.org/writx\n#PriscaDezigns #WritxCopy #Copywriting"),
-        "Karjov": ("Reply fast. Convert more.\n\n"
-                   "Karjov automates your WhatsApp. Instant replies, lead qualification, booking. 24/7.\n\n"
-                   "Link in bio: priscadezigns.org/karjov\n#PriscaDezigns #KarjovAI #WhatsAppAutomation"),
-        "Orbyt":  ("Your app idea. Launched.\n\n"
-                   "Orbyt designs and builds mobile apps from concept to App Store in 30 days.\n\n"
-                   "Link in bio: priscadezigns.org/orbyt\n#PriscaDezigns #OrbytApp #MobileApp"),
-        "Clasp":  ("Raw data in. Clean sheets out.\n\n"
-                   "Clasp automates your spreadsheets. No formulas, no manual work, just results.\n\n"
-                   "Link in bio: priscadezigns.org/clasp\n#PriscaDezigns #ClaspApp #Automation"),
-        "Clarev": ("Your client portal. Done properly.\n\n"
-                   "Clarev gives clients a branded dashboard with projects, invoices, and updates.\n\n"
-                   "Link in bio: priscadezigns.org/clarev\n#PriscaDezigns #Clarev #ClientPortal"),
-    }
-
-    if slot == 1:
-        img_url = PD_PROMO_IMAGES.get(sub, PD_PROMO_IMAGES["Clasp"])
-        txt = intros.get(sub, intros["Clasp"])
-        return txt, img_url
-    elif slot == 2:
-        options = PD_PAIN_POINTS.get(sub, PD_PAIN_POINTS["Vela"])
-        return options[day % len(options)], None
-    elif slot == 3:
-        options = PD_SOCIAL_PROOF.get(sub, PD_SOCIAL_PROOF["Vela"])
-        return options[day % len(options)], None
-    elif slot == 4:
-        return PD_AUDIT_CTAS[day % len(PD_AUDIT_CTAS)], None
-    return "Check out our latest services at priscadezigns.org #PriscaDezigns", None
-
 
 
 def get_caption(niche, product=None):
@@ -587,7 +452,42 @@ def get_caption(niche, product=None):
 
 def post_to_facebook(page_id, token, message, photo_url=None, video_path=None):
     """Post to a Facebook page. Returns dict with 'id' on success or 'error' on failure."""
+    import email.mime.multipart, email.mime.base, email.mime.text
     base = "https://graph.facebook.com/v19.0"
+
+    if video_path and os.path.exists(video_path):
+        # Upload video file to FB /videos endpoint (multipart)
+        import mimetypes, http.client, uuid
+        url_video = f"{base}/{page_id}/videos"
+        boundary = uuid.uuid4().hex
+        with open(video_path, "rb") as vf:
+            video_data = vf.read()
+        filename = os.path.basename(video_path)
+        body = (
+            f"--{boundary}\r\n"
+            f'Content-Disposition: form-data; name="access_token"\r\n\r\n{token}\r\n'
+            f"--{boundary}\r\n"
+            f'Content-Disposition: form-data; name="description"\r\n\r\n{message}\r\n'
+            f"--{boundary}\r\n"
+            f'Content-Disposition: form-data; name="source"; filename="{filename}"\r\n'
+            f'Content-Type: video/mp4\r\n\r\n'
+        ).encode() + video_data + f"\r\n--{boundary}--\r\n".encode()
+        try:
+            req = urllib.request.Request(
+                url_video, data=body, method="POST",
+                headers={"Content-Type": f"multipart/form-data; boundary={boundary}"}
+            )
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                return json.loads(resp.read().decode())
+        except urllib.error.HTTPError as e:
+            body_err = e.read().decode()
+            try:
+                return json.loads(body_err)
+            except Exception:
+                return {"error": {"message": body_err[:200]}}
+        except Exception as ex:
+            return {"error": {"message": str(ex)}}
+
     if photo_url:
         url = f"{base}/{page_id}/photos"
         payload = urllib.parse.urlencode({"url": photo_url, "caption": message, "access_token": token}).encode()
@@ -722,7 +622,8 @@ def get_product_for_brand(brand_name, advance_photo=True):
         with open(PHOTOS_FILE) as f:
             photos_data = json.load(f)
     except Exception as e:
-        return None  # photo rotation file not present — skip silently
+        print(f"Photo rotation load error: {e}")
+        return None
 
     products = photos_data.get(slug, [])
     if not products:
@@ -776,6 +677,82 @@ def get_ai_image_url(niche_keyword, style="product"):
     except Exception:
         pass
     return ""
+
+def post_reel_to_instagram(ig_id, token, video_path, caption):
+    """Upload a local video file as an Instagram Reel via Graph API.
+    Returns dict with 'id' on success or 'error' on failure."""
+    import uuid, os
+    base = "https://graph.facebook.com/v19.0"
+
+    if not video_path or not os.path.exists(video_path):
+        return {"error": {"message": "video_path missing or not found"}}
+
+    # Step 1: create media container for reel
+    container_url = f"{base}/{ig_id}/media"
+    payload = urllib.parse.urlencode({
+        "media_type": "REELS",
+        "caption": caption,
+        "share_to_feed": "true",
+        "access_token": token
+    }).encode()
+    # We need to upload the video file itself — IG Reels requires a video_url (hosted URL)
+    # Upload to FB first to get a hosted URL, then use that for IG
+    # For now: upload to IG using multipart (video upload endpoint)
+    boundary = uuid.uuid4().hex
+    with open(video_path, "rb") as vf:
+        video_data = vf.read()
+    filename = os.path.basename(video_path)
+    body = (
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="access_token"\r\n\r\n{token}\r\n'
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="caption"\r\n\r\n{caption}\r\n'
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="media_type"\r\n\r\nREELS\r\n'
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="share_to_feed"\r\n\r\ntrue\r\n'
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="video"; filename="{filename}"\r\n'
+        f'Content-Type: video/mp4\r\n\r\n'
+    ).encode() + video_data + f"\r\n--{boundary}--\r\n".encode()
+    try:
+        req = urllib.request.Request(
+            f"{base}/{ig_id}/media", data=body, method="POST",
+            headers={"Content-Type": f"multipart/form-data; boundary={boundary}"}
+        )
+        with urllib.request.urlopen(req, timeout=180) as resp:
+            container = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        body_err = e.read().decode()
+        try:
+            return json.loads(body_err)
+        except Exception:
+            return {"error": {"message": body_err[:200]}}
+    except Exception as ex:
+        return {"error": {"message": str(ex)}}
+
+    if "id" not in container:
+        return container
+
+    # Step 2: publish container
+    publish_url = f"{base}/{ig_id}/media_publish"
+    pub_payload = urllib.parse.urlencode({
+        "creation_id": container["id"],
+        "access_token": token
+    }).encode()
+    try:
+        req2 = urllib.request.Request(publish_url, data=pub_payload, method="POST")
+        with urllib.request.urlopen(req2, timeout=30) as resp2:
+            return json.loads(resp2.read().decode())
+    except urllib.error.HTTPError as e:
+        body_err = e.read().decode()
+        try:
+            return json.loads(body_err)
+        except Exception:
+            return {"error": {"message": body_err[:200]}}
+    except Exception as ex:
+        return {"error": {"message": str(ex)}}
+
 
 def find_ig_safe_image(brand_name, preferred_url):
     """Return the real product image for this brand (day-rotated from niche_products.json).
@@ -882,7 +859,6 @@ def get_prisca_brand_image():
     import random
     return random.choice(purple_images)
 
-
 def run_post(brand_name, post_type):
     """Execute one post for a brand."""
     brand = BRANDS.get(brand_name) or BRANDS.get(brand_name.strip())
@@ -901,36 +877,6 @@ def run_post(brand_name, post_type):
     if not page_id or not token:
         return f"Skipping {brand_name} — no page token"
 
-    # ── PRISCA DEZIGNS OVERRIDE — 4-slot marketing system ──────────────────
-    if "prisca" in brand_name.lower():
-        # Map post_type to slot: text=pain point or social proof or CTA, photo=promo image
-        from datetime import date as _date
-        day = _date.today().timetuple().tm_yday
-        hour = datetime.now().hour
-        # Slot assignment by time of day (4 posts/day):
-        # 08:00 → slot 1 (promo image)
-        # 11:00 → slot 2 (pain point)
-        # 14:00 → slot 3 (social proof)
-        # 19:00 → slot 4 (audit CTA)
-        if post_type == "photo" or hour < 10:
-            slot = 1
-        elif hour < 13:
-            slot = 2
-        elif hour < 17:
-            slot = 3
-        else:
-            slot = 4
-
-        pd_text, pd_image = get_pd_post(slot)
-        if pd_image:
-            result = post_to_facebook(page_id, token, pd_text, photo_url=pd_image)
-        else:
-            result = post_to_facebook(page_id, token, pd_text)
-        status = "✅" if "id" in result else "❌"
-        sub = get_pd_sub_brand_today()
-        return f"{status} Prisca Dezigns [slot {slot} — {sub}] FB:{result.get('id', result.get('error','?'))}"
-    # ── END PRISCA DEZIGNS OVERRIDE ─────────────────────────────────────────
-
     # Get today's product for this brand from the live site (niche_products.json)
     product_used = get_product_for_brand(brand_name)
     if product_used:
@@ -940,13 +886,20 @@ def run_post(brand_name, post_type):
         aff_link  = get_affiliate_link(aff, niche)
         photo_url = ""
 
-    caption   = get_caption(niche, product_used)
+    # GUARD: Prisca Dezigns and Seamrite Designs NEVER use product/niche captions
+    if niche in ("agency", "fashion_art"):
+        caption = get_caption(niche, None)
+    else:
+        caption = get_caption(niche, product_used)
     ig_result = ""  # populated for photo posts that hit Instagram
 
     if post_type == "text":
-        # Text posts use NICHE_TIPS (editorial value content, not product promotion)
+        # AGENCY/FASHION_ART pages use their own CAPTIONS, not NICHE_TIPS
+        if niche in ("agency", "fashion_art"):
+            tips = CAPTIONS.get(niche, ["Visit priscadezigns.org"])
+        else:
+            tips = NICHE_TIPS.get(niche, NICHE_TIPS.get("eco", ["Follow for daily niche content."]))
         from datetime import date as _date
-        tips = NICHE_TIPS.get(niche, NICHE_TIPS.get("eco", ["Follow for daily niche content."]))
         tip_idx = _date.today().timetuple().tm_yday % len(tips)
         # Rotate through different tips for each of the 3 text posts per day
         hour_offset = datetime.now().hour // 4  # shifts tip index by time of day
