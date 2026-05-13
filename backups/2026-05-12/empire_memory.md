@@ -233,3 +233,27 @@ Columns: Date | Description | Business/Payee | Type | Category | Payment Method 
 - Seamrite Designs = fashion/art, pink & black, NehNeh is the art section within same site.
 - The Way Made Known = faith/devotional content ONLY. No affiliate products ever.
 - NehNeh/Seamrite = fashion & art only. NO skincare, beauty, or health products.
+
+---
+## Session Update — 2026-05-12
+
+### Website Fixes
+- Affiliate brands page: replaced all 17 broken inline SVG logos with real PNG files from assets/logos/
+- Rowcell: fixed nav (white-on-white → dark green bg), cleaned doubled anchor HTML in nav + footer, wordmark size 1.7rem
+- Rowcell SVG wordmark saved as assets/logos/rowcell.svg and rowcell_dark.svg
+- Float buttons: fixed overlapping on 25 pages (TR: 84px→90px, BT: 148px→162px)
+- Trogon Business Plan live at /trogon/business-plan/ — investor-grade dark branded doc
+- Cupyx: added CSS fallback wordmark for nav logo
+
+### Ad Creative
+- New Prisca Dezigns FB ad at /prisca-dezigns/ad/ — Pinterest-inspired animated dark design
+- Features: "First 5 clients get 1 month FREE maintenance" offer strip, Playfair+Space Grotesk fonts, purple/pink gradient orbs, floating cards, animated CTA bar
+
+### Pending (from session)
+- Clarev: needs card added to /platforms/ page with link to /clarev/ — logo needs creating (teal brand: #00B4A6)
+- Rowcell: JPG/PNG exports of CSS wordmark (needs browser rendering — browser tool was at concurrency limit)
+- Platforms page: Clarev + D'PanYard cards missing
+- FB ad: ready to screenshot and post to FB as photo/reel
+
+### WA Lead
+- "My Hair" hair extensions lead still active — waiting on reply to name/branding question
