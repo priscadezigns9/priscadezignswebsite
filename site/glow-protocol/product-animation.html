@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glow Protocol — Serum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Cormorant+Garamond:ital,wght@0,400;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    ::-webkit-scrollbar { display: none; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #04020C;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    #scene {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background radial gradient */
+    #scene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 55% at 50% 45%, rgba(80, 50, 10, 0.28) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 35% at 50% 45%, rgba(60, 20, 90, 0.22) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* Particle stars */
+    #particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(200, 168, 75, 0.6);
+      animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.1; transform: scale(0.8); }
+      50% { opacity: 0.9; transform: scale(1.2); }
+    }
+
+    /* Glow orb behind bottle */
+    #glow-orb {
+      position: absolute;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200, 168, 75, 0.18) 0%, rgba(160, 100, 200, 0.08) 50%, transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -58%);
+      animation: glowPulse 3.5s ease-in-out infinite;
+      pointer-events: none;
+      filter: blur(18px);
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.3; transform: translate(-50%, -58%) scale(1); }
+      50% { opacity: 0.65; transform: translate(-50%, -58%) scale(1.12); }
+    }
+
+    /* Thin horizontal light lines for luxury feel */
+    #light-lines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0.06;
+    }
+
+    .light-line {
+      position: absolute;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(200,168,75,0.8) 30%, rgba(200,168,75,0.8) 70%, transparent 100%);
+    }
+
+    /* 3D bottle container */
+    #bottle-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 200px;
+      height: 360px;
+      margin-bottom: 40px;
+      perspective: 900px;
+      perspective-origin: 50% 45%;
+      animation: pageLoad 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes pageLoad {
+      0%   { opacity: 0; transform: scale(0.3) translateY(30px); }
+      60%  { opacity: 1; transform: scale(1.05) translateY(-4px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* The spinning assembly */
+    #assembly {
+      position: relative;
+      width: 0;
+      height: 0;
+      transform-style: preserve-3d;
+      animation:
+        spinY 20s linear infinite,
+        floatY 3s ease-in-out infinite;
+      transform: rotateY(0deg) translateY(0px);
+    }
+
+    @keyframes spinY {
+      from { transform: rotateY(0deg); }
+      to   { transform: rotateY(360deg); }
+    }
+
+    @keyframes floatY {
+      0%, 100% { margin-top: 0px; }
+      50%       { margin-top: -30px; }
+    }
+
+    /* Shadow beneath bottle */
+    #bottle-shadow {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 18px;
+      background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: shadowPulse 3s ease-in-out infinite;
+      filter: blur(4px);
+    }
+
+    @keyframes shadowPulse {
+      0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.6; }
+      50%       { transform: translateX(-50%) scaleX(0.75); opacity: 0.3; }
+    }
+
+    /* Brand text below bottle */
+    #brand-text {
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      animation: textReveal 2s ease forwards;
+      animation-delay: 0.8s;
+      opacity: 0;
+    }
+
+    @keyframes textReveal {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #brand-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      color: #C8A84B;
+      text-transform: uppercase;
+      text-shadow: 0 0 30px rgba(200, 168, 75, 0.5), 0 0 60px rgba(200, 168, 75, 0.2);
+    }
+
+    #brand-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      margin: 10px 0 8px;
+    }
+
+    #brand-divider span {
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #C8A84B, transparent);
+    }
+
+    #brand-divider .diamond {
+      color: #C8A84B;
+      font-size: 9px;
+    }
+
+    #brand-subtitle {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 300;
+      letter-spacing: 0.25em;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    #brand-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: rgba(200, 168, 75, 0.85);
+      letter-spacing: 0.05em;
+    }
+
+    /* Recording hint */
+    #hint {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.18);
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    /* ---- 3D face styles injected via JS ---- */
+  </style>
+</head>
+<body>
+
+<div id="scene">
+
+  <div id="particles"></div>
+  <div id="light-lines"></div>
+  <div id="glow-orb"></div>
+
+  <div id="bottle-wrap">
+    <div id="bottle-shadow"></div>
+    <div id="assembly">
+      <!-- Built by JS -->
+    </div>
+  </div>
+
+  <div id="brand-text">
+    <div id="brand-name">Glow Protocol</div>
+    <div id="brand-divider">
+      <span></span>
+      <span class="diamond">◆</span>
+      <span></span>
+    </div>
+    <div id="brand-subtitle">Advanced Serum Formula</div>
+    <div id="brand-tagline">Luminous skin begins here.</div>
+  </div>
+
+</div>
+
+<div id="hint">Best viewed fullscreen &bull; Screen record for 15 seconds</div>
+
+<script>
+(function() {
+
+  // ─────────────────────────────────────────────
+  // PARTICLE STARS
+  // ─────────────────────────────────────────────
+  const particlesEl = document.getElementById('particles');
+  for (let i = 0; i < 55; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.8;
+    s.style.cssText = `
+      width:${size}px;
+      height:${size}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      --dur:${(Math.random()*3+2).toFixed(1)}s;
+      --delay:-${(Math.random()*4).toFixed(1)}s;
+    `;
+    particlesEl.appendChild(s);
+  }
+
+  // ─────────────────────────────────────────────
+  // LIGHT LINES
+  // ─────────────────────────────────────────────
+  const llEl = document.getElementById('light-lines');
+  [18, 36, 54, 72, 88].forEach(pct => {
+    const l = document.createElement('div');
+    l.className = 'light-line';
+    l.style.top = pct + '%';
+    llEl.appendChild(l);
+  });
+
+  // ─────────────────────────────────────────────
+  // CYLINDER BUILDER
+  // ─────────────────────────────────────────────
+  function createCylinder(faceCount, radius, height, faceWidth, getStyle) {
+    const container = document.createElement('div');
+    container.style.cssText = 'position:relative;width:0;height:0;transform-style:preserve-3d;';
+    for (let i = 0; i < faceCount; i++) {
+      const face = document.createElement('div');
+      const angle = (360 / faceCount) * i;
+      const style = getStyle(i, faceCount);
+      face.style.cssText = `
+        position:absolute;
+        width:${faceWidth}px;
+        height:${height}px;
+        transform: rotateY(${angle}deg) translateZ(${radius}px);
+        transform-origin: center center;
+        left:${-faceWidth/2}px;
+        top:${-height/2}px;
+        ${style}
+      `;
+      container.appendChild(face);
+    }
+    return container;
+  }
+
+  // ─────────────────────────────────────────────
+  // ASSEMBLY ROOT
+  // ─────────────────────────────────────────────
+  const assembly = document.getElementById('assembly');
+
+  // ─────────────────────────────────────────────
+  // 1. BOTTLE BODY (24 faces)
+  // ─────────────────────────────────────────────
+  const BODY_FACES  = 24;
+  const BODY_RADIUS = 61;
+  const BODY_HEIGHT = 200;
+  const BODY_FWIDTH = Math.round(2 * Math.PI * BODY_RADIUS / BODY_FACES) + 1; // ~17px
+
+  // Label occupies roughly faces 20–24 and 0–4 (front-facing arc)
+  const LABEL_FACES = new Set([20,21,22,23,0,1,2,3,4]);
+
+  function bodyFaceStyle(i, total) {
+    const isLabel = LABEL_FACES.has(i);
+
+    // Angular position for gradient mapping
+    const t = i / total; // 0..1
+
+    // Simulate glass highlight: bright on one side, dim on other
+    const lightAngle = (i / total) * 360;
+    let glassAlpha = 0.10 + 0.18 * Math.abs(Math.cos((lightAngle * Math.PI) / 180));
+
+    if (isLabel) {
+      // Label face — dark glass with brand print
+      return `
+        background: #0A0A0F;
+        border-left: 0.5px solid rgba(200,168,75,0.12);
+        border-right: 0.5px solid rgba(200,168,75,0.12);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      `;
+    }
+
+    // Glass body
+    const glR = Math.round(170 + 20*Math.cos(lightAngle*Math.PI/180));
+    const glG = Math.round(195 + 15*Math.cos(lightAngle*Math.PI/180));
+    const glB = Math.round(220 + 10*Math.cos(lightAngle*Math.PI/180));
+
+    return `
+      background: linear-gradient(
+        180deg,
+        rgba(${glR},${glG},${glB},${(glassAlpha+0.05).toFixed(2)}) 0%,
+        rgba(${glR},${glG},${glB},${glassAlpha.toFixed(2)}) 40%,
+        rgba(${glR},${glG},${glB},${(glassAlpha*0.7).toFixed(2)}) 100%
+      );
+      border-left: 0.5px solid rgba(255,255,255,0.04);
+      border-right: 0.5px solid rgba(255,255,255,0.04);
+    `;
+  }
+
+  const bottleBody = createCylinder(BODY_FACES, BODY_RADIUS, BODY_HEIGHT, BODY_FWIDTH, bodyFaceStyle);
+
+  // Offset downward so shoulder sits on top
+  bottleBody.style.transform = 'translateY(60px)';
+
+  // Add label content to label faces
+  const labelFaceEls = [];
+  LABEL_FACES.forEach(idx => {
+    labelFaceEls.push(bottleBody.children[idx]);
+  });
+  // Center label face only (face 0 / front)
+  const frontFace = bottleBody.children[0];
+  frontFace.innerHTML = `
+    <div style="
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100%;
+      padding:0 1px;
+      color:#C8A84B;
+    ">
+      <div style="width:100%;height:0.5px;background:linear-gradient(90deg,transparent,#C8A84B,transparent);margin-bottom:6px;"></div>
+      <div style="color:#C8A84B;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;letter-spacing:2px;">GLOW</div>
+      <div style="color:#fff;font-family:'Space Grotesk',sans-serif;font-size:7px;letter-spacing:3px;margin:2px 0;">PROTOCOL</div>
+      <div style="color:#C8A84B;font-size:7px;margin:2px 0;">◆</div>
+      <div style="width:100%;height:0.5px;background:linear-gradient(90deg,transparent,#C8A84B,transparent);margin-top:6px;"></div>
+    </div>
+  `;
+
+  assembly.appendChild(bottleBody);
+
+  // ─────────────────────────────────────────────
+  // 2. REFLECTION LAYER (slightly larger, very subtle)
+  // ─────────────────────────────────────────────
+  const reflLayer = createCylinder(16, BODY_RADIUS + 2, BODY_HEIGHT - 20, BODY_FWIDTH + 2, (i) => {
+    const angle = (i / 16) * 360;
+    const alpha = 0.04 + 0.06 * Math.abs(Math.cos(angle * Math.PI / 180));
+    return `background: rgba(255,255,255,${alpha.toFixed(3)});`;
+  });
+  reflLayer.style.transform = 'translateY(60px)';
+  assembly.appendChild(reflLayer);
+
+  // ─────────────────────────────────────────────
+  // 3. SHOULDER (tapered section connecting body to neck)
+  // ─────────────────────────────────────────────
+  // Simulated as a short frustum-like cylinder with height gradient
+  const SHOULDER_FACES = 16;
+  const SHOULDER_HEIGHT = 45;
+  const SHOULDER_RADIUS = 50;
+  const SHOULDER_FWIDTH = Math.round(2 * Math.PI * SHOULDER_RADIUS / SHOULDER_FACES) + 1;
+
+  const shoulder = createCylinder(SHOULDER_FACES, SHOULDER_RADIUS, SHOULDER_HEIGHT, SHOULDER_FWIDTH, (i) => {
+    const angle = (i / SHOULDER_FACES) * 360;
+    const glAlpha = 0.12 + 0.15 * Math.abs(Math.cos(angle * Math.PI / 180));
+    const glR = Math.round(180 + 20*Math.cos(angle*Math.PI/180));
+    const glG = Math.round(200 + 15*Math.cos(angle*Math.PI/180));
+    const glB = Math.round(220 + 10*Math.cos(angle*Math.PI/180));
+    return `
+      background: linear-gradient(
+        180deg,
+        rgba(${glR},${glG},${glB},${(glAlpha*0.6).toFixed(2)}) 0%,
+        rgba(${glR},${glG},${glB},${glAlpha.toFixed(2)}) 100%
+      );
+      border-left: 0.5px solid rgba(255,255,255,0.05);
+      clip-path: polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%);
+    `;
+  });
+  // Position shoulder: on top of body
+  shoulder.style.transform = `translateY(${60 - BODY_HEIGHT/2 - SHOULDER_HEIGHT/2 + 2}px)`;
+  assembly.appendChild(shoulder);
+
+  // ─────────────────────────────────────────────
+  // 4. NECK
+  // ─────────────────────────────────────────────
+  const NECK_FACES  = 12;
+  const NECK_RADIUS = 18;
+  const NECK_HEIGHT = 42;
+  const NECK_FWIDTH = Math.round(2 * Math.PI * NECK_RADIUS / NECK_FACES) + 1;
+
+  const neck = createCylinder(NECK_FACES, NECK_RADIUS, NECK_HEIGHT, NECK_FWIDTH, (i) => {
+    const angle = (i / NECK_FACES) * 360;
+    const alpha = 0.18 + 0.2 * Math.abs(Math.cos(angle * Math.PI / 180));
+    const glR = Math.round(175 + 30*Math.cos(angle*Math.PI/180));
+    const glG = Math.round(195 + 20*Math.cos(angle*Math.PI/180));
+    const glB = Math.round(215 + 15*Math.cos(angle*Math.PI/180));
+    return `
+      background: rgba(${glR},${glG},${glB},${alpha.toFixed(2)});
+      border-left: 0.5px solid rgba(255,255,255,0.06);
+    `;
+  });
+
+  const neckY = 60 - BODY_HEIGHT/2 - SHOULDER_HEIGHT - NECK_HEIGHT/2 + 4;
+  neck.style.transform = `translateY(${neckY}px)`;
+  assembly.appendChild(neck);
+
+  // ─────────────────────────────────────────────
+  // 5. CAP (Gold dropper cap)
+  // ─────────────────────────────────────────────
+  const CAP_FACES  = 8;
+  const CAP_RADIUS = 15;
+  const CAP_HEIGHT = 60;
+  const CAP_FWIDTH = Math.round(2 * Math.PI * CAP_RADIUS / CAP_FACES) + 1;
+
+  const cap = createCylinder(CAP_FACES, CAP_RADIUS, CAP_HEIGHT, CAP_FWIDTH, (i) => {
+    const angle = (i / CAP_FACES) * 360;
+    const brightness = 0.75 + 0.35 * Math.abs(Math.cos(angle * Math.PI / 180));
+    const r = Math.round(200 * brightness);
+    const g = Math.round(168 * brightness);
+    const b = Math.round(75 * brightness);
+    return `
+      background: linear-gradient(
+        180deg,
+        rgba(${Math.min(255,r+30)},${Math.min(255,g+20)},${Math.min(255,b+10)},0.98) 0%,
+        rgba(${r},${g},${b},0.95) 60%,
+        rgba(${Math.max(0,r-20)},${Math.max(0,g-15)},${Math.max(0,b-5)},0.92) 100%
+      );
+      border-left: 0.5px solid rgba(255,230,140,0.3);
+      border-right: 0.5px solid rgba(120,80,10,0.3);
+    `;
+  });
+
+  const capY = neckY - NECK_HEIGHT/2 - CAP_HEIGHT/2;
+  cap.style.transform = `translateY(${capY}px)`;
+  assembly.appendChild(cap);
+
+  // Cap top disc
+  const capTop = document.createElement('div');
+  capTop.style.cssText = `
+    position: absolute;
+    width: ${CAP_RADIUS * 2}px;
+    height: ${CAP_RADIUS * 2}px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e8c86a, #a07820);
+    transform: rotateX(90deg) translateZ(0px);
+    left: ${-CAP_RADIUS}px;
+    top: ${-CAP_HEIGHT/2 + capY}px;
+    transform-origin: center center;
+  `;
+  // Position at top of cap using a wrapper
+  const capTopWrap = document.createElement('div');
+  capTopWrap.style.cssText = `position:absolute;width:0;height:0;transform-style:preserve-3d;transform:translateY(${capY - CAP_HEIGHT/2}px);`;
+  const capTopDisc = document.createElement('div');
+  capTopDisc.style.cssText = `
+    position:absolute;
+    width:${CAP_RADIUS*2}px;
+    height:${CAP_RADIUS*2}px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #f0d878, #b08828);
+    transform: rotateX(90deg);
+    left:${-CAP_RADIUS}px;
+    top:${-CAP_RADIUS}px;
+  `;
+  capTopWrap.appendChild(capTopDisc);
+  assembly.appendChild(capTopWrap);
+
+  // ─────────────────────────────────────────────
+  // 6. BOTTLE BASE DISC
+  // ─────────────────────────────────────────────
+  const baseWrap = document.createElement('div');
+  const bodyBottomY = 60 + BODY_HEIGHT/2;
+  baseWrap.style.cssText = `position:absolute;width:0;height:0;transform-style:preserve-3d;transform:translateY(${bodyBottomY}px);`;
+  const baseDisc = document.createElement('div');
+  baseDisc.style.cssText = `
+    position:absolute;
+    width:${BODY_RADIUS*2}px;
+    height:${BODY_RADIUS*2}px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(20,35,50,0.8) 0%, rgba(10,20,30,0.6) 100%);
+    border: 1px solid rgba(180,200,220,0.1);
+    transform: rotateX(90deg);
+    left:${-BODY_RADIUS}px;
+    top:${-BODY_RADIUS}px;
+  `;
+  baseWrap.appendChild(baseDisc);
+  assembly.appendChild(baseWrap);
+
+  // ─────────────────────────────────────────────
+  // 7. VERTICAL HIGHLIGHT STREAK on bottle
+  // ─────────────────────────────────────────────
+  const streakWrap = document.createElement('div');
+  streakWrap.style.cssText = `position:absolute;width:0;height:0;transform-style:preserve-3d;transform:translateY(60px) rotateY(-30deg) translateZ(${BODY_RADIUS+1}px);`;
+  const streak = document.createElement('div');
+  streak.style.cssText = `
+    position:absolute;
+    width:5px;
+    height:${BODY_HEIGHT * 0.7}px;
+    background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0.15) 70%, transparent 100%);
+    left:-2.5px;
+    top:${-(BODY_HEIGHT*0.7)/2}px;
+    border-radius: 3px;
+    filter: blur(1.5px);
+  `;
+  streakWrap.appendChild(streak);
+  assembly.appendChild(streakWrap);
+
+})();
+</script>
+
+</body>
+</html>
