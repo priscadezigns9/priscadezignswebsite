@@ -1,1 +1,566 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Callaloo — Discover Food Your Way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="/callaloo/manifest.json">
+<meta name="theme-color" content="#00875A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Callaloo">
+<link rel="apple-touch-icon" href="/callaloo/icon.svg">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#00875A;--primary-light:#00C47A;--primary-dark:#005C3E;
+  --accent:#FFD166;--accent2:#F4A435;
+  --cream:#F0FFF8;--cream-dark:#D6F5E8;--dark:#0D2B1E;--mid:#3A6B52;--light:#6B9E86;
+  --white:#fff;--border:#A8DFC4;
+}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--dark);line-height:1.6}
+
+/* ── NAV ── */
+nav{background:rgba(255,248,240,0.95);backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:100;padding:0 5%;
+  display:flex;align-items:center;justify-content:space-between;
+  height:68px;border-bottom:1px solid var(--border)}
+.nav-logo svg{display:block}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{text-decoration:none;color:var(--mid);font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--primary)}
+.nav-cta{background:var(--primary);color:var(--white)!important;padding:10px 22px;border-radius:50px;font-weight:600!important;font-size:14px!important;transition:transform .2s,box-shadow .2s!important}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,69,0,0.35)!important}
+
+/* ── HERO ── */
+.hero{padding:80px 5% 60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1200px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,184,0,0.15);border:1px solid rgba(255,184,0,0.4);border-radius:50px;padding:6px 16px;font-size:13px;font-weight:600;color:#B8860B;margin-bottom:24px}
+.hero-badge .dot{width:7px;height:7px;background:var(--accent);border-radius:50%}
+.hero h1{font-family:'Fraunces',serif;font-size:58px;font-weight:900;line-height:1.1;letter-spacing:-1.5px;margin-bottom:20px}
+.hero h1 .highlight{color:var(--primary)}
+.hero-desc{font-size:17px;color:var(--mid);line-height:1.75;margin-bottom:32px;max-width:480px}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:36px}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#FF6B35);color:var(--white);padding:14px 28px;border-radius:50px;text-decoration:none;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(255,69,0,0.3);transition:transform .2s,box-shadow .2s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(255,69,0,0.4)}
+.btn-ghost{background:transparent;border:2px solid var(--primary);color:var(--primary);padding:13px 28px;border-radius:50px;text-decoration:none;font-weight:600;font-size:15px;transition:all .2s}
+.btn-ghost:hover{background:var(--primary);color:var(--white)}
+.hero-proof{display:flex;align-items:center;gap:12px}
+.proof-faces{display:flex}
+.proof-face{width:32px;height:32px;border-radius:50%;border:2px solid var(--white);background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--white);margin-left:-8px}
+.proof-face:first-child{margin-left:0}
+.proof-text{font-size:13px;color:var(--mid)}.proof-text strong{color:var(--dark)}
+
+/* ── HERO VISUAL (mosaic) ── */
+.hero-visual{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;gap:12px}
+.recipe-card{border-radius:18px;padding:20px 16px 16px;position:relative;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s}
+.recipe-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.12)}
+.recipe-card.tall{grid-row:span 2}
+.rc-tag{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:0.8;margin-bottom:8px}
+.rc-name{font-family:'Fraunces',serif;font-size:18px;font-weight:700;line-height:1.2;margin-bottom:8px;color:var(--white)}
+.rc-meta{display:flex;gap:8px;font-size:11px;font-weight:500;opacity:0.85;color:var(--white)}
+.rc-pill{background:rgba(255,255,255,0.2);border-radius:20px;padding:3px 8px}
+.rc-heart{position:absolute;top:14px;right:14px;width:30px;height:30px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+/* Recipe card colors */
+.rc1{background:linear-gradient(135deg,#E84511,#FF6B35)}
+.rc2{background:linear-gradient(135deg,#C17900,var(--accent))}
+.rc3{background:linear-gradient(135deg,#007A3D,var(--primary-light))}
+.rc4{background:linear-gradient(135deg,#7B2D8B,#C840A0)}
+.rc5{background:linear-gradient(135deg,#1A6B8A,#2DD4BF)}
+
+/* ── VIBES SECTION ── */
+.vibes{padding:60px 5%;background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.section-label{font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--primary);margin-bottom:12px}
+.section-title{font-family:'Fraunces',serif;font-size:38px;font-weight:900;margin-bottom:8px;letter-spacing:-0.5px}
+.section-sub{font-size:16px;color:var(--mid);margin-bottom:36px;max-width:540px}
+.vibes-scroll{display:flex;gap:14px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+.vibes-scroll::-webkit-scrollbar{display:none}
+.vibe-card{flex-shrink:0;background:var(--cream);border:1px solid var(--border);border-radius:16px;padding:20px 24px;text-align:center;cursor:pointer;transition:all .2s;min-width:120px}
+.vibe-card:hover{background:var(--primary);border-color:var(--primary);transform:translateY(-2px)}
+.vibe-card:hover .vibe-name{color:var(--white)}
+.vibe-card:hover .vibe-icon{transform:scale(1.15)}
+.vibe-icon{font-size:28px;margin-bottom:8px;display:block;transition:transform .2s}
+.vibe-name{font-size:13px;font-weight:600;color:var(--dark)}
+
+/* ── HOW IT WORKS ── */
+.hiw{padding:80px 5%;max-width:1100px;margin:0 auto}
+.hiw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:40px}
+.hiw-step{text-align:center;padding:36px 28px;background:var(--white);border-radius:24px;border:1px solid var(--border);position:relative;transition:transform .2s,box-shadow .2s}
+.hiw-step:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(255,69,0,0.08)}
+.step-num{width:44px;height:44px;background:linear-gradient(135deg,var(--primary),#FF6B35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--white);margin:0 auto 16px}
+.step-icon{font-size:36px;margin-bottom:14px;display:block}
+.hiw-step h3{font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:10px}
+.hiw-step p{font-size:14px;color:var(--mid);line-height:1.7}
+
+/* ── RECIPE GRID ── */
+.recipes{padding:80px 5%;background:var(--white)}
+.recipes-inner{max-width:1200px;margin:0 auto}
+.recipes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px}
+.rg-card{background:var(--cream);border-radius:20px;overflow:hidden;border:1px solid var(--border);transition:transform .25s,box-shadow .25s;cursor:pointer}
+.rg-card:hover{transform:translateY(-5px);box-shadow:0 20px 48px rgba(255,69,0,0.12)}
+.rg-img{height:160px;position:relative;display:flex;align-items:center;justify-content:center;font-size:56px}
+.rg-body{padding:16px}
+.rg-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.rg-tag{background:rgba(255,69,0,0.1);color:var(--primary);font-size:10px;font-weight:700;letter-spacing:0.5px;padding:3px 10px;border-radius:20px;text-transform:uppercase}
+.rg-name{font-family:'Fraunces',serif;font-size:18px;font-weight:700;margin-bottom:8px}
+.rg-meta{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--light)}
+.rg-meta .cook-time{display:flex;align-items:center;gap:4px}
+.rg-save{background:none;border:none;font-size:18px;cursor:pointer;transition:transform .2s}
+.rg-save:hover{transform:scale(1.2)}
+
+/* ── WHY SECTION ── */
+.why{padding:80px 5%;max-width:1100px;margin:0 auto}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:40px}
+.why-card{padding:36px 28px;border-radius:24px;border:1px solid var(--border);background:var(--white)}
+.why-icon{font-size:40px;margin-bottom:16px;display:block}
+.why-card h3{font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:10px}
+.why-card p{font-size:14px;color:var(--mid);line-height:1.75}
+
+/* ── DOWNLOAD CTA ── */
+.download-cta{margin:0 5% 80px;border-radius:28px;background:linear-gradient(135deg,var(--primary) 0%,#FF6B35 50%,var(--accent) 100%);padding:60px 60px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:40px;overflow:hidden;position:relative}
+.download-cta::before{content:'🌿';position:absolute;right:180px;top:-20px;font-size:160px;opacity:0.1}
+.cta-title{font-family:'Fraunces',serif;font-size:40px;font-weight:900;color:var(--white);line-height:1.2;margin-bottom:12px}
+.cta-sub{font-size:16px;color:rgba(255,255,255,0.85);max-width:420px}
+.cta-btns{display:flex;flex-direction:column;gap:12px;flex-shrink:0}
+.store-btn{background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.3);color:var(--white);padding:14px 28px;border-radius:14px;text-decoration:none;display:flex;align-items:center;gap:12px;font-weight:600;font-size:14px;transition:background .2s;white-space:nowrap}
+.store-btn:hover{background:rgba(255,255,255,0.25)}
+.store-btn .store-icon{font-size:22px}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);color:rgba(255,255,255,0.6);padding:48px 5%;display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px}
+.footer-brand h3{font-family:'Fraunces',serif;font-size:22px;color:var(--white);font-weight:900;margin-bottom:8px}
+.footer-brand p{font-size:13px;line-height:1.75;max-width:300px}
+.footer-col h4{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--white);margin-bottom:16px}
+.footer-col a{display:block;color:rgba(255,255,255,0.5);text-decoration:none;font-size:14px;margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:var(--primary)}
+.footer-bottom{background:#111;color:rgba(255,255,255,0.3);text-align:center;padding:16px;font-size:12px}
+
+/* ── STANDARD FLOAT STACK ── */
+
+
+
+
+
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;gap:40px;padding:60px 5% 40px}
+  .hero h1{font-size:40px}
+  .hero-visual{display:none}
+  .hiw-grid,.recipes-grid,.why-grid{grid-template-columns:1fr}
+  .download-cta{grid-template-columns:1fr;padding:40px 32px}
+  footer{grid-template-columns:1fr}
+  .nav-links .nav-link{display:none}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<!-- PWA Install Banner -->
+<div id="c-install-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:10000;background:linear-gradient(135deg,#00875A,#00C47A);padding:16px 20px;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(0,135,90,0.5);">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:44px;height:44px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🌿</div>
+    <div>
+      <div style="color:white;font-weight:700;font-size:0.95rem;font-family:Space Grotesk,sans-serif;">Install Callaloo</div>
+      <div style="color:rgba(255,255,255,0.8);font-size:0.78rem;">Caribbean recipes on your home screen</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="document.getElementById('c-install-banner').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:0.85rem;">Later</button>
+    <button onclick="installCallaloo()" style="background:white;border:none;color:#00875A;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.85rem;font-family:Space Grotesk,sans-serif;">Install</button>
+  </div>
+</div>
+
+
+<!-- NAV -->
+<nav>
+  <a href="/callaloo/" class="nav-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="160" height="47">
+      <defs><linearGradient id="clg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#F5A623"/><stop offset="100%" style="stop-color:#FFC85A"/></linearGradient></defs>
+      <path d="M16,50 Q10,30 28,18 Q20,32 32,42 Z" fill="url(#clg)" opacity="0.9"/>
+      <path d="M28,18 Q46,12 48,32 Q38,28 32,42 Z" fill="url(#clg)" opacity="0.6"/>
+      <path d="M16,50 Q32,46 48,50" stroke="url(#clg)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <text x="62" y="42" font-family="Arial,sans-serif" font-weight="900" font-size="30" fill="url(#clg)" letter-spacing="0.5">Callaloo</text>
+      <text x="63" y="57" font-family="Arial,sans-serif" font-size="9" fill="#F5A623" letter-spacing="3" opacity="0.8">FOOD &amp; RECIPES</text>
+    </svg>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/callaloo/">Home</a>
+    <a class="nav-link" href="/callaloo/recipes/">Recipes</a>
+    <a class="nav-link" href="/callaloo/cooks/">Cooks</a>
+    <a class="nav-link" href="/callaloo/for-cooks/">For Cooks</a>
+    <a class="nav-cta" href="/callaloo/waitlist/">Join Waitlist</a>
+    <button id="authBtn" onclick="toggleAuthModal()" style="background:rgba(0,135,90,0.15);border:1px solid rgba(0,175,100,0.3);color:#00CF78;padding:7px 16px;border-radius:980px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">Sign In</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-badge"><span class="dot"></span> The Recipe Discovery App</div>
+    <h1>Cook anything.<br><span class="highlight">Find it near you.</span></h1>
+    <p class="hero-desc">Browse recipes from every cuisine — local favourites, international classics, fusion and more. Find every ingredient at a store near you and track nutrition with real data.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="/callaloo/recipes/">Browse Recipes →</a>
+      <a class="btn-ghost" href="/callaloo/cooks/">Meet Our Cooks 👨‍🍳</a>
+    </div>
+    <div class="hero-proof">
+      <div class="proof-faces">
+        <div class="proof-face">JM</div><div class="proof-face">KT</div>
+        <div class="proof-face">RD</div><div class="proof-face">SA</div>
+        <div class="proof-face">+</div>
+      </div>
+      <div class="proof-text"><strong>10,000+</strong> households cook smarter</div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="recipe-card rc1 tall">
+      <div class="rc-tag">🔥 Trending</div>
+      <div class="rc-name">Doubles</div>
+      <div class="rc-meta"><span class="rc-pill">⏱ 30 min</span><span class="rc-pill">Street Food</span></div>
+      <div class="rc-heart">❤️</div>
+    </div>
+    <div class="recipe-card rc2">
+      <div class="rc-tag">☀️ Sunday Lunch</div>
+      <div class="rc-name">Pelau</div>
+      <div class="rc-meta"><span class="rc-pill">⏱ 1h</span><span class="rc-pill">Easy</span></div>
+      <div class="rc-heart">🤍</div>
+    </div>
+    <div class="recipe-card rc3">
+      <div class="rc-tag">🌊 Seafood</div>
+      <div class="rc-name">Bake & Shark</div>
+      <div class="rc-meta"><span class="rc-pill">⏱ 45 min</span></div>
+      <div class="rc-heart">❤️</div>
+    </div>
+    <div class="recipe-card rc4" style="grid-column:span 2">
+      <div class="rc-tag">🍲 Classic</div>
+      <div class="rc-name">Callaloo Soup</div>
+      <div class="rc-meta"><span class="rc-pill">⏱ 50 min</span><span class="rc-pill">Healthy</span></div>
+      <div class="rc-heart">❤️</div>
+    </div>
+  </div>
+</section>
+
+<!-- BROWSE BY VIBE -->
+<section class="vibes" id="vibes">
+  <div style="max-width:1200px;margin:0 auto">
+    <p class="section-label">Browse by Vibe</p>
+    <h2 class="section-title">Find recipes for every craving</h2>
+    <p class="section-sub">From quick weeknight dinners to weekend feasts — every cuisine, every occasion, every craving.</p>
+    <div class="vibes-scroll">
+      <div class="vibe-card"><span class="vibe-icon">🥘</span><div class="vibe-name">Sunday Lunch</div></div>
+      <div class="vibe-card"><span class="vibe-icon">🎉</span><div class="vibe-name">Celebrations</div></div>
+      <div class="vibe-card"><span class="vibe-icon">💪</span><div class="vibe-name">Healthy Eats</div></div>
+      <div class="vibe-card"><span class="vibe-icon">🔥</span><div class="vibe-name">Street Food</div></div>
+      <div class="vibe-card"><span class="vibe-icon">🍰</span><div class="vibe-name">Desserts</div></div>
+      <div class="vibe-card"><span class="vibe-icon">☕</span><div class="vibe-name">Breakfast</div></div>
+      <div class="vibe-card"><span class="vibe-icon">🐟</span><div class="vibe-name">Seafood</div></div>
+      <div class="vibe-card"><span class="vibe-icon">🌶️</span><div class="vibe-name">Spicy</div></div>
+      <div class="vibe-card"><span class="vibe-icon">🥗</span><div class="vibe-name">Quick Meals</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="hiw">
+  <div class="hiw">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">Three steps to better cooking</h2>
+    <div class="hiw-grid">
+      <div class="hiw-step">
+        <span class="step-icon">🍽️</span>
+        <div class="step-num">1</div>
+        <h3>Browse by vibe or occasion</h3>
+        <p>Scroll through beautiful recipe collections curated by mood, occasion, and cuisine type — like Pinterest, but for food.</p>
+      </div>
+      <div class="hiw-step">
+        <span class="step-icon">📍</span>
+        <div class="step-num">2</div>
+        <h3>Find Caribbean ingredients near you</h3>
+        <p>Every recipe — whether it's jerk chicken, sushi, pasta, or jollof rice — shows exactly where to buy each ingredient at stores near you. No more substitutions.</p>
+      </div>
+      <div class="hiw-step">
+        <span class="step-icon">📊</span>
+        <div class="step-num">3</div>
+        <h3>Track with local data</h3>
+        <p>Count calories and macros using real nutrition data that matches what's actually on your shelf — not generic databases built for other markets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECIPE GRID -->
+<section class="recipes" id="recipes">
+  <div class="recipes-inner">
+    <p class="section-label">Featured Recipes</p>
+    <h2 class="section-title">What's everyone cooking?</h2>
+    <p class="section-sub">Recipes from every cuisine — shared by home cooks and chefs around the world.</p>
+    <div class="recipes-grid">
+      <div class="rg-card">
+        <div class="rg-img rc1">🥙</div>
+        <div class="rg-body">
+          <div class="rg-tags"><span class="rg-tag">Street Food</span><span class="rg-tag">Quick</span></div>
+          <div class="rg-name">Doubles</div>
+          <div class="rg-meta"><span class="cook-time">⏱ 30 min · Easy</span><button class="rg-save">🤍</button></div>
+        </div>
+      </div>
+      <div class="rg-card">
+        <div class="rg-img rc2">🍚</div>
+        <div class="rg-body">
+          <div class="rg-tags"><span class="rg-tag">Sunday Lunch</span></div>
+          <div class="rg-name">Pelau</div>
+          <div class="rg-meta"><span class="cook-time">⏱ 1h · Medium</span><button class="rg-save">❤️</button></div>
+        </div>
+      </div>
+      <div class="rg-card">
+        <div class="rg-img rc3">🐟</div>
+        <div class="rg-body">
+          <div class="rg-tags"><span class="rg-tag">Seafood</span><span class="rg-tag">Classic</span></div>
+          <div class="rg-name">Bake &amp; Shark</div>
+          <div class="rg-meta"><span class="cook-time">⏱ 45 min · Medium</span><button class="rg-save">🤍</button></div>
+        </div>
+      </div>
+      <div class="rg-card">
+        <div class="rg-img rc4">🌿</div>
+        <div class="rg-body">
+          <div class="rg-tags"><span class="rg-tag">Healthy</span><span class="rg-tag">Vegetarian</span></div>
+          <div class="rg-name">Callaloo Soup</div>
+          <div class="rg-meta"><span class="cook-time">⏱ 50 min · Easy</span><button class="rg-save">❤️</button></div>
+        </div>
+      </div>
+      <div class="rg-card">
+        <div class="rg-img rc5">🍗</div>
+        <div class="rg-body">
+          <div class="rg-tags"><span class="rg-tag">Sunday Lunch</span></div>
+          <div class="rg-name">Stew Chicken</div>
+          <div class="rg-meta"><span class="cook-time">⏱ 1h 15min · Easy</span><button class="rg-save">🤍</button></div>
+        </div>
+      </div>
+      <div class="rg-card">
+        <div class="rg-img" style="background:linear-gradient(135deg,#8B4513,#CD853F)">🟡</div>
+        <div class="rg-body">
+          <div class="rg-tags"><span class="rg-tag">Snack</span><span class="rg-tag">Street Food</span></div>
+          <div class="rg-name">Pholourie</div>
+          <div class="rg-meta"><span class="cook-time">⏱ 25 min · Easy</span><button class="rg-save">❤️</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CALLALOO -->
+<section>
+  <div class="why">
+    <p class="section-label">Why Callaloo</p>
+    <h2 class="section-title">Cook any dish. Find everything you need.</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="why-icon">📍</span>
+        <h3>Location-aware shopping</h3>
+        <p>Every recipe shows you exactly where to buy each ingredient near you — whether you're cooking Italian, Asian, West African, or anything else.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">📊</span>
+        <h3>Real nutrition data</h3>
+        <p>Track calories and macros using data built for the foods you actually eat — not US or UK databases that don't match your local staples.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-icon">👩‍🍳</span>
+        <h3>Community recipes</h3>
+        <p>Home cooks and chefs from every background share their best dishes. Follow your favourites, save collections, and discover something new every day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD CTA -->
+<div class="download-cta">
+  <div>
+    <div class="cta-title">Cook smarter.<br>Eat better.<br>Start today.</div>
+    <p class="cta-sub">Join thousands of home cooks discovering recipes from every cuisine, finding ingredients near them, and eating better every day.</p>
+  </div>
+  <div class="cta-btns">
+    <a href="/callaloo/start/" class="store-btn"><span class="store-icon">🍎</span> App Store — Coming Soon</a>
+    <a href="/callaloo/start/" class="store-btn"><span class="store-icon">🤖</span> Google Play — Coming Soon</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <h3>Callaloo</h3>
+    <p>Any recipe, any cuisine — find every ingredient near you. Cook better every day.</p>
+    <p style="margin-top:12px;font-size:12px">Powered by <a href="/prisca-dezigns/" style="color:var(--primary);text-decoration:none">Prisca Dezigns</a></p>
+  </div>
+  <div class="footer-col">
+    <h4>Discover</h4>
+    <a href="#vibes">Browse by Vibe</a>
+    <a href="#recipes">Featured Recipes</a>
+    <a href="#hiw">How It Works</a>
+  </div>
+  <div class="footer-col">
+    <h4>Get the App</h4>
+    <a href="/callaloo/start/">Download Free</a>
+    <a href="/callaloo/start/">Join Waitlist</a>
+  </div>
+</footer>
+<div class="footer-bottom">© 2026 Callaloo. All rights reserved.</div>
+
+<!-- STANDARD FLOAT STACK -->
+
+</div>
+
+
+<script>
+
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({pageLanguage:'en',autoDisplay:false},'google_translate_element');
+}
+</script>
+
+
+<!-- FEATURED RECIPES SECTION -->
+<section style="padding:80px 5%;background:var(--cream);border-top:1px solid var(--border)">
+  <div style="max-width:1200px;margin:0 auto">
+    <p style="font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--primary);margin-bottom:8px">🌿 FRESH FROM THE KITCHEN</p>
+    <h2 style="font-family:'Fraunces',serif;font-size:clamp(28px,4vw,42px);font-weight:900;color:var(--dark);margin-bottom:12px">Featured Recipes</h2>
+    <p style="color:var(--mid);max-width:560px;margin-bottom:40px;line-height:1.7">Beloved dishes from our community of Caribbean home cooks. Authentic, tested, and loved.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px">
+
+      <a href="/callaloo/recipe/" style="text-decoration:none;background:var(--white);border-radius:20px;overflow:hidden;border:1px solid var(--border);display:block;transition:transform .25s,box-shadow .25s" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,135,90,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="height:160px;background:linear-gradient(135deg,#8B4513,#D4872C,#FFD166);display:flex;align-items:center;justify-content:center;font-size:56px">🍚</div>
+        <div style="padding:16px">
+          <span style="background:rgba(0,135,90,0.1);color:var(--primary);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase">Mains</span>
+          <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--dark);margin:10px 0 8px">Pelau</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--light)"><span>⏱ 75 mins · Medium</span><span style="color:#FFD166">★ 4.9</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--mid)"><div style="width:26px;height:26px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;flex-shrink:0">AM</div>Aunty Merle</div>
+        </div>
+      </a>
+
+      <a href="/callaloo/recipes/" style="text-decoration:none;background:var(--white);border-radius:20px;overflow:hidden;border:1px solid var(--border);display:block;transition:transform .25s,box-shadow .25s" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,135,90,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="height:160px;background:linear-gradient(135deg,#C17900,#FFD166,#FFF0AA);display:flex;align-items:center;justify-content:center;font-size:56px">🫓</div>
+        <div style="padding:16px">
+          <span style="background:rgba(0,135,90,0.1);color:var(--primary);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase">Snacks</span>
+          <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--dark);margin:10px 0 8px">Doubles</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--light)"><span>⏱ 30 mins · Easy</span><span style="color:#FFD166">★ 5.0</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--mid)"><div style="width:26px;height:26px;background:linear-gradient(135deg,#C17900,#FFD166);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;flex-shrink:0">RK</div>Ravi K</div>
+        </div>
+      </a>
+
+      <a href="/callaloo/recipes/" style="text-decoration:none;background:var(--white);border-radius:20px;overflow:hidden;border:1px solid var(--border);display:block;transition:transform .25s,box-shadow .25s" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,135,90,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="height:160px;background:linear-gradient(135deg,#007A3D,#00C47A,#80FFB8);display:flex;align-items:center;justify-content:center;font-size:56px">🥬</div>
+        <div style="padding:16px">
+          <span style="background:rgba(0,135,90,0.1);color:var(--primary);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase">Soups &amp; Stews</span>
+          <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--dark);margin:10px 0 8px">Callaloo Soup</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--light)"><span>⏱ 50 mins · Medium</span><span style="color:#FFD166">★ 4.8</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--mid)"><div style="width:26px;height:26px;background:linear-gradient(135deg,#007A3D,#00C47A);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;flex-shrink:0">MD</div>Mama Denise</div>
+        </div>
+      </a>
+
+      <a href="/callaloo/recipes/" style="text-decoration:none;background:var(--white);border-radius:20px;overflow:hidden;border:1px solid var(--border);display:block;transition:transform .25s,box-shadow .25s" onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 20px 48px rgba(0,135,90,0.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="height:160px;background:linear-gradient(135deg,#1A6B8A,#E84511,#FF8C42);display:flex;align-items:center;justify-content:center;font-size:56px">🦀</div>
+        <div style="padding:16px">
+          <span style="background:rgba(0,135,90,0.1);color:var(--primary);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase">Mains</span>
+          <div style="font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--dark);margin:10px 0 8px">Crab &amp; Callaloo</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--light)"><span>⏱ 65 mins · Hard</span><span style="color:#FFD166">★ 5.0</span></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--mid)"><div style="width:26px;height:26px;background:linear-gradient(135deg,#1A6B8A,#2DD4BF);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;flex-shrink:0">CA</div>Chef Anton</div>
+        </div>
+      </a>
+
+    </div>
+    <div style="text-align:center;margin-top:40px">
+      <a href="/callaloo/recipes/" style="display:inline-block;background:var(--primary);color:white;padding:14px 36px;border-radius:50px;font-weight:700;font-family:'Space Grotesk',sans-serif;font-size:16px;text-decoration:none">See All Recipes →</a>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN OUR COOKS CTA -->
+<section style="padding:80px 5%;background:linear-gradient(135deg,var(--dark) 0%,#005C3E 100%);position:relative;overflow:hidden">
+  <div style="position:absolute;top:-40px;right:5%;font-size:220px;opacity:0.06;line-height:1">🌿</div>
+  <div style="max-width:700px;margin:0 auto;text-align:center;position:relative;z-index:1">
+    <p style="font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:16px">👨‍🍳 FOR HOME COOKS</p>
+    <h2 style="font-family:'Fraunces',serif;font-size:clamp(28px,4vw,48px);font-weight:900;color:white;line-height:1.2;margin-bottom:20px">Share your recipes.<br>Build your following.</h2>
+    <p style="color:rgba(255,255,255,0.7);font-size:18px;line-height:1.7;margin-bottom:40px">Join Caribbean home cooks already sharing their authentic recipes on Callaloo. Build a following, get discovered, and help preserve our food culture.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a href="/callaloo/for-cooks/" style="display:inline-block;background:var(--accent);color:var(--dark);padding:16px 36px;border-radius:50px;font-weight:700;font-family:'Space Grotesk',sans-serif;font-size:16px;text-decoration:none">Become a Cook →</a>
+      <a href="/callaloo/cooks/" style="display:inline-block;background:rgba(255,255,255,0.1);color:white;padding:16px 36px;border-radius:50px;font-weight:600;font-family:'Space Grotesk',sans-serif;font-size:16px;text-decoration:none;border:1px solid rgba(255,255,255,0.2)">Meet Our Cooks</a>
+    </div>
+    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-top:24px">✓ Free to join &nbsp;·&nbsp; ✓ Keep your recipes &nbsp;·&nbsp; ✓ Grow your audience</p>
+  </div>
+</section>
+
+<!-- Standard Float Stack -->
+<style>
+.sfw-wa{position:fixed;bottom:24px;right:24px;z-index:9999;width:50px;height:50px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);text-decoration:none;transition:transform .2s;}
+.sfw-wa:hover{transform:scale(1.08);}
+.sfw-wa svg{width:26px;height:26px;fill:#fff;}
+.sfw-tr{position:fixed;bottom:84px;right:24px;z-index:9999;background:rgba(15,12,28,0.92);border:1px solid rgba(255,255,255,0.12);border-radius:25px;padding:5px 12px;backdrop-filter:blur(10px);}
+.sfw-tr .goog-te-gadget{font-size:0!important;color:transparent!important;}
+.sfw-tr select,.sfw-tr .goog-te-gadget-simple{background:transparent;border:none;color:#fff;font-size:.75rem;cursor:pointer;outline:none;}
+.sfw-tr select option{background:#1a1a2e;color:#fff;}
+.sfw-bt{position:fixed;bottom:148px;right:24px;z-index:9999;width:44px;height:44px;border-radius:50%;background:#00875Acc;border:none;color:#fff;cursor:pointer;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s;font-size:1.2rem;display:flex;align-items:center;justify-content:center;}
+.sfw-bt.vis{opacity:1;transform:translateY(0);}
+.sfw-bt:hover{background:#00875A;}
+</style>
+<a href="https://wa.me/447576505652" target="_blank" rel="noopener" class="sfw-wa" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.417A9.956 9.956 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a7.946 7.946 0 01-4.274-1.244l-.306-.181-3.094.881.842-3.024-.198-.314A7.95 7.95 0 014 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z"/></svg>
+</a>
+<div class="sfw-tr"><div id="gte_callaloo"></div></div>
+<script>function gteInit_callaloo(){new google.translate.TranslateElement({pageLanguage:'en',autoDisplay:false},'gte_callaloo');}</script>
+<script src="//translate.google.com/translate_a/element.js?cb=gteInit_callaloo"></script>
+<button class="sfw-bt" id="sbt_callaloo" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+<script>window.addEventListener('scroll',function(){var b=document.getElementById('sbt_callaloo');if(b)b.classList.toggle('vis',window.scrollY>400);});</script>
+<!-- /Standard Float Stack -->
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('/callaloo/sw.js').catch(function(){});
+  });
+}
+var _cprompt;
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault(); _cprompt=e;
+  document.getElementById('c-install-banner').style.display='flex';
+});
+function installCallaloo(){
+  if(_cprompt){_cprompt.prompt();_cprompt.userChoice.then(function(){_cprompt=null;document.getElementById('c-install-banner').style.display='none';});}
+}
+</script>
+<!-- AUTH MODAL -->
+<div id="authOverlay" onclick="closeAuth()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:998;backdrop-filter:blur(4px)"></div>
+<div id="authModal" style="display:none;position:fixed;top:0;right:0;bottom:0;width:340px;max-width:100vw;background:#071a10;border-left:1px solid rgba(0,175,100,0.2);z-index:999;padding:40px 28px;flex-direction:column;gap:20px;overflow-y:auto">
+  <button onclick="closeAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.4rem;cursor:pointer">&#x2715;</button>
+  <div style="display:flex;gap:0;margin-bottom:8px;border:1px solid rgba(0,175,100,0.2);border-radius:8px;overflow:hidden">
+    <button id="tabSignIn" onclick="switchTab('in')" style="flex:1;padding:10px;background:rgba(0,175,100,0.2);border:none;color:#00CF78;font-weight:600;cursor:pointer;font-size:0.85rem">Sign In</button>
+    <button id="tabSignUp" onclick="switchTab('up')" style="flex:1;padding:10px;background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.85rem">Sign Up</button>
+  </div>
+  <input id="authEmail" type="email" placeholder="Email address" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(0,175,100,0.2);border-radius:8px;color:#fff;font-size:0.9rem;box-sizing:border-box;outline:none">
+  <input id="authPass" type="password" placeholder="Password" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(0,175,100,0.2);border-radius:8px;color:#fff;font-size:0.9rem;box-sizing:border-box;outline:none;margin-top:-10px">
+  <button id="authSubmit" onclick="submitAuth()" style="width:100%;padding:13px;background:linear-gradient(135deg,#00875A,#00CF78);border:none;border-radius:980px;color:#fff;font-weight:700;font-size:0.95rem;cursor:pointer">Sign In</button>
+  <p id="authMsg" style="color:#ff6b6b;font-size:0.8rem;text-align:center;min-height:16px;margin:0"></p>
+  <div id="userInfo" style="display:none;text-align:center">
+    <p style="color:#00CF78;font-size:0.9rem" id="userEmail"></p>
+    <button onclick="doSignOut()" style="margin-top:12px;padding:10px 24px;background:rgba(255,100,100,0.15);border:1px solid rgba(255,100,100,0.3);color:#ff6b6b;border-radius:980px;cursor:pointer;font-size:0.85rem">Sign Out</button>
+  </div>
+</div>
+<script>
+const SUPA_URL='https://YOUR_PROJECT.supabase.co';
+const SUPA_KEY='YOUR_ANON_KEY';
+let _sb=null;
+function getSB(){if(!_sb&&window.supabase)_sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);return _sb;}
+let _tab='in';
+function toggleAuthModal(){document.getElementById('authOverlay').style.display='block';document.getElementById('authModal').style.display='flex';getSB()&&getSB().auth.getUser().then(({data})=>{if(data.user)showUserInfo(data.user);});}
+function closeAuth(){document.getElementById('authOverlay').style.display='none';document.getElementById('authModal').style.display='none';}
+function switchTab(t){_tab=t;document.getElementById('tabSignIn').style.background=t==='in'?'rgba(0,175,100,0.2)':'none';document.getElementById('tabSignIn').style.color=t==='in'?'#00CF78':'rgba(255,255,255,0.4)';document.getElementById('tabSignUp').style.background=t==='up'?'rgba(0,175,100,0.2)':'none';document.getElementById('tabSignUp').style.color=t==='up'?'#00CF78':'rgba(255,255,255,0.4)';document.getElementById('authSubmit').textContent=t==='in'?'Sign In':'Create Account';}
+async function submitAuth(){const sb=getSB();if(!sb){document.getElementById('authMsg').textContent='Auth not available yet.';return;}const email=document.getElementById('authEmail').value;const pass=document.getElementById('authPass').value;document.getElementById('authMsg').textContent='';if(!email||!pass){document.getElementById('authMsg').textContent='Please fill in all fields.';return;}let res;if(_tab==='in'){res=await sb.auth.signInWithPassword({email,password:pass});}else{res=await sb.auth.signUp({email,password:pass});if(!res.error)await sb.from('profiles').upsert({id:res.data.user?.id,email,app:'callaloo',saved_recipes:[],followed_cooks:[],created_at:new Date().toISOString()});}if(res.error){document.getElementById('authMsg').textContent=res.error.message;}else{showUserInfo(res.data.user);}}
+function showUserInfo(user){document.getElementById('userInfo').style.display='block';document.getElementById('userEmail').textContent=user.email;document.getElementById('authSubmit').style.display='none';document.getElementById('authEmail').style.display='none';document.getElementById('authPass').style.display='none';document.getElementById('authBtn').textContent='My Account';document.getElementById('authBtn').style.background='rgba(0,175,100,0.25)';}
+async function doSignOut(){const sb=getSB();if(sb)await sb.auth.signOut();document.getElementById('authBtn').textContent='Sign In';document.getElementById('authBtn').style.background='rgba(0,135,90,0.15)';document.getElementById('userInfo').style.display='none';document.getElementById('authSubmit').style.display='block';document.getElementById('authEmail').style.display='block';document.getElementById('authPass').style.display='block';closeAuth();}
+window.addEventListener('load',()=>{const sb=getSB();if(sb)sb.auth.onAuthStateChange((e,s)=>{if(s)showUserInfo(s.user);});});
+</script>
+
+</body>
+</html>
