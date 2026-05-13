@@ -281,7 +281,8 @@ footer h4{font-size:13px;font-weight:700;color:rgba(255,255,255,0.25);letter-spa
           <span class="scan-where-icon">📍</span>
           <div id="rWhere" class="scan-where-text"></div>
         </div>
-        <button onclick="resetScanner()" style="margin-top:10px;width:100%;background:rgba(232,119,34,0.15);border:1px solid rgba(232,119,34,0.3);color:var(--primary-light);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">Scan another dish</button>
+        <button id="confirmScanBtn" onclick="saveScanToDB(_lastScanResult,true)" style="margin-top:10px;width:100%;background:rgba(50,200,100,0.1);border:1px solid rgba(50,200,100,0.3);color:#5efa8a;border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">&#10003; This is correct &#8212; add to Callaloo database</button>
+        <button onclick="resetScanner()" style="margin-top:6px;width:100%;background:rgba(232,119,34,0.15);border:1px solid rgba(232,119,34,0.3);color:var(--primary-light);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600">Scan another dish</button>
       </div>
       <!-- DEFAULT RESULT (shown before first scan) -->
       <div id="scanDefault" class="scan-result">
@@ -699,6 +700,9 @@ function showScanResult(r){
   document.getElementById('rIngr').textContent = '🧑\u200d🍳 ' + (r.ingredients||[]).join(' · ');
   document.getElementById('rWhere').innerHTML = getStoresuggestion(r.ingredients || []);
   document.getElementById('scanResult').style.display='block';
+  _lastScanResult = r;
+  const cb=document.getElementById('confirmScanBtn');if(cb){cb.textContent='\u2713 This is correct \u2014 add to Callaloo database';cb.disabled=false;cb.style.background='rgba(50,200,100,0.1)';cb.style.color='#5efa8a';}
+  saveScanToDB(r, false);
 }
 
 
@@ -725,6 +729,34 @@ fetch('https://ipapi.co/json/')
   .then(r=>r.json())
   .then(d=>{_userCountry = d.country_code || null;})
   .catch(()=>{});
+
+
+let _lastScanResult = null;
+
+async function saveScanToDB(r, confirmed){
+  const sb = getSB();
+  if(!sb) return;
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    await sb.from('food_scans').insert({
+      user_id: user ? user.id : null,
+      dish_name: r.dish || 'Unknown',
+      raw_gemini_response: r,
+      calories: r.calories || null,
+      protein_g: r.protein_g || null,
+      carbs_g: r.carbs_g || null,
+      fat_g: r.fat_g || null,
+      ingredients: r.ingredients || [],
+      tags: r.tags || [],
+      user_country: _userCountry || null,
+      confirmed: confirmed
+    });
+    if(confirmed){
+      const btn = document.getElementById('confirmScanBtn');
+      if(btn){btn.textContent='\u2713 Saved to database!';btn.disabled=true;btn.style.background='rgba(50,200,100,0.2)';btn.style.color='#5efa8a';}
+    }
+  } catch(e){ console.log('DB save skipped:', e.message); }
+}
 
 function resetScanner(){
   document.getElementById('scanResult').style.display='none';
