@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Profile — Callaloo</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -228,7 +228,13 @@ let _sb = null;
 let _tab = 'in';
 
 function getSB(){
-  if(!_sb && window.supabase) _sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+  if(!_sb){
+    if(window.supabase){
+      _sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+    } else {
+      return null;
+    }
+  }
   return _sb;
 }
 
@@ -241,7 +247,14 @@ function switchTab(t){
 }
 
 async function doAuth(){
+  // Wait up to 4s for Supabase SDK to load
+  let attempts = 0;
+  while(!getSB() && attempts < 40){ await new Promise(r=>setTimeout(r,100)); attempts++; }
   const sb = getSB();
+  if(!sb){
+    document.getElementById('authMsg').textContent = 'Could not connect to auth service. Please refresh and try again.';
+    return;
+  }
   const email = document.getElementById('authEmail').value.trim();
   const pass = document.getElementById('authPass').value;
   const msg = document.getElementById('authMsg');
