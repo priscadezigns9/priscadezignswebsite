@@ -45,6 +45,10 @@ CREATE TABLE IF NOT EXISTS recipes (
   protein_g NUMERIC,
   carbs_g NUMERIC,
   fat_g NUMERIC,
+  sugar_g NUMERIC,
+  sodium_mg NUMERIC,
+  fibre_g NUMERIC,
+  cholesterol_mg NUMERIC,
   instructions TEXT[],  -- ordered steps
   video_url TEXT,
   is_published BOOLEAN DEFAULT false,
