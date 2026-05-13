@@ -271,10 +271,15 @@ footer h4{font-size:13px;font-weight:700;color:rgba(255,255,255,0.25);letter-spa
       <div id="scanResult" class="scan-result" style="display:none">
         <div id="rDish" class="scan-dish"></div>
         <div id="rTags" class="scan-tags"></div>
-        <div id="rStats" class="scan-stats">
+        <div id="rStats" class="scan-stats" style="flex-wrap:wrap;gap:6px">
           <div class="stat-box"><div id="rCal" class="stat-num">—</div><div class="stat-lbl">Calories</div></div>
           <div class="stat-box"><div id="rPro" class="stat-num">—</div><div class="stat-lbl">Protein</div></div>
           <div class="stat-box"><div id="rCarb" class="stat-num">—</div><div class="stat-lbl">Carbs</div></div>
+          <div class="stat-box"><div id="rFat" class="stat-num">—</div><div class="stat-lbl">Fat</div></div>
+          <div class="stat-box"><div id="rSug" class="stat-num">—</div><div class="stat-lbl">Sugar</div></div>
+          <div class="stat-box"><div id="rSod" class="stat-num">—</div><div class="stat-lbl">Sodium</div></div>
+          <div class="stat-box"><div id="rFib" class="stat-num">—</div><div class="stat-lbl">Fibre</div></div>
+          <div class="stat-box"><div id="rChol" class="stat-num">—</div><div class="stat-lbl">Chol.</div></div>
         </div>
         <div id="rIngr" class="scan-ingredients"></div>
         <div class="scan-where">
@@ -305,6 +310,35 @@ footer h4{font-size:13px;font-weight:700;color:rgba(255,255,255,0.25);letter-spa
   </div>
 </section>
 
+
+<section style="padding:60px 20px;background:linear-gradient(180deg,#0d0500 0%,#1a0900 100%)">
+  <div style="max-width:600px;margin:0 auto;text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">&#128106;</div>
+    <h2 style="color:#fff;font-size:1.8rem;margin-bottom:12px">Let someone monitor your diet</h2>
+    <p style="color:rgba(255,255,255,0.6);font-size:1rem;margin-bottom:32px;line-height:1.6">Share your Callaloo profile with family or your doctor. They can see everything you scan &#8212; calories, sugar, sodium &#8212; in real time.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:340px;margin:0 auto">
+      <div style="background:rgba(232,119,34,0.08);border:1px solid rgba(232,119,34,0.2);border-radius:16px;padding:20px;text-align:left">
+        <div style="color:var(--primary);font-weight:700;font-size:.95rem;margin-bottom:8px">&#128202; What they see</div>
+        <ul style="color:rgba(255,255,255,0.7);font-size:.88rem;line-height:1.8;padding-left:18px;margin:0">
+          <li>Every dish you scan</li>
+          <li>Daily calorie &amp; sugar totals</li>
+          <li>Sodium &amp; cholesterol trends</li>
+          <li>Your most scanned foods</li>
+        </ul>
+      </div>
+      <div style="background:rgba(232,119,34,0.08);border:1px solid rgba(232,119,34,0.2);border-radius:16px;padding:20px;text-align:left">
+        <div style="color:var(--primary);font-weight:700;font-size:.95rem;margin-bottom:8px">&#128274; You stay in control</div>
+        <ul style="color:rgba(255,255,255,0.7);font-size:.88rem;line-height:1.8;padding-left:18px;margin:0">
+          <li>You choose who can view</li>
+          <li>Revoke access anytime</li>
+          <li>They can view only &#8212; not edit</li>
+        </ul>
+      </div>
+      <button onclick="toggleAuthModal()" style="background:var(--primary);color:#fff;border:none;border-radius:50px;padding:16px 32px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:8px">Create your profile to get started</button>
+      <p style="color:rgba(255,255,255,0.35);font-size:.8rem;margin-top:4px">Free. No credit card needed.</p>
+    </div>
+  </div>
+</section>
 <!-- HOW IT WORKS -->
 <section>
   <div class="hiw">
@@ -656,6 +690,10 @@ Respond ONLY with valid JSON, no markdown, no extra text:
   "carbs_g": 00,
   "fat_g": 00,
   "ingredients": ["ingredient 1","ingredient 2","ingredient 3","ingredient 4","ingredient 5"],
+  "sugar_g": 00,
+  "sodium_mg": 000,
+  "fibre_g": 00,
+  "cholesterol_mg": 000,
   "where_to_buy": "Based on the ingredients listed, suggest where to buy them — return only the ingredient names as a simple list, no store names (those will be added by the app)"
 }
 If it is not food, set dish to "Not a food item 🤔" and zeros for nutrition.`;
@@ -697,6 +735,11 @@ function showScanResult(r){
   document.getElementById('rCal').textContent = r.calories || '—';
   document.getElementById('rPro').textContent = (r.protein_g||'—')+'g';
   document.getElementById('rCarb').textContent = (r.carbs_g||'—')+'g';
+  document.getElementById('rFat').textContent = (r.fat_g||'—')+'g';
+  document.getElementById('rSug').textContent = (r.sugar_g||'—')+'g';
+  document.getElementById('rSod').textContent = (r.sodium_mg||'—')+'mg';
+  document.getElementById('rFib').textContent = (r.fibre_g||'—')+'g';
+  document.getElementById('rChol').textContent = (r.cholesterol_mg||'—')+'mg';
   document.getElementById('rIngr').textContent = '🧑\u200d🍳 ' + (r.ingredients||[]).join(' · ');
   document.getElementById('rWhere').innerHTML = getStoresuggestion(r.ingredients || []);
   document.getElementById('scanResult').style.display='block';
@@ -746,6 +789,10 @@ async function saveScanToDB(r, confirmed){
       protein_g: r.protein_g || null,
       carbs_g: r.carbs_g || null,
       fat_g: r.fat_g || null,
+      sugar_g: r.sugar_g || null,
+      sodium_mg: r.sodium_mg || null,
+      fibre_g: r.fibre_g || null,
+      cholesterol_mg: r.cholesterol_mg || null,
       ingredients: r.ingredients || [],
       tags: r.tags || [],
       user_country: _userCountry || null,
