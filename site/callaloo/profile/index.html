@@ -120,7 +120,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:16px 5
 <body>
 
 <nav>
-  <a href="/callaloo/" class="nav-logo">Calla<span>loo</span></a>
+  <a href="/callaloo/feed/" class="nav-logo">Calla<span>loo</span></a>
   <div style="display:flex;gap:14px;align-items:center"><a href="/callaloo/feed/" style="color:var(--primary);font-weight:700;font-size:.9rem;text-decoration:none">🍽 Feed</a><a href="/callaloo/recipes/" style="color:var(--muted);font-size:.9rem;text-decoration:none">📖 Recipes</a></div>
 </nav>
 
@@ -322,7 +322,8 @@ async function uploadAvatar(e){
       el2.style.backgroundImage='url('+b64+')'; el2.style.backgroundSize='cover'; el2.style.backgroundPosition='center'; el2.textContent='';
       _userProfile.avatar_url = b64;
       localStorage.setItem('callaloo_avatar_'+_currentUser.id, b64);
-      await sb.from('profiles').upsert({id:_currentUser.id, avatar_url:b64.substring(0,600), updated_at:new Date().toISOString()});
+      localStorage.setItem('callaloo_avatar_'+_currentUser.id, b64);
+      await sb.from('profiles').upsert({id:_currentUser.id, avatar_url:'__local__', updated_at:new Date().toISOString()});
       document.getElementById('uploadProgress').textContent='Photo saved!';
       setTimeout(()=>document.getElementById('uploadProgress').style.display='none',2000);
     };
@@ -363,7 +364,7 @@ async function loadProfile(user){
   const name = email.split('@')[0];
 
   // Fetch profile (bio + avatar)
-  const { data: profileData } = await sb.from('profiles').select('bio,avatar_url').eq('id', user.id).single();
+  const { data: profileData } = await sb.from('profiles').select('bio,avatar_url,display_name').eq('id', user.id).single();
   if(profileData){
     _userProfile = profileData;
     if(profileData.bio){
@@ -372,10 +373,9 @@ async function loadProfile(user){
     }
     if(profileData.avatar_url){
       const el = document.getElementById('avatarEl');
-      el.style.backgroundImage = 'url(' + profileData.avatar_url + ')';
-      el.style.backgroundSize = 'cover';
-      el.style.backgroundPosition = 'center';
-      el.textContent = '';
+      let avUrl = profileData.avatar_url;
+      if(avUrl === '__local__'){ avUrl = localStorage.getItem('callaloo_avatar_'+user.id) || ''; }
+      if(avUrl && avUrl !== '__local__'){ el.style.backgroundImage='url('+avUrl+')'; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; el.textContent=''; }
     }
   }
   const joined = new Date(user.created_at).toLocaleDateString('en-US',{month:'long',year:'numeric'});
@@ -504,7 +504,7 @@ window.addEventListener('load', async ()=>{
 <!-- BOTTOM NAV -->
 <style>.bnav-c{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(12px);border-top:1px solid rgba(232,119,34,0.18);display:flex;z-index:200}.bnav-ci{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 0 8px;text-decoration:none;color:rgba(26,13,0,0.45);font-size:.65rem;font-weight:600;gap:4px}.bnav-ci.on{color:#E87722}.bnav-ci .ic{font-size:22px;line-height:1}</style>
 <div class="bnav-c">
-  <a href="/callaloo/" class="bnav-ci"><span class="ic">🏠</span>Home</a>
+  <a href="/callaloo/feed/" class="bnav-ci"><span class="ic">🏠</span>Home</a>
   <a href="/callaloo/feed/" class="bnav-ci"><span class="ic">🍽</span>Feed</a>
   <a href="/callaloo/recipes/" class="bnav-ci"><span class="ic">📖</span>Recipes</a>
   <a href="/callaloo/profile/" class="bnav-ci on"><span class="ic">👤</span>Profile</a>
