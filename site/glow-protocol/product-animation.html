@@ -2,499 +2,383 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Glow Protocol — Advanced Serum</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300;1,400&family=Montserrat:wght@100;200;300;400&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glow Protocol — Product Showcase</title>
 <style>
-  *, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: radial-gradient(ellipse at 50% 30%, #1a0a2e 0%, #0a0514 40%, #020008 100%);
-    min-height: 100vh;
-    overflow: hidden;
-    font-family: 'Montserrat', sans-serif;
+    background: #0a0008;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-height: 100vh;
+    font-family: 'Georgia', serif;
+    overflow: hidden;
+  }
+
+  .scene {
     position: relative;
+    width: 420px;
+    height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  /* ─── CORNER ACCENTS ─── */
-  .corner {
-    position: fixed;
-    width: 22px;
-    height: 22px;
-    opacity: 0;
-    animation: fadeIn 2s ease 0.5s forwards;
-  }
-  .corner-tl { top: 28px; left: 28px; border-top: 2px solid #C8A84B; border-left: 2px solid #C8A84B; }
-  .corner-tr { top: 28px; right: 28px; border-top: 2px solid #C8A84B; border-right: 2px solid #C8A84B; }
-  .corner-bl { bottom: 28px; left: 28px; border-bottom: 2px solid #C8A84B; border-left: 2px solid #C8A84B; }
-  .corner-br { bottom: 28px; right: 28px; border-bottom: 2px solid #C8A84B; border-right: 2px solid #C8A84B; }
-
-  /* ─── LIGHT ORBS ─── */
-  .orb {
-    position: fixed;
+  /* Ambient glow background */
+  .glow-bg {
+    position: absolute;
+    width: 340px;
+    height: 340px;
     border-radius: 50%;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .orb-gold {
-    width: 300px;
-    height: 300px;
-    top: calc(40% - 150px);
-    left: calc(50% - 150px);
-    background: radial-gradient(circle, rgba(200,168,75,0.25), transparent 70%);
-    animation: pulse-gold 4s ease-in-out infinite alternate;
-  }
-  .orb-purple {
-    width: 400px;
-    height: 400px;
-    top: calc(60% - 200px);
-    left: calc(30% - 200px);
-    background: radial-gradient(circle, rgba(120,60,200,0.2), transparent 70%);
-    animation: drift-purple 6s ease-in-out infinite alternate;
-  }
-  .orb-blue {
-    width: 250px;
-    height: 250px;
-    top: calc(50% - 125px);
-    left: calc(70% - 125px);
-    background: radial-gradient(circle, rgba(60,100,220,0.2), transparent 70%);
-    animation: drift-blue 5s ease-in-out infinite alternate;
+    background: radial-gradient(circle, rgba(255,180,220,0.18) 0%, rgba(200,100,200,0.12) 40%, transparent 70%);
+    animation: pulseGlow 4s ease-in-out infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
-  @keyframes pulse-gold {
-    from { opacity: 0.4; transform: scale(0.9); }
-    to   { opacity: 0.8; transform: scale(1.1); }
-  }
-  @keyframes drift-purple {
-    from { transform: translate(0, 0); }
-    to   { transform: translate(30px, -20px); }
-  }
-  @keyframes drift-blue {
-    from { transform: translate(0, 0); }
-    to   { transform: translate(-20px, 15px); }
+  .glow-bg2 {
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,220,180,0.14) 0%, rgba(255,150,100,0.08) 50%, transparent 70%);
+    animation: pulseGlow2 5s ease-in-out infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 
-  /* ─── PARTICLES CONTAINER ─── */
-  #particles {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.6; transform: translate(-50%,-50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%,-50%) scale(1.15); }
   }
+
+  @keyframes pulseGlow2 {
+    0%, 100% { opacity: 0.4; transform: translate(-50%,-50%) scale(1.1); }
+    50% { opacity: 0.8; transform: translate(-50%,-50%) scale(0.9); }
+  }
+
+  /* Floating particles */
   .particle {
     position: absolute;
-    width: 3px;
-    height: 3px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
-    background: #C8A84B;
-    animation: rise linear infinite;
-  }
-  @keyframes rise {
-    0%   { transform: translateY(0)       translateX(0);            opacity: 0;   }
-    20%  { opacity: 0.8; }
-    80%  { opacity: 0.4; }
-    100% { transform: translateY(-200px) translateX(var(--drift));  opacity: 0;   }
+    background: rgba(255,180,220,0.7);
+    animation: floatUp linear infinite;
   }
 
-  /* ─── MAIN LAYOUT ─── */
-  .page-layout {
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(0) translateX(0); }
+    20% { opacity: 1; }
+    80% { opacity: 0.6; }
+    100% { opacity: 0; transform: translateY(-180px) translateX(var(--drift)); }
+  }
+
+  /* Product carousel */
+  .product-track {
     position: relative;
-    z-index: 10;
+    width: 240px;
+    height: 300px;
+  }
+
+  .product-card {
+    position: absolute;
+    width: 240px;
+    height: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    min-height: 100vh;
-    padding: 60px 20px;
-    gap: 0;
-  }
-
-  /* ─── TOP TEXT ─── */
-  .brand-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.8rem;
-    font-weight: 700;
-    color: #C8A84B;
-    letter-spacing: 10px;
-    text-align: center;
-    text-transform: uppercase;
     opacity: 0;
-    animation: fadeIn 2s ease 0.3s forwards;
-    margin-bottom: 14px;
-  }
-  .title-line {
-    width: 80px;
-    height: 1px;
-    background: #C8A84B;
-    margin: 0 auto 40px auto;
-    opacity: 0;
-    animation: fadeIn 2s ease 0.6s forwards;
-  }
-
-  /* ─── 3D SCENE ─── */
-  .scene {
-    perspective: 800px;
-    perspective-origin: 50% 40%;
-    width: 140px;
-    height: 370px;
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .bottle-wrap {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform-origin: center center;
-    transform-style: preserve-3d;
-    margin-left: -45px;
-    margin-top: -175px;
-    width: 90px;
-    height: 350px;
-    animation:
-      intro 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-      spin  10s linear 1.5s infinite,
-      float  3s ease-in-out 1.5s infinite alternate;
-  }
-
-  @keyframes intro {
-    from { opacity: 0; transform: scale(0.3) rotateY(0deg); }
-    to   { opacity: 1; transform: scale(1)   rotateY(180deg); }
-  }
-  @keyframes spin  { from { transform: rotateY(0deg);   } to { transform: rotateY(360deg); } }
-  @keyframes float {
-    from { transform: rotateY(var(--r, 0deg)) translateY(0);     }
-    to   { transform: rotateY(var(--r, 0deg)) translateY(-18px); }
-  }
-
-  /* ─── BOTTLE PARTS ─── */
-  .bottle-body {
-    position: absolute;
-    width: 90px;
-    height: 220px;
-    bottom: 0;
-    left: 0;
-    border-radius: 45px / 20px;
-    background: linear-gradient(
-      105deg,
-      rgba(200,230,245,0.15)  0%,
-      rgba(180,210,235,0.55) 30%,
-      rgba(220,240,255,0.80) 50%,
-      rgba(170,200,220,0.45) 70%,
-      rgba(150,180,200,0.20) 100%
-    );
-    box-shadow:
-      inset -20px 0 40px rgba(0,0,0,0.3),
-      inset  10px 0 30px rgba(255,255,255,0.15),
-      0 20px 80px rgba(100,150,200,0.3),
-      0  0  60px rgba(200,180,255,0.15);
-    -webkit-backdrop-filter: blur(2px);
-    backdrop-filter: blur(2px);
-    border: 1px solid rgba(255,255,255,0.2);
-  }
-
-  .bottle-highlight {
-    position: absolute;
-    width: 12px;
-    height: 140px;
-    left: 18px;
-    bottom: 50px;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      rgba(255,255,255,0.6) 30%,
-      rgba(255,255,255,0.8) 50%,
-      rgba(255,255,255,0.3) 70%,
-      transparent
-    );
-    border-radius: 6px;
-    opacity: 0.7;
+    transform: scale(0.85) translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
     pointer-events: none;
-    animation: shimmer 3s ease-in-out infinite alternate;
-  }
-  @keyframes shimmer {
-    from { opacity: 0.4; transform: scaleY(0.95); }
-    to   { opacity: 0.9; transform: scaleY(1.05); }
   }
 
-  .bottle-label {
-    position: absolute;
-    width: 70px;
-    height: 100px;
-    left: 10px;
-    bottom: 80px;
-    background: rgba(5,0,15,0.85);
-    border: 1px solid rgba(200,168,75,0.4);
-    border-radius: 4px;
-    padding: 10px 8px;
-    text-align: center;
+  .product-card.active {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+  }
+
+  .product-card.exit {
+    opacity: 0;
+    transform: scale(1.05) translateY(-20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .product-img-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    pointer-events: none;
-  }
-  .label-line {
-    width: 40px;
-    height: 0;
-    border-top: 1px solid #C8A84B;
-  }
-  .label-glow {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px;
-    font-weight: 800;
-    color: #C8A84B;
-    letter-spacing: 3px;
-    line-height: 1;
-    margin-top: 3px;
-  }
-  .label-protocol {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 7px;
-    color: #ffffff;
-    letter-spacing: 4px;
-    margin-top: 1px;
-  }
-  .label-diamond {
-    color: #C8A84B;
-    font-size: 8px;
-    margin-top: 2px;
-    line-height: 1;
-  }
-  .label-serum {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 6px;
-    color: rgba(200,168,75,0.7);
-    letter-spacing: 1px;
-    font-style: italic;
-    margin-top: 1px;
+    animation: floatProduct 3s ease-in-out infinite;
   }
 
-  .bottle-neck {
+  @keyframes floatProduct {
+    0%, 100% { transform: translateY(0px) rotate(-1deg); }
+    50% { transform: translateY(-12px) rotate(1deg); }
+  }
+
+  .product-img-wrap::before {
+    content: '';
     position: absolute;
-    width: 36px;
-    height: 50px;
-    left: 27px;
-    bottom: 220px;
-    background: linear-gradient(
-      to right,
-      rgba(150,190,210,0.4),
-      rgba(220,240,255,0.7),
-      rgba(150,190,210,0.4)
-    );
-    border-radius: 18px 18px 8px 8px;
-    border: 1px solid rgba(255,255,255,0.15);
-  }
-
-  .bottle-cap {
-    position: absolute;
-    width: 44px;
-    height: 65px;
-    left: 23px;
-    bottom: 268px;
-    background: linear-gradient(
-      135deg,
-      #8B6914  0%,
-      #C8A84B 30%,
-      #F0D060 50%,
-      #C8A84B 70%,
-      #7A5C10 100%
-    );
-    border-radius: 22px 22px 6px 6px;
-    box-shadow:
-      0 4px 20px rgba(200,168,75,0.4),
-      inset 0 2px 4px rgba(255,255,255,0.3);
-  }
-
-  .bottle-base {
-    position: absolute;
-    width: 90px;
-    height: 16px;
-    bottom: -10px;
-    left: 0;
-    background: linear-gradient(
-      to right,
-      rgba(100,140,170,0.3),
-      rgba(180,210,230,0.5),
-      rgba(100,140,170,0.3)
-    );
-    border-radius: 50%;
-    filter: blur(2px);
-  }
-
-  /* ─── REFLECTION UNDER BOTTLE ─── */
-  .reflection {
-    width: 80px;
-    height: 20px;
-    background: radial-gradient(ellipse, rgba(200,168,75,0.3), transparent 70%);
-    border-radius: 50%;
-    filter: blur(8px);
-    animation: ref-pulse 3s ease-in-out infinite alternate;
-    margin-top: 10px;
-    flex-shrink: 0;
-  }
-  @keyframes ref-pulse {
-    from { opacity: 0.4; transform: scaleX(0.8); }
-    to   { opacity: 0.8; transform: scaleX(1.2); }
-  }
-
-  /* ─── BOTTOM TEXT ─── */
-  .bottom-text {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 32px;
-    opacity: 0;
-    animation: fadeIn 2s ease 1.2s forwards;
-  }
-  .tagline-sub {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.9rem;
-    color: #ffffff;
-    letter-spacing: 5px;
-    text-align: center;
-    font-weight: 200;
-  }
-  .tagline-main {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.85rem;
-    color: #C8A84B;
-    font-style: italic;
-    margin-top: 8px;
-    text-align: center;
-    letter-spacing: 2px;
-  }
-
-  /* ─── SCREEN RECORD HINT ─── */
-  .hint {
-    position: fixed;
-    bottom: 14px;
+    bottom: -20px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 1px;
-    text-align: center;
-    z-index: 20;
-    opacity: 0;
-    animation: fadeIn 2s ease 2s forwards;
-    white-space: nowrap;
+    width: 120px;
+    height: 20px;
+    background: radial-gradient(ellipse, rgba(200,100,200,0.4) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: shadowPulse 3s ease-in-out infinite;
   }
 
-  /* ─── SHARED FADE IN ─── */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+  @keyframes shadowPulse {
+    0%, 100% { opacity: 0.5; transform: translateX(-50%) scaleX(1); }
+    50% { opacity: 0.8; transform: translateX(-50%) scaleX(0.85); }
+  }
+
+  .product-img {
+    max-width: 180px;
+    max-height: 180px;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 32px rgba(255,150,200,0.5)) drop-shadow(0 0 16px rgba(200,100,255,0.3));
+    border-radius: 12px;
+  }
+
+  /* Shine sweep */
+  .shine-sweep {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.12) 50%, transparent 60%);
+    animation: shineSweep 4s ease-in-out infinite;
+    pointer-events: none;
+    border-radius: 12px;
+  }
+
+  @keyframes shineSweep {
+    0%, 70% { left: -100%; opacity: 0; }
+    71% { opacity: 1; }
+    100% { left: 150%; opacity: 0; }
+  }
+
+  .product-info {
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  .brand-tag {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,180,220,0.7);
+    margin-bottom: 6px;
+  }
+
+  .product-name {
+    font-size: 0.88rem;
+    color: #fff;
+    font-weight: 400;
+    line-height: 1.4;
+    max-width: 200px;
+    text-shadow: 0 0 20px rgba(255,150,200,0.4);
+  }
+
+  /* Bottom dots */
+  .dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,180,220,0.3);
+    transition: all 0.4s ease;
+  }
+
+  .dot.active {
+    background: rgba(255,180,220,0.9);
+    transform: scale(1.3);
+    box-shadow: 0 0 8px rgba(255,150,200,0.6);
+  }
+
+  /* Top brand label */
+  .brand-header {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+
+  .brand-header span {
+    font-size: 0.72rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,180,220,0.5);
+  }
+
+  /* Corner sparkles */
+  .sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(255,220,180,0.8);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: sparklePop ease-in-out infinite;
+  }
+
+  @keyframes sparklePop {
+    0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1) rotate(180deg); }
   }
 </style>
 </head>
 <body>
 
-<!-- Light orbs -->
-<div class="orb orb-gold"></div>
-<div class="orb orb-purple"></div>
-<div class="orb orb-blue"></div>
+<div class="scene">
 
-<!-- Particles container -->
-<div id="particles"></div>
+  <!-- Ambient glow -->
+  <div class="glow-bg"></div>
+  <div class="glow-bg2"></div>
 
-<!-- Corner accents -->
-<div class="corner corner-tl"></div>
-<div class="corner corner-tr"></div>
-<div class="corner corner-bl"></div>
-<div class="corner corner-br"></div>
+  <!-- Brand header -->
+  <div class="brand-header">
+    <span>Glow Protocol</span>
+  </div>
 
-<!-- Hint -->
-<div class="hint">Open fullscreen &middot; Screen record 15 seconds</div>
+  <!-- Sparkles -->
+  <div class="sparkle" style="top:60px;left:30px;animation-duration:2.8s;animation-delay:0s"></div>
+  <div class="sparkle" style="top:80px;right:25px;animation-duration:3.4s;animation-delay:0.8s;width:5px;height:5px"></div>
+  <div class="sparkle" style="bottom:100px;left:20px;animation-duration:4s;animation-delay:1.4s;width:4px;height:4px"></div>
+  <div class="sparkle" style="bottom:120px;right:30px;animation-duration:2.5s;animation-delay:0.4s"></div>
+  <div class="sparkle" style="top:160px;left:10px;animation-duration:3.8s;animation-delay:1.9s;width:3px;height:3px"></div>
 
-<!-- Main layout -->
-<div class="page-layout">
+  <!-- Particles -->
+  <div class="particle" style="bottom:80px;left:80px;animation-duration:5s;animation-delay:0s;--drift:20px"></div>
+  <div class="particle" style="bottom:80px;left:160px;animation-duration:6s;animation-delay:1.5s;--drift:-15px;width:3px;height:3px"></div>
+  <div class="particle" style="bottom:80px;left:220px;animation-duration:4.5s;animation-delay:0.8s;--drift:10px;width:2px;height:2px"></div>
+  <div class="particle" style="bottom:80px;left:120px;animation-duration:7s;animation-delay:2.5s;--drift:-25px;width:3px;height:3px"></div>
 
-  <!-- Top text -->
-  <h1 class="brand-title">Glow Protocol</h1>
-  <div class="title-line"></div>
+  <!-- Product carousel -->
+  <div class="product-track">
 
-  <!-- 3D Bottle scene -->
-  <div class="scene">
-    <div class="bottle-wrap" id="bottleWrap">
-
-      <!-- Cap -->
-      <div class="bottle-cap"></div>
-
-      <!-- Neck -->
-      <div class="bottle-neck"></div>
-
-      <!-- Body -->
-      <div class="bottle-body">
-        <!-- Highlight streak -->
-        <div class="bottle-highlight"></div>
-
-        <!-- Label -->
-        <div class="bottle-label">
-          <div class="label-line"></div>
-          <div class="label-glow">GLOW</div>
-          <div class="label-protocol">PROTOCOL</div>
-          <div class="label-line"></div>
-          <div class="label-diamond">&#9670;</div>
-          <div class="label-serum">Advanced Serum</div>
-        </div>
+    <div class="product-card active" data-brand="Medicube" data-name="Zero Pore Pads 2.0">
+      <div class="product-img-wrap">
+        <img class="product-img" src="https://m.media-amazon.com/images/I/71Mcspt-6AL._SL1500_.jpg" alt="Medicube Zero Pore Pads">
+        <div class="shine-sweep"></div>
       </div>
-
-      <!-- Base shadow -->
-      <div class="bottle-base"></div>
-
+      <div class="product-info">
+        <div class="brand-tag">Medicube</div>
+        <div class="product-name">Zero Pore Pads 2.0</div>
+      </div>
     </div>
+
+    <div class="product-card" data-brand="The Ordinary" data-name="Glycolic Acid 7% Toner">
+      <div class="product-img-wrap">
+        <img class="product-img" src="https://m.media-amazon.com/images/I/51bC4vVdkOL._SL1240_.jpg" alt="The Ordinary Toner">
+        <div class="shine-sweep"></div>
+      </div>
+      <div class="product-info">
+        <div class="brand-tag">The Ordinary</div>
+        <div class="product-name">Glycolic Acid 7% Toner</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-brand="Neutrogena" data-name="Ultra Sheer SPF 70">
+      <div class="product-img-wrap">
+        <img class="product-img" src="https://m.media-amazon.com/images/I/416kUGx2rQL._SL1024_.jpg" alt="Neutrogena SPF 70">
+        <div class="shine-sweep"></div>
+      </div>
+      <div class="product-info">
+        <div class="brand-tag">Neutrogena</div>
+        <div class="product-name">Ultra Sheer SPF 70</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-brand="COSRX" data-name="Advanced Snail 96 Serum">
+      <div class="product-img-wrap">
+        <img class="product-img" src="https://m.media-amazon.com/images/I/61EidjXUBrL._SL1000_.jpg" alt="COSRX Serum">
+        <div class="shine-sweep"></div>
+      </div>
+      <div class="product-info">
+        <div class="brand-tag">COSRX</div>
+        <div class="product-name">Advanced Snail 96 Serum</div>
+      </div>
+    </div>
+
+    <div class="product-card" data-brand="CeraVe" data-name="Moisturizing Cream 19oz">
+      <div class="product-img-wrap">
+        <img class="product-img" src="https://m.media-amazon.com/images/I/51bC4vVdkOL._SL1240_.jpg" alt="CeraVe Cream">
+        <div class="shine-sweep"></div>
+      </div>
+      <div class="product-info">
+        <div class="brand-tag">CeraVe</div>
+        <div class="product-name">Moisturizing Cream 19oz</div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- Reflection -->
-  <div class="reflection"></div>
-
-  <!-- Bottom text -->
-  <div class="bottom-text">
-    <div class="tagline-sub">Advanced Serum Formula</div>
-    <div class="tagline-main">Luminous skin begins here.</div>
-  </div>
+  <!-- Navigation dots -->
+  <div class="dots" id="dots"></div>
 
 </div>
 
 <script>
-  // ── Generate 20 gold particles ──
-  const container = document.getElementById('particles');
-  const centerX   = window.innerWidth  / 2;
-  const centerY   = window.innerHeight / 2;
+  const cards = document.querySelectorAll('.product-card');
+  const dotsEl = document.getElementById('dots');
+  let current = 0;
+  let timer;
 
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
+  // Build dots
+  cards.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
 
-    // Random X spread around bottle (±80px from centre)
-    const x    = centerX + (Math.random() * 160 - 80);
-    const y    = centerY + (Math.random() * 120 - 20);
-    const dur  = (3 + Math.random() * 4).toFixed(2);   // 3–7 s
-    const del  = (Math.random() * 5).toFixed(2);        // 0–5 s
-    const drift= (Math.random() * 40 - 20).toFixed(0);  // ±20 px
+  function goTo(idx) {
+    clearTimeout(timer);
+    const prev = current;
+    current = idx;
 
-    p.style.cssText = `
-      left:${x}px;
-      top:${y}px;
-      animation-duration:${dur}s;
-      animation-delay:-${del}s;
-      --drift:${drift}px;
-    `;
-    container.appendChild(p);
+    cards[prev].classList.remove('active');
+    cards[prev].classList.add('exit');
+    setTimeout(() => cards[prev].classList.remove('exit'), 600);
+
+    cards[current].classList.add('active');
+
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+
+    scheduleNext();
   }
+
+  function scheduleNext() {
+    timer = setTimeout(() => {
+      goTo((current + 1) % cards.length);
+    }, 3500);
+  }
+
+  scheduleNext();
 </script>
+
 </body>
 </html>
