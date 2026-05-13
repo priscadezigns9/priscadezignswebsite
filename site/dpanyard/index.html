@@ -142,6 +142,7 @@ footer{background:var(--dark);color:rgba(255,255,255,0.55);padding:48px 5%;displ
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="D' PanYard">
 <link rel="apple-touch-icon" href="/dpanyard/icon.svg">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <!-- PWA Install Banner -->
@@ -167,6 +168,7 @@ footer{background:var(--dark);color:rgba(255,255,255,0.55);padding:48px 5%;displ
     <a class="nav-link" href="#providers">Providers</a>
     <a class="nav-link" href="#hiw">How It Works</a>
     <a class="nav-cta" href="/dpanyard/list/">List Your Business</a>
+    <button id="authBtn" onclick="toggleAuthModal()" style="background:rgba(26,60,143,0.15);border:1px solid rgba(26,60,143,0.4);color:#4A90D9;padding:7px 16px;border-radius:980px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s">Sign In</button>
   </div>
 </nav>
 
@@ -434,6 +436,38 @@ function installPWA(){
   }
 }
 </script>
+<!-- AUTH MODAL -->
+<div id="authOverlay" onclick="closeAuth()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:998;backdrop-filter:blur(4px)"></div>
+<div id="authModal" style="display:none;position:fixed;top:0;right:0;bottom:0;width:340px;max-width:100vw;background:#070D1A;border-left:1px solid rgba(26,60,143,0.2);z-index:999;padding:40px 28px;flex-direction:column;gap:20px;overflow-y:auto">
+  <button onclick="closeAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.4rem;cursor:pointer">&#x2715;</button>
+  <div style="display:flex;gap:0;margin-bottom:8px;border:1px solid rgba(26,60,143,0.4);border-radius:8px;overflow:hidden">
+    <button id="tabSignIn" onclick="switchTab('in')" style="flex:1;padding:10px;background:rgba(26,60,143,0.2);border:none;color:#4A90D9;font-weight:600;cursor:pointer;font-size:0.85rem">Sign In</button>
+    <button id="tabSignUp" onclick="switchTab('up')" style="flex:1;padding:10px;background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.85rem">Sign Up</button>
+  </div>
+  <input id="authEmail" type="email" placeholder="Email address" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(26,60,143,0.4);border-radius:8px;color:#fff;font-size:0.9rem;box-sizing:border-box;outline:none">
+  <input id="authPass" type="password" placeholder="Password" style="width:100%;padding:12px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(26,60,143,0.4);border-radius:8px;color:#fff;font-size:0.9rem;box-sizing:border-box;outline:none;margin-top:-10px">
+  <button id="authSubmit" onclick="submitAuth()" style="width:100%;padding:13px;background:linear-gradient(135deg,#1A3C8F,#4A90D9);border:none;border-radius:980px;color:#fff;font-weight:700;font-size:0.95rem;cursor:pointer">Sign In</button>
+  <p id="authMsg" style="color:#ff6b6b;font-size:0.8rem;text-align:center;min-height:16px;margin:0"></p>
+  <div id="userInfo" style="display:none;text-align:center">
+    <p style="color:#4A90D9;font-size:0.9rem" id="userEmail"></p>
+    <button onclick="doSignOut()" style="margin-top:12px;padding:10px 24px;background:rgba(255,100,100,0.15);border:1px solid rgba(255,100,100,0.3);color:#ff6b6b;border-radius:980px;cursor:pointer;font-size:0.85rem">Sign Out</button>
+  </div>
+</div>
+<script>
+const SUPA_URL='https://YOUR_PROJECT.supabase.co';
+const SUPA_KEY='YOUR_ANON_KEY';
+let _sb=null;
+function getSB(){if(!_sb&&window.supabase)_sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);return _sb;}
+let _tab='in';
+function toggleAuthModal(){document.getElementById('authOverlay').style.display='block';document.getElementById('authModal').style.display='flex';getSB()&&getSB().auth.getUser().then(({data})=>{if(data.user)showUserInfo(data.user);});}
+function closeAuth(){document.getElementById('authOverlay').style.display='none';document.getElementById('authModal').style.display='none';}
+function switchTab(t){_tab=t;document.getElementById('tabSignIn').style.background=t==='in'?'rgba(26,60,143,0.2)':'none';document.getElementById('tabSignIn').style.color=t==='in'?'#4A90D9':'rgba(255,255,255,0.4)';document.getElementById('tabSignUp').style.background=t==='up'?'rgba(26,60,143,0.2)':'none';document.getElementById('tabSignUp').style.color=t==='up'?'#4A90D9':'rgba(255,255,255,0.4)';document.getElementById('authSubmit').textContent=t==='in'?'Sign In':'Create Account';}
+async function submitAuth(){const sb=getSB();if(!sb){document.getElementById('authMsg').textContent='Auth not available yet.';return;}const email=document.getElementById('authEmail').value;const pass=document.getElementById('authPass').value;document.getElementById('authMsg').textContent='';if(!email||!pass){document.getElementById('authMsg').textContent='Please fill in all fields.';return;}let res;if(_tab==='in'){res=await sb.auth.signInWithPassword({email,password:pass});}else{res=await sb.auth.signUp({email,password:pass});if(!res.error)await sb.from('profiles').upsert({id:res.data.user?.id,email,app:'dpanyard',saved_providers:[],area:'',created_at:new Date().toISOString()});}if(res.error){document.getElementById('authMsg').textContent=res.error.message;}else{showUserInfo(res.data.user);}}
+function showUserInfo(user){document.getElementById('userInfo').style.display='block';document.getElementById('userEmail').textContent=user.email;document.getElementById('authSubmit').style.display='none';document.getElementById('authEmail').style.display='none';document.getElementById('authPass').style.display='none';document.getElementById('authBtn').textContent='My Account';document.getElementById('authBtn').style.background='rgba(26,60,143,0.25)';}
+async function doSignOut(){const sb=getSB();if(sb)await sb.auth.signOut();document.getElementById('authBtn').textContent='Sign In';document.getElementById('authBtn').style.background='rgba(26,60,143,0.15)';document.getElementById('userInfo').style.display='none';document.getElementById('authSubmit').style.display='block';document.getElementById('authEmail').style.display='block';document.getElementById('authPass').style.display='block';closeAuth();}
+window.addEventListener('load',()=>{const sb=getSB();if(sb)sb.auth.onAuthStateChange((e,s)=>{if(s)showUserInfo(s.user);});});
+</script>
+
 </body>
 </html>
 
