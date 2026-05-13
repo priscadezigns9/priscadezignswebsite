@@ -655,7 +655,7 @@ Respond ONLY with valid JSON, no markdown, no extra text:
   "carbs_g": 00,
   "fat_g": 00,
   "ingredients": ["ingredient 1","ingredient 2","ingredient 3","ingredient 4","ingredient 5"],
-  "where_to_buy": "Suggest 1-2 types of local Caribbean grocery stores or markets where these ingredients can be found"
+  "where_to_buy": "Based on the ingredients listed, suggest where to buy them — return only the ingredient names as a simple list, no store names (those will be added by the app)"
 }
 If it is not food, set dish to "Not a food item 🤔" and zeros for nutrition.`;
 
@@ -697,9 +697,34 @@ function showScanResult(r){
   document.getElementById('rPro').textContent = (r.protein_g||'—')+'g';
   document.getElementById('rCarb').textContent = (r.carbs_g||'—')+'g';
   document.getElementById('rIngr').textContent = '🧑\u200d🍳 ' + (r.ingredients||[]).join(' · ');
-  document.getElementById('rWhere').innerHTML = r.where_to_buy || 'Check your local Caribbean grocery store';
+  document.getElementById('rWhere').innerHTML = getStoresuggestion(r.ingredients || []);
   document.getElementById('scanResult').style.display='block';
 }
+
+
+function getStoresuggestion(ingredients){
+  const country = _userCountry || 'unknown';
+  const stores = {
+    'TT': ['Hi-Lo Food Stores', 'Massy Stores', 'PriceSmart', 'Standard Distributors'],
+    'JM': ['Sovereign Supercentre', 'MegaMart', 'Loshusan Supermarket', 'Hi-Lo Jamaica'],
+    'BB': ['Massy Stores Barbados', 'Carlton Supermarket', 'Cost-U-Less'],
+    'GY': ['Survival Supermarket', 'Nigel's Supermarket', 'Bounty Farm'],
+    'GB': ['Wing Yip', 'Ridley Road Market', 'Tropical Superstore', 'your local Caribbean grocery'],
+    'CA': ['No Frills', 'T&T Supermarket', 'your local Caribbean or ethnic grocery'],
+    'US': ['Seafood City', 'Compare Foods', 'your nearest Caribbean or West Indian grocery'],
+  };
+  const local = stores[country];
+  const picked = local ? local.slice(0,2) : ['your local Caribbean grocery store'];
+  return 'Pick up ingredients at <strong>' + picked.join('</strong> or <strong>') + '</strong>';
+}
+
+
+let _userCountry = null;
+// Detect country via IP (free, no key needed)
+fetch('https://ipapi.co/json/')
+  .then(r=>r.json())
+  .then(d=>{_userCountry = d.country_code || null;})
+  .catch(()=>{});
 
 function resetScanner(){
   document.getElementById('scanResult').style.display='none';
