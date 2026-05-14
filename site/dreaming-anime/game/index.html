@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anime Trivia Blitz — Dreaming Anime</title>
+<link rel="manifest" href="/dreaming-anime/game/manifest.json">
+<meta name="theme-color" content="#FF6B00">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0A0A;color:#fff;font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,107,0,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,107,0,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.screen{display:none;position:relative;z-index:1;min-height:100vh;padding:20px}
+.screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* START SCREEN */
+.game-title{font-family:'Bangers',cursive;font-size:clamp(48px,10vw,96px);color:#FF6B00;text-shadow:0 0 40px rgba(255,107,0,0.6),0 4px 0 #CC5500;letter-spacing:4px;text-align:center;line-height:1}
+.game-sub{font-size:14px;letter-spacing:3px;color:#FF8C00;text-transform:uppercase;margin:8px 0 32px;text-align:center}
+.high-score-box{background:#1A1A1A;border:1px solid rgba(255,107,0,0.3);border-radius:12px;padding:16px 32px;margin-bottom:32px;text-align:center}
+.hs-label{font-size:12px;color:#888;letter-spacing:2px;text-transform:uppercase}
+.hs-val{font-family:'Bangers',cursive;font-size:40px;color:#FF6B00}
+.btn{display:inline-block;padding:16px 40px;border-radius:50px;font-weight:900;font-size:16px;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none}
+.btn-orange{background:linear-gradient(135deg,#FF6B00,#FF8C00);color:#fff;box-shadow:0 4px 20px rgba(255,107,0,0.4)}
+.btn-orange:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,107,0,0.6)}
+.btn-ghost{background:transparent;color:#FF6B00;border:2px solid #FF6B00;margin-top:12px}
+.btn-ghost:hover{background:rgba(255,107,0,0.1)}
+.name-input{background:#1A1A1A;border:2px solid rgba(255,107,0,0.3);border-radius:12px;padding:12px 20px;color:#fff;font-size:16px;width:100%;max-width:300px;margin-bottom:16px;font-family:'Inter',sans-serif;text-align:center}
+.name-input:focus{outline:none;border-color:#FF6B00}
+
+/* GAME SCREEN */
+.game-header{width:100%;max-width:600px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.lives{display:flex;gap:6px;font-size:24px}
+.score-display{font-family:'Bangers',cursive;font-size:32px;color:#FF6B00}
+.streak-badge{background:rgba(255,107,0,0.2);border:1px solid rgba(255,107,0,0.4);border-radius:50px;padding:4px 12px;font-size:12px;font-weight:700;color:#FF8C00}
+.timer-bar-wrap{width:100%;max-width:600px;height:8px;background:#1A1A1A;border-radius:4px;margin-bottom:24px;overflow:hidden}
+.timer-bar{height:100%;background:linear-gradient(90deg,#FF6B00,#FF8C00);border-radius:4px;transition:width 1s linear,background .3s}
+.question-card{background:#1A1A1A;border:1px solid rgba(255,107,0,0.2);border-radius:20px;padding:28px;width:100%;max-width:600px;margin-bottom:20px}
+.q-num{font-size:11px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.q-text{font-size:clamp(16px,3vw,20px);font-weight:700;line-height:1.4;color:#fff}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:600px}
+.ans-btn{background:#1A1A1A;border:2px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 18px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;text-align:left;transition:all .15s;font-family:'Inter',sans-serif}
+.ans-btn:hover:not(:disabled){border-color:#FF6B00;background:rgba(255,107,0,0.1)}
+.ans-btn.correct{background:rgba(34,197,94,0.2);border-color:#22c55e;color:#22c55e}
+.ans-btn.wrong{background:rgba(239,68,68,0.2);border-color:#ef4444;color:#ef4444}
+.ans-btn:disabled{cursor:default}
+
+/* GAME OVER */
+.go-score{font-family:'Bangers',cursive;font-size:80px;color:#FF6B00;text-shadow:0 0 30px rgba(255,107,0,0.5);line-height:1}
+.go-grade{font-family:'Bangers',cursive;font-size:48px;margin:8px 0}
+.go-grade.S{color:#FFD700}.go-grade.A{color:#FF6B00}.go-grade.B{color:#888}.go-grade.C{color:#555}
+.pb-badge{background:rgba(255,215,0,0.15);border:1px solid gold;border-radius:50px;padding:6px 16px;font-size:12px;color:gold;font-weight:700;margin-bottom:24px}
+.leaderboard{background:#1A1A1A;border:1px solid rgba(255,107,0,0.2);border-radius:16px;padding:20px;width:100%;max-width:480px;margin:20px 0}
+.lb-title{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:12px}
+.lb-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.lb-row:last-child{border:none}
+.lb-rank{font-family:'Bangers',cursive;font-size:20px;color:#FF6B00;width:32px}
+.lb-name{flex:1;font-size:14px;font-weight:600}
+.lb-score{font-family:'Bangers',cursive;font-size:20px;color:#FF8C00}
+.affiliate-card{background:linear-gradient(135deg,#1A1A1A,#220A00);border:1px solid rgba(255,107,0,0.4);border-radius:16px;padding:20px;width:100%;max-width:480px;text-align:center;margin-top:8px}
+.aff-text{font-size:14px;color:#aaa;margin-bottom:12px}
+.btn-aff{background:linear-gradient(135deg,#FF6B00,#FF8C00);color:#fff;padding:12px 28px;border-radius:50px;font-weight:700;font-size:14px;text-decoration:none;display:inline-block}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+
+@media(max-width:500px){
+  .answers{grid-template-columns:1fr}
+  .game-header{flex-wrap:wrap;gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<!-- START SCREEN -->
+<div class="screen active" id="screen-start">
+  <div class="game-title">ANIME<br>TRIVIA<br>BLITZ</div>
+  <div class="game-sub">How well do you know anime?</div>
+  <div class="high-score-box">
+    <div class="hs-label">Personal Best</div>
+    <div class="hs-val" id="hs-display">0</div>
+  </div>
+  <input class="name-input" id="player-name" type="text" placeholder="Enter your name" maxlength="16">
+  <button class="btn btn-orange" onclick="startGame()">PLAY NOW</button>
+  <a href="/dreaming-anime/" class="btn btn-ghost" style="margin-top:16px;font-size:14px">← Back to Dreaming Anime</a>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="screen-game">
+  <div class="game-header">
+    <div class="lives" id="lives-display">❤️❤️❤️</div>
+    <div class="streak-badge" id="streak-display">🔥 x1</div>
+    <div class="score-display" id="score-display">0</div>
+  </div>
+  <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+  <div class="question-card">
+    <div class="q-num" id="q-num">QUESTION 1 / 10</div>
+    <div class="q-text" id="q-text">Loading...</div>
+  </div>
+  <div class="answers" id="answers"></div>
+</div>
+
+<!-- GAME OVER SCREEN -->
+<div class="screen" id="screen-gameover">
+  <div style="font-size:14px;letter-spacing:2px;color:#888;text-transform:uppercase;margin-bottom:8px">FINAL SCORE</div>
+  <div class="go-score" id="go-score">0</div>
+  <div class="go-grade" id="go-grade">C</div>
+  <div class="pb-badge" id="pb-badge" style="display:none">🏆 New Personal Best!</div>
+  <div class="leaderboard">
+    <div class="lb-title">🏆 Top 10 Leaderboard</div>
+    <div id="lb-rows"></div>
+  </div>
+  <div class="affiliate-card">
+    <div class="aff-text">Think you know anime? Shop the collection.</div>
+    <a href="/dreaming-anime/" class="btn-aff">Browse Anime Merch →</a>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-orange" onclick="startGame()">PLAY AGAIN</button>
+    <a href="/dreaming-anime/" class="btn btn-ghost">Home</a>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {q:"Which studio produced Attack on Titan (seasons 1-3)?",a:["Wit Studio","Bones","Madhouse","Sunrise"],c:0},
+  {q:"What is Naruto's most iconic jutsu?",a:["Rasengan","Chidori","Shadow Clone Jutsu","Eight Gates"],c:2},
+  {q:"In Dragon Ball Z, who was Goku fighting when he first went Super Saiyan?",a:["Frieza","Cell","Buu","Vegeta"],c:0},
+  {q:"Which anime features the motto 'Plus Ultra'?",a:["My Hero Academia","Black Clover","Demon Slayer","Jujutsu Kaisen"],c:0},
+  {q:"Who created the One Piece manga?",a:["Eiichiro Oda","Masashi Kishimoto","Akira Toriyama","Hajime Isayama"],c:0},
+  {q:"What year did the Death Note anime first air?",a:["2004","2006","2008","2010"],c:1},
+  {q:"Which character uses 'Infinity' in Jujutsu Kaisen?",a:["Gojo Satoru","Yuji Itadori","Megumi Fushiguro","Nobara Kugisaki"],c:0},
+  {q:"What is Tanjiro's primary breathing style in Demon Slayer?",a:["Water Breathing","Flame Breathing","Sun Breathing","Wind Breathing"],c:2},
+  {q:"Which anime follows the Elric brothers?",a:["Fullmetal Alchemist","Blue Exorcist","Soul Eater","Noragami"],c:0},
+  {q:"What studio made Spirited Away?",a:["Studio Ghibli","Toei Animation","Gainax","Trigger"],c:0},
+  {q:"Who voices Luffy in the original Japanese dub?",a:["Mayumi Tanaka","Junko Takeuchi","Rie Kugimiya","Mamoru Miyano"],c:0},
+  {q:"Which anime features the Survey Corps?",a:["Attack on Titan","Demon Slayer","My Hero Academia","Black Clover"],c:0},
+  {q:"What is Sasuke's evolved Sharingan called?",a:["Mangekyou Sharingan","Rinnegan","Byakugan","Tenseigan"],c:0},
+  {q:"In Hunter x Hunter, what is the power system called?",a:["Nen","Chakra","Ki","Reiatsu"],c:0},
+  {q:"What is Ichigo's zanpakuto called in Bleach?",a:["Zangetsu","Senbonzakura","Ryujin Jakka","Wabisuke"],c:0},
+  {q:"Which anime features the Phantom Troupe?",a:["Hunter x Hunter","Naruto","Bleach","One Piece"],c:0},
+  {q:"What year did Sword Art Online first air?",a:["2010","2012","2014","2016"],c:1},
+  {q:"Who is the main villain in MHA season 1?",a:["All For One","Shigaraki","Muscular","Stain"],c:1},
+  {q:"What is Killua's family's profession in HxH?",a:["Assassins","Thieves","Merchants","Soldiers"],c:0},
+  {q:"What is the currency in the One Piece world?",a:["Berry","Zeni","Gold","Credits"],c:0},
+  {q:"Who created Dragon Ball?",a:["Akira Toriyama","Eiichiro Oda","Tite Kubo","Yoshihiro Togashi"],c:0},
+  {q:"What is the name of Naruto's village?",a:["Konoha","Suna","Kiri","Iwa"],c:0},
+  {q:"Which anime features the Akatsuki?",a:["Naruto","Bleach","One Piece","Fairy Tail"],c:0},
+  {q:"What does 'Shonen' mean?",a:["Young boy","Young girl","Adult","Elder"],c:0},
+  {q:"Which studio produced Demon Slayer: Kimetsu no Yaiba?",a:["ufotable","A-1 Pictures","Madhouse","Wit Studio"],c:0},
+  {q:"In FMA Brotherhood, what is the law of equivalent exchange about?",a:["To gain you must give equal value","Power comes from sacrifice","All things return to dust","Nothing is truly lost"],c:0},
+  {q:"What is the name of Luffy's pirate crew?",a:["Straw Hat Pirates","Heart Pirates","Whitebeard Pirates","Red Hair Pirates"],c:0},
+  {q:"Which anime is set in a world where 80% of people have superpowers?",a:["My Hero Academia","One Punch Man","Mob Psycho 100","Tiger & Bunny"],c:0},
+  {q:"What is the name of the death god in Death Note?",a:["Ryuk","Rem","Gelus","Sidoh"],c:0},
+  {q:"Which anime features the 'Will of D'?",a:["One Piece","Naruto","Bleach","Fairy Tail"],c:0},
+  {q:"What power does Meruem have in Hunter x Hunter?",a:["Royal Guard Aura — absorbs abilities he eats","Transmutation Nen","Electricity Nen","Conjuration Nen"],c:0},
+  {q:"What is the real name of 'Light Yagami' in Death Note?",a:["Light Yagami","Kira","L Lawliet","Near"],c:0},
+  {q:"Which anime features Alchemists as soldiers?",a:["Fullmetal Alchemist","Blue Exorcist","Noragami","Soul Eater"],c:0},
+];
+
+let score=0, lives=3, streak=0, multiplier=1, timer=null, timeLeft=60;
+let currentQ=null, qPool=[], qIndex=0, gameActive=false;
+let playerName='Player';
+
+function shuffle(arr){return arr.sort(()=>Math.random()-0.5)}
+
+function getLeaderboard(){
+  try{return JSON.parse(localStorage.getItem('atb_lb')||'[]')}catch{return[]}
+}
+function saveScore(name,s){
+  let lb=getLeaderboard();
+  lb.push({name,score:s});
+  lb.sort((a,b)=>b.score-a.score);
+  lb=lb.slice(0,10);
+  localStorage.setItem('atb_lb',JSON.stringify(lb));
+}
+function getHighScore(){
+  const lb=getLeaderboard();
+  return lb.length?lb[0].score:0;
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function updateLives(){
+  const icons=['❤️','❤️','❤️'];
+  const display=icons.slice(0,lives).join('')+(lives<3?'🖤'.repeat(3-lives):'');
+  document.getElementById('lives-display').textContent=display;
+}
+
+function startGame(){
+  const nameInput=document.getElementById('player-name');
+  playerName=(nameInput&&nameInput.value.trim())||'Player';
+  score=0; lives=3; streak=0; multiplier=1; timeLeft=60; qIndex=0;
+  qPool=shuffle([...QUESTIONS]).slice(0,10);
+  gameActive=true;
+  updateLives();
+  document.getElementById('score-display').textContent='0';
+  document.getElementById('streak-display').textContent='🔥 x1';
+  showScreen('screen-game');
+  startTimer();
+  showQuestion();
+}
+
+function startTimer(){
+  clearInterval(timer);
+  updateTimerBar();
+  timer=setInterval(()=>{
+    timeLeft--;
+    updateTimerBar();
+    if(timeLeft<=0){clearInterval(timer);endGame();}
+  },1000);
+}
+
+function updateTimerBar(){
+  const bar=document.getElementById('timer-bar');
+  const pct=(timeLeft/60)*100;
+  bar.style.width=pct+'%';
+  bar.style.background=timeLeft>20?'linear-gradient(90deg,#FF6B00,#FF8C00)':
+    timeLeft>10?'linear-gradient(90deg,#FF8C00,#FFD700)':'linear-gradient(90deg,#ef4444,#FF6B00)';
+}
+
+function showQuestion(){
+  if(qIndex>=qPool.length){endGame();return;}
+  currentQ=qPool[qIndex];
+  document.getElementById('q-num').textContent=`QUESTION ${qIndex+1} / ${qPool.length}`;
+  document.getElementById('q-text').textContent=currentQ.q;
+  const answersEl=document.getElementById('answers');
+  answersEl.innerHTML='';
+  const letters=['A','B','C','D'];
+  currentQ.a.forEach((ans,i)=>{
+    const btn=document.createElement('button');
+    btn.className='ans-btn';
+    btn.textContent=letters[i]+'. '+ans;
+    btn.onclick=()=>answer(i,btn);
+    answersEl.appendChild(btn);
+  });
+}
+
+function answer(idx,btn){
+  if(!gameActive)return;
+  const btns=document.querySelectorAll('.ans-btn');
+  btns.forEach(b=>b.disabled=true);
+  if(idx===currentQ.c){
+    btn.classList.add('correct');
+    streak++;
+    if(streak%3===0)multiplier=Math.min(multiplier+1,3);
+    score+=10*multiplier;
+    document.getElementById('score-display').textContent=score;
+    document.getElementById('streak-display').textContent=`🔥 x${multiplier}`;
+  } else {
+    btn.classList.add('wrong');
+    btns[currentQ.c].classList.add('correct');
+    streak=0; multiplier=1;
+    lives--;
+    updateLives();
+    document.getElementById('streak-display').textContent='🔥 x1';
+    if(lives<=0){setTimeout(()=>{clearInterval(timer);endGame();},800);return;}
+  }
+  qIndex++;
+  setTimeout(showQuestion,800);
+}
+
+function endGame(){
+  gameActive=false;
+  clearInterval(timer);
+  const prevBest=getHighScore();
+  saveScore(playerName,score);
+  const isNew=score>prevBest&&score>0;
+  document.getElementById('go-score').textContent=score;
+  const grade=score>=200?'S':score>=140?'A':score>=80?'B':'C';
+  const gradeEl=document.getElementById('go-grade');
+  gradeEl.textContent=`RANK ${grade}`;
+  gradeEl.className='go-grade '+grade;
+  document.getElementById('pb-badge').style.display=isNew?'block':'none';
+  const lb=getLeaderboard();
+  const rows=document.getElementById('lb-rows');
+  rows.innerHTML=lb.map((e,i)=>`
+    <div class="lb-row">
+      <div class="lb-rank">${i+1}</div>
+      <div class="lb-name">${e.name}</div>
+      <div class="lb-score">${e.score}</div>
+    </div>`).join('');
+  showScreen('screen-gameover');
+}
+
+// Init
+document.getElementById('hs-display').textContent=getHighScore();
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/dreaming-anime/game/sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
