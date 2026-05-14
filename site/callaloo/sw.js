@@ -1,47 +1,29 @@
-const CACHE_NAME = 'callaloo-v3';
-const PRECACHE = [
-  '/callaloo/',
-  '/callaloo/index.html',
-  '/callaloo/manifest.json',
-  '/callaloo/feed/',
-  '/callaloo/recipes/',
-  '/callaloo/profile/',
-  '/callaloo/icon-192.png',
-  '/callaloo/icon-512.png'
+// Callaloo Service Worker v3
+const CACHE = "callaloo-v3";
+const ASSETS = [
+  "/callaloo/",
+  "/callaloo/index.html",
+  "/callaloo/recipes/",
+  "/callaloo/scan/",
+  "/callaloo/feed/",
+  "/callaloo/blog/",
+  "/callaloo/waitlist/",
 ];
-
-self.addEventListener('install', function(event) {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return Promise.allSettled(
-        PRECACHE.map(function(url) { return cache.add(url).catch(function(){}); })
-      );
-    })
-  );
+self.addEventListener("install", e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
-
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys.filter(function(k) { return k !== CACHE_NAME; }).map(function(k) { return caches.delete(k); })
-      );
-    }).then(function() { return self.clients.claim(); })
-  );
+self.addEventListener("activate", e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ).then(() => self.clients.claim()));
 });
-
-self.addEventListener('fetch', function(event) {
-  if(event.request.method !== 'GET') return;
-  event.respondWith(
-    caches.match(event.request).then(function(cached) {
-      return cached || fetch(event.request).then(function(response) {
-        if(response && response.status === 200) {
-          var clone = response.clone();
-          caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clone); });
-        }
-        return response;
-      }).catch(function() { return cached; });
-    })
+self.addEventListener("fetch", e => {
+  if(e.request.method !== "GET") return;
+  e.respondWith(
+    fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return res;
+    }).catch(() => caches.match(e.request))
   );
 });
