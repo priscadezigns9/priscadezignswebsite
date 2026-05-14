@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recipe Feed — Callaloo</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" async></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
   --primary:#E87722;
@@ -20,9 +19,56 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding-bottom:72px}
 
+/* SPLASH SCREEN */
+#splash{
+  position:fixed;inset:0;z-index:99999;
+  background:#FFF8F0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;
+  transition:opacity .5s ease, visibility .5s ease;
+}
+#splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.splash-logo-wrap{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  animation:splashPop .6s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes splashPop{
+  0%{opacity:0;transform:scale(.6) translateY(20px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
+.splash-icon{
+  width:96px;height:96px;border-radius:28px;
+  background:linear-gradient(135deg,#E87722,#F5A623);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 12px 40px rgba(232,119,34,0.35);
+  animation:splashGlow 1.6s ease-in-out infinite alternate;
+}
+@keyframes splashGlow{
+  0%{box-shadow:0 12px 40px rgba(232,119,34,0.3)}
+  100%{box-shadow:0 16px 56px rgba(232,119,34,0.6)}
+}
+.splash-icon img{width:60px;height:60px;object-fit:contain}
+.splash-wordmark{
+  font-family:'Fraunces',serif;font-size:2.2rem;font-weight:900;
+  color:#1A0D00;letter-spacing:-1px;line-height:1;
+}
+.splash-wordmark span{color:#E87722}
+.splash-tagline{
+  font-size:.82rem;font-weight:500;color:rgba(26,13,0,0.5);
+  letter-spacing:.5px;text-transform:uppercase;
+  animation:splashFadeIn .6s .4s ease both;
+}
+@keyframes splashFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.splash-dots{display:flex;gap:7px;animation:splashFadeIn .6s .6s ease both}
+.splash-dot{width:7px;height:7px;border-radius:50%;background:rgba(232,119,34,0.3)}
+.splash-dot:nth-child(1){animation:dotPulse 1.2s .2s ease-in-out infinite}
+.splash-dot:nth-child(2){animation:dotPulse 1.2s .4s ease-in-out infinite}
+.splash-dot:nth-child(3){animation:dotPulse 1.2s .6s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{background:rgba(232,119,34,0.25);transform:scale(1)}50%{background:#E87722;transform:scale(1.4)}}
+
 /* NAV */
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5%;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border);box-shadow:0 2px 16px rgba(232,119,34,0.07);gap:12px}
-.nav-logo{font-size:1.2rem;font-weight:900;color:var(--primary);text-decoration:none;flex-shrink:0}
+.nav-logo{font-size:1.2rem;font-weight:900;color:var(--primary);text-decoration:none;flex-shrink:0;font-family:'Fraunces',serif}
 .nav-logo span{color:#1A0D00}
 
 /* SEARCH BAR */
@@ -42,7 +88,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5
 /* RESULTS COUNT */
 .results-bar{padding:10px 5% 0;font-size:.82rem;color:var(--muted);font-weight:500}
 
-/* FEED GRID — Pinterest style masonry */
+/* FEED GRID */
 .feed-grid{columns:2;column-gap:12px;padding:14px 5% 100px;max-width:1200px;margin:0 auto}
 @media(min-width:600px){.feed-grid{columns:3}}
 @media(min-width:900px){.feed-grid{columns:4}}
@@ -51,9 +97,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5
 /* RECIPE CARD */
 .recipe-card{break-inside:avoid;margin-bottom:12px;background:var(--card);border-radius:18px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 12px rgba(232,119,34,0.06);transition:all .22s;cursor:pointer;display:block;text-decoration:none;color:inherit;position:relative}
 .recipe-card:hover{transform:translateY(-4px);box-shadow:0 10px 32px rgba(232,119,34,0.18);border-color:rgba(232,119,34,0.4)}
-.card-img{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative}
-.card-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);color:#fff;font-size:.65rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px}
-.save-btn{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+.card-img{width:100%;aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg,#E87722,#F5A623);display:flex;align-items:center;justify-content:center;font-size:3rem}
+.card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.recipe-card:hover .card-img img{transform:scale(1.05)}
+.card-badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);color:#fff;font-size:.65rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;z-index:2}
+.save-btn{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:2}
 .save-btn:hover{transform:scale(1.15)}
 .save-btn.saved{background:var(--primary);color:#fff}
 .card-body{padding:12px}
@@ -62,19 +110,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5
 .card-dot{color:rgba(232,119,34,0.4)}
 .card-rating{color:var(--primary);font-weight:700}
 .card-view{display:inline-block;margin-top:8px;font-size:.75rem;font-weight:700;color:var(--primary);text-decoration:none}
-.card-view:hover{text-decoration:underline}
-
-/* SAVED SECTION HEADER */
-.section-header{padding:16px 5% 4px;display:flex;align-items:center;justify-content:space-between}
-.section-title{font-size:1rem;font-weight:800;color:var(--text)}
-.section-link{font-size:.82rem;color:var(--primary);text-decoration:none;font-weight:600}
-.section-link:hover{text-decoration:underline}
-
-/* EMPTY STATE */
-.empty{text-align:center;padding:60px 20px;color:var(--muted)}
-.empty-icon{font-size:48px;margin-bottom:16px}
-.empty h3{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:8px}
-.empty p{font-size:.88rem;line-height:1.6}
 
 /* TOAST */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A0D00;color:#fff;padding:10px 22px;border-radius:50px;font-size:.85rem;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;white-space:nowrap}
@@ -93,9 +128,33 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5
 
 /* NO RESULTS */
 #noResults{display:none;text-align:center;padding:60px 20px;color:var(--muted)}
+
+/* LOADING SKELETONS */
+.skeleton-card{break-inside:avoid;margin-bottom:12px;border-radius:18px;overflow:hidden;background:var(--card);border:1px solid var(--border)}
+.skeleton-img{width:100%;aspect-ratio:4/3;background:linear-gradient(90deg,#f0e8dc 25%,#ffe8cc 50%,#f0e8dc 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.skeleton-body{padding:12px}
+.skeleton-line{height:12px;border-radius:6px;background:linear-gradient(90deg,#f0e8dc 25%,#ffe8cc 50%,#f0e8dc 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;margin-bottom:8px}
+.skeleton-line.short{width:60%}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-logo-wrap">
+    <div class="splash-icon">
+      <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/callaloo.svg" alt="Callaloo" onerror="this.style.display='none';this.parentNode.innerHTML='🍃'">
+    </div>
+    <div class="splash-wordmark">Calla<span>loo</span></div>
+  </div>
+  <div class="splash-tagline">Caribbean food, rediscovered</div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
 
 <nav>
   <a href="/callaloo/" class="nav-logo">Calla<span>loo</span></a>
@@ -107,7 +166,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5
   <a href="/callaloo/profile/" style="font-size:24px;text-decoration:none" title="Profile">👤</a>
 </nav>
 
-<!-- FILTER PILLS -->
 <div class="filter-bar">
   <button class="filter-pill active" onclick="setFilter('all',this)">All</button>
   <button class="filter-pill" onclick="setFilter('mains',this)">🍽 Mains</button>
@@ -120,18 +178,20 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5
 
 <div class="results-bar" id="resultsBar"></div>
 
-<!-- FEED -->
-<div class="feed-grid" id="feedGrid"></div>
+<div class="feed-grid" id="feedGrid">
+  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+</div>
 <div id="noResults">
   <div style="font-size:48px;margin-bottom:16px">🔍</div>
   <div style="font-size:1rem;font-weight:700;margin-bottom:8px;color:var(--text)">No recipes found</div>
   <div style="font-size:.88rem">Try a different search or filter</div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <a href="/callaloo/" class="bnav-item"><span class="icon">🏠</span>Home</a>
   <a href="/callaloo/feed/" class="bnav-item active"><span class="icon">🍽</span>Feed</a>
@@ -139,187 +199,105 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 5
   <a href="/callaloo/profile/" class="bnav-item"><span class="icon">👤</span>Profile</a>
 </div>
 
-<!-- FLOAT BUTTONS -->
 <a href="https://wa.me/447576505652" target="_blank" rel="noopener" class="std-float-wa" aria-label="WhatsApp">💬</a>
 <button class="std-float-bt" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/callaloo/recipe-data.js"></script>
-<script src="/callaloo/recipe-data-2.js"></script>
 <script>
-// ── CONFIG ─────────────────────────────────────────────────────────────────
-const SB_URL = 'https://ysqcxakaahxtvgefimtk.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzcWN4YWthYWh4dHZnZWZpbXRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4ODQ1ODcsImV4cCI6MjA2MjQ2MDU4N30.GCiMFG4D8SOJXiU0VhYPSMJPYZBPMnDqUAHCRkBXpco';
-var _sb = null;
-var _user = null;
-var _savedSlugs = new Set();
-var _currentFilter = 'all';
-var _currentSearch = '';
+const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNTY1NzIsImV4cCI6MjA2MjczMjU3Mn0.oEYHPGkIoYiMIqXM7JSNFkBnlr8FMM5lXBJLFuFtEzI';
+var _sb=null,_user=null,_savedSlugs=new Set(),_currentFilter='all',_currentSearch='',_recipes=[];
 
-function getSB(){
-  if(!_sb && window.supabase) _sb = window.supabase.createClient(SB_URL, SB_KEY);
-  return _sb;
+function getSB(){if(!_sb&&window.supabase)_sb=window.supabase.createClient(SB_URL,SB_KEY);return _sb;}
+
+function hideSplash(){
+  var s=document.getElementById('splash');
+  if(s){s.classList.add('hidden');setTimeout(function(){if(s)s.remove();},600);}
 }
 
-// ── INIT ────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', async function(){
-  // Load saved from localStorage immediately (works even without login)
-  var ls = localStorage.getItem('callaloo_saved');
-  if(ls){ try{ _savedSlugs = new Set(JSON.parse(ls)); }catch(e){} }
-
-  // Then check Supabase session
-  var sb = getSB();
-  if(sb){
-    var { data: { session } } = await sb.auth.getSession();
-    if(session){ _user = session.user; await loadSavedFromDB(); }
-  }
-
-  renderFeed();
-
-  // Scroll back-to-top
-  window.addEventListener('scroll', function(){
-    var btn = document.getElementById('backTop');
-    if(window.scrollY > 400){ btn.classList.add('visible'); } else { btn.classList.remove('visible'); }
-  }, {passive:true});
+window.addEventListener('DOMContentLoaded',async function(){
+  var ls=localStorage.getItem('callaloo_saved');
+  if(ls){try{_savedSlugs=new Set(JSON.parse(ls));}catch(e){}}
+  var sb=getSB();
+  if(sb){var r=await sb.auth.getSession();if(r.data.session){_user=r.data.session.user;await loadSavedFromDB();}}
+  await loadRecipes();
+  setTimeout(hideSplash,1400);
+  window.addEventListener('scroll',function(){
+    var btn=document.getElementById('backTop');
+    btn.classList.toggle('visible',window.scrollY>400);
+  },{passive:true});
 });
 
-// ── LOAD SAVED FROM SUPABASE ────────────────────────────────────────────────
-async function loadSavedFromDB(){
-  var sb = getSB();
-  if(!sb || !_user) return;
-  var { data } = await sb.from('saved_recipes').select('slug').eq('user_id', _user.id);
-  if(data){ data.forEach(function(r){ _savedSlugs.add(r.slug); }); }
-  // Sync localStorage
-  localStorage.setItem('callaloo_saved', JSON.stringify([..._savedSlugs]));
+async function loadRecipes(){
+  var sb=getSB();
+  if(!sb){return;}
+  try{
+    var res=await sb.from('recipes').select('id,title,cover_photo_url,prep_time,cook_time,difficulty,tags').order('title',{ascending:true}).limit(200);
+    if(res.error||!res.data||res.data.length===0){return;}
+    _recipes=res.data.map(function(r){
+      var tags=r.tags||[];
+      var badge=tags.length>0?tags[0]:'';
+      var totalTime=(parseInt(r.prep_time)||0)+(parseInt(r.cook_time)||0);
+      return{id:r.id,slug:r.id,name:r.title,badge:badge,photo:r.cover_photo_url||'',emoji:getBadgeEmoji(badge),gradient:getBadgeGradient(badge),time:totalTime?totalTime+' min':'',rating:(4.5+Math.random()*0.5).toFixed(1),category:tags.join(' ').toLowerCase()};
+    });
+    renderFeed();
+  }catch(e){}
 }
 
-// ── TOGGLE SAVE ─────────────────────────────────────────────────────────────
-async function toggleSave(slug, btn, e){
-  e.preventDefault(); e.stopPropagation();
-  var wasSaved = _savedSlugs.has(slug);
-  if(wasSaved){
-    _savedSlugs.delete(slug);
-  } else {
-    _savedSlugs.add(slug);
-  }
-  // Update localStorage
-  localStorage.setItem('callaloo_saved', JSON.stringify([..._savedSlugs]));
+function getBadgeEmoji(b){b=(b||'').toLowerCase();if(b.includes('dessert')||b.includes('sweet'))return'🍰';if(b.includes('drink')||b.includes('juice'))return'🥤';if(b.includes('soup')||b.includes('stew'))return'🍲';if(b.includes('rice'))return'🍚';if(b.includes('chicken'))return'🍗';if(b.includes('fish')||b.includes('seafood'))return'🐟';if(b.includes('bread')||b.includes('roti')||b.includes('bake'))return'🫓';if(b.includes('curry'))return'🍛';return'🍽';}
+function getBadgeGradient(b){b=(b||'').toLowerCase();if(b.includes('dessert'))return'linear-gradient(135deg,#f093fb,#f5576c)';if(b.includes('drink'))return'linear-gradient(135deg,#4facfe,#00f2fe)';if(b.includes('soup')||b.includes('stew'))return'linear-gradient(135deg,#f7971e,#ffd200)';if(b.includes('fish')||b.includes('seafood'))return'linear-gradient(135deg,#43b89c,#3ab0e0)';return'linear-gradient(135deg,#E87722,#F5A623)';}
 
-  // Update button
-  btn.classList.toggle('saved', !wasSaved);
-  btn.textContent = _savedSlugs.has(slug) ? '❤️' : '🤍';
-  showToast(_savedSlugs.has(slug) ? 'Saved to your collection!' : 'Removed from collection');
+async function loadSavedFromDB(){var sb=getSB();if(!sb||!_user)return;var r=await sb.from('saved_recipes').select('slug').eq('user_id',_user.id);if(r.data){r.data.forEach(function(x){_savedSlugs.add(x.slug);});localStorage.setItem('callaloo_saved',JSON.stringify([..._savedSlugs]));}}
 
-  // Sync to Supabase if logged in
-  var sb = getSB();
-  if(sb && _user){
-    if(!wasSaved){
-      await sb.from('saved_recipes').upsert({user_id: _user.id, slug: slug, saved_at: new Date().toISOString()});
-    } else {
-      await sb.from('saved_recipes').delete().eq('user_id', _user.id).eq('slug', slug);
-    }
-  }
-
-  // If we're in saved filter, re-render
-  if(_currentFilter === 'saved') renderFeed();
+async function toggleSave(slug,btn,e){
+  e.preventDefault();e.stopPropagation();
+  var was=_savedSlugs.has(slug);was?_savedSlugs.delete(slug):_savedSlugs.add(slug);
+  localStorage.setItem('callaloo_saved',JSON.stringify([..._savedSlugs]));
+  btn.classList.toggle('saved',!was);btn.textContent=_savedSlugs.has(slug)?'❤️':'🤍';
+  showToast(_savedSlugs.has(slug)?'Saved!':'Removed');
+  var sb=getSB();
+  if(sb&&_user){if(!was){await sb.from('saved_recipes').upsert({user_id:_user.id,slug:slug,saved_at:new Date().toISOString()});}else{await sb.from('saved_recipes').delete().eq('user_id',_user.id).eq('slug',slug);}}
+  if(_currentFilter==='saved')renderFeed();
 }
 
-// ── BUILD ALL RECIPES LIST ──────────────────────────────────────────────────
-function getAllRecipes(){
-  var all = [];
-  var data = window.RECIPE_DATA || {};
-  // Merge both data files (RECIPE_DATA_2 extends RECIPE_DATA)
-  Object.keys(data).forEach(function(slug){
-    var r = data[slug];
-    all.push({slug:slug, name:r.name, badge:r.badge||'', emoji:r.emoji||'🍽', gradient:r.gradient||'linear-gradient(135deg,#E87722,#F5A623)', time:r.time||'', difficulty:r.difficulty||'', rating:r.rating||'4.8', category:(r.badge||'').toLowerCase()});
-  });
-  return all;
-}
-
-// ── RENDER FEED ─────────────────────────────────────────────────────────────
 function renderFeed(){
-  var recipes = getAllRecipes();
-  var search = _currentSearch.toLowerCase().trim();
-  var filter = _currentFilter;
-
-  var filtered = recipes.filter(function(r){
-    var matchSearch = !search || r.name.toLowerCase().includes(search) || r.badge.toLowerCase().includes(search) || r.category.includes(search);
-    var matchFilter = filter === 'all' || (filter === 'saved' && _savedSlugs.has(r.slug)) || r.category.includes(filter) || r.badge.toLowerCase().includes(filter);
-    return matchSearch && matchFilter;
+  var search=_currentSearch.toLowerCase().trim(),filter=_currentFilter;
+  var filtered=_recipes.filter(function(r){
+    var ms=!search||r.name.toLowerCase().includes(search)||r.badge.toLowerCase().includes(search)||r.category.includes(search);
+    var mf=filter==='all'||(filter==='saved'&&_savedSlugs.has(r.slug))||r.category.includes(filter)||r.badge.toLowerCase().includes(filter);
+    return ms&&mf;
   });
-
-  var grid = document.getElementById('feedGrid');
-  var noRes = document.getElementById('noResults');
-  var bar = document.getElementById('resultsBar');
-
-  if(filtered.length === 0){
-    grid.innerHTML = '';
-    noRes.style.display = 'block';
-    bar.textContent = '';
-    return;
-  }
-  noRes.style.display = 'none';
-  bar.textContent = filtered.length + ' recipe' + (filtered.length !== 1 ? 's' : '');
-
-  grid.innerHTML = filtered.map(function(r){
-    var saved = _savedSlugs.has(r.slug);
-    return '<a class="recipe-card" href="/callaloo/recipe/?r=' + r.slug + '">' +
-      '<div class="card-img" style="background:' + r.gradient + '">' +
-        '<span style="font-size:2.8rem">' + r.emoji + '</span>' +
-        '<span class="card-badge">' + r.badge + '</span>' +
-        '<button class="save-btn' + (saved?' saved':'') + '" onclick="toggleSave('' + r.slug + '',this,event)" title="' + (saved?'Remove from saved':'Save recipe') + '">' + (saved?'❤️':'🤍') + '</button>' +
-      '</div>' +
-      '<div class="card-body">' +
-        '<div class="card-title">' + r.name + '</div>' +
-        '<div class="card-meta">' +
-          '<span>⏱ ' + r.time + '</span><span class="card-dot">·</span>' +
-          '<span class="card-rating">★ ' + r.rating + '</span>' +
-        '</div>' +
-        '<span class="card-view">View Recipe →</span>' +
-      '</div>' +
-    '</a>';
+  var grid=document.getElementById('feedGrid'),noRes=document.getElementById('noResults'),bar=document.getElementById('resultsBar');
+  if(filtered.length===0){grid.innerHTML='';noRes.style.display='block';bar.textContent='';return;}
+  noRes.style.display='none';
+  bar.textContent=filtered.length+' recipe'+(filtered.length!==1?'s':'');
+  grid.innerHTML=filtered.map(function(r){
+    var saved=_savedSlugs.has(r.slug);
+    var img=r.photo?'<img src="'+r.photo+'" alt="'+r.name+'" loading="lazy" onerror="this.style.display=\'none\'">':'<span style="font-size:2.8rem">'+(r.emoji||'🍽')+'</span>';
+    return '<a class="recipe-card" href="/callaloo/recipe/?r='+r.slug+'">'+
+      '<div class="card-img" style="background:'+(r.gradient||'linear-gradient(135deg,#E87722,#F5A623)')+'">'+img+
+      '<span class="card-badge">'+r.badge+'</span>'+
+      '<button class="save-btn'+(saved?' saved':'')+'" onclick="toggleSave(\''+r.slug+'\',this,event)">'+(saved?'❤️':'🤍')+'</button>'+
+      '</div><div class="card-body">'+
+      '<div class="card-title">'+r.name+'</div>'+
+      '<div class="card-meta">'+(r.time?'<span>⏱ '+r.time+'</span><span class="card-dot">·</span>':'')+
+      '<span class="card-rating">★ '+r.rating+'</span></div>'+
+      '<span class="card-view">View Recipe →</span></div></a>';
   }).join('');
 }
 
-// ── SEARCH ──────────────────────────────────────────────────────────────────
-function handleSearch(val){
-  _currentSearch = val;
-  document.getElementById('searchClear').style.display = val ? 'block' : 'none';
-  renderFeed();
-}
+function handleSearch(v){_currentSearch=v;document.getElementById('searchClear').style.display=v?'block':'none';renderFeed();}
+function clearSearch(){document.getElementById('searchInput').value='';_currentSearch='';document.getElementById('searchClear').style.display='none';renderFeed();}
+function setFilter(f,el){_currentFilter=f;document.querySelectorAll('.filter-pill').forEach(function(p){p.classList.remove('active');});el.classList.add('active');renderFeed();}
 
-function clearSearch(){
-  document.getElementById('searchInput').value = '';
-  _currentSearch = '';
-  document.getElementById('searchClear').style.display = 'none';
-  renderFeed();
-}
-
-// ── FILTER ──────────────────────────────────────────────────────────────────
-function setFilter(filter, el){
-  _currentFilter = filter;
-  document.querySelectorAll('.filter-pill').forEach(function(p){ p.classList.remove('active'); });
-  el.classList.add('active');
-  renderFeed();
-}
-
-// ── TOAST ───────────────────────────────────────────────────────────────────
-var _toastTimer;
-function showToast(msg){
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
-}
+var _tt;
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(function(){t.classList.remove('show');},2200);}
 </script>
 
-<!-- Google Translate -->
 <div style="position:fixed;bottom:84px;right:16px;z-index:9999;background:rgba(20,20,30,0.88);border:1px solid rgba(232,119,34,0.35);border-radius:25px;padding:5px 10px;backdrop-filter:blur(10px)">
   <div id="google_translate_element"></div>
 </div>
-<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',autoDisplay:false},'google_translate_element')}
-</script>
+<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',autoDisplay:false},'google_translate_element')}</script>
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
