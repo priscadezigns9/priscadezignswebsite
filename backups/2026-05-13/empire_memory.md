@@ -1,5 +1,5 @@
 # Empire Memory — Prisca Dezigns
-*Last updated: Mon 2026-05-11 21:54 AST*
+*Last updated: Wed 2026-05-13 21:54 AST*
 
 ---
 
@@ -257,3 +257,26 @@ Columns: Date | Description | Business/Payee | Type | Category | Payment Method 
 
 ### WA Lead
 - "My Hair" hair extensions lead still active — waiting on reply to name/branding question
+
+
+---
+## Session Update — 2026-05-13
+
+### Website Status
+- All 25 pages at priscadezigns.org returning 200 OK (confirmed at 20:59 and 21:32 AST)
+- No 404s, no fixes needed
+
+### FB Page Status
+- All 18 pages compliant at 4+ posts/24h (audited 21:10 and 21:41 AST)
+- Counts: Prisca Dezigns 5 | Dreaming Anime 5 | The Escapist 5 | Quiet Luxury 5 | Verdant Co 5 | all others 4
+
+### Backups
+- Full backup of 6 key files pushed to GitHub backups/2026-05-13/ (empire_memory.md, daily_poster.py, fb_page_tokens.json, midnight_audit2.py, ig_accounts.json, anime_clip_log.json)
+
+### Pending Tasks (carried over)
+- Clarev card on /platforms/ page still missing
+- D PanYard card on /platforms/ page still missing
+- Rowcell PNG/JPG wordmark export still pending
+- Safron page not yet built
+- Trogon: Groq API key still placeholder (gsk_placeholder)
+- SVG icon upgrades for Clarev, Trogon, Prisca Dezigns (payloads ready in workspace)
