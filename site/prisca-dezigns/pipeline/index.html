@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prisca Dezigns — Client Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0A0A0F;
+    --card: #1A1A1A;
+    --card2: #222228;
+    --border: #2A2A35;
+    --purple: #7B35D4;
+    --purple-light: #9B55F4;
+    --purple-dim: rgba(123,53,212,0.15);
+    --text: #F0F0F5;
+    --muted: #888899;
+    --danger: #E84040;
+    --success: #2ED47A;
+    --warn: #F5A623;
+    --col1: #3B82F6;
+    --col2: #A855F7;
+    --col3: #F59E0B;
+    --col4: #10B981;
+    --col5-won: #2ED47A;
+    --col5-lost: #E84040;
+  }
+
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 50% 40%, rgba(123,53,212,0.18) 0%, var(--bg) 70%);
+  }
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px 40px 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  .login-logo {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .login-logo span { color: var(--purple-light); }
+  .login-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+  .login-box h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .login-box input {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 16px;
+  }
+  .login-box input:focus { border-color: var(--purple); }
+  .login-box button {
+    width: 100%;
+    background: var(--purple);
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .login-box button:hover { background: var(--purple-light); }
+  .login-box button:active { transform: scale(0.98); }
+  .login-err {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ── APP SHELL ── */
+  #app { display: none; min-height: 100vh; flex-direction: column; }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-brand {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .header-brand span { color: var(--purple-light); }
+  .header-tag {
+    background: var(--purple-dim);
+    border: 1px solid var(--purple);
+    color: var(--purple-light);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-left: 12px;
+  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-primary {
+    background: var(--purple);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary:hover { background: var(--purple-light); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-outline:hover { border-color: var(--purple); color: var(--purple-light); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px 0;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    flex: 1;
+    min-width: 130px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent, var(--purple));
+    border-radius: 12px 12px 0 0;
+  }
+  .stat-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  /* ── BOARD ── */
+  .board-wrapper {
+    padding: 20px 24px 40px;
+    overflow-x: auto;
+  }
+  .board {
+    display: flex;
+    gap: 14px;
+    min-width: 900px;
+  }
+  .column {
+    flex: 1;
+    min-width: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+  .col-header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 60px;
+    background: var(--card);
+    border-radius: 14px 14px 0 0;
+    z-index: 10;
+  }
+  .col-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .col-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--col-color);
+    flex-shrink: 0;
+  }
+  .col-count {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .col-cards {
+    padding: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 80px;
+  }
+
+  /* ── PROSPECT CARD ── */
+  .prospect-card {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .prospect-card:hover {
+    border-color: rgba(123,53,212,0.4);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .prospect-card.lost {
+    opacity: 0.45;
+    border-color: var(--danger) !important;
+  }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .card-name {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    flex: 1;
+    padding-right: 8px;
+  }
+  .card-badge {
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .badge-active { background: var(--purple-dim); color: var(--purple-light); border: 1px solid rgba(123,53,212,0.4); }
+  .badge-lost { background: rgba(232,64,64,0.15); color: var(--danger); border: 1px solid rgba(232,64,64,0.3); }
+  .badge-won { background: rgba(46,212,122,0.15); color: var(--success); border: 1px solid rgba(46,212,122,0.3); }
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .meta-pill {
+    background: rgba(255,255,255,0.05);
+    border-radius: 5px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .card-date {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .card-notes {
+    font-size: 12px;
+    color: #B0B0C0;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 9px;
+    min-height: 36px;
+    width: 100%;
+    resize: vertical;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 10px;
+  }
+  .card-notes:focus { border-color: var(--purple); }
+  .card-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .btn-move {
+    flex: 1;
+    background: var(--purple-dim);
+    border: 1px solid rgba(123,53,212,0.3);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--purple-light);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.2s;
+  }
+  .btn-move:hover { background: rgba(123,53,212,0.25); border-color: var(--purple); }
+  .btn-move:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-wa {
+    background: rgba(37,211,102,0.12);
+    border: 1px solid rgba(37,211,102,0.25);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: #25D366;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-wa:hover { background: rgba(37,211,102,0.22); }
+  .btn-lost {
+    background: rgba(232,64,64,0.1);
+    border: 1px solid rgba(232,64,64,0.2);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--danger);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-lost:hover { background: rgba(232,64,64,0.2); }
+  .btn-restore {
+    background: rgba(46,212,122,0.1);
+    border: 1px solid rgba(46,212,122,0.2);
+    border-radius: 7px;
+    padding: 7px 10px;
+    color: var(--success);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-restore:hover { background: rgba(46,212,122,0.2); }
+
+  /* Won/Lost sub-columns in Closed */
+  .closed-divider {
+    padding: 6px 10px 2px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    width: 100%;
+    max-width: 480px;
+    padding: 32px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .modal h2 span { color: var(--purple-light); }
+  .modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 32px; height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .modal-close:hover { border-color: var(--danger); color: var(--danger); }
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 7px;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--purple); }
+  .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888899' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  .form-select option { background: #1A1A1A; }
+  .form-textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+  .modal-footer { display: flex; gap: 10px; margin-top: 24px; }
+  .btn-cancel {
+    flex: 1;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 12px;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+  .btn-save {
+    flex: 2;
+    background: var(--purple);
+    border: none;
+    border-radius: 9px;
+    padding: 12px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-save:hover { background: var(--purple-light); }
+
+  /* ── EMPTY STATE ── */
+  .empty-col {
+    text-align: center;
+    padding: 24px 12px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .empty-col svg { opacity: 0.3; margin-bottom: 8px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3A3A4A; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 9999;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.info { border-color: var(--purple); color: var(--purple-light); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .stats-bar { gap: 8px; padding: 16px 16px 0; }
+    .stat-card { min-width: 110px; padding: 12px 14px; }
+    .stat-value { font-size: 22px; }
+    header { padding: 0 16px; }
+    .board-wrapper { padding: 16px 16px 40px; }
+    .header-tag { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Prisca<span>Dezigns</span></div>
+    <div class="login-sub">Client Pipeline Manager</div>
+    <h2>Sign In</h2>
+    <input type="password" id="pwd-input" placeholder="Enter password" autocomplete="current-password">
+    <button onclick="checkLogin()">Access Dashboard →</button>
+    <div class="login-err" id="login-err">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app">
+  <header>
+    <div style="display:flex;align-items:center;gap:0">
+      <div class="header-brand">Prisca<span>Dezigns</span></div>
+      <div class="header-tag">CRM</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-outline" onclick="exportCSV()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+      <button class="btn-primary" onclick="openAddModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Prospect
+      </button>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="stats-bar"></div>
+
+  <!-- Board -->
+  <div class="board-wrapper">
+    <div class="board" id="board"></div>
+  </div>
+</div>
+
+<!-- ── ADD PROSPECT MODAL ── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal()">✕</div>
+    <h2>➕ Add <span>Prospect</span></h2>
+    <div class="form-group">
+      <label class="form-label">Business Name *</label>
+      <input type="text" class="form-input" id="f-name" placeholder="e.g. Lush Beauty Studio">
+    </div>
+    <div class="form-group">
+      <label class="form-label">WhatsApp Number</label>
+      <input type="text" class="form-input" id="f-phone" placeholder="e.g. 18681234567">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Industry / Niche</label>
+      <select class="form-select" id="f-industry">
+        <option value="Salon/Beauty">Salon/Beauty</option>
+        <option value="Photography">Photography</option>
+        <option value="Food & Beverage">Food & Beverage</option>
+        <option value="Retail">Retail</option>
+        <option value="Real Estate">Real Estate</option>
+        <option value="Fitness">Fitness</option>
+        <option value="Printing">Printing</option>
+        <option value="Furniture">Furniture</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="f-notes" placeholder="Initial notes, context, anything relevant..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Starting Stage</label>
+      <select class="form-select" id="f-stage">
+        <option value="0">Outreach Sent</option>
+        <option value="1">Replied</option>
+        <option value="2">Discovery Call</option>
+        <option value="3">Proposal Sent</option>
+        <option value="4">Closed</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProspect()">Save Prospect</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── PASSWORD ──
+const PASS = 'PriscaCRM2026!';
+const SESSION_KEY = 'pd_crm_auth';
+const DATA_KEY = 'pd_crm_data';
+
+function checkLogin() {
+  const val = document.getElementById('pwd-input').value;
+  if (val === PASS) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('app').style.flexDirection = 'column';
+    init();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+  }
+}
+
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkLogin();
+});
+
+// Auto-login if session active
+if (sessionStorage.getItem(SESSION_KEY)) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('app').style.flexDirection = 'column';
+}
+
+// ── CONSTANTS ──
+const STAGES = [
+  { id: 0, label: 'Outreach Sent', color: '#3B82F6' },
+  { id: 1, label: 'Replied',       color: '#A855F7' },
+  { id: 2, label: 'Discovery Call',color: '#F59E0B' },
+  { id: 3, label: 'Proposal Sent', color: '#10B981' },
+  { id: 4, label: 'Closed',        color: '#2ED47A' },
+];
+
+const INDUSTRIES = [
+  'Salon/Beauty','Photography','Food & Beverage','Retail',
+  'Real Estate','Fitness','Printing','Furniture','Other'
+];
+
+// ── SEED DATA ──
+const SEED = [
+  { name: 'Advance Printing',         phone: '18687063018', industry: 'Printing' },
+  { name: 'Beauty In Full Salon',     phone: '18682706666', industry: 'Salon/Beauty' },
+  { name: 'The Furniture Factory',    phone: '18687528936', industry: 'Furniture' },
+  { name: 'CLR Photography',          phone: '18683263393', industry: 'Photography' },
+  { name: 'Fashion Therapy Boutique', phone: '18682986308', industry: 'Retail' },
+  { name: 'Trini Cakez',              phone: '18683341515', industry: 'Food & Beverage' },
+  { name: "Rakeeb's Gourmet Bake Shop", phone: '18684945624', industry: 'Food & Beverage' },
+  { name: 'DP Cakery',                phone: '18686851832', industry: 'Food & Beverage' },
+  { name: 'Emerald Designs',          phone: '18687791632', industry: 'Other' },
+  { name: 'Macon Group TT',           phone: '18686226601', industry: 'Other' },
+  { name: 'Urban Fitness',            phone: '18687481271', industry: 'Fitness' },
+  { name: 'Makeda Jones Photography', phone: '18686851644', industry: 'Photography' },
+  { name: 'Domain Realtors',          phone: '18682842003', industry: 'Real Estate' },
+  { name: 'Glam by Abbey',            phone: '18684678979', industry: 'Salon/Beauty' },
+];
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+function today() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(DATA_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  // First load — seed
+  const prospects = SEED.map(s => ({
+    id: uid(),
+    name: s.name,
+    phone: s.phone,
+    industry: s.industry,
+    notes: '',
+    stage: 0,
+    lost: false,
+    won: false,
+    lastContact: today(),
+    createdAt: today(),
+  }));
+  saveData(prospects);
+  return prospects;
+}
+
+function saveData(data) {
+  localStorage.setItem(DATA_KEY, JSON.stringify(data));
+}
+
+let prospects = [];
+
+// ── INIT ──
+function init() {
+  prospects = loadData();
+  render();
+}
+
+// ── RENDER ──
+function render() {
+  renderStats();
+  renderBoard();
+}
+
+function renderStats() {
+  const total = prospects.length;
+  const replied = prospects.filter(p => p.stage >= 1).length;
+  const proposals = prospects.filter(p => p.stage >= 3).length;
+  const won = prospects.filter(p => p.won).length;
+  const rate = total > 0 ? Math.round((won / total) * 100) : 0;
+
+  const stats = [
+    { label: 'Total Prospects', value: total, accent: '#7B35D4' },
+    { label: 'Replied',         value: replied, accent: '#A855F7' },
+    { label: 'Proposals Sent',  value: proposals, accent: '#10B981' },
+    { label: 'Closed / Won',    value: won, accent: '#2ED47A' },
+    { label: 'Conversion Rate', value: rate + '%', accent: '#F59E0B' },
+  ];
+
+  const bar = document.getElementById('stats-bar');
+  bar.innerHTML = stats.map(s => `
+    <div class="stat-card" style="--accent:${s.accent}">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value" style="color:${s.accent}">${s.value}</div>
+    </div>
+  `).join('');
+}
+
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+
+  STAGES.forEach((stage, si) => {
+    const col = document.createElement('div');
+    col.className = 'column';
+    col.style.setProperty('--col-color', stage.color);
+
+    const stageProspects = prospects.filter(p => p.stage === si && !p.lost);
+    // For closed: separate won and not-won
+    const activeProspects = si < 4 ? stageProspects : stageProspects.filter(p => p.won);
+    const lostProspects = prospects.filter(p => p.lost && p.stage === si);
+
+    const count = stageProspects.length + (si < 4 ? lostProspects.length : 0);
+    const totalCount = prospects.filter(p => p.stage === si).length + (si < 4 ? lostProspects.length : 0);
+
+    col.innerHTML = `
+      <div class="col-header">
+        <div class="col-title">
+          <div class="col-dot"></div>
+          ${stage.label}
+        </div>
+        <div class="col-count">${prospects.filter(p => p.stage === si).length + lostProspects.length}</div>
+      </div>
+      <div class="col-cards" id="col-${si}"></div>
+    `;
+    board.appendChild(col);
+
+    const cardsEl = col.querySelector(`#col-${si}`);
+
+    // Active prospects
+    const activeAll = prospects.filter(p => p.stage === si && !p.lost && !p.won);
+    const wonAll    = prospects.filter(p => p.stage === si && p.won);
+    const lostAll   = prospects.filter(p => p.lost && p.stage === si);
+
+    if (si === 4 && wonAll.length > 0) {
+      const d = document.createElement('div');
+      d.className = 'closed-divider';
+      d.style.color = 'var(--success)';
+      d.textContent = '🏆 Won';
+      cardsEl.appendChild(d);
+      wonAll.forEach(p => cardsEl.appendChild(buildCard(p, si)));
+    }
+
+    if (si === 4 && activeAll.length > 0) {
+      const d = document.createElement('div');
+      d.className = 'closed-divider';
+      cardsEl.appendChild(d);
+    }
+
+    if (si < 4) {
+      activeAll.forEach(p => cardsEl.appendChild(buildCard(p, si)));
+    } else {
+      activeAll.forEach(p => cardsEl.appendChild(buildCard(p, si)));
+    }
+
+    if (lostAll.length > 0) {
+      const d = document.createElement('div');
+      d.className = 'closed-divider';
+      d.style.color = 'var(--danger)';
+      d.textContent = '✕ Lost';
+      cardsEl.appendChild(d);
+      lostAll.forEach(p => cardsEl.appendChild(buildCard(p, si)));
+    }
+
+    const totalVisible = activeAll.length + wonAll.length + lostAll.length;
+    if (totalVisible === 0) {
+      cardsEl.innerHTML = `<div class="empty-col">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div>No prospects yet</div>
+      </div>`;
+    }
+  });
+}
+
+function buildCard(p, si) {
+  const card = document.createElement('div');
+  card.className = 'prospect-card' + (p.lost ? ' lost' : '');
+
+  const badge = p.lost ? '<span class="card-badge badge-lost">Lost</span>'
+               : p.won  ? '<span class="card-badge badge-won">Won</span>'
+               : '<span class="card-badge badge-active">Active</span>';
+
+  const isLastStage = si === 4;
+  const moveBtn = isLastStage
+    ? `<button class="btn-move" disabled title="Final stage">✓ Closed</button>`
+    : (p.lost ? '' : `<button class="btn-move" onclick="moveNext('${p.id}')">Move Forward →</button>`);
+
+  const lostOrRestore = p.lost
+    ? `<button class="btn-restore" onclick="restoreProspect('${p.id}')">↩ Restore</button>`
+    : `<button class="btn-lost" onclick="markLost('${p.id}')" title="Mark as Lost">✕</button>`;
+
+  const wonBtn = (si === 4 && !p.won && !p.lost)
+    ? `<button class="btn-move" onclick="markWon('${p.id}')" style="background:rgba(46,212,122,0.12);border-color:rgba(46,212,122,0.3);color:var(--success)">🏆 Mark Won</button>`
+    : '';
+
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-name">${escHtml(p.name)}</div>
+      ${badge}
+    </div>
+    <div class="card-meta">
+      <div class="meta-pill">📞 ${escHtml(p.phone)}</div>
+      <div class="meta-pill">🏷️ ${escHtml(p.industry)}</div>
+    </div>
+    <div class="card-date">📅 Last contact: ${p.lastContact || '—'}</div>
+    <textarea class="card-notes" placeholder="Add notes..." onblur="saveNotes('${p.id}', this.value)">${escHtml(p.notes || '')}</textarea>
+    <div class="card-actions">
+      ${wonBtn || moveBtn}
+      <a class="btn-wa" href="https://wa.me/${p.phone}" target="_blank" title="Open WhatsApp">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </a>
+      ${lostOrRestore}
+    </div>
+  `;
+  return card;
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── ACTIONS ──
+function moveNext(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p || p.stage >= 4) return;
+  p.stage++;
+  p.lastContact = today();
+  saveData(prospects);
+  render();
+  showToast(`${p.name} moved to ${STAGES[p.stage].label}`, 'info');
+}
+
+function markLost(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  p.lost = true;
+  p.won = false;
+  p.lastContact = today();
+  saveData(prospects);
+  render();
+  showToast(`${p.name} marked as lost`, 'info');
+}
+
+function markWon(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  p.won = true;
+  p.lost = false;
+  p.lastContact = today();
+  saveData(prospects);
+  render();
+  showToast(`🏆 ${p.name} marked as Won!`, 'success');
+}
+
+function restoreProspect(id) {
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  p.lost = false;
+  p.won = false;
+  saveData(prospects);
+  render();
+  showToast(`${p.name} restored to active`, 'success');
+}
+
+function saveNotes(id, val) {
+  const p = prospects.find(x => x.id === id);
+  if (!p) return;
+  if (p.notes !== val) {
+    p.notes = val;
+    p.lastContact = today();
+    saveData(prospects);
+  }
+}
+
+// ── MODAL ──
+function openAddModal() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-phone').value = '';
+  document.getElementById('f-industry').value = 'Salon/Beauty';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('f-stage').value = '0';
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+function saveProspect() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { showToast('Please enter a business name', 'info'); return; }
+  const p = {
+    id: uid(),
+    name,
+    phone: document.getElementById('f-phone').value.trim(),
+    industry: document.getElementById('f-industry').value,
+    notes: document.getElementById('f-notes').value.trim(),
+    stage: parseInt(document.getElementById('f-stage').value),
+    lost: false,
+    won: false,
+    lastContact: today(),
+    createdAt: today(),
+  };
+  prospects.push(p);
+  saveData(prospects);
+  closeModal();
+  render();
+  showToast(`${name} added to pipeline!`, 'success');
+}
+
+// ── EXPORT ──
+function exportCSV() {
+  const headers = ['Name','Phone','Industry','Stage','Status','Last Contact','Notes'];
+  const rows = prospects.map(p => [
+    p.name, p.phone, p.industry,
+    STAGES[p.stage]?.label || '',
+    p.won ? 'Won' : p.lost ? 'Lost' : 'Active',
+    p.lastContact || '',
+    (p.notes || '').replace(/\n/g,' ')
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `prisca-dezigns-pipeline-${today()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV exported!', 'success');
+}
+
+// ── TOAST ──
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Auto-init if already logged in
+if (sessionStorage.getItem(SESSION_KEY)) {
+  init();
+}
+</script>
+</body>
+</html>
