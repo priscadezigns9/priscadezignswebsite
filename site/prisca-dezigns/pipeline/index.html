@@ -592,7 +592,20 @@
     .board-wrapper { padding: 16px 16px 40px; }
     .header-tag { display: none; }
   }
+
+#pwa-install-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:#7B35D4;color:#fff;padding:12px 20px;z-index:9999;align-items:center;justify-content:space-between;font-size:.9rem;font-family:Inter,sans-serif}
+#pwa-install-bar button{background:#fff;color:#7B35D4;border:none;border-radius:8px;padding:8px 18px;font-weight:700;cursor:pointer;font-size:.85rem}
+#pwa-install-bar .dismiss{background:transparent;color:rgba(255,255,255,0.7);font-size:1.2rem;padding:0 8px}
+
 </style>
+
+  <link rel="manifest" href="/prisca-dezigns/pipeline/manifest.json">
+  <meta name="theme-color" content="#7B35D4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PD Pipeline">
+  <link rel="apple-touch-icon" href="/prisca-dezigns/pipeline/icon-192.png">
 </head>
 <body>
 
@@ -1073,6 +1086,47 @@ function showToast(msg, type = 'info') {
 // Auto-init if already logged in
 if (sessionStorage.getItem(SESSION_KEY)) {
   init();
+}
+</script>
+
+<div id="pwa-install-bar">
+  <span>Install Pipeline on your home screen for quick access</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="pwa-install-btn">Install App</button>
+    <button class="dismiss" id="pwa-dismiss">✕</button>
+  </div>
+</div>
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('pwa-install-bar').style.display = 'flex';
+});
+document.getElementById('pwa-install-btn').addEventListener('click', function() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(r) {
+      deferredPrompt = null;
+      document.getElementById('pwa-install-bar').style.display = 'none';
+    });
+  }
+});
+document.getElementById('pwa-dismiss').addEventListener('click', function() {
+  document.getElementById('pwa-install-bar').style.display = 'none';
+});
+window.addEventListener('appinstalled', function() {
+  document.getElementById('pwa-install-bar').style.display = 'none';
+});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/prisca-dezigns/pipeline/sw.js')
+      .then(function(reg) { console.log('SW registered:', reg.scope); })
+      .catch(function(err) { console.log('SW error:', err); });
+  });
 }
 </script>
 </body>
