@@ -129,6 +129,20 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:16px 5
   <div style="font-family:'Inter',sans-serif;font-size:2rem;font-weight:900;color:#E87722;margin-bottom:16px">Calla<span style="color:#1A0D00">loo</span></div>
   <h2 style="color:#1A0D00;font-size:1.8rem;margin-bottom:12px">Sign in to view your profile</h2>
   <p style="color:rgba(26,13,0,0.55)">Track your scans, save recipes, and share your diet journey.</p>
+  <!-- Language selector -->
+  <div style="margin-bottom:20px;display:flex;align-items:center;gap:10px;justify-content:center">
+    <span style="font-size:13px;color:rgba(26,13,0,0.45);font-weight:500">&#127760;</span>
+    <select id="langSelect" onchange="changeLanguage(this.value)" style="background:#FFF8F0;border:1px solid rgba(232,119,34,0.3);border-radius:50px;padding:7px 20px 7px 16px;font-size:13px;font-weight:600;color:#1A0D00;cursor:pointer;outline:none">
+      <option value="en">English</option>
+      <option value="es">Espa&#241;ol</option>
+      <option value="fr">Fran&#231;ais</option>
+      <option value="ht">Krey&#242;l Ayisyen</option>
+      <option value="pt">Portugu&#234;s</option>
+      <option value="nl">Nederlands</option>
+      <option value="zh-TW">&#20013;&#25991;</option>
+      <option value="hi">&#2361;&#2367;&#2344;&#2381;&#2342;&#2368;</option>
+    </select>
+  </div>
   <div class="auth-box">
     <div class="auth-tabs">
       <button class="auth-tab active" id="tabIn" onclick="switchTab('in')">Sign In</button>
@@ -219,7 +233,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:16px 5
 </div>
 
 <!-- FLOAT -->
-<a href="https://wa.me/447576505652" target="_blank" rel="noopener" class="std-float-wa" aria-label="WhatsApp">💬</a>
 <button class="std-float-bt" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
@@ -574,6 +587,24 @@ function applyCrop(){
   c.addEventListener('touchmove', function(e){ if(e.touches.length===1 && _cropDrag && _cropImg){ _cropOffX+=e.touches[0].clientX-_cropLastX; _cropOffY+=e.touches[0].clientY-_cropLastY; _cropLastX=e.touches[0].clientX; _cropLastY=e.touches[0].clientY; drawCrop(); } if(e.touches.length===2){ e.preventDefault(); } }, {passive:false});
   c.addEventListener('touchend', function(){ _cropDrag=false; });
 })();
+
+function changeLanguage(lang) {
+  if (!lang || lang === 'en') {
+    document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
+    document.cookie = 'googtrans=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=.' + location.hostname;
+    location.reload();
+    return;
+  }
+  var exp = new Date(Date.now() + 86400000).toUTCString();
+  document.cookie = 'googtrans=/en/' + lang + ';expires=' + exp + ';path=/';
+  document.cookie = 'googtrans=/en/' + lang + ';expires=' + exp + ';path=/;domain=.' + location.hostname;
+  location.reload();
+}
+(function(){
+  var m = document.cookie.match(/googtrans=\/en\/([^;]+)/);
+  if (m) { var sel = document.getElementById('langSelect'); if (sel) sel.value = m[1]; }
+})();
+
 </script>
 
 <!-- BOTTOM NAV -->
@@ -598,6 +629,9 @@ function applyCrop(){
     </div>
   </div>
 </div>
+<div id="google_translate_element" style="display:none"></div>
+<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',autoDisplay:false},'google_translate_element');}</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
 
