@@ -73,7 +73,7 @@ footer{background:#080f17;border-top:1px solid rgba(255,255,255,0.06);padding:24
   <h1>Find Trusted Professionals <span>Near You</span></h1>
   <p>Browse verified local service providers across every category. Contact them directly and get the job done.</p>
   <div class="search-bar">
-    <input type="text" placeholder="Search by name or service...">
+    <input type="text" id="search-input" placeholder="Search by name or service..." oninput="filterCards()">
     <select>
       <option value="">All Categories</option>
       <option>Beauty &amp; Wellness</option>
@@ -90,15 +90,15 @@ footer{background:#080f17;border-top:1px solid rgba(255,255,255,0.06);padding:24
 </div>
 
 <div class="filters">
-  <button class="filter-btn active">All</button>
-  <button class="filter-btn">Beauty &amp; Wellness</button>
-  <button class="filter-btn">Home Services</button>
-  <button class="filter-btn">Food &amp; Catering</button>
-  <button class="filter-btn">Education</button>
-  <button class="filter-btn">Tech &amp; IT</button>
-  <button class="filter-btn">Events</button>
-  <button class="filter-btn">Fitness</button>
-  <button class="filter-btn">Automotive</button>
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="beauty-wellness">Beauty &amp; Wellness</button>
+  <button class="filter-btn" data-filter="home-services">Home Services</button>
+  <button class="filter-btn" data-filter="food-catering">Food &amp; Catering</button>
+  <button class="filter-btn" data-filter="education-tutoring">Education</button>
+  <button class="filter-btn" data-filter="tech-it">Tech &amp; IT</button>
+  <button class="filter-btn" data-filter="events-entertainment">Events</button>
+  <button class="filter-btn" data-filter="health-fitness">Fitness</button>
+  <button class="filter-btn" data-filter="automotive">Automotive</button>
 </div>
 
 <div class="grid-section">
@@ -284,6 +284,7 @@ footer{background:#080f17;border-top:1px solid rgba(255,255,255,0.06);padding:24
 
   </div>
 </div>
+<div id="no-results" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,0.4);font-size:15px">No providers found matching your search.</div>
 
 <div class="list-cta">
   <h2>Are You a Service Provider?</h2>
@@ -303,10 +304,30 @@ window.addEventListener('scroll',function(){
   if(window.scrollY>400) btn.classList.add('visible');
   else btn.classList.remove('visible');
 });
+var activeFilter = 'all';
+
+function filterCards() {
+  var query = (document.getElementById('search-input').value || '').toLowerCase().trim();
+  var cards = document.querySelectorAll('.card');
+  cards.forEach(function(card) {
+    var name = (card.getAttribute('data-name') || '').toLowerCase();
+    var cat = (card.getAttribute('data-cat') || '').toLowerCase();
+    var matchSearch = !query || name.includes(query) || cat.includes(query);
+    var matchCat = activeFilter === 'all' || cat === activeFilter;
+    card.style.display = (matchSearch && matchCat) ? '' : 'none';
+  });
+  // Show/hide no-results message
+  var visible = Array.from(cards).filter(function(c){return c.style.display !== 'none';}).length;
+  var noRes = document.getElementById('no-results');
+  if(noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+}
+
 document.querySelectorAll('.filter-btn').forEach(function(btn){
-  btn.addEventListener('click',function(){
+  btn.addEventListener('click', function(){
     document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active');});
     this.classList.add('active');
+    activeFilter = this.getAttribute('data-filter') || 'all';
+    filterCards();
   });
 });
 function googleTranslateElementInit(){
