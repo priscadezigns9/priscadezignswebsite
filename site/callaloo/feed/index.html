@@ -205,6 +205,35 @@ const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNTY1NzIsImV4cCI6MjA2MjczMjU3Mn0.oEYHPGkIoYiMIqXM7JSNFkBnlr8FMM5lXBJLFuFtEzI';
 var _sb=null,_user=null,_savedSlugs=new Set(),_currentFilter='all',_currentSearch='',_recipes=[];
 
+
+// ── Demo Caribbean recipe dataset (shown when Supabase DB is empty) ─────────
+var DEMO_RECIPES = [
+  {id:"doubles",slug:"doubles",name:"Doubles",badge:"Street Food",photo:"",time:"30 min",rating:"4.9",category:"street food snacks",emoji:"🫓",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"callaloo-soup",slug:"callaloo-soup",name:"Callaloo Soup",badge:"Soup",photo:"",time:"45 min",rating:"4.8",category:"soup mains",emoji:"🍲",gradient:"linear-gradient(135deg,#f7971e,#ffd200)"},
+  {id:"pelau",slug:"pelau",name:"Chicken Pelau",badge:"Mains",photo:"",time:"60 min",rating:"4.9",category:"mains rice chicken",emoji:"🍗",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"stewed-chicken",slug:"stewed-chicken",name:"Stewed Chicken",badge:"Mains",photo:"",time:"55 min",rating:"4.8",category:"mains chicken",emoji:"🍗",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"pholourie",slug:"pholourie",name:"Pholourie",badge:"Snacks",photo:"",time:"35 min",rating:"4.7",category:"snacks street food",emoji:"🥜",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"roti",slug:"roti",name:"Dhalpuri Roti",badge:"Bread",photo:"",time:"90 min",rating:"4.9",category:"bread mains",emoji:"🫓",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"shark-bake",slug:"shark-bake",name:"Shark & Bake",badge:"Street Food",photo:"",time:"40 min",rating:"4.9",category:"street food mains seafood",emoji:"🐟",gradient:"linear-gradient(135deg,#43b89c,#3ab0e0)"},
+  {id:"curry-chicken",slug:"curry-chicken",name:"Curry Chicken",badge:"Mains",photo:"",time:"60 min",rating:"4.8",category:"mains chicken curry",emoji:"🍛",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"oildown",slug:"oildown",name:"Oildown",badge:"Mains",photo:"",time:"120 min",rating:"4.9",category:"mains stew",emoji:"🍲",gradient:"linear-gradient(135deg,#f7971e,#ffd200)"},
+  {id:"black-cake",slug:"black-cake",name:"Black Cake",badge:"Desserts",photo:"",time:"180 min",rating:"5.0",category:"desserts baking",emoji:"🍰",gradient:"linear-gradient(135deg,#f093fb,#f5576c)"},
+  {id:"sorrel",slug:"sorrel",name:"Sorrel Drink",badge:"Drinks",photo:"",time:"20 min",rating:"4.8",category:"drinks desserts",emoji:"🥤",gradient:"linear-gradient(135deg,#4facfe,#00f2fe)"},
+  {id:"macaroni-pie",slug:"macaroni-pie",name:"Macaroni Pie",badge:"Sides",photo:"",time:"50 min",rating:"4.8",category:"sides baking",emoji:"🥗",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"buljol",slug:"buljol",name:"Buljol",badge:"Breakfast",photo:"",time:"20 min",rating:"4.7",category:"breakfast sides seafood",emoji:"🍽",gradient:"linear-gradient(135deg,#43b89c,#3ab0e0)"},
+  {id:"fried-bake",slug:"fried-bake",name:"Fried Bake",badge:"Bread",photo:"",time:"30 min",rating:"4.8",category:"bread breakfast",emoji:"🫓",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"pepper-sauce",slug:"pepper-sauce",name:"Pepper Sauce",badge:"Condiments",photo:"",time:"15 min",rating:"4.9",category:"condiments",emoji:"🫙",gradient:"linear-gradient(135deg,#f7971e,#ffd200)"},
+  {id:"stew-peas",slug:"stew-peas",name:"Stew Peas",badge:"Mains",photo:"",time:"75 min",rating:"4.7",category:"mains",emoji:"🍽",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"geera-pork",slug:"geera-pork",name:"Geera Pork",badge:"Mains",photo:"",time:"50 min",rating:"4.8",category:"mains pork",emoji:"🍽",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"provisions",slug:"provisions",name:"Boiled Provisions",badge:"Sides",photo:"",time:"25 min",rating:"4.6",category:"sides",emoji:"🥗",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"kurma",slug:"kurma",name:"Kurma",badge:"Desserts",photo:"",time:"45 min",rating:"4.7",category:"desserts snacks",emoji:"🍰",gradient:"linear-gradient(135deg,#f093fb,#f5576c)"},
+  {id:"coconut-sweet-bread",slug:"coconut-sweet-bread",name:"Coconut Sweet Bread",badge:"Desserts",photo:"",time:"70 min",rating:"4.8",category:"desserts baking bread",emoji:"🍰",gradient:"linear-gradient(135deg,#f093fb,#f5576c)"},
+  {id:"corn-soup",slug:"corn-soup",name:"Corn Soup",badge:"Soup",photo:"",time:"90 min",rating:"4.9",category:"soup mains street food",emoji:"🍲",gradient:"linear-gradient(135deg,#f7971e,#ffd200)"},
+  {id:"buss-up-shut",slug:"buss-up-shut",name:"Buss Up Shut",badge:"Bread",photo:"",time:"60 min",rating:"4.8",category:"bread mains",emoji:"🫓",gradient:"linear-gradient(135deg,#E87722,#F5A623)"},
+  {id:"shadow-beni-sauce",slug:"shadow-beni-sauce",name:"Shadow Beni Sauce",badge:"Condiments",photo:"",time:"10 min",rating:"4.9",category:"condiments",emoji:"🫙",gradient:"linear-gradient(135deg,#f7971e,#ffd200)"},
+  {id:"trinidad-ponche-de-creme",slug:"ponche-de-creme",name:"Ponche de Creme",badge:"Drinks",photo:"",time:"20 min",rating:"4.9",category:"drinks desserts",emoji:"🥤",gradient:"linear-gradient(135deg,#4facfe,#00f2fe)"}
+];
+
 function getSB(){if(!_sb&&window.supabase)_sb=window.supabase.createClient(SB_URL,SB_KEY);return _sb;}
 
 function hideSplash(){
@@ -230,7 +259,12 @@ async function loadRecipes(){
   if(!sb){return;}
   try{
     var res=await sb.from('recipes').select('id,title,cover_photo_url,prep_time,cook_time,difficulty,tags').order('title',{ascending:true}).limit(200);
-    if(res.error||!res.data||res.data.length===0){return;}
+    if(res.error||!res.data||res.data.length===0){
+      // No DB data yet — show demo Caribbean recipes
+      _recipes=DEMO_RECIPES;
+      renderFeed();
+      return;
+    }
     _recipes=res.data.map(function(r){
       var tags=r.tags||[];
       var badge=tags.length>0?tags[0]:'';
