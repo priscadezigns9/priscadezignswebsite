@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Client Portal — Prisca Dezigns</title>
+<meta name="theme-color" content="#7B35D4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prisca Dezigns">
+<link rel="manifest" href="/prisca-dezigns/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--purple:#7B35D4;--purple-light:#9B55F4;--bg:#07060F;--card:rgba(255,255,255,0.05);--text:#F0F0F8;--muted:rgba(240,240,248,0.55);--border:rgba(123,53,212,0.22)}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+nav{position:sticky;top:0;z-index:100;background:rgba(7,6,15,0.96);backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);padding:0 5%;display:flex;align-items:center;
+    justify-content:space-between;height:62px}
+.nav-logo{font-size:.95rem;font-weight:900;color:var(--text);text-decoration:none}
+.nav-logo span{color:var(--purple-light)}
+.nav-user{display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#EC4899);
+    display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;cursor:pointer}
+.hero{padding:44px 5% 32px}
+.hero h1{font-size:1.6rem;font-weight:800;margin-bottom:6px}
+.hero p{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:0 5% 32px}
+.tile{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px 18px;
+    text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:10px;transition:all .2s;cursor:pointer}
+.tile:hover{border-color:rgba(123,53,212,0.5);transform:translateY(-2px)}
+.tile-icon{font-size:1.8rem}
+.tile-label{font-size:.85rem;font-weight:700;color:var(--text)}
+.tile-sub{font-size:.76rem;color:var(--muted)}
+.section{padding:0 5% 32px}
+.section-label{font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    color:var(--purple-light);margin-bottom:14px}
+.project-card{background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:18px 16px;margin-bottom:12px;display:flex;align-items:center;gap:14px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.active{background:#22C55E}
+.status-dot.review{background:#F59E0B}
+.status-dot.waiting{background:#6B7280}
+.proj-title{font-size:.9rem;font-weight:600;margin-bottom:3px}
+.proj-meta{font-size:.78rem;color:var(--muted)}
+.msg-cta{background:linear-gradient(135deg,rgba(123,53,212,0.2),rgba(236,72,153,0.1));
+    border:1px solid rgba(123,53,212,0.3);border-radius:18px;padding:22px 18px;margin:0 5% 32px;
+    display:flex;align-items:center;justify-content:space-between;gap:14px}
+.msg-cta p{font-size:.88rem;color:var(--muted);flex:1}
+.msg-btn{background:var(--purple);color:#fff;text-decoration:none;border-radius:50px;
+    padding:10px 20px;font-size:.82rem;font-weight:700;white-space:nowrap;transition:all .2s}
+.msg-btn:hover{background:var(--purple-light)}
+.bottomnav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,6,15,0.97);
+    backdrop-filter:blur(20px);border-top:1px solid var(--border);
+    display:flex;justify-content:space-around;padding:10px 0 14px}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:4px;
+    color:var(--muted);font-size:.68rem;font-weight:500;cursor:pointer;
+    text-decoration:none;transition:color .2s;padding:4px 14px}
+.bnav-item.active{color:var(--purple-light)}
+.bnav-item span{font-size:1.3rem}
+.auth-wall{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:80vh;padding:40px 5%;text-align:center}
+.auth-wall h2{font-size:1.4rem;font-weight:800;margin-bottom:10px}
+.auth-wall p{color:var(--muted);font-size:.9rem;margin-bottom:28px;max-width:320px}
+.auth-form{width:100%;max-width:360px;display:flex;flex-direction:column;gap:12px}
+.auth-input{background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:12px;
+    padding:14px 16px;color:var(--text);font-size:.95rem;font-family:inherit;outline:none;transition:border-color .2s}
+.auth-input:focus{border-color:var(--purple)}
+.auth-btn{background:var(--purple);color:#fff;border:none;border-radius:12px;padding:14px;
+    font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.auth-btn:hover{background:var(--purple-light)}
+.auth-toggle{color:var(--purple-light);font-size:.85rem;cursor:pointer;margin-top:4px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(123,53,212,0.9);
+    color:#fff;border-radius:50px;padding:10px 22px;font-size:.85rem;font-weight:600;
+    opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/prisca-dezigns/" class="nav-logo">Prisca<span>Dezigns</span></a>
+  <div class="nav-user">
+    <div class="avatar" id="avatarBtn" onclick="toggleAuthPanel()">PD</div>
+  </div>
+</nav>
+
+<div id="authWall" class="auth-wall" style="display:none">
+  <div style="font-size:3rem;margin-bottom:16px">🔐</div>
+  <h2>Client Portal</h2>
+  <p>Sign in to view your projects, invoices, and communicate with the team.</p>
+  <div class="auth-form">
+    <input class="auth-input" id="authEmail" type="email" placeholder="Your email address">
+    <input class="auth-input" id="authPass" type="password" placeholder="Password">
+    <button class="auth-btn" onclick="signIn()">Sign In</button>
+    <div class="auth-toggle" onclick="toggleAuthMode()">Don't have an account? <u>Sign up</u></div>
+  </div>
+</div>
+
+<div id="portalContent">
+  <div class="hero">
+    <h1>Welcome back 👋</h1>
+    <p>Here's an overview of your active projects with Prisca Dezigns.</p>
+  </div>
+
+  <div class="grid">
+    <div class="tile" onclick="showToast('Projects loading...')">
+      <div class="tile-icon">📁</div>
+      <div class="tile-label">Projects</div>
+      <div class="tile-sub">3 active</div>
+    </div>
+    <div class="tile" onclick="showToast('Invoices loading...')">
+      <div class="tile-icon">💳</div>
+      <div class="tile-label">Invoices</div>
+      <div class="tile-sub">1 pending</div>
+    </div>
+    <a href="https://wa.me/447576505652" target="_blank" class="tile">
+      <div class="tile-icon">💬</div>
+      <div class="tile-label">Message Us</div>
+      <div class="tile-sub">WhatsApp</div>
+    </a>
+    <div class="tile" onclick="showToast('Files loading...')">
+      <div class="tile-icon">📎</div>
+      <div class="tile-label">Files</div>
+      <div class="tile-sub">Deliverables</div>
+    </div>
+    <a href="/our-tools/" class="tile">
+      <div class="tile-icon">🛠️</div>
+      <div class="tile-label">Our Tools</div>
+      <div class="tile-sub">5 available</div>
+    </a>
+    <a href="/blog/" class="tile">
+      <div class="tile-icon">📖</div>
+      <div class="tile-label">Blog</div>
+      <div class="tile-sub">Resources</div>
+    </a>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Active Projects</div>
+    <div class="project-card">
+      <div class="status-dot active"></div>
+      <div>
+        <div class="proj-title">Brand Identity Package</div>
+        <div class="proj-meta">In progress · Est. delivery: 2 weeks</div>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="status-dot review"></div>
+      <div>
+        <div class="proj-title">Website Redesign</div>
+        <div class="proj-meta">Awaiting your review · 2 items pending</div>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="status-dot waiting"></div>
+      <div>
+        <div class="proj-title">Social Media Management</div>
+        <div class="proj-meta">Monthly retainer · Next report: May 31</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="msg-cta">
+    <p>Have a question or want to discuss your project?</p>
+    <a href="https://wa.me/447576505652" target="_blank" class="msg-btn">WhatsApp Us</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<nav class="bottomnav">
+  <a href="/prisca-dezigns/" class="bnav-item"><span>🏠</span>Home</a>
+  <a href="/prisca-dezigns/portal/" class="bnav-item active"><span>📁</span>Portal</a>
+  <a href="/our-tools/" class="bnav-item"><span>🛠️</span>Tools</a>
+  <a href="/blog/" class="bnav-item"><span>📖</span>Blog</a>
+  <a href="https://wa.me/447576505652" target="_blank" class="bnav-item"><span>💬</span>Chat</a>
+</nav>
+
+<script>
+const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyMTg2MzgsImV4cCI6MjA2MTc5NDYzOH0.vFMlkwOdRhN7C5_sKWbFnkFNHKpBh0XmXQkZRxp7kf4';
+let _sb = null;
+function getSB(){if(!_sb&&window.supabase)_sb=window.supabase.createClient(SB_URL,SB_KEY);return _sb;}
+
+let authMode = 'signin';
+
+async function checkAuth(){
+  const sb = getSB();
+  if(!sb) return;
+  const {data:{session}} = await sb.auth.getSession();
+  if(session){
+    document.getElementById('authWall').style.display='none';
+    document.getElementById('portalContent').style.display='block';
+    const email = session.user.email;
+    document.getElementById('avatarBtn').textContent = email.substring(0,2).toUpperCase();
+  } else {
+    document.getElementById('authWall').style.display='flex';
+    document.getElementById('portalContent').style.display='none';
+  }
+}
+
+async function signIn(){
+  const sb = getSB(); if(!sb) return;
+  const email = document.getElementById('authEmail').value;
+  const pass = document.getElementById('authPass').value;
+  if(authMode === 'signin'){
+    const {error} = await sb.auth.signInWithPassword({email, password: pass});
+    if(error){showToast('Sign in failed: ' + error.message);return;}
+  } else {
+    const {error} = await sb.auth.signUp({email, password: pass});
+    if(error){showToast('Sign up failed: ' + error.message);return;}
+    showToast('Check your email to confirm your account');return;
+  }
+  checkAuth();
+}
+
+function toggleAuthMode(){
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  document.querySelector('.auth-toggle').innerHTML =
+    authMode === 'signin'
+      ? 'Don't have an account? <u>Sign up</u>'
+      : 'Already have an account? <u>Sign in</u>';
+  document.querySelector('.auth-btn').textContent = authMode === 'signin' ? 'Sign In' : 'Sign Up';
+}
+
+function toggleAuthPanel(){ checkAuth(); }
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+document.addEventListener('DOMContentLoaded', checkAuth);
+</script>
+</body>
+</html>
