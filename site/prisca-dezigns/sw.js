@@ -1,8 +1,12 @@
-// Prisca Dezigns Service Worker
-const CACHE = 'pd-cache-v1';
+// Prisca Dezigns Service Worker v2
+const CACHE = 'pd-cache-v2';
 const ASSETS = [
   '/prisca-dezigns/',
   '/prisca-dezigns/index.html',
+  '/blog/',
+  '/blog/index.html',
+  '/our-tools/',
+  '/our-tools/index.html',
 ];
 
 self.addEventListener('install', e => {
