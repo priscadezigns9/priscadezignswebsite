@@ -893,6 +893,46 @@ def run_post(brand_name, post_type):
         caption = get_caption(niche, product_used)
     ig_result = ""  # populated for photo posts that hit Instagram
 
+    # SEAMRITE DESIGNS OVERRIDE — Alice Mohamed / Neh Neh page
+    # Rules: 1 post/day only, at 10AM (odd days) or 2PM (even days), photo required
+    if niche == "fashion_art":
+        from datetime import date as _sd, datetime as _sdt
+        today_day = _sd.today().day
+        current_hour = _sdt.now().hour
+        allowed_hour = 10 if today_day % 2 != 0 else 14  # odd=10AM, even=2PM
+        if current_hour != allowed_hour:
+            return f"Skipping {brand_name} — not scheduled hour (need {allowed_hour}:00, current {current_hour}:00)"
+        # Scrape a product photo from the shop picks page
+        import urllib.request as _ur, re as _re
+        try:
+            _req = _ur.Request("https://priscadezigns.org/nehneh/shop/", headers={"User-Agent": "Mozilla/5.0"})
+            with _ur.urlopen(_req, timeout=8) as _resp:
+                _html = _resp.read().decode(errors="ignore")
+            # Find all img src tags that look like Amazon product images
+            _imgs = _re.findall(r'src=["\'](https://m\.media-amazon\.com/images/[^"\']+)["\']', _html)
+            if not _imgs:
+                _imgs = _re.findall(r'src=["\'](https://[^"\']+\.jpg)["\']', _html)
+            if _imgs:
+                import random as _rand
+                photo_url = _rand.choice(_imgs[:8])  # pick from first 8 product images
+        except Exception as _e:
+            print(f"Shop scrape failed: {_e} — using fallback")
+            photo_url = ""
+        if not photo_url:
+            # Fallback: niche fashion image (non-Pexels)
+            _fashion_fallbacks = [
+                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1080",
+                "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1080",
+                "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1080",
+                "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1080",
+                "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1080",
+            ]
+            from datetime import date as _fd
+            photo_url = _fashion_fallbacks[_fd.today().timetuple().tm_yday % len(_fashion_fallbacks)]
+        # Post photo with caption — return after posting, skip all other post_type logic below
+        result = post_to_facebook(page_id, token, caption, photo_url=photo_url)
+        return f"{'✅' if 'id' in result else '❌'} {brand_name} [photo] FB:{result.get('id', result.get('error','?'))[:60]}"
+
     if post_type == "text":
         # AGENCY/FASHION_ART pages use their own CAPTIONS, not NICHE_TIPS
         if niche in ("agency", "fashion_art"):
