@@ -633,5 +633,58 @@ function toggleTheme(){
 <script>window.addEventListener('scroll',function(){var b=document.getElementById('sbt_karjov');if(b)b.classList.toggle('vis',window.scrollY>400);});</script>
 <!-- /Standard Float Stack -->
 
+
+<!-- AI Caption Writer -->
+<section id="ai-caption-writer" style="background:#0a0a0a;border-top:1px solid #222;padding:80px 40px;text-align:center">
+  <div style="max-width:700px;margin:0 auto">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.15em;color:#C084FC;margin-bottom:12px">POWERED BY AI</div>
+    <h2 style="font-size:clamp(32px,5vw,48px);font-weight:900;color:#fff;margin-bottom:16px">AI Social Caption Writer</h2>
+    <p style="color:#888;font-size:16px;margin-bottom:40px">Describe your post or product. Get a ready-to-publish caption in seconds.</p>
+    <div style="background:#111;border:1px solid #222;border-radius:8px;padding:32px;text-align:left">
+      <label style="display:block;font-size:13px;font-weight:600;color:#aaa;margin-bottom:8px">Describe your post or product</label>
+      <textarea id="captionPrompt" rows="4" placeholder="e.g. A new summer dress collection, bright colours, beach vibes..." style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:4px;padding:12px;color:#fff;font-size:15px;font-family:Inter,sans-serif;resize:vertical;box-sizing:border-box"></textarea>
+      <label style="display:block;font-size:13px;font-weight:600;color:#aaa;margin:16px 0 8px">Platform</label>
+      <select id="captionPlatform" style="width:100%;background:#0a0a0a;border:1px solid #333;border-radius:4px;padding:10px 12px;color:#fff;font-size:15px;font-family:Inter,sans-serif;box-sizing:border-box">
+        <option value="Instagram">Instagram</option>
+        <option value="Facebook">Facebook</option>
+        <option value="TikTok">TikTok</option>
+        <option value="LinkedIn">LinkedIn</option>
+      </select>
+      <button onclick="generateCaption()" id="captionBtn" style="width:100%;margin-top:20px;background:#7B2FBE;color:#fff;border:none;padding:14px;font-size:16px;font-weight:700;border-radius:4px;cursor:pointer">Generate Caption</button>
+      <div id="captionOutput" style="display:none;margin-top:24px;background:#0a0a0a;border:1px solid #333;border-radius:4px;padding:20px;color:#e0e0e0;font-size:15px;line-height:1.7;white-space:pre-wrap"></div>
+      <div id="captionError" style="display:none;margin-top:16px;color:#f87171;font-size:14px"></div>
+    </div>
+  </div>
+</section>
+<script>
+async function generateCaption() {
+  const prompt = document.getElementById("captionPrompt").value.trim();
+  const platform = document.getElementById("captionPlatform").value;
+  const btn = document.getElementById("captionBtn");
+  const output = document.getElementById("captionOutput");
+  const errEl = document.getElementById("captionError");
+  if (!prompt) { errEl.style.display="block"; errEl.textContent="Please describe your post or product."; return; }
+  btn.textContent = "Generating..."; btn.disabled = true;
+  errEl.style.display="none"; output.style.display="none";
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer ' + (window.GROQ_KEY||'') + '" },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: "Write a compelling " + platform + " caption for the following. Keep it punchy, engaging, and optimised for " + platform + ". Include relevant hashtags at the end. Post description: " + prompt }],
+        max_tokens: 400
+      })
+    });
+    const data = await res.json();
+    if (data.choices && data.choices[0]) {
+      output.textContent = data.choices[0].message.content;
+      output.style.display = "block";
+    } else { throw new Error("No response"); }
+  } catch(e) { errEl.style.display="block"; errEl.textContent="Something went wrong. Please try again."; }
+  btn.textContent = "Generate Caption"; btn.disabled = false;
+}
+</script>
+
 </body>
 </html>
