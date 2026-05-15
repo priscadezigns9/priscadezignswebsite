@@ -1,59 +1,70 @@
 # Empire Memory — Prisca Dezigns
-*Last updated: Wed 2026-05-13 21:54 AST*
+*Last updated: Thu 2026-05-14 21:54 AST*
 
 ---
 
 ## 🌐 Website Status
 - **Domain:** priscadezigns.org (GitHub Pages — repo: priscadezigns9/priscadezignswebsite)
-- **Total pages:** 25 live (all returning 200 OK as of 21:30 AST)
-- **Pages live:**
-  `/` | `/prisca-dezigns/` | `/vela/` | `/orbyt/` | `/karjov/` | `/writx/` | `/trogon/` | `/seamritedesigns/` | `/nehneh/` | `/dreaming-anime/` | `/atelier-gaming/` | `/sole-prestige/` | `/verdant-co/` | `/the-watch-list/` | `/peak-fit/` | `/the-escapist/` | `/paw-vault/` | `/quiet-luxury/` | `/glow-protocol/` | `/essence-elite/` | `/prime-land-network/` | `/tech-scout/` | `/the-autodrome/` | `/couture-gallery/` | `/the-way-made-known/`
-- **NOT yet built:** `/safron/` — Safron brand exists (vision board in Drive) but no page. Homepage has "Coming soon" card.
-- **Clasp:** Lives at `/clasp-books/` (not `/clasp/`)
-- **Riddim:** Coming soon card on homepage — no page built yet
+- **Total pages:** 30+ live
+- **Pages live (as of 2026-05-14):**
+  `/` | `/prisca-dezigns/` | `/velloq/` | `/moblync/` | `/karjov/` | `/cupyx/` | `/trogon/` | `/seamritedesigns/` | `/nehneh/` | `/dreaming-anime/` | `/dreaming-anime/shop/` | `/atelier-gaming/` | `/sole-prestige/` | `/verdant-co/` | `/the-watch-list/` | `/peak-fit/` | `/the-escapist/` | `/paw-vault/` | `/quiet-luxury/` | `/glow-protocol/` | `/essence-elite/` | `/prime-land-network/` | `/tech-scout/` | `/the-autodrome/` | `/couture-gallery/` | `/the-way-made-known/` | `/riddiim/` | `/rowcell/` | `/calalloo/` | `/dpanyard/` | `/clarev/`
+
+- **Affiliate brands redirect:** `/affiliate-brands/` → redirects to `/dreaming-anime/shop/`
+- **NOT yet built:** `/safron/` — brand identity in Drive, no page yet. Also `/clasp-books/` may be stale (now renamed Rowcell)
+
+### Name/Path Updates (LOCKED 2026-05-14)
+- Vela → **Velloq** (path: `/velloq/`)
+- Orbyt → **Moblync** (path: `/moblync/`)
+- Writx → **Cupyx** (path: `/cupyx/`)
+- Clasp → **Rowcell** (path: `/rowcell/`)
+- Riddim → **Riddiim** (path: `/riddiim/`)
+- Callaloo → **Calalloo** (path: `/calalloo/`)
+- Panyard → **D' PanYard** (path: `/dpanyard/`)
 
 ---
 
 ## 🏢 Brand Directory
 
 ### Core Agency
-- **Prisca Dezigns** — digital agency, branding, web design, social media management. Master brand.
-- **Seamrite Designs (formerly NehNeh)** — fashion & art brand. Pink & black. Two-section site: fashion (top) + art (bottom/NehNeh).
+- **Prisca Dezigns** — digital agency, branding, web design, social media management. Master brand. Purple & black.
+- **Seamrite Designs (NehNeh)** — CLIENT BRAND (Alice Mohamed). Fashion & art. Hot Pink & Black. Two-section site.
 
 ### SaaS Platforms
-- **Vela** — social scheduling / content calendar SaaS. Cyan/navy.
-- **Orbyt** — AI-powered ad targeting SaaS. Blue/purple.
-- **Karjov** — analytics/reporting SaaS. Gold/dark.
-- **Writx** — AI writing assistant SaaS. Rose/dark.
-- **Trogon** — business management / client portal SaaS. (Supabase auth, Vercel deployment)
-- **Clarev** — Healthcare SaaS (originally Medova). Teal/navy, HIPAA, EHR, billing. ($49/$99/custom pricing)
-- **Linkup** — professional networking platform (LinkedIn competitor). Dark navy #070B14, electric blue #0066FF, Barlow 800. Tagline: "Connect. Grow. Get Hired."
-- **Panyard** — Caribbean music & events discovery. Mango/gold/green. "Cook the culture. Spend smart."
-- **Clasp** — data entry / spreadsheet management service. White bg, Excel green (#1D6F42). Lives at `/clasp-books/`
-- **Deskwell** — (page exists, details TBC)
-- **Safron** — brand identity only (vision board in Drive, amber #F59E0B). No web page yet.
-- **Riddim** — music discovery app. Icon: vinyl record. Wordmark: bold 900-weight. Black (#0A0A0F)/white. Coming soon.
+- **Velloq** (formerly Vela) — social scheduling / content calendar SaaS. Cyan/navy.
+- **Moblync** (formerly Orbyt) — AI-powered app design tool. Blue/purple.
+- **Karjov** — analytics/reporting SaaS. Gold/dark. Full page built 2026-05-14.
+- **Cupyx** (formerly Writx) — AI writing assistant SaaS. Rose/dark. Step cards fixed 2026-05-14.
+- **Trogon** — business management / client portal SaaS. BI Dashboard section added 2026-05-14.
+- **Clarev** — Healthcare SaaS. Teal/navy, HIPAA, EHR, billing. ($49/$99/custom pricing)
+- **Rowcell** (formerly Clasp) — data/sheets management tool. Dark green brand.
+- **Riddiim** (formerly Riddim) — music discovery app. "The Record Room" redesign live 2026-05-14. Black/white, vinyl aesthetic. Domain: riddiim.
+- **Calalloo** (formerly Callaloo) — "The Pinterest of Caribbean food." Visual recipe app, location-aware. Pinterest discovery layer live 2026-05-14 — vibe filter bar, masonry grid, trending section, ingredient CTA.
+- **D' PanYard** (formerly Panyard) — LOCAL SERVICES MARKETPLACE. Like Facebook Marketplace + Thumbtack. Customers find local service providers by area.
+- **Safron** — brand identity only (vision board in Drive, amber #F59E0B). No page yet.
 
 ### Affiliate Niche Pages (15 pages)
 Verdant Co | The Watch List | Sole Prestige | Atelier Gaming | Couture Gallery | The Autodrome | Peak Fit | The Escapist | Paw Vault | Quiet Luxury | Glow Protocol | Essence Elite | Prime Land Network | The Tech Scout HQ | The Way Made Known (faith/devotional — NO affiliate products)
 
 ### Dreaming Anime
-- Anime content brand. Orange & black. 6-product affiliate rotation (continuous, no same photo twice in a row).
+- Anime content brand. Orange & black. "The Panel" full manga redesign live 2026-05-14.
+- Affiliate shop at `/dreaming-anime/shop/` — live 2026-05-14.
+- Dark mode toggle added 2026-05-14.
 
 ---
 
 ## 📘 Brand Identity Rules (LOCKED)
-- **Dreaming Anime** — Orange & Black ✅ FINALIZED
-- **Prisca Dezigns** — Purple & Black ✅ FINALIZED
-- **Seamrite Designs (NehNeh)** — Hot Pink (#FF007F) & Black ✅ FINALIZED
+- **Dreaming Anime** — Orange & Black ✅ FINALIZED. The Panel aesthetic.
+- **Prisca Dezigns** — Purple & Black ✅ FINALIZED. Gistesy + Belliza fonts locked.
+- **Seamrite Designs (NehNeh)** — Hot Pink (#FF007F) & Black ✅ FINALIZED.
+- **D' PanYard** — Red #E01B24 + White + Deep Navy #0D1B2A. Sora 800 + Inter. NO orange.
 - **Wordmark fonts:** Gistesy (Prisca) + Belliza (DEZIGNS) — LOCKED
 - **No regional mentions** — NEVER use "Trinidad", "Caribbean" in any client-facing content. Global-first always.
-- **Aesthetic for future platforms:** Dark, premium, Remotion-inspired. Dark bg, high contrast, clean grid, subtle glows, monospace + strong sans-serif.
+- **Future platforms aesthetic:** Dark, premium, Remotion-inspired. Dark bg, high contrast, clean grid, subtle glows, monospace + strong sans-serif.
 
 ---
 
 ## 📱 Facebook Pages (18 total)
-**Tokens:** Long-lived page tokens stored in `fb_page_tokens.json` (GitHub repo). Never-expiring (expires_at = 0).
+**Tokens:** Long-lived page tokens stored in `fb_page_tokens.json` (GitHub repo). Never-expiring.
 
 | Page | Page ID |
 |---|---|
@@ -76,15 +87,9 @@ Verdant Co | The Watch List | Sole Prestige | Atelier Gaming | Couture Gallery |
 | Prime Land Network | 1131532363373441 |
 | The Tech Scout HQ | 1124620534060229 |
 
-**Posting schedule:** 8AM, 11AM, 2PM, 7PM AST daily (4 posts/day minimum per page)
-**Minimums:** All pages = 4 posts/day. The Way Made Known = faith content only, no affiliate products.
-
-**FB Audit — 21:52 AST (Mon 2026-05-11):**
-- ✅ Dreaming Anime: 4/4 compliant
-- ❌ Prisca Dezigns: 1/4 (deficit: 3)
-- ❌ Seamrite Designs: 1/4 (deficit: 3)
-- ❌ The Way Made Known: 2/4 (deficit: 2)
-- ❌ All 14 affiliate pages: 3/4 (deficit: 1 each — evening post slot likely missed)
+**Posting schedule:** 8AM, 11AM, 2PM, 7PM AST daily
+**Limits:** Empire pages = 4 posts/day MAX & MIN. Seamrite Designs = 2 posts/day MAX & MIN.
+**No catch-up batches** — if a slot is missed, wait for next scheduled slot.
 
 ---
 
@@ -93,17 +98,15 @@ Verdant Co | The Watch List | Sole Prestige | Atelier Gaming | Couture Gallery |
 ### daily_poster.py (server-side)
 - Fires at 8AM, 11AM, 2PM, 7PM AST via cron
 - Downloads fresh fb_page_tokens.json + niches from GitHub each run
-- Posts affiliate products (photo + caption) in 6-day rotation — no repeated photo same product consecutive day
+- Posts affiliate products (photo + caption) in 6-day rotation — no repeated photo consecutive day
 - Staggered: one group every 15 min to avoid simultaneous API flood
 - Bug fixed 2026-05-11: accepts both `id` and `page_id` keys in tokens JSON
-- Bug fixed 2026-05-11: silent missing photo file error
-- Bug fixed 2026-05-11: fb_page_tokens.json key renamed "Seamrite Designs" (was "alicemohammed / NehNeh") — now all 18 pages match niches correctly
 
 ### midnight_audit2.py (server-side)
 - Runs nightly, checks all pages, logs to memory
 
 ### Website Audit Cron (Zapia)
-- Checks all 25 pages HTTP status every 30 min
+- Checks all pages HTTP status every 30 min
 - Silent if 200 OK, notifies Prisca on any failure
 
 ### FB Audit Cron (Zapia)
@@ -112,7 +115,11 @@ Verdant Co | The Watch List | Sole Prestige | Atelier Gaming | Couture Gallery |
 
 ### WhatsApp Prospect Check (Zapia)
 - Checks inbound messages every 30 min from all 14 prospect numbers + personal number
-- Reports any new replies for Prisca to approve before responding
+- NO reports from personal number (18683424101) after 9 PM AST
+- Reports new replies for Prisca to approve before responding
+
+### Empire Memory Backup Cron (Zapia)
+- Fires nightly — updates empire_memory.md and uploads to Drive (file ID: 1xvlHIaM5ui1meFyS7Aeas4X7wiFLQV1u)
 
 ### GitHub Backup (nightly)
 - Backs up: empire_memory.md, daily_poster.py, fb_page_tokens.json, midnight_audit2.py, ig_accounts.json, anime_clip_log.json
@@ -130,23 +137,12 @@ Verdant Co | The Watch List | Sole Prestige | Atelier Gaming | Couture Gallery |
 - **Prisca Dezigns Business Receipts 2025-2026:** `1jd2919lRSqVXUj514N81yqw3Nncr3sMR`
 - **Seamrite Designs Business Receipts 2025-2026:** `1W8aOUZa3Vjs5tRbw3f_PaxQegr6JpwoR`
 
-### Sheet Format
-Columns: Date | Description | Business/Payee | Type | Category | Payment Method | Amount (TT$) | Receipt Kept?
-
-### Flow
-1. Prisca sends receipt photo
-2. Extract: date, vendor, amount, category, currency
-3. Append row to correct tracker (above totals/unverified section, after last dated entry)
-4. Upload photo to correct receipts folder: `YYYY-MM-DD_Vendor_Amount.jpg`
-5. Confirm to Prisca with extracted details
-
 ---
 
 ## 📲 WhatsApp Outreach
 
 ### Business Number (UK): +447576505652
 - Outreach sent May 10 to 14 prospects — NO follow-ups until they reply first (LOCKED RULE)
-- No inbound replies as of 21:52 AST Mon 2026-05-11
 
 ### Prospect Numbers (Batch 1)
 - 18687063018 — Advance Printing
@@ -168,55 +164,51 @@ Columns: Date | Description | Business/Payee | Type | Category | Payment Method 
 
 ### Personal Number: 18683424101
 - Checked for unknown inbound messages (possible client leads)
+- NOT reported after 9 PM AST
 
 ---
 
 ## 🔧 Pending Tasks
 
 ### HIGH PRIORITY
-1. **FB posting deficit** — 17/18 pages below 4-post minimum today. Evening post slot appears to have missed or not fired. Catch-up needed.
-2. **SVG icon upgrade — 3 pages pending** (payloads ready in workspace):
-   - Clarev → push_clarev.json
-   - Trogon → push_trogon.json
-   - Prisca Dezigns → push_priscadezigns.json
-3. **Safron page** — needs to be built when Prisca is ready (brand identity exists in Drive)
+1. **Translate fix sweep** — in progress 2026-05-14 evening. All empire pages getting new working translate dropdown (click → 10-language list → Google Translate opens page translated). Old broken Google widget being removed from all pages.
+2. **Safron page** — needs to be built when Prisca is ready (brand identity exists in Drive)
 
 ### MEDIUM PRIORITY
-4. **Trogon:** Groq API key placeholder (gsk_placeholder) — needs real key from team/Groq account
-5. **TikTok App resubmission** — fix /legal/terms/ and /legal/privacy/ pages, then resubmit
-6. **NehNeh wrongly-posted content** — Verdant Co composting captions were posted to NehNeh FB page (key mismatch bug, now fixed). Prisca to manually delete those posts.
-7. **Raider** — Prisca mentioned a new product/feature concept. Awaiting brief.
+3. **Trogon:** Groq API key placeholder (gsk_placeholder) — needs real key from Groq account
+4. **TikTok App resubmission** — fix /legal/terms/ and /legal/privacy/ pages, then resubmit
+5. **Clarev + D' PanYard cards** on /platforms/ page — still missing
+6. **Rowcell PNG/JPG wordmark export** — still pending (needs browser render)
+7. **SVG icon upgrades for Clarev, Trogon, Prisca Dezigns** — payloads ready in workspace (push_clarev.json, push_trogon.json, push_priscadezigns.json)
 
-### DESIGN
-8. **Pinterest image direction LOCKED** — all future brand promo images/reels must follow:
-   - Dark dramatic backgrounds (deep black, purple/blue cinematic gradients)
-   - 3D rendered characters/objects (bold, expressive)
-   - BIG bold uppercase typography with accent word highlights
-   - Glassmorphism service pill badges
-   - Logo top-right, contact footer bar
-   - Applies to: Writx, Karjov, Vela, Clasp, Orbyt, Prisca Dezigns
-   - Pinterest reference folder: Drive ID `1mURMX-BjHy4ZlevWFAUbqoLTRnZZVLIo` (16 images)
+### TRADING (NEW 2026-05-14)
+8. **Risk Per Trade:** $200 (4%). Lot sizes must reflect this.
+9. **S&P500 levels:** 4-digit format to match cTrader feed (e.g. 7211.40)
+10. **Entry:** Clean retest of 8:15 AM candle midpoint on 5m chart at 9:30 AM or after
+11. **Hard stop:** 11:00 AM AST. Max 2 trades/day. Power 2 filter.
 
 ---
 
-## 🖼️ Promo Assets (current)
+## 🖼️ Promo Assets
 
 ### Reels (Drive)
 - Prisca Dezigns Reel v4: `1XJInSQZA2AztmUtUELjth-18oepla7dY`
 - Seamrite Reel 1 v4: `1bRSSzzwRVOtqIjj0UmJ4ESBVre5lerN9`
-- Seamrite Reel 2 v4: `15Qp-oEQ4b-phxpZfgXY3Z8UDa6ahJFP9`
+- Seamrite Reel 2 v4: `15Qp-oEQ4b-phxpZgXY3Z8UDa6ahJFP9`
 - Seamrite Reel 3 v4: `1mmowxF3BT4CccQDMBoeKL-3k9xyXkvJD`
 - NehNeh Reel v4: `1pK0Ie2lF8JQjVi4jCd87XrWgG4_i_yGe`
-
-### Promo Image Folders
-- Writx: `1LBubfjPzrzD4amy9SIOeIEUnZPxKp3CE`
-- Orbyt: `1-mZFQWapGVa9WElK6dfD0wWOR4kl3m9Y`
-- Karjov: `1HdvO0v0OyuZBjtvAhUW9dM8GsD6ryApA`
-- Vela: `19GGHjeriEaqeXXHqB9Xap1u68Cok-3V-`
 
 ### Master Logo
 - File: `media/1778428022219.jpg` (workspace) + `logos/prisca-dezigns-logo.png` (GitHub)
 - Black bg, purple circle, "Prisca" cursive + "DEZIGNS" caps underneath — NEVER substitute
+
+### Pinterest Design Direction (LOCKED)
+- Dark dramatic backgrounds (deep black, purple/blue cinematic gradients)
+- 3D rendered characters/objects (bold, expressive)
+- BIG bold uppercase typography with accent word highlights
+- Glassmorphism service pill badges
+- Logo top-right, contact footer bar
+- Reference folder: Drive ID `1mURMX-BjHy4ZlevWFAUbqoLTRnZZVLIo` (16 images)
 
 ---
 
@@ -224,59 +216,43 @@ Columns: Date | Description | Business/Payee | Type | Category | Payment Method 
 - No regional mentions (no "Trinidad", "Caribbean") in any client-facing content
 - Global-first positioning always
 - No follow-up WA messages to prospects until they reply first
-- WA messages to Prisca: 6AM–6PM AST only
 - No double posting — empire automation runs in one dedicated chat only
 - No rebuilds / UI changes without explicit instruction
 - Competitor research MANDATORY before any design work
-- Clarev = Healthcare SaaS (NOT client portal). Client portal product needs a new name from Prisca.
-- Linkup = professional networking (LinkedIn competitor). Name locked.
-- Seamrite Designs = fashion/art, pink & black, NehNeh is the art section within same site.
-- The Way Made Known = faith/devotional content ONLY. No affiliate products ever.
-- NehNeh/Seamrite = fashion & art only. NO skincare, beauty, or health products.
+- Course review MANDATORY before any new project/feature build
+- Clarev = Healthcare SaaS. NOT client portal.
+- D' PanYard = LOCAL SERVICES MARKETPLACE. NOT food/recipe. NOT professional networking.
+- Calalloo = "Pinterest of Caribbean food" — visual recipe discovery, location-aware.
+- Seamrite/NehNeh = fashion & art CLIENT brand. NO skincare, beauty, health products.
+- The Way Made Known = faith/devotional ONLY. No affiliate products.
 
 ---
-## Session Update — 2026-05-12
 
-### Website Fixes
-- Affiliate brands page: replaced all 17 broken inline SVG logos with real PNG files from assets/logos/
-- Rowcell: fixed nav (white-on-white → dark green bg), cleaned doubled anchor HTML in nav + footer, wordmark size 1.7rem
-- Rowcell SVG wordmark saved as assets/logos/rowcell.svg and rowcell_dark.svg
-- Float buttons: fixed overlapping on 25 pages (TR: 84px→90px, BT: 148px→162px)
-- Trogon Business Plan live at /trogon/business-plan/ — investor-grade dark branded doc
-- Cupyx: added CSS fallback wordmark for nav logo
+## 📅 Session Log
 
-### Ad Creative
-- New Prisca Dezigns FB ad at /prisca-dezigns/ad/ — Pinterest-inspired animated dark design
-- Features: "First 5 clients get 1 month FREE maintenance" offer strip, Playfair+Space Grotesk fonts, purple/pink gradient orbs, floating cards, animated CTA bar
+### 2026-05-12
+- Affiliate brands page: replaced 17 broken SVG logos with real PNGs
+- Rowcell: nav fix (white-on-white), doubled anchor fix, wordmark 1.7rem
+- Float buttons: overlap fix on 25 pages
+- Trogon Business Plan live at /trogon/business-plan/
+- Cupyx: CSS fallback wordmark for nav logo
+- New Prisca Dezigns FB ad at /prisca-dezigns/ad/
 
-### Pending (from session)
-- Clarev: needs card added to /platforms/ page with link to /clarev/ — logo needs creating (teal brand: #00B4A6)
-- Rowcell: JPG/PNG exports of CSS wordmark (needs browser rendering — browser tool was at concurrency limit)
-- Platforms page: Clarev + D'PanYard cards missing
-- FB ad: ready to screenshot and post to FB as photo/reel
+### 2026-05-13
+- All 25 pages 200 OK (confirmed 20:59 + 21:32 AST)
+- All 18 FB pages 4+ posts/24h compliant
+- Full GitHub backup pushed to backups/2026-05-13/
 
-### WA Lead
-- "My Hair" hair extensions lead still active — waiting on reply to name/branding question
-
-
----
-## Session Update — 2026-05-13
-
-### Website Status
-- All 25 pages at priscadezigns.org returning 200 OK (confirmed at 20:59 and 21:32 AST)
-- No 404s, no fixes needed
-
-### FB Page Status
-- All 18 pages compliant at 4+ posts/24h (audited 21:10 and 21:41 AST)
-- Counts: Prisca Dezigns 5 | Dreaming Anime 5 | The Escapist 5 | Quiet Luxury 5 | Verdant Co 5 | all others 4
-
-### Backups
-- Full backup of 6 key files pushed to GitHub backups/2026-05-13/ (empire_memory.md, daily_poster.py, fb_page_tokens.json, midnight_audit2.py, ig_accounts.json, anime_clip_log.json)
-
-### Pending Tasks (carried over)
-- Clarev card on /platforms/ page still missing
-- D PanYard card on /platforms/ page still missing
-- Rowcell PNG/JPG wordmark export still pending
-- Safron page not yet built
-- Trogon: Groq API key still placeholder (gsk_placeholder)
-- SVG icon upgrades for Clarev, Trogon, Prisca Dezigns (payloads ready in workspace)
+### 2026-05-14 (tonight)
+- **Riddiim** — Full "The Record Room" redesign live. Vinyl/tape aesthetic, dark premium.
+- **Dreaming Anime** — Full "The Panel" manga redesign. Orange/black, panel grid layout.
+- **Dreaming Anime Shop** — New page built. Affiliate brand links moved here from affiliate-brands page.
+- **Affiliate brands** — Now redirects to /dreaming-anime/shop/
+- **Dark mode** — Added to Dreaming Anime main + shop pages. LocalStorage persisted.
+- **Calalloo** — Pinterest discovery layer: vibe filter bar (8 categories), masonry recipe grid (12 cards), trending section, ingredient CTA banner. Nav link fixed /callaloo/ → /calalloo/.
+- **Rowcell** — AI Insights section + wordmark fix
+- **Trogon** — BI Dashboard section added
+- **Karjov** — Full page built from scratch
+- **Cupyx** — Step cards spacing fixed
+- **Translate fix** — All empire pages: old broken Google widget replaced with working dropdown (10 languages, opens Google Translate in new tab). In progress as of 21:54 AST.
+- **Trading rules confirmed:** $200/trade (4% risk), 4-digit S&P500 format, 8:15 AM 5m candle midpoint entry, 11 AM AST hard stop, max 2 trades/day.
