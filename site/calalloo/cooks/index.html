@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cooks — Callaloo</title>
+<link rel="manifest" href="/callaloo/manifest.json">
+<meta name="theme-color" content="#E87722">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Callaloo">
+<link rel="apple-touch-icon" href="/callaloo/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#E87722;--primary-light:#F5A623;--primary-dark:#B85A10;
+  --bg:#FFF8F0;--card:#FFFFFF;--text:#1A0D00;--muted:rgba(26,13,0,0.5);
+  --border:rgba(232,119,34,0.18);
+}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px;min-height:100vh}
+
+/* NAV */
+nav{background:rgba(255,248,240,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;
+    padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:60px;
+    border-bottom:1px solid var(--border)}
+.nav-logo{font-family:"Fraunces",serif;font-size:1.2rem;font-weight:900;color:var(--text);text-decoration:none}
+.nav-logo span{color:var(--primary)}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1A0D00 0%,#3D1A00 60%,#5A2800 100%);
+      padding:44px 5% 36px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 0%,rgba(232,119,34,0.18) 0%,transparent 70%)}
+.hero h1{font-family:"Fraunces",serif;font-size:clamp(1.8rem,5vw,2.6rem);font-weight:900;
+    color:#fff;margin-bottom:10px;position:relative}
+.hero h1 span{color:var(--primary-light)}
+.hero p{color:rgba(255,255,255,0.65);font-size:.95rem;max-width:480px;margin:0 auto 24px;
+    line-height:1.65;position:relative}
+.become-btn{display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;
+    text-decoration:none;border-radius:50px;padding:12px 24px;font-size:.88rem;font-weight:700;
+    transition:transform .2s,box-shadow .2s;position:relative}
+.become-btn:active{transform:scale(.97)}
+
+/* SEARCH */
+.search-wrap{padding:20px 5% 8px;max-width:700px;margin:0 auto;position:relative}
+.search-wrap input{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:50px;
+    padding:11px 44px 11px 18px;font-size:.9rem;color:var(--text);outline:none;font-family:inherit;transition:border .2s}
+.search-wrap input:focus{border-color:var(--primary)}
+.search-wrap .si{position:absolute;right:28px;top:50%;transform:translateY(-50%);font-size:16px;opacity:.4}
+
+/* COUNT */
+.count{padding:0 5% 12px;max-width:700px;margin:0 auto;font-size:.82rem;color:var(--muted);font-weight:600}
+
+/* COOKS GRID */
+.cooks-grid{padding:0 5%;max-width:700px;margin:0 auto;
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+@media(min-width:520px){.cooks-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
+
+/* COOK CARD */
+.cook-card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;
+    text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:center;
+    padding:24px 16px 18px;text-align:center;transition:all .22s;cursor:pointer;position:relative}
+.cook-card:active{transform:scale(.97)}
+.cook-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;
+    color:#fff;margin-bottom:14px;flex-shrink:0;border:3px solid rgba(232,119,34,0.2)}
+.cook-name{font-weight:700;font-size:.95rem;margin-bottom:4px}
+.cook-location{font-size:.78rem;color:var(--muted);margin-bottom:10px}
+.cook-stats{display:flex;gap:12px;justify-content:center;margin-bottom:14px}
+.cook-stat{text-align:center}
+.cook-stat-val{font-size:.9rem;font-weight:800;color:var(--primary)}
+.cook-stat-lbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.cook-follow-btn{background:rgba(232,119,34,0.1);border:1.5px solid rgba(232,119,34,0.3);
+    color:var(--primary);border-radius:50px;padding:7px 20px;font-size:.8rem;font-weight:700;
+    cursor:pointer;font-family:inherit;transition:all .2s;width:100%}
+.cook-follow-btn:active,.cook-follow-btn.following{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* SKELETON */
+.sk-card{border-radius:20px;overflow:hidden;background:var(--card);border:1px solid var(--border);
+    padding:24px 16px 18px;display:flex;flex-direction:column;align-items:center}
+.sk-av{width:72px;height:72px;border-radius:50%;background:linear-gradient(90deg,#f0e8dc 25%,#ffe8cc 50%,#f0e8dc 75%);
+    background-size:200% 100%;animation:shimmer 1.5s infinite;margin-bottom:14px}
+.sk-line{height:11px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,#f0e8dc 25%,#ffe8cc 50%,#f0e8dc 75%);
+    background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* EMPTY */
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:3rem;margin-bottom:12px}
+
+/* BECOME A COOK BANNER */
+.cta-banner{margin:28px 5% 0;max-width:700px;margin-left:auto;margin-right:auto;
+    background:linear-gradient(135deg,#1A0D00,#3D1A00);border-radius:20px;
+    padding:28px 24px;text-align:center;position:relative;overflow:hidden}
+.cta-banner::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 0%,rgba(232,119,34,0.15) 0%,transparent 70%)}
+.cta-banner h3{font-family:"Fraunces",serif;font-size:1.2rem;font-weight:900;color:#fff;
+    margin-bottom:8px;position:relative}
+.cta-banner p{color:rgba(255,255,255,0.6);font-size:.85rem;margin-bottom:18px;line-height:1.6;position:relative}
+.cta-banner a{display:inline-block;background:var(--primary);color:#fff;text-decoration:none;
+    border-radius:50px;padding:11px 28px;font-size:.88rem;font-weight:700;position:relative}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);
+    backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;z-index:200;
+    box-shadow:0 -4px 20px rgba(232,119,34,0.08)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:10px 0 8px;min-height:56px;text-decoration:none;color:var(--muted);
+    font-size:.65rem;font-weight:600;gap:4px;transition:color .2s}
+.bnav-item.active{color:var(--primary)}
+.bnav-item .icon{font-size:22px;line-height:1}
+
+.btt{position:fixed;bottom:70px;right:16px;z-index:9999;width:40px;height:40px;border-radius:50%;
+    background:var(--primary);border:none;color:#fff;cursor:pointer;opacity:0;
+    transform:translateY(10px);transition:opacity .3s,transform .3s;font-size:16px}
+.btt.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/callaloo/" class="nav-logo">Calla<span>loo</span></a>
+</nav>
+
+<div class="hero">
+  <h1>Meet Our <span>Cooks</span></h1>
+  <p>Real home cooks sharing authentic Caribbean recipes from their kitchens to yours.</p>
+  <a href="/callaloo/for-cooks/" class="become-btn">&#43; Become a Cook</a>
+</div>
+
+<div class="search-wrap">
+  <input id="searchInput" type="search" placeholder="Search cooks..." oninput="filterCooks()">
+  <span class="si">&#128269;</span>
+</div>
+
+<div class="count" id="cookCount"></div>
+
+<div class="cooks-grid" id="cooksGrid">
+  <div class="sk-card"><div class="sk-av"></div><div class="sk-line" style="width:70%"></div><div class="sk-line" style="width:50%"></div></div>
+  <div class="sk-card"><div class="sk-av"></div><div class="sk-line" style="width:70%"></div><div class="sk-line" style="width:50%"></div></div>
+  <div class="sk-card"><div class="sk-av"></div><div class="sk-line" style="width:70%"></div><div class="sk-line" style="width:50%"></div></div>
+  <div class="sk-card"><div class="sk-av"></div><div class="sk-line" style="width:70%"></div><div class="sk-line" style="width:50%"></div></div>
+</div>
+
+<div class="cta-banner" id="ctaBanner" style="display:none">
+  <h3>Share Your Recipes</h3>
+  <p>Join our community of Caribbean home cooks. Upload your recipes, build a following, and inspire people worldwide.</p>
+  <a href="/callaloo/for-cooks/">Apply to be a Cook</a>
+</div>
+
+<div class="bottom-nav">
+  <a href="/callaloo/feed/" class="bnav-item"><span class="icon">&#127374;</span>Feed</a>
+  <a href="/callaloo/recipes/" class="bnav-item"><span class="icon">&#128214;</span>Recipes</a>
+  <a href="/callaloo/profile/" class="bnav-item"><span class="icon">&#128100;</span>Profile</a>
+</div>
+
+<button class="btt" id="bttBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNTY1NzIsImV4cCI6MjA2MjczMjU3Mn0.oEYHPGkIoYiMIqXM7JSNFkBnlr8FMM5lXBJLFuFtEzI';
+
+var _allCooks = [];
+var _followed = JSON.parse(localStorage.getItem('callaloo_followed') || '[]');
+
+function initials(name) {
+  if (!name) return '?';
+  var parts = name.trim().split(' ');
+  return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+
+function renderCooks(cooks) {
+  var grid = document.getElementById('cooksGrid');
+  var count = document.getElementById('cookCount');
+  var banner = document.getElementById('ctaBanner');
+  if (!cooks.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">&#128104;&#8205;&#127859;</div><div>No cooks found</div></div>';
+    count.textContent = '';
+    return;
+  }
+  count.textContent = cooks.length + ' cook' + (cooks.length !== 1 ? 's' : '');
+  grid.innerHTML = cooks.map(function(c) {
+    var isFollowing = _followed.indexOf(c.id) !== -1;
+    var avatarHtml = c.avatar_url
+      ? '<img class="cook-avatar" src="' + c.avatar_url + '" alt="' + (c.display_name||'') + '" onerror="this.outerHTML='<div class=cook-avatar>' + initials(c.display_name) + '</div>'">'
+      : '<div class="cook-avatar">' + initials(c.display_name || c.username) + '</div>';
+    return '<div class="cook-card">'
+      + avatarHtml
+      + '<div class="cook-name">' + (c.display_name || c.username || 'Cook') + '</div>'
+      + '<div class="cook-location">' + (c.location ? '&#128205; ' + c.location : '') + '</div>'
+      + '<div class="cook-stats">'
+      + '<div class="cook-stat"><div class="cook-stat-val">' + (c.recipe_count || 0) + '</div><div class="cook-stat-lbl">Recipes</div></div>'
+      + '<div class="cook-stat"><div class="cook-stat-val">' + (c.follower_count || 0) + '</div><div class="cook-stat-lbl">Followers</div></div>'
+      + '</div>'
+      + '<button class="cook-follow-btn' + (isFollowing ? ' following' : '') + '" onclick="toggleFollow(this,' + JSON.stringify(c.id) + ')">'
+      + (isFollowing ? 'Following' : 'Follow') + '</button>'
+      + '</div>';
+  }).join('');
+  if (banner) banner.style.display = 'block';
+}
+
+function filterCooks() {
+  var q = (document.getElementById('searchInput').value || '').toLowerCase();
+  var filtered = _allCooks.filter(function(c) {
+    return !q
+      || (c.display_name||'').toLowerCase().includes(q)
+      || (c.username||'').toLowerCase().includes(q)
+      || (c.location||'').toLowerCase().includes(q);
+  });
+  renderCooks(filtered);
+}
+
+function toggleFollow(btn, cookId) {
+  var idx = _followed.indexOf(cookId);
+  if (idx === -1) {
+    _followed.push(cookId);
+    btn.textContent = 'Following';
+    btn.classList.add('following');
+  } else {
+    _followed.splice(idx, 1);
+    btn.textContent = 'Follow';
+    btn.classList.remove('following');
+  }
+  localStorage.setItem('callaloo_followed', JSON.stringify(_followed));
+}
+
+window.addEventListener('load', async function() {
+  var sb = window.supabase.createClient(SB_URL, SB_KEY);
+  try {
+    // Try profiles table first, fall back to users table
+    var res = await sb.from('profiles')
+      .select('id,display_name,username,avatar_url,location,recipe_count,follower_count,bio')
+      .eq('is_cook', true)
+      .order('follower_count', {ascending: false})
+      .limit(100);
+    if (res.error || !res.data || res.data.length === 0) {
+      // Try without is_cook filter
+      res = await sb.from('profiles')
+        .select('id,display_name,username,avatar_url,location,recipe_count,follower_count,bio')
+        .order('id', {ascending: true})
+        .limit(50);
+    }
+    _allCooks = (res.data || []);
+    if (_allCooks.length === 0) {
+      // No cooks yet - show the CTA to join
+      document.getElementById('cooksGrid').innerHTML =
+        '<div class="empty"><div class="empty-icon">&#128104;&#8205;&#127859;</div>'
+        + '<div style="font-weight:700;margin-bottom:6px">No cooks yet</div>'
+        + '<div style="font-size:.85rem">Be among the first to share your recipes!</div></div>';
+      document.getElementById('cookCount').textContent = '';
+      document.getElementById('ctaBanner').style.display = 'block';
+    } else {
+      filterCooks();
+    }
+  } catch(e) {
+    document.getElementById('cooksGrid').innerHTML =
+      '<div class="empty"><div class="empty-icon">&#128104;&#8205;&#127859;</div><div>Could not load cooks. Please try again.</div></div>';
+  }
+});
+
+window.addEventListener('scroll', function() {
+  var btn = document.getElementById('bttBtn');
+  if (btn) btn.classList.toggle('visible', window.scrollY > 300);
+}, {passive:true});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/callaloo/sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

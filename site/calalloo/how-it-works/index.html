@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How It Works — Callaloo</title>
+  <meta name="description" content="Discover how Callaloo's ingredient-finding engine works. Search any recipe, AI maps every ingredient, and we show you the nearest stores with availability."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0A0A0F;
+      --bg2: #111118;
+      --bg3: #16161F;
+      --green: #22C55E;
+      --green-dim: #16A34A;
+      --green-glow: rgba(34,197,94,0.15);
+      --white: #FFFFFF;
+      --muted: #9CA3AF;
+      --border: rgba(255,255,255,0.08);
+      --card: rgba(255,255,255,0.04);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--white);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { font-size: 1.5rem; font-weight: 900; color: var(--white); text-decoration: none; letter-spacing: -0.5px; }
+    .nav-logo span { color: var(--green); }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--green); color: #000 !important; font-weight: 700 !important;
+      padding: 8px 20px; border-radius: 8px; font-size: 0.85rem !important;
+      transition: background 0.2s, transform 0.2s !important;
+    }
+    .nav-cta:hover { background: #16A34A !important; transform: translateY(-1px); }
+    .nav-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+    .nav-menu-btn span { display: block; width: 22px; height: 2px; background: var(--white); margin: 5px 0; border-radius: 2px; transition: 0.3s; }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-menu-btn { display: block; }
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(34,197,94,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { position: relative; max-width: 760px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green-glow); border: 1px solid rgba(34,197,94,0.3);
+      padding: 6px 16px; border-radius: 100px;
+      font-size: 0.8rem; font-weight: 600; color: var(--green);
+      margin-bottom: 28px;
+      animation: fadeDown 0.6s ease both;
+    }
+    .hero-badge::before { content: '⚡'; }
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 900; line-height: 1.1; letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    h1 em { font-style: normal; color: var(--green); }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted); max-width: 560px; margin: 0 auto 40px;
+      line-height: 1.7;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+    .hero-scroll {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--muted); font-size: 0.85rem;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+    .hero-scroll .arrow { animation: bounce 2s infinite; }
+
+    /* STEPS SECTION */
+    .section {
+      padding: 100px 24px;
+      max-width: 1100px; margin: 0 auto;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 3px;
+      color: var(--green); text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800; letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--muted); font-size: 1.05rem;
+      max-width: 600px; margin: 0 auto 64px;
+    }
+
+    /* STEPS GRID */
+    .steps-grid {
+      display: grid;
+      gap: 0;
+    }
+    .step-row {
+      display: grid;
+      grid-template-columns: 1fr 80px 1fr;
+      gap: 24px;
+      align-items: center;
+      margin-bottom: 0;
+    }
+    .step-row:nth-child(even) .step-card { order: 3; }
+    .step-row:nth-child(even) .step-visual { order: 1; }
+    .step-row:nth-child(even) .step-connector { order: 2; }
+
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 36px;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .step-card:hover {
+      border-color: rgba(34,197,94,0.4);
+      transform: translateY(-4px);
+    }
+    .step-number {
+      position: absolute; top: -16px; left: 32px;
+      background: var(--green); color: #000;
+      font-weight: 900; font-size: 0.75rem;
+      padding: 4px 12px; border-radius: 100px;
+      letter-spacing: 1px;
+    }
+    .step-icon {
+      font-size: 2.5rem; margin-bottom: 16px;
+      filter: drop-shadow(0 0 12px rgba(34,197,94,0.5));
+    }
+    .step-card h3 {
+      font-size: 1.3rem; font-weight: 700;
+      margin-bottom: 12px; letter-spacing: -0.5px;
+    }
+    .step-card p {
+      color: var(--muted); line-height: 1.7; font-size: 0.95rem;
+    }
+    .step-connector {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0;
+    }
+    .connector-line {
+      width: 2px; height: 60px;
+      background: linear-gradient(180deg, var(--green) 0%, transparent 100%);
+    }
+    .connector-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+    }
+    .step-visual {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-visual-inner {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    /* TECH UNDER THE HOOD */
+    .tech-section {
+      padding: 100px 24px;
+      background: var(--bg2);
+    }
+    .tech-inner {
+      max-width: 1100px; margin: 0 auto;
+    }
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 64px;
+    }
+    .tech-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .tech-card:hover {
+      border-color: rgba(34,197,94,0.4);
+      transform: translateY(-3px);
+    }
+    .tech-icon {
+      width: 48px; height: 48px;
+      background: var(--green-glow);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+    .tech-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .tech-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+    /* PROCESS FLOW */
+    .flow-section {
+      padding: 100px 24px;
+      max-width: 900px; margin: 0 auto;
+    }
+    .flow-steps {
+      display: flex; flex-direction: column; gap: 0;
+      position: relative;
+    }
+    .flow-steps::before {
+      content: '';
+      position: absolute;
+      left: 27px; top: 14px; bottom: 14px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--green) 0%, rgba(34,197,94,0.1) 100%);
+    }
+    .flow-item {
+      display: flex; gap: 24px; align-items: flex-start;
+      padding: 24px 0;
+    }
+    .flow-dot {
+      width: 56px; height: 56px; flex-shrink: 0;
+      background: var(--green-glow);
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      position: relative; z-index: 1;
+    }
+    .flow-text h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+    .flow-text p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+    /* STATS */
+    .stats-section {
+      padding: 80px 24px;
+      background: linear-gradient(135deg, rgba(34,197,94,0.08) 0%, transparent 60%);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-inner {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 48px; text-align: center;
+    }
+    .stat-num {
+      font-size: 3rem; font-weight: 900; color: var(--green);
+      letter-spacing: -2px; line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label { font-size: 0.9rem; color: var(--muted); }
+
+    /* CTA */
+    .cta-section {
+      padding: 100px 24px;
+      text-align: center;
+    }
+    .cta-inner { max-width: 600px; margin: 0 auto; }
+    .cta-inner h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800; letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .cta-inner p { color: var(--muted); margin-bottom: 40px; font-size: 1.05rem; }
+    .btn-green {
+      display: inline-block;
+      background: var(--green); color: #000;
+      font-weight: 700; font-size: 1rem;
+      padding: 16px 36px; border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 30px rgba(34,197,94,0.3);
+    }
+    .btn-green:hover { background: #16A34A; transform: translateY(-2px); box-shadow: 0 0 40px rgba(34,197,94,0.5); }
+    .btn-outline {
+      display: inline-block;
+      background: transparent; color: var(--white);
+      border: 1px solid var(--border);
+      font-weight: 600; font-size: 1rem;
+      padding: 16px 36px; border-radius: 12px;
+      text-decoration: none;
+      margin-left: 16px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--green); transform: translateY(-2px); }
+
+    /* FOOTER */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 48px 24px;
+      text-align: center;
+    }
+    footer .footer-logo { font-size: 1.4rem; font-weight: 900; margin-bottom: 16px; }
+    footer .footer-logo span { color: var(--green); }
+    footer p { color: var(--muted); font-size: 0.85rem; }
+    footer nav { margin-top: 24px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+    footer nav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+    footer nav a:hover { color: var(--white); }
+
+    /* FLOATS */
+    .float-stack {
+      position: fixed; bottom: 24px; right: 24px;
+      display: flex; flex-direction: column; gap: 12px;
+      z-index: 999;
+    }
+    .float-btn {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; text-decoration: none;
+      font-size: 1.2rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .float-btn:hover { transform: scale(1.1); }
+    .float-wa { background: #25D366; }
+    .float-translate { background: #4285F4; font-size: 0.7rem; font-weight: 700; color: #fff; }
+    .float-top { background: var(--bg3); border: 1px solid var(--border); color: var(--white); font-size: 1rem; }
+
+    /* ANIMATIONS */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      .step-row { grid-template-columns: 1fr; }
+      .step-connector { flex-direction: row; justify-content: flex-start; padding-left: 20px; }
+      .connector-line { width: 40px; height: 2px; background: linear-gradient(90deg, var(--green), transparent); }
+      .step-row:nth-child(even) .step-card { order: 0; }
+      .step-row:nth-child(even) .step-visual { order: 0; }
+      .step-row:nth-child(even) .step-connector { order: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/callaloo/" class="nav-logo">Call<span>aloo</span></a>
+  <div class="nav-links">
+    <a href="/callaloo/how-it-works/">How It Works</a>
+    <a href="/callaloo/recipes/">Recipes</a>
+    <a href="/callaloo/for-cooks/">For Cooks</a>
+    <a href="/callaloo/waitlist/" class="nav-cta">Join Waitlist</a>
+  </div>
+  <button class="nav-menu-btn" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">The Ingredient Engine</div>
+    <h1>From <em>cravings</em> to<br/>cart in minutes</h1>
+    <p class="hero-sub">Search any recipe from any cuisine on Earth. Callaloo's AI instantly maps every ingredient — then finds exactly where you can buy them near you.</p>
+    <div class="hero-scroll">Scroll to explore <span class="arrow">↓</span></div>
+  </div>
+</section>
+
+<!-- STEP-BY-STEP VISUAL -->
+<section class="section">
+  <p class="section-label">The Process</p>
+  <h2 class="section-title reveal">Three steps to cooking <em style="color:var(--green)">anything</em></h2>
+  <p class="section-sub reveal">No more guessing which store has cardamom. No more abandoned recipe dreams. We handle the logistics.</p>
+
+  <div class="steps-grid">
+    <div class="step-row reveal">
+      <div class="step-card">
+        <span class="step-number">STEP 01</span>
+        <div class="step-icon">🔍</div>
+        <h3>Search Any Recipe</h3>
+        <p>Type the name of any dish — from spaghetti carbonara to jollof rice to miso ramen. Our recipe database spans every cuisine on Earth, with thousands of dishes and more added daily. Don't see it? Request it and we'll add it within 24 hours.</p>
+      </div>
+      <div class="step-connector">
+        <div class="connector-dot"></div>
+        <div class="connector-line"></div>
+      </div>
+      <div class="step-visual">
+        <div class="step-visual-inner">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <span style="color:var(--muted)">🔍</span>
+            <span style="color:var(--muted);font-size:0.9rem;">Search any recipe...</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--bg2);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:10px 14px;font-size:0.85rem;cursor:pointer;">🍝 Spaghetti Carbonara</div>
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.85rem;color:var(--muted)">🍜 Pad Thai</div>
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:0.85rem;color:var(--muted)">🥘 Jollof Rice</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row reveal">
+      <div class="step-card">
+        <span class="step-number">STEP 02</span>
+        <div class="step-icon">🤖</div>
+        <h3>AI Maps Every Ingredient</h3>
+        <p>Our ingredient engine doesn't just list items — it understands them. It knows that "dashi" might also be sold as "bonito broth," that "nam pla" is fish sauce, and that Parmesan-Reggiano and "Parmigiano" are the same thing. Every ingredient is normalised, alternative names flagged, and quantities calculated automatically for your serving size.</p>
+      </div>
+      <div class="step-connector">
+        <div class="connector-dot"></div>
+        <div class="connector-line"></div>
+      </div>
+      <div class="step-visual">
+        <div class="step-visual-inner">
+          <div style="font-size:0.75rem;color:var(--green);font-weight:700;letter-spacing:2px;margin-bottom:12px;">AI INGREDIENT MAP</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border);">
+              <span>🥚 Eggs</span><span style="color:var(--green);font-size:0.75rem;">✓ Common</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border);">
+              <span>🥓 Guanciale <span style="color:var(--muted);font-size:0.7rem;">/ pancetta</span></span><span style="color:#F59E0B;font-size:0.75rem;">Alt found</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;padding:6px 0;border-bottom:1px solid var(--border);">
+              <span>🧀 Pecorino Romano</span><span style="color:var(--green);font-size:0.75rem;">✓ Common</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;padding:6px 0;">
+              <span>🌶️ Black Pepper</span><span style="color:var(--green);font-size:0.75rem;">✓ Common</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-row reveal">
+      <div class="step-card">
+        <span class="step-number">STEP 03</span>
+        <div class="step-icon">📍</div>
+        <h3>Find It Near You</h3>
+        <p>With your location (or postcode), we search nearby supermarkets, specialty stores, and independent grocers to find exactly where each ingredient is available — with real-time stock data, prices, and directions. One tap adds everything to your shopping list or sends it straight to a grocery delivery service.</p>
+      </div>
+      <div class="step-connector">
+        <div class="connector-dot"></div>
+        <div class="connector-line"></div>
+      </div>
+      <div class="step-visual">
+        <div class="step-visual-inner">
+          <div style="font-size:0.75rem;color:var(--green);font-weight:700;letter-spacing:2px;margin-bottom:12px;">📍 NEARBY STORES</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="background:var(--bg);border-radius:8px;padding:12px;border:1px solid rgba(34,197,94,0.2)">
+              <div style="font-size:0.85rem;font-weight:600">Whole Foods Market</div>
+              <div style="color:var(--muted);font-size:0.75rem;margin-top:2px;">0.4 mi · 6/6 items in stock</div>
+              <div style="color:var(--green);font-size:0.75rem;margin-top:4px;">★ Best match</div>
+            </div>
+            <div style="background:var(--bg);border-radius:8px;padding:12px;border:1px solid var(--border)">
+              <div style="font-size:0.85rem;font-weight:600">Trader Joe's</div>
+              <div style="color:var(--muted);font-size:0.75rem;margin-top:2px;">0.7 mi · 5/6 items in stock</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-section">
+  <div class="stats-inner">
+    <div class="reveal">
+      <div class="stat-num">50K+</div>
+      <div class="stat-label">Recipes from every cuisine</div>
+    </div>
+    <div class="reveal">
+      <div class="stat-num">200+</div>
+      <div class="stat-label">Ingredients mapped per dish</div>
+    </div>
+    <div class="reveal">
+      <div class="stat-num">98%</div>
+      <div class="stat-label">Ingredient match accuracy</div>
+    </div>
+    <div class="reveal">
+      <div class="stat-num">2 min</div>
+      <div class="stat-label">Average time from search to cart</div>
+    </div>
+  </div>
+</div>
+
+<!-- TECH UNDER THE HOOD -->
+<section class="tech-section">
+  <div class="tech-inner">
+    <p class="section-label">Technology</p>
+    <h2 class="section-title reveal">What powers the engine</h2>
+    <p class="section-sub reveal">A combination of AI, real-time store data, and ingredient intelligence that no other recipe app offers.</p>
+
+    <div class="tech-grid">
+      <div class="tech-card reveal">
+        <div class="tech-icon">🧠</div>
+        <h4>Natural Language Ingredient Parsing</h4>
+        <p>AI reads recipe text the way a human chef would — understanding context, quantities, preparation methods, and regional ingredient names to extract precisely what you need.</p>
+      </div>
+      <div class="tech-card reveal">
+        <div class="tech-icon">🔄</div>
+        <h4>Ingredient Synonym Database</h4>
+        <p>Over 40,000 ingredient aliases mapped. "Coriander" and "cilantro" are the same. "Cornflour" and "cornstarch" are the same. Our database knows this, globally.</p>
+      </div>
+      <div class="tech-card reveal">
+        <div class="tech-icon">📡</div>
+        <h4>Real-Time Store Inventory API</h4>
+        <p>Live connections to major supermarket chains and grocery platforms. Inventory checked at the moment you search — not yesterday's data.</p>
+      </div>
+      <div class="tech-card reveal">
+        <div class="tech-icon">📍</div>
+        <h4>Hyperlocal Store Matching</h4>
+        <p>Not just "near you" — we rank stores by how many of your specific ingredients they carry, saving you from splitting your shop across five locations.</p>
+      </div>
+      <div class="tech-card reveal">
+        <div class="tech-icon">⚖️</div>
+        <h4>Serving Size Scaling</h4>
+        <p>Cooking for 2 or 20? Ingredient quantities scale automatically, and we calculate the exact pack sizes you need so nothing goes to waste.</p>
+      </div>
+      <div class="tech-card reveal">
+        <div class="tech-icon">🛒</div>
+        <h4>One-Tap Shopping Cart</h4>
+        <p>Ingredients land directly in your grocery delivery app or as a shareable shopping list. No copy-pasting. No retyping. Just cook.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW TIMELINE -->
+<section class="flow-section">
+  <p class="section-label">Behind the Scenes</p>
+  <h2 class="section-title reveal" style="text-align:center">What happens in milliseconds</h2>
+  <p class="section-sub reveal" style="text-align:center">When you search a recipe, here's what our engine does before you even look up.</p>
+
+  <div class="flow-steps" style="margin-top:60px;">
+    <div class="flow-item reveal">
+      <div class="flow-dot">🔍</div>
+      <div class="flow-text">
+        <h4>Query Received</h4>
+        <p>Your search is received and matched against our recipe database using semantic search — catching typos, alternate spellings, and related dishes.</p>
+      </div>
+    </div>
+    <div class="flow-item reveal">
+      <div class="flow-dot">📋</div>
+      <div class="flow-text">
+        <h4>Ingredient Extraction</h4>
+        <p>The AI reads the recipe's ingredient list and extracts every item, quantity, preparation note, and optional substitution.</p>
+      </div>
+    </div>
+    <div class="flow-item reveal">
+      <div class="flow-dot">🌍</div>
+      <div class="flow-text">
+        <h4>Localisation & Synonyms</h4>
+        <p>Each ingredient is checked against our global synonym database — matching to how it's labelled on store shelves in your region.</p>
+      </div>
+    </div>
+    <div class="flow-item reveal">
+      <div class="flow-dot">📡</div>
+      <div class="flow-text">
+        <h4>Live Store Query</h4>
+        <p>Real-time queries fire to nearby stores' inventory APIs, checking stock availability for each ingredient.</p>
+      </div>
+    </div>
+    <div class="flow-item reveal">
+      <div class="flow-dot">🏆</div>
+      <div class="flow-text">
+        <h4>Store Ranking</h4>
+        <p>Stores are scored by completeness (how many items they carry), distance, price, and user ratings — then ranked for you.</p>
+      </div>
+    </div>
+    <div class="flow-item reveal">
+      <div class="flow-dot">✅</div>
+      <div class="flow-text">
+        <h4>Results Delivered</h4>
+        <p>You see the full ingredient list, which stores carry what, prices where available, and a one-tap path to your shopping cart.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2 class="reveal">Ready to cook <em style="color:var(--green)">anything?</em></h2>
+    <p class="reveal">Join thousands already on the waitlist. Be the first to access Callaloo when we launch.</p>
+    <div class="reveal">
+      <a href="/callaloo/waitlist/" class="btn-green">Join the Waitlist</a>
+      <a href="/callaloo/recipes/" class="btn-outline">Browse Recipes</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Call<span>aloo</span></div>
+  <p>Cook anything. Find it near you.</p>
+  <nav>
+    <a href="/callaloo/">Home</a>
+    <a href="/callaloo/how-it-works/">How It Works</a>
+    <a href="/callaloo/recipes/">Recipes</a>
+    <a href="/callaloo/for-cooks/">For Cooks</a>
+    <a href="/callaloo/waitlist/">Waitlist</a>
+    <a href="/callaloo/business-plan/">Business Plan</a>
+  </nav>
+  <p style="margin-top:24px;font-size:0.75rem">© 2025 Callaloo. All rights reserved.</p>
+</footer>
+
+<!-- FLOAT STACK -->
+<div class="float-stack">
+  <a href="https://wa.me/447576505652" target="_blank" class="float-btn float-wa" title="WhatsApp">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+  <div class="float-btn float-translate" title="Translate" onclick="if(document.querySelector('#gt-script')){return;}var s=document.createElement('script');s.id='gt-script';s.src='//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';document.body.appendChild(s);window.googleTranslateElementInit=function(){new google.translate.TranslateElement({pageLanguage:'en'},'gt-widget');}">
+    <span>A</span>
+  </div>
+  <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" class="float-btn float-top" title="Back to Top">↑</a>
+</div>
+<div id="gt-widget" style="position:fixed;bottom:80px;right:24px;z-index:1000;"></div>
+
+<script>
+  // Intersection Observer for reveal animations
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

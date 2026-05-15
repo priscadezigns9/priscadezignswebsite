@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recipes — Callaloo</title>
+<link rel="manifest" href="/callaloo/manifest.json">
+<meta name="theme-color" content="#E87722">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Callaloo">
+<link rel="apple-touch-icon" href="/callaloo/icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#E87722;--primary-light:#F5A623;--primary-dark:#B85A10;
+  --bg:#FFF8F0;--card:#FFFFFF;--text:#1A0D00;--muted:rgba(26,13,0,0.5);
+  --border:rgba(232,119,34,0.18);
+}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);padding-bottom:80px;min-height:100vh}
+
+/* NAV */
+nav{background:rgba(255,248,240,0.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;
+    padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:60px;
+    border-bottom:1px solid var(--border)}
+.nav-logo{font-family:"Fraunces",serif;font-size:1.2rem;font-weight:900;color:var(--text);text-decoration:none}
+.nav-logo span{color:var(--primary)}
+
+/* PAGE HEADER */
+.page-header{padding:28px 5% 0;max-width:900px;margin:0 auto}
+.page-header h1{font-family:"Fraunces",serif;font-size:clamp(1.6rem,4vw,2.2rem);font-weight:900;margin-bottom:6px}
+.page-header p{color:var(--muted);font-size:.9rem;margin-bottom:20px}
+
+/* SEARCH + FILTER */
+.controls{padding:0 5% 16px;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.search-bar{position:relative}
+.search-bar input{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:50px;
+    padding:11px 44px 11px 18px;font-size:.9rem;color:var(--text);outline:none;font-family:inherit;
+    transition:border .2s}
+.search-bar input:focus{border-color:var(--primary)}
+.search-bar .icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:16px;opacity:.4}
+.filters{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter-btn{flex-shrink:0;background:#fff;border:1.5px solid var(--border);border-radius:50px;
+    padding:7px 16px;font-size:.8rem;font-weight:600;color:var(--muted);cursor:pointer;
+    font-family:inherit;transition:all .2s;white-space:nowrap}
+.filter-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* RECIPE GRID */
+.grid-wrap{padding:0 5%;max-width:900px;margin:0 auto}
+.count{font-size:.82rem;color:var(--muted);font-weight:600;margin-bottom:14px}
+.recipe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+@media(min-width:600px){.recipe-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
+
+/* RECIPE CARD */
+.rc{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;
+    text-decoration:none;color:inherit;display:block;transition:all .22s;cursor:pointer}
+.rc:active{transform:scale(.97)}
+.rc-img{width:100%;aspect-ratio:4/3;object-fit:cover;background:linear-gradient(135deg,#FFE8CC,#F5A623)}
+.rc-img-fallback{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;
+    font-size:2.5rem;background:linear-gradient(135deg,#FFE8CC,#F5A623)}
+.rc-body{padding:12px}
+.rc-badge{display:inline-block;background:rgba(232,119,34,0.12);color:var(--primary);
+    font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:20px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.rc-title{font-weight:700;font-size:.88rem;line-height:1.3;margin-bottom:6px;color:var(--text)}
+.rc-meta{font-size:.75rem;color:var(--muted);display:flex;gap:8px;align-items:center}
+
+/* SKELETON */
+.skeleton-card{border-radius:18px;overflow:hidden;background:var(--card);border:1px solid var(--border)}
+.sk-img{width:100%;aspect-ratio:4/3;background:linear-gradient(90deg,#f0e8dc 25%,#ffe8cc 50%,#f0e8dc 75%);
+    background-size:200% 100%;animation:shimmer 1.5s infinite}
+.sk-body{padding:12px}
+.sk-line{height:11px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,#f0e8dc 25%,#ffe8cc 50%,#f0e8dc 75%);
+    background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:3rem;margin-bottom:12px}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);
+    backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;z-index:200;
+    box-shadow:0 -4px 20px rgba(232,119,34,0.08)}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:10px 0 8px;min-height:56px;text-decoration:none;color:var(--muted);
+    font-size:.65rem;font-weight:600;gap:4px;transition:color .2s}
+.bnav-item.active{color:var(--primary)}
+.bnav-item .icon{font-size:22px;line-height:1}
+
+/* BACK TO TOP */
+.btt{position:fixed;bottom:70px;right:16px;z-index:9999;width:40px;height:40px;border-radius:50%;
+    background:var(--primary);border:none;color:#fff;cursor:pointer;opacity:0;
+    transform:translateY(10px);transition:opacity .3s,transform .3s;font-size:16px}
+.btt.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/callaloo/" class="nav-logo">Calla<span>loo</span></a>
+</nav>
+
+<div class="page-header">
+  <h1>Recipes</h1>
+  <p>Browse authentic Caribbean dishes from our community.</p>
+</div>
+
+<div class="controls">
+  <div class="search-bar">
+    <input id="searchInput" type="search" placeholder="Search recipes..." oninput="filterRecipes()">
+    <span class="icon">🔍</span>
+  </div>
+  <div class="filters" id="filterRow">
+    <button class="filter-btn active" data-cat="all" onclick="setFilter(this)">All</button>
+    <button class="filter-btn" data-cat="mains" onclick="setFilter(this)">Mains</button>
+    <button class="filter-btn" data-cat="snacks" onclick="setFilter(this)">Snacks</button>
+    <button class="filter-btn" data-cat="drinks" onclick="setFilter(this)">Drinks</button>
+    <button class="filter-btn" data-cat="desserts" onclick="setFilter(this)">Desserts</button>
+    <button class="filter-btn" data-cat="soups" onclick="setFilter(this)">Soups</button>
+    <button class="filter-btn" data-cat="breakfast" onclick="setFilter(this)">Breakfast</button>
+    <button class="filter-btn" data-cat="sides" onclick="setFilter(this)">Sides</button>
+  </div>
+</div>
+
+<div class="grid-wrap">
+  <div class="count" id="recipeCount"></div>
+  <div class="recipe-grid" id="recipeGrid">
+    <!-- Skeletons while loading -->
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="width:50%;margin-bottom:6px"></div><div class="sk-line" style="width:85%"></div><div class="sk-line" style="width:60%"></div></div></div>
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="width:50%;margin-bottom:6px"></div><div class="sk-line" style="width:85%"></div><div class="sk-line" style="width:60%"></div></div></div>
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="width:50%;margin-bottom:6px"></div><div class="sk-line" style="width:85%"></div><div class="sk-line" style="width:60%"></div></div></div>
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="width:50%;margin-bottom:6px"></div><div class="sk-line" style="width:85%"></div><div class="sk-line" style="width:60%"></div></div></div>
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="width:50%;margin-bottom:6px"></div><div class="sk-line" style="width:85%"></div><div class="sk-line" style="width:60%"></div></div></div>
+    <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line" style="width:50%;margin-bottom:6px"></div><div class="sk-line" style="width:85%"></div><div class="sk-line" style="width:60%"></div></div></div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a href="/callaloo/feed/" class="bnav-item"><span class="icon">&#127374;</span>Feed</a>
+  <a href="/callaloo/recipes/" class="bnav-item active"><span class="icon">&#128214;</span>Recipes</a>
+  <a href="/callaloo/profile/" class="bnav-item"><span class="icon">&#128100;</span>Profile</a>
+</div>
+
+<button class="btt" id="bttBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script src="/callaloo/recipe-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcxNTY1NzIsImV4cCI6MjA2MjczMjU3Mn0.oEYHPGkIoYiMIqXM7JSNFkBnlr8FMM5lXBJLFuFtEzI';
+
+var _allRecipes = [];
+var _currentFilter = 'all';
+
+var BADGE_EMOJI = {
+  'mains':'&#127374;','snacks':'&#129372;','drinks':'&#127864;','desserts':'&#127849;',
+  'soups':'&#129378;','breakfast':'&#127858;','sides':'&#127807;','default':'&#127374;'
+};
+
+function getBadgeEmoji(cat) {
+  return BADGE_EMOJI[(cat||'').toLowerCase()] || BADGE_EMOJI['default'];
+}
+
+function renderGrid(recipes) {
+  var grid = document.getElementById('recipeGrid');
+  var count = document.getElementById('recipeCount');
+  if (!recipes.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">&#128269;</div><div>No recipes found</div></div>';
+    count.textContent = '';
+    return;
+  }
+  count.textContent = recipes.length + ' recipe' + (recipes.length !== 1 ? 's' : '');
+  grid.innerHTML = recipes.map(function(r) {
+    var cat = (r.category || '').toLowerCase();
+    var badge = r.tags && r.tags.length ? r.tags[0] : (cat || 'Recipe');
+    var emoji = getBadgeEmoji(cat);
+    var prepTime = parseInt(r.prep_time)||0;
+    var cookTime = parseInt(r.cook_time)||0;
+    var totalTime = prepTime + cookTime;
+    var imgHtml = r.cover_photo_url
+      ? '<img class="rc-img" src="' + r.cover_photo_url + '" alt="' + r.title + '" loading="lazy" onerror="this.outerHTML='<div class=rc-img-fallback>' + emoji + '</div>'">'
+      : '<div class="rc-img-fallback">' + emoji + '</div>';
+    return '<a class="rc" href="/callaloo/recipe/?r=' + r.id + '">'
+      + imgHtml
+      + '<div class="rc-body">'
+      + '<div class="rc-badge">' + badge + '</div>'
+      + '<div class="rc-title">' + r.title + '</div>'
+      + '<div class="rc-meta">'
+      + (totalTime ? '<span>&#9201; ' + totalTime + ' min</span>' : '')
+      + (r.difficulty ? '<span>&#128202; ' + r.difficulty + '</span>' : '')
+      + '</div>'
+      + '</div></a>';
+  }).join('');
+}
+
+function filterRecipes() {
+  var q = (document.getElementById('searchInput').value || '').toLowerCase();
+  var filtered = _allRecipes.filter(function(r) {
+    var matchSearch = !q || r.title.toLowerCase().includes(q) || (r.category||'').toLowerCase().includes(q) || (r.tags||[]).join(' ').toLowerCase().includes(q);
+    var matchCat = _currentFilter === 'all' || (r.category||'').toLowerCase() === _currentFilter;
+    return matchSearch && matchCat;
+  });
+  renderGrid(filtered);
+}
+
+function setFilter(btn) {
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  _currentFilter = btn.getAttribute('data-cat');
+  filterRecipes();
+}
+
+window.addEventListener('load', async function() {
+  // Try Supabase first, fall back to local RECIPE_DATA
+  var loaded = false;
+  try {
+    var sb = window.supabase.createClient(SB_URL, SB_KEY);
+    var res = await sb.from('recipes')
+      .select('id,title,category,cover_photo_url,prep_time,cook_time,difficulty,tags')
+      .order('id', {ascending: true})
+      .limit(200);
+    if (!res.error && res.data && res.data.length > 0) {
+      _allRecipes = res.data;
+      loaded = true;
+    }
+  } catch(e) {}
+  if (!loaded && typeof RECIPE_DATA !== 'undefined') {
+    // Convert RECIPE_DATA object to array format
+    _allRecipes = Object.entries(RECIPE_DATA).map(function([k,r]) {
+      return {
+        id: k,
+        title: r.name || k,
+        category: (r.badge || 'mains').toLowerCase(),
+        cover_photo_url: null,
+        prep_time: r.time || '',
+        cook_time: r.time || '',
+        difficulty: r.difficulty || 'Medium',
+        tags: r.tags || [],
+        emoji: r.emoji || '',
+        gradient: r.gradient || ''
+      };
+    });
+  }
+  filterRecipes();
+});
+
+window.addEventListener('scroll', function() {
+  var btn = document.getElementById('bttBtn');
+  if (btn) btn.classList.toggle('visible', window.scrollY > 300);
+}, {passive:true});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/callaloo/sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
