@@ -877,6 +877,26 @@ def run_post(brand_name, post_type):
     if not page_id or not token:
         return f"Skipping {brand_name} — no page token"
 
+    # ── HARD POST CAP (Kinetik-style per-brand daily limit) ─────────────────
+    import time as _t
+    _is_seamrite = "seamrite" in brand_name.lower()
+    MAX_DAILY = 2 if _is_seamrite else 4
+    _since_24h = int(_t.time()) - 86400
+    try:
+        _cap_url = (
+            f"https://graph.facebook.com/v19.0/{page_id}/posts"
+            f"?fields=id,created_time&since={_since_24h}&limit=100&access_token={token}"
+        )
+        _cap_req = urllib.request.Request(_cap_url)
+        with urllib.request.urlopen(_cap_req, timeout=10) as _r:
+            _cap_data = json.loads(_r.read())
+        _posts_today = len(_cap_data.get("data", []))
+        if _posts_today >= MAX_DAILY:
+            return f"⏭️ {brand_name} — CAPPED ({_posts_today}/{MAX_DAILY} posts in last 24h)"
+    except Exception as _cap_e:
+        pass  # If cap check fails, allow post to proceed
+    # ── END CAP CHECK ────────────────────────────────────────────────────────
+
     # Get today's product for this brand from the live site (niche_products.json)
     product_used = get_product_for_brand(brand_name)
     if product_used:
