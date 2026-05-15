@@ -210,14 +210,14 @@ footer{background:var(--dark);color:rgba(255,255,255,0.55);padding:48px 5%;displ
   <h1>Find trusted local services.<br><span>Anywhere in the world.</span></h1>
   <p class="hero-sub">Browse trusted local service providers — salons, barbers, electricians, tutors, pet sitters and more. Check reviews, contact directly. They come to you.</p>
   <div class="search-bar">
-    <input type="text" placeholder="What service are you looking for?">
-    <div class="loc">📍 Near me</div>
-    <button class="search-btn">Search</button>
+    <input id="dpySearchInput" type="text" placeholder="What service are you looking for?" onkeydown="if(event.key==='Enter')dpyDoSearch()">
+    <div class="loc" id="dpyLocLabel">📍 Near me</div>
+    <button class="search-btn" onclick="dpyDoSearch()">Search</button>
   </div>
   <div class="quick-cats">
-    <div class="qcat">💇 Hair &amp; Beauty</div>
-    <div class="qcat">🔧 Trades &amp; Home</div>
-    <div class="qcat">📚 Tutoring</div>
+    <div class="qcat" onclick="dpyQuickCat(this,'hair')">💇 Hair &amp; Beauty</div>
+    <div class="qcat" onclick="dpyQuickCat(this,'trades')">🔧 Trades &amp; Home</div>
+    <div class="qcat" onclick="dpyQuickCat(this,'tutoring')">📚 Tutoring</div>
     <div class="qcat">🐾 Pet Care</div>
     <div class="qcat">🏋️ Fitness</div>
     <div class="qcat">🎨 Creative</div>
@@ -500,6 +500,50 @@ async function doSignOut(){const sb=getSB();if(sb)await sb.auth.signOut();docume
 window.addEventListener('load',()=>{const sb=getSB();if(sb)sb.auth.onAuthStateChange((e,s)=>{if(s)showUserInfo(s.user);});});
 </script>
 
+
+<script>
+// D' PanYard Search
+var _dpyProviders = [];
+function dpyInitProviders() {
+  // Collect all provider cards into searchable array
+  document.querySelectorAll('.provider-card').forEach(function(card) {
+    var name = card.querySelector('h3') ? card.querySelector('h3').innerText : '';
+    var cat = card.querySelector('.prov-cat') ? card.querySelector('.prov-cat').innerText : '';
+    var desc = card.querySelector('.prov-desc') ? card.querySelector('.prov-desc').innerText : '';
+    _dpyProviders.push({el: card, text: (name+' '+cat+' '+desc).toLowerCase()});
+    card.setAttribute('data-visible','1');
+  });
+}
+function dpyDoSearch() {
+  var q = (document.getElementById('dpySearchInput').value||'').toLowerCase().trim();
+  if (!q) { _dpyProviders.forEach(function(p){p.el.style.display='';}); dpyUpdateCount(); return; }
+  var found=0;
+  _dpyProviders.forEach(function(p) {
+    var show=p.text.includes(q);
+    p.el.style.display=show?'':'none';
+    if(show)found++;
+  });
+  dpyUpdateCount(found,q);
+}
+function dpyQuickCat(btn,cat) {
+  document.getElementById('dpySearchInput').value=cat;
+  document.querySelectorAll('.qcat').forEach(function(q){q.style.background='';q.style.color='';});
+  btn.style.background='var(--primary)';btn.style.color='#fff';
+  dpyDoSearch();
+}
+function dpyUpdateCount(n,q) {
+  var el=document.getElementById('dpyResultCount');
+  if(!el)return;
+  if(n===undefined){el.textContent='';return;}
+  el.textContent=n+' result'+(n!==1?'s':'')+' for "'+q+'"';
+}
+window.addEventListener('DOMContentLoaded',function(){
+  dpyInitProviders();
+  // Add result count label
+  var sb=document.querySelector('.search-bar');
+  if(sb){var rc=document.createElement('div');rc.id='dpyResultCount';rc.style.cssText='text-align:center;font-size:13px;color:var(--mid);margin-top:8px;min-height:18px';sb.parentNode.insertBefore(rc,sb.nextSibling);}
+});
+</script>
 </body>
 </html>
 
