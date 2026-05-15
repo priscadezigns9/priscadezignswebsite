@@ -146,6 +146,7 @@ nav{background:rgba(255,248,240,0.97);backdrop-filter:blur(12px);position:sticky
 
 <button class="btt" id="bttBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
 
+<script src="/callaloo/recipe-data.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
@@ -213,18 +214,37 @@ function setFilter(btn) {
 }
 
 window.addEventListener('load', async function() {
-  var sb = window.supabase.createClient(SB_URL, SB_KEY);
+  // Try Supabase first, fall back to local RECIPE_DATA
+  var loaded = false;
   try {
+    var sb = window.supabase.createClient(SB_URL, SB_KEY);
     var res = await sb.from('recipes')
       .select('id,title,category,cover_photo_url,prep_time,cook_time,difficulty,tags')
       .order('id', {ascending: true})
       .limit(200);
-    if (res.error) throw res.error;
-    _allRecipes = res.data || [];
-    filterRecipes();
-  } catch(e) {
-    document.getElementById('recipeGrid').innerHTML = '<div class="empty"><div class="empty-icon">&#127374;</div><div>Could not load recipes. Please try again.</div></div>';
+    if (!res.error && res.data && res.data.length > 0) {
+      _allRecipes = res.data;
+      loaded = true;
+    }
+  } catch(e) {}
+  if (!loaded && typeof RECIPE_DATA !== 'undefined') {
+    // Convert RECIPE_DATA object to array format
+    _allRecipes = Object.entries(RECIPE_DATA).map(function([k,r]) {
+      return {
+        id: k,
+        title: r.name || k,
+        category: (r.badge || 'mains').toLowerCase(),
+        cover_photo_url: null,
+        prep_time: r.time || '',
+        cook_time: r.time || '',
+        difficulty: r.difficulty || 'Medium',
+        tags: r.tags || [],
+        emoji: r.emoji || '',
+        gradient: r.gradient || ''
+      };
+    });
   }
+  filterRecipes();
 });
 
 window.addEventListener('scroll', function() {
