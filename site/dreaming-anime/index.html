@@ -872,6 +872,8 @@ footer {
   .newsletter-input { border: 3px solid #0A0A0A; border-bottom: none; }
   .newsletter-btn { border: 3px solid #0A0A0A; border-left: 3px solid #0A0A0A; }
 }
+</style>
+
 /* ── DARK MODE ── */
 [data-theme="dark"] {
   --da-bg: #0A0A0A;
@@ -920,7 +922,6 @@ html { transition: background 0.3s, color 0.3s; }
 [data-theme="dark"] .theme-toggle { border-color: #F5F5F5; color: #F5F5F5; }
 
 </head>
-</style>
 <body>
 
 <!-- ===== NAV ===== -->
@@ -1302,5 +1303,148 @@ function toggleTheme() {
   document.addEventListener("click", function(){ dropdown.style.display="none"; });
 })();
 </script>
+
+<!-- == AI ANIME TREND FINDER == -->
+<section id="ai-trend-finder" style="padding:80px 0 80px;background:#f5f5f5;border-top:var(--border-thick);">
+<div style="max-width:900px;margin:0 auto;padding:0 24px;">
+  <!-- Header -->
+  <div style="text-align:center;margin-bottom:40px;">
+    <div style="display:inline-block;background:#FF6B00;color:#fff;font-family:'Bangers',cursive;font-size:0.85rem;letter-spacing:3px;padding:6px 18px;border:3px solid #0A0A0A;margin-bottom:20px;transform:rotate(-1deg);">ORIANE AI</div>
+    <h2 style="font-family:'Bangers',cursive;font-size:clamp(2.2rem,6vw,4rem);color:#0A0A0A;letter-spacing:2px;line-height:1;margin-bottom:16px;">AI ANIME TREND FINDER</h2>
+    <p style="font-family:'Inter',sans-serif;font-size:1rem;color:#444;max-width:540px;margin:0 auto;line-height:1.75;">Enter any anime genre or topic. The AI reveals what's trending, hot content ideas, and audience insights &#8212; your edge in the anime scene.</p>
+  </div>
+
+  <!-- Widget Box -->
+  <div style="background:#fff;border:var(--border-thick);padding:36px;box-shadow:6px 6px 0 #0A0A0A;">
+    <!-- API Key Setup -->
+    <div id="at-key-setup" style="margin-bottom:24px;padding:14px 16px;background:#f5f5f5;border:2px solid #0A0A0A;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FF6B00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        <span style="font-family:'Inter',sans-serif;font-size:0.82rem;color:#444;font-weight:500;">Free AI key needed &mdash; <a href="https://console.groq.com" target="_blank" rel="noopener" style="color:#FF6B00;text-decoration:underline;font-weight:600;">get yours at console.groq.com</a></span>
+        <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;margin-top:8px;">
+          <input id="at-api-key-input" type="password" placeholder="Paste Groq API key (gsk_...)" style="padding:8px 12px;font-size:0.82rem;border:2px solid #0A0A0A;font-family:'Inter',sans-serif;outline:none;min-width:200px;background:#fff;" />
+          <button onclick="atSaveKey()" style="padding:8px 16px;background:#FF6B00;color:#fff;border:2px solid #0A0A0A;font-family:'Bangers',cursive;font-size:0.95rem;letter-spacing:1px;cursor:pointer;">SAVE KEY</button>
+        </div>
+      </div>
+      <div id="at-key-status" style="margin-top:8px;font-size:0.78rem;font-family:'Inter',sans-serif;color:#666;"></div>
+    </div>
+
+    <!-- Genre/Topic Input -->
+    <div style="margin-bottom:20px;">
+      <label for="at-genre-input" style="display:block;font-family:'Bangers',cursive;font-size:1.1rem;letter-spacing:2px;color:#0A0A0A;margin-bottom:10px;">GENRE OR TOPIC</label>
+      <input id="at-genre-input" type="text" placeholder="e.g. Isekai, Mecha, Slice of Life, Magical Girl, Sports Anime..." style="width:100%;padding:14px 16px;font-family:'Inter',sans-serif;font-size:0.95rem;border:var(--border-thick);background:#fff;color:#0A0A0A;outline:none;transition:border-color 0.2s;" />
+    </div>
+
+    <!-- Focus Toggles -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <label style="font-family:'Bangers',cursive;font-size:0.95rem;letter-spacing:2px;color:#0A0A0A;">ANGLE:</label>
+      <button onclick="atSetFocus(this,'trends')" class="at-focus-btn at-active">Trending Now</button>
+      <button onclick="atSetFocus(this,'content')" class="at-focus-btn">Content Ideas</button>
+      <button onclick="atSetFocus(this,'audience')" class="at-focus-btn">Audience Insights</button>
+      <button onclick="atSetFocus(this,'all')" class="at-focus-btn">Full Report</button>
+    </div>
+
+    <!-- Find Button -->
+    <button id="at-find-btn" onclick="atFindTrends()">
+      <span id="at-btn-text">&#9654; FIND TRENDS</span>
+    </button>
+
+    <!-- Output -->
+    <div id="at-output" style="display:none;margin-top:28px;border-top:var(--border-thick);padding-top:24px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="background:#FF6B00;border:2px solid #0A0A0A;padding:4px 12px;">
+          <span style="font-family:'Bangers',cursive;font-size:0.9rem;letter-spacing:2px;color:#fff;">TREND REPORT</span>
+        </div>
+        <button onclick="atCopy()" id="at-copy-btn" style="margin-left:auto;font-family:'Space Mono',monospace;font-size:0.72rem;padding:4px 12px;border:2px solid #0A0A0A;background:none;color:#0A0A0A;cursor:pointer;transition:all 0.2s;">[ COPY ]</button>
+      </div>
+      <div id="at-result" style="font-family:'Inter',sans-serif;font-size:0.92rem;color:#0A0A0A;line-height:1.8;white-space:pre-wrap;background:#f5f5f5;padding:20px;border:2px solid #0A0A0A;min-height:80px;"></div>
+    </div>
+
+    <!-- Error -->
+    <div id="at-error" style="display:none;margin-top:16px;padding:14px 18px;background:#fff0f0;border:2px solid #c62828;font-family:'Inter',sans-serif;font-size:0.88rem;color:#c62828;"></div>
+  </div>
+</div>
+</section>
+
+<style>
+.at-focus-btn{font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;padding:6px 14px;border:2px solid #0A0A0A;background:none;color:#0A0A0A;cursor:pointer;transition:all 0.15s;}
+.at-focus-btn:hover{background:#FF6B00;color:#fff;border-color:#FF6B00;}
+.at-active{background:#FF6B00!important;color:#fff!important;border-color:#FF6B00!important;}
+#at-genre-input:focus{border-color:#FF6B00!important;}
+#at-find-btn{width:100%;padding:16px 32px;font-family:'Bangers',cursive;font-size:1.4rem;letter-spacing:3px;background:#FF6B00;color:#fff;border:3px solid #0A0A0A;cursor:pointer;transition:all 0.15s;box-shadow:4px 4px 0 #0A0A0A;}
+#at-find-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #0A0A0A;}
+#at-find-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:4px 4px 0 #0A0A0A;}
+#at-copy-btn:hover{background:#0A0A0A;color:#fff;}
+</style>
+
+<script>
+(function(){
+var atFocus='trends';
+function getKey(){return localStorage.getItem('pd_groq_key')||'';}
+window.atSaveKey=function(){
+  var k=document.getElementById('at-api-key-input').value.trim();
+  if(!k){document.getElementById('at-key-status').textContent='Please enter a key.';return;}
+  localStorage.setItem('pd_groq_key',k);
+  document.getElementById('at-key-status').innerHTML='<span style="color:#FF6B00;font-weight:600">&#10003; Key saved in your browser.</span>';
+  document.getElementById('at-api-key-input').value='';
+};
+(function initStatus(){
+  if(getKey()) document.getElementById('at-key-status').innerHTML='<span style="color:#FF6B00;font-weight:600">&#10003; API key ready.</span>';
+})();
+window.atSetFocus=function(btn,f){
+  atFocus=f;
+  document.querySelectorAll('.at-focus-btn').forEach(function(b){b.classList.remove('at-active');});
+  btn.classList.add('at-active');
+};
+window.atFindTrends=function(){
+  var genre=document.getElementById('at-genre-input').value.trim();
+  var key=getKey();
+  var btn=document.getElementById('at-find-btn');
+  var btnTxt=document.getElementById('at-btn-text');
+  var output=document.getElementById('at-output');
+  var result=document.getElementById('at-result');
+  var err=document.getElementById('at-error');
+  err.style.display='none'; output.style.display='none';
+  if(!key){err.textContent='Please save your Groq API key first (see setup above).';err.style.display='block';return;}
+  if(!genre){err.textContent='Please enter an anime genre or topic first.';err.style.display='block';return;}
+  var focusMap={
+    trends:'List the top 5-7 currently trending topics, shows, characters, or themes within this genre. Include what is driving each trend.',
+    content:'Generate 8 specific, creative content ideas (posts, videos, reviews, lists) for creators or shops in this anime genre. Make them actionable.',
+    audience:'Describe the typical audience for this anime genre: demographics, what they love, what they buy, what content they engage with most, and how to reach them.',
+    all:'Provide a full trend report covering: (1) What is trending now, (2) Top content ideas, (3) Audience profile and what drives them to buy or engage. Be thorough.'
+  };
+  btn.disabled=true; btnTxt.textContent='SCANNING TRENDS...';
+  fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({
+      model:'llama-3.1-8b-instant',
+      messages:[
+        {role:'system',content:'You are an anime industry analyst and content strategist. You know everything about anime trends, fandom culture, merchandise, and audience behaviour. Respond in structured plain text with emoji headers. Be specific, enthusiastic, and actionable. Max 500 words.'},
+        {role:'user',content:'Anime genre/topic: '+genre+'\n\nTask: '+focusMap[atFocus]}
+      ],
+      max_tokens:700,temperature:0.7
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.choices&&d.choices[0]&&d.choices[0].message){
+      result.textContent=d.choices[0].message.content;
+      output.style.display='block';
+      output.scrollIntoView({behavior:'smooth',block:'start'});
+    } else {throw new Error(d.error?d.error.message:'Unexpected AI response');}
+  })
+  .catch(function(e){err.textContent='Error: '+(e.message||'Please try again.');err.style.display='block';})
+  .finally(function(){btn.disabled=false;btnTxt.textContent='> FIND TRENDS';});
+};
+window.atCopy=function(){
+  var t=document.getElementById('at-result').textContent;
+  var b=document.getElementById('at-copy-btn');
+  if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){b.textContent='[ COPIED! ]';setTimeout(function(){b.textContent='[ COPY ]';},2000);});}
+};
+})();
+</script>
+<!-- == /AI ANIME TREND FINDER == -->
+
 </body>
 </html>
