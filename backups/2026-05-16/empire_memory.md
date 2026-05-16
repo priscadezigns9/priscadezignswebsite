@@ -363,10 +363,15 @@ Applied starting 2026-05-16
 - Benefit-led messaging: solve the "plants are hard" anxiety
 - Free plant care resource -> email list
 
-### Minimalist Fashion (Quiet Luxury) — COS/Toteme
-- Contextual product imagery: worn in real environments, not white backgrounds
-- Sparse full-bleed UX communicates luxury without stating price
-- Searchable "quiet luxury" + "old money aesthetic" content angles
+### Luxury Home Decor (Quiet Luxury) — Architectural Digest / The RealReal / Restoration Hardware
+- **NICHE: Luxury home decor and interior design — NOT fashion**
+- Visual-first: every section anchored by a stunning room photo (living room, bedroom, kitchen, patio, bathroom, library, man cave, walk-in closet, balcony, office)
+- AI Service: "Design My Space" advisor — user picks a room + vibe + budget → curated Amazon product recommendations to achieve that exact look
+- Each room category = its own product carousel with Amazon affiliate links
+- Searchable angles: "quiet luxury bedroom", "old money home aesthetic", "luxury home decor on a budget"
+- Palette: white/ivory, warm stone, brushed gold accents — NOT dark/cream like Couture Gallery
+- Content tone: editorial, aspirational, interior-design publication energy
+- Blog: room transformations, product spotlights, seasonal decor edits
 
 ### Digital Agency (Prisca Dezigns) — R/GA/Pentagram
 - Founder-attributed case studies: Prisca personally, not just the agency
