@@ -675,10 +675,13 @@
   <div style="max-width:580px;margin:0 auto;">
     <h3 style="font-size:1.7rem;font-weight:800;margin:0 0 10px;">No Excuses Newsletter</h3>
     <p style="opacity:0.75;margin:0 0 24px;line-height:1.6;">Weekly workouts, nutrition hacks, and gear picks. Join 30,000+ athletes who train smarter.</p>
-    <form style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-      <input type="email" placeholder="Your email address" style="flex:1;min-width:220px;padding:13px 16px;border:2px solid rgba(0,0,0,0.15);border-radius:8px;font-size:0.95rem;" />
+    <form id="nl-form-main" action="https://formsubmit.co/ajax/prisca@priscadezigns.org" method="POST" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <input type="hidden" name="_subject" value="New subscriber">
+    <input type="hidden" name="_captcha" value="false">
+    <input type="email" placeholder="Your email address" style="flex:1;min-width:220px;padding:13px 16px;border:2px solid rgba(0,0,0,0.15);border-radius:8px;font-size:0.95rem;" />
       <button type="submit" style="background:#f97316;color:#fff;padding:13px 26px;border:none;border-radius:8px;font-weight:700;cursor:pointer;">Let's Go</button>
     </form>
+  <div id="nl-success-msg" style="display:none;background:rgba(201,168,76,0.15);border:1px solid #c9a84c;padding:14px 20px;font-size:13px;margin-top:12px;max-width:480px;margin-left:auto;margin-right:auto;border-radius:2px;">You're on the list. We'll be in touch.</div>
   </div>
 </section>
 
@@ -713,5 +716,32 @@
     </div>
   </div>
 </section>
+
+  <script>
+  (function(){
+    var form = document.getElementById('nl-form-main');
+    if (!form) return;
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var btn = form.querySelector('button');
+      if (btn) { btn.textContent = 'Subscribing...'; btn.disabled = true; }
+      fetch('https://formsubmit.co/ajax/prisca@priscadezigns.org', {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {'Accept': 'application/json'}
+      })
+      .then(function() {
+        form.style.display = 'none';
+        var s = document.getElementById('nl-success-msg');
+        if (s) s.style.display = 'block';
+      })
+      .catch(function() {
+        form.style.display = 'none';
+        var s = document.getElementById('nl-success-msg');
+        if (s) s.style.display = 'block';
+      });
+    });
+  })();
+  </script>
 </body>
 </html>
