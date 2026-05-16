@@ -1920,5 +1920,31 @@ function restartQuiz() {
   document.getElementById('q1').classList.add('active');
 }
 </script>
+<script>
+/* ===== FILTER: NO RESULTS MESSAGE ===== */
+(function(){
+  var filterBtns = document.querySelectorAll('[data-filter], .filter-tab');
+  if(!filterBtns.length) return;
+  // Inject no-results element if not present
+  var grid = document.querySelector('.product-grid, .products-grid, .collection-grid, .grid, [id*="grid"]');
+  if(!grid) return;
+  if(!document.getElementById('no-results-msg')){
+    var msg = document.createElement('p');
+    msg.id = 'no-results-msg';
+    msg.style.cssText = 'display:none;text-align:center;padding:40px 20px;color:#888;font-size:1rem;grid-column:1/-1;';
+    msg.textContent = 'No products found in this category.';
+    grid.appendChild(msg);
+  }
+  function checkEmpty(){
+    var items = grid.querySelectorAll('[data-cat],[data-category],[class*="product-card"],[class*="card"]');
+    var visible = Array.from(items).filter(function(el){ return el.style.display !== 'none' && el.id !== 'no-results-msg'; });
+    var msg = document.getElementById('no-results-msg');
+    if(msg) msg.style.display = visible.length === 0 ? 'block' : 'none';
+  }
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){ setTimeout(checkEmpty, 50); });
+  });
+})();
+</script>
 </body>
 </html>
