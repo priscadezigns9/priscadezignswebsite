@@ -877,24 +877,29 @@ def run_post(brand_name, post_type):
     if not page_id or not token:
         return f"Skipping {brand_name} — no page token"
 
-    # ── HARD POST CAP (Kinetik-style per-brand daily limit) ─────────────────
-    import time as _t
-    _is_seamrite = "seamrite" in brand_name.lower()
+    # ── HARD POST CAP — fail-CLOSED, date-based (updated 2026-05-16) ────────
+    from datetime import date as _date, timezone as _tz, timedelta as _td, datetime as _dt
+    _is_seamrite = ("seamrite" in brand_name.lower() or
+                    "nehneh" in brand_name.lower() or
+                    "neh neh" in brand_name.lower())
     MAX_DAILY = 2 if _is_seamrite else 4
-    _since_24h = int(_t.time()) - 86400
     try:
+        # Use midnight-to-now window (local date) for reliable counting
+        _midnight_utc = _dt.combine(_date.today(), _dt.min.time()).replace(tzinfo=_tz.utc)
+        _since_ts = int(_midnight_utc.timestamp()) - 4*3600  # 4h offset for AST (UTC-4)
         _cap_url = (
-            f"https://graph.facebook.com/v19.0/{page_id}/posts"
-            f"?fields=id,created_time&since={_since_24h}&limit=100&access_token={token}"
+            f"https://graph.facebook.com/v19.0/{page_id}/published_posts"
+            f"?fields=id,created_time&since={_since_ts}&limit=50&access_token={token}"
         )
-        _cap_req = urllib.request.Request(_cap_url)
+        _cap_req = urllib.request.Request(_cap_url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(_cap_req, timeout=10) as _r:
             _cap_data = json.loads(_r.read())
         _posts_today = len(_cap_data.get("data", []))
         if _posts_today >= MAX_DAILY:
-            return f"⏭️ {brand_name} — CAPPED ({_posts_today}/{MAX_DAILY} posts in last 24h)"
+            return f"⏭️ {brand_name} — CAPPED ({_posts_today}/{MAX_DAILY} posts today — skipped)"
     except Exception as _cap_e:
-        pass  # If cap check fails, allow post to proceed
+        # Fail CLOSED — if we can't verify the count, skip rather than over-post
+        return f"⏭️ {brand_name} — cap check failed ({_cap_e}) — skipped to avoid over-posting"
     # ── END CAP CHECK ────────────────────────────────────────────────────────
 
     # Get today's product for this brand from the live site (niche_products.json)
