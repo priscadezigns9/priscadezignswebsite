@@ -3,6 +3,11 @@
 
 ---
 
+## Amazon Associates
+- **Tag:** `priscadezigns-20`
+- Use this tag in ALL affiliate product links across every empire shop page
+- Format: `https://www.amazon.com/dp/ASIN/?tag=priscadezigns-20`
+
 ## 🌐 Website Status
 - **Domain:** priscadezigns.org (GitHub Pages — repo: priscadezigns9/priscadezignswebsite)
 - **Total pages:** 30+ live
@@ -44,6 +49,9 @@
 
 ### Affiliate Niche Pages (15 pages)
 Verdant Co | The Watch List | Sole Prestige | Atelier Gaming | Couture Gallery | The Autodrome | Peak Fit | The Escapist | Paw Vault | Quiet Luxury | Glow Protocol | Essence Elite | Prime Land Network | The Tech Scout HQ | The Way Made Known (faith/devotional — NO affiliate products)
+
+### Affiliate Niche Locks (NON-NEGOTIABLE)
+- **Couture Gallery** — LUXURY PURSES & BAGS only. Content, products, shop, posts — all purse/bag/handbag focused. High-end brands: Louis Vuitton, Chanel, Hermès, Gucci, Bottega Veneta, etc. Never stray into general fashion or clothing. LOCKED 2026-05-16.
 
 ### Dreaming Anime
 - Anime content brand. Orange & black. "The Panel" full manga redesign live 2026-05-14.
@@ -283,3 +291,85 @@ Verdant Co | The Watch List | Sole Prestige | Atelier Gaming | Couture Gallery |
 
 ### GitHub Backup (22:02 AST)
 All 6 files pushed to backups/2026-05-15/ OK
+
+
+---
+
+## Fortune 500 Strategy Intelligence — May 2026
+Applied starting 2026-05-16
+
+### Gaming (Atelier Gaming) — Xbox/Nintendo
+- Daily-return content: serialized posts, "coming tomorrow" teasers, daily tips
+- Discord community around the brand
+- Measure return visits not just followers
+
+### Sneakers (Sole Prestige) — Nike
+- Sub-brand content lanes: retro runners vs streetwear drops (separate content)
+- 80% aspiration/community, 20% product
+- Irreverent, anti-polished tone — go against category grain
+
+### Luxury Bags (Couture Gallery) — LV/Chanel/Hermes
+- Reddit presence (r/handbags, r/femalefashionadvice) — luxury brands are invisible there
+- FAQ schema on every page for AI search (ChatGPT/Perplexity cite FAQs not brand sites)
+- Investment bag angle: resale value, scarcity, collector content
+
+### Skincare (Glow Protocol) — L'Oreal
+- Embed skin quiz / virtual try-on (Perfect Corp / YouCam Web AR)
+- Science-forward ingredient breakdowns as content pillars
+- Hyper-personalized content by skin type
+
+### Fragrance (Essence Elite) — Chanel/Dior
+- Fragrance identity quiz -> affiliate recommendation funnel (Typeform/Interact)
+- Storytelling videos: origin, nostalgia, emotion — not product demos
+- Position scent as identity signal not just product
+
+### Fitness (Peak Fit) — Nike NTC
+- Free gated resource (workout PDF/program) behind email capture
+- Bundle workout + nutrition + mindset content
+- Daily content to drive habitual return visits
+
+### Travel (The Escapist) — Airbnb
+- Hyper-specific structured content: exact neighborhoods, distances, itineraries
+- Set-jetting content: destinations featured in TV shows/movies
+- AI rewards specificity — vague copy gets penalized
+
+### Tech (Tech Scout) — Apple
+- Scrollytelling product pages: spec -> demo -> testimonial -> CTA
+- FAQ schema for AI search visibility
+- One product, one page, cinematic simplicity
+
+### Cars (The Autodrome) — BMW/Mercedes
+- Regular update content cycle — each new piece = a published update
+- EV restomod + software-defined vehicle content angles
+- AI features as content hooks
+
+### Watches (The Watch List) — Rolex/LVMH
+- Secondhand curator content: CPO reviews, resale value comparisons
+- Bridge luxury vs smart watch (Apple Watch alternative angle)
+- Purpose-driven storytelling beyond specs
+
+### Pets (Paw Vault) — Chewy
+- Join Chewy affiliate program (5 flat per new customer) via Impact.com
+- Long-tail pet health queries: "best food for senior dogs with kidney disease"
+- Micro-petfluencer partnership angle
+
+### Real Estate (Prime Land Network) — Zillow
+- Hyper-local SEO: specific neighborhoods + buyer intent keywords
+- Monthly housing market update content
+- 3D tour embeds as differentiator (Matterport Go free tier)
+
+### Plants (Verdant Co) — The Sill
+- Annual/seasonal trend report as SEO anchor
+- Benefit-led messaging: solve the "plants are hard" anxiety
+- Free plant care resource -> email list
+
+### Minimalist Fashion (Quiet Luxury) — COS/Toteme
+- Contextual product imagery: worn in real environments, not white backgrounds
+- Sparse full-bleed UX communicates luxury without stating price
+- Searchable "quiet luxury" + "old money aesthetic" content angles
+
+### Digital Agency (Prisca Dezigns) — R/GA/Pentagram
+- Founder-attributed case studies: Prisca personally, not just the agency
+- Reposition as intelligent brand systems for the AI age
+- Portfolio filterable by service type
+- Target keywords: "branding agency Trinidad", "Caribbean digital agency results"
