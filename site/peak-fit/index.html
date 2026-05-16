@@ -1169,7 +1169,18 @@
       .shop-grid { grid-template-columns: 1fr; }
       .gear-grid { grid-template-columns: 1fr; }
     }
-  </style>
+  
+#no-results-msg {
+  display: none;
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+  font-size: 1rem;
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+</style>
 </head>
 <body>
 
@@ -1789,13 +1800,28 @@ window.addEventListener('scroll', () => {
 function filterShop(cat, el) {
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
+  var visible = 0;
   document.querySelectorAll('.shop-card').forEach(card => {
     if (cat === 'all' || card.dataset.cat === cat) {
       card.classList.remove('hidden');
+      visible++;
     } else {
       card.classList.add('hidden');
     }
   });
+  // Show no-results message
+  var msg = document.getElementById('no-results-msg');
+  if (!msg) {
+    var grid = document.querySelector('.shop-grid, .products-grid, .product-grid');
+    if (grid) {
+      msg = document.createElement('p');
+      msg.id = 'no-results-msg';
+      msg.textContent = 'No products found in this category.';
+      msg.style.cssText = 'display:none;text-align:center;padding:60px 20px;color:#888;font-size:1rem;grid-column:1/-1;';
+      grid.appendChild(msg);
+    }
+  }
+  if (msg) msg.style.display = visible === 0 ? 'block' : 'none';
 }
 
 // ===== QUIZ =====
