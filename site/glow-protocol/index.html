@@ -734,7 +734,7 @@
 
 <!-- ══ NAV ══ -->
 <nav>
-  <a class="nav-logo" href="#">✨ Glow Protocol</a>
+  <a class="nav-logo" href="/glow-protocol/">✨ Glow Protocol</a>
   <button class="nav-hamburger" id="navToggle" aria-label="Menu">☰</button>
   <ul class="nav-links" id="navLinks">
     <li><a href="#">Home</a></li>
@@ -1430,14 +1430,14 @@
           <li><a href="#skin-quiz">Skin Quiz</a></li>
           <li><a href="#hair-section">Hair Match</a></li>
           <li><a href="/glow-protocol/blog/">Blog</a></li>
-          <li><a href="#">Routine Builder</a></li>
+          <li><a href="#skin-quiz">Routine Builder</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Info</h4>
         <ul>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="/glow-protocol/about/">About</a></li>
+          <li><a href="/privacy-policy/">Privacy Policy</a></li>
           <li><a href="#">Affiliate Disclosure</a></li>
           <li><a href="#">Contact</a></li>
         </ul>
@@ -1579,6 +1579,66 @@ function showHairResult(type, el) {
   result.classList.add('visible');
   result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
+</script>
+<script>
+/* ===== NEWSLETTER: AJAX SUCCESS ===== */
+(function(){
+  var forms = document.querySelectorAll('form[action*="formsubmit"]');
+  forms.forEach(function(form){
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var emailInput = form.querySelector('input[type="email"]');
+      var btn = form.querySelector('button[type="submit"], button');
+      var origBtnText = btn ? btn.textContent : '';
+      var origBtnBg = btn ? btn.style.background : '';
+      if(btn){ btn.textContent = '✓ You're in!'; btn.disabled = true; }
+      if(emailInput) emailInput.value = '';
+      // Show success message
+      var successEl = form.parentNode.querySelector('.nl-success');
+      if(!successEl){
+        successEl = document.createElement('p');
+        successEl.className = 'nl-success';
+        successEl.style.cssText = 'margin-top:16px;color:#4caf50;font-weight:600;font-size:0.95rem;';
+        form.parentNode.insertBefore(successEl, form.nextSibling);
+      }
+      successEl.textContent = '🎉 Thanks for subscribing! Check your inbox soon.';
+      successEl.style.display = 'block';
+      // Actually submit in background
+      var data = new FormData(form);
+      fetch(form.action, { method: 'POST', body: data }).catch(function(){});
+      setTimeout(function(){
+        if(btn){ btn.textContent = origBtnText; btn.disabled = false; }
+        successEl.style.display = 'none';
+      }, 5000);
+    });
+  });
+})();
+</script>
+<script>
+/* ===== FILTER: NO RESULTS MESSAGE ===== */
+(function(){
+  var filterBtns = document.querySelectorAll('[data-filter], .filter-tab');
+  if(!filterBtns.length) return;
+  // Inject no-results element if not present
+  var grid = document.querySelector('.product-grid, .products-grid, .collection-grid, .grid, [id*="grid"]');
+  if(!grid) return;
+  if(!document.getElementById('no-results-msg')){
+    var msg = document.createElement('p');
+    msg.id = 'no-results-msg';
+    msg.style.cssText = 'display:none;text-align:center;padding:40px 20px;color:#888;font-size:1rem;grid-column:1/-1;';
+    msg.textContent = 'No products found in this category.';
+    grid.appendChild(msg);
+  }
+  function checkEmpty(){
+    var items = grid.querySelectorAll('[data-cat],[data-category],[class*="product-card"],[class*="card"]');
+    var visible = Array.from(items).filter(function(el){ return el.style.display !== 'none' && el.id !== 'no-results-msg'; });
+    var msg = document.getElementById('no-results-msg');
+    if(msg) msg.style.display = visible.length === 0 ? 'block' : 'none';
+  }
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){ setTimeout(checkEmpty, 50); });
+  });
+})();
 </script>
 </body>
 </html>
