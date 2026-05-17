@@ -35,6 +35,9 @@ def _load_ig_ids():
     try:
         with open("ig_accounts.json") as f:
             accounts = json.load(f)
+        # Support both dict format {brand: {ig_id, token}} and list format [{page_name, ig_id}]
+        if isinstance(accounts, dict):
+            return {k.strip(): v["ig_id"] for k, v in accounts.items() if isinstance(v, dict) and "ig_id" in v}
         return {a["page_name"].strip(): a["ig_id"] for a in accounts}
     except Exception:
         return {}
