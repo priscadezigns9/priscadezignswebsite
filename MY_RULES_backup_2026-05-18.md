@@ -189,7 +189,7 @@ Sources per brand:
 - Font priority: 1) brand's own font (fetch from live brand page CSS) → 2) matching Google Font → 3) closest system font (never plain PIL default)
 - Font map (confirmed):
   - Dreaming Anime → Bangers (anime/bold display)
-  - Atelier Gaming → Rajdhani or Orbitron (tech/gaming)
+  - Atelier Gaming → Orbitron / Impact / Bebas Neue (thick blocky futuristic — NON-NEGOTIABLE for news posts)
   - The Watch List → Cormorant Garamond (luxury serif)
   - The Escapist → Playfair Display (travel/editorial)
   - Prime Land Network → Cinzel (premium real estate)
@@ -221,23 +221,45 @@ Use these exact prompts per brand unless Prisca gives a new one. Never substitut
 - **Rowcell**: Hyper-realistic, high-angle flat lay of a modern workspace. A person's hands are typing on a sleek keyboard on one side. On the other side, glowing holographic data nodes and structured spreadsheet charts float slightly above the desk, blending modern digital technology with an organized office environment. Neon blue and crisp white lighting, commercial technology aesthetic, photorealistic, highly detailed.
 - **NehNeh / Seamrite Designs**: A dynamic fashion advertisement showing a hyper-realistic athletic model mid-twist jump, light trails following her limbs. She is wearing iridescent metallic runner tights and a holographic white cropped tech hoodie. Background features a prism-shifting, hot-magenta to sapphire gradient with refracted lens flares and dramatic floating geometric art forms. Bold, high-energy fashion aesthetic, glossy skin tones, 8K, cinematic lighting, dramatic studio smoke effects.
 - **Tech Scout HQ**: Extreme macro shot. A sleek [Product Name] sitting center frame on a dark matte surface. Deep black background with electric blue neon light rings glowing behind the product. Particle effects, lens flare, cinematic dramatic lighting, sharp product focus, photorealistic, 8k, editorial tech ad style, shot on DSLR --ar 9:16
-- **Glow Protocol**: Extreme macro shot. A sleek, glossy bottle of [Product Name] sitting in the center of a pale pink, minimalist background with tiny, floating water droplets around it. Bright and airy aesthetic, soft diffused studio lighting, sharp skin-level focus, photorealistic, 8k, editorial beauty ad style, shot on DSLR --ar 9:16
-- **Couture Gallery**: Photorealistic, high-end commercial ad of a [bag style]. The purse is artfully arranged on a [environment] surrounded by [background details]. Sunlight filters through leaves creating a warm, golden hour glow. Hyper-detailed, showing the rich texture and precise metal clasps. Blurred natural background, cinematic depth of field, vibrant but serene, 8k, photorealistic --ar 9:16
+- **Glow Protocol (product hero)**: Extreme macro shot. A sleek, glossy bottle of [Product Name] sitting in the center of a pale pink, minimalist background with tiny, floating water droplets around it. Bright and airy aesthetic, soft diffused studio lighting, sharp skin-level focus, photorealistic, 8k, editorial beauty ad style, shot on DSLR --ar 9:16
+- **Glow Protocol (Prompt A — Skincare Trends)**: Minimalist 3D editorial, soft beige+pastel pink bg, serum bottle on marble pedestal with cucumber slices + water droplets. PIL center: SKINCARE TRENDS / WHAT'S NEW. Semi-transparent band mandatory.
+- **Glow Protocol (Prompt B — Haircare Event)**: Vibrant close-up of glowing silky hair, golden hour, editorial photography. PIL center: NEW HAIRCARE EVENT / THE DROP OF THE YEAR! Gold or white on warm band.
+- **Glow Protocol (Prompt C — Self-Care Sunday)**: Tranquil flat-lay on pastel pink — candle, moisturizer, jade roller, towel. PIL top: SELF-CARE SUNDAY. Pastel band behind text.
+- **Glow Protocol (Prompt D — Men's Grooming)**: Dark teal/charcoal bg, beard oil + face wash on dark slate. PIL top: MEN'S GROOMING / TRENDS & NEWS in bold white block. Dark bg = no band needed.
+- **Glow Protocol (Prompt E — All-In-One)**: Split-screen men's + women's products. PIL center: ALL-IN-ONE SELF CARE. Rotate all 5 for variety. Font: Montserrat/Lato/Futura — never script.
+- **Pixelcut workflow (Glow Protocol + all beauty brands)**: If AI misspells text in generated image, erase in Pixelcut AI Photo Editor and retype correct overlay manually.
+- **Couture Gallery (news/trends post)**: Sleek cinematic 4K editorial — luxury designer handbag on polished marble pedestal, sunlit minimalist studio, soft natural lighting, high-end fashion magazine cover style. PIL overlay: bold heavy white sans-serif at TOP or BOTTOM (keep bag as central focal point). Font: Montserrat, Futura, or Helvetica Black. Colors: white on dark leather / gold (#D4AF37) or charcoal on light bags. Rotate text: LUXURY BAG TRENDS / THE IT-BAG OF THE SEASON / UNBOXING THE FUTURE / ICONIC SILHOUETTES / THE NEW LUXURY — or swap with actual news headline.
+- **Couture Gallery (product — hero)**: Photorealistic, high-end commercial ad of a [bag style]. The purse is artfully arranged on a [environment] surrounded by [background details]. Sunlight filters through leaves creating a warm, golden hour glow. Hyper-detailed, showing the rich texture and precise metal clasps. Blurred natural background, cinematic depth of field, vibrant but serene, 8k, photorealistic --ar 9:16
 - **Quiet Luxury (product/lifestyle)**: Cinematic commercial interior photography, 8k resolution, photorealistic. Wide-angle shot of a high-end luxury living room featuring [hero product]. Polished concrete flooring, abstract canvas painting on the wall. Dramatic and moody lighting from a sleek brushed-brass floor lamp. High-end, sophisticated lifestyle aesthetic --ar 4:5
 - **Quiet Luxury (news/trends post)**: A trending, ultra-luxurious home decor magazine spread. A modern living room with plush velvet sofas, marble coffee tables, and elegant arched doorways. Natural sunlight streaming through large windows. Bold, massive, centered typography overlay: "TOP 2026 DECOR TRENDS" (headline) + "Minimalist Luxury & Earthy Tones" (subtext). Text overlays: vibrant, large, legible, sleek modern sans-serif. High-fashion, photorealistic, 8k, cinematic lighting. Replace headline/subtext at runtime with actual news via PIL overlay.
-- **Atelier Gaming**: (add when prompted by Prisca)
+- **Atelier Gaming (news/breaking post)**: High-energy cinematic gaming news. Background = striking in-game screenshot with dark gradient overlay. PIL overlay top/center: BREAKING: [ACTUAL HEADLINE] in massive neon-glowing red (#E53935) or white with red outline, blocky futuristic font (Orbitron/Impact/Bebas Neue), drop shadow. Below: 3-4 word subline in white/yellow. Max 6 words on image total. Dark vignette mandatory so text pops. All details go in caption only.
 - **Dreaming Anime**: A young female protagonist with glowing magenta eyes and silver hair standing in a highly detailed bustling cyberpunk Tokyo street. Masterful blend of sleek modern anime and photorealistic live-action. Photorealistic textures on hair/clothing, exaggerated expressive anime eyes. Shot on Arri Alexa Mini, 85mm lens, f/1.8, cinematic shallow depth of field. Neon reflections on wet asphalt, volumetric lighting, glowing atmospheric haze, dynamic lens flares. Character looks directly at camera with a confident smirk. Vibrant colors, ultra-HD 16K. NOTE: This prompt is for brand/character posts ONLY — news, events, trending anime, weekly rankings always use real sourced images from MAL/Crunchyroll/AniList.
-- **Sole Prestige**: (add when prompted by Prisca)
+- **Sole Prestige (Prompt A — Studio/Heels)**: Designer heels on polished marble pedestal, soft moody dark gray bg, side studio lighting, glossy + stitching detail. Text: elegant bold white top/bottom, no band needed on dark bg. Montserrat ExtraBold or Futura Bold.
+- **Sole Prestige (Prompt B — Action/Sneakers)**: First-person POV, retro sneakers on wet reflective city pavement, neon city bokeh. Text: bold white with dark stroke top, semi-transparent band. Bebas Neue or Montserrat.
+- **Sole Prestige (Prompt C — Nature/Boots)**: Leather boots on mossy log, sun-dappled enchanted forest, golden hour canopy light. Text: cream or white bold top/bottom, dark band in foliage area.
+- **Sole Prestige (Prompt D — Minimalist)**: White sneakers floating mid-air, pastel sage green bg, floating leaves. Text: clean black or charcoal bold on clean pastel bg, no band needed. Futura Bold or Helvetica Neue Black.
+- Rotate A/B/C/D by shoe type: A=heels/formal, B=sneakers/casual, C=boots/sandals, D=minimalist.
+- AI shoe tips: pair fix = add "perfectly mirrored pair" / always specify material (suede, patent, mesh) / surface context adds depth (marble, concrete, wood).
 - **Essence Elite**: (add when prompted by Prisca)
 - **Peak Fit**: (add when prompted by Prisca)
 - **The Watch List (Prompt A — Titanium)**: Cinematic macro of sleek titanium watch on dark marble slab, studio lighting, 8k. Negative space LEFT. Text center: THE TITANIUM REVOLUTION (bold white sans-serif). Text bottom: Top Watch Trends of the Year (smaller).
 - **The Watch List (Prompt B — Retro)**: High-contrast flat-lay, vintage gold digital watch + retro cassettes + sunglasses on vibrant orange bg. Distressed typography across image: RETRO TECH IS BACK. Bottom-right: FALL 2026 WATCH TRENDS.
 - **The Watch List (Prompt C — Mechanical)**: Close-up skeleton watch gears, moody deep blue + gold palette. Neon-style typography: MECHANICAL MARVELS. Bottom-center: Inside the 2026 Trends.
 - Rotate A/B/C for variety. Replace overlay text at runtime with actual news headline via PIL. Keep layout per prompt (center / bottom-right / bottom-center).
-- **The Autodrome (news/breaking post)**: A dynamic, high-contrast automotive news background featuring a sleek sports car driving on a coastal highway. Overlay the words "BREAKING NEWS" in massive, bold, all-caps sans-serif typography across the top of the image. Overlay the words "2026 SUPERCAR REVEAL" in heavy, bright teal (#00B4A6), block-letter font at the bottom. Cinematic lighting, photorealistic, cinematic, space left in the center for readability. NOTE: Replace bottom text with actual news headline via PIL overlay. Keep BREAKING NEWS at top, actual headline at bottom in teal.
-- **The Escapist**: A hyper-realistic travel photograph taken from a luxurious overwater bungalow, gazing out at a crystal-clear turquoise ocean. In the extreme foreground, a wooden deck with an infinity plunge pool and a freshly served tropical cocktail are in razor-sharp focus. In the background, softly blurred with creamy bokeh, a lush, vibrant green tropical island meets a bright blue sky with wispy clouds. Golden hour sunlight, warm glowing tones, cinematic lighting, ultra-detailed, shot on 35mm lens, 8k resolution. --ar 16:9 --style raw --v 6.0
+- **The Autodrome (news/breaking post)**: Dynamic coastal highway sports car, BREAKING NEWS top (massive bold all-caps), actual headline bottom in teal #00B4A6 block letters via PIL. Replace bottom text at runtime.
+- **The Autodrome (Prompt A — Fashion Editorial)**: Matte-black luxury car, stylish person leaning on hood, urban dusk bokeh, golden hour. Text in negative space (not over car), Montserrat Bold, teal accent.
+- **The Autodrome (Prompt B — Action Shot)**: Crimson supercar low-angle coastal highway, motion blur, lens flare. Bold teal headline top or bottom, dark gradient band, Bebas Neue or Impact.
+- **The Autodrome (Prompt C — Night City)**: Luxury hypercar outside glass skyscraper, neon reflections on wet pavement. Neon teal glowing text bottom-third, Orbitron or Bebas Neue — city reflections are the hero.
+- **The Autodrome (Prompt D — Studio Display)**: Luxury EV in minimalist white studio, soft geometric shadows, poster-style. Teal or charcoal headline centered top or bottom, Montserrat or Futura Black.
+- Rotate A/B/C/D: action for reveals, studio for EVs, night for luxury, editorial for fashion. Angle keywords: low angle / eye-level / close-up macro. Lighting: golden hour / neon glow / studio softbox. NEVER place text over the car's hero lines.
+- **The Escapist (Prompt A — airplane sunset)**: Sleek airplane flying through brilliant sunset over tropical coastline. PIL overlay top: BREAKING: TOP TRAVEL TRENDS UNVEILED (massive bold all-caps white). Bottom: short subtitle (max 12 words). Semi-transparent dark band behind both text blocks.
+- **The Escapist (Prompt B — Mediterranean beach)**: Pristine crystal-clear Mediterranean beach with dramatic cliffs, vibrant warm palette. PIL overlay center: 2026'S TOP HIDDEN GEMS (massive extra-bold, yellow or white with shadow). Dark semi-transparent shape behind text.
+- **The Escapist (Prompt C — flat-lay desk)**: Minimalist desk flat-lay with vintage passport, retro compass, smartphone. PIL overlay center: THE FUTURE OF TRAVEL: WHAT YOU NEED TO KNOW (clean bold black text on semi-transparent white geometric box).
+- Rotate A/B/C. Replace overlay text at runtime with actual news headline via PIL. Max 2 short lines on image — all details in caption.
 - **Verdant Co**: (add when prompted by Prisca)
-- **Paw Vault**: (add when prompted by Prisca)
+- **Paw Vault (Prompt A — product)**: Vibrant high-contrast professional product photo in bright clean setting. PIL: bold rounded sans-serif [KEY BENEFIT or CTA] — sky blue #50A0FF or white, Nunito ExtraBold or Fredoka One, drop shadow if bg is busy.
+- **Paw Vault (Prompt B — event/action)**: Exciting action-shot of happy pet in lively outdoor/event setting. PIL: festival-style bold typography [EVENT NAME] oversized + [date & location] smaller. Never text over the pet — use sky, wall, or blurred bg area.
+- **Paw Vault overlay rules**: Drop shadow/glow on busy backgrounds. Rule of thirds — text in empty spaces only. Light photo → dark text / dark photo → white or neon text. Rounded bold font only (Nunito, Fredoka One, Poppins Bold). Max 2 lines on image.
 - **Prime Land Network**: Hyper-realistic luxury real estate photography. Stunning modern executive mansion exterior, infinity pool overlooking ocean, panoramic water views, golden hour lighting, manicured landscaping, grand entrance, glass walls, architectural masterpiece, cinematic depth of field, 8k, ultra-detailed, professional real estate ad photography. Ad copy template: luxury real estate marketing expert tone — attention-grabbing hook, 3 key selling points, CTA to book a private viewing. Target: affluent professionals and growing families.
 
 ## BRAND LOGO WATERMARK RULE (2026-05-18, NON-NEGOTIABLE)
@@ -315,6 +337,11 @@ Use these exact prompts per brand unless Prisca gives a new one. Never substitut
 - News sources: Tech Scout HQ=TechCrunch/Verge, Dreaming Anime=Crunchyroll/ANN, Gaming=IGN/Kotaku, Skincare=Allure/Byrdie, Fragrance=Fragrantica, Watches=Hodinkee, Auto=Motor Trend/F1.com, Travel=CNT/Lonely Planet, others=web_search time_period=week
 - After overlay: compress 800x800 quality 72, push to site/assets/social-imgs/[slug]-ig.jpg, get approval, post FB+IG
 
+## PIXELCUT FALLBACK RULE (2026-05-18 — ALL BRANDS)
+- If AI image generator produces misspelled or garbled text on the image: use **Pixelcut AI Photo Editor** to erase the AI text, then type in the correct overlay manually
+- This applies to ALL brands — not just beauty/skincare
+- Always check text accuracy before sending to Drive for approval
+
 ## TEXT OVERLAY SIZE RULE (2026-05-18 — NON-NEGOTIABLE)
 - Text overlays must be LARGE and BOLD — matching the scale seen in the Pinterest inspiration folder
 - Reference: Drive folder 1mURMX-BjHy4ZlevWFAUbqoLTRnZZVLIo (Prisca Dezigns Pinterest inspo)
@@ -329,6 +356,10 @@ Use these exact prompts per brand unless Prisca gives a new one. Never substitut
 - After wrapping, vertically center the text block in its designated band (top third for headline, bottom third for subline)
 - Test: before saving, verify no text extends beyond image boundaries
 - NEVER use the PIL default font — always load a TTF font (DejaVu, Google Font, or brand font)
+- Busy background = ALWAYS add solid or semi-transparent shape behind text so big fonts pop
+- Font style: modern sans-serif or bold slab (Montserrat, Futura, Helvetica style) — NOT decorative scripts for news posts
+- Max 2 short lines on image — all details go in caption, NOT on the image
+- Text contrast check: white on dark, black on light, yellow with shadow on colorful — always legible at thumbnail size
 
 ## IG-READY IMAGE HOSTING RULE (2026-05-18 — NON-NEGOTIABLE)
 - Every social image created for posting MUST be pushed to GitHub at:
