@@ -135,20 +135,7 @@ footer a{color:#E87722;text-decoration:none}
   </div>
 </footer>
 <script>
-// GOOGLE SHEETS INTEGRATION
-// To activate: go to script.google.com, create a new project, paste the Apps Script below,
-// deploy as Web App (anyone can access), then replace SCRIPT_URL below with your deployment URL.
-//
-// Apps Script code to paste:
-// function doPost(e){
-//   var ss=SpreadsheetApp.openById("YOUR_SHEET_ID");
-//   var sheet=ss.getActiveSheet();
-//   var p=JSON.parse(e.postData.contents);
-//   sheet.appendRow([new Date(),p.first_name,p.last_name,p.email,p.cook_type]);
-//   return ContentService.createTextOutput(JSON.stringify({result:"success"})).setMimeType(ContentService.MimeType.JSON);
-// }
-
-var SCRIPT_URL = "REPLACE_WITH_APPS_SCRIPT_URL";
+var SCRIPT_URL = "https://formspree.io/f/xwvzkyzb";
 
 document.getElementById("waitlistForm").addEventListener("submit", function(e){
   e.preventDefault();
@@ -165,20 +152,14 @@ document.getElementById("waitlistForm").addEventListener("submit", function(e){
     cook_type: document.getElementById("cookType").value
   };
 
-  if(SCRIPT_URL === "REPLACE_WITH_APPS_SCRIPT_URL"){
-    // Fallback until script URL is configured: show success and log locally
-    document.getElementById("waitlistForm").style.display = "none";
-    document.getElementById("successState").classList.add("show");
-    return;
-  }
-
   fetch(SCRIPT_URL, {
     method: "POST",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify(payload)
   })
   .then(function(r){ return r.json(); })
   .then(function(data){
-    if(data.result === "success"){
+    if(data.ok){
       document.getElementById("waitlistForm").style.display = "none";
       document.getElementById("successState").classList.add("show");
     } else {
