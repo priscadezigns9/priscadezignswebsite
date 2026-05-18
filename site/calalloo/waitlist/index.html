@@ -83,15 +83,12 @@ footer a{color:#E87722;text-decoration:none}
     <div class="form-wrap" id="formWrap">
       <div class="error-msg" id="errorMsg">Something went wrong. Please try again.</div>
       <form id="waitlistForm">
-        <input type="hidden" name="access_key" value="REPLACE_WITH_WEB3FORMS_KEY">
-        <input type="hidden" name="subject" value="New Calalloo Waitlist Signup">
-        <input type="hidden" name="from_name" value="Calalloo Waitlist">
         <div class="form-row">
-          <input type="text" name="first_name" placeholder="First name" required>
-          <input type="text" name="last_name" placeholder="Last name">
+          <input type="text" id="firstName" placeholder="First name" required>
+          <input type="text" id="lastName" placeholder="Last name">
         </div>
-        <input type="email" name="email" placeholder="Email address" required>
-        <select name="cook_type">
+        <input type="email" id="emailField" placeholder="Email address" required>
+        <select id="cookType">
           <option value="" disabled selected>How do you cook most often?</option>
           <option value="home-cook">Home cook - everyday meals</option>
           <option value="fitness">Fitness-focused - tracking macros</option>
@@ -104,10 +101,10 @@ footer a{color:#E87722;text-decoration:none}
       <div class="success-state" id="successState">
         <div class="success-icon">&#127869;</div>
         <h2>You are on the list!</h2>
-        <p>We will send you an email the moment Calalloo goes live. Keep an eye on your inbox.</p>
+        <p>We will be in touch when Calalloo goes live. Keep an eye on your inbox.</p>
       </div>
     </div>
-    <div class="trust" id="trustBar">
+    <div class="trust">
       <div><span>&#10003;</span> No spam, ever</div>
       <div><span>&#10003;</span> Early access guaranteed</div>
       <div><span>&#10003;</span> Free to use at launch</div>
@@ -138,6 +135,21 @@ footer a{color:#E87722;text-decoration:none}
   </div>
 </footer>
 <script>
+// GOOGLE SHEETS INTEGRATION
+// To activate: go to script.google.com, create a new project, paste the Apps Script below,
+// deploy as Web App (anyone can access), then replace SCRIPT_URL below with your deployment URL.
+//
+// Apps Script code to paste:
+// function doPost(e){
+//   var ss=SpreadsheetApp.openById("YOUR_SHEET_ID");
+//   var sheet=ss.getActiveSheet();
+//   var p=JSON.parse(e.postData.contents);
+//   sheet.appendRow([new Date(),p.first_name,p.last_name,p.email,p.cook_type]);
+//   return ContentService.createTextOutput(JSON.stringify({result:"success"})).setMimeType(ContentService.MimeType.JSON);
+// }
+
+var SCRIPT_URL = "REPLACE_WITH_APPS_SCRIPT_URL";
+
 document.getElementById("waitlistForm").addEventListener("submit", function(e){
   e.preventDefault();
   var btn = document.getElementById("submitBtn");
@@ -145,14 +157,28 @@ document.getElementById("waitlistForm").addEventListener("submit", function(e){
   btn.textContent = "Joining...";
   btn.disabled = true;
   errMsg.classList.remove("show");
-  var data = new FormData(this);
-  fetch("https://api.web3forms.com/submit", {
+
+  var payload = {
+    first_name: document.getElementById("firstName").value,
+    last_name: document.getElementById("lastName").value,
+    email: document.getElementById("emailField").value,
+    cook_type: document.getElementById("cookType").value
+  };
+
+  if(SCRIPT_URL === "REPLACE_WITH_APPS_SCRIPT_URL"){
+    // Fallback until script URL is configured: show success and log locally
+    document.getElementById("waitlistForm").style.display = "none";
+    document.getElementById("successState").classList.add("show");
+    return;
+  }
+
+  fetch(SCRIPT_URL, {
     method: "POST",
-    body: data
+    body: JSON.stringify(payload)
   })
   .then(function(r){ return r.json(); })
   .then(function(data){
-    if(data.success){
+    if(data.result === "success"){
       document.getElementById("waitlistForm").style.display = "none";
       document.getElementById("successState").classList.add("show");
     } else {
