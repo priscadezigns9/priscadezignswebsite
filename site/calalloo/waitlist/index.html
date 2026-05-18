@@ -17,9 +17,12 @@
 :root{--primary:#E87722;--primary-dark:#C45A00;--cream:#FFF8F0;--dark:#1A0D00;--mid:#8B4A1E}
 body{font-family:"Inter",sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;display:flex;flex-direction:column}
 nav{background:rgba(255,248,240,0.96);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:64px;border-bottom:1px solid rgba(232,119,34,0.12)}
-.nav-logo{text-decoration:none;font-family:"Fraunces",serif;font-size:1.4rem;font-weight:900;color:var(--primary)}
-.nav-back{color:var(--mid);text-decoration:none;font-size:14px;font-weight:500}
-.nav-back:hover{color:var(--primary)}
+.nav-logo{text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-links a{color:var(--mid);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--primary)}
+.nav-cta{background:var(--primary);color:#fff !important;padding:8px 20px;border-radius:50px;font-weight:600 !important;transition:background .2s !important}
+.nav-cta:hover{background:var(--primary-dark) !important}
 .hero{flex:1;display:flex;align-items:center;justify-content:center;padding:80px 5%;text-align:center}
 .hero-inner{max-width:580px;width:100%}
 .badge{display:inline-block;background:rgba(232,119,34,0.12);color:var(--primary);border:1px solid rgba(232,119,34,0.3);border-radius:50px;padding:6px 18px;font-size:13px;font-weight:600;margin-bottom:28px}
@@ -35,8 +38,16 @@ input::placeholder{color:#BBA080}
 .form-row input{margin-bottom:0}
 .btn-submit{width:100%;background:var(--primary);color:#fff;border:none;border-radius:12px;padding:16px;font-family:"Fraunces",serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;margin-top:4px}
 .btn-submit:hover{background:var(--primary-dark);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:0.7;cursor:not-allowed;transform:none}
 .trust{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;font-size:13px;color:var(--mid)}
 .trust span{color:var(--primary)}
+.success-state{display:none;text-align:center;padding:40px 20px}
+.success-state.show{display:block}
+.success-icon{font-size:3rem;margin-bottom:16px}
+.success-state h2{font-family:"Fraunces",serif;font-size:1.8rem;font-weight:900;margin-bottom:12px;color:var(--dark)}
+.success-state p{color:var(--mid);font-size:1rem;line-height:1.6}
+.error-msg{display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:14px;text-align:center;color:#dc2626;font-size:14px;margin-bottom:12px}
+.error-msg.show{display:block}
 .features{background:#fff;border-top:1px solid rgba(232,119,34,0.1);padding:64px 5%;text-align:center}
 .features h2{font-family:"Fraunces",serif;font-size:1.7rem;font-weight:900;margin-bottom:40px}
 .feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;max-width:900px;margin:0 auto}
@@ -44,9 +55,10 @@ input::placeholder{color:#BBA080}
 .feat-icon{font-size:1.8rem;margin-bottom:12px}
 .feat-card h3{font-size:.95rem;font-weight:700;margin-bottom:8px}
 .feat-card p{font-size:14px;color:var(--mid);line-height:1.6}
-footer{background:var(--dark);color:rgba(255,248,240,0.6);text-align:center;padding:28px;font-size:13px}
-footer a{color:var(--primary);text-decoration:none}
-@media(max-width:520px){.form-row{flex-direction:column}.trust{flex-direction:column;gap:12px}}
+footer{background:#0d0d0d;border-top:1px solid #2a2a2a;padding:32px 24px;text-align:center;margin-top:48px}
+footer a{color:#E87722;text-decoration:none}
+@media(max-width:520px){.form-row{flex-direction:column}.trust{flex-direction:column;gap:12px}.nav-links{gap:14px}.nav-links a{font-size:13px}}
+@media(max-width:380px){.nav-links{display:none}}
 </style>
 </head>
 <body>
@@ -68,25 +80,34 @@ footer a{color:var(--primary);text-decoration:none}
     <div class="badge">Early Access</div>
     <h1>Be the first to <span>snap, know and eat smarter</span></h1>
     <p class="sub">Calalloo is launching soon. Drop your email and we will let you know the moment it is live.</p>
-    <div class="form-wrap">
-      <form onsubmit="handleSubmit(event)">
+    <div class="form-wrap" id="formWrap">
+      <div class="error-msg" id="errorMsg">Something went wrong. Please try again.</div>
+      <form id="waitlistForm">
+        <input type="hidden" name="access_key" value="REPLACE_WITH_WEB3FORMS_KEY">
+        <input type="hidden" name="subject" value="New Calalloo Waitlist Signup">
+        <input type="hidden" name="from_name" value="Calalloo Waitlist">
         <div class="form-row">
-          <input type="text" placeholder="First name" required>
-          <input type="text" placeholder="Last name">
+          <input type="text" name="first_name" placeholder="First name" required>
+          <input type="text" name="last_name" placeholder="Last name">
         </div>
-        <input type="email" placeholder="Email address" required>
-        <select>
+        <input type="email" name="email" placeholder="Email address" required>
+        <select name="cook_type">
           <option value="" disabled selected>How do you cook most often?</option>
-          <option>Home cook - everyday meals</option>
-          <option>Fitness-focused - tracking macros</option>
-          <option>Busy parent - quick family meals</option>
-          <option>Food enthusiast - trying new dishes</option>
-          <option>Professional chef or caterer</option>
+          <option value="home-cook">Home cook - everyday meals</option>
+          <option value="fitness">Fitness-focused - tracking macros</option>
+          <option value="busy-parent">Busy parent - quick family meals</option>
+          <option value="food-enthusiast">Food enthusiast - trying new dishes</option>
+          <option value="professional">Professional chef or caterer</option>
         </select>
-        <button type="submit" class="btn-submit">Join the Waitlist</button>
+        <button type="submit" class="btn-submit" id="submitBtn">Join the Waitlist</button>
       </form>
+      <div class="success-state" id="successState">
+        <div class="success-icon">&#127869;</div>
+        <h2>You are on the list!</h2>
+        <p>We will send you an email the moment Calalloo goes live. Keep an eye on your inbox.</p>
+      </div>
     </div>
-    <div class="trust">
+    <div class="trust" id="trustBar">
       <div><span>&#10003;</span> No spam, ever</div>
       <div><span>&#10003;</span> Early access guaranteed</div>
       <div><span>&#10003;</span> Free to use at launch</div>
@@ -102,13 +123,13 @@ footer a{color:var(--primary);text-decoration:none}
     <div class="feat-card"><div class="feat-icon">&#127909;</div><h3>Step-by-step videos</h3><p>Every recipe has a how-to video built in. No switching apps, no searching - just cook.</p></div>
   </div>
 </section>
-<footer style="background:#0d0d0d;border-top:1px solid #2a2a2a;padding:32px 24px;text-align:center;margin-top:48px">
-  <a href="/calalloo/" class="nav-logo" style="display:inline-block;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="140" height="42">
+<footer>
+  <a href="/calalloo/" style="display:inline-block;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="140" height="42">
   <defs><linearGradient id="clg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#E87722"/><stop offset="100%" style="stop-color:#F5A623"/></linearGradient></defs>
   <text x="8" y="52" font-family="Georgia,serif" font-size="52" font-weight="700" fill="url(#clg)">Calalloo</text>
 </svg></a>
-  <p style="color:#888;font-size:0.82rem;margin:0">© 2026 Calalloo. A <a href="/prisca-dezigns/" style="color:#E87722">Prisca Dezigns</a> product.</p>
-  <div style="margin-top:12px;display:flex;gap:16px;justify-content:center;font-size:0.8rem">
+  <p style="color:#888;font-size:0.82rem;margin:0">&#169; 2026 Calalloo. A <a href="/prisca-dezigns/">Prisca Dezigns</a> product.</p>
+  <div style="margin-top:12px;display:flex;gap:16px;justify-content:center;font-size:0.8rem;flex-wrap:wrap">
     <a href="/calalloo/recipes/" style="color:#aaa">Recipes</a>
     <a href="/calalloo/blog/" style="color:#aaa">Blog</a>
     <a href="/calalloo/for-cooks/" style="color:#aaa">For Cooks</a>
@@ -117,13 +138,35 @@ footer a{color:var(--primary);text-decoration:none}
   </div>
 </footer>
 <script>
-function handleSubmit(e){
+document.getElementById("waitlistForm").addEventListener("submit", function(e){
   e.preventDefault();
-  var btn=e.target.querySelector(".btn-submit");
-  btn.textContent="You are on the list!";
-  btn.style.background="#2D8B4E";
-  btn.disabled=true;
-}
+  var btn = document.getElementById("submitBtn");
+  var errMsg = document.getElementById("errorMsg");
+  btn.textContent = "Joining...";
+  btn.disabled = true;
+  errMsg.classList.remove("show");
+  var data = new FormData(this);
+  fetch("https://api.web3forms.com/submit", {
+    method: "POST",
+    body: data
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.success){
+      document.getElementById("waitlistForm").style.display = "none";
+      document.getElementById("successState").classList.add("show");
+    } else {
+      btn.textContent = "Join the Waitlist";
+      btn.disabled = false;
+      errMsg.classList.add("show");
+    }
+  })
+  .catch(function(){
+    btn.textContent = "Join the Waitlist";
+    btn.disabled = false;
+    errMsg.classList.add("show");
+  });
+});
 </script>
 </body>
 </html>
