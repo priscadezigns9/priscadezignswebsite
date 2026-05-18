@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Search Recipes — Calalloo</title>
+<meta name="description" content="Search hundreds of Caribbean recipes. Filter by meal type, cook time, difficulty and more.">
+<link rel="manifest" href="/calalloo/manifest.json">
+<meta name="theme-color" content="#E87722">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Calalloo">
+<link rel="apple-touch-icon" href="/calalloo/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#E87722;--primary-light:#F5A623;--primary-dark:#B85A10;
+  --bg:#FFF8F0;--card:#FFFFFF;--text:#1A0D00;--muted:rgba(26,13,0,0.45);
+  --border:rgba(232,119,34,0.18);
+}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--text);padding-bottom:84px;min-height:100vh}
+
+/* ─── TOP SEARCH BAR ─── */
+.search-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,248,240,0.97);backdrop-filter:blur(14px);
+  padding:12px 16px 8px;
+  border-bottom:1px solid var(--border);
+}
+.search-row{display:flex;align-items:center;gap:10px}
+.back-btn{width:38px;height:38px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text);flex-shrink:0;font-size:18px}
+.search-wrap{flex:1;position:relative}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;opacity:.45;pointer-events:none}
+.search-input{
+  width:100%;background:#fff;border:1.5px solid var(--border);border-radius:50px;
+  padding:10px 40px 10px 40px;font-size:.95rem;color:var(--text);
+  outline:none;transition:border .2s;font-family:inherit;
+}
+.search-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(232,119,34,0.1)}
+.search-clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);display:none;padding:2px}
+
+/* ─── FILTER CHIPS ─── */
+.filter-scroll{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none}
+.filter-scroll::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:7px 16px;border-radius:50px;border:1.5px solid var(--border);background:var(--card);color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* ─── POPULAR SEARCHES ─── */
+.section-head{padding:20px 16px 10px;font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.popular-grid{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 4px}
+.popular-tag{padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:50px;font-size:.82rem;font-weight:600;color:var(--text);cursor:pointer;transition:all .15s}
+.popular-tag:active{background:rgba(232,119,34,0.12);border-color:var(--primary)}
+
+/* ─── CATEGORY CARDS (horizontal scroll) ─── */
+.cat-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-card{
+  flex-shrink:0;width:110px;height:100px;border-radius:18px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  font-size:1.8rem;font-weight:700;cursor:pointer;border:1.5px solid transparent;
+  transition:all .2s;position:relative;overflow:hidden;
+}
+.cat-card span{font-size:.72rem;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.4);text-align:center;line-height:1.2}
+.cat-card.active{border-color:#fff;box-shadow:0 0 0 2px var(--primary)}
+
+/* ─── RESULTS GRID ─── */
+.results-count{padding:12px 16px 8px;font-size:.8rem;color:var(--muted);font-weight:600}
+.results-grid{
+  padding:0 12px;
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+}
+@media(min-width:540px){.results-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ─── RECIPE CARD ─── */
+.r-card{
+  border-radius:16px;overflow:hidden;background:var(--card);
+  border:1px solid var(--border);cursor:pointer;
+  text-decoration:none;color:inherit;display:block;
+  transition:transform .2s,box-shadow .2s;
+}
+.r-card:active{transform:scale(.98)}
+.r-card-img{
+  width:100%;aspect-ratio:4/3;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#E87722,#F5A623);
+  display:flex;align-items:center;justify-content:center;font-size:2.8rem;
+}
+.r-card-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.r-card:hover .r-card-img img{transform:scale(1.05)}
+.r-cat-badge{position:absolute;top:6px;left:6px;background:rgba(0,0,0,0.52);backdrop-filter:blur(6px);color:#fff;font-size:.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:20px}
+.r-save{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.r-save.saved{background:var(--primary);color:#fff}
+.r-body{padding:10px 10px 12px}
+.r-title{font-weight:700;font-size:.85rem;line-height:1.3;margin-bottom:5px;color:var(--text)}
+.r-meta{display:flex;align-items:center;gap:5px;font-size:.7rem;color:var(--muted);flex-wrap:wrap}
+.r-rating{color:var(--primary);font-weight:700}
+
+/* ─── EMPTY / NO RESULTS ─── */
+.no-results{text-align:center;padding:60px 20px}
+.no-results .icon{font-size:3.5rem;margin-bottom:14px}
+.no-results h3{font-family:"Fraunces",serif;font-size:1.3rem;font-weight:900;color:var(--text);margin-bottom:8px}
+.no-results p{font-size:.88rem;color:var(--muted);line-height:1.6}
+
+/* ─── SKELETON ─── */
+.skel-card{border-radius:16px;overflow:hidden;background:var(--card);border:1px solid var(--border)}
+.skel-img{width:100%;aspect-ratio:4/3;background:linear-gradient(90deg,#f0e8dc 25%,#ffe8cc 50%,#f0e8dc 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+.skel-body{padding:10px}
+.skel-line{height:11px;border-radius:6px;background:linear-gradient(90deg,#f0e8dc 25%,#ffe8cc 50%,#f0e8dc 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;margin-bottom:7px}
+.skel-line.s{width:60%}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(255,255,255,0.97);backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+  display:flex;z-index:200;
+  box-shadow:0 -4px 20px rgba(232,119,34,0.07);
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 0 8px;min-height:58px;text-decoration:none;
+  color:var(--muted);font-size:.62rem;font-weight:600;gap:3px;
+  border:none;background:none;font-family:inherit;cursor:pointer;
+  transition:color .2s;
+}
+.bnav-item.active{color:var(--primary)}
+.bnav-icon{font-size:1.3rem;line-height:1}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1A0D00;color:#fff;padding:10px 22px;border-radius:50px;
+  font-size:.82rem;font-weight:600;opacity:0;transition:all .3s;
+  pointer-events:none;z-index:9999;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- SEARCH HEADER -->
+<div class="search-header">
+  <div class="search-row">
+    <a href="/calalloo/feed/" class="back-btn" aria-label="Back">←</a>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        class="search-input"
+        id="searchInput"
+        type="search"
+        placeholder="Search recipes, ingredients…"
+        autocomplete="off"
+        inputmode="search"
+        autofocus
+      >
+      <button class="search-clear" id="searchClear" aria-label="Clear">✕</button>
+    </div>
+  </div>
+
+  <!-- FILTER CHIPS -->
+  <div class="filter-scroll" id="filterScroll">
+    <div class="chip active" data-filter="all">All</div>
+    <div class="chip" data-filter="breakfast">🍳 Breakfast</div>
+    <div class="chip" data-filter="mains">🍽 Mains</div>
+    <div class="chip" data-filter="soups">🍲 Soups</div>
+    <div class="chip" data-filter="snacks">🥜 Snacks</div>
+    <div class="chip" data-filter="bread">🫓 Bread</div>
+    <div class="chip" data-filter="desserts">🍰 Desserts</div>
+    <div class="chip" data-filter="drinks">🥤 Drinks</div>
+    <div class="chip" data-filter="condiments">🫙 Condiments</div>
+    <div class="chip" data-filter="quick">⚡ Under 30 min</div>
+    <div class="chip" data-filter="easy">✅ Easy</div>
+  </div>
+</div>
+
+<!-- DEFAULT STATE: Popular + Categories (shown when no search) -->
+<div id="defaultState">
+  <div class="section-head">Popular searches</div>
+  <div class="popular-grid" id="popularGrid">
+    <div class="popular-tag">Doubles</div>
+    <div class="popular-tag">Pelau</div>
+    <div class="popular-tag">Roti</div>
+    <div class="popular-tag">Corn Soup</div>
+    <div class="popular-tag">Callaloo Soup</div>
+    <div class="popular-tag">Chicken Curry</div>
+    <div class="popular-tag">Fried Bake</div>
+    <div class="popular-tag">Ponche de Creme</div>
+    <div class="popular-tag">Black Cake</div>
+    <div class="popular-tag">Shark & Bake</div>
+    <div class="popular-tag">Macaroni Pie</div>
+    <div class="popular-tag">Buss Up Shut</div>
+  </div>
+
+  <div class="section-head">Browse by category</div>
+  <div class="cat-scroll">
+    <div class="cat-card" data-cat="mains" style="background:linear-gradient(135deg,#C45A00,#E87722)">🍽<span>Mains</span></div>
+    <div class="cat-card" data-cat="breakfast" style="background:linear-gradient(135deg,#B85A10,#F5A623)">🍳<span>Breakfast</span></div>
+    <div class="cat-card" data-cat="soups" style="background:linear-gradient(135deg,#007A3D,#00C47A)">🍲<span>Soups</span></div>
+    <div class="cat-card" data-cat="snacks" style="background:linear-gradient(135deg,#C17900,#FFD166)">🥜<span>Snacks</span></div>
+    <div class="cat-card" data-cat="bread" style="background:linear-gradient(135deg,#8B4A1E,#D4872C)">🫓<span>Bread</span></div>
+    <div class="cat-card" data-cat="desserts" style="background:linear-gradient(135deg,#9C2742,#E87393)">🍰<span>Desserts</span></div>
+    <div class="cat-card" data-cat="drinks" style="background:linear-gradient(135deg,#1A6B8A,#0EA5E9)">🥤<span>Drinks</span></div>
+    <div class="cat-card" data-cat="condiments" style="background:linear-gradient(135deg,#7A3B00,#D4660A)">🫙<span>Sauces</span></div>
+  </div>
+
+  <div class="section-head">Trending now</div>
+  <div class="results-grid" id="trendingGrid">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- RESULTS STATE: shown when searching or filtering -->
+<div id="resultsState" style="display:none">
+  <div class="results-count" id="resultsCount"></div>
+  <div class="results-grid" id="resultsGrid"></div>
+  <div class="no-results" id="noResults" style="display:none">
+    <div class="icon">🔍</div>
+    <h3>No recipes found</h3>
+    <p>Try a different search or browse a category above.</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a href="/calalloo/feed/" class="bnav-item"><span class="bnav-icon">🏠</span>Feed</a>
+  <a href="/calalloo/recipes/" class="bnav-item"><span class="bnav-icon">📖</span>Recipes</a>
+  <a href="/calalloo/search/" class="bnav-item active"><span class="bnav-icon">🔍</span>Search</a>
+  <a href="/calalloo/log/" class="bnav-item"><span class="bnav-icon">📊</span>Log</a>
+  <a href="/calalloo/profile/" class="bnav-item"><span class="bnav-icon">👤</span>Me</a>
+</nav>
+
+<script src="/calalloo/recipe-data.js"></script>
+<script src="/calalloo/recipe-data-2.js"></script>
+<script>
+// ── RECIPE CARD RENDERER ──────────────────────────────────────────────────
+var SAVED = new Set(JSON.parse(localStorage.getItem('calalloo_saved')||'[]'));
+
+function saveRecipe(slug, btn) {
+  if (SAVED.has(slug)) { SAVED.delete(slug); btn.textContent='🤍'; btn.classList.remove('saved'); }
+  else { SAVED.add(slug); btn.textContent='❤️'; btn.classList.add('saved'); }
+  localStorage.setItem('calalloo_saved', JSON.stringify([...SAVED]));
+  showToast(SAVED.has(slug) ? 'Saved! ❤️' : 'Removed');
+  event.preventDefault(); event.stopPropagation();
+}
+
+function cardHTML(slug, r) {
+  var saved = SAVED.has(slug);
+  var imgTag = r.cover_photo_url
+    ? '<img src="'+r.cover_photo_url+'" alt="'+r.name+'" loading="lazy" onerror="this.style.display=\'none\'">'
+    : '';
+  return '<a href="/calalloo/recipe/?r='+slug+'" class="r-card">'
+    + '<div class="r-card-img">'+r.emoji+(imgTag||'')
+    + '<div class="r-cat-badge">'+(r.badge||'')+'</div>'
+    + '<button class="r-save'+(saved?' saved':'')+'" onclick="saveRecipe(\''+slug+'\',this)" aria-label="Save">'+(saved?'❤️':'🤍')+'</button>'
+    + '</div>'
+    + '<div class="r-body">'
+    + '<div class="r-title">'+r.name+'</div>'
+    + '<div class="r-meta"><span class="r-rating">★ '+(r.rating||'4.8')+'</span><span>·</span><span>'+(r.time||'–')+'</span><span>·</span><span>'+(r.difficulty||'')+'</span></div>'
+    + '</div></a>';
+}
+
+// ── DATA ─────────────────────────────────────────────────────────────────
+var ALL_RECIPES = typeof RECIPE_DATA !== 'undefined' ? RECIPE_DATA : {};
+// Merge RECIPE_DATA_2 if present
+if (typeof RECIPE_DATA_2 !== 'undefined') {
+  Object.assign(ALL_RECIPES, RECIPE_DATA_2);
+}
+var SLUGS = Object.keys(ALL_RECIPES);
+
+// Category mapping
+var CAT_MAP = {
+  mains:       ['mains','main','pelau','stewed','curry','geera','oildown','stew'],
+  breakfast:   ['breakfast','buljol','bake'],
+  soups:       ['soup','soups','corn soup','callaloo soup'],
+  snacks:      ['snacks','snack','pholourie','doubles','street food'],
+  bread:       ['bread','roti','buss up shut','dhalpuri','bara','fried bake'],
+  desserts:    ['desserts','dessert','cake','kurma','coconut sweet','black cake'],
+  drinks:      ['drinks','drink','sorrel','ponche','juice'],
+  condiments:  ['condiments','sauce','pepper','shadow beni'],
+};
+
+function matchesCat(r, cat) {
+  if (!cat || cat === 'all') return true;
+  if (cat === 'quick') return (parseInt((r.time||'99'),10) < 35);
+  if (cat === 'easy') return (r.difficulty||'').toLowerCase() === 'easy';
+  var kws = CAT_MAP[cat] || [cat];
+  var searchStr = ((r.badge||'')+(r.name||'')+(r.description||'')).toLowerCase();
+  return kws.some(function(k){return searchStr.indexOf(k)!==-1;});
+}
+
+function filterRecipes(query, cat) {
+  var q = (query||'').toLowerCase().trim();
+  return SLUGS.filter(function(slug){
+    var r = ALL_RECIPES[slug];
+    var haystack = (r.name+' '+(r.badge||'')+' '+(r.description||'')+' '+(r.ingredients||[]).join(' ')).toLowerCase();
+    var matchQ = !q || haystack.indexOf(q) !== -1;
+    var matchC = matchesCat(r, cat);
+    return matchQ && matchC;
+  });
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────
+var _activeFilter = 'all';
+var _activeSearch = '';
+
+function renderResults(slugList) {
+  var grid = document.getElementById('resultsGrid');
+  var noRes = document.getElementById('noResults');
+  var count = document.getElementById('resultsCount');
+  if (!slugList.length) {
+    grid.innerHTML=''; noRes.style.display='block';
+    count.textContent='';
+    return;
+  }
+  noRes.style.display='none';
+  count.textContent = slugList.length + ' recipe' + (slugList.length!==1?'s':'') + ' found';
+  grid.innerHTML = slugList.map(function(s){return cardHTML(s,ALL_RECIPES[s]);}).join('');
+}
+
+function renderTrending() {
+  // Show first 6 recipes as "trending"
+  var trending = SLUGS.slice(0,6);
+  var grid = document.getElementById('trendingGrid');
+  if (grid) grid.innerHTML = trending.map(function(s){return cardHTML(s,ALL_RECIPES[s]);}).join('');
+}
+
+function doSearch() {
+  var q = _activeSearch.trim();
+  var cat = _activeFilter;
+  var showResults = q || cat !== 'all';
+  document.getElementById('defaultState').style.display = showResults ? 'none' : '';
+  document.getElementById('resultsState').style.display = showResults ? '' : 'none';
+  if (showResults) {
+    renderResults(filterRecipes(q, cat));
+  }
+}
+
+// ── POPULAR TAG CLICK ─────────────────────────────────────────────────────
+document.getElementById('popularGrid').addEventListener('click', function(e){
+  var tag = e.target.closest('.popular-tag');
+  if (!tag) return;
+  var inp = document.getElementById('searchInput');
+  inp.value = tag.textContent.trim();
+  _activeSearch = inp.value;
+  document.getElementById('searchClear').style.display = 'block';
+  doSearch();
+});
+
+// ── CATEGORY CARD CLICK ───────────────────────────────────────────────────
+document.querySelector('.cat-scroll').addEventListener('click', function(e){
+  var card = e.target.closest('.cat-card');
+  if (!card) return;
+  _activeFilter = card.dataset.cat;
+  _activeSearch = '';
+  document.getElementById('searchInput').value = '';
+  // update chips
+  document.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('active', c.dataset.filter===_activeFilter)});
+  doSearch();
+});
+
+// ── SEARCH INPUT ──────────────────────────────────────────────────────────
+var _debounce;
+document.getElementById('searchInput').addEventListener('input', function(){
+  _activeSearch = this.value;
+  document.getElementById('searchClear').style.display = this.value ? 'block' : 'none';
+  clearTimeout(_debounce);
+  _debounce = setTimeout(doSearch, 200);
+});
+document.getElementById('searchClear').addEventListener('click', function(){
+  var inp = document.getElementById('searchInput');
+  inp.value = ''; _activeSearch = '';
+  this.style.display = 'none';
+  doSearch();
+  inp.focus();
+});
+
+// ── FILTER CHIPS ──────────────────────────────────────────────────────────
+document.getElementById('filterScroll').addEventListener('click', function(e){
+  var chip = e.target.closest('.chip');
+  if (!chip) return;
+  _activeFilter = chip.dataset.filter;
+  document.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('active', c===chip)});
+  doSearch();
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2000);
+}
+
+// ── URL PARAM PRE-FILL ────────────────────────────────────────────────────
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  var q = p.get('q'); var cat = p.get('cat');
+  if (q) { document.getElementById('searchInput').value=q; _activeSearch=q; document.getElementById('searchClear').style.display='block'; }
+  if (cat) { _activeFilter=cat; document.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('active',c.dataset.filter===cat)});}
+  renderTrending();
+  doSearch();
+})();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/calalloo/sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>
