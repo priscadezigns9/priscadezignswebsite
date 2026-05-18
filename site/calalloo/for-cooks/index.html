@@ -521,10 +521,14 @@
           <label>Instagram or website (optional)</label>
           <input type="text" placeholder="@yourusername or https://..."/>
         </div>
+        <div id="formError" style="display:none;color:#e55;font-size:13px;margin-bottom:10px;padding:10px;background:rgba(229,85,85,0.1);border-radius:8px;"></div>
         <button class="form-submit" type="button" onclick="submitForm()">Submit Application →</button>
         <p class="form-note">We review every application personally. You'll hear back within 3–5 business days.</p>
       </div>
-      <div class="success-msg" id="successMsg">
+      <div class="success-msg" id="successMsg" style="display:none;text-align:center;padding:48px 24px;">
+        <div style="font-size:3rem;margin-bottom:16px">&#127869;</div>
+        <h3 style="font-size:1.5rem;margin-bottom:12px;color:#22c55e;">Application received!</h3>
+        <p style="color:var(--muted);line-height:1.7;">Thank you for applying to join the Calalloo cook community. We review every application personally and will be in touch within 3 to 5 business days.</p>
         <div class="tick">🎉</div>
         <h3>Application received!</h3>
         <p>We'll review your application and get back to you within 3–5 business days. Welcome to the Calalloo family.</p>
@@ -561,8 +565,46 @@
 
 <script>
   function submitForm() {
-    document.getElementById('formContent').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
+    var btn = document.querySelector('.form-submit');
+    var errEl = document.getElementById('formError');
+    if(errEl) errEl.style.display = 'none';
+
+    // Gather field values
+    var inputs = document.querySelectorAll('#formContent input, #formContent select, #formContent textarea');
+    var fields = ['full_name','email','cook_type','cuisines','bio','social'];
+    var payload = {};
+    inputs.forEach(function(el, i){ payload[fields[i] || ('field_'+i)] = el.value; });
+
+    // Basic validation
+    if(!payload.full_name || !payload.email || !payload.bio){
+      if(errEl) { errEl.textContent = 'Please fill in all required fields.'; errEl.style.display = 'block'; }
+      return;
+    }
+
+    btn.textContent = 'Submitting...';
+    btn.disabled = true;
+
+    fetch('https://formspree.io/f/xwvzkyzb', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(Object.assign(payload, { _subject: 'New Calalloo Cook Application' }))
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.ok){
+        document.getElementById('formContent').style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      } else {
+        btn.textContent = 'Submit Application →';
+        btn.disabled = false;
+        if(errEl){ errEl.textContent = 'Something went wrong. Please try again.'; errEl.style.display = 'block'; }
+      }
+    })
+    .catch(function(){
+      btn.textContent = 'Submit Application →';
+      btn.disabled = false;
+      if(errEl){ errEl.textContent = 'Something went wrong. Please try again.'; errEl.style.display = 'block'; }
+    });
   }
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver(entries => {
