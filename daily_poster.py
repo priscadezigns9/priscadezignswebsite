@@ -788,33 +788,92 @@ def post_reel_to_instagram(ig_id, token, video_path, caption):
         return {"error": {"message": str(ex)}}
 
 
+
+
+def post_early_signal_to_ig(brand_name, image_url, caption):
+    """Post an early-signal / blog-announcement image directly to Instagram.
+    Used for pre-event and trend content where the image is a brand-generated
+    graphic (not an Amazon product photo).
+    Returns result dict with 'id' on success or 'error' on failure."""
+    try:
+        with open("ig_accounts.json") as f:
+            accounts = json.load(f)
+    except Exception as e:
+        return {"error": {"message": f"ig_accounts.json load failed: {e}"}}
+
+    ig_id = None
+    token = None
+    for name, info in accounts.items():
+        if isinstance(info, dict) and (
+            name.lower() == brand_name.lower() or
+            brand_name.lower() in name.lower() or
+            name.lower() in brand_name.lower()
+        ):
+            ig_id = info.get("ig_id")
+            token = info.get("token")
+            break
+
+    if not ig_id or not token:
+        return {"error": {"message": f"No IG account found for brand: {brand_name}"}}
+
+    return post_to_instagram(ig_id, token, caption, image_url)
+
+
+def post_early_signal_all_brands(posts):
+    """Post a list of early-signal items to IG for multiple brands at once.
+    posts = [{"brand": str, "image_url": str, "caption": str}, ...]
+    Returns list of result strings."""
+    results = []
+    for p in posts:
+        brand = p.get("brand", "")
+        image_url = p.get("image_url", "")
+        caption = p.get("caption", "")
+        if not all([brand, image_url, caption]):
+            results.append(f"⏭️ {brand} — missing required fields")
+            continue
+        r = post_early_signal_to_ig(brand, image_url, caption)
+        ok = "id" in r
+        results.append(f"{'✅' if ok else '❌'} {brand} | IG={'posted: '+r['id'] if ok else str(r.get('error','?'))[:80]}")
+    return results
+
 def find_ig_safe_image(brand_name, preferred_url):
-    """Return the real product image for this brand (day-rotated from niche_products.json).
-    Falls back to preferred_url only if no scraped products exist.
-    Zero Picsum, zero stock photos — always niche-specific real product images.
-    GUARD: never use a non-Amazon image for affiliate/niche brands."""
-    # Always try to get a real product image first
+    """Return the best image for IG posting for this brand.
+    Priority order:
+    1. Real Amazon product image from niche_products_photos.json (day-rotated)
+    2. preferred_url if it's Amazon CDN
+    3. preferred_url if it's a Google Drive direct-download URL (brand-generated images)
+    4. preferred_url if it's any other publicly accessible image
+    GUARD: never use Picsum, placeholder, or broken URLs."""
+    TRUSTED_DOMAINS = [
+        "amazon.com", "media-amazon.com",  # affiliate product images
+        "lh3.googleusercontent.com", "drive.google.com",  # Drive-hosted brand images
+        "googleapis.com",                  # GCS hosted images
+        "priscadezigns.org",               # own CDN
+    ]
+    BLOCKED_DOMAINS = ["picsum", "placeholder", "via.placeholder", "lorempixel"]
+
+    # 1. Always try real product image first
     product = get_product_for_brand(brand_name)
     if product and product.get("image"):
         img = product["image"]
-        # Hard guard: must be an Amazon image for niche brands
         if "amazon.com" in img or "media-amazon" in img:
             return img
 
-    # Fall back to preferred_url only if it's a real Amazon product image
+    # 2–4. Evaluate preferred_url
     if preferred_url and preferred_url.startswith("http"):
-        # HARD GUARD: only allow Amazon product images for niche pages
+        # Block known placeholder domains
+        if any(b in preferred_url for b in BLOCKED_DOMAINS):
+            print(f"[GUARD] Blocked placeholder image for {brand_name}: {preferred_url[:60]}")
+            return ""
+        # Accept Amazon CDN directly
         if "amazon.com" in preferred_url or "media-amazon" in preferred_url:
-            try:
-                ratio = get_image_ratio(preferred_url)
-                if ratio and 0.5 <= ratio <= 1.91:
-                    return preferred_url
-            except Exception:
-                pass
             return preferred_url
-        # Non-Amazon URLs are blocked for niche/affiliate brands
-        print(f"[GUARD] Blocked non-Amazon image for {brand_name}: {preferred_url[:60]}")
-        return ""
+        # Accept trusted brand/Drive domains
+        if any(d in preferred_url for d in TRUSTED_DOMAINS):
+            return preferred_url
+        # Accept any other public URL — IG will validate aspect ratio server-side
+        # (avoids blocking brand-generated images uploaded to Drive or hosted externally)
+        return preferred_url
 
     return ""
 
