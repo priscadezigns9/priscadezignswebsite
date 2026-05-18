@@ -6,6 +6,37 @@ Schedule: 8AM, 11AM, 2PM, 7PM AST
 import json, sys, random, urllib.request, urllib.parse, urllib.error, re, os
 from datetime import datetime
 
+
+# ── APPROVAL GATE ─────────────────────────────────────────────────────────────
+# Photo posts require Prisca's approval via approved_images.json before posting.
+# Format: {"Brand Name": {"date": "YYYY-MM-DD", "approved": true, "image_url": "...", "drive_url": "..."}}
+APPROVED_IMAGES_FILE = "approved_images.json"
+
+def load_approved_images():
+    from datetime import date
+    today = date.today().isoformat()
+    try:
+        with open(APPROVED_IMAGES_FILE) as f:
+            data = json.load(f)
+    except Exception:
+        return {}
+    approved = {}
+    for brand, info in data.items():
+        if isinstance(info, dict) and info.get("date") == today and info.get("approved"):
+            approved[brand] = info.get("image_url", "")
+    return approved
+
+def is_photo_approved(brand_name):
+    approved = load_approved_images()
+    if brand_name in approved:
+        return True, approved[brand_name]
+    for k, v in approved.items():
+        if k.strip().lower() == brand_name.strip().lower():
+            return True, v
+    return False, ""
+
+# ── END APPROVAL GATE ─────────────────────────────────────────────────────────
+
 RATE = 6.80
 
 # Brand name → site slug mapping  (must match keys in BRANDS exactly)
@@ -935,6 +966,12 @@ def run_post(brand_name, post_type):
         result = post_to_facebook(page_id, token, tip_text)
 
     elif post_type == "photo":
+        # APPROVAL GATE
+        _approved, _approved_url = is_photo_approved(brand_name)
+        if not _approved:
+            return f"SKIP {brand_name} [photo] — no approved image for today"
+        if _approved_url and _approved_url.startswith("http"):
+            photo_url = _approved_url
         # photo_url already set above from the real product image
         # DREAMING ANIME — override: try video first, then anime merch product image
         if "dreaming" in brand_name.lower() or "anime" in brand_name.lower():
