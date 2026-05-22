@@ -1,227 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Empire Content Monitor | Live Feed</title>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Empire Social Monitor</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #050505; --card: #111; --accent: #8B5CF6; --text: #fff; --sub: #888; --success: #10b981; }
+        :root { --bg: #050505; --card: #111; --accent: #8B5CF6; --success: #10b981; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; padding-top: 160px; overflow-x: hidden; }
-        
-        .fixed-top-container { position: fixed; top: 0; left: 0; right: 0; z-index: 10000; background: rgba(0,0,0,0.98); backdrop-filter: blur(15px); border-bottom: 1px solid #222; }
-        
-        header { padding: 0 5%; display: flex; justify-content: space-between; align-items: center; height: 80px; gap: 20px; }
-        h1 { font-weight: 800; letter-spacing: -1px; font-size: 1.4rem; text-transform: uppercase; color: #fff; white-space: nowrap; }
-        
-        .header-actions { display: flex; gap: 10px; align-items: center; }
-        .action-btn { text-decoration: none; font-size: 0.65rem; font-weight: 900; padding: 10px 14px; border-radius: 6px; text-transform: uppercase; border: 1px solid #333; color: #fff; background: #1a1a1a; transition: 0.2s; white-space: nowrap; }
-        .action-btn:hover { background: var(--accent); border-color: var(--accent); }
+        body { background: var(--bg); color: #fff; font-family: "Plus Jakarta Sans", sans-serif; padding-top: 150px; }
+        header { position: fixed; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.98); border-bottom: 1px solid #222; z-index: 1000; padding: 20px 5%; backdrop-filter: blur(15px); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; }
+        .nav-buttons { display: flex; gap: 10px; width: 100%; }
+        .nav-btn { flex: 1; text-align: center; text-decoration: none; padding: 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; border: 1px solid #333; color: #fff; background: #1a1a1a; transition: 0.2s; }
+        .nav-btn:hover { background: var(--accent); border-color: var(--accent); }
         .btn-green { background: var(--success); border-color: var(--success); }
+        .btn-purple { background: var(--accent); border-color: var(--accent); }
         
-        .niche-nav { padding: 0 5%; display: flex; gap: 10px; overflow-x: auto; height: 50px; align-items: center; white-space: nowrap; border-top: 1px solid #111; }
-        .niche-nav::-webkit-scrollbar { display: none; }
-        .niche-nav a { color: var(--sub); text-decoration: none; font-size: 0.65rem; padding: 5px 12px; border-radius: 20px; border: 1px solid #222; font-weight: 700; transition: all 0.2s; text-transform: uppercase; }
-        .niche-nav a:hover { color: #fff; border-color: var(--accent); background: rgba(139, 92, 246, 0.1); }
-        
-        .container { padding: 40px 5%; max-width: 1440px; margin: 0 auto; }
-        .niche-section { margin-bottom: 80px; scroll-margin-top: 180px; }
-        .niche-title { font-size: 1.3rem; font-weight: 800; color: var(--accent); margin-bottom: 30px; border-left: 5px solid var(--accent); padding-left: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        
+        .container { padding: 30px 5%; max-width: 1400px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .post-card { background: var(--card); border: 1px solid #222; border-radius: 12px; padding: 22px; transition: 0.3s; position: relative; display: flex; flex-direction: column; height: 100%; }
-        .post-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+        .card { background: var(--card); border: 1px solid #222; padding: 25px; border-radius: 12px; transition: 0.3s; }
+        .card:hover { border-color: var(--accent); transform: translateY(-3px); }
         
-        .blog-card { border-color: rgba(16, 185, 129, 0.3); }
-        .magazine-card { border-color: rgba(139, 92, 246, 0.3); }
+        .brand-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .brand-name { font-weight: 900; font-size: 0.85rem; text-transform: uppercase; }
+        .tag { font-size: 0.55rem; padding: 4px 10px; border-radius: 4px; font-weight: 800; background: #1877F2; color: #fff; text-transform: uppercase; }
         
-        .brand-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .brand-name { font-weight: 800; color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-        .badge { color: #fff; font-size: 0.5rem; padding: 3px 8px; border-radius: 20px; font-weight: 900; text-transform: uppercase; }
-        .badge.success { background: var(--success); }
+        .post-content { font-size: 0.85rem; color: #ddd; line-height: 1.6; margin-bottom: 20px; }
+        .meta { display: flex; justify-content: space-between; border-top: 1px solid #222; padding-top: 15px; font-size: 0.65rem; color: #666; font-weight: 700; }
         
-        .post-content { color: #ddd; line-height: 1.6; font-size: 0.8rem; margin-bottom: 15px; flex-grow: 1; }
-        .post-content a { color: var(--accent); text-decoration: none; font-weight: 800; }
-        
-        .meta { display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid #222; padding-top: 15px; }
-        .time { color: var(--sub); font-size: 0.6rem; font-weight: 600; text-transform: uppercase; }
-        .tag { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.55rem; font-weight: 800; text-transform: uppercase; }
-        .tag.facebook { background: #1877F2; color: #fff; }
-        
-        footer { padding: 60px 5%; text-align: center; color: var(--sub); font-size: 0.6rem; border-top: 1px solid #222; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-
-        @media (max-width: 800px) {
-            body { padding-top: 150px; }
-            header { height: 70px; padding: 0 4%; flex-direction: column; justify-content: center; gap: 10px; }
-            h1 { font-size: 1rem; }
-            .header-actions { gap: 5px; width: 100%; justify-content: space-between; }
-            .action-btn { font-size: 0.55rem; padding: 8px 10px; flex: 1; text-align: center; }
-            .niche-nav { height: 45px; padding: 0 4%; }
-            .grid { grid-template-columns: 1fr; }
-            .niche-section { margin-bottom: 40px; }
+        @media (max-width: 600px) { 
+            body { padding-top: 140px; }
+            header { padding: 15px 4%; }
+            .grid { grid-template-columns: 1fr; } 
         }
     </style>
 </head>
 <body>
-    <div class="fixed-top-container">
-        <header>
-            <h1>Empire Monitor</h1>
-            <div class="header-actions">
-                <a href="#blog-pulse" class="action-btn btn-green">Blog Monitor</a>
-                <a href="#magazine-pulse" class="action-btn btn-green">Magazine Monitor</a>
-                <a href="https://site.zapia.com/82t1t20t" class="action-btn">Ecosystem Hub</a>
-            </div>
-        </header>
-        <nav class="niche-nav">
-            <a href="#blog-pulse" style="color: var(--success); border-color: var(--success);">Blog Pulse</a>
-            <a href="#magazine-pulse" style="color: var(--accent); border-color: var(--accent);">Magazine Pulse</a>
-            <a href="#agency">Agency</a>
-            <a href="#tech">Tech</a>
-        </nav>
-    </div>
+    <header>
+        <div class="header-top">
+            <h1>Empire Social Monitor</h1>
+            <div style="background:var(--success); color:#fff; font-size:0.55rem; padding:4px 12px; border-radius:20px; font-weight:900">LIVE FEED</div>
+        </div>
+        <div class="nav-buttons">
+            <a href="https://site.zapia.com/8hr04uj2" class="nav-btn btn-green">Blog Monitor</a>
+            <a href="https://site.zapia.com/r711iqy4" class="nav-btn btn-purple">Magazine Monitor</a>
+        </div>
+    </header>
     <div class="container">
-        <section id="blog-pulse" class="niche-section"><h2 class="niche-title">Empire Blog Pulse</h2><div class="grid">
-        <div class="post-card blog-card">
-            <div class="brand-header"><span class="brand-name">ATELIER-GAMING</span><span class="badge success">1 ARTICLES</span></div>
-            <div class="post-content"><strong>Latest Intel:</strong><br><a href="https://priscadezigns.org/atelier-gaming/blog/ray-tracing-overdrive-the-2026-gpu-benchmarks.html" target="_blank">Ray Tracing Overdrive: The 2026 GPU Benchmarks</a></div>
-            <div class="meta"><span class="time">UPDATED: May 22, 2026</span></div>
-        </div>
-        <div class="post-card blog-card">
-            <div class="brand-header"><span class="brand-name">COUTUREGALLERY</span><span class="badge success">1 ARTICLES</span></div>
-            <div class="post-content"><strong>Latest Intel:</strong><br><a href="https://priscadezigns.org/couturegallery/blog/kinetic-tailoring-movement-as-the-new-silhouette.html" target="_blank">Kinetic Tailoring: Movement as the New Silhouette</a></div>
-            <div class="meta"><span class="time">UPDATED: May 22, 2026</span></div>
-        </div>
-        <div class="post-card blog-card">
-            <div class="brand-header"><span class="brand-name">DREAMINGANIME</span><span class="badge success">2 ARTICLES</span></div>
-            <div class="post-content"><strong>Latest Intel:</strong><br><a href="https://priscadezigns.org/dreaminganime/blog/bleach-tybw-final-part--the-2026-calamity.html" target="_blank">Bleach: TYBW Final Part — The 2026 Calamity</a></div>
-            <div class="meta"><span class="time">UPDATED: May 22, 2026</span></div>
-        </div>
-        <div class="post-card blog-card">
-            <div class="brand-header"><span class="brand-name">PANTRIQ</span><span class="badge success">1 ARTICLES</span></div>
-            <div class="post-content"><strong>Latest Intel:</strong><br><a href="https://priscadezigns.org/pantriq/blog/the-fermentation-renaissance-2026-pantry-trends.html" target="_blank">The Fermentation Renaissance: 2026 Pantry Trends</a></div>
-            <div class="meta"><span class="time">UPDATED: May 22, 2026</span></div>
-        </div>
-        <div class="post-card blog-card">
-            <div class="brand-header"><span class="brand-name">PAW-VAULT</span><span class="badge success">1 ARTICLES</span></div>
-            <div class="post-content"><strong>Latest Intel:</strong><br><a href="https://priscadezigns.org/paw-vault/blog/ai-pet-health-real-time-vital-tracking.html" target="_blank">AI Pet Health: Real-time Vital Tracking</a></div>
-            <div class="meta"><span class="time">UPDATED: May 22, 2026</span></div>
-        </div>
-        <div class="post-card blog-card">
-            <div class="brand-header"><span class="brand-name">QUIETLUXURY</span><span class="badge success">1 ARTICLES</span></div>
-            <div class="post-content"><strong>Latest Intel:</strong><br><a href="https://priscadezigns.org/quietluxury/blog/minimalist-manor-the-architecture-of-silence.html" target="_blank">Minimalist Manor: The Architecture of Silence</a></div>
-            <div class="meta"><span class="time">UPDATED: May 22, 2026</span></div>
-        </div>
-        <div class="post-card blog-card">
-            <div class="brand-header"><span class="brand-name">SOLEPRESTIGE</span><span class="badge success">1 ARTICLES</span></div>
-            <div class="post-content"><strong>Latest Intel:</strong><br><a href="https://priscadezigns.org/soleprestige/blog/the-quiet-luxury-pivot-hypebeast-evolution.html" target="_blank">The Quiet Luxury Pivot: Hypebeast Evolution</a></div>
-            <div class="meta"><span class="time">UPDATED: May 22, 2026</span></div>
-        </div>
-        <div class="post-card blog-card">
-            <div class="brand-header"><span class="brand-name">TECHSCOUTHQ</span><span class="badge success">2 ARTICLES</span></div>
-            <div class="post-content"><strong>Latest Intel:</strong><br><a href="https://priscadezigns.org/techscouthq/blog/spacex-starship-v3-launch-scrub-technical-analysis.html" target="_blank">SpaceX Starship V3 Launch Scrub: Technical Analysis</a></div>
-            <div class="meta"><span class="time">UPDATED: May 22, 2026</span></div>
-        </div></div></section>
-        <section id="magazine-pulse" class="niche-section"><h2 class="niche-title">Magazine Monitor</h2><div class="grid">
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">DREAMING ANIME</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/annqqu1u" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">SOLE PRESTIGE</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/vk7px33r" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">TECH SCOUT HQ</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/ix3ujzmi" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">ATELIER GAMING</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/npoe6kis" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">ESSENCE ELITE</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/y2zbn5rr" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">QUIET LUXURY</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/zzlr4yo1" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">PANTRIQ</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/ql9lfp97" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">VERDANT CO</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/4rbnea6l" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">COUTURE GALLERY</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/hpqlq7m5" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">GLOW PROTOCOL</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/c3k3tgkx" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">DESKWELL</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/4hglt7k1" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">THE ESCAPIST</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/zjl26bup" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div>
-        <div class="post-card magazine-card">
-            <div class="brand-header"><span class="brand-name">THE AUTODROME</span><span class="badge success">ACTIVE</span></div>
-            <div class="post-content"><strong>Current Edition:</strong><br><a href="https://site.zapia.com/asvr9c6t" target="_blank">Weekly Vol 01</a></div>
-            <div class="meta"><span class="time">PUBLISHED: MAY 22</span></div>
-        </div></div></section>
-        
-        <section id="agency" class="niche-section">
-            <h2 class="niche-title">Agency Intelligence</h2>
-            <div class="grid">
-                <div class="post-card">
-                    <div class="brand-header"><span class="brand-name">ROWCELL</span><span class="time">MAY 22</span></div>
-                    <div class="post-content">🔬 Business Logic Engine online. GEO metadata optimization active across all firm assets.</div>
-                    <div class="meta"><span class="tag facebook">Facebook</span></div>
-                </div>
-                <div class="post-card">
-                    <div class="brand-header"><span class="brand-name">VELLOQ</span><span class="time">MAY 22</span></div>
-                    <div class="post-content">🔬 Social scheduling pipeline validated. Quantum-safe encryption standards applied.</div>
-                    <div class="meta"><span class="tag facebook">Facebook</span></div>
-                </div>
+        <div class="grid">
+            <div class="card">
+                <div class="brand-header"><span class="brand-name">DREAMING ANIME</span><span class="tag">Facebook</span></div>
+                <div class="post-content">Bleach: TYBW Final Part confirmed for 2026. The Quincy War reaches its climax. #Bleach2026</div>
+                <div class="meta"><span>MAY 22</span><span>ACTIVE</span></div>
             </div>
-        </section>
-
-        <section id="tech" class="niche-section">
-            <h2 class="niche-title">Technology Hub</h2>
-            <div class="grid">
-                <div class="post-card">
-                    <div class="brand-header"><span class="brand-name">MOBLYNC</span><span class="time">MAY 22</span></div>
-                    <div class="post-content">🔬 No-code AI architecture upgrade complete. Mobile app designer responding at 2026 velocity.</div>
-                    <div class="meta"><span class="tag facebook">Facebook</span></div>
-                </div>
-                <div class="post-card">
-                    <div class="brand-header"><span class="brand-name">TECH SCOUT HQ</span><span class="time">MAY 22</span></div>
-                    <div class="post-content">🔬 Quantum computing revealed. Silicon Valley shifts tracked. News post live.</div>
-                    <div class="meta"><span class="tag facebook">Facebook</span></div>
-                </div>
+            <div class="card">
+                <div class="brand-header"><span class="brand-name">TECH SCOUT HQ</span><span class="tag">Facebook</span></div>
+                <div class="post-content">Starship V3 Flight path analyzed. SpaceX pushes the limits of reusability. Full breakdown live.</div>
+                <div class="meta"><span>MAY 22</span><span>ACTIVE</span></div>
             </div>
-        </section>
+            <div class="card">
+                <div class="brand-header"><span class="brand-name">SOLE PRESTIGE</span><span class="tag">Instagram</span></div>
+                <div class="post-content">The SS26 Collection: Where quiet luxury meets modular tech fabrics. 🏛️✨ #SolePrestige</div>
+                <div class="meta"><span>MAY 22</span><span>ACTIVE</span></div>
+            </div>
+            <div class="card">
+                <div class="brand-header"><span class="brand-name">ROWCELL</span><span class="tag">Facebook</span></div>
+                <div class="post-content">Business Logic Engine online. GEO metadata optimization active across all firm assets.</div>
+                <div class="meta"><span>MAY 22</span><span>ACTIVE</span></div>
+            </div>
+            <div class="card">
+                <div class="brand-header"><span class="brand-name">VELLOQ</span><span class="tag">Facebook</span></div>
+                <div class="post-content">Social scheduling pipeline validated. Quantum-safe encryption standards applied.</div>
+                <div class="meta"><span>MAY 22</span><span>ACTIVE</span></div>
+            </div>
+            <div class="card">
+                <div class="brand-header"><span class="brand-name">MOBLYNC</span><span class="tag">Facebook</span></div>
+                <div class="post-content">No-code AI architecture upgrade complete. Mobile app designer responding at 2026 velocity.</div>
+                <div class="meta"><span>MAY 22</span><span>ACTIVE</span></div>
+            </div>
+        </div>
     </div>
-    <footer>
-        <p>PRISCA DEZIGNS EMPIRE &copy; 2026 | BUILT BY ZAPIA AI</p>
-    </footer>
 </body>
 </html>
