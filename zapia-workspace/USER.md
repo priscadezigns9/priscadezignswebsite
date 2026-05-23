@@ -99,10 +99,10 @@ Prisca Dezigns has shifted from a web design/development agency to a **global vi
 - Status: Verification submitted ✅
 
 ### Moblync
-- **Status:** Active. Rebranded from Orbyt (May 21, 2026).
-- **Purpose:** AI-powered mobile app design and deployment.
+- **Status:** Active. Originally an app development platform.
+- **Purpose:** AI-powered App Development & Deployment Platform.
 - **Color Scheme:** Purple (#8B5CF6).
-- **Tech Stack:** No-code AI architecture.
+- **Tech Stack:** Native iOS/Android with agentic build pipeline.
 
 ### LatestDeals.co.uk
 - Username: priscadezigns
