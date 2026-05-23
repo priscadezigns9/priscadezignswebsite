@@ -87,8 +87,8 @@ Add whatever helps you do your job. This is your cheat sheet.
 - **Sheet (Prisca Dezigns):** Prisca Dezigns — Income & Expense Tracker 2026
 - **Sheet ID (Prisca):** 1IaKo7XuLbx4op4RwaeHc0k7G2ezuTCgtLODwyJ85h1A
 - **Sheet (Seamrite Designs):** ✅ SEAMRITE TRACKER 2026 - FINAL OFFICIAL
-- **Sheet ID (Seamrite):** 1_ZdsPJ-rj6JRcQLJQoUZfpuvSNNLmceRrgaSWwzCjqs
-- **Link (Seamrite):** https://docs.google.com/spreadsheets/d/1vXWPVe5czQaQeHGMbAdLwzk-THfDHMk8emcU6v8PijM/edit
+- **Sheet ID (Seamrite):** 1BY_ZYN8xLezPP5uwG9-qO-2ACop7GXqOi-mQHfqqJ2k
+- **Link (Seamrite):** https://docs.google.com/spreadsheets/d/1BY_ZYN8xLezPP5uwG9-qO-2ACop7GXqOi-mQHfqqJ2k/edit
 - **Monitor:** Subscriptions + First Citizens, Scotiabank, Eastern Credit Union bank alerts
 - **Sources:** Gmail (priscillanarine@gmail.com) + Outlook
 - **Logging:** Append row via Sheets API on every Radar cycle
