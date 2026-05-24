@@ -106,3 +106,12 @@
   - ./dreaming-anime/shop/index.html
   - ./couture-gallery/shop/index.html
   - ./sole-prestige/shop/index.html
+
+## [2026-05-24 12:02] - Brand Standard Expansion
+- Added **Atelier Gaming** standard based on Alienware (Elite Gaming Frontier, high-fidelity rig visuals).
+- Updated BRAND_STANDARDS.md to include 10 major niches.
+
+## [2026-05-24] SHOP UPDATE — ESSENCE ELITE
+- Fixed top 5 broken images (YSL, Maison Margiela, Jo Malone, Viktor&Rolf, Armani).
+- Migrated assets to EMPIRE_AMAZON_PRODUCT_PHOTOS on Drive per Protocol 1.
+- Audited for GEO-optimized EU/UK shipping context.
