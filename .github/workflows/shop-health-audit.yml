@@ -1,0 +1,77 @@
+name: Empire Shop Health Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday at midnight
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run Audit Script
+        run: |
+          python3 -c "
+          import os, re, requests
+          
+          shops = []
+          for root, dirs, files in os.walk('.'):
+              if 'shop' in root and 'index.html' in files:
+                  shops.append(os.path.join(root, 'index.html'))
+          
+          broken_report = '# SHOP HEALTH REPORT\n\n'
+          has_broken = False
+          
+          for shop in shops:
+              print(f'Auditing: {shop}')
+              with open(shop, 'r') as f:
+                  content = f.read()
+              
+              # Match both m.media-amazon.com/images/I and images-na.ssl-images-amazon.com/images/I
+              imgs = re.findall(r'src=[\"\\'](https://[\w.-]*amazon\.com/images/I/[^\"\\' ]+)[\"\\']', content)
+              imgs += re.findall(r'src=[\"\\'](https://[\w.-]*amazon\.com/images/P/[^\"\\' ]+)[\"\\']', content)
+              
+              shop_broken = []
+              for img in set(imgs):
+                  try:
+                      r = requests.head(img, timeout=10)
+                      if int(r.headers.get('Content-Length', 0)) == 9:
+                          shop_broken.append(img)
+                  except:
+                      pass
+              
+              if shop_broken:
+                  has_broken = True
+                  broken_report += f'## {shop}\n'
+                  for b in shop_broken:
+                      broken_report += f'- [BROKEN] {b}\n'
+                  broken_report += '\n'
+          
+          if has_broken:
+              with open('SHOP_HEALTH.md', 'w') as f:
+                  f.write(broken_report)
+              print('Broken images found. Report written to SHOP_HEALTH.md')
+          else:
+              if os.path.exists('SHOP_HEALTH.md'):
+                  os.remove('SHOP_HEALTH.md')
+              print('All shops healthy.')
+          "
+      
+      - name: Commit and Push Report
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add SHOP_HEALTH.md || true
+          git commit -m "docs: Update Shop Health Report [skip ci]" || echo "No changes to commit"
+          git push
