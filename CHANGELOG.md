@@ -1,23 +1,12 @@
-# Prisca Dezigns Empire — Changelog
-
-## [Unreleased]
-
+## [2026-05-24] - Newsletter Deployment and Intelligence System
 ### Added
-- 18 SaaS platform app dashboards (/slug/app/ and /slug/app/dashboard/)
-- 18 SaaS /start/ intake forms with brand-specific styling
-- GitHub Actions: auto-deploy, PR checks, weekly audits, release changelog
-- Staging branch for safe previews before going live
-- Issue labels for organised project tracking
-- Branch protection on main
+- Deployed 25 brand-specific newsletter signup pages with FormSubmit integration.
+- Initialized `EARLY_SIGNAL_SYSTEM.md` to track upcoming product launches and events.
+- Published early signal pre-event blogs for Atelier Gaming (Fortnite) and Sole Prestige (AJ1).
+### Updated
+- Configured newsletter forwarding via ImprovMX (catch-all verified for SaaS/new brands).
+- Audited and updated 19 brand shop pages to include 15 products each.
+- Added niche-specific 'See More on Amazon' buttons to all shop pages.
+- Brands updated: dreaming-anime, atelier-gaming, sole-prestige, glow-protocol, essence-elite, peak-fit, quiet-luxury, the-watch-list, the-autodrome, the-escapist, verdant-co, paw-vault, couture-gallery, prime-land-network, tech-scout, shelfly, deskwell, pantriq, nehneh, the-way-made-known.
+- All products include working Amazon affiliate links with tag priscadezigns-20.
 
-## [v1.0.0] — 2026-05-05
-
-### Added
-- Main site (priscadezigns.org)
-- 18 affiliate niche stores with self-hosted product images
-- 18 SaaS landing pages with unique brand identities
-- 5 core service pages (Vela, Orbyt, Karjov, Govern, Writx) with intake forms
-- Nehneh dual-brand page (Seamrite Designs + Neh Neh)
-- Facebook automated posting system (18 pages, 4 posts/day)
-- Site audit cron (every 2 hours)
-- Anime daily clip automation (Dreaming Anime)
