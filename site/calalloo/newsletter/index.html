@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calalloo — Newsletter</title>
+  <title>Calalloo | The Alpha Signal Newsletter</title>
+  <meta property="og:image" content="../calalloo_3d_leaf.jpg" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -101,10 +102,10 @@
 </head>
 <body>
   <div class="container">
-    <span class="eyebrow">Stay In The Loop</span>
+    <span class="eyebrow">The Alpha Signal</span>
     <h1>Calalloo<br>Newsletter</h1>
     <p class="sub">Get the latest signals, drops, and intel from Calalloo delivered straight to your inbox. No noise. Just the alpha.</p>
-    <form id="newsletter-form" action="https://formsubmit.co/calalloo@priscadezigns.org" method="POST">
+    <form id="newsletter-form">
       <input type="hidden" name="_subject" value="New Newsletter Subscriber — Calalloo">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_next" value="?subscribed=1">
@@ -121,6 +122,39 @@
       document.getElementById('newsletter-form').style.display = 'none';
       document.getElementById('success-msg').style.display = 'block';
     }
+  </script>
+
+  <script>
+    document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const btn = form.querySelector('button');
+      const email = form.querySelector('input[name="email"]').value;
+      const nameInput = form.querySelector('input[name="name"]');
+      const name = nameInput ? nameInput.value : '';
+      
+      btn.disabled = true;
+      btn.textContent = 'Subscribing...';
+      
+      const formData = new URLSearchParams();
+      formData.append('email', email);
+      formData.append('name', name);
+      formData.append('brand', 'Calalloo');
+      formData.append('source', 'Newsletter Page');
+      
+      fetch('https://script.google.com/macros/s/AKfycbwQx48DZ41k1d9nAVwE0MRqy3X33ZLOb8ThUR6LpMt8INMV2rxpo_OUQ5HyDLqq3dEQ/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData
+      }).then(() => {
+        form.style.display = 'none';
+        document.getElementById('success-msg').style.display = 'block';
+      }).catch(err => {
+        btn.disabled = false;
+        btn.textContent = 'Subscribe Now';
+      });
+    });
   </script>
 </body>
 </html>
