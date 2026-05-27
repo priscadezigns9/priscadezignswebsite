@@ -243,7 +243,21 @@
             nav { display: none; }
             .hero { padding: 100px 4% 60px; }
         }
-    </style>
+    
+    /* --- Autonomous Payment Modal --- */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.open { display: flex; animation: fadeInModal 0.3s ease; }
+    .modal { background: #fff; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; position: relative; color: #1a1a1a; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .modal-close { position: absolute; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: #999; }
+    .modal-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .modal-tab { background: none; border: none; padding: 8px 16px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #999; }
+    .modal-tab.active { color: #0EA5E9; border-bottom: 2px solid #0EA5E9; }
+    .pay-detail { display: none; }
+    .pay-detail.open { display: block; }
+    .modal-copy-btn { font-size: 0.7rem; font-weight: 600; color: #0EA5E9; border: 1px solid #0EA5E9; background: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; margin-left: 10px; }
+    @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
+
+</style>
 </head>
 <body>
 
@@ -363,34 +377,90 @@
         </section>
 
         <!-- Payment Section -->
+        
         <section id="payment" class="section">
             <div class="container">
                 <div class="section-header">
-                    <h2>Seamless Payment</h2>
-                    <p>We accept global and digital payment methods.</p>
+                    <h2>Autonomous Settlement</h2>
+                    <p>The Laboratory supports instant global clearing and local bank transfers.</p>
                 </div>
                 <div class="payment-methods">
-                    <div class="payment-card">
-                        <h3>PayPal</h3>
-                        <p>Instant · Secure · Global</p>
-                        <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=QXE9PL58QPU9L&item_name=Service+Payment&currency_code=USD" class="btn btn-outline" style="margin-top:15px">Pay with PayPal</a>
+                    <div class="payment-card" style="cursor:pointer" onclick="openPayModal('Bank Transfer', 'Local')">
+                        <h3>Local Bank</h3>
+                        <p>First Citizens / Scotia</p>
+                        <button class="btn btn-outline" style="margin-top:15px">Get Reference</button>
                     </div>
-                    <div class="payment-card">
+                    <div class="payment-card" style="cursor:pointer" onclick="openPayModal('Crypto Settlement', 'Web3')">
                         <h3>Crypto</h3>
-                        <p>USDT / ETH / BTC</p>
-                        <p style="font-size: 0.7rem; margin-top:10px; color: var(--accent); word-break: break-all;">0xcef857e82c306b3d0f2db080e7794f4bb376049e</p>
+                        <p>ETH / USDT / BTC</p>
+                        <button class="btn btn-outline" style="margin-top:15px">Get Address</button>
                     </div>
-                    <div class="payment-card">
-                        <h3>Bank Transfer (US)</h3>
-                        <p>Local ACH & Wire (Payoneer)</p>
-                        <a href="https://wa.me/447576505652?text=I'd%20like%20to%20request%20US%20Bank%20details%20for%20a%20Payoneer%20transfer." class="btn btn-outline" style="margin-top:15px">Request Details</a>
+                    <div class="payment-card" style="cursor:pointer" onclick="openPayModal('International', 'PayPal')">
+                        <h3>PayPal / Intl</h3>
+                        <p>Secure · Global · Instant</p>
+                        <button class="btn btn-outline" style="margin-top:15px">Checkout</button>
                     </div>
                 </div>
             </div>
         </section>
+
     </main>
 
-    <footer>
+    
+    <!-- Autonomous Payment Modal -->
+    <div class="modal-overlay" id="payModal">
+      <div class="modal">
+        <span class="modal-close" onclick="closePayModal()">&#x2715;</span>
+        <div class="modal-tabs">
+          <button class="modal-tab active" onclick="togglePay('bank')">Bank Transfer</button>
+          <button class="modal-tab" onclick="togglePay('eth')">Crypto</button>
+          <button class="modal-tab" onclick="togglePay('intl')">PayPal/Intl</button>
+        </div>
+        <h3 id="modal-plan-name" style="font-size: 1.2rem; margin-bottom: 20px; color: #111;">Service Payment</h3>
+        
+        <div id="pay-bank" class="pay-detail open">
+          <p style="font-size:0.85rem;color:#666;margin-bottom:12px;">Local Bank Transfer (Autonomous Verification)</p>
+          <div style="margin-bottom:15px; background:#f0f7ff; padding:12px; border-radius:8px; border:1px solid #d0e4ff;">
+            <p style="font-size:0.8rem; font-weight:700; color:#0056b3; margin-bottom:5px;">First Citizens (Preferred)</p>
+            <div style="font-family:monospace; font-size:0.8rem; color:#333;">
+              <p>Name: Prisca Dezigns</p>
+              <p>Account: 2905646</p>
+              <p>Type: Savings</p>
+            </div>
+          </div>
+          <div style="background:#fff5f5; padding:12px; border-radius:8px; border:1px solid #ffe3e3;">
+            <p style="font-size:0.8rem; font-weight:700; color:#c53030; margin-bottom:5px;">Scotiabank</p>
+            <div style="font-family:monospace; font-size:0.8rem; color:#333;">
+              <p>Name: Prisca Dezigns</p>
+              <p>Account: 9015387</p>
+              <p>Type: Savings</p>
+            </div>
+          </div>
+          <div style="margin-top:15px; padding:10px; background:#f8f9fa; border-radius:6px; font-size:0.75rem; color:#666;">
+            <p>Reference: <span id="auto-ref-bank" style="font-weight:700; color:#1a1a1a;">[REF_ID]</span></p>
+          </div>
+        </div>
+
+        <div id="pay-eth" class="pay-detail">
+          <p style="font-size:0.85rem;color:#666;margin-bottom:12px;">Ethereum / USDT (ERC-20)</p>
+          <div style="background:#f8f9fa;padding:12px;border-radius:8px;border:1px solid #eee;word-break:break-all;font-family:monospace;font-size:0.8rem;">
+            <span id="eth-addr">0xb794f5ea0ba39494ce839613fffba74279579268</span>
+            <button class="modal-copy-btn" onclick="copyAddr('eth-addr')">Copy</button>
+          </div>
+          <p style="font-size:0.75rem;color:#999;margin-top:10px;">Reference: <span id="auto-ref-eth" style="font-weight:700; color:#1a1a1a;">[REF_ID]</span></p>
+        </div>
+
+        <div id="pay-intl" class="pay-detail">
+          <p style="font-size:0.85rem;color:#666;margin-bottom:12px;">PayPal & US Bank Transfers</p>
+          <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=QXE9PL58QPU9L&item_name=Service+Payment&currency_code=USD" class="btn btn-outline" style="display:block; text-align:center; margin-bottom:10px;">Pay via PayPal</a>
+          <p style="font-size:0.75rem;color:#666;">For Payoneer / ACH, please provide the reference below when contacting us.</p>
+          <p style="font-size:0.75rem;color:#999;margin-top:10px;">Reference: <span id="auto-ref-intl" style="font-weight:700; color:#1a1a1a;">[REF_ID]</span></p>
+        </div>
+
+      </div>
+    </div>
+
+<footer>
         <img src="/logos/prisca-dezigns-wordmark.svg" alt="Prisca Dezigns" style="height: 60px; margin-bottom: 10px; opacity: 0.8;">
         
         <div class="social-links" style="margin-bottom: 30px;">
@@ -400,6 +470,56 @@
 
         <p class="copyright">© 2026 PRISCA DEZIGNS · AI-POWERED BRAND ARCHITECTURE</p>
     </footer>
+
+
+    <script>
+    function generateRef() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let ref = 'LAB-';
+      for(let i=0; i<6; i++) ref += chars.charAt(Math.floor(Math.random() * chars.length));
+      return ref;
+    }
+
+    function openPayModal(plan, price) { 
+      const ref = generateRef();
+      const planEl = document.getElementById('modal-plan-name');
+      const refBank = document.getElementById('auto-ref-bank');
+      const refEth = document.getElementById('auto-ref-eth');
+      const refIntl = document.getElementById('auto-ref-intl');
+      
+      if(planEl) planEl.textContent = plan + (price ? ' — ' + price : ''); 
+      if(refBank) refBank.textContent = ref;
+      if(refEth) refEth.textContent = ref;
+      if(refIntl) refIntl.textContent = ref;
+      
+      const modal = document.getElementById('payModal');
+      if(modal) modal.classList.add('open'); 
+    }
+
+    function closePayModal() { 
+      const modal = document.getElementById('payModal');
+      if(modal) modal.classList.remove('open'); 
+    }
+    
+    function togglePay(id) { 
+      document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('open')); 
+      const target = document.getElementById('pay-' + id);
+      if(target) target.classList.add('open'); 
+      document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+      if(event && event.target) event.target.classList.add('active');
+    }
+    
+    function copyAddr(id) { 
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text); 
+      alert('Address copied!'); 
+    }
+    
+    window.addEventListener('click', function(event) { 
+      const modal = document.getElementById('payModal');
+      if (event.target == modal) closePayModal(); 
+    });
+    </script>
 
 </body>
 </html>
