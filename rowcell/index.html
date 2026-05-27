@@ -843,8 +843,9 @@ Submit from anywhere. Delivered digitally.
 <span class="modal-close" onclick="closePayModal()">&#x2715;</span>
 
       <div class="modal-tabs">
-        <button class="modal-tab active" onclick="togglePay('eth')">Ethereum</button>
-        <button class="modal-tab" onclick="togglePay('bank')">Bank Transfer</button>
+        <button class="modal-tab active" onclick="togglePay('pp')">PayPal</button>
+        <button class="modal-tab" onclick="togglePay('cr')">Crypto</button>
+        <button class="modal-tab" onclick="togglePay('bt')">Bank Transfer</button>
       </div>
 <h3 id="modal-plan-name">Standard</h3>
 <p class="modal-sub">Choose how you'd like to pay. Once payment is made, email your receipt and data files to <strong>priscadezigns@gmail.com</strong> — we'll confirm within 2 hours and get started.</p>
@@ -874,7 +875,7 @@ Submit from anywhere. Delivered digitally.
 </div>
 </div>
 <div class="pay-detail" id="pay-cr">
-<div style="font-size:0.8rem;margin-bottom:12px;color:var(--text-dim)">Send the exact USD amount in USDT, ETH, or BTC to the address below. Email your transaction hash with your order.</div>
+<div style="font-size:0.8rem;margin-bottom:12px;color:var(--text-dim)">Send the exact USD amount in USDT, ETH, or BTC to the address below. <strong>IMPORTANT:</strong> Use Reference ID <span id="auto-ref-eth" style="color:var(--accent)"></span> in your transaction or email.</div>
 <div style="font-size:0.75rem;font-weight:600;color:var(--text);margin-bottom:4px">ETH / USDC (ERC-20)</div>
 <div class="pay-addr" id="eth-addr">0xcef857e82c306b3d0f2db080e7794f4bb376049e</div>
 <button class="copy-btn" onclick="copyAddr('eth-addr')">Copy address</button>
@@ -886,13 +887,19 @@ Submit from anywhere. Delivered digitally.
 <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="16" fill="#1D6F42"/><path d="M16 7l9 5v2H7v-2l9-5z" fill="#fff"/><rect x="9" y="15" width="3" height="7" fill="#fff"/><rect x="14.5" y="15" width="3" height="7" fill="#fff"/><rect x="20" y="15" width="3" height="7" fill="#fff"/><rect x="7" y="22" width="18" height="2" rx="1" fill="#fff"/></svg>
 </div>
 <div>
-<div class="pay-label">Wire Transfer</div>
-<div class="pay-desc">BANK TO BANK</div>
+<div class="pay-label">Bank Transfer</div>
+<div class="pay-desc">Direct Bank-to-Bank</div>
 </div>
 </div>
 <div class="pay-detail" id="pay-bt">
-<p style="font-size:0.78rem;color:var(--text-dim);line-height:1.65;margin-bottom:14px">Direct bank-to-bank transfer. Ideal for large project fees. Contact us for full banking details.</p>
-<a href="mailto:priscadezigns9@gmail.com?subject=Wire%20Transfer%20Details" class="pay-action">Request details &rarr;</a>
+<div style="font-size:0.8rem;margin-bottom:12px;color:var(--text-dim)">Transfer to our Payoneer USD account. <strong>MANDATORY:</strong> Use Reference ID <span id="auto-ref-bank" style="color:var(--accent)"></span> as the transfer description.</div>
+<div style="background:rgba(255,255,255,0.03);padding:12px;border-radius:8px;font-size:0.8rem;margin-bottom:12px">
+    <div style="margin-bottom:4px"><strong>Account Holder:</strong> Priscella Narine</div>
+    <div style="margin-bottom:4px"><strong>Bank:</strong> First Republic Bank</div>
+    <div style="margin-bottom:4px"><strong>Account Type:</strong> Checking</div>
+    <div><strong>Routing Number:</strong> 121140399</div>
+</div>
+<a href="mailto:priscadezigns9@gmail.com?subject=Bank%20Transfer%20Verification" class="pay-action">Email Receipt &rarr;</a>
 </div>
 </div>
 <p class="modal-note">After payment, email your receipt + data files to <strong>priscadezigns@gmail.com</strong> with subject: <em>"Rowcell — [Package Name]"</em>. We'll confirm within 2 hours.</p>
@@ -928,6 +935,7 @@ let currentPlan = '';
       
       const modal = document.getElementById('payModal');
       if(modal) modal.classList.add('open'); 
+      togglePay('pp');
     }
 
 function closePayModal() { document.getElementById('payModal').classList.remove('open'); }
@@ -938,7 +946,13 @@ function closePayModal() { document.getElementById('payModal').classList.remove(
       if(detail) detail.classList.add('open'); 
       
       document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
-      const activeTab = Array.from(document.querySelectorAll('.modal-tab')).find(t => t.innerText.toLowerCase().includes(id));
+      const activeTab = Array.from(document.querySelectorAll('.modal-tab')).find(t => {
+          const text = t.innerText.toLowerCase();
+          if (id === 'pp') return text.includes('paypal');
+          if (id === 'cr') return text.includes('crypto');
+          if (id === 'bt') return text.includes('bank');
+          return text.includes(id);
+      });
       if(activeTab) activeTab.classList.add('active');
     }
 
