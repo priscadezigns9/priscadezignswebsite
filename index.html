@@ -257,6 +257,63 @@
     .modal-copy-btn { font-size: 0.7rem; font-weight: 600; color: #0EA5E9; border: 1px solid #0EA5E9; background: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; margin-left: 10px; }
     @keyframes fadeInModal { from { opacity: 0; } to { opacity: 1; } }
 
+
+    /* --- Neural Animations --- */
+    .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .scan-box {
+        position: relative;
+        overflow: hidden;
+    }
+    .scan-box::after {
+        content: '';
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent, rgba(123,53,212,0.1), transparent);
+        animation: neuralScan 4s infinite linear;
+        pointer-events: none;
+    }
+    
+    @keyframes neuralScan {
+        0% { top: -100%; }
+        100% { top: 100%; }
+    }
+    
+    .btn-primary {
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-primary::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+        transform: scale(0);
+        transition: transform 0.6s ease-out;
+        pointer-events: none;
+    }
+    .btn-primary:hover::after {
+        transform: scale(1);
+    }
+
+    .card {
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
 </style>
 </head>
 <body>
@@ -283,11 +340,11 @@
 
     <main>
         <!-- Hero Section -->
-        <section class="hero">
+        <section class="hero reveal">
             <div class="container">
                 <h1>Global Identity Architecture.</h1>
                 
-                <div class="scan-box">
+                <div class="scan-box reveal">
                     <h2>Alpha Scan</h2>
                     <p>Detect the Signal Gaps in your brand architecture with our Neural Diagnostic engine.</p>
                     <a href="/scan/" class="btn btn-primary" style="background: var(--accent); color: white; padding: 20px 60px; font-size: 1.5rem; width: 100%; display: block; border-radius: 12px; margin-bottom: 15px;">FREE BRAND SCAN</a>
@@ -304,12 +361,12 @@
         <!-- Services Section -->
         <section id="pricing" class="section">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header reveal">
                     <h2>Choose Your Tier</h2>
                     <p>Strategic architectures designed to dominate the 2026 AI landscape.</p>
                 </div>
-                <div class="grid">
-                    <div class="card">
+                <div class="grid reveal">
+                    <div class="card reveal">
                         <h3>Identity Baseline</h3>
                         <span class="price">$1,500 / setup</span>
                         <p>Visual Identity & System Map. A modular identity designed for 2026.</p>
@@ -321,7 +378,7 @@
                         </ul>
                         <a href="javascript:void(0)" onclick="openPayModal('Identity Baseline', ',500 USD')" class="btn btn-outline">Get Started</a>
                     </div>
-                    <div class="card" style="border-color: var(--accent);">
+                    <div class="card reveal" style="border-color: var(--accent);">
                         <h3>Flagship Architecture</h3>
                         <span class="price">$4,500 / setup</span>
                         <p>The Full Ecosystem. Visual identity + Generative Web + GEO strategy.</p>
@@ -333,7 +390,7 @@
                         </ul>
                         <a href="javascript:void(0)" onclick="openPayModal('Flagship Architecture', ',500 USD')" class="btn btn-primary">Select Flagship</a>
                     </div>
-                    <div class="card">
+                    <div class="card reveal">
                         <h3>Autonomous Systems</h3>
                         <span class="price">$10,000+ / setup</span>
                         <p>Custom AI Infrastructure and autonomous business agents.</p>
@@ -352,22 +409,22 @@
         <!-- À La Carte Section -->
         <section id="alacarte" class="section" style="background: rgba(255,255,255,0.2);">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header reveal">
                     <h2>À La Carte Architecture</h2>
                     <p>Modular components to enhance your global visual identity.</p>
                 </div>
-                <div class="grid">
-                    <div class="card">
+                <div class="grid reveal">
+                    <div class="card reveal">
                         <h3>Neural Identity Audit</h3>
                         <span class="price">$750</span>
                         <p>Deep-dive analysis of your current brand vs. 2026 trends.</p>
                     </div>
-                    <div class="card">
+                    <div class="card reveal">
                         <h3>AI Content Archetype</h3>
                         <span class="price">$950</span>
                         <p>Custom master template for autonomous brand publishing.</p>
                     </div>
-                    <div class="card">
+                    <div class="card reveal">
                         <h3>3D Cinematic Asset</h3>
                         <span class="price">$450</span>
                         <p>High-end kinetic logo or product reveal in 4K.</p>
@@ -380,7 +437,7 @@
         
         <section id="payment" class="section">
             <div class="container">
-                <div class="section-header">
+                <div class="section-header reveal">
                     <h2>Autonomous Settlement</h2>
                     <p>The Laboratory supports instant global clearing and local bank transfers.</p>
                 </div>
@@ -534,6 +591,23 @@
       const modal = document.getElementById('payModal');
       if (event.target == modal) closePayModal(); 
     });
+    
+    // --- Neural Reveal Logic ---
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    
+    // Add staggered delay to cards
+    document.querySelectorAll('.grid .card').forEach((card, i) => {
+        card.style.transitionDelay = (i * 0.15) + 's';
+    });
+
     </script>
 
 
