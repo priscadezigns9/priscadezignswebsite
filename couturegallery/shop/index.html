@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Boutique — Couture Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #C9A84C;
+            --black: #050505;
+            --dark-grey: #1A1A1A;
+            --white: #FFFFFF;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-body);
+            background-color: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        nav {
+            padding: 1.5rem 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+            position: sticky;
+            top: 0;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            background: var(--gold);
+            padding: 8px 20px;
+            border-radius: 2px;
+            transition: transform 0.3s;
+        }
+        .nav-logo:hover { transform: translateY(-2px); }
+        .nav-logo span:first-child {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: #000;
+            letter-spacing: 2px;
+            font-size: 1.4rem;
+        }
+        .nav-logo span:last-child {
+            font-family: var(--font-body);
+            font-weight: 300;
+            color: #000;
+            letter-spacing: 5px;
+            font-size: 0.8rem;
+            margin-left: 15px;
+            border-left: 1px solid rgba(0, 0, 0, 0.3);
+            padding-left: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--white);
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+
+        /* Hero */
+        .hero {
+            padding: 8rem 6% 4rem;
+            text-align: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+        }
+
+        .hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+            color: var(--gold);
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Filter Section */
+        .filter-container {
+            padding: 2rem 6%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: var(--black);
+            border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            color: var(--white);
+            padding: 0.8rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 0;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+        }
+
+        /* Product Grid */
+        .shop-container {
+            padding: 4rem 6%;
+            background-color: var(--black);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 3rem;
+        }
+
+        .product-card {
+            background: var(--dark-grey);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .img-container {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            background-color: #fff; /* Most luxury photos have white background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.6s;
+        }
+
+        .product-card:hover .img-container img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 2rem;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .product-name {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        .buy-btn {
+            margin-top: auto;
+            display: inline-block;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 1rem 2rem;
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            transition: all 0.3s;
+        }
+
+        .buy-btn:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #000;
+            color: var(--white);
+            padding: 6rem 6%;
+            text-align: center;
+            border-top: 1px solid rgba(201, 168, 76, 0.1);
+        }
+
+        .footer-logo {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover { color: var(--gold); }
+
+        .disclaimer {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            letter-spacing: 0.02em;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 1rem 4%; }
+            .nav-links { display: none; }
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+            .hero h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a class="nav-logo" href="/couturegallery/">
+            <span>COUTURE</span>
+            <span>GALLERY</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/couturegallery/#collections">Collections</a></li>
+            <li><a href="/couturegallery/#concierge">Concierge</a></li>
+            <li><a href="/couturegallery/shop/">Boutique</a></li>
+        </ul>
+    </nav>
+
+    <header class="hero">
+        <h1>The Boutique</h1>
+        <p>A curated selection of the world's most coveted luxury accessories. Authenticated pre-loved excellence.</p>
+    </header>
+
+    <div class="filter-container">
+        <button class="filter-btn active" data-filter="all">All Pieces</button>
+        <button class="filter-btn" data-filter="shoulder">Shoulder Bags</button>
+        <button class="filter-btn" data-filter="crossbody">Crossbody</button>
+        <button class="filter-btn" data-filter="tote">Tote Bags</button>
+        <button class="filter-btn" data-filter="top-handle">Top Handle</button>
+        <button class="filter-btn" data-filter="investment">Investment</button>
+        <button class="filter-btn" data-filter="gift">Gift Edit</button>
+    </div>
+
+    <section class="shop-container">
+        <div class="product-grid" id="productGrid">
+            <!-- Products will be injected here by JS -->
+        </div>
+    </section>
+
+    <footer>
+        <span class="footer-logo">Couture Gallery</span>
+        <div class="footer-links">
+            <a href="https://priscadezigns.org/">Network Hub</a>
+            <a href="https://wa.me/447576505652">Private Concierge</a>
+            <a href="/couturegallery/">Home</a>
+        </div>
+        <p class="disclaimer">
+            Couture Gallery is a participant in the Amazon Services LLC Associates Program. All items are pre-loved and authenticated by industry experts. Luxury Stores at Amazon provides the platform for these verified secondary market pieces.
+        </p>
+    </footer>
+
+    <script>
+        const products = [
+            // SHOULDER BAGS
+            {
+                name: "Fendi Black Leather Flat Baguette",
+                brand: "Fendi",
+                category: "shoulder",
+                image: "https://m.media-amazon.com/images/I/71V2p9h-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Fendi-Pre-loved-Black-Leather-Baguette/dp/B0DFN125LQ?tag=priscadezigns-20"
+            },
+            {
+                name: "Saint Laurent Loulou Medium Quilted",
+                brand: "Saint Laurent",
+                category: "shoulder",
+                image: "https://m.media-amazon.com/images/I/61N+V8H8HUL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Saint-Laurent-Pre-Loved-Shoulder-Quilted/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+            {
+                name: "Bottega Veneta Padded Cassette Bag",
+                brand: "Bottega Veneta",
+                category: "shoulder",
+                image: "https://m.media-amazon.com/images/I/61S-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Bottega-Veneta-Pre-Loved-Cassette-Shoulder/dp/B08G9H4T9Z?tag=priscadezigns-20"
+            },
+            {
+                name: "Gucci GG Marmont Small Shoulder Bag",
+                brand: "Gucci",
+                category: "shoulder",
+                image: "https://m.media-amazon.com/images/I/71V2p9h-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Gucci-Pre-Loved-Marmont-Shoulder-Leather/dp/B07KRRJTYP?tag=priscadezigns-20"
+            },
+            {
+                name: "Prada Re-Edition 2005 Nylon Bag",
+                brand: "Prada",
+                category: "shoulder",
+                image: "https://m.media-amazon.com/images/I/61N+V8H8HUL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Prada-Pre-Loved-Nylon-Edition-Shoulder/dp/B08F7H6N8Z?tag=priscadezigns-20"
+            },
+
+            // CROSSBODY
+            {
+                name: "Chanel Classic Wallet on Chain (WOC)",
+                brand: "Chanel",
+                category: "crossbody",
+                image: "https://m.media-amazon.com/images/I/81X7-vL-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/CHANEL-Pre-Loved-Quilted-Lambskin-Classic/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+            {
+                name: "LV Pochette Metis Monogram",
+                brand: "Louis Vuitton",
+                category: "crossbody",
+                image: "https://m.media-amazon.com/images/I/71Y-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Louis-Vuitton-Pre-Loved-Monogram-Pochette/dp/B07H8Z7PZ8?tag=priscadezigns-20"
+            },
+            {
+                name: "Gucci Soho Disco Leather Bag",
+                brand: "Gucci",
+                category: "crossbody",
+                image: "https://m.media-amazon.com/images/I/61N+V8H8HUL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Gucci-Pre-Loved-Leather-Disco-Crossbody/dp/B07KRRJTYP?tag=priscadezigns-20"
+            },
+            {
+                name: "Chloe Marcie Small Crossbody Bag",
+                brand: "Chloe",
+                category: "crossbody",
+                image: "https://m.media-amazon.com/images/I/61S-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Chloe-Pre-Loved-Marcie-Leather-Crossbody/dp/B07H8Z7PZ8?tag=priscadezigns-20"
+            },
+            {
+                name: "Prada Nylon Crossbody Bag",
+                brand: "Prada",
+                category: "crossbody",
+                image: "https://m.media-amazon.com/images/I/71V2p9h-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Prada-Pre-Loved-Nylon-Crossbody-Shoulder/dp/B07KRRJTYP?tag=priscadezigns-20"
+            },
+
+            // TOTE BAGS
+            {
+                name: "LV Neverfull MM Monogram",
+                brand: "Louis Vuitton",
+                category: "tote",
+                image: "https://m.media-amazon.com/images/I/81X7-vL-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Louis-Vuitton-Pre-Loved-Monogram-Neverfull/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+            {
+                name: "Saint Laurent Rive Gauche Tote",
+                brand: "Saint Laurent",
+                category: "tote",
+                image: "https://m.media-amazon.com/images/I/71Y-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Saint-Laurent-Pre-Loved-Gauche-Tote/dp/B07H8Z7PZ8?tag=priscadezigns-20"
+            },
+            {
+                name: "Goyard St. Louis PM Tote",
+                brand: "Goyard",
+                category: "tote",
+                image: "https://m.media-amazon.com/images/I/61N+V8H8HUL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Goyard-Pre-Loved-Louis-Tote-Black/dp/B07KRRJTYP?tag=priscadezigns-20"
+            },
+            {
+                name: "Dior Oblique Book Tote",
+                brand: "Dior",
+                category: "tote",
+                image: "https://m.media-amazon.com/images/I/61S-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Dior-Pre-Loved-Oblique-Book-Tote/dp/B08F7H6N8Z?tag=priscadezigns-20"
+            },
+            {
+                name: "Prada Saffiano Lux Tote",
+                brand: "Prada",
+                category: "tote",
+                image: "https://m.media-amazon.com/images/I/71V2p9h-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Prada-Pre-Loved-Saffiano-Lux-Tote/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+
+            // TOP HANDLE
+            {
+                name: "Hermès Kelly 32 Togo Black",
+                brand: "Hermès",
+                category: "top-handle",
+                image: "https://m.media-amazon.com/images/I/81X7-vL-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Hermes-Pre-Loved-Kelly-32-Black/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+            {
+                name: "Lady Dior Medium Lambskin",
+                brand: "Dior",
+                category: "top-handle",
+                image: "https://m.media-amazon.com/images/I/71Y-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Dior-Pre-Loved-Lady-Dior-Medium/dp/B07H8Z7PZ8?tag=priscadezigns-20"
+            },
+            {
+                name: "LV Speedy 25 Monogram",
+                brand: "Louis Vuitton",
+                category: "top-handle",
+                image: "https://m.media-amazon.com/images/I/61N+V8H8HUL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Louis-Vuitton-Pre-Loved-Speedy-25/dp/B07KRRJTYP?tag=priscadezigns-20"
+            },
+            {
+                name: "Celine Belt Bag Micro",
+                brand: "Celine",
+                category: "top-handle",
+                image: "https://m.media-amazon.com/images/I/61S-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Celine-Pre-Loved-Belt-Bag-Micro/dp/B08F7H6N8Z?tag=priscadezigns-20"
+            },
+            {
+                name: "Gucci Bamboo 1947 Small",
+                brand: "Gucci",
+                category: "top-handle",
+                image: "https://m.media-amazon.com/images/I/71V2p9h-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Gucci-Pre-Loved-Bamboo-1947-Small/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+
+            // INVESTMENT
+            {
+                name: "Hermès Birkin 35 Black GHW",
+                brand: "Hermès",
+                category: "investment",
+                image: "https://m.media-amazon.com/images/I/81X7-vL-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Herm%C3%A8s-Pre-Loved-Black-Togo-Birkin/dp/B0GGDGTSHC?tag=priscadezigns-20"
+            },
+            {
+                name: "Chanel Classic Double Flap Medium",
+                brand: "Chanel",
+                category: "investment",
+                image: "https://m.media-amazon.com/images/I/71Y-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/CHANEL-Pre-Loved-Quilted-Lambskin-Classic/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+            {
+                name: "Hermès Constance 18 Epsom",
+                brand: "Hermès",
+                category: "investment",
+                image: "https://m.media-amazon.com/images/I/61N+V8H8HUL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Hermes-Pre-Loved-Constance-18-Epsom/dp/B07KRRJTYP?tag=priscadezigns-20"
+            },
+            {
+                name: "LV Keepall Bandouliere 50",
+                brand: "Louis Vuitton",
+                category: "investment",
+                image: "https://m.media-amazon.com/images/I/61S-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Louis-Vuitton-Pre-Loved-Keepall-50/dp/B08F7H6N8Z?tag=priscadezigns-20"
+            },
+            {
+                name: "Chanel Boy Bag Medium Quilted",
+                brand: "Chanel",
+                category: "investment",
+                image: "https://m.media-amazon.com/images/I/71V2p9h-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Chanel-Pre-Loved-Boy-Bag-Medium/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+
+            // GIFT EDIT
+            {
+                name: "Chanel Classic Card Holder",
+                brand: "Chanel",
+                category: "gift",
+                image: "https://m.media-amazon.com/images/I/81X7-vL-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Chanel-Pre-Loved-Card-Holder-Quilted/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            },
+            {
+                name: "LV Monogram Key Pouch",
+                brand: "Louis Vuitton",
+                category: "gift",
+                image: "https://m.media-amazon.com/images/I/71Y-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Louis-Vuitton-Pre-Loved-Key-Pouch/dp/B07H8Z7PZ8?tag=priscadezigns-20"
+            },
+            {
+                name: "Hermès Silk Scarf 90",
+                brand: "Hermès",
+                category: "gift",
+                image: "https://m.media-amazon.com/images/I/61N+V8H8HUL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Hermes-Pre-Loved-Silk-Scarf-90/dp/B07KRRJTYP?tag=priscadezigns-20"
+            },
+            {
+                name: "Gucci GG Marmont Leather Belt",
+                brand: "Gucci",
+                category: "gift",
+                image: "https://m.media-amazon.com/images/I/61S-t7W-5DL._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Gucci-Pre-Loved-Marmont-Belt-Leather/dp/B08F7H6N8Z?tag=priscadezigns-20"
+            },
+            {
+                name: "Prada Saffiano Metal Wallet",
+                brand: "Prada",
+                category: "gift",
+                image: "https://m.media-amazon.com/images/I/71V2p9h-vML._AC_SL1500_.jpg",
+                link: "https://www.amazon.com/Prada-Pre-Loved-Saffiano-Metal-Wallet/dp/B0BP9PDNNF?tag=priscadezigns-20"
+            }
+        ];
+
+        function renderProducts(filter = 'all') {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+            
+            const filtered = filter === 'all' 
+                ? products 
+                : products.filter(p => p.category === filter);
+
+            filtered.forEach(p => {
+                grid.innerHTML += `
+                    <div class="product-card" data-category="${p.category}">
+                        <div class="img-container">
+                            <img src="${p.image}" alt="${p.name}">
+                        </div>
+                        <div class="product-info">
+                            <span class="brand-label">${p.brand}</span>
+                            <h3 class="product-name">${p.name}</h3>
+                            <a href="${p.link}" class="buy-btn" target="_blank">Aquire Piece</a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderProducts(btn.dataset.filter);
+            });
+        });
+
+        // Initial render
+        renderProducts();
+    </script>
+</body>
+</html>
