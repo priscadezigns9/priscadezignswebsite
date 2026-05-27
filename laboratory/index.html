@@ -47,7 +47,7 @@
                 <h2>Signal Claim Portal <span class="status-badge" style="background: rgba(201, 168, 76, 0.1); color: #C9A84C;">Neural Ledger</span></h2>
                 <p>Purchased an Alpha Signal from our network? Enter your Order ID or ASIN to mint your Digital Twin certificate.</p>
                 <input type="text" id="signal-ref" placeholder="Order ID or Product ASIN" style="width: 100%; padding: 10px; background: #1a1a2e; border: 1px solid #333; color: white; margin-bottom: 10px; border-radius: 5px;">
-                <button class="btn-launch" style="background: #C9A84C; width: 100%; border:none; cursor:pointer;" onclick="alert('Neural Ledger Verification: Analyzing Signal for Order ' + document.getElementById('signal-ref').value + '...')">Claim Digital Twin</button>
+                <button class="btn-launch btn-claim" style="background: #C9A84C; width: 100%; border:none; cursor:pointer;" onclick="claimSignal()">Claim Digital Twin</button>
             </div>
             <div class="card">
                 <h2>Rowcell <span class="status-badge">Active</span></h2>
@@ -66,5 +66,36 @@
             </div>
         </div>
     </div>
+    <script>
+        async function claimSignal() {
+            const input = document.getElementById('signal-ref').value.trim().toUpperCase();
+            if (!input) {
+                alert('Please enter an Order ID or ASIN.');
+                return;
+            }
+
+            const btn = document.querySelector('.btn-claim');
+            btn.innerText = 'Verifying Signal...';
+            
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/autonomous_core/SIGNAL_CERTIFICATES.json');
+                const certs = await response.json();
+                
+                const match = certs.find(c => c.product.asin.toUpperCase() === input || c.certificate_id.toUpperCase() === input);
+                
+                if (match) {
+                    alert('Alpha Signal Verified! Minting your Digital Twin now...');
+                    window.location.href = `/laboratory/certificates/${match.certificate_id}.html`;
+                } else {
+                    alert('Signal not found. Ensure you are using the correct ASIN or Order ID from a verified niche hub.');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Connection to Neural Ledger timed out. Please try again.');
+            } finally {
+                btn.innerText = 'Claim Digital Twin';
+            }
+        }
+    </script>
 </body>
 </html>
