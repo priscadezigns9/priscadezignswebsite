@@ -18,15 +18,15 @@
    <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0A0A0F;
+      --bg: #1A1A2E;
       --green: #56C02B;
       --green-dark: #2E7D0D;
-      --red: #E63946;
+      --red: #E53935;
       --gold: #FFC107;
       --white: #F5F5F5;
       --panel: #0F0F1F;
       --border: #3A3A5C;
-      --muted: #457B9D;
+      --muted: #8888aa;
     }
     html { scroll-behavior: smooth; }
     body {
@@ -46,7 +46,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      background: rgba(10, 10, 15, 0.95);
+      background: rgba(15, 15, 31, 0.95);
       backdrop-filter: blur(12px);
       border-bottom: 3px solid var(--red);
       min-height: 64px;
@@ -1319,7 +1319,198 @@
     </div>
    </div>
   </section>
-  <!-- ═══════════════════ MARIO WORLD STRIP ═══════════════════ -->
+  <!-- ATELIER GAMING MINI-GAME: CYBER-BIRD -->
+<section id="mini-game" style="background: #050508; padding: 60px 20px; border-top: 1px solid rgba(230, 57, 70, 0.2); border-bottom: 1px solid rgba(230, 57, 70, 0.2);">
+    <div class="container" style="max-width: 600px; margin: 0 auto; text-align: center;">
+        <h2 style="font-family: 'Press Start 2P', cursive; font-size: 1.2rem; color: #E63946; margin-bottom: 30px; letter-spacing: 2px;">ATELIER_MINI_GAME</h2>
+        
+        <div id="game-container" style="position: relative; width: 100%; max-width: 400px; height: 500px; margin: 0 auto; background: #0A0A0F; border: 4px solid #E63946; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(230, 57, 70, 0.3);">
+            <canvas id="gameCanvas" width="400" height="500" style="display: block;"></canvas>
+            
+            <!-- Game Over / Start Overlay -->
+            <div id="game-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 10, 15, 0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; z-index: 10;">
+                <h3 id="overlay-title" style="font-family: 'Press Start 2P', cursive; font-size: 1.5rem; margin-bottom: 20px; color: #457B9D;">CYBER_BIRD</h3>
+                <p id="overlay-score" style="font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; margin-bottom: 30px; display: none;">SCORE: 0</p>
+                <button id="start-btn" class="game-btn" style="padding: 15px 40px; font-size: 1rem;">START_SESSION</button>
+                <p style="margin-top: 20px; font-size: 0.7rem; color: #666; font-family: 'Space Mono', monospace;">SPACE or TAP to HOP</p>
+            </div>
+            
+            <div id="score-display" style="position: absolute; top: 20px; width: 100%; text-align: center; font-family: 'Press Start 2P', cursive; font-size: 1.5rem; color: rgba(255, 255, 255, 0.5); pointer-events: none; z-index: 5;">0</div>
+        </div>
+        
+        <p style="margin-top: 30px; color: #aaa; font-size: 0.8rem; font-family: 'Space Mono', monospace;">// SYSTEM_STATUS: ONLINE // VERSION: 1.0.4_BETA</p>
+    </div>
+</section>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('start-btn');
+    const overlay = document.getElementById('game-overlay');
+    const title = document.getElementById('overlay-title');
+    const scoreText = document.getElementById('overlay-score');
+    const scoreDisplay = document.getElementById('score-display');
+
+    let gameActive = false;
+    let score = 0;
+    let frame = 0;
+    
+    // Bird properties
+    const bird = {
+        x: 50,
+        y: 250,
+        width: 30,
+        height: 24,
+        gravity: 0.6,
+        lift: -10,
+        velocity: 0,
+        draw() {
+            ctx.fillStyle = '#457B9D';
+            // Draw a techy bird shape
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillStyle = '#A8DADC';
+            ctx.fillRect(this.x + 20, this.y + 5, 5, 5); // Eye
+            ctx.fillStyle = '#E63946';
+            ctx.fillRect(this.x - 5, this.y + 10, 10, 5); // Jet trail
+        },
+        update() {
+            this.velocity += this.gravity;
+            this.y += this.velocity;
+            if (this.y + this.height > canvas.height) {
+                this.y = canvas.height - this.height;
+                gameOver();
+            }
+            if (this.y < 0) {
+                this.y = 0;
+                this.velocity = 0;
+            }
+        },
+        hop() {
+            this.velocity = this.lift;
+        }
+    };
+
+    // Pipe properties
+    const pipes = [];
+    const pipeWidth = 60;
+    const pipeGap = 160;
+
+    function createPipe() {
+        const minHeight = 50;
+        const maxHeight = canvas.height - pipeGap - minHeight;
+        const height = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
+        pipes.push({
+            x: canvas.width,
+            top: height,
+            bottom: canvas.height - (height + pipeGap),
+            passed: false
+        });
+    }
+
+    function drawPipes() {
+        ctx.fillStyle = '#E63946';
+        pipes.forEach(pipe => {
+            // Draw top pipe
+            ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(pipe.x, 0, pipeWidth, pipe.top);
+            
+            // Draw bottom pipe
+            ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipeWidth, pipe.bottom);
+            ctx.strokeRect(pipe.x, canvas.height - pipe.bottom, pipeWidth, pipe.bottom);
+        });
+    }
+
+    function updatePipes() {
+        if (frame % 90 === 0) createPipe();
+        
+        pipes.forEach((pipe, index) => {
+            pipe.x -= 3;
+            
+            // Collision detection
+            if (
+                bird.x < pipe.x + pipeWidth &&
+                bird.x + bird.width > pipe.x &&
+                (bird.y < pipe.top || bird.y + bird.height > canvas.height - pipe.bottom)
+            ) {
+                gameOver();
+            }
+
+            if (!pipe.passed && bird.x > pipe.x + pipeWidth) {
+                score++;
+                pipe.passed = true;
+                scoreDisplay.textContent = score;
+            }
+
+            if (pipe.x + pipeWidth < 0) {
+                pipes.splice(index, 1);
+            }
+        });
+    }
+
+    function gameOver() {
+        gameActive = false;
+        title.textContent = 'SYSTEM_FAILURE';
+        title.style.color = '#E63946';
+        scoreText.textContent = 'FINAL_SCORE: ' + score;
+        scoreText.style.display = 'block';
+        startBtn.textContent = 'REBOOT_SYSTEM';
+        overlay.style.display = 'flex';
+    }
+
+    function resetGame() {
+        bird.y = 250;
+        bird.velocity = 0;
+        pipes.length = 0;
+        score = 0;
+        frame = 0;
+        scoreDisplay.textContent = '0';
+        gameActive = true;
+        overlay.style.display = 'none';
+        requestAnimationFrame(gameLoop);
+    }
+
+    function gameLoop() {
+        if (!gameActive) return;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Background grid
+        ctx.strokeStyle = 'rgba(69, 123, 157, 0.1)';
+        ctx.lineWidth = 1;
+        for(let i=0; i<canvas.width; i+=40) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+        }
+        for(let i=0; i<canvas.height; i+=40) {
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+        }
+
+        bird.update();
+        bird.draw();
+        updatePipes();
+        drawPipes();
+        
+        frame++;
+        requestAnimationFrame(gameLoop);
+    }
+
+    startBtn.addEventListener('click', resetGame);
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            if (gameActive) bird.hop();
+            else if (overlay.style.display !== 'none') resetGame();
+            e.preventDefault();
+        }
+    });
+    canvas.addEventListener('touchstart', (e) => {
+        if (gameActive) bird.hop();
+        e.preventDefault();
+    }, { passive: false });
+
+</script>
+
+<!-- ═══════════════════ MARIO WORLD STRIP ═══════════════════ -->
   <div class="world-strip">
    <div class="cloud cloud1">
    </div>
