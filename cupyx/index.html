@@ -66,7 +66,14 @@
     .modal-copy-btn { font-size: 0.7rem; font-weight: 600; color: var(--primary, #0EA5E9); border: 1px solid var(--primary, #0EA5E9); background: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; }
     .pay-action { display: block; text-align: center; margin-top: 14px; padding: 11px; background: var(--primary, #0EA5E9); color: #fff; font-weight: 600; font-size: 0.82rem; letter-spacing: 0.3px; border-radius: 8px; text-decoration: none; }
     .modal-note { font-size: 0.72rem; color: #666; margin-top: 20px; line-height: 1.6; text-align: center; }
-  </style>
+  
+    .modal-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .modal-tab { background: none; border: none; padding: 8px 16px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #999; }
+    .modal-tab.active { color: var(--primary, #0EA5E9); border-bottom: 2px solid var(--primary, #0EA5E9); }
+    .pay-detail { display: none; }
+    .pay-detail.open { display: block; }
+
+</style>
 </head>
 <body>
   <header>
@@ -156,7 +163,12 @@
   <div class="modal-overlay" id="payModal">
     <div class="modal">
       <span class="modal-close" onclick="closePayModal()">✕</span>
-      <h3 id="modal-plan-name">Subscription</h3>
+      
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="togglePay('eth')">Ethereum</button>
+        <button class="modal-tab" onclick="togglePay('bank')">Bank Transfer</button>
+      </div>
+<h3 id="modal-plan-name">Subscription</h3>
       <p class="modal-sub">Choose your payment method. After payment, email your receipt to <strong>priscadezigns@gmail.com</strong>.</p>
       <div class="pay-method" onclick="togglePay('pp')">
         <div class="pay-method-top">
@@ -182,7 +194,14 @@
   <script>
     function openPayModal(plan, price) { document.getElementById('modal-plan-name').textContent = plan + ' — ' + price; document.getElementById('payModal').classList.add('open'); }
     function closePayModal() { document.getElementById('payModal').classList.remove('open'); }
-    function togglePay(id) { const el = document.getElementById('pay-' + id); document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('open')); el.classList.add('open'); }
+    
+    function togglePay(id) { 
+      document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('open')); 
+      document.getElementById('pay-' + id).classList.add('open'); 
+      document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+      if(event && event.target) event.target.classList.add('active');
+    }
+
     function copyAddr(id) { navigator.clipboard.writeText(document.getElementById(id).textContent); alert('Address copied!'); }
     document.getElementById('payModal').addEventListener('click', function(e) { if (e.target === this) closePayModal(); });
   </script>
