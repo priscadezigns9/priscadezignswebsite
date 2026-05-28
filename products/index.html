@@ -173,26 +173,22 @@
     
     
 
+    
     <style id="anim-system">
-        /* Aggressive Initial State: Hidden */
+        /* --- Reveal Animations --- */
         .reveal-up, .reveal-left {
-            opacity: 0 !important;
+            opacity: 0;
             will-change: opacity, transform;
         }
         
-        .reveal-up { transform: translateY(50px) !important; }
-        .reveal-left { transform: translateX(-40px) !important; }
+        .reveal-up { transform: translateY(40px); }
+        .reveal-left { transform: translateX(-40px); }
 
-        /* Slow, Luxurious Transition */
-        .reveal-up, .reveal-left {
-            transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), 
-                        transform 1.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-
-        /* Revealed State */
         .revealed {
             opacity: 1 !important;
             transform: translate(0) !important;
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
         
         #pd-cursor-glow {
@@ -204,9 +200,10 @@
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            transition: left 0.15s ease, top 0.15s ease;
+            transition: left 0.1s ease, top 0.1s ease;
         }
     </style>
+
 </head>
 
 
@@ -296,33 +293,34 @@
 
     
 
+    
     <script>
     (function() {
-        // Run after a short delay to ensure the browser has rendered the 0-opacity state
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            // Small staggered delay for cards
-                            const delay = entry.target.dataset.delay || 0;
-                            setTimeout(() => {
-                                entry.target.classList.add('revealed');
-                            }, delay);
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.1 });
-
-                document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => {
-                    observer.observe(el);
+        const reveal = () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const delay = entry.target.dataset.delay || 0;
+                        setTimeout(() => {
+                            entry.target.classList.add('revealed');
+                        }, delay);
+                        observer.unobserve(entry.target);
+                    }
                 });
-                
-                console.log('PD_ANIM: Animation Engine Started.');
-            }, 300); 
-        });
+            }, { threshold: 0.1 });
 
-        // Interactive Cursor
+            document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => {
+                observer.observe(el);
+            });
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', reveal);
+        } else {
+            reveal();
+        }
+
+        // Glow
         document.addEventListener('mousemove', e => {
             const glow = document.getElementById('pd-cursor-glow');
             if (glow) {
@@ -332,6 +330,7 @@
         });
     })();
     </script>
+
 </body>
 
 
