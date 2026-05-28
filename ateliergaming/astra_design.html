@@ -10,7 +10,7 @@
         :root {
             --crimson: #E63946;
             --void: #050508;
-            --obsidian: #0A0A0F;
+            --charcoal: #1A1A24;
             --teal: #00B4A6;
             --white: #F1FAEE;
             --glass: rgba(255, 255, 255, 0.03);
@@ -25,7 +25,6 @@
             overflow-x: hidden;
         }
 
-        /* Dossier Layout */
         .dossier {
             max-width: 1400px;
             margin: 0 auto;
@@ -36,7 +35,6 @@
             position: relative;
         }
 
-        /* Left Column: Visual Archive */
         .visual-archive {
             position: sticky;
             top: 80px;
@@ -44,27 +42,40 @@
         }
 
         .main-render {
-            background: var(--obsidian);
+            background: #000;
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 20px;
-            padding: 40px;
+            padding: 20px;
             box-shadow: 0 40px 100px rgba(0,0,0,0.8);
             position: relative;
             overflow: hidden;
         }
 
-        .main-render::before {
-            content: "ARCHIVE // PILOT_001";
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
-            letter-spacing: 2px;
-            opacity: 0.3;
+        .anim-controls {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
         }
 
-        /* Right Column: Technical Dossier */
+        .btn-anim {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 8px;
+            font-size: 10px;
+            font-family: 'JetBrains Mono';
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .btn-anim:hover, .btn-anim.active {
+            background: var(--crimson);
+            border-color: var(--crimson);
+        }
+
         .content {
             padding-bottom: 200px;
         }
@@ -86,7 +97,7 @@
         h1 {
             font-family: 'Cormorant Garamond', serif;
             font-style: italic;
-            font-size: 8rem;
+            font-size: 6rem;
             margin: 0;
             letter-spacing: -4px;
             line-height: 0.8;
@@ -94,7 +105,7 @@
         }
 
         .bio {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             line-height: 1.6;
             font-weight: 300;
             opacity: 0.8;
@@ -102,64 +113,19 @@
             max-width: 700px;
         }
 
-        /* Sections */
         section {
-            margin-top: 120px;
+            margin-top: 100px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 60px;
+            padding-top: 50px;
         }
 
         h2 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 3rem;
-            margin-bottom: 40px;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
             font-style: italic;
         }
 
-        /* Abilities Grid */
-        .ability-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        .ability-card {
-            background: var(--glass);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 12px;
-            transition: 0.3s;
-        }
-
-        .ability-card:hover {
-            border-color: var(--crimson);
-            transform: translateY(-5px);
-            background: rgba(230, 57, 70, 0.02);
-        }
-
-        .ability-name {
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .ability-icon {
-            width: 30px;
-            height: 30px;
-            stroke: var(--crimson);
-        }
-
-        .ability-desc {
-            font-size: 0.95rem;
-            opacity: 0.6;
-            line-height: 1.5;
-        }
-
-        /* Architecture Specs */
         .spec-list {
             list-style: none;
             padding: 0;
@@ -170,7 +136,7 @@
 
         .spec-list li {
             padding: 20px;
-            background: var(--obsidian);
+            background: rgba(255,255,255,0.02);
             border-radius: 8px;
             display: flex;
             flex-direction: column;
@@ -185,21 +151,10 @@
         }
 
         .spec-value {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
         }
 
-        /* Animations */
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        /* HUD Overlay for Render */
         .hud-scan {
             position: absolute;
             top: 0;
@@ -220,23 +175,36 @@
         @media (max-width: 1100px) {
             .dossier { grid-template-columns: 1fr; }
             .visual-archive { position: relative; top: 0; }
-            h1 { font-size: 5rem; }
+            h1 { font-size: 4rem; }
         }
     </style>
 </head>
 <body>
 
     <div class="dossier">
-        <!-- VISUAL SIDE -->
         <div class="visual-archive">
             <div class="main-render">
                 <div class="hud-scan"></div>
-                <!-- INTERACTIVE 3D CHARACTER ENGINE (Three.js Manifest) -->
-                <div id="astra-3d-manifest" style="width: 100%; height: 700px; border-radius: 12px; overflow: hidden; background: #000; position: relative; border: 1px solid var(--glass);">
+                <div id="astra-3d-manifest" style="width: 100%; height: 600px; border-radius: 12px; overflow: hidden; background: #000; position: relative;">
                     <div id="loading-manifest" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'JetBrains Mono'; color: var(--crimson); font-size: 10px; letter-spacing: 2px;">
-                        INITIALIZING_CHARACTER_VOXEL_ENGINE...
+                        MANIFESTING_CINEMATIC_RIG...
                     </div>
                 </div>
+                
+                <div class="anim-controls">
+                    <button class="btn-anim active" onclick="setAnim('IDLE')">Idle</button>
+                    <button class="btn-anim" onclick="setAnim('WALK')">Walk</button>
+                    <button class="btn-anim" onclick="setAnim('RUN')">Run</button>
+                    <button class="btn-anim" onclick="setAnim('SKIP')">Skip</button>
+                    <button class="btn-anim" onclick="setAnim('HOP')">Hop</button>
+                    <button class="btn-anim" onclick="setAnim('LEAP')">Leap</button>
+                    <button class="btn-anim" onclick="setAnim('WAVE')">Wave</button>
+                    <button class="btn-anim" onclick="setAnim('THUMBS_UP')">Thumbs Up</button>
+                    <button class="btn-anim" onclick="setAnim('PEACE')">Peace</button>
+                    <button class="btn-anim" onclick="setAnim('HEART')">Heart</button>
+                    <button class="btn-anim" onclick="setAnim('TALK')">Talk</button>
+                </div>
+
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
                 <script>
                     const container = document.getElementById('astra-3d-manifest');
@@ -245,13 +213,13 @@
                     let lArm, rArm, lLeg, rLeg;
                     let lHand, rHand, lFoot, rFoot;
                     let mouth, lEyebrow, rEyebrow;
-                    let lEye, rEye;
-                    let neck, upperTorso, lowerTorso;
+                    let lEye, rEye, neck, upperTorso, lowerTorso;
+                    let animState = 'IDLE';
 
                     function initAstra() {
                         scene = new THREE.Scene();
-                        camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-                        camera.position.set(0, 1.8, 5.5);
+                        camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 1000);
+                        camera.position.set(0, 1.8, 6);
 
                         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
                         renderer.setSize(container.clientWidth, container.clientHeight);
@@ -259,336 +227,284 @@
                         container.appendChild(renderer.domElement);
                         document.getElementById('loading-manifest').remove();
 
-                        // Lights
-                        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+                        const ambient = new THREE.AmbientLight(0xffffff, 0.6);
                         scene.add(ambient);
-                        const point = new THREE.PointLight(0xE63946, 2, 12);
+                        const point = new THREE.PointLight(0xE63946, 2, 15);
                         point.position.set(5, 5, 5);
                         scene.add(point);
-                        const rim = new THREE.PointLight(0x00B4A6, 2, 10);
+                        const rim = new THREE.PointLight(0x00B4A6, 3, 10);
                         rim.position.set(-5, 2, -5);
                         scene.add(rim);
 
-                        // --- LEGENDARY_FOX_PROTOCOL: CINEMATIC_HUMAN_FIDELITY ---
                         astra = new THREE.Group();
 
-                        // Materials (Fur-Simulated & Fabric)
+                        // MATERIALS (Cinematic High-Contrast)
                         const skinMat = new THREE.MeshStandardMaterial({ 
-                            color: 0x0A0A0F, 
-                            roughness: 0.85, 
-                            metalness: 0.1,
-                            emissive: 0x00B4A6,
-                            emissiveIntensity: 0.05
-                        });
-                        const tunicMat = new THREE.MeshStandardMaterial({ 
-                            color: 0xE63946, 
+                            color: 0x1A1A24, // High-contrast charcoal/fur
                             roughness: 0.9,
-                            emissive: 0x800000,
-                            emissiveIntensity: 0.2
+                            emissive: 0x00B4A6,
+                            emissiveIntensity: 0.1
                         });
-                        const eyeCoreMat = new THREE.MeshBasicMaterial({ color: 0xE63946 });
-                        const detailMat = new THREE.MeshStandardMaterial({ color: 0x00B4A6, emissive: 0x00B4A6, emissiveIntensity: 1.0 });
+                        const bellyMat = new THREE.MeshStandardMaterial({ color: 0x2A2A34, roughness: 0.9 });
+                        const tunicMat = new THREE.MeshStandardMaterial({ color: 0xE63946, roughness: 0.8, emissive: 0x800000, emissiveIntensity: 0.2 });
+                        const eyeMat = new THREE.MeshBasicMaterial({ color: 0xE63946 });
+                        const glowMat = new THREE.MeshStandardMaterial({ color: 0x00B4A6, emissive: 0x00B4A6, emissiveIntensity: 1.5 });
 
-                        // 1. Articulated Torso (Humanoid Structure)
+                        // 1. TORSO RIG
                         lowerTorso = new THREE.Group();
-                        const pelvicMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 3), skinMat);
-                        pelvicMesh.scale.set(1.1, 0.8, 1);
-                        lowerTorso.add(pelvicMesh);
+                        const pelvis = new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 3), skinMat);
+                        pelvis.scale.set(1.1, 0.8, 1);
+                        lowerTorso.add(pelvis);
                         astra.add(lowerTorso);
 
                         upperTorso = new THREE.Group();
-                        const chestMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 3), skinMat);
-                        chestMesh.scale.set(1.2, 1.1, 0.9);
-                        upperTorso.add(chestMesh);
+                        const chest = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 3), skinMat);
+                        chest.scale.set(1.2, 1.1, 0.9);
+                        upperTorso.add(chest);
                         upperTorso.position.y = 0.6;
                         lowerTorso.add(upperTorso);
 
-                        // Tunic (Humanoid Fit)
-                        tunic = new THREE.Group();
-                        const tunicMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.48, 3), tunicMat);
-                        tunicMesh.scale.set(1.25, 1.2, 1.0);
-                        tunic.add(tunicMesh);
-                        const collar = new THREE.Mesh(new THREE.TorusGeometry(0.25, 0.06, 16, 32), tunicMat);
-                        collar.rotation.x = Math.PI/2;
-                        collar.position.y = 0.6;
-                        tunic.add(collar);
+                        // Tunic
+                        tunic = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 3), tunicMat);
+                        tunic.scale.set(1.25, 1.2, 1.0);
+                        tunic.position.y = 0.2;
                         upperTorso.add(tunic);
 
-                        // 2. Head & Neck
+                        // 2. HEAD & FACE
                         neck = new THREE.Group();
-                        const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.3, 12), skinMat);
-                        neck.add(neckMesh);
+                        const nMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 0.3, 12), skinMat);
+                        neck.add(nMesh);
                         neck.position.y = 0.5;
                         upperTorso.add(neck);
 
                         head = new THREE.Group();
-                        const skull = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 3), skinMat);
+                        const skull = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 3), skinMat);
                         head.add(skull);
 
-                        const muzzle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 2), skinMat);
-                        muzzle.scale.set(1.1, 0.9, 1.7);
-                        muzzle.position.set(0, -0.05, 0.38);
+                        const muzzle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.22, 2), bellyMat);
+                        muzzle.scale.set(1, 0.85, 1.7);
+                        muzzle.position.set(0, -0.05, 0.35);
                         head.add(muzzle);
 
-                        // Humanoid Facial Expression: Mouth & Eyebrows
-                        mouth = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.03, 0.1), new THREE.MeshBasicMaterial({color: 0x000000}));
+                        // Expressive Mouth
+                        mouth = new THREE.Group();
+                        const mouthTop = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.03, 0.1), skinMat);
+                        const mouthBot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.03, 0.15), skinMat);
+                        mouthBot.position.set(0, -0.08, 0);
+                        mouth.add(mouthTop);
+                        mouth.add(mouthBot);
                         mouth.position.set(0, -0.15, 0.55);
                         head.add(mouth);
 
-                        const browGeo = new THREE.BoxGeometry(0.18, 0.04, 0.06);
-                        lEyebrow = new THREE.Mesh(browGeo, skinMat);
-                        lEyebrow.position.set(-0.2, 0.28, 0.38);
+                        // Brows
+                        const bGeo = new THREE.BoxGeometry(0.2, 0.05, 0.05);
+                        lEyebrow = new THREE.Mesh(bGeo, skinMat);
+                        lEyebrow.position.set(-0.22, 0.28, 0.38);
                         head.add(lEyebrow);
-                        rEyebrow = new THREE.Mesh(browGeo, skinMat);
-                        rEyebrow.position.set(0.2, 0.28, 0.38);
+                        rEyebrow = new THREE.Mesh(bGeo, skinMat);
+                        rEyebrow.position.set(0.22, 0.28, 0.38);
                         head.add(rEyebrow);
 
-                        const earGeo = new THREE.ConeGeometry(0.13, 0.55, 4);
-                        lEar = new THREE.Mesh(earGeo, skinMat);
-                        lEar.position.set(-0.25, 0.48, 0);
-                        head.add(lEar);
-                        rEar = new THREE.Mesh(earGeo, skinMat);
-                        rEar.position.set(0.25, 0.48, 0);
-                        head.add(rEar);
-
-                        const eyeGeo = new THREE.SphereGeometry(0.085, 16, 16);
-                        lEye = new THREE.Mesh(eyeGeo, eyeCoreMat);
-                        lEye.position.set(-0.18, 0.12, 0.38);
+                        const eGeo = new THREE.SphereGeometry(0.09, 16, 16);
+                        lEye = new THREE.Mesh(eGeo, eyeMat);
+                        lEye.position.set(-0.2, 0.12, 0.38);
                         head.add(lEye);
-                        rEye = new THREE.Mesh(eyeGeo, eyeCoreMat);
-                        rEye.position.set(0.18, 0.12, 0.38);
+                        rEye = new THREE.Mesh(eGeo, eyeMat);
+                        rEye.position.set(0.2, 0.12, 0.38);
                         head.add(rEye);
+
+                        lEar = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.6, 4), skinMat);
+                        lEar.position.set(-0.28, 0.5, 0);
+                        head.add(lEar);
+                        rEar = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.6, 4), skinMat);
+                        rEar.position.set(0.28, 0.5, 0);
+                        head.add(rEar);
 
                         head.position.y = 0.3;
                         neck.add(head);
 
-                        // 3. Humanoid Arms (Jointed)
-                        function createHumanArm(isLeft) {
-                            const armGroup = new THREE.Group();
-                            const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.06, 0.5, 12), skinMat);
-                            upperArm.position.y = -0.25;
-                            armGroup.add(upperArm);
+                        // 3. LIMBS
+                        function createLimb(isArm, isLeft) {
+                            const group = new THREE.Group();
+                            const upper = new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.08 : 0.12, isArm ? 0.07 : 0.1, 0.6, 12), skinMat);
+                            upper.position.y = -0.3;
+                            group.add(upper);
                             
-                            const forearm = new THREE.Group();
-                            const forearmMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.5, 12), skinMat);
-                            forearmMesh.position.y = -0.25;
-                            forearm.add(forearmMesh);
-                            forearm.position.y = -0.5;
-                            upperArm.add(forearm);
+                            const lower = new THREE.Group();
+                            const lowerMesh = new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.07 : 0.1, isArm ? 0.06 : 0.09, 0.6, 12), skinMat);
+                            lowerMesh.position.y = -0.3;
+                            lower.add(lowerMesh);
+                            lower.position.y = -0.6;
+                            upper.add(lower);
                             
-                            const hand = new THREE.Group();
-                            const palm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.08), skinMat);
-                            hand.add(palm);
-                            const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.06), detailMat);
-                            thumb.position.set(isLeft ? 0.1 : -0.1, -0.05, 0.05);
-                            hand.add(thumb);
-                            hand.position.y = -0.6;
-                            forearm.add(hand);
+                            const end = new THREE.Group();
+                            const endMesh = new THREE.Mesh(new THREE.BoxGeometry(isArm ? 0.2 : 0.22, isArm ? 0.2 : 0.15, isArm ? 0.1 : 0.5), skinMat);
+                            end.add(endMesh);
+                            if(isArm) {
+                                const fingers = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, 0.06), glowMat);
+                                fingers.position.y = -0.12;
+                                end.add(fingers);
+                            }
+                            end.position.y = -0.7;
+                            lower.add(end);
                             
-                            return { armGroup, forearm, hand };
+                            return { group, lower, end };
                         }
 
-                        const leftArmData = createHumanArm(true);
-                        lArm = leftArmData.armGroup;
-                        lArm.position.set(-0.65, 0.4, 0);
-                        upperTorso.add(lArm);
+                        const la = createLimb(true, true); lArm = la.group; lArm.position.set(-0.65, 0.4, 0); upperTorso.add(lArm);
+                        const ra = createLimb(true, false); rArm = ra.group; rArm.position.set(0.65, 0.4, 0); upperTorso.add(rArm);
+                        const ll = createLimb(false, true); lLeg = ll.group; lLeg.position.set(-0.28, -0.1, 0); lowerTorso.add(lLeg);
+                        const rl = createLimb(false, false); rLeg = rl.group; rLeg.position.set(0.28, -0.1, 0); lowerTorso.add(rLeg);
 
-                        const rightArmData = createHumanArm(false);
-                        rArm = rightArmData.armGroup;
-                        rArm.position.set(0.65, 0.4, 0);
-                        upperTorso.add(rArm);
+                        lHand = la.end; rHand = ra.end;
+                        lFoot = ll.end; rFoot = rl.end;
 
-                        // 4. Humanoid Legs (Jointed)
-                        function createHumanLeg() {
-                            const legGroup = new THREE.Group();
-                            const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.08, 0.6, 12), skinMat);
-                            thigh.position.y = -0.3;
-                            legGroup.add(thigh);
-                            
-                            const calf = new THREE.Group();
-                            const calfMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.6, 12), skinMat);
-                            calfMesh.position.y = -0.3;
-                            calf.add(calfMesh);
-                            calf.position.y = -0.6;
-                            thigh.add(calf);
-                            
-                            const foot = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.5), skinMat);
-                            foot.position.set(0, -0.7, 0.2);
-                            calf.add(foot);
-                            
-                            return { legGroup, calf };
-                        }
-
-                        const leftLegData = createHumanLeg();
-                        lLeg = leftLegData.legGroup;
-                        lLeg.position.set(-0.25, -0.1, 0);
-                        lowerTorso.add(lLeg);
-
-                        const rightLegData = createHumanLeg();
-                        rLeg = rightLegData.legGroup;
-                        rLeg.position.set(0.25, -0.1, 0);
-                        lowerTorso.add(rLeg);
-
-                        // 5. Tail
-                        tail = new THREE.Mesh(new THREE.IcosahedronGeometry(0.28, 2), skinMat);
-                        tail.scale.set(1, 1, 3.8);
+                        // 4. TAIL
+                        tail = new THREE.Mesh(new THREE.IcosahedronGeometry(0.3, 2), skinMat);
+                        tail.scale.set(1, 1, 4.5);
                         tail.position.set(0, 0, -0.4);
                         tail.rotation.x = -Math.PI / 8;
                         lowerTorso.add(tail);
 
                         astra.position.y = 1.0;
                         scene.add(astra);
-                        animateAstra();
+                        animate();
                     }
 
-                    function animateAstra() {
-                        requestAnimationFrame(animateAstra);
-                        const time = Date.now() * 0.001;
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        const t = Date.now() * 0.001;
+                        resetRig();
 
-                        // --- THE HUMAN_FIDELITY_WALK_ENGINE ---
-                        const walkSpeed = 4.5;
-                        const walkAmp = 0.5;
-                        const cycle = time * walkSpeed;
-                        const stride = Math.sin(cycle);
-                        const strideCos = Math.cos(cycle);
-                        
-                        // 1. Natural Weight Shift (Hips & Spine)
-                        lowerTorso.rotation.z = stride * 0.08; // Hip sway
-                        lowerTorso.rotation.x = Math.abs(strideCos) * 0.05; // Pelvic tilt
-                        astra.position.y = 1.0 + Math.abs(strideCos) * 0.15; // Natural bobbing
-                        
-                        // 2. Counter-Rotation (Shoulders vs Hips)
-                        upperTorso.rotation.y = -stride * 0.15; 
-                        upperTorso.rotation.z = -stride * 0.05;
-
-                        // 3. Human Legs (Jointed Bend)
-                        lLeg.rotation.x = stride * walkAmp;
-                        rLeg.rotation.x = -stride * walkAmp;
-                        // Knee Bend (Heel Strike to Toe Off)
-                        lLeg.children[0].children[0].rotation.x = Math.max(0, -stride * 0.6); 
-                        rLeg.children[0].children[0].rotation.x = Math.max(0, stride * 0.6);
-
-                        // 4. Human Arms (Natural Swing & Elbow Flex)
-                        lArm.rotation.x = -stride * (walkAmp * 0.9);
-                        rArm.rotation.x = stride * (walkAmp * 0.9);
-                        lArm.children[0].children[0].rotation.x = -0.3 + Math.abs(stride) * 0.4;
-                        rArm.children[0].children[0].rotation.x = -0.3 + Math.abs(stride) * 0.4;
-                        lArm.rotation.z = -0.15;
-                        rArm.rotation.z = 0.15;
-
-                        // 5. Head Tracking & Stability
-                        neck.rotation.x = -upperTorso.rotation.x - lowerTorso.rotation.x + 0.1;
-                        head.rotation.y = Math.sin(time * 0.7) * 0.15;
-
-                        // 6. SENTIENT EXPRESSION ENGINE
-                        // Determined/Focus Face
-                        lEyebrow.rotation.z = -0.2 + Math.sin(time * 2) * 0.1;
-                        rEyebrow.rotation.z = 0.2 - Math.sin(time * 2) * 0.1;
-                        lEyebrow.position.y = 0.28 + Math.abs(Math.sin(time)) * 0.02;
-
-                        // Blinking (Natural Pattern)
-                        if(Math.random() > 0.992) {
-                            lEye.scale.y = 0.1; rEye.scale.y = 0.1;
-                            setTimeout(() => { lEye.scale.y = 1; rEye.scale.y = 1; }, 80);
+                        // ANIMATION STATE MACHINE
+                        switch(animState) {
+                            case 'IDLE':
+                                astra.position.y = 1.1 + Math.sin(t * 1.5) * 0.05;
+                                lowerTorso.rotation.x = Math.sin(t * 1.2) * 0.03;
+                                lArm.rotation.x = 0.2 + Math.sin(t * 1.5) * 0.1;
+                                rArm.rotation.x = 0.2 + Math.cos(t * 1.5) * 0.1;
+                                break;
+                            case 'WALK':
+                                applyWalk(t, 5, 0.5, 0.15);
+                                break;
+                            case 'RUN':
+                                applyWalk(t, 10, 0.8, 0.25);
+                                break;
+                            case 'SKIP':
+                                applyWalk(t, 6, 0.6, 0.3);
+                                astra.position.y = 1.2 + Math.abs(Math.sin(t * 6)) * 0.5;
+                                break;
+                            case 'HOP':
+                                astra.position.y = 1.0 + Math.abs(Math.sin(t * 8)) * 0.8;
+                                lLeg.rotation.x = -0.3; rLeg.rotation.x = -0.3;
+                                lArm.rotation.x = 0.5; rArm.rotation.x = 0.5;
+                                break;
+                            case 'LEAP':
+                                astra.position.y = 1.0 + Math.sin(t * 3) * 2;
+                                astra.position.z = Math.cos(t * 3) * 1.5;
+                                lLeg.rotation.x = 1.2; rLeg.rotation.x = 1.2;
+                                break;
+                            case 'WAVE':
+                                rArm.rotation.x = -1.5;
+                                rArm.children[0].children[0].rotation.z = Math.sin(t * 8) * 0.5;
+                                break;
+                            case 'THUMBS_UP':
+                                rArm.rotation.x = -1.2;
+                                rHand.rotation.z = 0.5;
+                                break;
+                            case 'PEACE':
+                                lArm.rotation.x = -1.2;
+                                lHand.scale.set(1.2, 1.2, 1);
+                                break;
+                            case 'HEART':
+                                lArm.rotation.set(-1, 0, 0.5);
+                                rArm.rotation.set(-1, 0, -0.5);
+                                break;
+                            case 'TALK':
+                                mouth.children[1].position.y = -0.08 + Math.abs(Math.sin(t * 15)) * 0.12;
+                                head.rotation.x = Math.sin(t * 5) * 0.05;
+                                break;
                         }
 
-                        // Breathing & Tail
-                        const breath = 1 + Math.sin(time * 2) * 0.015;
-                        upperTorso.scale.x = breath;
-                        tail.rotation.y = Math.sin(time * 3) * 0.3;
+                        // UNIVERSAL SECONDARY MOTIONS
+                        tail.rotation.y = Math.sin(t * 3) * 0.6;
+                        tail.rotation.z = Math.cos(t * 2) * 0.2;
+                        lEyebrow.rotation.z = -0.1 + Math.sin(t * 4) * 0.05;
+                        rEyebrow.rotation.z = 0.1 - Math.sin(t * 4) * 0.05;
+                        
+                        if(Math.random() > 0.99) { lEye.scale.y = 0.1; rEye.scale.y = 0.1; setTimeout(()=> { lEye.scale.y=1; rEye.scale.y=1;}, 80); }
 
-                        astra.rotation.y += 0.005; // Display Rotation
+                        astra.rotation.y += 0.005;
                         renderer.render(scene, camera);
                     }
+
+                    function applyWalk(t, speed, amp, bob) {
+                        const stride = Math.sin(t * speed);
+                        const strideCos = Math.cos(t * speed);
+                        lLeg.rotation.x = stride * amp;
+                        rLeg.rotation.x = -stride * amp;
+                        lArm.rotation.x = -stride * (amp * 0.8);
+                        rArm.rotation.x = stride * (amp * 0.8);
+                        astra.position.y = 1.1 + Math.abs(strideCos) * bob;
+                        lowerTorso.rotation.z = stride * 0.05;
+                        upperTorso.rotation.y = -stride * 0.1;
+                    }
+
+                    function resetRig() {
+                        astra.position.set(0, 1, 0);
+                        astra.rotation.set(0, astra.rotation.y, 0);
+                        lArm.rotation.set(0,0,0); rArm.rotation.set(0,0,0);
+                        lLeg.rotation.set(0,0,0); rLeg.rotation.set(0,0,0);
+                        lHand.rotation.set(0,0,0); rHand.rotation.set(0,0,0);
+                        lHand.scale.set(1,1,1); mouth.children[1].position.y = -0.08;
+                    }
+
+                    window.setAnim = (s) => {
+                        animState = s;
+                        document.querySelectorAll('.btn-anim').forEach(b => b.classList.remove('active'));
+                        event.target.classList.add('active');
+                    };
 
                     initAstra();
                 </script>
             </div>
         </div>
 
-        <!-- CONTENT SIDE -->
         <div class="content">
             <header class="header">
-                <span class="tagline">Neural Unit // ASTRA-01</span>
-                <h1>The Obsidian<br>Fox</h1>
+                <span class="tagline">Neural Unit // ASTRA-MAX</span>
+                <h1>Cinematic<br>Manifest</h1>
                 <p class="bio">
-                    Constructed in the deep-void laboratories of Atelier World, Astra is not merely a character—she is a sentient neural bridge. Her chassis is composed of softFur (matte obsidian-composite) that absorbs 99.9% of ambient light, while her internals pulse with raw data-flow.
+                    Astra has evolved. No longer a silhouette in the void, she is now manifest in high-fidelity charcoal charcoal fur with neural-teal highlights. She is built for multidimensional performance—capable of running, leaping, and expressing human-like sentience through a complex rig of jointed limbs and facial optics.
                 </p>
             </header>
 
             <section>
-                <h2>Core Architecture</h2>
+                <h2>Performance Architecture</h2>
                 <ul class="spec-list">
                     <li>
-                        <span class="spec-label">Species</span>
-                        <span class="spec-value">Sub-Void Neural Fox</span>
+                        <span class="spec-label">Visual Status</span>
+                        <span class="spec-value">High-Contrast Charcoal</span>
                     </li>
                     <li>
-                        <span class="spec-label">Optics</span>
-                        <span class="spec-value">Crimson Specular (X-Ray)</span>
+                        <span class="spec-label">Animations</span>
+                        <span class="spec-value">10+ Action States</span>
                     </li>
                     <li>
-                        <span class="spec-label">Chassis Material</span>
-                        <span class="spec-value">Synthetic Reactive Skin</span>
+                        <span class="spec-label">Facial Rig</span>
+                        <span class="spec-value">Jointed Brows & Jaw</span>
                     </li>
                     <li>
-                        <span class="spec-label">Tactical Apparel</span>
-                        <span class="spec-value">Nano-Crimson Tunic</span>
-                    </li>
-                    <li>
-                        <span class="spec-label">Neural Sync Rate</span>
-                        <span class="spec-value">99.8% Perfect</span>
+                        <span class="spec-label">Limb Rig</span>
+                        <span class="spec-value">IK Jointed Humanoid</span>
                     </li>
                 </ul>
             </section>
 
             <section>
-                <h2>Master Abilities</h2>
-                <div class="ability-grid">
-                    <div class="ability-card">
-                        <div class="ability-name">
-                            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                            </svg>
-                            Void Shift
-                        </div>
-                        <p class="ability-desc">Short-range neural displacement. Astra can bypass physical and digital firewalls by temporarily phasing into the sub-void.</p>
-                    </div>
-                    <div class="ability-card">
-                        <div class="ability-name">
-                            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="3"/>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                            </svg>
-                            Sync-Link
-                        </div>
-                        <p class="ability-desc">Direct mind-to-machine interface. Allows Astra to control the ship’s weapons and engines with zero latency, purely through thought.</p>
-                    </div>
-                    <div class="ability-card">
-                        <div class="ability-name">
-                            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                            </svg>
-                            Phantom Pulse
-                        </div>
-                        <p class="ability-desc">A wide-range sensory wave. Emits a localized crimson pulse that reveals hidden enemies or rare network loot caches.</p>
-                    </div>
-                    <div class="ability-card">
-                        <div class="ability-name">
-                            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            </svg>
-                            Void Barrier
-                        </div>
-                        <p class="ability-desc">The ultimate defense. Astra creates a localized field of negative energy that deletes incoming projectiles from existence.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section>
                 <h2>Design Philosophy</h2>
                 <p class="bio">
-                    The design goal for Astra was "Tactile Futurism." Unlike Mario’s playful, rounded shapes, Astra is defined by sharp angles, high-contrast lighting, and a feeling of dangerous precision. She is built for speed and intelligence, representing the peak of Atelier's RPG evolution.
+                    The goal for this reveal was "Visual Visibility." By lightening the base obsidian to a charcoal grey and adding neural-teal highlights to the hands and tail, every movement—from a wave to a run—is now unmistakable. She is the first Atelier character to possess a fully jointed facial rig for lip-sync and emotional expression.
                 </p>
                 <div style="margin-top: 60px;">
                     <a href="/ateliergaming/" style="text-decoration: none; color: var(--crimson); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 12px; border: 1px solid var(--crimson); padding: 15px 30px; transition: 0.3s;" onmouseover="this.style.background='var(--crimson)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='var(--crimson)'">Return to Bridge</a>
