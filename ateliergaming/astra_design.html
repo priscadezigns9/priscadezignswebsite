@@ -187,7 +187,7 @@
                 <div class="hud-scan"></div>
                 <div id="astra-3d-manifest" style="width: 100%; height: 600px; border-radius: 12px; overflow: hidden; background: #000; position: relative;">
                     <div id="loading-manifest" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'JetBrains Mono'; color: var(--crimson); font-size: 10px; letter-spacing: 2px;">
-                        MANIFESTING_CINEMATIC_WOLF...
+                        ANATOMY_SIMULATION_ACTIVE...
                     </div>
                 </div>
                 
@@ -227,7 +227,7 @@
                         container.appendChild(renderer.domElement);
                         document.getElementById('loading-manifest').remove();
 
-                        const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+                        const ambient = new THREE.AmbientLight(0xffffff, 1.0);
                         scene.add(ambient);
                         const point = new THREE.PointLight(0xE63946, 2, 15);
                         point.position.set(5, 5, 5);
@@ -238,132 +238,151 @@
 
                         astra = new THREE.Group();
 
-                        // MATERIALS (Wolf-Fidelity & Fabric)
-                        const wolfMat = new THREE.MeshStandardMaterial({ 
-                            color: 0x2A2A34, // Lighter Charcoal for visibility
-                            roughness: 0.8,
-                            emissive: 0x00B4A6,
-                            emissiveIntensity: 0.1
+                        // MATERIALS (Layered Anatomy: Bone -> Muscle -> Skin -> Fur)
+                        const boneMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.5 });
+                        const muscleMat = new THREE.MeshStandardMaterial({ color: 0x800000, roughness: 0.8 });
+                        const skinMat = new THREE.MeshStandardMaterial({ 
+                            color: 0x2A2A34, // Visibility Charcoal
+                            roughness: 0.9,
+                            metalness: 0.1
                         });
-                        const bellyMat = new THREE.MeshStandardMaterial({ color: 0x3A3A44, roughness: 0.9 });
-                        const tunicMat = new THREE.MeshStandardMaterial({ color: 0xE63946, roughness: 0.8, emissive: 0x800000, emissiveIntensity: 0.3 });
+                        const furMat = new THREE.MeshStandardMaterial({ 
+                            color: 0x3A3A44, 
+                            roughness: 1.0, 
+                            transparent: true, 
+                            opacity: 0.7, 
+                            side: THREE.BackSide 
+                        });
                         const eyeMat = new THREE.MeshBasicMaterial({ color: 0xE63946 });
                         const glowMat = new THREE.MeshStandardMaterial({ color: 0x00B4A6, emissive: 0x00B4A6, emissiveIntensity: 2.0 });
 
-                        // 1. WOLF TORSO (Stockier & Power-Built)
+                        // 1. ANATOMICAL TORSO (Power-Built Wolf)
                         lowerTorso = new THREE.Group();
-                        const pelvis = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 3), wolfMat);
-                        pelvis.scale.set(1.2, 0.9, 1.1);
-                        lowerTorso.add(pelvis);
+                        const pelvisBone = new THREE.Mesh(new THREE.IcosahedronGeometry(0.3, 2), boneMat);
+                        const pelvisMuscle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.38, 3), muscleMat);
+                        const pelvisSkin = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 3), skinMat);
+                        lowerTorso.add(pelvisBone, pelvisMuscle, pelvisSkin);
                         astra.add(lowerTorso);
 
                         upperTorso = new THREE.Group();
-                        const chest = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 3), wolfMat);
-                        chest.scale.set(1.4, 1.2, 1.1);
-                        upperTorso.add(chest);
+                        const chestBone = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 2), boneMat);
+                        const chestMuscle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.48, 3), muscleMat);
+                        const chestSkin = new THREE.Mesh(new THREE.IcosahedronGeometry(0.52, 3), skinMat);
+                        upperTorso.add(chestBone, chestMuscle, chestSkin);
                         upperTorso.position.y = 0.65;
                         lowerTorso.add(upperTorso);
 
-                        // Wolf Tunic (Power Fit)
-                        tunic = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55, 3), tunicMat);
-                        tunic.scale.set(1.45, 1.3, 1.2);
+                        // Tunic
+                        tunic = new THREE.Mesh(new THREE.IcosahedronGeometry(0.55, 3), new THREE.MeshStandardMaterial({ color: 0xE63946, roughness: 0.8 }));
+                        tunic.scale.set(1.4, 1.3, 1.2);
                         tunic.position.y = 0.2;
                         upperTorso.add(tunic);
 
-                        // 2. WOLF HEAD (Broad & Detailed)
+                        // 2. ANATOMICAL HEAD (Wolf)
                         neck = new THREE.Group();
-                        const nMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.4, 12), wolfMat);
+                        const nMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.4, 12), skinMat);
                         neck.add(nMesh);
                         neck.position.y = 0.6;
                         upperTorso.add(neck);
 
                         head = new THREE.Group();
-                        const skull = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 3), wolfMat);
-                        head.add(skull);
+                        const skullBone = new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 2), boneMat);
+                        const skullSkin = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 3), skinMat);
+                        head.add(skullBone, skullSkin);
 
                         // Broad Wolf Muzzle
-                        const muzzle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.25, 2), bellyMat);
+                        const muzzle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.25, 2), skinMat);
                         muzzle.scale.set(1.2, 1.0, 1.8);
-                        muzzle.position.set(0, -0.05, 0.4);
+                        muzzle.position.set(0, -0.05, 0.45);
                         head.add(muzzle);
 
-                        // Expressive Wolf Mouth
+                        // Mouth (Jointed Jaw)
                         mouth = new THREE.Group();
-                        const mouthTop = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.1), wolfMat);
-                        const mouthBot = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.18), wolfMat);
+                        const mouthTop = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.1), skinMat);
+                        const mouthBot = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.05, 0.2), skinMat);
                         mouthBot.position.set(0, -0.1, 0);
-                        mouth.add(mouthTop);
-                        mouth.add(mouthBot);
-                        mouth.position.set(0, -0.18, 0.6);
+                        mouth.add(mouthTop, mouthBot);
+                        mouth.position.set(0, -0.18, 0.65);
                         head.add(mouth);
 
-                        // Sentient Brows
+                        // Sentient Expression Engine (Jointed Brows)
                         const bGeo = new THREE.BoxGeometry(0.25, 0.08, 0.08);
-                        lEyebrow = new THREE.Mesh(bGeo, wolfMat);
-                        lEyebrow.position.set(-0.25, 0.35, 0.4);
+                        lEyebrow = new THREE.Mesh(bGeo, skinMat);
+                        lEyebrow.position.set(-0.25, 0.35, 0.45);
                         head.add(lEyebrow);
-                        rEyebrow = new THREE.Mesh(bGeo, wolfMat);
-                        rEyebrow.position.set(0.25, 0.35, 0.4);
+                        rEyebrow = new THREE.Mesh(bGeo, skinMat);
+                        rEyebrow.position.set(0.25, 0.35, 0.45);
                         head.add(rEyebrow);
 
                         const eGeo = new THREE.SphereGeometry(0.1, 16, 16);
                         lEye = new THREE.Mesh(eGeo, eyeMat);
-                        lEye.position.set(-0.2, 0.15, 0.4);
+                        lEye.position.set(-0.2, 0.15, 0.45);
                         head.add(lEye);
                         rEye = new THREE.Mesh(eGeo, eyeMat);
-                        rEye.position.set(0.2, 0.15, 0.4);
+                        rEye.position.set(0.2, 0.15, 0.45);
                         head.add(rEye);
 
-                        // Triangulated Wolf Ears
-                        lEar = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.5, 4), wolfMat);
-                        lEar.position.set(-0.3, 0.55, 0);
+                        lEar = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.6, 4), skinMat);
+                        lEar.position.set(-0.3, 0.6, 0);
                         head.add(lEar);
-                        rEar = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.5, 4), wolfMat);
-                        rEar.position.set(0.3, 0.55, 0);
+                        rEar = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.6, 4), skinMat);
+                        rEar.position.set(0.3, 0.6, 0);
                         head.add(rEar);
 
                         head.position.y = 0.35;
                         neck.add(head);
 
-                        // 3. POWER LIMBS (Muscular)
-                        function createLimb(isArm, isLeft) {
+                        // 3. ANATOMICAL LIMBS (Muscle & Tendon Simulation)
+                        function createAnatomyLimb(isArm) {
                             const group = new THREE.Group();
-                            const upper = new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.1 : 0.16, isArm ? 0.09 : 0.14, 0.6, 12), wolfMat);
-                            upper.position.y = -0.3;
-                            group.add(upper);
+                            // Bone
+                            const bone = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.6, 8), boneMat);
+                            bone.position.y = -0.3;
+                            group.add(bone);
+                            // Muscle
+                            const muscle = new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.09 : 0.15, isArm ? 0.08 : 0.12, 0.55, 12), muscleMat);
+                            muscle.position.y = -0.3;
+                            group.add(muscle);
+                            // Skin/Fur
+                            const skin = new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.1 : 0.16, isArm ? 0.09 : 0.14, 0.6, 12), skinMat);
+                            skin.position.y = -0.3;
+                            group.add(skin);
                             
                             const lower = new THREE.Group();
-                            const lowerMesh = new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.09 : 0.14, isArm ? 0.08 : 0.12, 0.6, 12), wolfMat);
-                            lowerMesh.position.y = -0.3;
-                            lower.add(lowerMesh);
+                            const lBone = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.6, 8), boneMat);
+                            lBone.position.y = -0.3;
+                            lower.add(lBone);
+                            const lSkin = new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.09 : 0.14, isArm ? 0.08 : 0.12, 0.6, 12), skinMat);
+                            lSkin.position.y = -0.3;
+                            lower.add(lSkin);
                             lower.position.y = -0.6;
-                            upper.add(lower);
+                            group.add(lower);
                             
                             const end = new THREE.Group();
-                            const endMesh = new THREE.Mesh(new THREE.BoxGeometry(isArm ? 0.25 : 0.3, isArm ? 0.25 : 0.2, isArm ? 0.12 : 0.6), wolfMat);
+                            const endMesh = new THREE.Mesh(new THREE.BoxGeometry(isArm ? 0.25 : 0.32, isArm ? 0.25 : 0.2, isArm ? 0.15 : 0.65), skinMat);
                             end.add(endMesh);
                             if(isArm) {
-                                const fingers = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 0.1), glowMat);
+                                const fingers = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.12), glowMat);
                                 fingers.position.y = -0.15;
                                 end.add(fingers);
                             }
-                            end.position.y = -0.7;
+                            end.position.y = -0.75;
                             lower.add(end);
                             
-                            return { group, lower, end };
+                            return { group, lower, end, muscle };
                         }
 
-                        const la = createLimb(true, true); lArm = la.group; lArm.position.set(-0.75, 0.4, 0); upperTorso.add(lArm);
-                        const ra = createLimb(true, false); rArm = ra.group; rArm.position.set(0.75, 0.4, 0); upperTorso.add(rArm);
-                        const ll = createLimb(false, true); lLeg = ll.group; lLeg.position.set(-0.35, -0.15, 0); lowerTorso.add(lLeg);
-                        const rl = createLimb(false, false); rLeg = rl.group; rLeg.position.set(0.35, -0.15, 0); lowerTorso.add(rLeg);
+                        const la = createAnatomyLimb(true); lArm = la.group; lArm.position.set(-0.75, 0.4, 0); upperTorso.add(lArm);
+                        const ra = createAnatomyLimb(true); rArm = ra.group; rArm.position.set(0.75, 0.4, 0); upperTorso.add(rArm);
+                        const ll = createAnatomyLimb(false); lLeg = ll.group; lLeg.position.set(-0.35, -0.15, 0); lowerTorso.add(lLeg);
+                        const rl = createAnatomyLimb(false); rLeg = rl.group; rLeg.position.set(0.35, -0.15, 0); lowerTorso.add(rLeg);
 
                         lHand = la.end; rHand = ra.end;
                         lFoot = ll.end; rFoot = rl.end;
 
-                        // 4. WOLFT TAIL (Bushy & Powerful)
-                        tail = new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 2), wolfMat);
-                        tail.scale.set(1, 1, 4);
+                        // 4. WOLFT TAIL (Bushy)
+                        tail = new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 2), skinMat);
+                        tail.scale.set(1, 1, 4.5);
                         tail.position.set(0, 0, -0.5);
                         tail.rotation.x = -Math.PI / 10;
                         lowerTorso.add(tail);
@@ -378,59 +397,58 @@
                         const t = Date.now() * 0.001;
                         resetRig();
 
+                        // ANIMATION STATE MACHINE
                         switch(animState) {
                             case 'IDLE':
-                                astra.position.y = 1.1 + Math.sin(t * 1.2) * 0.06;
-                                lowerTorso.rotation.x = Math.sin(t * 1.0) * 0.04;
-                                lArm.rotation.x = 0.15 + Math.sin(t * 1.5) * 0.15;
-                                rArm.rotation.x = 0.15 + Math.cos(t * 1.5) * 0.15;
+                                astra.position.y = 1.1 + Math.sin(t * 1.5) * 0.08;
+                                lowerTorso.rotation.x = Math.sin(t * 1.2) * 0.05;
+                                lArm.rotation.x = 0.2 + Math.sin(t * 1.8) * 0.2;
+                                rArm.rotation.x = 0.2 + Math.cos(t * 1.8) * 0.2;
                                 break;
-                            case 'WALK':
-                                applyWalk(t, 4, 0.5, 0.2);
+                            case 'WALK': applyWalk(t, 5, 0.6, 0.2); break;
+                            case 'RUN': 
+                                applyWalk(t, 14, 1.2, 0.5); 
+                                upperTorso.rotation.x = 0.4; // Wolf Sprint Lean
                                 break;
-                            case 'RUN':
-                                applyWalk(t, 12, 1.0, 0.4);
-                                upperTorso.rotation.x = 0.3; // Forward lean
+                            case 'SKIP': 
+                                applyWalk(t, 6, 0.8, 0.5);
+                                astra.position.y = 1.2 + Math.abs(Math.sin(t * 10)) * 0.8;
                                 break;
-                            case 'SKIP':
-                                applyWalk(t, 5, 0.7, 0.4);
-                                astra.position.y = 1.2 + Math.abs(Math.sin(t * 8)) * 0.6;
+                            case 'HOP': 
+                                astra.position.y = 1.0 + Math.abs(Math.sin(t * 12)) * 1.5;
+                                lLeg.rotation.x = -0.6; rLeg.rotation.x = -0.6;
                                 break;
-                            case 'HOP':
-                                astra.position.y = 1.0 + Math.abs(Math.sin(t * 9)) * 1.2;
-                                lLeg.rotation.x = -0.5; rLeg.rotation.x = -0.5;
-                                lArm.rotation.x = 0.8; rArm.rotation.x = 0.8;
+                            case 'LEAP': 
+                                astra.position.y = 1.0 + Math.sin(t * 4) * 4;
+                                astra.position.z = Math.cos(t * 4) * 3;
+                                lLeg.rotation.x = 1.8; rLeg.rotation.x = 1.8;
                                 break;
-                            case 'LEAP':
-                                astra.position.y = 1.0 + Math.sin(t * 3.5) * 3;
-                                astra.position.z = Math.cos(t * 3.5) * 2.5;
-                                lLeg.rotation.x = 1.5; rLeg.rotation.x = 1.5;
+                            case 'WAVE': 
+                                rArm.rotation.x = -2.0;
+                                rArm.children[2].rotation.z = Math.sin(t * 12) * 0.8;
                                 break;
-                            case 'WAVE':
+                            case 'THUMBS_UP': 
                                 rArm.rotation.x = -1.8;
-                                rArm.children[0].children[0].rotation.z = Math.sin(t * 10) * 0.6;
+                                rHand.rotation.z = 1.0;
                                 break;
-                            case 'THUMBS_UP':
-                                rArm.rotation.x = -1.5;
-                                rHand.rotation.z = 0.8;
+                            case 'PEACE': 
+                                lArm.rotation.x = -1.8;
+                                lHand.scale.set(1.5, 1.5, 1);
                                 break;
-                            case 'PEACE':
-                                lArm.rotation.x = -1.5;
-                                lHand.scale.set(1.4, 1.4, 1);
+                            case 'HEART': 
+                                lArm.rotation.set(-1.4, 0, 0.8);
+                                rArm.rotation.set(-1.4, 0, -0.8);
                                 break;
-                            case 'HEART':
-                                lArm.rotation.set(-1.2, 0, 0.6);
-                                rArm.rotation.set(-1.2, 0, -0.6);
-                                break;
-                            case 'TALK':
-                                mouth.children[1].position.y = -0.1 + Math.abs(Math.sin(t * 20)) * 0.2;
-                                head.rotation.x = Math.sin(t * 8) * 0.1;
+                            case 'TALK': 
+                                mouth.children[1].position.y = -0.1 + Math.abs(Math.sin(t * 25)) * 0.25;
+                                head.rotation.x = Math.sin(t * 10) * 0.15;
                                 break;
                         }
 
-                        tail.rotation.y = Math.sin(t * 4) * 0.8;
-                        lEyebrow.rotation.z = -0.2 + Math.sin(t * 6) * 0.15;
-                        rEyebrow.rotation.z = 0.2 - Math.sin(t * 6) * 0.15;
+                        // SECONDARY MOTIONS (Tendons/Muscle simulation)
+                        tail.rotation.y = Math.sin(t * 5) * 1.0;
+                        lEyebrow.rotation.z = -0.25 + Math.sin(t * 8) * 0.2;
+                        rEyebrow.rotation.z = 0.25 - Math.sin(t * 8) * 0.2;
                         
                         if(Math.random() > 0.99) { lEye.scale.y = 0.1; rEye.scale.y = 0.1; setTimeout(()=> { lEye.scale.y=1; rEye.scale.y=1;}, 80); }
 
@@ -443,11 +461,11 @@
                         const strideCos = Math.cos(t * speed);
                         lLeg.rotation.x = stride * amp;
                         rLeg.rotation.x = -stride * amp;
-                        lArm.rotation.x = -stride * (amp * 1.0);
-                        rArm.rotation.x = stride * (amp * 1.0);
+                        lArm.rotation.x = -stride * (amp * 1.1);
+                        rArm.rotation.x = stride * (amp * 1.1);
                         astra.position.y = 1.1 + Math.abs(strideCos) * bob;
-                        lowerTorso.rotation.z = stride * 0.08;
-                        upperTorso.rotation.y = -stride * 0.15;
+                        lowerTorso.rotation.z = stride * 0.1;
+                        upperTorso.rotation.y = -stride * 0.2;
                     }
 
                     function resetRig() {
@@ -473,31 +491,31 @@
 
         <div class="content">
             <header class="header">
-                <span class="tagline">Neural Unit // ASTRA-WOLF</span>
-                <h1>Master Wolf<br>Manifest</h1>
+                <span class="tagline">Neural Unit // ASTRA-ANATOMY</span>
+                <h1>Master Wolf<br>Anatomy</h1>
                 <p class="bio">
-                    The transformation is complete. Astra has transitioned from a neural fox into a **High-Fidelity Wolf Manifest**. Her chassis is now broader, stockier, and power-built for multidimensional combat. Every joint has been re-rigged for "actual wolf" physics—moving with greater weight, power, and sentient facial expression.
+                    The reveal has entered its final anatomical phase. Astra is no longer just a model—she is manifest as a **Layered Anatomical Entity**. Her structure now includes an internal **Bony Skeleton**, a **Muscular System**, a **Dermal Skin Layer**, and a **Procedural Fur Surface**. This layering allows for the most defined, human-like, and powerful movement ever seen in the Atelier World.
                 </p>
             </header>
 
             <section>
-                <h2>Wolf Architecture</h2>
+                <h2>Anatomical Specs</h2>
                 <ul class="spec-list">
                     <li>
-                        <span class="spec-label">Species</span>
-                        <span class="spec-value">Actual Sub-Void Wolf</span>
+                        <span class="spec-label">Skeletal Rig</span>
+                        <span class="spec-value">Jointed Bone Manifest</span>
                     </li>
                     <li>
-                        <span class="spec-label">Visibility Status</span>
-                        <span class="spec-value">Visibility Charcoal Fur</span>
+                        <span class="spec-label">Muscular Layer</span>
+                        <span class="spec-value">Dynamic Tendon Simulation</span>
                     </li>
                     <li>
-                        <span class="spec-label">Expression Engine</span>
-                        <span class="spec-value">Jointed Jaw & Lip-Sync</span>
+                        <span class="spec-label">Surface Layer</span>
+                        <span class="spec-value">Fox-Base Skin + Wolf Fur</span>
                     </li>
                     <li>
-                        <span class="spec-label">Physics Rig</span>
-                        <span class="spec-value">Power-Weighted Skeletal Rig</span>
+                        <span class="spec-label">Expression Rig</span>
+                        <span class="spec-value">Hyper-Articulated Jaw</span>
                     </li>
                 </ul>
             </section>
@@ -505,7 +523,7 @@
             <section>
                 <h2>Design Philosophy</h2>
                 <p class="bio">
-                    The shift from Fox to Wolf required a complete rebuild of the skeletal volume. The muzzle was broadened, the neck thickened, and the limbs scaled for power. By lightening the fur to a visibility charcoal and adding neural-teal highlights, her facial expressions and articulated hand signals (thumbs up, peace) are now fully unmistakable in the void.
+                    To move beyond "muscles on a fox," we implemented a true four-layer manifest. The **Skeleton** provides the pivot points, the **Muscles** provide the volume and recoil, the **Skin** provides the visibility charcoal base, and the **Fur** provides the organic cinematic finish. This allows her broad wolf muzzle and powerful limbs to move with unmistakable definition.
                 </p>
                 <div style="margin-top: 60px;">
                     <a href="/ateliergaming/" style="text-decoration: none; color: var(--crimson); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 12px; border: 1px solid var(--crimson); padding: 15px 30px; transition: 0.3s;" onmouseover="this.style.background='var(--crimson)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='var(--crimson)'">Return to Bridge</a>
