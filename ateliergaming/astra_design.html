@@ -189,7 +189,7 @@
                 <div class="hud-scan"></div>
                 <div id="astra-3d-manifest" style="width: 100%; height: 600px; border-radius: 12px; overflow: hidden; background: #000; position: relative;">
                     <div id="loading-manifest" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'JetBrains Mono'; color: var(--crimson); font-size: 10px; letter-spacing: 2px;">
-                        SIMULATING_FOX_BIOLOGY...
+                        SYNTHESIZING_ORGANIC_SKIN...
                     </div>
                 </div>
                 
@@ -227,9 +227,9 @@
                         container.appendChild(renderer.domElement);
                         document.getElementById('loading-manifest').remove();
 
-                        const ambient = new THREE.AmbientLight(0xffffff, 1.5);
+                        const ambient = new THREE.AmbientLight(0xffffff, 1.4);
                         scene.add(ambient);
-                        const point = new THREE.PointLight(0xE63946, 2, 20);
+                        const point = new THREE.PointLight(0xE63946, 1.5, 20);
                         point.position.set(5, 5, 5);
                         scene.add(point);
                         const rim = new THREE.PointLight(0x00B4A6, 3, 10);
@@ -238,128 +238,153 @@
 
                         astra = new THREE.Group();
 
-                        // MATERIALS (Anatomical Red Fox)
-                        const boneMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
-                        const muscleMat = new THREE.MeshStandardMaterial({ color: 0xB03030 });
-                        const skinMat = new THREE.MeshStandardMaterial({ color: 0x8B0000 }); // Deep Red Skin
-                        const furRedMat = new THREE.MeshStandardMaterial({ color: 0xD42426, roughness: 1.0 }); // Crimson Red Fur
-                        const furWhiteMat = new THREE.MeshStandardMaterial({ color: 0xF1FAEE, roughness: 1.0 });
-                        const glowMat = new THREE.MeshStandardMaterial({ color: 0x00B4A6, emissive: 0x00B4A6, emissiveIntensity: 2.0 });
+                        // MATERIALS (Organic Red Fox Skin & Fur)
+                        const furRedMat = new THREE.MeshStandardMaterial({ 
+                            color: 0xD42426, // Crimson Red
+                            roughness: 0.95,
+                            metalness: 0.05
+                        });
+                        const furWhiteMat = new THREE.MeshStandardMaterial({ 
+                            color: 0xF1FAEE, 
+                            roughness: 0.95 
+                        });
+                        const skinBlackMat = new THREE.MeshStandardMaterial({ 
+                            color: 0x0A0A0F, 
+                            roughness: 0.6 
+                        });
+                        const eyeMat = new THREE.MeshBasicMaterial({ color: 0xE63946 });
+                        const glowMat = new THREE.MeshStandardMaterial({ 
+                            color: 0x00B4A6, 
+                            emissive: 0x00B4A6, 
+                            emissiveIntensity: 2.0 
+                        });
 
-                        // 1. BIOLOGICAL SPINE & TORSO
+                        // 1. ORGANIC TORSO (Slender Fox Shape)
                         spine = new THREE.Group();
                         
                         const pelvis = new THREE.Group();
-                        pelvis.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.28, 3), furRedMat));
-                        spine.add(pelvis);
+                        const pelvisSkin = new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), furRedMat);
+                        pelvisSkin.scale.set(1.1, 0.85, 1);
+                        pelvis.add(pelvisSkin);
+                        astra.add(pelvis);
 
                         const chest = new THREE.Group();
-                        chest.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 3), furRedMat));
-                        const belly = new THREE.Mesh(new THREE.IcosahedronGeometry(0.36, 3), furWhiteMat);
-                        belly.scale.set(1.1, 0.7, 1.1);
-                        belly.position.y = -0.15;
-                        chest.add(belly);
-                        chest.position.y = 0.7;
+                        const chestSkin = new THREE.Mesh(new THREE.SphereGeometry(0.45, 32, 32), furRedMat);
+                        chestSkin.scale.set(1.2, 1.05, 0.95);
+                        chest.add(chestSkin);
+                        
+                        // Belly Fur (Smooth Blend)
+                        const bellyFur = new THREE.Mesh(new THREE.SphereGeometry(0.38, 32, 32), furWhiteMat);
+                        bellyFur.scale.set(1.1, 0.6, 1.15);
+                        bellyFur.position.y = -0.2;
+                        chest.add(bellyFur);
+                        chest.position.y = 0.75;
                         pelvis.add(chest);
 
-                        // Tunic
-                        const tunic = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 3), new THREE.MeshStandardMaterial({ color: 0xE63946 }));
-                        tunic.scale.set(1.2, 1.3, 1.1);
+                        // Tunic (Fitted Fabric)
+                        const tunic = new THREE.Mesh(new THREE.SphereGeometry(0.46, 32, 32), new THREE.MeshStandardMaterial({ color: 0xE63946 }));
+                        tunic.scale.set(1.2, 1.25, 1.0);
                         tunic.position.y = 0.3;
                         chest.add(tunic);
 
-                        // 2. FOX BIOLOGY: HEAD
+                        // 2. ORGANIC HEAD
                         neck = new THREE.Group();
-                        neck.add(new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.4, 12), furRedMat));
-                        neck.position.y = 0.5;
+                        const nMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.4, 32), furRedMat);
+                        neck.add(nMesh);
+                        neck.position.y = 0.6;
                         chest.add(neck);
 
                         head = new THREE.Group();
-                        const skull = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 3), furRedMat);
+                        const skull = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 32), furRedMat);
                         head.add(skull);
 
-                        // Narrow Fox Muzzle (Digitized Anatomy)
-                        const muzzle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 2), furWhiteMat);
-                        muzzle.scale.set(0.9, 0.7, 2.2); // Pointed
-                        muzzle.position.set(0, -0.05, 0.45);
+                        // Pointed Fox Muzzle
+                        const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 32), furWhiteMat);
+                        muzzle.scale.set(0.85, 0.7, 2.0);
+                        muzzle.position.set(0, -0.05, 0.4);
                         head.add(muzzle);
 
+                        // Black Nose Tip
+                        const nose = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 16), skinBlackMat);
+                        nose.position.set(0, -0.05, 0.8);
+                        head.add(nose);
+
                         mouth = new THREE.Group();
-                        mouth.add(new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, 0.1), furRedMat));
-                        const lowerJaw = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, 0.2), furWhiteMat);
-                        lowerJaw.position.set(0, -0.04, 0);
-                        mouth.add(lowerJaw);
-                        mouth.position.set(0, -0.15, 0.6);
+                        const mTop = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.1), furRedMat);
+                        const mBot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.2), furWhiteMat);
+                        mBot.position.set(0, -0.06, 0);
+                        mouth.add(mTop, mBot);
+                        mouth.position.set(0, -0.2, 0.6);
                         head.add(mouth);
 
-                        lEyebrow = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.05, 0.05), furRedMat);
-                        lEyebrow.position.set(-0.2, 0.28, 0.4);
+                        lEyebrow = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.06, 0.06), furRedMat);
+                        lEyebrow.position.set(-0.2, 0.3, 0.4);
                         head.add(lEyebrow);
-                        rEyebrow = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.05, 0.05), furRedMat);
-                        rEyebrow.position.set(0.2, 0.28, 0.4);
+                        rEyebrow = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.06, 0.06), furRedMat);
+                        rEyebrow.position.set(0.2, 0.3, 0.4);
                         head.add(rEyebrow);
 
-                        const eGeo = new THREE.SphereGeometry(0.08, 16, 16);
-                        const eMat = new THREE.MeshBasicMaterial({color: 0xE63946});
-                        const eyeL = new THREE.Mesh(eGeo, eMat); eyeL.position.set(-0.16, 0.12, 0.4); head.add(eyeL);
-                        const eyeR = new THREE.Mesh(eGeo, eMat); eyeR.position.set(0.16, 0.12, 0.4); head.add(eyeR);
+                        const eyeGeo = new THREE.SphereGeometry(0.09, 32, 32);
+                        const eyeL = new THREE.Mesh(eyeGeo, eyeMat); eyeL.position.set(-0.18, 0.15, 0.4); head.add(eyeL);
+                        const eyeR = new THREE.Mesh(eyeGeo, eyeMat); eyeR.position.set(0.18, 0.15, 0.4); head.add(eyeR);
 
-                        lEar = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.6, 4), furRedMat);
-                        lEar.position.set(-0.25, 0.55, 0);
+                        lEar = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.6, 32), furRedMat);
+                        lEar.position.set(-0.28, 0.55, 0);
                         head.add(lEar);
-                        rEar = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.6, 4), furRedMat);
-                        rEar.position.set(0.25, 0.55, 0);
+                        rEar = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.6, 32), furRedMat);
+                        rEar.position.set(0.28, 0.55, 0);
                         head.add(rEar);
 
-                        head.position.y = 0.35;
+                        head.position.y = 0.4;
                         neck.add(head);
 
-                        // 3. DIGITIGRADE LIMBS (True Fox Anatomy)
-                        function createDigitigradeLimb(isArm) {
+                        // 3. ORGANIC LIMBS (Jointed with Fingers/Toes)
+                        function createOrganicLimb(isArm) {
                             const group = new THREE.Group();
-                            // Thigh
-                            const thigh = new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.08 : 0.14, isArm ? 0.07 : 0.12, 0.6, 12), furRedMat);
-                            thigh.position.y = -0.3; group.add(thigh);
+                            // Upper
+                            const upper = new THREE.Mesh(new THREE.SphereGeometry(isArm ? 0.1 : 0.15, 32, 32), furRedMat);
+                            upper.scale.y = 2.5; upper.position.y = -0.3;
+                            group.add(upper);
                             
-                            // Calf/Forearm
-                            const calf = new THREE.Group();
-                            calf.add(new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.07 : 0.12, isArm ? 0.06 : 0.1, 0.6, 12), furRedMat));
-                            calf.position.y = -0.6; thigh.add(calf);
+                            // Lower
+                            const lower = new THREE.Group();
+                            const lowerMesh = new THREE.Mesh(new THREE.SphereGeometry(isArm ? 0.08 : 0.12, 32, 32), furRedMat);
+                            lowerMesh.scale.y = 3; lowerMesh.position.y = -0.3;
+                            lower.add(lowerMesh);
+                            lower.position.y = -0.6;
+                            group.add(lower);
                             
-                            // Metatarsal/Ankle (Digitigrade Bend)
-                            const ankle = new THREE.Group();
-                            ankle.add(new THREE.Mesh(new THREE.CylinderGeometry(isArm ? 0.06 : 0.1, isArm ? 0.05 : 0.08, 0.4, 12), furRedMat));
-                            ankle.position.y = -0.5; calf.add(ankle);
+                            // Paw (Feet/Hands)
+                            const paw = new THREE.Group();
+                            const palm = new THREE.Mesh(new THREE.SphereGeometry(isArm ? 0.12 : 0.16, 32, 32), furRedMat);
+                            palm.scale.z = 1.2;
+                            paw.add(palm);
                             
-                            // Hand/Foot with FINGERS
-                            const end = new THREE.Group();
-                            const palm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.1), furRedMat);
-                            end.add(palm);
-                            if(isArm) {
-                                for(let i=0; i<4; i++) {
-                                    const f = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.12, 0.04), glowMat);
-                                    f.position.set((i-1.5)*0.06, -0.15, 0); end.add(f);
-                                }
-                            } else {
-                                const f = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.5), furRedMat);
-                                f.position.set(0, -0.1, 0.2); end.add(f);
+                            // 4 Fingers/Toes
+                            for(let i=0; i<4; i++) {
+                                const toe = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 16), isArm ? glowMat : furRedMat);
+                                toe.position.set((i-1.5)*0.065, -0.12, 0.1);
+                                if(!isArm) toe.scale.z = 2.0; // Longer toes for feet
+                                paw.add(toe);
                             }
-                            end.position.y = -0.4; ankle.add(end);
                             
-                            return { group, calf, ankle, end };
+                            paw.position.y = -0.7;
+                            lower.add(paw);
+                            
+                            return { group, lower, paw };
                         }
 
-                        const la = createDigitigradeLimb(true); lArm = la.group; lArm.position.set(-0.65, 0.4, 0); chest.add(lArm);
-                        const ra = createDigitigradeLimb(true); rArm = ra.group; rArm.position.set(0.65, 0.4, 0); chest.add(ra.group);
-                        const ll = createDigitigradeLimb(false); lLeg = ll.group; lLeg.position.set(-0.3, -0.15, 0); pelvis.add(lLeg);
-                        const rl = createDigitigradeLimb(false); rLeg = rl.group; rLeg.position.set(0.3, -0.15, 0); pelvis.add(rLeg);
+                        const la = createOrganicLimb(true); lArm = la.group; lArm.position.set(-0.65, 0.4, 0); chest.add(lArm);
+                        const ra = createOrganicLimb(true); rArm = ra.group; rArm.position.set(0.65, 0.4, 0); chest.add(ra.group);
+                        const ll = createOrganicLimb(false); lLeg = ll.group; lLeg.position.set(-0.32, -0.15, 0); pelvis.add(lLeg);
+                        const rl = createOrganicLimb(false); rLeg = rl.group; rLeg.position.set(0.32, -0.15, 0); pelvis.add(rLeg);
 
-                        // 4. FOX TAIL (Bushy & Curved)
+                        // 4. ORGANIC BUSHY TAIL
                         tail = new THREE.Group();
-                        const tMain = new THREE.Mesh(new THREE.IcosahedronGeometry(0.3, 2), furRedMat);
-                        tMain.scale.set(1, 1, 4.5); tail.add(tMain);
-                        const tTip = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 2), furWhiteMat);
-                        tTip.position.z = -1.2; tail.add(tTip);
+                        const tMain = new THREE.Mesh(new THREE.SphereGeometry(0.3, 32, 32), furRedMat);
+                        tMain.scale.set(1, 1, 4); tail.add(tMain);
+                        const tTip = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 32), furWhiteMat);
+                        tTip.position.z = -1.3; tail.add(tTip);
                         tail.position.set(0, 0, -0.5);
                         tail.rotation.x = -Math.PI/6;
                         pelvis.add(tail);
@@ -376,18 +401,18 @@
 
                         switch(animState) {
                             case 'IDLE':
-                                astra.position.y = 1.1 + Math.sin(t*1.5)*0.06;
-                                pelvis.rotation.x = Math.sin(t*1.2)*0.04;
+                                astra.position.y = 1.1 + Math.sin(t*1.5)*0.08;
+                                pelvis.rotation.x = Math.sin(t*1.2)*0.05;
                                 lArm.rotation.x = 0.2 + Math.sin(t*2)*0.1;
                                 rArm.rotation.x = 0.2 + Math.cos(t*2)*0.1;
                                 break;
-                            case 'WALK': applyAnatomyWalk(t, 5, 0.5, 0.15); break;
+                            case 'WALK': applyOrganicWalk(t, 5, 0.6, 0.15); break;
                             case 'RUN': 
-                                applyAnatomyWalk(t, 15, 1.2, 0.4); 
+                                applyOrganicWalk(t, 15, 1.2, 0.4); 
                                 chest.rotation.x = 0.4;
                                 break;
                             case 'SKIP':
-                                applyAnatomyWalk(t, 6, 0.7, 0.4);
+                                applyOrganicWalk(t, 6, 0.8, 0.5);
                                 astra.position.y = 1.2 + Math.abs(Math.sin(t*10))*0.6;
                                 break;
                             case 'HOP':
@@ -396,32 +421,33 @@
                                 break;
                             case 'LEAP':
                                 astra.position.y = 1.0 + Math.sin(t*4)*4;
-                                astra.position.z = Math.cos(t*4)*2;
+                                astra.position.z = Math.cos(t*4)*2.5;
                                 break;
                             case 'WAVE':
                                 rArm.rotation.x = -2.0;
-                                rArm.children[1].children[0].rotation.z = Math.sin(t*15)*0.8;
+                                rArm.children[1].rotation.z = Math.sin(t*15)*0.8;
+                                rArm.children[1].children[1].children.forEach((f, i) => { if(i>0) f.rotation.x = Math.sin(t*20+i)*0.6; });
                                 break;
                             case 'THUMBS_UP':
                                 rArm.rotation.x = -1.8;
-                                rArm.children[1].children[0].children[0].children[1].rotation.x = -1.2;
+                                rArm.children[1].children[1].children[1].rotation.x = -1.2;
                                 break;
                             case 'PEACE':
                                 lArm.rotation.x = -1.8;
-                                lArm.children[1].children[0].children[0].children[1].rotation.z = -0.4;
-                                lArm.children[1].children[0].children[0].children[2].rotation.z = 0.4;
+                                lArm.children[1].children[1].children[1].rotation.z = -0.4;
+                                lArm.children[1].children[1].children[2].rotation.z = 0.4;
                                 break;
                             case 'HEART':
                                 lArm.rotation.set(-1.4, 0, 0.6);
                                 rArm.rotation.set(-1.4, 0, -0.6);
                                 break;
                             case 'TALK':
-                                mouth.children[1].position.y = -0.04 + Math.abs(Math.sin(t*25))*0.15;
-                                head.rotation.x = Math.sin(t*10)*0.1;
+                                mouth.children[1].position.y = -0.06 + Math.abs(Math.sin(t*25))*0.18;
+                                head.rotation.x = Math.sin(t*10)*0.15;
                                 break;
                         }
 
-                        tail.rotation.y = Math.sin(t*5)*0.8;
+                        tail.rotation.y = Math.sin(t*5)*1.2;
                         lEyebrow.rotation.z = -0.2 + Math.sin(t*6)*0.2;
                         rEyebrow.rotation.z = 0.2 - Math.sin(t*6)*0.2;
                         
@@ -429,12 +455,11 @@
                         renderer.render(scene, camera);
                     }
 
-                    function applyAnatomyWalk(t, speed, amp, bob) {
+                    function applyOrganicWalk(t, speed, amp, bob) {
                         const s = Math.sin(t*speed);
                         const c = Math.cos(t*speed);
                         lLeg.rotation.x = s*amp;
                         rLeg.rotation.x = -s*amp;
-                        // Digitigrade Bend
                         lLeg.children[1].rotation.x = Math.max(0, -s*0.8);
                         rLeg.children[1].rotation.x = Math.max(0, s*0.8);
                         lArm.rotation.x = -s*amp;
@@ -447,7 +472,9 @@
                         chest.rotation.set(0,0,0);
                         lArm.rotation.set(0,0,0); rArm.rotation.set(0,0,0);
                         lLeg.rotation.set(0,0,0); rLeg.rotation.set(0,0,0);
-                        mouth.children[1].position.y = -0.04;
+                        mouth.children[1].position.y = -0.06;
+                        lArm.children[1].children[1].children.forEach(f => { if(f.rotation) f.rotation.set(0,0,0); });
+                        rArm.children[1].children[1].children.forEach(f => { if(f.rotation) f.rotation.set(0,0,0); });
                     }
 
                     window.setAnim = (s) => {
@@ -463,31 +490,31 @@
 
         <div class="content">
             <header class="header">
-                <span class="tagline">Neural Unit // ASTRA-RED-FOX</span>
-                <h1>Master Red Fox<br>Anatomy</h1>
+                <span class="tagline">Neural Unit // ASTRA-ORGANIC-FOX</span>
+                <h1>Master Red Fox<br>Organic Skin</h1>
                 <p class="bio">
-                    The final synthesis is manifest. Astra has returned to her **Slender Red Fox Anatomy**, manifest with a true **Digitigrade Limb Structure** (triple-jointed legs) and an articulated skeletal rig. Her surface is now a deep **Crimson Red Fur** with white anatomical highlights, featuring **4 individual jointed fingers** per hand for human-like signaling and expression.
+                    The final biological synthesis is manifest. Astra has returned to her **Slender Organic Red Fox Anatomy**, manifest with a true **Digitigrade Limb Structure** and articulated **Paw Architecture**. Her surface is now a deep **Crimson Red Organic Skin** with white belly and muzzle highlights, featuring **4 individual jointed fingers and toes** per limb for high-fidelity humanoid performance.
                 </p>
             </header>
 
             <section>
-                <h2>Biological Specs</h2>
+                <h2>Anatomical Specs</h2>
                 <ul class="spec-list">
                     <li>
                         <span class="spec-label">Species</span>
-                        <span class="spec-value">Digitigrade Red Fox</span>
+                        <span class="spec-value">Organic Red Fox</span>
                     </li>
                     <li>
-                        <span class="spec-label">Hand Rig</span>
-                        <span class="spec-value">4 Jointed Fingers / Hand</span>
+                        <span class="spec-label">Feet Rig</span>
+                        <span class="spec-value">Digitigrade Paws with Toes</span>
+                    </li>
+                    <li>
+                        <span class="spec-label">Skin Layer</span>
+                        <span class="spec-value">Crimson Red Organic Surface</span>
                     </li>
                     <li>
                         <span class="spec-label">Anatomy</span>
-                        <span class="spec-value">Jointed Bone & Digitigrade Legs</span>
-                    </li>
-                    <li>
-                        <span class="spec-label">Fur Surface</span>
-                        <span class="spec-value">Crimson Red & Bone White</span>
+                        <span class="spec-value">Triple-Jointed Digitigrade Leg</span>
                     </li>
                 </ul>
             </section>
@@ -495,7 +522,7 @@
             <section>
                 <h2>Design Philosophy</h2>
                 <p class="bio">
-                    The goal was "Biological Accuracy." By transitioning to a digitigrade leg structure (walking on the toes), Astra’s movement—from her walk to her sprint—now carries the authentic weight and agility of a fox. The crimson red fur provides high-contrast visibility, ensuring her facial expressions and articulated hand signals are fully unmistakable.
+                    To achieve "Organic Fidelity," we replaced all geometric shapes with high-resolution sphere-based meshes, creating a seamless "skin" appearance. The feet were manifest with a true digitigrade paw structure, including four individual toes, while the hands were rigged for high-fidelity humanoid signaling. The crimson red fur absorbs light organically, ensuring every sentient facial expression and limb movement is unmistakably manifest.
                 </p>
                 <div style="margin-top: 60px;">
                     <a href="/ateliergaming/" style="text-decoration: none; color: var(--crimson); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 12px; border: 1px solid var(--crimson); padding: 15px 30px; transition: 0.3s;" onmouseover="this.style.background='var(--crimson)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='var(--crimson)'">Return to Bridge</a>
