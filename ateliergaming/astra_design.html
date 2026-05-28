@@ -246,11 +246,12 @@
                     let lHand, rHand, lFoot, rFoot;
                     let mouth, lEyebrow, rEyebrow;
                     let lEye, rEye;
+                    let neck, upperTorso, lowerTorso;
 
                     function initAstra() {
                         scene = new THREE.Scene();
                         camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-                        camera.position.set(0, 1.8, 5);
+                        camera.position.set(0, 1.8, 5.5);
 
                         renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
                         renderer.setSize(container.clientWidth, container.clientHeight);
@@ -259,22 +260,22 @@
                         document.getElementById('loading-manifest').remove();
 
                         // Lights
-                        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+                        const ambient = new THREE.AmbientLight(0xffffff, 0.5);
                         scene.add(ambient);
-                        const point = new THREE.PointLight(0xE63946, 2, 10);
-                        point.position.set(2, 2, 2);
+                        const point = new THREE.PointLight(0xE63946, 2, 12);
+                        point.position.set(5, 5, 5);
                         scene.add(point);
-                        const rim = new THREE.PointLight(0x00B4A6, 1.5, 10);
-                        rim.position.set(-2, 1, -2);
+                        const rim = new THREE.PointLight(0x00B4A6, 2, 10);
+                        rim.position.set(-5, 2, -5);
                         scene.add(rim);
 
-                        // --- LEGENDARY_FOX_PROTOCOL: HIGH-FIDELITY ORGANIC CHARACTER ---
+                        // --- LEGENDARY_FOX_PROTOCOL: CINEMATIC_HUMAN_FIDELITY ---
                         astra = new THREE.Group();
 
-                        // Materials (Fur & Fabric)
+                        // Materials (Fur-Simulated & Fabric)
                         const skinMat = new THREE.MeshStandardMaterial({ 
                             color: 0x0A0A0F, 
-                            roughness: 0.8, // Fur-like roughness
+                            roughness: 0.85, 
                             metalness: 0.1,
                             emissive: 0x00B4A6,
                             emissiveIntensity: 0.05
@@ -285,139 +286,157 @@
                             emissive: 0x800000,
                             emissiveIntensity: 0.2
                         });
-                        const detailMat = new THREE.MeshStandardMaterial({ color: 0x00B4A6, emissive: 0x00B4A6, emissiveIntensity: 0.8 });
                         const eyeCoreMat = new THREE.MeshBasicMaterial({ color: 0xE63946 });
+                        const detailMat = new THREE.MeshStandardMaterial({ color: 0x00B4A6, emissive: 0x00B4A6, emissiveIntensity: 1.0 });
 
-                        // 1. Organic Body (The Core)
-                        body = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 3), skinMat);
-                        body.scale.set(1, 1.3, 0.8);
-                        body.position.y = 0.8;
-                        astra.add(body);
+                        // 1. Articulated Torso (Humanoid Structure)
+                        lowerTorso = new THREE.Group();
+                        const pelvicMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.35, 3), skinMat);
+                        pelvicMesh.scale.set(1.1, 0.8, 1);
+                        lowerTorso.add(pelvicMesh);
+                        astra.add(lowerTorso);
 
-                        // 2. Nano-Crimson Tunic (Detailed Apparel)
+                        upperTorso = new THREE.Group();
+                        const chestMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.45, 3), skinMat);
+                        chestMesh.scale.set(1.2, 1.1, 0.9);
+                        upperTorso.add(chestMesh);
+                        upperTorso.position.y = 0.6;
+                        lowerTorso.add(upperTorso);
+
+                        // Tunic (Humanoid Fit)
                         tunic = new THREE.Group();
-                        const tunicMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.53, 3), tunicMat);
-                        tunicMesh.scale.set(1.05, 1.0, 0.9);
+                        const tunicMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.48, 3), tunicMat);
+                        tunicMesh.scale.set(1.25, 1.2, 1.0);
                         tunic.add(tunicMesh);
-                        // Collar Detail
-                        const collar = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.05, 16, 32), tunicMat);
+                        const collar = new THREE.Mesh(new THREE.TorusGeometry(0.25, 0.06, 16, 32), tunicMat);
                         collar.rotation.x = Math.PI/2;
-                        collar.position.y = 0.5;
+                        collar.position.y = 0.6;
                         tunic.add(collar);
-                        tunic.position.y = 1.0;
-                        astra.add(tunic);
+                        upperTorso.add(tunic);
 
-                        // 3. Head & Expressions
+                        // 2. Head & Neck
+                        neck = new THREE.Group();
+                        const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.3, 12), skinMat);
+                        neck.add(neckMesh);
+                        neck.position.y = 0.5;
+                        upperTorso.add(neck);
+
                         head = new THREE.Group();
-                        const skull = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 3), skinMat);
+                        const skull = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 3), skinMat);
                         head.add(skull);
 
                         const muzzle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 2), skinMat);
-                        muzzle.scale.set(1, 0.8, 1.6);
-                        muzzle.position.set(0, -0.1, 0.35);
+                        muzzle.scale.set(1.1, 0.9, 1.7);
+                        muzzle.position.set(0, -0.05, 0.38);
                         head.add(muzzle);
 
-                        // Mouth (Expressive)
-                        mouth = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.1), new THREE.MeshBasicMaterial({color: 0x000000}));
-                        mouth.position.set(0, -0.18, 0.5);
+                        // Humanoid Facial Expression: Mouth & Eyebrows
+                        mouth = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.03, 0.1), new THREE.MeshBasicMaterial({color: 0x000000}));
+                        mouth.position.set(0, -0.15, 0.55);
                         head.add(mouth);
 
-                        // Eyebrows (Human-like Expression)
-                        const browGeo = new THREE.BoxGeometry(0.15, 0.03, 0.05);
+                        const browGeo = new THREE.BoxGeometry(0.18, 0.04, 0.06);
                         lEyebrow = new THREE.Mesh(browGeo, skinMat);
-                        lEyebrow.position.set(-0.18, 0.25, 0.35);
+                        lEyebrow.position.set(-0.2, 0.28, 0.38);
                         head.add(lEyebrow);
                         rEyebrow = new THREE.Mesh(browGeo, skinMat);
-                        rEyebrow.position.set(0.18, 0.25, 0.35);
+                        rEyebrow.position.set(0.2, 0.28, 0.38);
                         head.add(rEyebrow);
 
-                        const earGeo = new THREE.ConeGeometry(0.12, 0.5, 4);
+                        const earGeo = new THREE.ConeGeometry(0.13, 0.55, 4);
                         lEar = new THREE.Mesh(earGeo, skinMat);
-                        lEar.position.set(-0.25, 0.45, 0);
-                        lEar.rotation.z = 0.1;
+                        lEar.position.set(-0.25, 0.48, 0);
                         head.add(lEar);
                         rEar = new THREE.Mesh(earGeo, skinMat);
-                        rEar.position.set(0.25, 0.45, 0);
-                        rEar.rotation.z = -0.1;
+                        rEar.position.set(0.25, 0.48, 0);
                         head.add(rEar);
 
-                        const eyeGeo = new THREE.SphereGeometry(0.08, 16, 16);
+                        const eyeGeo = new THREE.SphereGeometry(0.085, 16, 16);
                         lEye = new THREE.Mesh(eyeGeo, eyeCoreMat);
-                        lEye.position.set(-0.18, 0.1, 0.35);
+                        lEye.position.set(-0.18, 0.12, 0.38);
                         head.add(lEye);
                         rEye = new THREE.Mesh(eyeGeo, eyeCoreMat);
-                        rEye.position.set(0.18, 0.1, 0.35);
+                        rEye.position.set(0.18, 0.12, 0.38);
                         head.add(rEye);
 
-                        head.position.y = 1.7;
-                        astra.add(head);
+                        head.position.y = 0.3;
+                        neck.add(head);
 
-                        // 4. Arms & Hands (Human Rig)
-                        const limbMat = skinMat;
-                        const armGeo = new THREE.CylinderGeometry(0.08, 0.07, 0.7, 12);
-                        
-                        lArm = new THREE.Group();
-                        const lArmUpper = new THREE.Mesh(armGeo, limbMat);
-                        lArmUpper.position.y = -0.35;
-                        lArm.add(lArmUpper);
-                        // Hand & Fingers
-                        lHand = new THREE.Group();
-                        const palmL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.1), limbMat);
-                        lHand.add(palmL);
-                        const fingerL = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.1, 0.05), detailMat);
-                        fingerL.position.set(-0.05, -0.15, 0);
-                        lHand.add(fingerL);
-                        lHand.position.y = -0.75;
-                        lArm.add(lHand);
-                        lArm.position.set(-0.6, 1.4, 0);
-                        astra.add(lArm);
+                        // 3. Humanoid Arms (Jointed)
+                        function createHumanArm(isLeft) {
+                            const armGroup = new THREE.Group();
+                            const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.06, 0.5, 12), skinMat);
+                            upperArm.position.y = -0.25;
+                            armGroup.add(upperArm);
+                            
+                            const forearm = new THREE.Group();
+                            const forearmMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.5, 12), skinMat);
+                            forearmMesh.position.y = -0.25;
+                            forearm.add(forearmMesh);
+                            forearm.position.y = -0.5;
+                            upperArm.add(forearm);
+                            
+                            const hand = new THREE.Group();
+                            const palm = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.08), skinMat);
+                            hand.add(palm);
+                            const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.06), detailMat);
+                            thumb.position.set(isLeft ? 0.1 : -0.1, -0.05, 0.05);
+                            hand.add(thumb);
+                            hand.position.y = -0.6;
+                            forearm.add(hand);
+                            
+                            return { armGroup, forearm, hand };
+                        }
 
-                        rArm = new THREE.Group();
-                        const rArmUpper = new THREE.Mesh(armGeo, limbMat);
-                        rArmUpper.position.y = -0.35;
-                        rArm.add(rArmUpper);
-                        // Hand & Fingers
-                        rHand = new THREE.Group();
-                        const palmR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.1), limbMat);
-                        rHand.add(palmR);
-                        const fingerR = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.1, 0.05), detailMat);
-                        fingerR.position.set(0.05, -0.15, 0);
-                        rHand.add(fingerR);
-                        rHand.position.y = -0.75;
-                        rArm.add(rHand);
-                        rArm.position.set(0.6, 1.4, 0);
-                        astra.add(rArm);
+                        const leftArmData = createHumanArm(true);
+                        lArm = leftArmData.armGroup;
+                        lArm.position.set(-0.65, 0.4, 0);
+                        upperTorso.add(lArm);
 
-                        // 5. Legs & Feet (Human-like Walk)
-                        const legGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.8, 12);
-                        
-                        lLeg = new THREE.Group();
-                        const lLegUpper = new THREE.Mesh(legGeo, limbMat);
-                        lLegUpper.position.y = -0.4;
-                        lLeg.add(lLegUpper);
-                        lFoot = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.4), limbMat);
-                        lFoot.position.set(0, -0.85, 0.15);
-                        lLeg.add(lFoot);
-                        lLeg.position.set(-0.3, 0.5, 0);
-                        astra.add(lLeg);
+                        const rightArmData = createHumanArm(false);
+                        rArm = rightArmData.armGroup;
+                        rArm.position.set(0.65, 0.4, 0);
+                        upperTorso.add(rArm);
 
-                        rLeg = new THREE.Group();
-                        const rLegUpper = new THREE.Mesh(legGeo, limbMat);
-                        rLegUpper.position.y = -0.4;
-                        rLeg.add(rLegUpper);
-                        rFoot = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.4), limbMat);
-                        rFoot.position.set(0, -0.85, 0.15);
-                        rLeg.add(rFoot);
-                        rLeg.position.set(0.3, 0.5, 0);
-                        astra.add(rLeg);
+                        // 4. Humanoid Legs (Jointed)
+                        function createHumanLeg() {
+                            const legGroup = new THREE.Group();
+                            const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.08, 0.6, 12), skinMat);
+                            thigh.position.y = -0.3;
+                            legGroup.add(thigh);
+                            
+                            const calf = new THREE.Group();
+                            const calfMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.6, 12), skinMat);
+                            calfMesh.position.y = -0.3;
+                            calf.add(calfMesh);
+                            calf.position.y = -0.6;
+                            thigh.add(calf);
+                            
+                            const foot = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.12, 0.5), skinMat);
+                            foot.position.set(0, -0.7, 0.2);
+                            calf.add(foot);
+                            
+                            return { legGroup, calf };
+                        }
 
-                        // 6. Multidimensional Tail
-                        tail = new THREE.Mesh(new THREE.IcosahedronGeometry(0.25, 2), skinMat);
-                        tail.scale.set(1, 1, 3.5);
-                        tail.position.set(0, 0.5, -0.8);
-                        tail.rotation.x = -Math.PI / 6;
-                        astra.add(tail);
+                        const leftLegData = createHumanLeg();
+                        lLeg = leftLegData.legGroup;
+                        lLeg.position.set(-0.25, -0.1, 0);
+                        lowerTorso.add(lLeg);
 
+                        const rightLegData = createHumanLeg();
+                        rLeg = rightLegData.legGroup;
+                        rLeg.position.set(0.25, -0.1, 0);
+                        lowerTorso.add(rLeg);
+
+                        // 5. Tail
+                        tail = new THREE.Mesh(new THREE.IcosahedronGeometry(0.28, 2), skinMat);
+                        tail.scale.set(1, 1, 3.8);
+                        tail.position.set(0, 0, -0.4);
+                        tail.rotation.x = -Math.PI / 8;
+                        lowerTorso.add(tail);
+
+                        astra.position.y = 1.0;
                         scene.add(astra);
                         animateAstra();
                     }
@@ -426,48 +445,59 @@
                         requestAnimationFrame(animateAstra);
                         const time = Date.now() * 0.001;
 
-                        // 1. Natural Walk Cycle (Human-like Weight Shift)
-                        const walkSpeed = 5;
+                        // --- THE HUMAN_FIDELITY_WALK_ENGINE ---
+                        const walkSpeed = 4.5;
                         const walkAmp = 0.5;
-                        const stride = Math.sin(time * walkSpeed);
+                        const cycle = time * walkSpeed;
+                        const stride = Math.sin(cycle);
+                        const strideCos = Math.cos(cycle);
                         
-                        // Legs (Organic Step)
+                        // 1. Natural Weight Shift (Hips & Spine)
+                        lowerTorso.rotation.z = stride * 0.08; // Hip sway
+                        lowerTorso.rotation.x = Math.abs(strideCos) * 0.05; // Pelvic tilt
+                        astra.position.y = 1.0 + Math.abs(strideCos) * 0.15; // Natural bobbing
+                        
+                        // 2. Counter-Rotation (Shoulders vs Hips)
+                        upperTorso.rotation.y = -stride * 0.15; 
+                        upperTorso.rotation.z = -stride * 0.05;
+
+                        // 3. Human Legs (Jointed Bend)
                         lLeg.rotation.x = stride * walkAmp;
                         rLeg.rotation.x = -stride * walkAmp;
-                        
-                        // Arms (Natural Swing)
-                        lArm.rotation.x = -stride * (walkAmp * 0.8);
-                        rArm.rotation.x = stride * (walkAmp * 0.8);
-                        lArm.rotation.z = -0.1 + Math.sin(time * 2) * 0.05; // Natural arm hang
-                        rArm.rotation.z = 0.1 - Math.sin(time * 2) * 0.05;
-                        
-                        // Human-like Weight Shift (Hips & Shoulders)
-                        astra.position.y = Math.abs(Math.cos(time * walkSpeed * 2)) * 0.12; // Bobbing
-                        astra.rotation.z = Math.sin(time * walkSpeed) * 0.05; // Hip sway
-                        astra.rotation.y += 0.005; // Display rotation
+                        // Knee Bend (Heel Strike to Toe Off)
+                        lLeg.children[0].children[0].rotation.x = Math.max(0, -stride * 0.6); 
+                        rLeg.children[0].children[0].rotation.x = Math.max(0, stride * 0.6);
 
-                        // 2. Facial Expressions (Neural Sentience)
-                        // Eyebrow movement (Determined/Thinking)
-                        lEyebrow.position.y = 0.25 + Math.sin(time * 1.5) * 0.02;
-                        rEyebrow.position.y = 0.25 + Math.cos(time * 1.5) * 0.02;
-                        lEyebrow.rotation.z = Math.sin(time * 2) * 0.1;
+                        // 4. Human Arms (Natural Swing & Elbow Flex)
+                        lArm.rotation.x = -stride * (walkAmp * 0.9);
+                        rArm.rotation.x = stride * (walkAmp * 0.9);
+                        lArm.children[0].children[0].rotation.x = -0.3 + Math.abs(stride) * 0.4;
+                        rArm.children[0].children[0].rotation.x = -0.3 + Math.abs(stride) * 0.4;
+                        lArm.rotation.z = -0.15;
+                        rArm.rotation.z = 0.15;
 
-                        // Blinking (Alertness)
-                        if(Math.random() > 0.99) {
-                            lEye.scale.y = 0.1;
-                            rEye.scale.y = 0.1;
-                            setTimeout(() => { lEye.scale.y = 1; rEye.scale.y = 1; }, 100);
+                        // 5. Head Tracking & Stability
+                        neck.rotation.x = -upperTorso.rotation.x - lowerTorso.rotation.x + 0.1;
+                        head.rotation.y = Math.sin(time * 0.7) * 0.15;
+
+                        // 6. SENTIENT EXPRESSION ENGINE
+                        // Determined/Focus Face
+                        lEyebrow.rotation.z = -0.2 + Math.sin(time * 2) * 0.1;
+                        rEyebrow.rotation.z = 0.2 - Math.sin(time * 2) * 0.1;
+                        lEyebrow.position.y = 0.28 + Math.abs(Math.sin(time)) * 0.02;
+
+                        // Blinking (Natural Pattern)
+                        if(Math.random() > 0.992) {
+                            lEye.scale.y = 0.1; rEye.scale.y = 0.1;
+                            setTimeout(() => { lEye.scale.y = 1; rEye.scale.y = 1; }, 80);
                         }
 
-                        // Mouth (Subtle Speech/Neural Flow)
-                        mouth.scale.x = 1 + Math.sin(time * 8) * 0.15;
+                        // Breathing & Tail
+                        const breath = 1 + Math.sin(time * 2) * 0.015;
+                        upperTorso.scale.x = breath;
+                        tail.rotation.y = Math.sin(time * 3) * 0.3;
 
-                        // 3. Organic Details
-                        const breath = 1 + Math.sin(time * 2) * 0.02;
-                        body.scale.x = breath;
-                        tail.rotation.y = Math.sin(time * 2.5) * 0.5;
-                        head.rotation.y = Math.sin(time * 1.2) * 0.2;
-
+                        astra.rotation.y += 0.005; // Display Rotation
                         renderer.render(scene, camera);
                     }
 
