@@ -76,6 +76,24 @@
             margin-bottom: 24px;
             line-height: 0.9;
             letter-spacing: -2px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+            display: inline-block;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .scan-box {
@@ -87,52 +105,13 @@
             margin: 40px auto;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: scale(0.95);
+            animation: fadeInUpScale 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
         }
 
-        .scan-box h2 {
-            font-family: var(--font-heading);
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-
-        .scan-box p {
-            color: #999;
-            font-size: 1rem;
-            margin-bottom: 25px;
-        }
-
-        .cta-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 16px 40px;
-            border-radius: 50px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-outline { border: 1px solid var(--border); color: var(--text); background: transparent; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(123,53,212,0.15); }
-
-        .section-header { text-align: center; margin-bottom: 60px; }
-        .section-header h2 { font-family: var(--font-heading); font-size: 2.5rem; margin-bottom: 10px; }
-        .section-header p { color: var(--muted); font-size: 1.1rem; }
-
-        /* Grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+        @keyframes fadeInUpScale {
+            to { opacity: 1; transform: scale(1); }
         }
 
         .card {
@@ -140,9 +119,35 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 24px;
-            transition: all 0.3s;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             text-decoration: none;
             color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .card:hover::after {
+            left: 100%;
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .card:hover {
@@ -285,7 +290,7 @@
         <!-- Hero Section -->
         <section class="hero">
             <div class="container">
-                <h1>Global Identity Architecture.</h1>
+                <h1>Global Identity <span>Architecture</span>.</h1>
                 
                 <div class="scan-box">
                     <h2>Alpha Scan</h2>
@@ -302,7 +307,7 @@
         </section>
 
         <!-- Services Section -->
-        <section id="pricing" class="section">
+        <section id="pricing" class="section reveal-on-scroll">
             <div class="container">
                 <div class="section-header">
                     <h2>Choose Your Tier</h2>
@@ -350,7 +355,7 @@
         </section>
 
         <!-- À La Carte Section -->
-        <section id="alacarte" class="section" style="background: rgba(255,255,255,0.2);">
+        <section id="alacarte" class="section reveal-on-scroll" style="background: rgba(255,255,255,0.2);">
             <div class="container">
                 <div class="section-header">
                     <h2>À La Carte Architecture</h2>
@@ -377,7 +382,7 @@
         </section>
 
         <!-- Payment Section -->
-        <section id="payment" class="section">
+        <section id="payment" class="section reveal-on-scroll">
             <div class="container">
                 <div class="section-header">
                     <h2>Seamless Payment</h2>
@@ -461,6 +466,21 @@
     </footer>
 
     <script>
+    // Scroll Reveal Animation
+    const observerOptions = {
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+
     function generateRef() {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let ref = 'LAB-';
