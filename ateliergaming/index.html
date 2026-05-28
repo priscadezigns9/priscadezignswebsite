@@ -73,37 +73,44 @@
             letter-spacing: 1px;
         }
 
-        /* ─── CURRENCY HUD ─── */
+        /* ─── GENSHIN-LEVEL CURRENCY HUD ─── */
         .currency-hud {
             display: flex;
-            gap: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px 18px;
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 30px;
+            background: rgba(5, 5, 8, 0.85);
+            padding: 12px 32px;
+            border-radius: 16px;
+            border: 1px solid rgba(230, 57, 70, 0.3);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(230, 57, 70, 0.1);
         }
 
         .coin {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.8rem;
+            gap: 15px;
+            font-size: 0.95rem;
             letter-spacing: 1px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            perspective: 1000px;
         }
 
-        .coin:hover { transform: scale(1.05); }
+        .coin:hover { transform: translateY(-2px); filter: brightness(1.2); }
 
         .coin-svg {
-            width: 24px;
-            height: 24px;
-            filter: drop-shadow(0 0 5px rgba(230, 57, 70, 0.5));
+            width: 42px;
+            height: 42px;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.7));
+            transition: 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
         }
 
+        .coin:hover .coin-svg { transform: rotateY(180deg) scale(1.15); }
+
         .neural-coin-svg {
-            filter: drop-shadow(0 0 5px rgba(52, 152, 219, 0.5));
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
         }
 
         nav {
@@ -313,27 +320,79 @@
                 <svg class="coin-svg" viewBox="0 0 100 100">
                     <defs>
                         <linearGradient id="astrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#E63946;stop-opacity:1" />
+                            <stop offset="0%" style="stop-color:#FF3B3B;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#E63946;stop-opacity:1" />
                             <stop offset="100%" style="stop-color:#800e16;stop-opacity:1" />
                         </linearGradient>
+                        <filter id="3d-depth">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+                            <feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+                            <feSpecularLighting in="blur" surfaceScale="5" specularConstant=".75" specularExponent="20" lighting-color="#white" result="specOut">
+                                <fePointLight x="-5000" y="-10000" z="20000"/>
+                            </feSpecularLighting>
+                            <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
+                            <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litPaint"/>
+                        </filter>
                     </defs>
-                    <circle cx="50" cy="50" r="45" fill="url(#astrGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-                    <path d="M50 25 L75 75 L25 75 Z" fill="rgba(255,255,255,0.15)" />
-                    <text x="50" y="65" font-family="Space Grotesk" font-size="40" font-weight="900" fill="white" text-anchor="middle">A</text>
+                    <!-- Outer Rim (Extrusion) -->
+                    <circle cx="50" cy="53" r="46" fill="rgba(0,0,0,0.4)" />
+                    <circle cx="50" cy="50" r="46" fill="#D4AF37" stroke="#8B6914" stroke-width="1.5" />
+                    
+                    <!-- Main Body -->
+                    <circle cx="50" cy="50" r="42" fill="url(#astrGrad)" filter="url(#3d-depth)" />
+                    
+                    <!-- Inner Detail (Genshin Style Engraving) -->
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4" stroke-dasharray="2,1" />
+                    <circle cx="50" cy="50" r="32" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="1" />
+                    
+                    <!-- Center Glyph: Atelier Logo (Neural Nexus A) -->
+                    <g transform="translate(25, 25) scale(0.5)" filter="url(#3d-depth)">
+                        <path d="M50 5 L90 80 L10 80 Z" fill="none" stroke="white" stroke-width="4" stroke-linejoin="round" />
+                        <path d="M50 5 L50 80 M30 45 L70 45" stroke="white" stroke-width="4" stroke-opacity="0.8" />
+                        <circle cx="50" cy="5" r="5" fill="white" />
+                        <circle cx="90" cy="80" r="5" fill="white" />
+                        <circle cx="10" cy="80" r="5" fill="white" />
+                        <circle cx="50" cy="45" r="8" fill="white" />
+                    </g>
+                    
+                    <!-- Shine -->
+                    <ellipse cx="35" cy="30" rx="15" ry="8" fill="rgba(255,255,255,0.15)" transform="rotate(-30 35 30)" />
                 </svg>
                 <span id="astr-count">1,250 ASTR</span>
             </div>
-            <div class="coin">
+            <div class="coin" onclick="location.href='/ateliergaming/astra_reveal.html'">
                 <svg class="coin-svg neural-coin-svg" viewBox="0 0 100 100">
                     <defs>
                         <linearGradient id="neuralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#3498DB;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#1c5a85;stop-opacity:1" />
+                            <stop offset="0%" style="stop-color:#4FACFE;stop-opacity:1" />
+                            <stop offset="50%" style="stop-color:#00F2FE;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#3498DB;stop-opacity:1" />
                         </linearGradient>
                     </defs>
-                    <circle cx="50" cy="50" r="45" fill="url(#neuralGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-                    <path d="M30 30 L70 30 L70 70 L30 70 Z" fill="rgba(255,255,255,0.1)" />
-                    <text x="50" y="65" font-family="Space Grotesk" font-size="40" font-weight="900" fill="white" text-anchor="middle">N</text>
+                    <!-- Outer Rim -->
+                    <circle cx="50" cy="53" r="46" fill="rgba(0,0,0,0.4)" />
+                    <circle cx="50" cy="50" r="46" fill="#1C5A85" stroke="#0D2B40" stroke-width="1.5" />
+                    
+                    <!-- Main Body -->
+                    <circle cx="50" cy="50" r="42" fill="url(#neuralGrad)" filter="url(#3d-depth)" />
+                    
+                    <!-- Neural Lattice Engraving -->
+                    <path d="M30 50 Q50 20 70 50 T30 50" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                    <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" />
+                    
+                    <!-- Center Glyph: Fox Face (Astra) -->
+                    <g transform="translate(20, 22) scale(0.6)" filter="url(#3d-depth)">
+                        <!-- Head Shape -->
+                        <path d="M50 10 L85 45 L50 90 L15 45 Z" fill="white" />
+                        <!-- Ears -->
+                        <path d="M15 45 L5 10 L35 35 Z" fill="white" />
+                        <path d="M85 45 L95 10 L65 35 Z" fill="white" />
+                        <!-- Eyes (Crimson) -->
+                        <circle cx="35" cy="45" r="4" fill="#E63946" />
+                        <circle cx="65" cy="45" r="4" fill="#E63946" />
+                        <!-- Neural Highlights -->
+                        <path d="M35 60 Q50 70 65 60" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="2" />
+                    </g>
                 </svg>
                 <span id="neural-count">42 NEURAL</span>
             </div>
@@ -477,50 +536,96 @@
             ctx.translate(astra.x, astra.y);
             ctx.rotate(astra.angle + Math.PI / 2);
 
-            // HIGH-FIDELITY ASTRA STARSHIP (SVG-PATH STYLE)
-            ctx.shadowBlur = 30;
-            ctx.shadowColor = '#3498DB';
+            // ─── HIGH-FIDELITY ASTRA STARSHIP ───
+            ctx.shadowBlur = 40;
+            ctx.shadowColor = 'rgba(52, 152, 219, 0.4)';
             
             // Outer Wings (Matte Obsidian)
             ctx.fillStyle = '#050508';
             ctx.beginPath();
-            ctx.moveTo(0, -30);
-            ctx.lineTo(25, 25);
-            ctx.lineTo(8, 15);
-            ctx.lineTo(0, 20);
-            ctx.lineTo(-8, 15);
-            ctx.lineTo(-25, 25);
+            ctx.moveTo(0, -45);
+            ctx.lineTo(40, 35);
+            ctx.lineTo(15, 25);
+            ctx.lineTo(0, 35);
+            ctx.lineTo(-15, 25);
+            ctx.lineTo(-40, 35);
             ctx.closePath();
             ctx.fill();
             
-            // Neural Circuitry (Blue Glow)
-            ctx.strokeStyle = '#3498DB';
-            ctx.lineWidth = 1.5;
+            // ─── COCKPIT ENLARGEMENT (ZOOM ON ASTRA) ───
+            const cockpitGrd = ctx.createRadialGradient(0, -15, 0, 0, -15, 25);
+            cockpitGrd.addColorStop(0, 'rgba(52, 152, 219, 0.15)');
+            cockpitGrd.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+            
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = 'white';
+            ctx.fillStyle = cockpitGrd;
+            ctx.beginPath();
+            ctx.ellipse(0, -15, 14, 22, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1;
             ctx.stroke();
 
-            // Cockpit (Crimson Core)
-            ctx.shadowColor = '#E63946';
-            ctx.fillStyle = '#E63946';
+            // ─── ASTRA CHARACTER (DETAILED FACE) ───
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#010103'; // Deepest Obsidian
+            
+            // Head Shape (More Fox-like)
             ctx.beginPath();
-            ctx.ellipse(0, -5, 4, 10, 0, 0, Math.PI * 2);
+            ctx.moveTo(0, -5);
+            ctx.bezierCurveTo(8, -5, 10, -15, 10, -22); // Right cheek to ear
+            ctx.lineTo(6, -32); // Ear tip
+            ctx.lineTo(2, -24); // Ear base
+            ctx.lineTo(-2, -24); // Ear base left
+            ctx.lineTo(-6, -32); // Ear tip left
+            ctx.lineTo(-10, -22); // Ear base left
+            ctx.bezierCurveTo(-10, -15, -8, -5, 0, -5); // Left cheek to chin
             ctx.fill();
 
-            // Thrusters (Dual)
+            // SNOUT
+            ctx.fillStyle = '#050508';
+            ctx.beginPath();
+            ctx.ellipse(0, -14, 3, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // CRIMSON EYES (INTENSE GLOW)
+            ctx.shadowBlur = 15;
             ctx.shadowColor = '#E63946';
             ctx.fillStyle = '#E63946';
-            const flicker = Math.random() * 10;
             ctx.beginPath();
-            ctx.arc(-6, 20, 3 + flicker/5, 0, Math.PI * 2);
-            ctx.arc(6, 20, 3 + flicker/5, 0, Math.PI * 2);
+            // Slanted Fox Eyes
+            ctx.moveTo(-5, -21); ctx.lineTo(-2, -18); ctx.lineTo(-5, -16); ctx.closePath();
+            ctx.moveTo(5, -21); ctx.lineTo(2, -18); ctx.lineTo(5, -16); ctx.closePath();
+            ctx.fill();
+
+            // NEURAL WHISKER LINES (Blue highlights)
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = '#3498DB';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(-4, -14); ctx.lineTo(-12, -12);
+            ctx.moveTo(4, -14); ctx.lineTo(12, -12);
+            ctx.stroke();
+
+            // ─── THRUSTERS ───
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = '#E63946';
+            ctx.fillStyle = '#E63946';
+            const flicker = Math.random() * 15;
+            ctx.beginPath();
+            ctx.arc(-12, 32, 6 + flicker/5, 0, Math.PI * 2);
+            ctx.arc(12, 32, 6 + flicker/5, 0, Math.PI * 2);
             ctx.fill();
             
             // Ion Trail
             ctx.beginPath();
-            ctx.moveTo(-6, 20);
-            ctx.lineTo(-6, 35 + flicker);
-            ctx.moveTo(6, 20);
-            ctx.lineTo(6, 35 + flicker);
-            ctx.strokeStyle = 'rgba(230, 57, 70, 0.5)';
+            ctx.moveTo(-12, 32);
+            ctx.lineTo(-12, 55 + flicker);
+            ctx.moveTo(12, 32);
+            ctx.lineTo(12, 55 + flicker);
+            ctx.strokeStyle = 'rgba(230, 57, 70, 0.4)';
+            ctx.lineWidth = 5;
             ctx.stroke();
 
             ctx.restore();
