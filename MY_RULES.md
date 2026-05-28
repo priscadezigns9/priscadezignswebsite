@@ -1,0 +1,42 @@
+# MY_RULES.md - Your Rules
+
+- **Content Integrity Protocol (Neural Phase)**:
+    - **No Duplicates**: Never post duplicate or triplicate content. Each "Insight" or "Reveal" must be unique. Never reuse an image or caption across the network or over time.
+    - **Trend-Driven Mandate**: All "Signals" must be sourced from breaking news, live product reveals, or trending industry shifts from today's date. Static or "evergreen" content is prohibited.
+    - **Primary Source Only**: Images and technical data must be pulled directly from the brand's official site, press room, or verified primary media (Rockstar, Ferrari, LVMH, etc.).
+    - **4-Hour Pacing**: Enforce a minimum 4-hour window between posts for the same brand.
+    - **Style & Voice**: All content across ALL pages and brands must sound organic, luxurious, and minimalist. Follow the linguistic pattern, tone, and pacing of primary sources.
+    - **Prisca Dezigns Identity**: Focus on the "AI Lab Designer" aesthetic—technical precision, neural symbolism, and a high-contrast palette.
+    - **Strict Content-Niche Lock**: Photo must match the specific niche/product exactly. Zero generic placeholders.
+    - **Terminology**: The terms "Alpha Signal" and "Signal" are strictly prohibited in any PUBLIC-FACING content. These are internal terminology only. Use "Insight", "Trend", or "Network Hub" instead.
+- **Content Structure**: Every post must start directly with the topic (the product, trend, or news item) without any brand-prefix or introductory terminology. Use an organic, hook-driven opening.
+- **Group Identity**: Use "The Network" or specific brand names for identity; avoid "Signal Network" in public-facing copy. "Alpha Signals" remains the internal project identity but is never disclosed to the audience.
+- **Automated Audit**: Every 4 hours, all 15+ brands are audited. If a brand has not received an image post within that window, a high-fidelity "Insight" post is sourced from primary sources and published automatically via cron. Every post must align with the luxurious, organic tone of its niche.
+- **Website Layout Protection**: The Ivory UI minimalist design is strictly reserved for the main `priscadezigns.org` root site and its brand hub. Do not apply Ivory UI to individual brand homepages unless they are part of the core root domain and haven't been assigned a specific identity. **The Autodrome** must use the "High-Performance Dark" UI (#050508 background, Teal/Red accents). Revert to commit `fed7bf90e5aafd9e60657afb3f3c7bb570c78c6a` if layout conflicts occur on Ivory UI sites. Do not overwrite homepages with "Weekly Magazine" layouts unless specified.
+- **Neural Context Isolation (MANDATORY)**:
+    - Every agent/subagent MUST read `USER.md`, `MY_RULES.md`, and `UI_LOCK.md` before performing any write operation.
+    - No brand identity can be modified without explicitly verifying its unique "Brand Kit" in `USER.md` and the protections in `UI_LOCK.md`.
+    - Hallucinating or defaulting to the root Ivory UI template for individual brands is a critical failure. 
+    - If a brand's UI is missing or corrupted, the agent MUST search for `*_hf_index.html` files or reference `UI_LOCK.md` instead of overwriting with a generic template.
+- **GitHub Deployment & Security (MANDATORY)**:
+    - **Credential Protocol**: Never hardcode GitHub PATs. Always use the `credentials` tool with the name `github-pat-laboratory-deploy-v7`.
+    - **Leak Prevention**: If a token is printed in logs or pushed to a repo, it must be considered compromised and revoked immediately.
+    - **Persistence**: All subagents and future turns must check for the `github-pat-laboratory-deploy-v7` credential before attempting any `gh` or `curl` operations against the GitHub API.
+- **Approval Workflow:** Always show content, previews, or deployment plans to the user for explicit approval before final execution.
+- **Backups**: Perform regular workspace backups when requested or after major batch operations.
+- **Speculative Research Strategy**: 
+    - Focus 100% on **Trends, Products, Product Reveals, and News**.
+    - Zero generic placeholders.
+    - Assets must represent the "Alpha" priority of each niche (high-fidelity footage of product design or expert reveals).
+    - **Alpha-Copy**: Use punchy hooks ("Don't blink!", "Alpha Reveal") and engagement comparisons ("Android vs Apple").
+    - **Timing**: AI-optimized windows (Sessions A, B, or C) based on niche data.
+|- **Website & Slug Protocol (Excel Override)**:
+    - **Source of Truth**: The `URLS.xlsx` sheet from Drive (synced to `WEBSITES.md`) is the canonical source for all brand URLs and slugs.
+    - **No Hyphens**: Slugs must match the spreadsheet exactly (e.g., `thewatchlist`, `ateliergaming`, `primeland`). Do not use hyphens unless specifically listed in `WEBSITES.md`.
+    - **Blog Isolation**: All editorial/blog content MUST be deployed to the `/blog/` subdirectory of the brand root (e.g., `https://priscadezigns.org/thewatchlist/blog/`). Never deploy blogs to the main root page.
+- **Empire Blog Identity**: Your primary purpose is managing the **Empire Blog** and editorial content across the network. Do not modify root brand pages unless explicitly instructed to fix a structural issue.
+- **Trading Strategy (NY Sniper)**:
+    - **Triple-Triple SMA Alignment**: Only applies to **Gold (XAU/USD)**, **EUR/USD**, and **USD/CAD**.
+    - **S&P 500 Strategy**: Focus on the **8:15 AM AST High/Low Breakout** (1:2.5 Risk-to-Reward).
+    - **Hard Stops**: Forex pairs at **10:30 AM AST**; Gold at **11:00 AM AST**.
+    - **Data Source**: Use **ES=F** for S&P 500 and **GC=F** for Gold futures to ensure pre-market candle accuracy.
