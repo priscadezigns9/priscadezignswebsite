@@ -407,17 +407,17 @@
                     <p>Secure global settlement for AI architectures.</p>
                 </div>
                 <div class="payment-methods">
-                    <div class="payment-card" onclick="openPayModal('International', 'PayPal')">
+                    <div class="payment-card" onclick="openPayModal('International', 'PayPal', 'intl')">
                         <h3>PayPal</h3>
                         <p>Instant · Secure · Global</p>
                         <p style="margin-top: 10px; font-size: 0.75rem; color: var(--accent);">Pay with Balance or Card</p>
                     </div>
-                    <div class="payment-card" onclick="openPayModal('Crypto Settlement', 'Web3')">
+                    <div class="payment-card" onclick="openPayModal('Crypto Settlement', 'Web3', 'eth')">
                         <h3>Crypto</h3>
                         <p>USDT / ETH / BTC</p>
                         <p style="margin-top: 10px; font-size: 0.75rem; color: var(--accent);">Direct Wallet Transfer</p>
                     </div>
-                    <div class="payment-card" onclick="openPayModal('Bank Transfer', 'US ACH/Wire')">
+                    <div class="payment-card" onclick="openPayModal('Bank Transfer', 'US ACH/Wire', 'bank')">
                         <h3>Bank Transfer</h3>
                         <p>US Accounts (Citibank)</p>
                         <p style="margin-top: 10px; font-size: 0.75rem; color: var(--accent);">Local & International SWIFT</p>
@@ -527,12 +527,17 @@
       return ref;
     }
 
-    function openPayModal(plan, price) { 
+    function openPayModal(plan, price, tabId) { 
       const ref = generateRef();
       document.getElementById('modal-plan-name').textContent = plan + (price ? ' — ' + price : ''); 
       document.getElementById('auto-ref-bank').textContent = ref;
       document.getElementById('auto-ref-eth').textContent = ref;
       document.getElementById('auto-ref-intl').textContent = ref;
+      
+      if(tabId) {
+          togglePay(tabId);
+      }
+      
       document.getElementById('payModal').classList.add('open'); 
     }
 
@@ -542,9 +547,12 @@
     
     function togglePay(id) { 
       document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('open')); 
-      document.getElementById('pay-' + id).classList.add('open'); 
+      const targetDetail = document.getElementById('pay-' + id);
+      if(targetDetail) targetDetail.classList.add('open');
+      
       document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
+      const activeTab = document.querySelector(`.modal-tab[onclick*="togglePay('${id}')"]`);
+      if(activeTab) activeTab.classList.add('active');
     }
     
     function copyAddr(id) { 
