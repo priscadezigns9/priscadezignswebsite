@@ -76,34 +76,40 @@
         /* ─── CURRENCY HUD ─── */
         .currency-hud {
             display: flex;
-            gap: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px 18px;
-            border-radius: 50px;
+            gap: 25px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 24px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .coin {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-size: 0.8rem;
             letter-spacing: 1px;
             font-weight: 700;
             cursor: pointer;
             transition: 0.3s;
+            perspective: 1000px;
         }
 
         .coin:hover { transform: scale(1.05); }
 
         .coin-svg {
-            width: 24px;
-            height: 24px;
-            filter: drop-shadow(0 0 5px rgba(230, 57, 70, 0.5));
+            width: 32px;
+            height: 32px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
         }
 
+        .coin:hover .coin-svg { transform: rotateY(180deg); }
+
         .neural-coin-svg {
-            filter: drop-shadow(0 0 5px rgba(52, 152, 219, 0.5));
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
         }
 
         nav {
@@ -316,10 +322,21 @@
                             <stop offset="0%" style="stop-color:#E63946;stop-opacity:1" />
                             <stop offset="100%" style="stop-color:#800e16;stop-opacity:1" />
                         </linearGradient>
+                        <filter id="genshin3d">
+                            <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur" />
+                            <feSpecularLighting in="blur" surfaceScale="5" specularConstant="1.2" specularExponent="30" lighting-color="#ffffff" result="specOut">
+                                <fePointLight x="-5000" y="-10000" z="20000" />
+                            </feSpecularLighting>
+                            <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut" />
+                            <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" />
+                        </filter>
                     </defs>
-                    <circle cx="50" cy="50" r="45" fill="url(#astrGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-                    <path d="M50 25 L75 75 L25 75 Z" fill="rgba(255,255,255,0.15)" />
-                    <text x="50" y="65" font-family="Space Grotesk" font-size="40" font-weight="900" fill="white" text-anchor="middle">A</text>
+                    <g filter="url(#genshin3d)">
+                        <circle cx="50" cy="50" r="45" fill="url(#astrGrad)" />
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+                        <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1" />
+                        <text x="50" y="68" font-family="Space Grotesk" font-size="45" font-weight="900" fill="white" text-anchor="middle">A</text>
+                    </g>
                 </svg>
                 <span id="astr-count">1,250 ASTR</span>
             </div>
@@ -331,9 +348,12 @@
                             <stop offset="100%" style="stop-color:#1c5a85;stop-opacity:1" />
                         </linearGradient>
                     </defs>
-                    <circle cx="50" cy="50" r="45" fill="url(#neuralGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
-                    <path d="M30 30 L70 30 L70 70 L30 70 Z" fill="rgba(255,255,255,0.1)" />
-                    <text x="50" y="65" font-family="Space Grotesk" font-size="40" font-weight="900" fill="white" text-anchor="middle">N</text>
+                    <g filter="url(#genshin3d)">
+                        <circle cx="50" cy="50" r="45" fill="url(#neuralGrad)" />
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+                        <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1" />
+                        <text x="50" y="68" font-family="Space Grotesk" font-size="45" font-weight="900" fill="white" text-anchor="middle">N</text>
+                    </g>
                 </svg>
                 <span id="neural-count">42 NEURAL</span>
             </div>
@@ -477,72 +497,96 @@
             ctx.translate(astra.x, astra.y);
             ctx.rotate(astra.angle + Math.PI / 2);
 
-            // HIGH-FIDELITY ASTRA STARSHIP
-            ctx.shadowBlur = 30;
-            ctx.shadowColor = '#3498DB';
+            // ─── HIGH-FIDELITY ASTRA STARSHIP ───
+            ctx.shadowBlur = 40;
+            ctx.shadowColor = 'rgba(52, 152, 219, 0.4)';
             
             // Outer Wings (Matte Obsidian)
             ctx.fillStyle = '#050508';
             ctx.beginPath();
-            ctx.moveTo(0, -35);
-            ctx.lineTo(30, 25);
-            ctx.lineTo(10, 15);
-            ctx.lineTo(0, 25);
-            ctx.lineTo(-10, 15);
-            ctx.lineTo(-30, 25);
+            ctx.moveTo(0, -45);
+            ctx.lineTo(40, 35);
+            ctx.lineTo(15, 25);
+            ctx.lineTo(0, 35);
+            ctx.lineTo(-15, 25);
+            ctx.lineTo(-40, 35);
             ctx.closePath();
             ctx.fill();
             
-            // Neural Circuitry (Blue Glow)
-            ctx.strokeStyle = '#3498DB';
-            ctx.lineWidth = 1.5;
+            // ─── COCKPIT ENLARGEMENT (ZOOM ON ASTRA) ───
+            const cockpitGrd = ctx.createRadialGradient(0, -15, 0, 0, -15, 25);
+            cockpitGrd.addColorStop(0, 'rgba(52, 152, 219, 0.15)');
+            cockpitGrd.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+            
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = 'white';
+            ctx.fillStyle = cockpitGrd;
+            ctx.beginPath();
+            ctx.ellipse(0, -15, 14, 22, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1;
             ctx.stroke();
 
-            // COCKPIT DOME (Glass Effect)
-            ctx.fillStyle = 'rgba(52, 152, 219, 0.2)';
+            // ─── ASTRA CHARACTER (DETAILED FACE) ───
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#010103'; // Deepest Obsidian
+            
+            // Head Shape (More Fox-like)
             ctx.beginPath();
-            ctx.ellipse(0, -8, 8, 14, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.stroke();
-
-            // ASTRA PILOT (Obsidian Fox Silhouette)
-            ctx.fillStyle = '#010103';
-            ctx.beginPath();
-            // Head
-            ctx.arc(0, -10, 4, 0, Math.PI * 2);
-            // Ears
-            ctx.moveTo(-3, -12); ctx.lineTo(-5, -16); ctx.lineTo(-1, -13);
-            ctx.moveTo(3, -12); ctx.lineTo(5, -16); ctx.lineTo(1, -13);
+            ctx.moveTo(0, -5);
+            ctx.bezierCurveTo(8, -5, 10, -15, 10, -22); // Right cheek to ear
+            ctx.lineTo(6, -32); // Ear tip
+            ctx.lineTo(2, -24); // Ear base
+            ctx.lineTo(-2, -24); // Ear base left
+            ctx.lineTo(-6, -32); // Ear tip left
+            ctx.lineTo(-10, -22); // Ear base left
+            ctx.bezierCurveTo(-10, -15, -8, -5, 0, -5); // Left cheek to chin
             ctx.fill();
 
-            // CRIMSON EYES (The Protocol Astra Signature)
+            // SNOUT
+            ctx.fillStyle = '#050508';
+            ctx.beginPath();
+            ctx.ellipse(0, -14, 3, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // CRIMSON EYES (INTENSE GLOW)
             ctx.shadowBlur = 15;
             ctx.shadowColor = '#E63946';
             ctx.fillStyle = '#E63946';
             ctx.beginPath();
-            ctx.arc(-1.5, -10, 1, 0, Math.PI * 2);
-            ctx.arc(1.5, -10, 1, 0, Math.PI * 2);
+            // Slanted Fox Eyes
+            ctx.moveTo(-5, -21); ctx.lineTo(-2, -18); ctx.lineTo(-5, -16); ctx.closePath();
+            ctx.moveTo(5, -21); ctx.lineTo(2, -18); ctx.lineTo(5, -16); ctx.closePath();
             ctx.fill();
 
-            // Thrusters (Dual)
-            ctx.shadowBlur = 20;
+            // NEURAL WHISKER LINES (Blue highlights)
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = '#3498DB';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(-4, -14); ctx.lineTo(-12, -12);
+            ctx.moveTo(4, -14); ctx.lineTo(12, -12);
+            ctx.stroke();
+
+            // ─── THRUSTERS ───
+            ctx.shadowBlur = 25;
             ctx.shadowColor = '#E63946';
             ctx.fillStyle = '#E63946';
-            const flicker = Math.random() * 10;
+            const flicker = Math.random() * 15;
             ctx.beginPath();
-            ctx.arc(-8, 22, 4 + flicker/5, 0, Math.PI * 2);
-            ctx.arc(8, 22, 4 + flicker/5, 0, Math.PI * 2);
+            ctx.arc(-12, 32, 6 + flicker/5, 0, Math.PI * 2);
+            ctx.arc(12, 32, 6 + flicker/5, 0, Math.PI * 2);
             ctx.fill();
             
             // Ion Trail
             ctx.beginPath();
-            ctx.moveTo(-8, 22);
-            ctx.lineTo(-8, 40 + flicker);
-            ctx.moveTo(8, 22);
-            ctx.lineTo(8, 40 + flicker);
+            ctx.moveTo(-12, 32);
+            ctx.lineTo(-12, 55 + flicker);
+            ctx.moveTo(12, 32);
+            ctx.lineTo(12, 55 + flicker);
             ctx.strokeStyle = 'rgba(230, 57, 70, 0.4)';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 5;
             ctx.stroke();
 
             ctx.restore();
