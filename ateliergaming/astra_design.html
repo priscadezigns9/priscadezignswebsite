@@ -231,18 +231,119 @@
         <div class="visual-archive">
             <div class="main-render">
                 <div class="hud-scan"></div>
-                <!-- CINEMATIC 3D CHARACTER MANIFEST -->
-                <div style="position: relative; width: 100%; height: 700px; border-radius: 12px; overflow: hidden; background: #000;">
-                    <img src="https://media.easy-peasy.ai/39eaba68-b0b8-4d4d-bbd4-171191b73a66/c718763e-505d-41a6-96da-3e83e3881986_medium.webp" 
-                         alt="Astra: 3D Animated Character Manifest" 
-                         style="width: 100%; height: 100%; object-fit: cover; filter: brightness(1.1) contrast(1.1) drop-shadow(0 0 30px rgba(230, 57, 70, 0.3));">
-                    
-                    <!-- HUD Overlays for 3D Feel -->
-                    <div style="position: absolute; bottom: 20px; left: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--crimson);">
-                        STATUS: FULL_MANIFEST_REVEAL<br>
-                        SYNC: 99.8% PERFECT
+                <!-- INTERACTIVE 3D CHARACTER ENGINE (Three.js Manifest) -->
+                <div id="astra-3d-manifest" style="width: 100%; height: 700px; border-radius: 12px; overflow: hidden; background: #000; position: relative; border: 1px solid var(--glass);">
+                    <div id="loading-manifest" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'JetBrains Mono'; color: var(--crimson); font-size: 10px; letter-spacing: 2px;">
+                        INITIALIZING_CHARACTER_VOXEL_ENGINE...
                     </div>
                 </div>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+                <script>
+                    const container = document.getElementById('astra-3d-manifest');
+                    let scene, camera, renderer, astra;
+
+                    function initAstra() {
+                        scene = new THREE.Scene();
+                        camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+                        camera.position.set(0, 1.5, 4);
+
+                        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                        renderer.setSize(container.clientWidth, container.clientHeight);
+                        renderer.setPixelRatio(window.devicePixelRatio);
+                        container.appendChild(renderer.domElement);
+                        document.getElementById('loading-manifest').remove();
+
+                        // Lights
+                        const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+                        scene.add(ambient);
+                        const point = new THREE.PointLight(0xE63946, 2, 10);
+                        point.position.set(2, 2, 2);
+                        scene.add(point);
+                        const rim = new THREE.PointLight(0x00B4A6, 1, 10);
+                        rim.position.set(-2, 1, -2);
+                        scene.add(rim);
+
+                        // Create Astra 3D Manifest
+                        astra = new THREE.Group();
+
+                        // Materials
+                        const skinMat = new THREE.MeshStandardMaterial({ 
+                            color: 0x050508, 
+                            roughness: 0.8, 
+                            metalness: 0.2,
+                            emissive: 0x00B4A6,
+                            emissiveIntensity: 0.05
+                        });
+                        const tunicMat = new THREE.MeshStandardMaterial({ 
+                            color: 0xE63946, 
+                            roughness: 0.9,
+                            emissive: 0x800000,
+                            emissiveIntensity: 0.2
+                        });
+                        const eyeMat = new THREE.MeshBasicMaterial({ color: 0xE63946 });
+
+                        // Body (3D Form)
+                        const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.6), skinMat);
+                        body.position.y = 0.6;
+                        astra.add(body);
+
+                        // Tunic (Layered Gear)
+                        const tunic = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.8, 0.65), tunicMat);
+                        tunic.position.y = 0.8;
+                        astra.add(tunic);
+
+                        // Head
+                        const head = new THREE.Group();
+                        const skull = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), skinMat);
+                        head.add(skull);
+
+                        // Ears (Tactical)
+                        const earGeo = new THREE.ConeGeometry(0.12, 0.4, 4);
+                        const lEar = new THREE.Mesh(earGeo, skinMat);
+                        lEar.position.set(-0.2, 0.4, 0);
+                        head.add(lEar);
+                        const rEar = new THREE.Mesh(earGeo, skinMat);
+                        rEar.position.set(0.2, 0.4, 0);
+                        head.add(rEar);
+
+                        // Eyes (Expressive)
+                        const eyeGeo = new THREE.SphereGeometry(0.06, 16, 16);
+                        const lEye = new THREE.Mesh(eyeGeo, eyeMat);
+                        lEye.position.set(-0.15, 0.1, 0.3);
+                        head.add(lEye);
+                        const rEye = new THREE.Mesh(eyeGeo, eyeMat);
+                        rEye.position.set(0.15, 0.1, 0.3);
+                        head.add(rEye);
+
+                        // Muzzle
+                        const muzzle = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.3), skinMat);
+                        muzzle.position.set(0, -0.1, 0.35);
+                        head.add(muzzle);
+
+                        head.position.y = 1.5;
+                        astra.add(head);
+
+                        // Tail (Energy)
+                        const tailGeo = new THREE.CylinderGeometry(0.02, 0.15, 1.2, 8);
+                        const tail = new THREE.Mesh(tailGeo, skinMat);
+                        tail.position.set(0, 0.3, -0.6);
+                        tail.rotation.x = -Math.PI / 4;
+                        astra.add(tail);
+
+                        scene.add(astra);
+
+                        animateAstra();
+                    }
+
+                    function animateAstra() {
+                        requestAnimationFrame(animateAstra);
+                        astra.rotation.y += 0.005;
+                        astra.position.y = Math.sin(Date.now() * 0.002) * 0.05;
+                        renderer.render(scene, camera);
+                    }
+
+                    initAstra();
+                </script>
             </div>
         </div>
 
