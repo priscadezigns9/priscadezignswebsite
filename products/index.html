@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
+    
     <style>
         :root {
             --bg: #FDF8F2;
@@ -152,36 +153,42 @@
             color: var(--muted);
         }
     
-        /* Animation Base */
-        .section-header .section-title {
+        /* --- Reveal Animations --- */
+        .reveal-up {
             opacity: 0;
-            transform: translateX(-30px);
+            transform: translateY(40px);
             transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .section-header .section-sub {
+        
+        .reveal-left {
             opacity: 0;
-            transform: translateX(-20px);
-            transition: opacity 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .section-header.anim-visible .section-title,
-        .section-header.anim-visible .section-sub {
-            opacity: 1;
-            transform: translateX(0);
+            transform: translateX(-40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .service-card {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        .revealed {
+            opacity: 1 !important;
+            transform: translate(0) !important;
         }
-        .service-card.anim-visible {
-            opacity: 1;
-            transform: translateY(0);
+        
+        #pd-cursor-glow {
+            position: fixed;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(123,53,212,0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 9997;
+            transform: translate(-50%, -50%);
+            transition: left 0.1s ease, top 0.1s ease;
+            will-change: left, top;
         }
     </style>
 
+
     <link rel="stylesheet" href="/assets/anim/pd_anim.css">
 </head>
+
 
 
 <body>
@@ -202,14 +209,14 @@
         </nav>
     </header>
 
-    <div class="saas-hero section-header">
-        <h1 class="section-title">SaaS Lab.</h1>
-        <p class="section-sub">Autonomous tools and platforms built by the Prisca Dezigns Laboratory to power the 2026 digital economy.</p>
+    <div class="saas-hero">
+        <h1 class="reveal-left">SaaS Lab.</h1>
+        <p class="reveal-left" style="transition-delay: 0.1s;">Autonomous tools and platforms built by the Prisca Dezigns Laboratory to power the 2026 digital economy.</p>
     </div>
 
     <div class="brand-grid">
         <!-- Rowcell -->
-        <a href="/rowcell/" class="brand-card service-card">
+        <a href="/rowcell/" class="brand-card reveal-up">
             <div class="brand-logo-wrap">
                 <img src="/assets/logos/rowcell.svg" alt="Rowcell">
             </div>
@@ -219,7 +226,7 @@
             </div>
         </a>
         <!-- Karjov -->
-        <a href="/karjov/" class="brand-card service-card">
+        <a href="/karjov/" class="brand-card reveal-up" style="transition-delay: 0.1s;">
             <div class="brand-logo-wrap">
                 <img src="/assets/logos/karjov.png" alt="Karjov">
             </div>
@@ -229,7 +236,7 @@
             </div>
         </a>
         <!-- Moblync -->
-        <a href="/moblync/" class="brand-card service-card">
+        <a href="/moblync/" class="brand-card reveal-up" style="transition-delay: 0.2s;">
             <div class="brand-logo-wrap">
                 <img src="/assets/logos/moblync.png" alt="Moblync">
             </div>
@@ -239,7 +246,7 @@
             </div>
         </a>
         <!-- Cupyx -->
-        <a href="/cupyx/" class="brand-card service-card">
+        <a href="/cupyx/" class="brand-card reveal-up" style="transition-delay: 0.3s;">
             <div class="brand-logo-wrap">
                 <img src="/assets/logos/cupyx.png" alt="Cupyx">
             </div>
@@ -249,7 +256,7 @@
             </div>
         </a>
         <!-- Velloq -->
-        <a href="/velloq/" class="brand-card service-card">
+        <a href="/velloq/" class="brand-card reveal-up" style="transition-delay: 0.4s;">
             <div class="brand-logo-wrap">
                 <img src="/assets/logos/velloq.png" alt="Velloq">
             </div>
@@ -265,41 +272,32 @@
         <p>© 2026 PRISCA DEZIGNS · SAAS LAB</p>
     </footer>
 
-    
     <script>
-    (function() {
-        const S = [
-            { sel: '.section-header', cls: 'anim-visible', thr: 0.1, stag: 0 },
-            { sel: '.service-card', cls: 'anim-visible', thr: 0.1, stag: 100 }
-        ];
-        S.forEach(s => {
-            const els = Array.from(document.querySelectorAll(s.sel));
-            if (!els.length) return;
-            const io = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const idx = els.indexOf(entry.target);
-                        setTimeout(() => {
-                            entry.target.classList.add(s.cls);
-                        }, s.stag ? (idx % 6) * s.stag : 0);
-                        io.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: s.thr });
-            els.forEach(el => io.observe(el));
+    document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal-up, .reveal-left').forEach(el => {
+            observer.observe(el);
         });
 
         // Glow
-        const g = document.getElementById('pd-cursor-glow');
-        if (g) {
+        const glow = document.getElementById('pd-cursor-glow');
+        if (glow) {
             document.addEventListener('mousemove', e => {
-                g.style.left = e.clientX + 'px';
-                g.style.top = e.clientY + 'px';
+                glow.style.left = e.clientX + 'px';
+                glow.style.top = e.clientY + 'px';
             });
         }
-    })();
+    });
     </script>
-
 </body>
+
 
 </html>
