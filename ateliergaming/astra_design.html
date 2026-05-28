@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Design: Astra Nexus | Atelier World</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,700&family=Space+Grotesk:wght@300;400;700&family=JetBrains+Mono:wght@400&display=swap');
+        
+        :root {
+            --crimson: #E63946;
+            --void: #050508;
+            --obsidian: #0A0A0F;
+            --teal: #00B4A6;
+            --white: #F1FAEE;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            background: var(--void);
+            color: var(--white);
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Dossier Layout */
+        .dossier {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 60px;
+            position: relative;
+        }
+
+        /* Left Column: Visual Archive */
+        .visual-archive {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .main-render {
+            background: var(--obsidian);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-render::before {
+            content: "ARCHIVE // PILOT_001";
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            opacity: 0.3;
+        }
+
+        /* Right Column: Technical Dossier */
+        .content {
+            padding-bottom: 200px;
+        }
+
+        .header {
+            margin-bottom: 80px;
+        }
+
+        .tagline {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--crimson);
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 8rem;
+            margin: 0;
+            letter-spacing: -4px;
+            line-height: 0.8;
+            color: var(--white);
+        }
+
+        .bio {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            font-weight: 300;
+            opacity: 0.8;
+            margin-top: 40px;
+            max-width: 700px;
+        }
+
+        /* Sections */
+        section {
+            margin-top: 120px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 60px;
+        }
+
+        h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        /* Abilities Grid */
+        .ability-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .ability-card {
+            background: var(--glass);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .ability-card:hover {
+            border-color: var(--crimson);
+            transform: translateY(-5px);
+            background: rgba(230, 57, 70, 0.02);
+        }
+
+        .ability-name {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ability-icon {
+            width: 30px;
+            height: 30px;
+            stroke: var(--crimson);
+        }
+
+        .ability-desc {
+            font-size: 0.95rem;
+            opacity: 0.6;
+            line-height: 1.5;
+        }
+
+        /* Architecture Specs */
+        .spec-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .spec-list li {
+            padding: 20px;
+            background: var(--obsidian);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .spec-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.4;
+        }
+
+        .spec-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* HUD Overlay for Render */
+        .hud-scan {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--teal), transparent);
+            box-shadow: 0 0 10px var(--teal);
+            animation: scan 4s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        @media (max-width: 1100px) {
+            .dossier { grid-template-columns: 1fr; }
+            .visual-archive { position: relative; top: 0; }
+            h1 { font-size: 5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dossier">
+        <!-- VISUAL SIDE -->
+        <div class="visual-archive">
+            <div class="main-render">
+                <div class="hud-scan"></div>
+                <svg viewBox="0 0 400 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="neon">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#FF0000" />
+                            <stop offset="100%" stop-color="#E63946" stop-opacity="0" />
+                        </radialGradient>
+                    </defs>
+
+                    <!-- Background Grid -->
+                    <path d="M0 100 H400 M0 200 H400 M0 300 H400 M0 400 H400 M0 500 H400" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                    <path d="M100 0 V600 M200 0 V600 M300 0 V600" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+
+                    <!-- ASTRA MASTER SILHOUETTE -->
+                    <g transform="translate(50, 50) scale(0.75)">
+                        <!-- Tail Structure (Neural Segments) -->
+                        <path d="M300 350 C400 450 450 550 400 650" stroke="var(--crimson)" stroke-width="8" stroke-linecap="round" opacity="0.8" filter="url(#neon)">
+                            <animate attributeName="stroke-dasharray" from="0, 1000" to="1000, 0" dur="2s" fill="freeze" />
+                        </path>
+                        
+                        <!-- Body (Obsidian Layers) -->
+                        <path d="M100 550 L300 550 L350 300 L200 200 L50 300 Z" fill="#050508" stroke="#1A1A24" stroke-width="4" />
+                        <path d="M120 530 L280 530 L320 320 L200 230 L80 320 Z" fill="#0A0A0F" stroke="var(--crimson)" stroke-width="0.5" opacity="0.3" />
+
+                        <!-- Shoulder Guards -->
+                        <path d="M50 300 L20 350 L70 380 Z" fill="#1A1A24" stroke="var(--crimson)" stroke-width="1" />
+                        <path d="M350 300 L380 350 L330 380 Z" fill="#1A1A24" stroke="var(--crimson)" stroke-width="1" />
+
+                        <!-- Head Architecture -->
+                        <g transform="translate(100, 50)">
+                            <!-- Ears (Pointed Tech) -->
+                            <path d="M0 100 L40 -50 L80 80 Z" fill="#050508" stroke="var(--crimson)" stroke-width="2" />
+                            <path d="M200 100 L160 -50 L120 80 Z" fill="#050508" stroke="var(--crimson)" stroke-width="2" />
+                            
+                            <!-- Face Plate -->
+                            <path d="M20 100 L180 100 L150 250 L100 280 L50 250 Z" fill="#0A0A0F" stroke="#1A1A24" stroke-width="2" />
+                            
+                            <!-- Crimson Specular Eyes -->
+                            <g filter="url(#neon)">
+                                <ellipse cx="60" cy="140" rx="15" ry="8" fill="var(--crimson)" />
+                                <ellipse cx="140" cy="140" rx="15" ry="8" fill="var(--crimson)" />
+                                <!-- Pupils -->
+                                <rect x="58" y="135" width="4" height="10" fill="white" opacity="0.8" />
+                                <rect x="138" y="135" width="4" height="10" fill="white" opacity="0.8" />
+                            </g>
+                            
+                            <!-- Fiber-Optic Markings -->
+                            <path d="M100 200 L100 260 M70 230 L130 230" stroke="var(--teal)" stroke-width="1" opacity="0.6" />
+                        </g>
+
+                        <!-- Neural Core (Chest) -->
+                        <circle cx="200" cy="350" r="25" fill="none" stroke="var(--crimson)" stroke-width="2" opacity="0.5" filter="url(#neon)">
+                            <animate attributeName="r" values="20;30;20" dur="2s" repeatCount="indefinite" />
+                        </circle>
+                        <path d="M200 325 L200 375 M175 350 L225 350" stroke="var(--crimson)" stroke-width="1" />
+                    </g>
+
+                    <!-- Technical Callouts -->
+                    <text x="320" y="80" fill="var(--teal)" font-family="JetBrains Mono" font-size="8" class="pulse">SYNC: 99.8%</text>
+                    <text x="20" y="580" fill="var(--crimson)" font-family="JetBrains Mono" font-size="8">OBSIDIAN_CHASSIS_V4.2</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- CONTENT SIDE -->
+        <div class="content">
+            <header class="header">
+                <span class="tagline">Neural Unit // ASTRA-01</span>
+                <h1>The Obsidian<br>Fox</h1>
+                <p class="bio">
+                    Constructed in the deep-void laboratories of Atelier World, Astra is not merely a character—she is a sentient neural bridge. Her chassis is composed of matte obsidian-composite fur that absorbs 99.9% of ambient light, while her internals pulse with raw data-flow.
+                </p>
+            </header>
+
+            <section>
+                <h2>Core Architecture</h2>
+                <ul class="spec-list">
+                    <li>
+                        <span class="spec-label">Species</span>
+                        <span class="spec-value">Sub-Void Neural Fox</span>
+                    </li>
+                    <li>
+                        <span class="spec-label">Optics</span>
+                        <span class="spec-value">Crimson Specular (X-Ray)</span>
+                    </li>
+                    <li>
+                        <span class="spec-label">Chassis Material</span>
+                        <span class="spec-value">Matte Obsidian Fiber</span>
+                    </li>
+                    <li>
+                        <span class="spec-label">Neural Sync Rate</span>
+                        <span class="spec-value">99.8% Perfect</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Master Abilities</h2>
+                <div class="ability-grid">
+                    <div class="ability-card">
+                        <div class="ability-name">
+                            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                            </svg>
+                            Void Shift
+                        </div>
+                        <p class="ability-desc">Short-range neural displacement. Astra can bypass physical and digital firewalls by temporarily phasing into the sub-void.</p>
+                    </div>
+                    <div class="ability-card">
+                        <div class="ability-name">
+                            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            </svg>
+                            Sync-Link
+                        </div>
+                        <p class="ability-desc">Direct mind-to-machine interface. Allows Astra to control the ship’s weapons and engines with zero latency, purely through thought.</p>
+                    </div>
+                    <div class="ability-card">
+                        <div class="ability-name">
+                            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                            </svg>
+                            Phantom Pulse
+                        </div>
+                        <p class="ability-desc">A wide-range sensory wave. Emits a localized crimson pulse that reveals hidden enemies or rare network loot caches.</p>
+                    </div>
+                    <div class="ability-card">
+                        <div class="ability-name">
+                            <svg class="ability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                            Void Barrier
+                        </div>
+                        <p class="ability-desc">The ultimate defense. Astra creates a localized field of negative energy that deletes incoming projectiles from existence.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Design Philosophy</h2>
+                <p class="bio">
+                    The design goal for Astra was "Tactile Futurism." Unlike Mario’s playful, rounded shapes, Astra is defined by sharp angles, high-contrast lighting, and a feeling of dangerous precision. She is built for speed and intelligence, representing the peak of Atelier's RPG evolution.
+                </p>
+                <div style="margin-top: 60px;">
+                    <a href="/ateliergaming/" style="text-decoration: none; color: var(--crimson); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 12px; border: 1px solid var(--crimson); padding: 15px 30px; transition: 0.3s;" onmouseover="this.style.background='var(--crimson)'; this.style.color='white'" onmouseout="this.style.background='transparent'; this.style.color='var(--crimson)'">Return to Bridge</a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+</body>
+</html>
