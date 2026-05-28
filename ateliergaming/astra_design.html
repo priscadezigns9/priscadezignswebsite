@@ -263,16 +263,16 @@
                         rim.position.set(-2, 1, -2);
                         scene.add(rim);
 
-                        // Create Astra 3D Manifest
+                        // --- LEGENDARY_FOX_PROTOCOL: HIGH-FIDELITY CHARACTER ENGINE ---
                         astra = new THREE.Group();
 
-                        // Materials
+                        // Materials (Organic Skin & Fabric)
                         const skinMat = new THREE.MeshStandardMaterial({ 
-                            color: 0x050508, 
-                            roughness: 0.8, 
-                            metalness: 0.2,
+                            color: 0x0A0A0F, 
+                            roughness: 0.7, 
+                            metalness: 0.1,
                             emissive: 0x00B4A6,
-                            emissiveIntensity: 0.05
+                            emissiveIntensity: 0.1
                         });
                         const tunicMat = new THREE.MeshStandardMaterial({ 
                             color: 0xE63946, 
@@ -280,54 +280,88 @@
                             emissive: 0x800000,
                             emissiveIntensity: 0.2
                         });
-                        const eyeMat = new THREE.MeshBasicMaterial({ color: 0xE63946 });
+                        const innerEarMat = new THREE.MeshStandardMaterial({ color: 0x1A1A24 });
+                        const eyeCoreMat = new THREE.MeshBasicMaterial({ color: 0xE63946 });
+                        const pupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                        const highlightMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
 
-                        // Body (3D Form)
-                        const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.2, 0.6), skinMat);
-                        body.position.y = 0.6;
+                        // 1. Organic Body (The Core)
+                        const body = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 3), skinMat);
+                        body.scale.set(1, 1.4, 0.8);
+                        body.position.y = 0.7;
                         astra.add(body);
 
-                        // Tunic (Layered Gear)
-                        const tunic = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.8, 0.65), tunicMat);
-                        tunic.position.y = 0.8;
+                        // 2. The Nano-Crimson Tunic (Fabric Mesh)
+                        const tunic = new THREE.Mesh(new THREE.IcosahedronGeometry(0.52, 3), tunicMat);
+                        tunic.scale.set(1.05, 1.0, 0.85);
+                        tunic.position.y = 1.0;
                         astra.add(tunic);
 
-                        // Head
+                        // 3. Head & Expressions
                         const head = new THREE.Group();
-                        const skull = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), skinMat);
+                        const skull = new THREE.Mesh(new THREE.IcosahedronGeometry(0.4, 3), skinMat);
                         head.add(skull);
 
-                        // Ears (Tactical)
-                        const earGeo = new THREE.ConeGeometry(0.12, 0.4, 4);
-                        const lEar = new THREE.Mesh(earGeo, skinMat);
-                        lEar.position.set(-0.2, 0.4, 0);
-                        head.add(lEar);
-                        const rEar = new THREE.Mesh(earGeo, skinMat);
-                        rEar.position.set(0.2, 0.4, 0);
-                        head.add(rEar);
-
-                        // Eyes (Expressive)
-                        const eyeGeo = new THREE.SphereGeometry(0.06, 16, 16);
-                        const lEye = new THREE.Mesh(eyeGeo, eyeMat);
-                        lEye.position.set(-0.15, 0.1, 0.3);
-                        head.add(lEye);
-                        const rEye = new THREE.Mesh(eyeGeo, eyeMat);
-                        rEye.position.set(0.15, 0.1, 0.3);
-                        head.add(rEye);
-
-                        // Muzzle
-                        const muzzle = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.3), skinMat);
-                        muzzle.position.set(0, -0.1, 0.35);
+                        // Muzzle (Organic Form)
+                        const muzzle = new THREE.Mesh(new THREE.IcosahedronGeometry(0.2, 2), skinMat);
+                        muzzle.scale.set(1, 0.8, 1.5);
+                        muzzle.position.set(0, -0.1, 0.3);
                         head.add(muzzle);
 
-                        head.position.y = 1.5;
+                        // 4. Animated Ears (Alert/Forward)
+                        const earGeo = new THREE.ConeGeometry(0.15, 0.5, 4);
+                        const lEar = new THREE.Mesh(earGeo, skinMat);
+                        lEar.position.set(-0.25, 0.4, 0);
+                        lEar.rotation.z = 0.2;
+                        head.add(lEar);
+                        const rEar = new THREE.Mesh(earGeo, skinMat);
+                        rEar.position.set(0.25, 0.4, 0);
+                        rEar.rotation.z = -0.2;
+                        head.add(rEar);
+
+                        // Inner Ear Detail
+                        const innerEarGeo = new THREE.ConeGeometry(0.1, 0.35, 4);
+                        const lInnerEar = new THREE.Mesh(innerEarGeo, innerEarMat);
+                        lInnerEar.position.set(-0.25, 0.4, 0.05);
+                        lInnerEar.rotation.z = 0.2;
+                        head.add(lInnerEar);
+
+                        // 5. Expressive 3D Eyes (The Soul)
+                        const eyeGroupL = new THREE.Group();
+                        const eyeGroupR = new THREE.Group();
+
+                        const eyeGeo = new THREE.SphereGeometry(0.08, 16, 16);
+                        const lEye = new THREE.Mesh(eyeGeo, eyeCoreMat);
+                        const rEye = new THREE.Mesh(eyeGeo, eyeCoreMat);
+                        
+                        // Pupils
+                        const pupilGeo = new THREE.SphereGeometry(0.03, 8, 8);
+                        const lPupil = new THREE.Mesh(pupilGeo, pupilMat);
+                        lPupil.position.z = 0.07;
+                        lEye.add(lPupil);
+                        const rPupil = new THREE.Mesh(pupilGeo, pupilMat);
+                        rPupil.position.z = 0.07;
+                        rEye.add(rPupil);
+
+                        // Highlight (Life)
+                        const highGeo = new THREE.SphereGeometry(0.015, 8, 8);
+                        const lHigh = new THREE.Mesh(highGeo, highlightMat);
+                        lHigh.position.set(0.03, 0.03, 0.08);
+                        lEye.add(lHigh);
+
+                        lEye.position.set(-0.18, 0.1, 0.32);
+                        rEye.position.set(0.18, 0.1, 0.32);
+                        head.add(lEye);
+                        head.add(rEye);
+
+                        head.position.y = 1.6;
                         astra.add(head);
 
-                        // Tail (Energy)
-                        const tailGeo = new THREE.CylinderGeometry(0.02, 0.15, 1.2, 8);
-                        const tail = new THREE.Mesh(tailGeo, skinMat);
-                        tail.position.set(0, 0.3, -0.6);
-                        tail.rotation.x = -Math.PI / 4;
+                        // 6. Multidimensional Tail
+                        const tail = new THREE.Mesh(new THREE.IcosahedronGeometry(0.25, 2), skinMat);
+                        tail.scale.set(1, 1, 3);
+                        tail.position.set(0, 0.5, -0.8);
+                        tail.rotation.x = -Math.PI / 6;
                         astra.add(tail);
 
                         scene.add(astra);
