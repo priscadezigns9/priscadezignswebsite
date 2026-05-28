@@ -3,376 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelia Mascot System | Astra Engine v1.0</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <title>Atelia Mascot | Astra: Vulpine Illustration</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=JetBrains+Mono&display=swap');
-
-        :root {
-            --fox-red: #E63946;
-            --fox-white: #F1FAEE;
-            --fox-dark: #1D3557;
-            --void: #050508;
-            --accent: #00B4A6;
-        }
-
-        body {
+        body, html {
             margin: 0;
-            background: var(--void);
-            color: white;
-            font-family: 'Space Grotesk', sans-serif;
-            display: flex;
-            height: 100vh;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-        }
-
-        /* MODULAR INTERFACE */
-        .dashboard {
-            width: 350px;
-            background: rgba(10, 10, 15, 0.95);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            z-index: 100;
-        }
-
-        .viewport {
-            flex: 1;
+            background: #050508;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #050508 100%);
         }
-
-        /* THE MASCOT CONTAINER */
-        #astra-container {
-            width: 500px;
-            height: 500px;
-            position: relative;
-            cursor: pointer;
-            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.5));
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            cursor: crosshair;
         }
-
-        svg {
-            width: 100%;
-            height: 100%;
+        #ui-overlay {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            pointer-events: none;
+            font-family: 'Georgia', serif;
+            color: #E63946;
+            opacity: 0.6;
         }
-
-        /* UI COMPONENTS */
-        h1 { font-size: 24px; margin: 0; letter-spacing: -1px; }
-        .tag { font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; }
-        
-        .control-group { display: flex; flex-direction: column; gap: 10px; }
-        .label { font-size: 11px; opacity: 0.4; text-transform: uppercase; letter-spacing: 2px; }
-        
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        button {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 12px;
-            font-size: 11px;
-            font-family: 'Space Grotesk';
-            cursor: pointer;
-            transition: 0.3s;
-            text-align: left;
-        }
-        button:hover, button.active {
-            background: var(--fox-red);
-            border-color: var(--fox-red);
-            box-shadow: 0 0 20px rgba(230, 57, 70, 0.3);
-        }
-
-        .status-panel {
-            margin-top: auto;
-            padding: 20px;
-            background: rgba(0, 180, 166, 0.05);
-            border: 1px solid rgba(0, 180, 166, 0.1);
-            font-family: 'JetBrains Mono';
-            font-size: 10px;
-            color: var(--accent);
-            line-height: 1.6;
-        }
-
-        /* ANIMATION TARGETS */
-        #tail { transform-origin: 220px 380px; }
-        #ear-l { transform-origin: 200px 150px; }
-        #ear-r { transform-origin: 300px 150px; }
-        #head { transform-origin: 250px 250px; }
-        #eye-l, #eye-r { transform-origin: center; }
-        #mouth { transform-origin: center; }
-        #arm-l { transform-origin: 180px 280px; }
-        #arm-r { transform-origin: 320px 280px; }
     </style>
 </head>
 <body>
 
-    <div class="dashboard">
-        <header>
-            <span class="tag">Mascot System v1.0</span>
-            <h1>Astra Nexus</h1>
-        </header>
-
-        <div class="control-group">
-            <span class="label">Emotional States</span>
-            <div class="btn-grid">
-                <button class="active" onclick="setEmotion('HAPPY', this)">Happy</button>
-                <button onclick="setEmotion('CURIOUS', this)">Curious</button>
-                <button onclick="setEmotion('EXCITED', this)">Excited</button>
-                <button onclick="setEmotion('DETERMINED', this)">Determined</button>
-                <button onclick="setEmotion('SURPRISED', this)">Surprised</button>
-                <button onclick="setEmotion('WINK', this)">Wink</button>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <span class="label">Action Cycles</span>
-            <div class="btn-grid">
-                <button onclick="setCycle('IDLE', this)">Idle Sway</button>
-                <button onclick="setCycle('WALK', this)">Walk Cycle</button>
-                <button onclick="setCycle('TALK', this)">Talk State</button>
-                <button onclick="setCycle('WAVE', this)">Friendly Wave</button>
-            </div>
-        </div>
-
-        <div class="status-panel">
-            // COMPONENT_STATUS: ACTIVE<br>
-            // SYNC_MODE: INTERACTIVE<br>
-            // MESH_TYPE: MODULAR_SVG<br>
-            // STYLE: GENSHIN_HYBRID
-        </div>
+    <div id="ui-overlay">
+        <h2 style="font-weight: 400; font-style: italic; letter-spacing: 2px;">Astra Nexus</h2>
+        <p style="font-size: 12px; letter-spacing: 4px; text-transform: uppercase;">Cinematic Illustration Mode</p>
     </div>
 
-    <div class="viewport">
-        <div id="astra-container">
-            <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-                <!-- MODULAR LAYER SYSTEM -->
-                <g id="mascot-root">
-                    
-                    <!-- TAIL LAYER -->
-                    <g id="tail">
-                        <path d="M220 380 Q150 450 100 400 Q50 350 150 300 Q200 280 220 340" fill="#E63946" />
-                        <path d="M100 400 Q60 380 80 340 Q120 320 150 350" fill="white" />
-                        <path d="M180 340 L200 360 L180 380" fill="#1D3557" opacity="0.4" /> <!-- V-Mark -->
-                    </g>
-
-                    <!-- BODY LAYER -->
-                    <g id="body">
-                        <!-- Limbs -->
-                        <rect id="leg-l" x="200" y="380" width="20" height="60" rx="10" fill="#1D3557" />
-                        <rect id="leg-r" x="280" y="380" width="20" height="60" rx="10" fill="#1D3557" />
-                        <path id="foot-l" d="M190 430 H220 Q230 430 230 440 V450 H190 V430" fill="#E63946" />
-                        <path id="foot-r" d="M270 430 H300 Q310 430 310 440 V450 H270 V430" fill="#E63946" />
-                        
-                        <!-- Torso -->
-                        <path d="M200 280 Q250 250 300 280 V380 Q250 410 200 380 Z" fill="#E63946" />
-                        <path d="M220 290 Q250 280 280 290 V360 Q250 380 220 360 Z" fill="white" />
-                        
-                        <!-- Scarf -->
-                        <rect x="190" y="270" width="120" height="25" rx="12" fill="#1D3557" />
-                        <circle cx="250" cy="282" r="8" fill="#FFD700" /> <!-- Gold Charm -->
-
-                        <!-- Arms -->
-                        <rect id="arm-l" x="170" y="290" width="18" height="70" rx="9" fill="#E63946" />
-                        <rect id="arm-r" x="312" y="290" width="18" height="70" rx="9" fill="#E63946" />
-                    </g>
-
-                    <!-- HEAD LAYER -->
-                    <g id="head">
-                        <!-- Ears -->
-                        <path id="ear-l" d="M180 200 L210 100 L240 180 Z" fill="#E63946" />
-                        <path id="ear-r" d="M320 200 L290 100 L260 180 Z" fill="#E63946" />
-                        
-                        <!-- Face -->
-                        <circle cx="250" cy="200" r="85" fill="#E63946" />
-                        <path d="M200 230 Q250 260 300 230 Q300 180 250 180 Q200 180 200 230" fill="white" /> <!-- Muzzle -->
-                        <circle cx="250" cy="235" r="5" fill="#1D3557" /> <!-- Nose -->
-
-                        <!-- HAT -->
-                        <path d="M180 160 Q250 110 320 160 L330 175 H170 Z" fill="#E63946" />
-                        <path d="M160 175 H340 V185 H160 Z" fill="#E63946" /> <!-- Brim -->
-                        <circle cx="250" cy="145" r="22" fill="white" />
-                        <text x="250" y="152" font-family="Arial" font-weight="bold" font-size="20" fill="#E63946" text-anchor="middle">A</text>
-
-                        <!-- EYES (MODULAR STATES) -->
-                        <g id="eyes">
-                            <ellipse id="eye-l" cx="215" cy="205" rx="12" ry="18" fill="#1D3557" />
-                            <ellipse id="eye-r" cx="285" cy="205" rx="12" ry="18" fill="#1D3557" />
-                            <!-- Sparkles -->
-                            <circle cx="218" cy="198" r="4" fill="white" />
-                            <circle cx="288" cy="198" r="4" fill="white" />
-                        </g>
-
-                        <!-- MOUTH (MODULAR STATES) -->
-                        <path id="mouth" d="M240 250 Q250 260 260 250" fill="none" stroke="#1D3557" stroke-width="3" stroke-linecap="round" />
-                    </g>
-                </g>
-            </svg>
-        </div>
-    </div>
+    <canvas id="astraCanvas"></canvas>
 
     <script>
-        // MASCOT CONTROLLER CLASS
-        class AstraMascot {
-            constructor() {
-                this.container = document.getElementById('astra-container');
-                this.initAnimations();
-                this.startIdle();
-                this.setupMouseTracking();
-            }
-
-            initAnimations() {
-                // Persistent Blinking
-                gsap.to(["#eye-l", "#eye-r"], {
-                    scaleY: 0.1,
-                    repeat: -1,
-                    duration: 0.1,
-                    repeatDelay: 3,
-                    transformOrigin: "center"
-                });
-
-                // Tail Sway
-                gsap.to("#tail", {
-                    rotation: 15,
-                    duration: 2,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
-                });
-            }
-
-            startIdle() {
-                this.idleTween = gsap.to("#mascot-root", {
-                    y: -15,
-                    duration: 2.5,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
-                });
-
-                gsap.to("#head", {
-                    rotation: 2,
-                    duration: 3,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "sine.inOut"
-                });
-            }
-
-            setEmotion(state) {
-                const eyeL = document.getElementById('eye-l');
-                const eyeR = document.getElementById('eye-r');
-                const mouth = document.getElementById('mouth');
-
-                gsap.killTweensOf([eyeL, eyeR, mouth]);
-                
-                switch(state) {
-                    case 'HAPPY':
-                        gsap.to(mouth, { attr: { d: "M240 250 Q250 270 260 250" }, duration: 0.3 });
-                        gsap.to([eyeL, eyeR], { scaleY: 1, skewX: 0, rotation: 0, duration: 0.3 });
-                        break;
-                    case 'CURIOUS':
-                        gsap.to(mouth, { attr: { d: "M245 255 Q250 255 255 255" }, duration: 0.3 });
-                        gsap.to(eyeL, { y: -5, duration: 0.3 });
-                        gsap.to(eyeR, { y: 5, duration: 0.3 });
-                        break;
-                    case 'EXCITED':
-                        gsap.to(mouth, { attr: { d: "M235 250 Q250 280 265 250 Z" }, fill: "#E63946", duration: 0.3 });
-                        gsap.to([eyeL, eyeR], { scale: 1.3, duration: 0.3 });
-                        break;
-                    case 'DETERMINED':
-                        gsap.to(mouth, { attr: { d: "M240 255 L260 255" }, duration: 0.3 });
-                        gsap.to("#ear-l", { rotation: -15, duration: 0.3 });
-                        gsap.to("#ear-r", { rotation: 15, duration: 0.3 });
-                        break;
-                    case 'SURPRISED':
-                        gsap.to(mouth, { attr: { d: "M245 255 Q250 265 255 255 Q250 245 245 255" }, fill: "#1D3557", duration: 0.3 });
-                        gsap.to([eyeL, eyeR], { scale: 1.4, duration: 0.3 });
-                        break;
-                    case 'WINK':
-                        gsap.to(eyeL, { scaleY: 0.1, duration: 0.1 });
-                        gsap.to(eyeR, { scale: 1.2, duration: 0.1 });
-                        break;
-                }
-            }
-
-            setCycle(cycle) {
-                if (this.actionTween) this.actionTween.kill();
-                
-                switch(cycle) {
-                    case 'WALK':
-                        this.actionTween = gsap.to(["#leg-l", "#leg-r"], {
-                            y: -10,
-                            stagger: { each: 0.2, repeat: -1, yoyo: true },
-                            duration: 0.4
-                        });
-                        break;
-                    case 'TALK':
-                        this.actionTween = gsap.to("#mouth", {
-                            scaleY: 2,
-                            repeat: -1,
-                            yoyo: true,
-                            duration: 0.15
-                        });
-                        break;
-                    case 'WAVE':
-                        this.actionTween = gsap.to("#arm-r", {
-                            rotation: -120,
-                            repeat: 5,
-                            yoyo: true,
-                            duration: 0.3,
-                            transformOrigin: "320px 280px"
-                        });
-                        break;
-                    case 'IDLE':
-                        gsap.to(["#leg-l", "#leg-r", "#arm-l", "#arm-r"], { y: 0, rotation: 0, duration: 0.5 });
-                        break;
-                }
-            }
-
-            setupMouseTracking() {
-                window.addEventListener('mousemove', (e) => {
-                    const rect = this.container.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    
-                    const moveX = (e.clientX - centerX) / 25;
-                    const moveY = (e.clientY - centerY) / 25;
-
-                    gsap.to("#head", {
-                        x: moveX,
-                        y: moveY,
-                        duration: 0.6,
-                        ease: "power2.out"
-                    });
-                    
-                    gsap.to("#eyes", {
-                        x: moveX * 0.5,
-                        y: moveY * 0.5,
-                        duration: 0.4
-                    });
-                });
-            }
+        const canvas = document.getElementById('astraCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let mouse = { x: 0, y: 0 };
+        let targetMouse = { x: 0, y: 0 };
+        
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            mouse.x = width / 2;
+            mouse.y = height / 2;
+            targetMouse.x = width / 2;
+            targetMouse.y = height / 2;
         }
 
-        // Initialize System
-        const astra = new AstraMascot();
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => {
+            targetMouse.x = e.clientX;
+            targetMouse.y = e.clientY;
+        });
+        resize();
 
-        // UI Helpers
-        function setEmotion(state, btn) {
-            astra.setEmotion(state);
-            document.querySelectorAll('.control-group:first-of-type button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        function drawAstra(t) {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Interaction Lag
+            mouse.x += (targetMouse.x - mouse.x) * 0.05;
+            mouse.y += (targetMouse.y - mouse.y) * 0.05;
+            
+            const centerX = width / 2;
+            const centerY = height / 2 + Math.sin(t * 0.002) * 15;
+            
+            // Look direction factors
+            const lookX = (mouse.x - centerX) / (width / 2);
+            const lookY = (mouse.y - centerY) / (height / 2);
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+
+            // 1. SHADOW (Soft Organic Floor Shadow)
+            ctx.beginPath();
+            ctx.ellipse(0, 260, 120, 30, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fill();
+
+            // 2. THE TAIL (Flowing Biological Form)
+            ctx.save();
+            ctx.rotate(Math.sin(t * 0.001) * 0.1);
+            const tailGrad = ctx.createLinearGradient(-150, 200, -250, 0);
+            tailGrad.addColorStop(0, '#D42426');
+            tailGrad.addColorStop(0.7, '#E63946');
+            tailGrad.addColorStop(1, '#F1FAEE');
+            
+            ctx.beginPath();
+            ctx.moveTo(-40, 150);
+            ctx.bezierCurveTo(-150, 250, -350, 150, -250, -50);
+            ctx.bezierCurveTo(-150, -150, -50, -50, -40, 150);
+            ctx.fillStyle = tailGrad;
+            ctx.fill();
+            
+            // Tail V-Marking (Organic Blend)
+            ctx.beginPath();
+            ctx.moveTo(-120, 120);
+            ctx.lineTo(-140, 140);
+            ctx.lineTo(-160, 120);
+            ctx.strokeStyle = 'rgba(29, 53, 87, 0.2)';
+            ctx.lineWidth = 15;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            ctx.restore();
+
+            // 3. THE BODY (Fluid Anatomical Flow)
+            const bodyGrad = ctx.createRadialGradient(0, 50, 20, 0, 50, 200);
+            bodyGrad.addColorStop(0, '#E63946');
+            bodyGrad.addColorStop(1, '#A8252F');
+            
+            ctx.beginPath();
+            ctx.moveTo(-70, 220); // Left Leg base
+            ctx.bezierCurveTo(-100, 180, -90, 50, -80, 0); // Side to shoulder
+            ctx.bezierCurveTo(-70, -80, 70, -80, 80, 0); // Shoulder to Shoulder
+            ctx.bezierCurveTo(90, 50, 100, 180, 70, 220); // Down to right leg
+            ctx.bezierCurveTo(40, 250, -40, 250, -70, 220); // Belly curve
+            ctx.fillStyle = bodyGrad;
+            ctx.shadowBlur = 40;
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // White Underbelly (Natural Curve)
+            ctx.beginPath();
+            ctx.moveTo(-40, 210);
+            ctx.bezierCurveTo(-60, 150, -60, 50, 0, 40);
+            ctx.bezierCurveTo(60, 50, 60, 150, 40, 210);
+            ctx.bezierCurveTo(20, 225, -20, 225, -40, 210);
+            ctx.fillStyle = 'rgba(241, 250, 238, 0.9)';
+            ctx.fill();
+
+            // 4. LIMBS (Humanoid Connected Flow)
+            ctx.strokeStyle = '#D42426';
+            ctx.lineWidth = 35;
+            ctx.lineCap = 'round';
+            
+            // Legs (Digitigrade Flow)
+            ctx.beginPath();
+            ctx.moveTo(-45, 180);
+            ctx.quadraticCurveTo(-60, 260, -80, 250); // Left
+            ctx.moveTo(45, 180);
+            ctx.quadraticCurveTo(60, 260, 80, 250); // Right
+            ctx.stroke();
+
+            // Arms (Fluid Motion)
+            ctx.save();
+            ctx.translate(lookX * 5, lookY * 5);
+            ctx.beginPath();
+            ctx.moveTo(-75, 40);
+            ctx.quadraticCurveTo(-120, 100 + Math.sin(t*0.002)*10, -100, 160); // Left Arm
+            ctx.moveTo(75, 40);
+            ctx.quadraticCurveTo(120, 100 + Math.cos(t*0.002)*10, 100, 160); // Right Arm
+            ctx.stroke();
+            ctx.restore();
+
+            // 5. THE HEAD (Integrated with Hat)
+            ctx.save();
+            ctx.translate(lookX * 25, lookY * 15 - 50);
+            ctx.rotate(lookX * 0.1);
+
+            // Ears (Biological Vulpine Form)
+            ctx.fillStyle = '#D42426';
+            ctx.beginPath();
+            ctx.moveTo(-70, -20);
+            ctx.quadraticCurveTo(-90, -140, -40, -80); // Left Ear
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(70, -20);
+            ctx.quadraticCurveTo(90, -140, 40, -80); // Right Ear
+            ctx.fill();
+
+            // Face (Rounded Illustration Style)
+            ctx.beginPath();
+            ctx.arc(0, 0, 95, 0, Math.PI * 2);
+            ctx.fillStyle = '#E63946';
+            ctx.fill();
+
+            // Muzzle (Soft Blended Gradient)
+            const muzzGrad = ctx.createRadialGradient(0, 40, 10, 0, 40, 80);
+            muzzGrad.addColorStop(0, '#F1FAEE');
+            muzzGrad.addColorStop(1, 'rgba(241, 250, 238, 0)');
+            ctx.beginPath();
+            ctx.ellipse(0, 40, 70, 50, 0, 0, Math.PI * 2);
+            ctx.fillStyle = muzzGrad;
+            ctx.fill();
+
+            // Expression: Eyes (Expressive Oversized Lenses)
+            const eyeX = 40;
+            const eyeY = 10;
+            ctx.fillStyle = '#1D3557';
+            // Left Eye
+            ctx.beginPath();
+            ctx.ellipse(-eyeX + lookX * 5, eyeY + lookY * 5, 18, 28, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Right Eye
+            ctx.beginPath();
+            ctx.ellipse(eyeX + lookX * 5, eyeY + lookY * 5, 18, 28, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Sparkles
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath(); ctx.arc(-eyeX + 5 + lookX * 5, eyeY - 10 + lookY * 5, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(eyeX + 5 + lookX * 5, eyeY - 10 + lookY * 5, 6, 0, Math.PI * 2); ctx.fill();
+
+            // THE HAT (Integrated Illustration)
+            ctx.fillStyle = '#D42426';
+            ctx.beginPath();
+            ctx.arc(0, -30, 98, Math.PI, 0); // Cap dome
+            ctx.fill();
+            ctx.fillRect(-110, -35, 220, 15); // Brim
+            // Emblem
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath(); ctx.arc(0, -65, 28, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#D42426';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('A', 0, -57);
+
+            ctx.restore();
+
+            // 6. SCARF (Flowing Accessory)
+            ctx.save();
+            ctx.translate(lookX * 10, lookY * 5);
+            ctx.beginPath();
+            ctx.moveTo(-100, -20);
+            ctx.bezierCurveTo(-110, 30, 110, 30, 100, -20);
+            ctx.lineWidth = 30;
+            ctx.strokeStyle = '#1D3557';
+            ctx.stroke();
+            // Magic Charm
+            ctx.beginPath();
+            ctx.arc(0, 15, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFD700';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#FFD700';
+            ctx.fill();
+            ctx.restore();
+
+            ctx.restore();
+            
+            requestAnimationFrame(drawAstra);
         }
 
-        function setCycle(cycle, btn) {
-            astra.setCycle(cycle);
-            document.querySelectorAll('.control-group:last-of-type button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+        requestAnimationFrame(drawAstra);
     </script>
 </body>
 </html>
