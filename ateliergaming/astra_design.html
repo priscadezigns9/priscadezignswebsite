@@ -133,96 +133,104 @@
 
             astra = new THREE.Group();
 
-            // MATERIALS
-            const redMat = new THREE.MeshPhongMaterial({ color: 0xD42426, shininess: 40 });
-            const whiteMat = new THREE.MeshPhongMaterial({ color: 0xF1FAEE });
-            const blackMat = new THREE.MeshPhongMaterial({ color: 0x1A1A1A });
-            const goldMat = new THREE.MeshPhongMaterial({ color: 0xFFD700, shininess: 80 });
+            // MATERIALS (Cinematic Anime-Biological Hybrid)
+            const redMat = new THREE.MeshStandardMaterial({ 
+                color: 0xD42426, 
+                roughness: 0.6, 
+                metalness: 0.1,
+                emissive: 0x220000 
+            });
+            const whiteMat = new THREE.MeshStandardMaterial({ color: 0xF1FAEE, roughness: 0.8 });
+            const blackMat = new THREE.MeshStandardMaterial({ color: 0x0A0A0F, roughness: 0.3, metalness: 0.2 });
+            const goldMat = new THREE.MeshStandardMaterial({ color: 0xFFD700, roughness: 0.1, metalness: 0.9 });
+            const eyeMat = new THREE.MeshStandardMaterial({ 
+                color: 0xE63946, 
+                emissive: 0xE63946, 
+                emissiveIntensity: 0.5,
+                roughness: 0.1 
+            });
 
-            // 1. BODY & OUTFIT
-            body = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 32), redMat);
-            body.scale.set(1, 1.2, 0.8);
+            // 1. SEAMLESS BODY (Connected Anatomy)
+            body = new THREE.Group();
+            const core = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 32), redMat);
+            core.scale.set(1, 1.2, 0.8);
+            body.add(core);
             astra.add(body);
 
-            // Scarf
-            scarf = new THREE.Mesh(new THREE.TorusGeometry(0.25, 0.08, 16, 32), blackMat);
+            // SCARF & CHARM (Seamless Connection)
+            scarf = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.1, 16, 32), blackMat);
             scarf.rotation.x = Math.PI/2;
-            scarf.position.y = 0.5;
+            scarf.position.y = 0.55;
             body.add(scarf);
             
             const charm = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 16), goldMat);
-            charm.position.set(0, 0.4, 0.25);
+            charm.position.set(0, 0.45, 0.3);
             body.add(charm);
 
-            // 2. HEAD & HAT
+            // 2. HEAD & HAT (With 'A' Emblem)
             head = new THREE.Group();
             const skull = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 32), redMat);
             head.add(skull);
 
-            const muzz = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 32), whiteMat);
+            const muzz = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 32), whiteMat);
             muzz.scale.set(0.8, 0.7, 1.8);
-            muzz.position.z = 0.3;
+            muzz.position.z = 0.35;
             head.add(muzz);
 
-            // HAT (A Emblem)
             hat = new THREE.Group();
             const cap = new THREE.Mesh(new THREE.SphereGeometry(0.45, 32, 16, 0, Math.PI*2, 0, Math.PI/2), redMat);
             hat.add(cap);
-            const brim = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.05, 0.4), redMat);
-            brim.position.set(0, 0, 0.3);
+            const brim = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.05, 0.45), redMat);
+            brim.position.set(0, -0.05, 0.35);
             hat.add(brim);
-            const emblem = new THREE.Mesh(new THREE.CircleGeometry(0.12, 32), whiteMat);
-            emblem.position.set(0, 0.2, 0.4);
-            hat.add(emblem);
-            hat.position.y = 0.1;
+            
+            // The 'A' Emblem
+            const circle = new THREE.Mesh(new THREE.CircleGeometry(0.12, 32), whiteMat);
+            circle.position.set(0, 0.2, 0.42);
+            hat.add(circle);
+            
+            const aChar = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.1, 0.01), redMat);
+            const aBar = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.01), redMat);
+            const lLeg_a = aChar.clone(); lLeg_a.rotation.z = 0.3; lLeg_a.position.set(-0.03, 0.2, 0.43);
+            const rLeg_a = aChar.clone(); rLeg_a.rotation.z = -0.3; rLeg_a.position.set(0.03, 0.2, 0.43);
+            aBar.position.set(0, 0.18, 0.43);
+            hat.add(lLeg_a, rLeg_a, aBar);
+            
+            hat.position.y = 0.15;
             head.add(hat);
 
-            // EYES & EXPRESSIONS
-            lEye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), blackMat);
-            lEye.position.set(-0.18, 0.15, 0.35);
-            head.add(lEye);
-            rEye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 32, 32), blackMat);
-            rEye.position.set(0.18, 0.15, 0.35);
-            head.add(rEye);
+            // 2. SOFT NEON LAB LIGHTING (Teal & Red)
+            const neonRed = new THREE.PointLight(0xE63946, 3, 10);
+            neonRed.position.set(3, 2, 2);
+            scene.add(neonRed);
             
-            lBrow = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.04, 0.02), blackMat);
-            lBrow.position.set(-0.18, 0.3, 0.4);
-            head.add(lBrow);
-            rBrow = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.04, 0.02), blackMat);
-            rBrow.position.set(0.18, 0.3, 0.4);
-            head.add(rBrow);
+            const neonTeal = new THREE.PointLight(0x00B4A6, 4, 10);
+            neonTeal.position.set(-3, 2, 1);
+            scene.add(neonTeal);
+            
+            const topGlow = new THREE.DirectionalLight(0xffffff, 0.5);
+            topGlow.position.set(0, 10, 0);
+            scene.add(topGlow);
 
-            head.position.y = 0.9;
-            body.add(head);
-
-            // 3. LIMBS & BOOTS
-            function createLimb(isArm) {
-                const group = new THREE.Group();
-                const limb = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.6), isArm ? redMat : blackMat);
-                limb.position.y = -0.3;
-                group.add(limb);
-                const boot = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.35), redMat);
-                boot.position.y = -0.6;
-                group.add(boot);
-                return group;
-            }
-            lArm = createLimb(true); lArm.position.set(-0.5, 0.4, 0); body.add(lArm);
-            rArm = createLimb(true); rArm.position.set(0.5, 0.4, 0); body.add(rArm);
-            lLeg = createLimb(false); lLeg.position.set(-0.25, -0.4, 0); body.add(lLeg);
-            rLeg = createLimb(false); rLeg.position.set(0.25, -0.4, 0); body.add(rLeg);
-
-            // 4. TAIL (Unique Marking)
+            // 3. REFINED TAIL (Black 'V' Marking)
             tail = new THREE.Group();
-            const tBody = new THREE.Mesh(new THREE.SphereGeometry(0.3, 32, 32), redMat);
-            tBody.scale.set(1, 1, 3.5);
-            tail.add(tBody);
-            const tTip = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 32), whiteMat);
-            tTip.position.z = -1.8;
+            const tMain = new THREE.Mesh(new THREE.SphereGeometry(0.3, 32, 32), redMat);
+            tMain.scale.set(1, 1, 4);
+            tail.add(tMain);
+            
+            const tTip = new THREE.Mesh(new THREE.SphereGeometry(0.28, 32, 32), whiteMat);
+            tTip.position.z = -2.0;
             tail.add(tTip);
-            const marking = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.02, 16, 32), blackMat);
-            marking.position.z = -1.0;
-            tail.add(marking);
-            tail.position.set(0, -0.2, -0.4);
+            
+            // The 'V' Marking near the base
+            const v1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.05), blackMat);
+            v1.rotation.z = 0.5; v1.position.set(-0.1, 0.1, -0.6);
+            const v2 = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.05), blackMat);
+            v2.rotation.z = -0.5; v2.position.set(0.1, 0.1, -0.6);
+            tail.add(v1, v2);
+
+            tail.position.set(0, -0.2, -0.5);
+            tail.rotation.x = -0.2;
             body.add(tail);
 
             scene.add(astra);
