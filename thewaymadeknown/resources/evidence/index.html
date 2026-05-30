@@ -8,35 +8,46 @@
         :root { --bg: #F8FBFF; --text: #2C3E50; --baby-blue: #89CFF0; --deep-blue: #4682B4; --border: rgba(137, 207, 240, 0.2); }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; overflow-x: hidden; }
-        .nav { padding: 25px 6%; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid var(--border); position: relative; z-index: 10; }
+        .nav { padding: 25px 6%; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid var(--border); position: relative; z-index: 1000; }
         .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--deep-blue); text-decoration: none; }
         .container { max-width: 1000px; margin: 0 auto; padding: 80px 6%; position: relative; z-index: 5; }
         h1 { font-family: 'Playfair Display', serif; font-size: 3rem; margin-bottom: 20px; text-align: center; color: var(--deep-blue); }
         .subtitle { text-align: center; font-size: 1.1rem; color: #666; margin-bottom: 60px; }
         
-        .book-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .book-card { background: #fff; padding: 40px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
-        .book-card h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; margin-bottom: 15px; color: var(--deep-blue); }
-        .book-card p { font-size: 0.95rem; color: #5D6D7E; margin-bottom: 20px; }
-        .buy-btn { padding: 12px 25px; background: var(--baby-blue); color: #fff; border-radius: 50px; text-decoration: none; font-weight: 600; display: inline-block; font-size: 0.85rem; }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; }
+        .book-card { background: #fff; padding: 30px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between; }
+        .book-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 10px; color: var(--deep-blue); }
+        .book-card p { font-size: 0.85rem; color: #5D6D7E; margin-bottom: 20px; }
+        .buy-btn { padding: 10px 20px; background: var(--baby-blue); color: #fff; border-radius: 50px; text-decoration: none; font-weight: 600; text-align: center; font-size: 0.75rem; }
 
         .disclaimer { margin-top: 60px; padding: 40px; background: rgba(137, 207, 240, 0.05); border-radius: 20px; border: 1px solid var(--baby-blue); text-align: center; }
-        .disclaimer h4 { font-family: 'Playfair Display', serif; color: var(--deep-blue); margin-bottom: 10px; }
 
-        /* Animation Global */
-        .tree-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 1; opacity: 0.5; }
-        .mustard-tree-svg { width: 100%; height: 100%; position: absolute; bottom: -20px; left: -50px; transform-origin: bottom left; }
-        .tree-path { stroke: var(--baby-blue); stroke-width: 1.5; fill: none; stroke-dasharray: 2500; stroke-dashoffset: 2500; animation: growTree 7s ease-out forwards; }
-        @keyframes growTree { to { stroke-dashoffset: 0; } }
+        /* MUSTARD TREE ANIMATION V3 (COHESIVE GROWTH) */
+        .tree-system { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 1; }
+        .svg-canvas { width: 100%; height: 100%; }
+        .path-line { fill: none; stroke: var(--baby-blue); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 2000; stroke-dashoffset: 2000; }
+        .seed-core { fill: var(--baby-blue); transform: scale(0); transform-origin: 20px 98%; animation: seedPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes seedPop { to { transform: scale(1); } }
+        .bark { stroke-width: 5; animation: growMain 4s ease-in-out 0.8s forwards; }
+        .branch-main { stroke-width: 3; animation: growMain 5s ease-in-out 2s forwards; }
+        .foliage { stroke-width: 1.5; animation: growMain 4s ease-out 5s forwards; opacity: 0.8; }
+        .vine-fill { stroke-width: 1; stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: growMain 6s linear 7s forwards; opacity: 0.5; }
+        @keyframes growMain { to { stroke-dashoffset: 0; } }
 
         footer { padding: 60px 6%; text-align: center; border-top: 1px solid var(--border); font-size: 0.8rem; color: #888; position: relative; z-index: 10; background: #fff; }
     </style>
 </head>
 <body>
-    <div class="tree-container">
-        <svg class="mustard-tree-svg" viewBox="0 0 500 500" preserveAspectRatio="xMinYMax meet">
-            <path class="tree-path" d="M20,480 C40,400 80,350 120,300 C160,250 200,200 250,150 M120,300 C180,280 250,290 300,240 M120,330 C80,280 50,220 70,150 M250,150 C300,120 350,150 400,100 M250,150 C220,100 180,50 150,80" />
-            <circle cx="20" cy="480" r="6" fill="var(--baby-blue)" /> <!-- The Seed -->
+    <div class="tree-system">
+        <svg class="svg-canvas" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            <circle class="seed-core" cx="20" cy="980" r="10" />
+            <path class="path-line bark" d="M20,980 C20,800 40,700 60,600 C80,450 100,300 150,200" />
+            <path class="path-line branch-main" d="M150,200 C250,150 400,100 600,120" />
+            <path class="path-line branch-main" d="M150,200 C100,100 200,50 400,80" />
+            <path class="path-line foliage" d="M600,120 C700,140 800,100 900,150" />
+            <path class="path-line foliage" d="M400,80 C500,40 700,20 850,60" />
+            <path class="path-line vine-fill" d="M850,60 C900,100 950,200 960,400" />
+            <path class="path-line vine-fill" d="M900,150 C930,300 900,500 850,700" />
         </svg>
     </div>
     <nav class="nav"><a href="/thewaymadeknown/" class="logo">The Way Made Known</a></nav>
@@ -46,18 +57,28 @@
         <div class="book-grid">
             <div class="book-card">
                 <h3>Cold-Case Christianity</h3>
-                <p>J. Warner Wallace uses his experience as a cold-case homicide detective to investigate the claims of the New Testament.</p>
-                <a href="#" class="buy-btn">Acquire via Mission Bookstore</a>
+                <p>Detective J. Warner Wallace investigates the claims of the New Testament.</p>
+                <a href="https://www.amazon.com/s?k=Cold-Case+Christianity+J.+Warner+Wallace" target="_blank" class="buy-btn">View on Amazon</a>
             </div>
             <div class="book-card">
-                <h3>The 3 Tests for Truth</h3>
-                <p>The legacy of Ravi Zacharias: Logical Consistency, Empirical Adequacy, and Experiential Relevance.</p>
-                <a href="#" class="buy-btn">Acquire via Mission Bookstore</a>
+                <h3>Desiring God</h3>
+                <p>John Piper explains how the pursuit of joy in God is our highest calling.</p>
+                <a href="https://www.amazon.com/s?k=Desiring+God+John+Piper" target="_blank" class="buy-btn">View on Amazon</a>
+            </div>
+            <div class="book-card">
+                <h3>Devil's Cauldron</h3>
+                <p>The powerful testimony of ex-satanist John Ramirez and his encounter with Christ.</p>
+                <a href="https://www.amazon.com/s?k=Out+of+the+Devils+Cauldron+John+Ramirez" target="_blank" class="buy-btn">View on Amazon</a>
+            </div>
+            <div class="book-card">
+                <h3>Can Man Live Without God?</h3>
+                <p>Ravi Zacharias explores the logical consistency of the Christian worldview.</p>
+                <a href="https://www.amazon.com/s?k=Can+Man+Live+Without+God+Ravi+Zacharias" target="_blank" class="buy-btn">View on Amazon</a>
             </div>
         </div>
         <div class="disclaimer">
             <h4>Grace Paid For It</h4>
-            <p>Every resource in this library is funded by the business pillars of Prisca Dezigns. Your acquisitions support global outreach and mission work.</p>
+            <p>Every resource in this library is funded by the business pillars of Prisca Dezigns. Your acquisitions support global outreach.</p>
         </div>
     </div>
     <footer>© 2026 The Way Made Known</footer>
