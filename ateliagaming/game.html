@@ -11,8 +11,10 @@
         .logo { height: 50px; }
         .back-btn { color: white; text-decoration: none; font-size: 1.2rem; border: 2px solid var(--orange); padding: 5px 15px; transition: 0.3s; }
         .back-btn:hover { background: var(--orange); }
-        #game { width: 100%; height: calc(100vh - 100px); position: relative; background: radial-gradient(circle at center, #1a0000 0%, #000 100%); overflow: hidden; z-index: 1; }
-        #game::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(211,47,47,0.1), transparent); pointer-events:none; }
+        #game { width: 100%; height: calc(100vh - 100px); position: relative; background: url('https://images.unsplash.com/photo-1620712943543-bcc4628c7189?w=1920&q=80') center center / cover no-repeat; overflow: hidden; z-index: 1; }
+        #game::before { content: ''; position: absolute; top:0; left:0; width:200%; height:100%; background: inherit; animation: scrollBg 30s linear infinite; z-index: -1; }
+        @keyframes scrollBg { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        #game::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(211,47,47,0.2), rgba(0,0,0,0.4)); pointer-events:none; }
         #player { width: 140px; height: 140px; position: absolute; bottom: 50px; left: 100px; z-index: 10; transition: transform 0.1s; }
         .obs { width: 120px; height: 120px; position: absolute; bottom: 80px; border: 10px solid var(--orange); border-radius: 50%; box-shadow: 0 0 40px var(--orange), inset 0 0 30px var(--orange); background: rgba(255,107,0,0.1); }
         .obs::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; border-radius: 50%; border: 3px dashed white; animation: rotate 4s linear infinite; }
@@ -61,8 +63,8 @@
     const assets = {
         astra: { 
             sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp', 
-            r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp', 
-            j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp', 
+            r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.png', 
+            j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.png', 
             glow: 'rgba(255,107,0,0.8)', 
             flip: true 
         },
@@ -95,10 +97,11 @@
         let p = document.getElementById('player'); 
         p.src = assets[char].r; 
         p.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
+        // Ensure all are running right (scaling -1 if the asset faces left)
         p.style.transform = assets[char].flip ? 'scaleX(-1)' : 'scaleX(1)'; 
         active = true; spawn(); 
     }
-    function jump() { if (!active || jumping) return; jumping = true; let p = document.getElementById('player'); p.src = assets[char].j; let pos = 50, up = setInterval(() => { if (pos >= 250) { clearInterval(up); let down = setInterval(() => { if (pos <= 50) { clearInterval(down); jumping = false; p.src = assets[char].r; } pos -= 15; p.style.bottom = pos + 'px'; }, 20); } pos += 18; p.style.bottom = pos + 'px'; }, 20); }
+    function jump() { if (!active || jumping) return; jumping = true; let p = document.getElementById('player'); p.src = assets[char].j; p.style.transform = assets[char].flip ? 'scaleX(-1)' : 'scaleX(1)'; let pos = 50, up = setInterval(() => { if (pos >= 250) { clearInterval(up); let down = setInterval(() => { if (pos <= 50) { clearInterval(down); jumping = false; p.src = assets[char].r; p.style.transform = assets[char].flip ? 'scaleX(-1)' : 'scaleX(1)'; } pos -= 15; p.style.bottom = pos + 'px'; }, 20); } pos += 18; p.style.bottom = pos + 'px'; }, 20); }
     function spawn() { if (!active) return; let area = document.getElementById('game'), obs = document.createElement('div'); obs.className = 'obs'; obs.style.right = '-150px'; area.appendChild(obs); let move = setInterval(() => { if (!active) { clearInterval(move); return; } let r = parseInt(obs.style.right); if (r > area.clientWidth) { clearInterval(move); area.removeChild(obs); score++; document.getElementById('score-text').innerText = score.toString().padStart(3, '0'); } let pRect = document.getElementById('player').getBoundingClientRect(), oRect = obs.getBoundingClientRect(); if (pRect.right > oRect.left + 40 && pRect.left < oRect.right - 40 && pRect.bottom > oRect.top + 40) { active = false; document.getElementById('res-score').innerText = score; document.getElementById('atlr-count').innerText = '+' + score + ' ATLR'; document.getElementById('results-modal').style.display = 'flex'; } obs.style.right = (r + 15 + (score/10)) + 'px'; }, 20); setTimeout(spawn, 1000 + Math.random() * 2000); }
     window.addEventListener('keydown', e => { if (e.code === 'Space') jump(); });
     window.addEventListener('touchstart', jump);
