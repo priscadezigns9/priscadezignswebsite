@@ -1,32 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>The Arena | Atelia Gaming</title>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&display=swap" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&display=swap' rel='stylesheet'>
     <style>
         :root { --red: #D32F2F; --orange: #FF6B00; --white: #FFFFFF; --black: #050505; }
         body { margin: 0; background: var(--black); color: white; font-family: 'Russo One'; overflow: hidden; }
-        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--red); background: #000; position: relative; z-index: 100; }
+        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--red); background: #000; position: relative; z-index: 1000; }
         .logo { height: 50px; }
         .back-btn { color: white; text-decoration: none; font-size: 1.2rem; border: 2px solid var(--orange); padding: 5px 15px; transition: 0.3s; }
         .back-btn:hover { background: var(--orange); }
         
-        #game { width: 100%; height: calc(100vh - 100px); position: relative; background: radial-gradient(circle at center, #1a0000 0%, #000 100%); overflow: hidden; }
+        #game { width: 100%; height: calc(100vh - 100px); position: relative; background: radial-gradient(circle at center, #1a0000 0%, #000 100%); overflow: hidden; z-index: 1; }
         #game::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(211,47,47,0.1), transparent); pointer-events:none; }
         
         #player { 
             width: 140px; height: 140px; position: absolute; bottom: 50px; left: 100px; z-index: 10; 
             filter: drop-shadow(0 0 10px rgba(255,107,0,0.5)); 
             transition: transform 0.1s;
-            /* Removed global scaleX(-1) to fix orientation */
         }
         .obs { width: 80px; height: 80px; background: linear-gradient(45deg, var(--red), var(--orange)); position: absolute; bottom: 50px; border-radius: 4px; box-shadow: 0 0 30px var(--red); border: 3px solid white; }
         
-        #score-ui { position: absolute; top: 40px; right: 50px; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.9); padding: 15px 40px; border-radius: 0; border: 4px solid var(--orange); box-shadow: 5px 5px 0 var(--red); }
-        #score-ui span { font-family: 'Bangers'; font-size: 3rem; color: white; letter-spacing: 2px; }
+        #score-ui { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.9); padding: 10px 30px; border-radius: 0; border: 4px solid var(--orange); box-shadow: 5px 5px 0 var(--red); z-index: 100; }
+        #score-ui span { font-family: 'Bangers'; font-size: 2.5rem; color: white; letter-spacing: 2px; }
         
-        .char-select { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 30px; z-index: 50; background: rgba(0,0,0,0.95); padding: 50px; border: 5px solid var(--red); box-shadow: 20px 20px 0 var(--orange); }
+        .char-select { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 30px; z-index: 500; background: rgba(0,0,0,0.95); padding: 50px; border: 5px solid var(--red); box-shadow: 20px 20px 0 var(--orange); }
         .char-opt { text-align: center; cursor: pointer; transition: 0.3s; padding: 20px; border: 2px solid transparent; width: 180px; }
         .char-opt:hover { background: #111; border-color: var(--orange); transform: translateY(-10px); }
         .char-opt.active { background: #222; border-color: var(--white); box-shadow: 0 0 20px var(--red); }
@@ -37,47 +36,47 @@
         #start-btn { position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%); background: var(--red); color: white; border: none; padding: 15px 50px; font-family: 'Russo One'; font-size: 2rem; cursor: pointer; box-shadow: 5px 5px 0 var(--black); transition: 0.2s; }
         #start-btn:hover { background: var(--orange); transform: translateX(-50%) scale(1.05); }
         
-        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200; }
-        .modal h1 { font-family: 'Bangers'; font-size: 10rem; color: var(--red); margin: 0; text-shadow: 10px 10px 0 white; }
-        .modal p { font-size: 2rem; margin-bottom: 20px; }
+        .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+        .modal h1 { font-family: 'Bangers'; font-size: 8rem; color: var(--red); margin: 0; text-shadow: 6px 6px 0 white; }
+        .modal p { font-size: 1.8rem; margin-bottom: 20px; }
         .modal .coin-earned { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; font-family: 'Bangers'; font-size: 3rem; color: var(--orange); }
         .modal .coin-earned img { height: 80px; filter: drop-shadow(0 0 15px var(--orange)); }
-        .modal button { background: var(--orange); color: white; border: none; padding: 20px 60px; font-family: 'Russo One'; font-size: 2rem; cursor: pointer; border: 4px solid white; }
+        .modal button { background: var(--orange); color: white; border: none; padding: 15px 50px; font-family: 'Russo One'; font-size: 1.8rem; cursor: pointer; border: 4px solid white; }
     </style>
 </head>
 <body>
 <nav>
-    <a href="index.html"><img src="https://priscadezigns.org/ateliagaming/assets/atelia_rect_logo.webp" class="logo" alt="Atelia"></a>
-    <a href="index.html" class="back-btn">EXIT TO HUB</a>
+    <a href='index.html'><img src='https://priscadezigns.org/ateliagaming/assets/atelia_rect_logo.webp' class='logo' alt='Atelia'></a>
+    <a href='index.html' class='back-btn'>EXIT TO HUB</a>
 </nav>
 
-<div id="game">
-    <div id="score-ui"><span>SCORE: </span><span id="score-text">000</span></div>
-    <img id="player" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_2d_hf.webp" alt="Character">
+<div id='game'>
+    <div id='score-ui'><span>SCORE: </span><span id='score-text'>000</span></div>
+    <img id='player' src='https://priscadezigns.org/ateliagaming/assets/astra/astra_3d_hf.webp' alt='Character'>
     
-    <div class="char-select" id="select-screen">
-        <div class="char-opt active" onclick="sel('astra')" id="o-astra"><img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_2d_hf.webp"><p>ASTRA</p></div>
-        <div class="char-opt" onclick="sel('mimi')" id="o-mimi"><img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_2d_hf_1.webp"><p>MIMI</p></div>
-        <div class="char-opt" onclick="sel('nova')" id="o-nova"><img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_2d_hf.webp"><p>NOVA</p></div>
-        <div class="char-opt" onclick="sel('echo')" id="o-echo"><img src="https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp"><p>ECHO</p></div>
-        <button id="start-btn" onclick="start()">START ARENA</button>
+    <div class='char-select' id='select-screen'>
+        <div class='char-opt active' onclick='sel("astra")' id='o-astra'><img src='https://priscadezigns.org/ateliagaming/assets/astra/astra_3d_hf.webp'><p>ASTRA</p></div>
+        <div class='char-opt' onclick='sel("mimi")' id='o-mimi'><img src='https://priscadezigns.org/ateliagaming/assets/mimi/mimi_2d_hf_1.webp'><p>MIMI</p></div>
+        <div class='char-opt' onclick='sel("nova")' id='o-nova'><img src='https://priscadezigns.org/ateliagaming/assets/nova/nova_2d_hf.webp'><p>NOVA</p></div>
+        <div class='char-opt' onclick='sel("echo")' id='o-echo'><img src='https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp'><p>ECHO</p></div>
+        <button id='start-btn' onclick='start()'>START ARENA</button>
     </div>
 
-    <div class="modal" id="results-modal">
+    <div class='modal' id='results-modal'>
         <h1>WRECKED!</h1>
-        <p>FINAL SCORE: <span id="res-score">0</span></p>
-        <div class="coin-earned">
-            <img src="https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp" alt="ATLR Coin">
-            <span id="atlr-count">+0 ATLR</span>
+        <p>FINAL SCORE: <span id='res-score'>0</span></p>
+        <div class='coin-earned'>
+            <img src='https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp' alt='ATLR Coin'>
+            <span id='atlr-count'>+0 ATLR</span>
         </div>
-        <button onclick="location.reload()">TRY AGAIN</button>
+        <button onclick='location.reload()'>TRY AGAIN</button>
     </div>
 </div>
 
 <script>
     const assets = {
         astra: { 
-            sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_2d_hf.webp',
+            sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_3d_hf.webp',
             r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp', 
             j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp' 
         },
