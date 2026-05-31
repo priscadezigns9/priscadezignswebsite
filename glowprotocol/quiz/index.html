@@ -22,9 +22,10 @@
         p { font-size: 1.1rem; color: #666; margin-bottom: 40px; }
         .btn { display: inline-block; width: 100%; padding: 20px; background: var(--pink); color: #fff; text-decoration: none; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; transition: 0.3s; margin-bottom: 15px; }
         .btn:hover { background: #e0437a; }
+        .btn-choice { background:#f5f5f5; color:#000; }
         
-        #step3 .loader-bar { width: 100%; height: 6px; background: #eee; border-radius: 10px; overflow: hidden; margin: 30px 0; }
-        #step3 .loader-fill { width: 0%; height: 100%; background: var(--pink); transition: width 3s linear; }
+        #analyzing .loader-bar { width: 100%; height: 6px; background: #eee; border-radius: 10px; overflow: hidden; margin: 30px 0; }
+        #analyzing .loader-fill { width: 0%; height: 100%; background: var(--pink); transition: width 3s linear; }
         
         .result-card { background: #fff; padding: 40px; border-radius: 20px; border: 1px solid var(--border); text-align: left; }
         .result-card h2 { font-family: 'Playfair Display', serif; font-style: italic; color: var(--pink); margin-bottom: 15px; }
@@ -40,55 +41,74 @@
         </a>
     </nav>
     <div class="quiz-container">
-        <div id="step1" class="quiz-step active">
+        <div id="intro" class="quiz-step active">
             <h1>Calibrate Your Glow</h1>
-            <p>Our neural network will analyze your skin profile to suggest the optimal protocol for your local environment.</p>
-            <button class="btn" onclick="nextStep()">Begin Calibration</button>
+            <p>Our neural network will analyze your skin profile across multiple data points to suggest the optimal protocol.</p>
+            <button class="btn" onclick="goToStep('q1')">Begin Calibration</button>
         </div>
         
-        <div id="step2" class="quiz-step">
-            <h1>Step 1 of 3</h1>
-            <p>What is your primary skin concern for the current 12-hour cycle?</p>
-            <button class="btn" style="background:#f5f5f5; color:#000;" onclick="startAnalysis()">Hydration & Glow</button>
-            <button class="btn" style="background:#f5f5f5; color:#000;" onclick="startAnalysis()">Clarity & Texture</button>
-            <button class="btn" style="background:#f5f5f5; color:#000;" onclick="startAnalysis()">Age Correction</button>
+        <div id="q1" class="quiz-step">
+            <h1>Step 1 of 4</h1>
+            <p>How would you describe your skin's natural baseline?</p>
+            <button class="btn btn-choice" onclick="goToStep('q2')">Dry / Dehydrated</button>
+            <button class="btn btn-choice" onclick="goToStep('q2')">Oily / Congested</button>
+            <button class="btn btn-choice" onclick="goToStep('q2')">Combination</button>
+            <button class="btn btn-choice" onclick="goToStep('q2')">Sensitive / Reactive</button>
+        </div>
+
+        <div id="q2" class="quiz-step">
+            <h1>Step 2 of 4</h1>
+            <p>What is your primary high-fidelity target?</p>
+            <button class="btn btn-choice" onclick="goToStep('q3')">Hydration & Glow</button>
+            <button class="btn btn-choice" onclick="goToStep('q3')">Clarity & Texture</button>
+            <button class="btn btn-choice" onclick="goToStep('q3')">Fine Lines & Age Correction</button>
+        </div>
+
+        <div id="q3" class="quiz-step">
+            <h1>Step 3 of 4</h1>
+            <p>What is your primary environment exposure?</p>
+            <button class="btn btn-choice" onclick="goToStep('q4')">Urban (Pollution / Blue Light)</button>
+            <button class="btn btn-choice" onclick="goToStep('q4')">Outdoor (High UV Exposure)</button>
+            <button class="btn btn-choice" onclick="goToStep('q4')">Controlled (Indoor / Air-con)</button>
+        </div>
+
+        <div id="q4" class="quiz-step">
+            <h1>Step 4 of 4</h1>
+            <p>Select your sensitivity threshold:</p>
+            <button class="btn btn-choice" onclick="startAnalysis()">Low (Resilient)</button>
+            <button class="btn btn-choice" onclick="startAnalysis()">Moderate</button>
+            <button class="btn btn-choice" onclick="startAnalysis()">High (Reactive)</button>
         </div>
         
-        <div id="step3" class="quiz-step">
+        <div id="analyzing" class="quiz-step">
             <h1>Analyzing...</h1>
-            <p>Processing neural dataset for optimal results.</p>
+            <p>Cross-referencing dermal datasets for optimal protocol calibration.</p>
             <div class="loader-bar"><div class="loader-fill" id="fill"></div></div>
         </div>
 
-        <div id="step4" class="quiz-step">
+        <div id="result" class="quiz-step">
             <div class="result-card">
-                <h2>Your Protocol is Ready</h2>
-                <p>Based on your input, the AI suggests the <strong>High-Fidelity Luminosity Protocol</strong>.</p>
+                <h2>Your Protocol is Calibrated</h2>
+                <p>Based on your multi-point analysis, the AI suggests the <strong>High-Fidelity Luminosity Protocol</strong>.</p>
                 <p style="font-size:0.9rem; color:#888; margin-top:20px;">Optimal restock cycle: 45 days.</p>
-                <a href="../shop/" class="btn" style="margin-top:30px;">Acquire Suggested Items</a>
+                <a href="../shop/" class="btn" style="margin-top:30px; text-align:center;">Acquire Suggested Items</a>
             </div>
         </div>
     </div>
 
     <script>
-        function nextStep() {
-            document.getElementById('step1').classList.remove('active');
-            document.getElementById('step2').classList.add('active');
+        function goToStep(stepId) {
+            document.querySelectorAll('.quiz-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(stepId).classList.add('active');
         }
 
         function startAnalysis() {
-            document.getElementById('step2').classList.remove('active');
-            document.getElementById('step3').classList.add('active');
-            
-            // Start loading bar animation
+            goToStep('analyzing');
             setTimeout(() => {
                 document.getElementById('fill').style.width = '100%';
             }, 100);
-
-            // Move to result after 3 seconds
             setTimeout(() => {
-                document.getElementById('step3').classList.remove('active');
-                document.getElementById('step4').classList.add('active');
+                goToStep('result');
             }, 3500);
         }
     </script>
