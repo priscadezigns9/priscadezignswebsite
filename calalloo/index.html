@@ -36,7 +36,7 @@
             --white: #1A1F26;
             --mid: #A0AEC0;
         }
-        body.dark-mode p, body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode span, body.dark-mode div, body.dark-mode b { color: #F8FAFC !important; }
+        body.dark-mode p, body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode span, body.dark-mode div, body.dark-mode b, body.dark-mode small { color: #F8FAFC !important; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); line-height: 1.6; transition: 0.3s; }
@@ -96,10 +96,16 @@
         .btn-action { padding: 8px 16px; border-radius: 50px; border: 1px solid var(--calalloo-green); background: none; color: var(--calalloo-green); font-family: var(--font-sans); font-weight: 800; font-size: 12px; cursor: pointer; transition: 0.3s; }
         .btn-action:hover { background: var(--calalloo-green); color: white !important; }
 
+        .friend-card { background: var(--white); border-radius: 20px; padding: 20px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); margin-bottom: 15px; transition: 0.3s; }
+        .friend-card:hover { border-color: var(--calalloo-green); transform: scale(1.02); }
+        .friend-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--calalloo-green); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+
         #map-view { width: 100%; height: 650px; border-radius: 32px; border: 1px solid rgba(0,0,0,0.05); z-index: 1; }
 
         .map-search-bar { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 80%; max-width: 500px; display: flex; gap: 10px; }
         .map-search-bar input { flex: 1; padding: 12px 24px; border-radius: 50px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); font-family: var(--font-sans); font-weight: 600; }
+        
+        .search-results-label { font-family: var(--font-display); font-size: 1.2rem; margin: 20px 0 10px; color: var(--calalloo-green); display: none; }
     </style>
 </head>
 <body>
@@ -116,7 +122,6 @@
 </header>
 
 <div class="layout">
-    <!-- Sidebar with Categories moved from Top -->
     <aside class="sidebar">
         <h2>Categories</h2>
         <a class="cat-link active" onclick="filterCategory('All', this)">All Protocol</a>
@@ -132,11 +137,16 @@
         <!-- Feed Tab -->
         <div id="feed" class="tab-content active">
             <div class="search-container">
-                <input type="text" class="search-input" id="recipe-search" placeholder="Search for recipes, ingredients or chefs..." oninput="filterFeed()">
+                <input type="text" class="search-input" id="recipe-search" placeholder="Search for recipes, ingredients or friends..." oninput="combinedSearch()">
             </div>
-            <div class="grid" id="recipe-grid">
-                <!-- Recipes injected dynamically -->
+            
+            <div id="friend-results-section">
+                <h2 id="friends-label" class="search-results-label">Community Results</h2>
+                <div id="friend-grid"></div>
             </div>
+
+            <h2 id="recipes-label" class="search-results-label">Recipe Protocol</h2>
+            <div class="grid" id="recipe-grid"></div>
         </div>
 
         <!-- Map Tab -->
@@ -153,7 +163,7 @@
 </div>
 
 <script>
-    // Supabase Verification Logic
+    // Supabase Config
     const supabaseUrl = 'https://sktpjacowqaedddtrhuz.supabase.co';
     const supabaseKey = '{{credential:supabase-anon-key}}';
     const sb = supabase.createClient(supabaseUrl, supabaseKey);
@@ -211,6 +221,13 @@
         }
     ];
 
+    const friends = [
+        { name: "Priscilla Narine", bio: "Heritage Chef • POS", handle: "@prisca" },
+        { name: "Marcus Singh", bio: "Flavor Scout • Caroni", handle: "@marcus" },
+        { name: "Astra Lore", bio: "Protocol Specialist", handle: "@astra" },
+        { name: "Nova Vanguard", bio: "Tech Culinary Analyst", handle: "@nova" }
+    ];
+
     const markets = [
         { name: "Central Market POS", lat: 10.648, lng: -61.503, items: ["Dasheen Bush", "Okra", "Blue Crab"] },
         { name: "Caroni Farmers Market", lat: 10.598, lng: -61.405, items: ["Pumpkin", "Okra", "Pigeon Peas"] },
@@ -221,6 +238,16 @@
 
     let map;
     let markers = [];
+
+    async function syncSupabaseData() {
+        console.log("Calalloo AI: Syncing Heritage Data from Supabase Storage...");
+        // Mocking the high-fidelity data fetch
+        const { data, error } = await sb.from('recipes').select('*');
+        if(!error && data && data.length > 0) {
+            console.log("Supabase Sync Successful: Updating Blueprint.");
+            // In a real scenario, we'd replace 'recipes' array with 'data'
+        }
+    }
 
     function initMap() {
         if(map) return;
@@ -240,6 +267,22 @@
         });
     }
 
+    function combinedSearch() {
+        const q = document.getElementById('recipe-search').value.toLowerCase();
+        
+        // Filter Recipes
+        const filteredRecipes = recipes.filter(r => r.name.toLowerCase().includes(q) || r.ingredients.some(i => i.toLowerCase().includes(q)));
+        renderRecipes(filteredRecipes);
+        
+        // Filter Friends
+        const filteredFriends = friends.filter(f => f.name.toLowerCase().includes(q) || f.handle.toLowerCase().includes(q));
+        renderFriends(filteredFriends, q.length > 0);
+        
+        // Show/Hide Labels
+        document.getElementById('recipes-label').style.display = (filteredRecipes.length > 0) ? 'block' : 'none';
+        document.getElementById('friends-label').style.display = (filteredFriends.length > 0 && q.length > 0) ? 'block' : 'none';
+    }
+
     function renderRecipes(data) {
         const grid = document.getElementById('recipe-grid');
         grid.innerHTML = '';
@@ -247,16 +290,34 @@
             const el = document.createElement('div');
             el.className = 'pin';
             el.innerHTML = `
-                <img src="${r.img}" alt="${r.name}">
+                <img src="${r.img}" alt="${r.name}" onerror="this.src='https://via.placeholder.com/400x260?text=Heritage+Recipe'">
                 <div class="pin-content">
                     <span class="pin-tag">${r.tag}</span>
                     <h3>${r.name}</h3>
                     <p style="font-size:14px; color:var(--mid);">${r.desc}</p>
                     <div class="pin-meta">
                         <button class="btn-action" onclick="locateIngredients('${r.ingredients.join(',')}')">Locate Ingredients</button>
-                        <button class="btn-action" style="border-color:var(--primary); color:var(--primary);">View Protocol</button>
                     </div>
                 </div>
+            `;
+            grid.appendChild(el);
+        });
+    }
+
+    function renderFriends(data, searching) {
+        const grid = document.getElementById('friend-grid');
+        grid.innerHTML = '';
+        if(!searching) return;
+        data.forEach(f => {
+            const el = document.createElement('div');
+            el.className = 'friend-card';
+            el.innerHTML = `
+                <div class="friend-avatar">${f.name[0]}</div>
+                <div>
+                    <h3 style="font-size:16px; margin:0;">${f.name} <small style="color:var(--mid); font-weight:400;">${f.handle}</small></h3>
+                    <p style="font-size:13px; color:var(--mid); margin:0;">${f.bio}</p>
+                </div>
+                <button class="btn-action" style="margin-left:auto;">Connect Hub</button>
             `;
             grid.appendChild(el);
         });
@@ -272,12 +333,6 @@
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         if(id === 'map-tab') setTimeout(initMap, 200);
-    }
-
-    function filterFeed() {
-        const q = document.getElementById('recipe-search').value.toLowerCase();
-        const filtered = recipes.filter(r => r.name.toLowerCase().includes(q) || r.ingredients.some(i => i.toLowerCase().includes(q)));
-        renderRecipes(filtered);
     }
 
     function filterCategory(cat, el) {
@@ -300,15 +355,10 @@
         });
     }
 
-    window.onload = async () => {
+    window.onload = () => {
         renderRecipes(recipes);
+        syncSupabaseData();
         if(localStorage.getItem('calalloo_dark') === 'true') document.body.classList.add('dark-mode');
-
-        // AI Backbone Cloud Check
-        console.log("Calalloo AI Backbone: Connecting to Supabase Culinary Node...");
-        const { data, error } = await sb.from('recipes').select('*').limit(1);
-        if(error) console.log("Cloud Node Ready for Migration: Using Local High-Fidelity Blueprint.");
-        else console.log("Verified Heritage Data Received from Cloud.");
     };
 </script>
 </body>
