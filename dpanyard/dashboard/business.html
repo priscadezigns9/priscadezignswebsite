@@ -171,9 +171,9 @@
             <h1 style="font-family: Sora; margin-bottom: 32px;">Empire Digital Growth</h1>
             <div class="grid-2">
                 <button class="btn-p" style="background:var(--navy-deep); height:120px;" onclick="window.open('https://priscadezigns.org/velloq/')">🌐 velloq<br><span style="font-size:10px; opacity:0.7;">Web Development</span></button>
-                <button class="btn-p" style="background:var(--navy-deep); height:120px;" onclick="window.open('https://priscadezigns.org/cupyz/')">✍️ cupyz<br><span style="font-size:10px; opacity:0.7;">Copywriting</span></button>
+                <button class="btn-p" style="background:var(--navy-deep); height:120px;" onclick="window.open('https://priscadezigns.org/cupyx/')">✍️ cupyx<br><span style="font-size:10px; opacity:0.7;">3D Virtual Tours</span></button>
                 <button class="btn-p" style="background:var(--navy-deep); height:120px;" onclick="window.open('https://priscadezigns.org/moblync/')">📱 moblync<br><span style="font-size:10px; opacity:0.7;">App Development</span></button>
-                <button class="btn-p" style="background:var(--navy-deep); height:120px;" onclick="window.open('https://priscadezigns.org/agency/')">🎨 Studio<br><span style="font-size:10px; opacity:0.7;">Design Agency</span></button>
+                <button class="btn-p" style="background:var(--navy-deep); height:120px;" onclick="window.open('https://priscadezigns.org/')">🎨 Studio<br><span style="font-size:10px; opacity:0.7;">Prisca Dezigns</span></button>
             </div>
         </div>
 
@@ -182,10 +182,21 @@
             <h1 style="font-family: Sora; margin-bottom: 32px;">Suppliers & Gear</h1>
             <div class="card">
                 <h2>Niche Professional Tools</h2>
-                <div id="niche-gear-content">
-                    <p>Select your business category in profile to see curated gear.</p>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-weight:700; margin-bottom:8px;">Your Business Niche</label>
+                    <select id="niche-select" class="form-input" onchange="updateGear()">
+                        <option value="Beauty">Beauty & Skincare</option>
+                        <option value="Fashion">Fashion, Seamstress & Tailoring</option>
+                        <option value="Tech">PC Repair & Gadgets</option>
+                        <option value="Pets">Pet Care & Grooming</option>
+                        <option value="Home">Landscaping & Sustainability</option>
+                        <option value="Art">Artists & Design</option>
+                        <option value="Hospitality">Motels & Hospitality</option>
+                    </select>
                 </div>
-                <button class="btn-p" style="margin-top:20px;" onclick="window.open('https://calalloo.com/shop/')">Shop Empire Gear</button>
+                <div id="niche-gear-content" style="background:rgba(0,0,0,0.02); padding:20px; border-radius:15px; margin-bottom:20px;">
+                    <!-- Dynamic Content -->
+                </div>
             </div>
         </div>
 
@@ -238,6 +249,10 @@
                 <div class="toggle-row">
                     <span style="font-weight:700;">File & Camera Access</span>
                     <label class="toggle-switch"><input type="checkbox" id="file-toggle" onchange="toggleFiles()"><span class="slider"></span></label>
+                </div>
+                <div class="toggle-row">
+                    <span style="font-weight:700;">Stay Signed In</span>
+                    <label class="toggle-switch"><input type="checkbox" id="stay-toggle" onchange="toggleStay()"><span class="slider"></span></label>
                 </div>
                 <button class="btn-p" style="width:100%; margin-top:24px;" onclick="alert('Settings Saved!')">Save Settings</button>
                 <button class="btn-p secondary" style="width:100%; margin-top:12px;" onclick="localStorage.clear(); location.reload();">Log Out</button>
@@ -318,6 +333,33 @@
         localStorage.setItem('panyard_dark', document.body.classList.contains('dark-mode'));
     }
 
+    function toggleStay() {
+        localStorage.setItem('panyard_stay_signed_in', document.getElementById('stay-toggle').checked);
+    }
+
+    function updateGear() {
+        const niche = document.getElementById('niche-select').value;
+        localStorage.setItem('panyard_niche', niche);
+        const content = document.getElementById('niche-gear-content');
+        
+        const mapping = {
+            'Beauty': { name: 'Glow Protocol', url: 'https://priscadezigns.org/glowprotocol/', desc: 'Restock high-fidelity skincare and salon kits.' },
+            'Fashion': { name: 'Couture Gallery', url: 'https://priscadezigns.org/couturegallery/', desc: 'Sourcing tools for seamstresses, tailors and fashion designers.' },
+            'Tech': { name: 'Atelia Gaming / Tech Scout', url: 'https://priscadezigns.org/ateliagaming/', desc: 'Professional PC repair gear and gadget discovery.' },
+            'Pets': { name: 'Paw Vault', url: 'https://priscadezigns.org/pawvault/', desc: 'Premium grooming and pet nutrition supplies.' },
+            'Home': { name: 'Verdant Co.', url: 'https://priscadezigns.org/verdantco/', desc: 'Sustainability and professional landscaping tools.' },
+            'Art': { name: 'Empire Design Studio', url: 'https://priscadezigns.org/', desc: 'High-fidelity creative assets and artist supplies.' },
+            'Hospitality': { name: 'Prime Land / Quiet Luxury', url: 'https://priscadezigns.org/quietluxury/', desc: 'Supplies for motels and sanctuary-style hospitality.' }
+        };
+
+        const gear = mapping[niche] || mapping['Beauty'];
+        content.innerHTML = `
+            <div style="font-weight:800; color:var(--primary-red); margin-bottom:10px;">${gear.name} Affiliate Hub</div>
+            <p style="font-size:14px; margin-bottom:15px;">${gear.desc}</p>
+            <button class="btn-p" style="font-size:12px; padding:10px 20px;" onclick="window.open('${gear.url}', '_blank')">Shop Official Gear →</button>
+        `;
+    }
+
     window.onload = function() {
         if(localStorage.getItem('panyard_dark') === 'true') {
             document.body.classList.add('dark-mode');
@@ -338,6 +380,11 @@
         
         document.getElementById('loc-toggle').checked = localStorage.getItem('panyard_lat') !== null;
         document.getElementById('file-toggle').checked = localStorage.getItem('panyard_pp') !== null;
+        document.getElementById('stay-toggle').checked = localStorage.getItem('panyard_stay_signed_in') === 'true';
+
+        const savedNiche = localStorage.getItem('panyard_niche') || 'Beauty';
+        document.getElementById('niche-select').value = savedNiche;
+        updateGear();
 
         document.getElementById('biz-name').addEventListener('input', () => saveData(true));
         document.getElementById('biz-bio').addEventListener('input', () => saveData(true));
