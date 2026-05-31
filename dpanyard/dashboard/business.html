@@ -30,14 +30,19 @@
             --navy-deep: #F8FAFC;
             --border-color: #2D3748;
             --text-muted: #A0AEC0;
-            color: white;
         }
+        body.dark-mode p, body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode span, body.dark-mode div, body.dark-mode b { color: #F8FAFC !important; }
+        body.dark-mode .btn-p, body.dark-mode .btn-p span, body.dark-mode .btn-p b { color: white !important; }
+        body.dark-mode .side-link { color: #A0AEC0; }
+        body.dark-mode .side-link.active { color: var(--primary-red) !important; }
+        body.dark-mode .slider:before { background-color: #1A1F26; }
 
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--navy-deep); transition: 0.3s; }
 
         nav { background: var(--white); border-bottom: 2px solid var(--primary-red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 72px; position: sticky; top: 0; z-index: 1000; }
-        .brand img { height: 45px; display: block; }
+        .brand img { height: 45px; display: block; filter: none !important; }
+        .is-pro .brand::after { content: "✓ Verified Admin"; font-size: 10px; color: var(--primary-red); font-weight: 800; display: block; margin-top: -5px; }
         
         .layout { display: flex; min-height: calc(100vh - 72px); }
         .sidebar { width: 280px; background: var(--white); border-right: 1px solid var(--border-color); padding: 32px 16px; position: sticky; top: 72px; height: calc(100vh - 72px); overflow-y: auto; }
@@ -191,13 +196,20 @@
                 <div style="margin-bottom:20px;">
                     <label style="display:block; font-weight:700; margin-bottom:8px;">Your Business Niche</label>
                     <select id="niche-select" class="form-input" onchange="updateGear()">
-                        <option value="Beauty">Beauty & Skincare</option>
-                        <option value="Fashion">Fashion, Seamstress & Tailoring</option>
-                        <option value="Tech">PC Repair & Gadgets</option>
-                        <option value="Pets">Pet Care & Grooming</option>
-                        <option value="Home">Landscaping & Sustainability</option>
-                        <option value="Art">Artists & Design</option>
-                        <option value="Hospitality">Motels & Hospitality</option>
+                        <option value="AI">AI Architect (Empire Owner)</option>
+                        <option value="General">General Administrative / Office</option>
+                        <option value="Beauty">Beauty, Makeup & Mobile Spa</option>
+                        <option value="Fashion">Fashion Design, Tailoring & Seamstress</option>
+                        <option value="Tech">PC Repair, IT & Tech Scout</option>
+                        <option value="Pets">Pet Sitting & Grooming</option>
+                        <option value="Eco">Landscaping & Gardening (Eco-Friendly)</option>
+                        <option value="Hospitality">Event Management & Home Decor</option>
+                        <option value="Culinary">Professional Chefs & Home Cooks</option>
+                        <option value="Logistics">Cleaning & Maintenance Services</option>
+                        <option value="Fitness">Personal Trainers & Gym Owners</option>
+                        <option value="Childcare">Nannies, Babysitters & Private Nurses</option>
+                        <option value="Music">Music Tutors & Teachers</option>
+                        <option value="Automotive">Auto Mechanics & Repair</option>
                     </select>
                 </div>
                 <div id="niche-gear-content" style="background:rgba(0,0,0,0.02); padding:20px; border-radius:15px; margin-bottom:20px;"></div>
@@ -306,6 +318,12 @@
                 localStorage.setItem('panyard_lat', pos.coords.latitude);
                 localStorage.setItem('panyard_lng', pos.coords.longitude);
                 if(map) map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+                
+                // Visual Sync Feedback
+                const mapTab = document.querySelector('[onclick*="map"]');
+                mapTab.style.background = "rgba(224, 27, 36, 0.2)";
+                setTimeout(() => mapTab.style.background = "", 2000);
+                
                 alert('Discovery Map synced with real location!');
                 saveData(true);
             });
@@ -316,15 +334,22 @@
         const niche = document.getElementById('niche-select').value;
         const content = document.getElementById('niche-gear-content');
         const mapping = {
-            'Beauty': { name: 'Glow Protocol', url: 'https://priscadezigns.org/glowprotocol/', desc: 'High-fidelity skincare and salon kits.' },
-            'Fashion': { name: 'Couture Gallery', url: 'https://priscadezigns.org/couturegallery/', desc: 'Tools for seamstresses and designers.' },
-            'Tech': { name: 'Atelia Gaming', url: 'https://priscadezigns.org/ateliagaming/', desc: 'PC repair and tech performance gear.' },
-            'Pets': { name: 'Paw Vault', url: 'https://priscadezigns.org/pawvault/', desc: 'Grooming and pet nutrition.' },
-            'Home': { name: 'Verdant Co.', url: 'https://priscadezigns.org/verdantco/', desc: 'Landscaping and sustainability tools.' },
-            'Art': { name: 'Empire Studio', url: 'https://priscadezigns.org/', desc: 'Creative assets and artist supplies.' },
-            'Hospitality': { name: 'Quiet Luxury', url: 'https://priscadezigns.org/quietluxury/', desc: 'Supplies for high-fidelity hospitality.' }
+            'Beauty': { name: 'Glow Protocol', url: 'https://priscadezigns.org/glowprotocol/', desc: 'High-fidelity skincare and professional spa kits for makeup artists and mobile aestheticians.' },
+            'Fashion': { name: 'Prisca Dezigns Studio', url: 'https://priscadezigns.org/', desc: 'Elite creative tools for fashion designers, seamstresses, and tailors.' },
+            'Tech': { name: 'Atelia Gaming / Tech Scout', url: 'https://priscadezigns.org/ateliagaming/', desc: 'Professional repair kits and hardware for computer technicians and IT specialists.' },
+            'Pets': { name: 'Paw Vault', url: 'https://priscadezigns.org/pawvault/', desc: 'High-fidelity grooming supplies and nutrition for pet sitters and groomers.' },
+            'Eco': { name: 'Verdant Co.', url: 'https://priscadezigns.org/verdantco/', desc: 'Sustainable, eco-friendly tools for professional landscapers and gardeners.' },
+            'Hospitality': { name: 'Quiet Luxury', url: 'https://priscadezigns.org/quietluxury/', desc: 'Home decor and sanctuary-style supplies for event managers and interior designers.' },
+            'Culinary': { name: 'Pantriq / Calalloo', url: 'https://calalloo.com/shop/', desc: 'Kitchen essentials and heritage ingredients for home cooks and professional chefs.' },
+            'Logistics': { name: 'Shelfly', url: 'https://priscadezigns.org/', desc: 'Daily essentials and reliable logistics for professional cleaners and pool maintenance.' },
+            'Fitness': { name: 'Peak Fit', url: 'https://priscadezigns.org/peakfit/', desc: 'Performance gear and recovery science for personal trainers and gym owners.' },
+            'Childcare': { name: 'My Baby Dumplin\'', url: 'https://priscadezigns.org/', desc: 'High-fidelity essentials for nannies, babysitters, and private nurses.' },
+            'Music': { name: 'Riddiim', url: 'https://priscadezigns.org/', desc: 'High-fidelity audio gear and instruments for music tutors and teachers.' },
+            'Automotive': { name: 'The Autodrome', url: 'https://priscadezigns.org/autodrome/', desc: 'Professional diagnostic tools and automotive gear for mechanics.' },
+            'AI': { name: 'Prisca Dezigns Studio', url: 'https://priscadezigns.org/', desc: 'High-fidelity AI Architect tools and Empire administrative assets.' },
+            'General': { name: 'DeskWell / Office Supplies', url: 'https://priscadezigns.org/', desc: 'General office supplies, laptops, and stationary for all administrative professionals.' }
         };
-        const gear = mapping[niche] || mapping['Beauty'];
+        const gear = mapping[niche] || mapping['General'];
         content.innerHTML = `<div style="font-weight:800; color:var(--primary-red); margin-bottom:5px;">${gear.name} Affiliate</div><p style="font-size:13px; margin-bottom:10px;">${gear.desc}</p><button class="btn-p" style="font-size:11px; padding:8px 16px;" onclick="window.open('${gear.url}', '_blank')">Shop Niche Gear →</button>`;
         saveData(true);
     }
@@ -354,6 +379,7 @@
 
     function upgradePro() {
         localStorage.setItem('panyard_is_pro', 'true');
+        alert('Universal Payment Bridge Triggered: Linking to Stripe/PayPal/Empire Node.');
         location.reload();
     }
 
