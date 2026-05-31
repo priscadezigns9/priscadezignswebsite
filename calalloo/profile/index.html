@@ -30,12 +30,8 @@
             --navy-deep: #F8FAFC;
             --border-color: #2D3748;
             --text-muted: #A0AEC0;
+            color: white;
         }
-        body.dark-mode p, body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode span, body.dark-mode div, body.dark-mode b { color: #F8FAFC !important; }
-        body.dark-mode .btn-p, body.dark-mode .btn-p span, body.dark-mode .btn-p b { color: white !important; }
-        body.dark-mode .side-link { color: #A0AEC0; }
-        body.dark-mode .side-link.active { color: var(--calalloo-green) !important; }
-        body.dark-mode .slider:before { background-color: #1A1F26; }
 
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--navy-deep); transition: 0.3s; }
@@ -192,9 +188,17 @@
             navigator.geolocation.getCurrentPosition(pos => {
                 localStorage.setItem('calalloo_lat', pos.coords.latitude);
                 localStorage.setItem('calalloo_lng', pos.coords.longitude);
-                if(map) map.setView([pos.coords.latitude, pos.coords.longitude], 14);
-                alert('Kitchen Discovery Map enabled!');
+                if(map) {
+                    map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+                    L.marker([pos.coords.latitude, pos.coords.longitude], { 
+                        icon: L.divIcon({ className: 'user-kitchen', html: '<div style="background:var(--calalloo-green); width:15px; height:15px; border-radius:50%; border:3px solid white; box-shadow:0 0 10px rgba(0,0,0,0.3);"></div>' })
+                    }).addTo(map).bindPopup('<b>YOUR KITCHEN SYNCED</b>').openPopup();
+                }
+                alert('Kitchen Discovery Node Synchronized with Empire Map!');
                 saveData(true);
+            }, err => {
+                alert('Location Access Denied. Please enable GPS for High-Fidelity Discovery.');
+                document.getElementById('loc-toggle').checked = false;
             });
         }
     }
