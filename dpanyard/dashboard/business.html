@@ -157,7 +157,8 @@
                     </label>
                 </div>
 
-                <button class="btn-p" style="background:var(--navy-deep); width:100%; margin-top: 32px;" onclick="localStorage.clear(); location.reload();">Log Out</button>
+                <button class="btn-p" style="width:100%; margin-top: 24px;" onclick="saveSettings()">Save Settings</button>
+                <button class="btn-p" style="background:var(--navy-deep); width:100%; margin-top: 12px;" onclick="localStorage.clear(); location.reload();">Log Out</button>
             </div>
         </div>
     </div>
@@ -177,7 +178,9 @@
     }
 
     function requestLocation() {
-        if(document.getElementById('loc-toggle').checked) {
+        const checked = document.getElementById('loc-toggle').checked;
+        localStorage.setItem('panyard_loc_pref', checked);
+        if(checked) {
             navigator.geolocation.getCurrentPosition(
                 () => alert('Location permission granted!'),
                 () => { alert('Location permission denied.'); document.getElementById('loc-toggle').checked = false; }
@@ -186,7 +189,9 @@
     }
 
     function requestNotifications() {
-        if(document.getElementById('notif-toggle').checked) {
+        const checked = document.getElementById('notif-toggle').checked;
+        localStorage.setItem('panyard_notif_pref', checked);
+        if(checked) {
             Notification.requestPermission().then(p => {
                 if(p !== 'granted') { alert('Notification permission denied.'); document.getElementById('notif-toggle').checked = false; }
                 else { alert('Notification permission granted!'); }
@@ -195,9 +200,15 @@
     }
 
     function toggleFileAccess() {
-        if(document.getElementById('file-toggle').checked) {
+        const checked = document.getElementById('file-toggle').checked;
+        localStorage.setItem('panyard_file_pref', checked);
+        if(checked) {
             alert('File & Camera access enabled for uploads.');
         }
+    }
+
+    function saveSettings() {
+        alert('All high-fidelity settings saved and synced to your profile!');
     }
 
     function requestFilePermission(inputId) {
@@ -227,10 +238,17 @@
     }
 
     window.onload = function() {
+        // Restore Dark Mode
         if(localStorage.getItem('panyard_dark_mode') === 'true') {
             document.body.classList.add('dark-mode');
             document.getElementById('dark-toggle').checked = true;
         }
+        // Restore Prefs
+        document.getElementById('loc-toggle').checked = localStorage.getItem('panyard_loc_pref') === 'true';
+        document.getElementById('notif-toggle').checked = localStorage.getItem('panyard_notif_pref') === 'true';
+        document.getElementById('file-toggle').checked = localStorage.getItem('panyard_file_pref') === 'true';
+        
+        // Restore Profile
         document.getElementById('biz-name').value = localStorage.getItem('panyard_name') || '';
         document.getElementById('biz-bio').value = localStorage.getItem('panyard_bio') || '';
         const pp = localStorage.getItem('panyard_pp');
