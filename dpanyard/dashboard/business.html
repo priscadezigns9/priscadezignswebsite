@@ -20,7 +20,7 @@
 
         nav { background: var(--white); border-bottom: 2px solid var(--primary-red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 72px; position: sticky; top: 0; z-index: 1000; }
         .brand { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: var(--navy-deep); text-decoration: none; }
-        
+
         .layout { display: flex; min-height: calc(100vh - 72px); }
         .sidebar { width: 260px; background: var(--white); border-right: 1px solid var(--border-color); padding: 32px 16px; }
         .side-link { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; text-decoration: none; color: #64748B; font-weight: 600; margin-bottom: 4px; transition: all 0.3s; }
@@ -30,20 +30,33 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
         .header h1 { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800; }
 
-        .card { background: var(--white); border-radius: 20px; padding: 32px; border: 1px solid var(--border-color); margin-bottom: 32px; }
+        .card { background: var(--white); border-radius: 20px; padding: 32px; border: 1px solid var(--border-color); margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
         .card h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 24px; }
 
         .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 24px; }
         label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
-        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-color); font-family: 'Inter'; }
+        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-color); font-family: 'Inter'; font-size: 15px; }
 
-        .payment-pill { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
+        .payment-pill { border: 1.5px solid var(--border-color); border-radius: 16px; padding: 20px; margin-bottom: 16px; transition: 0.3s; }
         .payment-pill.active { border-color: var(--primary-red); background: rgba(224, 27, 36, 0.02); }
-        .payment-pill input { width: auto; }
+        .payment-input { margin-top: 12px; display: none; }
+        .payment-pill.active .payment-input { display: block; }
 
-        .btn-save { background: var(--primary-red); color: white; padding: 16px 32px; border-radius: 50px; border: none; font-weight: 800; font-family: Sora; cursor: pointer; }
+        .btn-save { background: var(--primary-red); color: white; padding: 16px 32px; border-radius: 50px; border: none; font-weight: 800; font-family: Sora; cursor: pointer; transition: 0.3s; }
+        .btn-save:hover { background: #C0151D; transform: translateY(-2px); }
+
+        .btn-ai { background: var(--navy-deep); color: white; border: none; padding: 8px 16px; border-radius: 50px; font-size: 12px; font-weight: 800; font-family: Sora; cursor: pointer; margin-bottom: 12px; }
+
+        /* Hours Grid */
+        .hours-grid { display: grid; gap: 12px; }
+        .day-row { display: grid; grid-template-columns: 100px 1fr 1fr 60px; gap: 12px; align-items: center; }
+        .day-label { font-weight: 700; font-size: 14px; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 24px; padding: 40px; width: 90%; max-width: 500px; }
     </style>
 </head>
 <body>
@@ -54,86 +67,141 @@
 
 <div class="layout">
     <div class="sidebar">
-        <a href="#" class="side-link"><span>📊</span> Dashboard</a>
-        <a href="#" class="side-link"><span>📅</span> Appointments</a>
-        <a href="#payments" class="side-link active"><span>💳</span> Payments</a>
+        <a href="business.html" class="side-link active"><span>📊</span> Dashboard</a>
+        <a href="#" class="side-link" onclick="alert('Appointments module coming soon!')"><span>📅</span> Appointments</a>
+        <a href="#payments" class="side-link"><span>💳</span> Payments</a>
         <a href="../providers/profile.html" class="side-link"><span>🌐</span> Public Profile</a>
-        <a href="#" class="side-link"><span>⚙️</span> Settings</a>
+        <a href="#" class="side-link" onclick="alert('Settings module coming soon!')"><span>⚙️</span> Settings</a>
     </div>
 
     <div class="main">
         <div class="header">
-            <h1>Payment & Profile Settings</h1>
+            <h1 id="biz-name-display">Marcus Electric Solutions</h1>
         </div>
 
         <div class="grid-2">
             <div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2>Business Bio</h2>
+                        <button class="btn-ai" onclick="openAI()">✨ Generate with AI</button>
+                    </div>
+                    <textarea id="biz-bio" rows="4" placeholder="Describe your business..."></textarea>
+                </div>
+
+                <div class="card">
+                    <h2>Business Hours</h2>
+                    <div class="hours-grid">
+                        <div class="day-row"><div class="day-label">Monday</div><input type="time" value="08:00"> <input type="time" value="18:00"> <input type="checkbox" checked></div>
+                        <div class="day-row"><div class="day-label">Tuesday</div><input type="time" value="08:00"> <input type="time" value="18:00"> <input type="checkbox" checked></div>
+                        <div class="day-row"><div class="day-label">Wednesday</div><input type="time" value="08:00"> <input type="time" value="18:00"> <input type="checkbox" checked></div>
+                        <div class="day-row"><div class="day-label">Thursday</div><input type="time" value="08:00"> <input type="time" value="18:00"> <input type="checkbox" checked></div>
+                        <div class="day-row"><div class="day-label">Friday</div><input type="time" value="08:00"> <input type="time" value="18:00"> <input type="checkbox" checked></div>
+                        <div class="day-row"><div class="day-label">Saturday</div><input type="time" value="09:00"> <input type="time" value="14:00"> <input type="checkbox" checked></div>
+                        <div class="day-row"><div class="day-label">Sunday</div><input type="time"> <input type="time"> <input type="checkbox"></div>
+                    </div>
+                </div>
+
                 <div class="card" id="payments">
-                    <h2>Manage Payment Methods</h2>
-                    <p style="color: #64748B; font-size: 14px; margin-bottom: 24px;">Select how you want to receive payments from your neighbourhood clients.</p>
+                    <h2>Payment Details</h2>
                     
                     <div class="payment-pill active">
-                        <input type="checkbox" checked>
-                        <div>
-                            <div style="font-weight: 800;">PayPal</div>
-                            <div style="font-size: 12px; color: #64748B;">Direct international payments</div>
+                        <label><input type="checkbox" checked> PayPal</label>
+                        <div class="payment-input">
+                            <input type="email" id="paypal-email" placeholder="Your PayPal email address">
                         </div>
                     </div>
 
                     <div class="payment-pill active">
-                        <input type="checkbox" checked>
-                        <div>
-                            <div style="font-weight: 800;">Crypto (USDT / BTC / ETH)</div>
-                            <div style="font-size: 12px; color: #64748B;">Modern decentralised payments</div>
+                        <label><input type="checkbox" checked> Crypto (USDT / BTC)</label>
+                        <div class="payment-input">
+                            <input type="text" id="crypto-addr" placeholder="Your Wallet Address (USDT-TRC20)">
                         </div>
                     </div>
 
                     <div class="payment-pill">
-                        <input type="checkbox">
-                        <div>
-                            <div style="font-weight: 800;">Local Bank Transfer</div>
-                            <div style="font-size: 12px; color: #64748B;">Standard T&T bank settlement</div>
+                        <label><input type="checkbox"> Local Bank Transfer</label>
+                        <div class="payment-input">
+                            <input type="text" placeholder="Bank Name, Account Number, Account Type">
                         </div>
                     </div>
 
-                    <div class="payment-pill active">
-                        <input type="checkbox" checked>
-                        <div>
-                            <div style="font-weight: 800;">Google Pay</div>
-                            <div style="font-size: 12px; color: #64748B;">One-tap mobile payments</div>
-                        </div>
-                    </div>
-
-                    <button class="btn-save" style="margin-top: 24px;" onclick="alert('Payment settings saved!')">Save Payment Choices</button>
+                    <button class="btn-save" onclick="saveData()">Save Dashboard Data</button>
                 </div>
 
                 <div class="card">
-                    <h2>Business Details</h2>
-                    <div class="form-group">
-                        <label>Business Bio</label>
-                        <textarea rows="4">High-fidelity electrical services for the neighbourhood. We specialize in residential wiring and smart home security installations...</textarea>
+                    <h2>Project Gallery</h2>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;">
+                        <div style="aspect-ratio: 1; background: #f1f5f9; border: 2px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;">+ Add Photo</div>
                     </div>
-                    <div class="form-group">
-                        <label>Business Hours</label>
-                        <input type="text" value="Mon - Fri: 8AM - 6PM, Sat: 9AM - 2PM">
-                    </div>
-                    <button class="btn-save" onclick="alert('Profile updated!')">Update Profile</button>
                 </div>
             </div>
 
             <div>
                 <div class="card">
                     <h2>Verification Status</h2>
-                    <div style="background: #FFFBEB; padding: 20px; border-radius: 12px; border: 1px solid #FEF3C7;">
+                    <div id="v-alert" style="background: #FFFBEB; padding: 20px; border-radius: 12px; border: 1px solid #FEF3C7;">
                         <div style="font-weight: 800; color: #92400E; margin-bottom: 8px;">Pending Review</div>
-                        <p style="font-size: 13px; color: #B45309;">Your ID and selfie are currently being reviewed by the neighbourhood safety team.</p>
+                        <p style="font-size: 13px; color: #B45309;">Upload your documents to earn your neighbourhood trust tick.</p>
                     </div>
-                    <a href="verify.html" style="display: block; margin-top: 20px; text-align: center; color: var(--primary-red); font-weight: 800; text-decoration: none; font-size: 14px;">View Verification Portal →</a>
+                    <a href="verify.html" style="display: block; margin-top: 20px; text-align: center; color: var(--primary-red); font-weight: 800; text-decoration: none; font-size: 14px;">Complete Verification →</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- AI Modal -->
+<div id="ai-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="font-family: Sora; margin-bottom: 24px;">AI Bio Helper ✨</h2>
+        <div class="form-group">
+            <label>What are your business's top specialties?</label>
+            <input type="text" id="q1" placeholder="e.g. Electrical wiring, smart home...">
+        </div>
+        <div class="form-group">
+            <label>How many years of experience do you have?</label>
+            <input type="text" id="q2" placeholder="e.g. 10 years">
+        </div>
+        <button class="btn-save" onclick="generateBio()">Generate High-Fidelity Bio</button>
+        <button style="background: none; border: none; width: 100%; margin-top: 12px; color: #888; cursor: pointer;" onclick="closeAI()">Cancel</button>
+    </div>
+</div>
+
+<script>
+    function openAI() { document.getElementById('ai-modal').style.display = 'flex'; }
+    function closeAI() { document.getElementById('ai-modal').style.display = 'none'; }
+    
+    function generateBio() {
+        const spec = document.getElementById('q1').value;
+        const exp = document.getElementById('q2').value;
+        const bio = `With over ${exp} of experience, we provide high-fidelity service specialising in ${spec}. Our mission is to professionalise neighbourhood services with reliability and excellence.`;
+        document.getElementById('biz-bio').value = bio;
+        closeAI();
+    }
+
+    function saveData() {
+        const data = {
+            name: document.getElementById('biz-name-display').innerText,
+            bio: document.getElementById('biz-bio').value,
+            paypal: document.getElementById('paypal-email').value,
+            crypto: document.getElementById('crypto-addr').value
+        };
+        localStorage.setItem('panyard_biz_data', JSON.stringify(data));
+        alert('High-fidelity dashboard data saved to your local profile!');
+    }
+
+    // Load data if exists
+    window.onload = function() {
+        const saved = localStorage.getItem('panyard_biz_data');
+        if (saved) {
+            const data = JSON.parse(saved);
+            document.getElementById('biz-bio').value = data.bio || '';
+            document.getElementById('paypal-email').value = data.paypal || '';
+            document.getElementById('crypto-addr').value = data.crypto || '';
+        }
+    }
+</script>
 
 </body>
 </html>
