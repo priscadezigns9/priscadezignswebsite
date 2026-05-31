@@ -36,6 +36,7 @@
             --white: #1A1F26;
             --mid: #A0AEC0;
         }
+        body.dark-mode p, body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode span, body.dark-mode div, body.dark-mode b { color: #F8FAFC !important; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); line-height: 1.6; transition: 0.3s; }
@@ -75,7 +76,7 @@
 
         .sidebar h2 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 20px; color: var(--calalloo-green); }
         .cat-link { display: block; padding: 12px 16px; border-radius: 12px; text-decoration: none; color: var(--mid); font-weight: 600; margin-bottom: 5px; transition: 0.3s; cursor: pointer; }
-        .cat-link:hover, .cat-link.active { background: var(--calalloo-green); color: white; }
+        .cat-link:hover, .cat-link.active { background: var(--calalloo-green); color: white !important; }
 
         .main { flex: 1; padding: 40px 5%; overflow-y: auto; }
         .tab-content { display: none; }
@@ -93,7 +94,7 @@
         .pin-tag { font-family: var(--font-mono); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; }
         .pin-meta { display: flex; gap: 10px; margin-top: 15px; }
         .btn-action { padding: 8px 16px; border-radius: 50px; border: 1px solid var(--calalloo-green); background: none; color: var(--calalloo-green); font-family: var(--font-sans); font-weight: 800; font-size: 12px; cursor: pointer; transition: 0.3s; }
-        .btn-action:hover { background: var(--calalloo-green); color: white; }
+        .btn-action:hover { background: var(--calalloo-green); color: white !important; }
 
         #map-view { width: 100%; height: 650px; border-radius: 32px; border: 1px solid rgba(0,0,0,0.05); z-index: 1; }
 
@@ -115,13 +116,16 @@
 </header>
 
 <div class="layout">
+    <!-- Sidebar with Categories moved from Top -->
     <aside class="sidebar">
         <h2>Categories</h2>
-        <a class="cat-link active" onclick="filterCategory('All')">All Protocol</a>
-        <a class="cat-link" onclick="filterCategory('Sunday')">Sunday Lunch</a>
-        <a class="cat-link" onclick="filterCategory('Street')">Street Food Heritage</a>
-        <a class="cat-link" onclick="filterCategory('Seafood')">Seafood & Coastal</a>
-        <a class="cat-link" onclick="filterCategory('Provision')">Provision & Soil</a>
+        <a class="cat-link active" onclick="filterCategory('All', this)">All Protocol</a>
+        <a class="cat-link" onclick="filterCategory('Sunday', this)">Sunday Lunch</a>
+        <a class="cat-link" onclick="filterCategory('Street', this)">Street Food Heritage</a>
+        <a class="cat-link" onclick="filterCategory('Seafood', this)">Seafood & Coastal</a>
+        <a class="cat-link" onclick="filterCategory('Provision', this)">Provision & Soil</a>
+        <a class="cat-link" onclick="filterCategory('Breakfast', this)">Caribbean Breakfast</a>
+        <a class="cat-link" onclick="filterCategory('Beverage', this)">Native Beverages</a>
     </aside>
 
     <main class="main">
@@ -131,7 +135,7 @@
                 <input type="text" class="search-input" id="recipe-search" placeholder="Search for recipes, ingredients or chefs..." oninput="filterFeed()">
             </div>
             <div class="grid" id="recipe-grid">
-                <!-- Recipes injected by AI Backbone -->
+                <!-- Recipes injected dynamically -->
             </div>
         </div>
 
@@ -194,6 +198,16 @@
             desc: "Store Bay protocol. Piquant curry with flour dumplings.",
             ingredients: ["Blue Crab", "Curry Powder", "Flour"],
             locations: ["Scarborough Market", "POS Fish Market"]
+        },
+        {
+            id: 5,
+            name: "Saltfish & Bake",
+            category: "Breakfast",
+            tag: "Morning Fuel • Authentic",
+            img: "https://simplytrinicooking.com/wp-content/uploads/2008/11/IMG_0185.jpg",
+            desc: "The quintessential Caribbean breakfast node. Fluffy bakes with piquant saltfish.",
+            ingredients: ["Saltfish", "Flour", "Onion", "Tomato"],
+            locations: ["Chaguanas Market", "Maraval Hub"]
         }
     ];
 
@@ -251,7 +265,7 @@
     function locateIngredients(ingredients) {
         showMainTab('map-tab');
         const list = ingredients.split(',');
-        searchMarkets(list[0]); // Search for the first ingredient as high-fidelity starting point
+        searchMarkets(list[0]);
     }
 
     function showMainTab(id) {
@@ -266,9 +280,9 @@
         renderRecipes(filtered);
     }
 
-    function filterCategory(cat) {
+    function filterCategory(cat, el) {
         document.querySelectorAll('.cat-link').forEach(l => l.classList.remove('active'));
-        event.target.classList.add('active');
+        if(el) el.classList.add('active');
         const filtered = cat === 'All' ? recipes : recipes.filter(r => r.category === cat);
         renderRecipes(filtered);
     }
