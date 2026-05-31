@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market Finder | Calalloo</title>
+    <title>Provision Markets | Calalloo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900;9..144,1,900&family=Inter:wght@400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
     
+    <!-- Leaflet for Real Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         :root {
             --bg: #FAFAFA;
             --primary: #E87722;
+            --secondary: #FF9F58;
             --dark: #1A0D00;
             --mid: #666666;
             --white: #FFFFFF;
@@ -21,141 +27,157 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
-        
-        header { position: sticky; top: 0; width: 100%; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .nav-brand { font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; color: var(--primary); text-decoration: none; }
-        nav a { font-size: 0.9rem; font-weight: 600; color: var(--dark); text-decoration: none; margin-left: 2rem; }
-        
-        .hero { padding: 8rem 2rem 4rem; text-align: center; }
-        .hero h1 { font-family: var(--font-display); font-size: 4rem; line-height: 1; margin-bottom: 1rem; }
-        .hero p { font-size: 1.2rem; color: var(--mid); max-width: 600px; margin: 0 auto; }
+        body {
+            background-color: var(--bg);
+            color: var(--dark);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+        }
 
-        .market-list { max-width: 1000px; margin: 4rem auto; padding: 0 2rem; display: grid; gap: 2rem; }
-        
-        .market-card { background: var(--white); padding: 2.5rem; border-radius: 32px; border: 1px solid rgba(0,0,0,0.05); display: grid; grid-template-columns: 1fr auto; align-items: start; transition: transform 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .market-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
-        
-        .market-info h2 { font-family: var(--font-display); font-size: 2rem; margin-bottom: 0.5rem; }
-        .market-tag { display: inline-block; padding: 0.4rem 1rem; background: rgba(232, 119, 34, 0.1); color: var(--primary); border-radius: 100px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1.5rem; font-family: var(--font-mono); }
-        
-        .market-details { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem; }
-        .detail-item span { display: block; font-size: 0.8rem; color: var(--mid); text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem; font-family: var(--font-mono); }
-        .detail-item p { font-size: 1rem; color: var(--dark); font-weight: 500; }
+        header {
+            position: sticky;
+            top: 0;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--primary);
+            z-index: 1000;
+        }
 
-        .status-badge { padding: 0.5rem 1rem; border-radius: 12px; font-weight: 600; font-size: 0.9rem; font-family: var(--font-mono); }
-        .status-open { background: #E6F4EA; color: #1E8E3E; }
-        .status-closed { background: #FCE8E6; color: #D93025; }
+        .nav-brand {
+            font-family: var(--font-display);
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
 
-        footer { padding: 4rem 2rem; text-align: center; color: var(--mid); font-size: 0.9rem; }
+        .layout { display: flex; height: calc(100vh - 72px); }
+        
+        .sidebar {
+            width: 400px;
+            background: white;
+            border-right: 1px solid rgba(0,0,0,0.05);
+            padding: 2rem;
+            overflow-y: auto;
+        }
 
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 3rem; }
-            .market-card { grid-template-columns: 1fr; }
-            .status-badge { margin-top: 1.5rem; width: fit-content; }
-            .market-details { grid-template-columns: 1fr; gap: 1rem; }
+        #map-view { flex: 1; height: 100%; z-index: 1; }
+
+        .market-card {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .market-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(232, 119, 34, 0.05); }
+        .market-card h3 { font-family: var(--font-display); margin-bottom: 0.5rem; }
+        .market-tags { font-family: var(--font-mono); font-size: 0.7rem; color: var(--primary); text-transform: uppercase; margin-bottom: 0.5rem; }
+
+        .btn-locate {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .search-box {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 100px;
+            border: 2px solid var(--primary);
+            outline: none;
+            font-family: inherit;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <a href="../index.html" class="nav-brand">Calalloo</a>
-        <nav>
-            <a href="../recipes/">Recipes</a>
-            <a href="../blog/">Journal</a>
-            <a href="../signup/">Join Hub</a>
-        </nav>
+        <a href="https://calalloo.com/" class="nav-brand">Calalloo</a>
+        <div style="font-weight: 800; font-size: 0.7rem; color: var(--primary);">PROVISION LOCATOR</div>
     </header>
 
-    <main>
-        <section class="hero">
-            <h1>Local Market Finder</h1>
-            <p>Direct sourcing from the heart of Trinidad & Tobago.</p>
-        </section>
-
-        <div class="market-list">
-            <!-- Macoya -->
-            <div class="market-card">
-                <div class="market-info">
-                    <span class="market-tag">Flagship Hub</span>
-                    <h2>NAMDEVCO Macoya Farmers Market</h2>
-                    <div class="market-details">
-                        <div class="detail-item">
-                            <span>Hours</span>
-                            <p>Fri-Sun: 4:00 AM - 12:00 PM</p>
-                        </div>
-                        <div class="detail-item">
-                            <span>Specialty</span>
-                            <p>Organic Heritage Grains & Leafy Greens</p>
-                        </div>
-                    </div>
-                </div>
-                <span class="status-badge status-open">Open This Weekend</span>
+    <div class="layout">
+        <aside class="sidebar">
+            <h2 style="font-family: var(--font-display); margin-bottom: 1.5rem;">Nearest Groceries</h2>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search ingredient or market...">
             </div>
 
-            <!-- Northern Wholesale -->
-            <div class="market-card">
-                <div class="market-info">
-                    <span class="market-tag">Wholesale</span>
-                    <h2>Norris Deonarine Northern Wholesale Market</h2>
-                    <div class="market-details">
-                        <div class="detail-item">
-                            <span>Hours</span>
-                            <p>Daily: 24 Hours</p>
-                        </div>
-                        <div class="detail-item">
-                            <span>Specialty</span>
-                            <p>Bulk Sourcing & Root Crops</p>
-                        </div>
-                    </div>
+            <div id="market-list">
+                <div class="market-card" onclick="focusMarket(10.665, -61.518, 'Central Market')">
+                    <div class="market-tags">Fresh Dasheen • Crab • Seasoning</div>
+                    <h3>Central Market POS</h3>
+                    <p style="font-size: 13px; color: var(--mid);">0.8 km away • Open Now</p>
+                    <button class="btn-locate" style="margin-top: 10px;">Locate Node</button>
                 </div>
-                <span class="status-badge status-open">Open 24/7</span>
-            </div>
 
-            <!-- San Fernando -->
-            <div class="market-card">
-                <div class="market-info">
-                    <span class="market-tag">Southern Hub</span>
-                    <h2>San Fernando Farmers Market</h2>
-                    <div class="market-details">
-                        <div class="detail-item">
-                            <span>Hours</span>
-                            <p>Sat-Sun: 5:00 AM - 1:00 PM</p>
-                        </div>
-                        <div class="detail-item">
-                            <span>Specialty</span>
-                            <p>Fresh Coastal Produce & Spices</p>
-                        </div>
-                    </div>
+                <div class="market-card" onclick="focusMarket(10.680, -61.525, 'Maraval Greens')">
+                    <div class="market-tags">Hydroponics • Coconut Milk</div>
+                    <h3>Maraval Greens & Supplies</h3>
+                    <p style="font-size: 13px; color: var(--mid);">2.4 km away • Closing at 6PM</p>
+                    <button class="btn-locate" style="margin-top: 10px;">Locate Node</button>
                 </div>
-                <span class="status-badge status-open">Open This Weekend</span>
-            </div>
 
-            <!-- Debe -->
-            <div class="market-card">
-                <div class="market-info">
-                    <span class="market-tag">Traditional Market</span>
-                    <h2>Debe Market</h2>
-                    <div class="market-details">
-                        <div class="detail-item">
-                            <span>Hours</span>
-                            <p>Sun: 6:00 AM - 12:00 PM</p>
-                        </div>
-                        <div class="detail-item">
-                            <span>Specialty</span>
-                            <p>Traditional Seasonings & Local Delicacies</p>
-                        </div>
-                    </div>
+                <div class="market-card" onclick="focusMarket(10.641, -61.402, 'Tunapuna Market')">
+                    <div class="market-tags">Root Crops • Provisions</div>
+                    <h3>Tunapuna Heritage Market</h3>
+                    <p style="font-size: 13px; color: var(--mid);">12.5 km away • Weekly Specials</p>
+                    <button class="btn-locate" style="margin-top: 10px;">Locate Node</button>
                 </div>
-                <span class="status-badge status-closed">Closed Today</span>
             </div>
-        </div>
-    </main>
+        </aside>
 
-    <footer>
-        &copy; 2026 Calalloo. A Prisca Dezigns Project. Data sourced from NAMDEVCO.
-    </footer>
+        <div id="map-view"></div>
+    </div>
+
+    <script>
+        let map;
+        function initMap() {
+            map = L.map('map-view').setView([10.66, -61.51], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            // User Location
+            const userIcon = L.divIcon({
+                className: 'user-icon',
+                html: '<div style="background:var(--primary); width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow:0 0 10px rgba(0,0,0,0.2);"></div>',
+                iconSize: [20, 20]
+            });
+            L.marker([10.66, -61.51], {icon: userIcon}).addTo(map).bindPopup('<b>YOUR KITCHEN</b>').openPopup();
+
+            // Market Markers
+            L.marker([10.665, -61.518]).addTo(map).bindPopup('<b>Central Market POS</b>');
+            L.marker([10.680, -61.525]).addTo(map).bindPopup('<b>Maraval Greens</b>');
+        }
+
+        function focusMarket(lat, lng, name) {
+            map.setView([lat, lng], 15);
+            L.popup().setLatLng([lat, lng]).setContent(`<b>${name}</b>`).openOn(map);
+        }
+
+        window.onload = initMap;
+    </script>
 
 </body>
 </html>
