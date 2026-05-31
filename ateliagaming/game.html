@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Arena | Atelia Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --orange: #FF6B00; --white: #FFFFFF; --black: #050505; }
+        body { background: var(--black); color: var(--white); font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
+        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--orange); background: #000; }
+        .back-link { color: var(--white); text-decoration: none; font-family: 'Russo One'; font-size: 1.5rem; transition: 0.3s; }
+        .back-link:hover { color: var(--orange); }
+
+        #gameArea {
+            width: 100%;
+            height: calc(100vh - 100px);
+            background: #080808;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 5px solid var(--orange);
+        }
+        #player { width: 120px; height: 120px; position: absolute; bottom: 40px; left: 100px; z-index: 10; }
+        .obstacle { width: 60px; height: 60px; background: var(--orange); position: absolute; bottom: 40px; border-radius: 8px; box-shadow: 0 0 15px var(--orange); }
+        #score { position: absolute; top: 40px; right: 50px; font-family: 'Russo One'; font-size: 4rem; color: var(--orange); text-shadow: 0 0 10px var(--orange); }
+        
+        #instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0,0,0,0.9);
+            padding: 40px;
+            border: 2px solid var(--orange);
+            border-radius: 15px;
+            z-index: 100;
+        }
+        #instructions h2 { font-family: 'Russo One'; font-size: 3rem; color: var(--orange); }
+        #instructions p { font-size: 1.2rem; margin: 20px 0; color: #888; }
+        .start-btn { 
+            background: var(--orange); color: white; border: none; padding: 15px 40px; 
+            font-family: 'Russo One'; font-size: 2rem; cursor: pointer; border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="back-link">← RETURN TO HUB</a>
+    <img src="https://priscadezigns.org/ateliagaming/assets/atelia_logo_transparent.webp" alt="Atelia" height="50">
+</nav>
+
+<div id="gameArea">
+    <div id="instructions">
+        <h2>HOW TO PLAY</h2>
+        <p>1. PRESS <b>SPACEBAR</b> TO JUMP.</p>
+        <p>2. AVOID THE INCOMING SIGNAL SPIKES.</p>
+        <p>3. SURVIVE THE ARENA TO PROCLAIM YOUR SCORE.</p>
+        <button class="start-btn" onclick="startGame()">START GAME</button>
+    </div>
+    <img id="player" src="https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp" alt="Echo">
+    <div id="score">000</div>
+</div>
+
+<script>
+    let isJumping = false;
+    let score = 0;
+    let gameActive = false;
+
+    function startGame() {
+        document.getElementById('instructions').style.display = 'none';
+        gameActive = true;
+        score = 0;
+        spawnObstacle();
+    }
+
+    function jump() {
+        if (isJumping || !gameActive) return;
+        isJumping = true;
+        let p = document.getElementById('player');
+        p.src = 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp';
+        p.style.transform = 'scaleX(-1)'; 
+        
+        let pos = 40;
+        let up = setInterval(() => {
+            if (pos >= 350) {
+                clearInterval(up);
+                let down = setInterval(() => {
+                    if (pos <= 40) {
+                        clearInterval(down);
+                        isJumping = false;
+                        p.src = 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp';
+                    }
+                    pos -= 15;
+                    p.style.bottom = pos + 'px';
+                }, 20);
+            }
+            pos += 18;
+            p.style.bottom = pos + 'px';
+        }, 20);
+    }
+
+    function spawnObstacle() {
+        if (!gameActive) return;
+        let area = document.getElementById('gameArea');
+        let obs = document.createElement('div');
+        obs.className = 'obstacle';
+        obs.style.right = '-80px';
+        area.appendChild(obs);
+
+        let move = setInterval(() => {
+            if (!gameActive) { clearInterval(move); return; }
+            let r = parseInt(obs.style.right);
+            if (r > area.clientWidth) {
+                clearInterval(move);
+                area.removeChild(obs);
+                score++;
+                document.getElementById('score').innerText = score.toString().padStart(3, '0');
+            }
+            
+            let pRect = document.getElementById('player').getBoundingClientRect();
+            let oRect = obs.getBoundingClientRect();
+            
+            if (pRect.right > oRect.left + 15 && pRect.left < oRect.right - 15 && pRect.bottom > oRect.top + 15) {
+                gameActive = false;
+                alert('CRITICAL FAILURE | SCORE: ' + score);
+                location.reload();
+            }
+            obs.style.right = (r + 14) + 'px';
+        }, 20);
+        setTimeout(spawnObstacle, 1000 + Math.random() * 2000);
+    }
+
+    window.addEventListener('keydown', (e) => { if (e.code === 'Space') jump(); });
+    window.addEventListener('touchstart', jump);
+</script>
+
+</body>
+</html>
