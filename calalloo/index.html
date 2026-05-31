@@ -8,9 +8,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900;9..144,1,900&family=Inter:wght@400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
+    
     <!-- Real Map Library -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --bg: #FAFAFA;
@@ -19,18 +24,26 @@
             --dark: #1A0D00;
             --mid: #666666;
             --white: #FFFFFF;
+            --calalloo-green: #2D5A27;
             --font-display: 'Fraunces', serif;
             --font-sans: 'Inter', sans-serif;
             --font-mono: 'Space Mono', monospace;
         }
 
+        body.dark-mode {
+            --bg: #0B0E14;
+            --dark: #F8FAFC;
+            --white: #1A1F26;
+            --mid: #A0AEC0;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); line-height: 1.6; }
+        body { background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); line-height: 1.6; transition: 0.3s; }
 
         header {
             padding: 1rem 5%;
             background: var(--white);
-            border-bottom: 2px solid var(--primary);
+            border-bottom: 2px solid var(--calalloo-green);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -43,7 +56,7 @@
             font-family: var(--font-display);
             font-weight: 900;
             font-size: 1.8rem;
-            color: var(--primary);
+            color: var(--calalloo-green);
             text-decoration: none;
         }
 
@@ -60,121 +73,229 @@
             overflow-y: auto;
         }
 
-        .sidebar h2 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 20px; }
+        .sidebar h2 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 20px; color: var(--calalloo-green); }
         .cat-link { display: block; padding: 12px 16px; border-radius: 12px; text-decoration: none; color: var(--mid); font-weight: 600; margin-bottom: 5px; transition: 0.3s; cursor: pointer; }
-        .cat-link:hover, .cat-link.active { background: var(--primary); color: white; }
+        .cat-link:hover, .cat-link.active { background: var(--calalloo-green); color: white; }
 
         .main { flex: 1; padding: 40px 5%; overflow-y: auto; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
         .search-container { margin-bottom: 40px; position: relative; }
-        .search-input { width: 100%; padding: 1.2rem 2.5rem; border-radius: 50px; border: 2px solid var(--primary); font-size: 1rem; font-family: var(--font-sans); outline: none; box-shadow: 0 10px 30px rgba(232, 119, 34, 0.05); }
+        .search-input { width: 100%; padding: 1.2rem 2.5rem; border-radius: 50px; border: 2px solid var(--calalloo-green); font-size: 1rem; font-family: var(--font-sans); outline: none; box-shadow: 0 10px 30px rgba(45, 90, 39, 0.05); background: var(--white); color: var(--dark); }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-        .pin { background: var(--white); border-radius: 24px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); transition: 0.3s; border: 1px solid rgba(0,0,0,0.02); }
-        .pin img { width: 100%; height: 280px; object-fit: cover; }
-        .pin-content { padding: 1.5rem; }
-        .pin-content h3 { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 5px; }
-        .pin-tag { font-family: var(--font-mono); font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+        .pin { background: var(--white); border-radius: 28px; overflow: hidden; box-shadow: 0 4px 25px rgba(0,0,0,0.04); transition: 0.3s; border: 1px solid rgba(0,0,0,0.02); display: flex; flex-direction: column; }
+        .pin:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(45, 90, 39, 0.1); }
+        .pin img { width: 100%; height: 260px; object-fit: cover; }
+        .pin-content { padding: 1.5rem; flex: 1; }
+        .pin-content h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 8px; color: var(--calalloo-green); }
+        .pin-tag { font-family: var(--font-mono); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; }
+        .pin-meta { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-action { padding: 8px 16px; border-radius: 50px; border: 1px solid var(--calalloo-green); background: none; color: var(--calalloo-green); font-family: var(--font-sans); font-weight: 800; font-size: 12px; cursor: pointer; transition: 0.3s; }
+        .btn-action:hover { background: var(--calalloo-green); color: white; }
 
-        #map-view { width: 100%; height: 600px; border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); z-index: 1; }
+        #map-view { width: 100%; height: 650px; border-radius: 32px; border: 1px solid rgba(0,0,0,0.05); z-index: 1; }
+
+        .map-search-bar { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 80%; max-width: 500px; display: flex; gap: 10px; }
+        .map-search-bar input { flex: 1; padding: 12px 24px; border-radius: 50px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); font-family: var(--font-sans); font-weight: 600; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="https://calalloo.com/" class="nav-brand">Calalloo</a>
+    <a href="/calalloo/index.html" class="nav-brand">Calalloo</a>
     <nav style="display: flex; gap: 20px; align-items: center;">
-        <a href="javascript:void(0)" onclick="showMainTab('feed')" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Feed</a>
-        <a href="javascript:void(0)" onclick="showMainTab('map')" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Markets</a>
-        <a href="community/" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Community</a>
-        <a href="profile/" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Profile</a>
-        <a href="login/" style="background:var(--primary); color:white; padding:10px 20px; border-radius:50px; text-decoration:none; font-weight:800; font-size:14px;">Sign In</a>
+        <a href="javascript:void(0)" onclick="showMainTab('feed')" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Culinary Feed</a>
+        <a href="javascript:void(0)" onclick="showMainTab('map-tab')" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Market Locator</a>
+        <a href="/calalloo/community/index.html" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Community</a>
+        <a href="/calalloo/profile/index.html" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Profile</a>
+        <a href="/calalloo/login/index.html" style="background:var(--calalloo-green); color:white; padding:10px 24px; border-radius:50px; text-decoration:none; font-weight:800; font-size:14px;">Sign In</a>
     </nav>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
         <h2>Categories</h2>
-        <a class="cat-link active">All Recipes</a>
-        <a class="cat-link">Sunday Lunch</a>
-        <a class="cat-link">Street Food</a>
-        <a class="cat-link">Seafood</a>
-        <a class="cat-link">Vegetarian</a>
-        <a class="cat-link">Provision</a>
+        <a class="cat-link active" onclick="filterCategory('All')">All Protocol</a>
+        <a class="cat-link" onclick="filterCategory('Sunday')">Sunday Lunch</a>
+        <a class="cat-link" onclick="filterCategory('Street')">Street Food Heritage</a>
+        <a class="cat-link" onclick="filterCategory('Seafood')">Seafood & Coastal</a>
+        <a class="cat-link" onclick="filterCategory('Provision')">Provision & Soil</a>
     </aside>
 
     <main class="main">
+        <!-- Feed Tab -->
         <div id="feed" class="tab-content active">
             <div class="search-container">
-                <input type="text" class="search-input" id="recipe-search" placeholder="Search recipes or people..." oninput="filterFeed()">
+                <input type="text" class="search-input" id="recipe-search" placeholder="Search for recipes, ingredients or chefs..." oninput="filterFeed()">
             </div>
             <div class="grid" id="recipe-grid">
-                <div class="pin">
-                    <img src="https://thisbagogirl.com/wp-content/uploads/2021/04/Tobago-Crab-and-Callaloo-Recipe-scaled.jpg" alt="Authentic Callaloo">
-                    <div class="pin-content">
-                        <span class="pin-tag">Heritage • Volume 1</span>
-                        <h3>Trinidadian Callaloo Protocol</h3>
-                        <p style="font-size:14px; color:var(--mid);">Dasheen bush, okra, and crab. Verified Primary Source.</p>
-                    </div>
-                </div>
-                <div class="pin">
-                    <img src="https://cookingwithria.com/wp-content/uploads/2013/02/IMG_1024-scaled.jpg" alt="Chicken Pelau">
-                    <div class="pin-content">
-                        <span class="pin-tag">Classic • One Pot</span>
-                        <h3>Heritage Chicken Pelau</h3>
-                        <p style="font-size:14px; color:var(--mid);">Caramelized chicken with pigeon peas and rice.</p>
-                    </div>
-                </div>
-                <div class="pin">
-                    <img src="https://globalkitchentravels.com/wp-content/uploads/2019/12/Trinidad-Doubles-HERO-LR.jpg" alt="Doubles">
-                    <div class="pin-content">
-                        <span class="pin-tag">Street Food • Authentic</span>
-                        <h3>Trinidadian Doubles</h3>
-                        <p style="font-size:14px; color:var(--mid);">Bara and curried channa. Primary source.</p>
-                    </div>
-                </div>
+                <!-- Recipes injected by AI Backbone -->
             </div>
         </div>
 
-        <div id="map" class="tab-content">
-            <h1 style="font-family: var(--font-display); margin-bottom: 24px;">Provision Discovery Grid</h1>
-            <div id="map-view"></div>
+        <!-- Map Tab -->
+        <div id="map-tab" class="tab-content">
+            <h1 style="font-family: var(--font-display); margin-bottom: 24px;">Market Discovery Node</h1>
+            <div style="position: relative;">
+                <div class="map-search-bar">
+                    <input type="text" id="market-search" placeholder="Search for local ingredients (e.g. Dasheen, Okra)..." oninput="searchMarkets()">
+                </div>
+                <div id="map-view"></div>
+            </div>
         </div>
     </main>
 </div>
 
 <script>
+    // Supabase Verification Logic
+    const supabaseUrl = 'https://sktpjacowqaedddtrhuz.supabase.co';
+    const supabaseKey = '{{credential:supabase-anon-key}}';
+    const sb = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const recipes = [
+        {
+            id: 1,
+            name: "Trinidadian Callaloo Protocol",
+            category: "Sunday",
+            tag: "Heritage • Vol. 1",
+            img: "https://thisbagogirl.com/wp-content/uploads/2021/04/Tobago-Crab-and-Callaloo-Recipe-scaled.jpg",
+            desc: "Verified protocol from Maraval. Ingredients: Dasheen bush, okra, crab, coconut milk.",
+            ingredients: ["Dasheen Bush", "Okra", "Crab", "Coconut Milk"],
+            locations: ["Central Market POS", "Caroni Farmers Market"]
+        },
+        {
+            id: 2,
+            name: "Heritage Chicken Pelau",
+            category: "Sunday",
+            tag: "Classic • One Pot",
+            img: "https://cookingwithria.com/wp-content/uploads/2013/02/IMG_1024-scaled.jpg",
+            desc: "The authentic 'burnt sugar' method. Ingredients: Chicken, Pigeon Peas, Rice, Pumpkin.",
+            ingredients: ["Pigeon Peas", "Rice", "Pumpkin", "Chicken"],
+            locations: ["Chaguanas Market", "Caroni Farmers Market"]
+        },
+        {
+            id: 3,
+            name: "Authentic Doubles Node",
+            category: "Street",
+            tag: "Street Food • Verified",
+            img: "https://globalkitchentravels.com/wp-content/uploads/2019/12/Trinidad-Doubles-HERO-LR.jpg",
+            desc: "Bara and curried channa. Source: Curepe Heritage Hub.",
+            ingredients: ["Channa", "Flour", "Turmeric", "Cumin"],
+            locations: ["Curepe Hub", "St. Augustine Market"]
+        },
+        {
+            id: 4,
+            name: "Curried Crab & Dumpling",
+            category: "Seafood",
+            tag: "Coastal • Heritage",
+            img: "https://www.sandals.com/blog/content/images/2020/02/Curry-Crab-Dumpling-Tobago.jpg",
+            desc: "Store Bay protocol. Piquant curry with flour dumplings.",
+            ingredients: ["Blue Crab", "Curry Powder", "Flour"],
+            locations: ["Scarborough Market", "POS Fish Market"]
+        }
+    ];
+
+    const markets = [
+        { name: "Central Market POS", lat: 10.648, lng: -61.503, items: ["Dasheen Bush", "Okra", "Blue Crab"] },
+        { name: "Caroni Farmers Market", lat: 10.598, lng: -61.405, items: ["Pumpkin", "Okra", "Pigeon Peas"] },
+        { name: "Chaguanas Market", lat: 10.516, lng: -61.411, items: ["Pigeon Peas", "Rice", "Coconut Milk"] },
+        { name: "Curepe Heritage Hub", lat: 10.645, lng: -61.403, items: ["Channa", "Turmeric"] },
+        { name: "St. Augustine Market", lat: 10.641, lng: -61.398, items: ["Flour", "Cumin"] }
+    ];
+
     let map;
+    let markers = [];
+
     function initMap() {
         if(map) return;
-        map = L.map('map-view').setView([10.66, -61.51], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
-        L.marker([10.66, -61.51]).addTo(map).bindPopup('<b>Your Kitchen</b>').openPopup();
+        const userLat = parseFloat(localStorage.getItem('calalloo_lat')) || 10.66;
+        const userLng = parseFloat(localStorage.getItem('calalloo_lng')) || -61.51;
         
-        // Mock Market
-        L.marker([10.665, -61.518]).addTo(map).bindPopup('<b>Central Market POS</b><br>Fresh Dasheen Available');
+        map = L.map('map-view').setView([userLat, userLng], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+        
+        L.marker([userLat, userLng], { 
+            icon: L.divIcon({ className: 'user-kitchen', html: '<div style="background:var(--calalloo-green); width:15px; height:15px; border-radius:50%; border:3px solid white; box-shadow:0 0 10px rgba(0,0,0,0.3);"></div>' })
+        }).addTo(map).bindPopup('<b>YOUR KITCHEN</b>');
+
+        markets.forEach(m => {
+            const marker = L.marker([m.lat, m.lng]).addTo(map).bindPopup(`<b>${m.name}</b><br>Available: ${m.items.join(', ')}`);
+            markers.push({ marker, data: m });
+        });
+    }
+
+    function renderRecipes(data) {
+        const grid = document.getElementById('recipe-grid');
+        grid.innerHTML = '';
+        data.forEach(r => {
+            const el = document.createElement('div');
+            el.className = 'pin';
+            el.innerHTML = `
+                <img src="${r.img}" alt="${r.name}">
+                <div class="pin-content">
+                    <span class="pin-tag">${r.tag}</span>
+                    <h3>${r.name}</h3>
+                    <p style="font-size:14px; color:var(--mid);">${r.desc}</p>
+                    <div class="pin-meta">
+                        <button class="btn-action" onclick="locateIngredients('${r.ingredients.join(',')}')">Locate Ingredients</button>
+                        <button class="btn-action" style="border-color:var(--primary); color:var(--primary);">View Protocol</button>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(el);
+        });
+    }
+
+    function locateIngredients(ingredients) {
+        showMainTab('map-tab');
+        const list = ingredients.split(',');
+        searchMarkets(list[0]); // Search for the first ingredient as high-fidelity starting point
     }
 
     function showMainTab(id) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(id === 'map') setTimeout(initMap, 200);
+        if(id === 'map-tab') setTimeout(initMap, 200);
     }
 
     function filterFeed() {
-        const query = document.getElementById('recipe-search').value.toLowerCase();
-        const pins = document.querySelectorAll('.pin');
-        pins.forEach(p => {
-            p.style.display = p.innerText.toLowerCase().includes(query) ? 'block' : 'none';
-        });
-        if(['priscilla', 'marcus', 'people', 'hub'].some(t => query.includes(term))) {
-            // Suggest community
-        }
+        const q = document.getElementById('recipe-search').value.toLowerCase();
+        const filtered = recipes.filter(r => r.name.toLowerCase().includes(q) || r.ingredients.some(i => i.toLowerCase().includes(q)));
+        renderRecipes(filtered);
     }
+
+    function filterCategory(cat) {
+        document.querySelectorAll('.cat-link').forEach(l => l.classList.remove('active'));
+        event.target.classList.add('active');
+        const filtered = cat === 'All' ? recipes : recipes.filter(r => r.category === cat);
+        renderRecipes(filtered);
+    }
+
+    function searchMarkets(override) {
+        const q = override || document.getElementById('market-search').value.toLowerCase();
+        markers.forEach(m => {
+            const matches = m.data.items.some(i => i.toLowerCase().includes(q)) || m.data.name.toLowerCase().includes(q);
+            if(matches) {
+                m.marker.addTo(map);
+                if(override) m.marker.openPopup();
+            } else {
+                map.removeLayer(m.marker);
+            }
+        });
+    }
+
+    window.onload = async () => {
+        renderRecipes(recipes);
+        if(localStorage.getItem('calalloo_dark') === 'true') document.body.classList.add('dark-mode');
+
+        // AI Backbone Cloud Check
+        console.log("Calalloo AI Backbone: Connecting to Supabase Culinary Node...");
+        const { data, error } = await sb.from('recipes').select('*').limit(1);
+        if(error) console.log("Cloud Node Ready for Migration: Using Local High-Fidelity Blueprint.");
+        else console.log("Verified Heritage Data Received from Cloud.");
+    };
 </script>
 </body>
 </html>
