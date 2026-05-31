@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | Calalloo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900&family=Inter:wght@400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900;9..144,1,900&family=Inter:wght@400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
     <style>
         :root {
@@ -45,7 +45,7 @@
             font-family: var(--font-display);
             font-weight: 900;
             font-size: 1.8rem;
-            color: var(--primary);
+            color: var(--primary) !important; /* Force correct branding color */
             text-decoration: none;
         }
 
@@ -99,12 +99,16 @@
     <div class="main">
         <!-- Profile Tab -->
         <div id="profile" class="tab-content active">
-            <h1 style="font-family: var(--font-display); margin-bottom: 32px;">My Heritage Profile</h1>
+            <h1 style="font-family: var(--font-display); margin-bottom: 32px;">Heritage Profile</h1>
             <div class="card">
                 <h2>Public Identity</h2>
                 <input type="text" id="user-name" class="form-input" placeholder="Your Name" oninput="autoSave()">
                 <textarea id="user-bio" class="form-input" placeholder="Culinary Bio" rows="4" oninput="autoSave()"></textarea>
-                <button class="btn-p" onclick="alert('Profile Saved and Synced!')">Sync Profile</button>
+                <button class="btn-p" onclick="saveData()">Save Profile</button>
+            </div>
+            <div class="card" style="background: rgba(232, 119, 34, 0.03);">
+                <p style="font-size: 13px; font-weight: 700; color: var(--primary);">CLOUD PERSISTENCE NOTE:</p>
+                <p style="font-size: 12px; color: var(--mid);">Your profile is currently saved to this browser. As we scale, Supabase sync will allow you to access this on any device.</p>
             </div>
         </div>
 
@@ -113,22 +117,21 @@
             <h1 style="font-family: var(--font-display); margin-bottom: 32px;">Saved Heritage</h1>
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2>Culinary Logs & Photos</h2>
-                    <button class="btn-p" style="font-size: 12px;" onclick="document.getElementById('photo-input').click()">+ Upload Photo</button>
+                    <h2>Culinary Logs</h2>
+                    <button class="btn-p" style="font-size: 12px;" onclick="requestFilePermission()">+ Upload Photo</button>
                     <input type="file" id="photo-input" style="display:none" accept="image/*" multiple onchange="uploadPhotos(event)">
                 </div>
-                <p style="color: var(--mid); font-size: 14px;">Your private collection of recipes, food scans, and kitchen memories.</p>
                 <div class="gallery-grid" id="heritage-gallery">
-                    <div class="upload-btn" onclick="document.getElementById('photo-input').click()">Add Item</div>
+                    <div class="upload-btn" onclick="requestFilePermission()">Add Photo</div>
                 </div>
             </div>
         </div>
 
         <!-- Settings Tab -->
         <div id="settings" class="tab-content">
-            <h1 style="font-family: var(--font-display); margin-bottom: 32px;">System Settings</h1>
+            <h1 style="font-family: var(--font-display); margin-bottom: 32px;">Settings</h1>
             <div class="card">
-                <h2>Permissions & Privacy</h2>
+                <h2>Permissions</h2>
                 <div class="permission-row">
                     <span style="font-weight: 700;">Dark Mode View</span>
                     <label class="toggle-switch">
@@ -137,29 +140,29 @@
                     </label>
                 </div>
                 <div class="permission-row">
-                    <span style="font-weight: 700;">Camera Permission (AI Scanner)</span>
+                    <span style="font-weight: 700;">Camera (AI Scanner)</span>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="camera-toggle" onchange="requestCamera()">
+                        <input type="checkbox" id="camera-toggle" onchange="togglePref('camera')">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="permission-row">
-                    <span style="font-weight: 700;">Location Protocol</span>
+                    <span style="font-weight: 700;">Location Discovery</span>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="loc-toggle" onchange="requestLoc()">
+                        <input type="checkbox" id="loc-toggle" onchange="togglePref('loc')">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="permission-row">
                     <span style="font-weight: 700;">File & Storage Access</span>
                     <label class="toggle-switch">
-                        <input type="checkbox" id="file-toggle" onchange="toggleFileAccess()">
+                        <input type="checkbox" id="file-toggle" onchange="togglePref('file')">
                         <span class="slider"></span>
                     </label>
                 </div>
 
                 <h2 style="margin-top: 40px; margin-bottom: 20px;">Support</h2>
-                <button class="btn-p" style="width: 100%; margin-bottom: 12px;" onclick="window.open('https://priscadezigns.org/agency/')">Contact Heritage Support</button>
+                <button class="btn-p" style="width: 100%; margin-bottom: 12px;" onclick="window.open('https://priscadezigns.org/')">Contact Support</button>
                 <button class="btn-p dark" style="width: 100%;" onclick="localStorage.clear(); location.reload();">Log Out</button>
             </div>
         </div>
@@ -176,33 +179,23 @@
 
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
-        localStorage.setItem('calalloo_dark_mode', document.body.classList.contains('dark-mode'));
+        localStorage.setItem('calalloo_dark', document.body.classList.contains('dark-mode'));
     }
 
-    function requestCamera() {
-        if(document.getElementById('camera-toggle').checked) {
-            alert('Camera protocol enabled for AI scanning.');
-        }
+    function togglePref(key) {
+        localStorage.setItem('calalloo_' + key, document.getElementById(key + '-toggle').checked);
     }
 
-    function requestLoc() {
-        if(document.getElementById('loc-toggle').checked) {
-            alert('Neighbourhood location discovery active.');
-        }
-    }
-
-    function toggleFileAccess() {
-        if(document.getElementById('file-toggle').checked) {
-            alert('File access granted for heritage uploads.');
+    function requestFilePermission() {
+        if(!document.getElementById('file-toggle').checked) {
+            alert('Enable File Access in Settings first.');
+            showTab('settings', document.querySelector('[onclick*="settings"]'));
+        } else {
+            document.getElementById('photo-input').click();
         }
     }
 
     function uploadPhotos(e) {
-        if(!document.getElementById('file-toggle').checked) {
-            alert('Please enable "File & Storage Access" in Settings first.');
-            showTab('settings', document.querySelector('[onclick*="settings"]'));
-            return;
-        }
         const gallery = document.getElementById('heritage-gallery');
         Array.from(e.target.files).forEach(file => {
             const reader = new FileReader();
@@ -211,6 +204,7 @@
                 img.className = 'gallery-item';
                 img.src = ev.target.result;
                 gallery.prepend(img);
+                // In Phase 2, we will save these to Supabase.
             };
             reader.readAsDataURL(file);
         });
@@ -221,13 +215,22 @@
         localStorage.setItem('calalloo_bio', document.getElementById('user-bio').value);
     }
 
+    function saveData() {
+        autoSave();
+        alert('Profile saved to local vault!');
+    }
+
     window.onload = function() {
-        if(localStorage.getItem('calalloo_dark_mode') === 'true') {
+        if(localStorage.getItem('calalloo_dark') === 'true') {
             document.body.classList.add('dark-mode');
             document.getElementById('dark-toggle').checked = true;
         }
         document.getElementById('user-name').value = localStorage.getItem('calalloo_name') || '';
         document.getElementById('user-bio').value = localStorage.getItem('calalloo_bio') || '';
+        
+        document.getElementById('camera-toggle').checked = localStorage.getItem('calalloo_camera') === 'true';
+        document.getElementById('loc-toggle').checked = localStorage.getItem('calalloo_loc') === 'true';
+        document.getElementById('file-toggle').checked = localStorage.getItem('calalloo_file') === 'true';
     }
 </script>
 </body>
