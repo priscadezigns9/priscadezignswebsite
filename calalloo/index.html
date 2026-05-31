@@ -27,7 +27,7 @@
         header {
             padding: 1.5rem 5%;
             background: var(--white);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 2px solid var(--primary);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -49,7 +49,6 @@
 
         .layout { display: flex; min-height: calc(100vh - 72px); }
         
-        /* Sidebar for Categories */
         .sidebar {
             width: 280px;
             background: var(--white);
@@ -86,6 +85,7 @@
     <nav style="display: flex; gap: 20px; align-items: center;">
         <a href="community/" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Community</a>
         <a href="profile/" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Profile</a>
+        <a href="markets/" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Markets</a>
         <a href="login/" style="background:var(--primary); color:white; padding:10px 20px; border-radius:50px; text-decoration:none; font-weight:800; font-size:14px;">Sign In</a>
     </nav>
 </header>
@@ -104,17 +104,16 @@
 
     <main class="main">
         <div class="search-container">
-            <input type="text" class="search-input" id="search" placeholder="Search 300+ authentic recipes or people..." oninput="filterItems()">
+            <input type="text" class="search-input" id="search" placeholder="Search recipes, people, or ingredients..." oninput="filterItems()">
         </div>
 
         <div class="grid" id="grid">
-            <!-- Item 1: Callaloo - FIXED IMAGE FROM PRIMARY SOURCE -->
             <div class="pin">
                 <img src="https://thisbagogirl.com/wp-content/uploads/2021/04/Tobago-Crab-and-Callaloo-Recipe-scaled.jpg" alt="Trinidadian Callaloo">
                 <div class="pin-content">
                     <span class="pin-tag">Sunday Lunch • Volume 1</span>
                     <h3>Trinidadian Callaloo Protocol</h3>
-                    <p style="font-size: 14px; color: var(--mid);">Authentic dasheen bush and crab infusion. A verified primary source recipe.</p>
+                    <p style="font-size: 14px; color: var(--mid);">Authentic dasheen bush and crab infusion. Primary source heritage.</p>
                 </div>
             </div>
 
@@ -123,7 +122,7 @@
                 <div class="pin-content">
                     <span class="pin-tag">One Pot • Heritage</span>
                     <h3>Classic Chicken Pelau</h3>
-                    <p style="font-size: 14px; color: var(--mid);">Caramelized chicken, pigeon peas, and rice. The ultimate comfort food.</p>
+                    <p style="font-size: 14px; color: var(--mid);">Caramelized chicken and pigeon peas.</p>
                 </div>
             </div>
 
@@ -132,7 +131,7 @@
                 <div class="pin-content">
                     <span class="pin-tag">Street Food • Authentic</span>
                     <h3>Trinidadian Doubles</h3>
-                    <p style="font-size: 14px; color: var(--mid);">Bara and curried channa. Verified street food protocol.</p>
+                    <p style="font-size: 14px; color: var(--mid);">Bara and curried channa. Verified protocol.</p>
                 </div>
             </div>
         </div>
@@ -143,14 +142,27 @@
     function filterItems() {
         const query = document.getElementById('search').value.toLowerCase();
         const items = document.querySelectorAll('.pin');
+        let found = false;
+        
         items.forEach(item => {
             const text = item.innerText.toLowerCase();
-            item.style.display = text.includes(query) ? 'block' : 'none';
+            if(text.includes(query)) {
+                item.style.display = 'block';
+                found = true;
+            } else {
+                item.style.display = 'none';
+            }
         });
         
-        // If searching for people (mock connection)
-        if(query === 'priscilla' || query === 'marcus') {
-            window.location.href = 'community/?q=' + query;
+        // If searching for people/community terms
+        const communityTerms = ['priscilla', 'marcus', 'people', 'friends', 'hub', 'scout', 'chef'];
+        if(communityTerms.some(term => query.includes(term))) {
+            // Delay slightly to show local results first, then suggest community
+            setTimeout(() => {
+                if(confirm('Search for "' + query + '" in the Calalloo Community?')) {
+                    window.location.href = 'community/?q=' + query;
+                }
+            }, 1000);
         }
     }
 </script>
