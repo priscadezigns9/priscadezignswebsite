@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900;9..144,1,900&family=Inter:wght@400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
+    <!-- Real Map Library -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
             --bg: #FAFAFA;
@@ -25,7 +28,7 @@
         body { background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); line-height: 1.6; }
 
         header {
-            padding: 1.5rem 5%;
+            padding: 1rem 5%;
             background: var(--white);
             border-bottom: 2px solid var(--primary);
             display: flex;
@@ -42,9 +45,6 @@
             font-size: 1.8rem;
             color: var(--primary);
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .layout { display: flex; min-height: calc(100vh - 72px); }
@@ -61,31 +61,35 @@
         }
 
         .sidebar h2 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 20px; }
-        .cat-link { display: block; padding: 12px 16px; border-radius: 12px; text-decoration: none; color: var(--mid); font-weight: 600; margin-bottom: 5px; transition: 0.3s; }
+        .cat-link { display: block; padding: 12px 16px; border-radius: 12px; text-decoration: none; color: var(--mid); font-weight: 600; margin-bottom: 5px; transition: 0.3s; cursor: pointer; }
         .cat-link:hover, .cat-link.active { background: var(--primary); color: white; }
 
-        .main { flex: 1; padding: 40px 5%; }
+        .main { flex: 1; padding: 40px 5%; overflow-y: auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         .search-container { margin-bottom: 40px; position: relative; }
         .search-input { width: 100%; padding: 1.2rem 2.5rem; border-radius: 50px; border: 2px solid var(--primary); font-size: 1rem; font-family: var(--font-sans); outline: none; box-shadow: 0 10px 30px rgba(232, 119, 34, 0.05); }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
         .pin { background: var(--white); border-radius: 24px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); transition: 0.3s; border: 1px solid rgba(0,0,0,0.02); }
-        .pin:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(232, 119, 34, 0.1); }
         .pin img { width: 100%; height: 280px; object-fit: cover; }
         .pin-content { padding: 1.5rem; }
         .pin-content h3 { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 5px; }
         .pin-tag { font-family: var(--font-mono); font-size: 0.7rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; }
+
+        #map-view { width: 100%; height: 600px; border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); z-index: 1; }
     </style>
 </head>
 <body>
 
 <header>
-    <a href="/" class="nav-brand">Calalloo</a>
+    <a href="https://calalloo.com/" class="nav-brand">Calalloo</a>
     <nav style="display: flex; gap: 20px; align-items: center;">
+        <a href="javascript:void(0)" onclick="showMainTab('feed')" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Feed</a>
+        <a href="javascript:void(0)" onclick="showMainTab('map')" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Markets</a>
         <a href="community/" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Community</a>
         <a href="profile/" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Profile</a>
-        <a href="markets/" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Markets</a>
         <a href="login/" style="background:var(--primary); color:white; padding:10px 20px; border-radius:50px; text-decoration:none; font-weight:800; font-size:14px;">Sign In</a>
     </nav>
 </header>
@@ -93,79 +97,84 @@
 <div class="layout">
     <aside class="sidebar">
         <h2>Categories</h2>
-        <a href="#" class="cat-link active">All Recipes</a>
-        <a href="#" class="cat-link">Sunday Lunch</a>
-        <a href="#" class="cat-link">Street Food</a>
-        <a href="#" class="cat-link">Seafood</a>
-        <a href="#" class="cat-link">Vegetarian</a>
-        <a href="#" class="cat-link">Desserts</a>
-        <a href="#" class="cat-link">Provision</a>
+        <a class="cat-link active">All Recipes</a>
+        <a class="cat-link">Sunday Lunch</a>
+        <a class="cat-link">Street Food</a>
+        <a class="cat-link">Seafood</a>
+        <a class="cat-link">Vegetarian</a>
+        <a class="cat-link">Provision</a>
     </aside>
 
     <main class="main">
-        <div class="search-container">
-            <input type="text" class="search-input" id="search" placeholder="Search recipes, people, or ingredients..." oninput="filterItems()">
+        <div id="feed" class="tab-content active">
+            <div class="search-container">
+                <input type="text" class="search-input" id="recipe-search" placeholder="Search recipes or people..." oninput="filterFeed()">
+            </div>
+            <div class="grid" id="recipe-grid">
+                <div class="pin">
+                    <img src="https://thisbagogirl.com/wp-content/uploads/2021/04/Tobago-Crab-and-Callaloo-Recipe-scaled.jpg" alt="Authentic Callaloo">
+                    <div class="pin-content">
+                        <span class="pin-tag">Heritage • Volume 1</span>
+                        <h3>Trinidadian Callaloo Protocol</h3>
+                        <p style="font-size:14px; color:var(--mid);">Dasheen bush, okra, and crab. Verified Primary Source.</p>
+                    </div>
+                </div>
+                <div class="pin">
+                    <img src="https://cookingwithria.com/wp-content/uploads/2013/02/IMG_1024-scaled.jpg" alt="Chicken Pelau">
+                    <div class="pin-content">
+                        <span class="pin-tag">Classic • One Pot</span>
+                        <h3>Heritage Chicken Pelau</h3>
+                        <p style="font-size:14px; color:var(--mid);">Caramelized chicken with pigeon peas and rice.</p>
+                    </div>
+                </div>
+                <div class="pin">
+                    <img src="https://globalkitchentravels.com/wp-content/uploads/2019/12/Trinidad-Doubles-HERO-LR.jpg" alt="Doubles">
+                    <div class="pin-content">
+                        <span class="pin-tag">Street Food • Authentic</span>
+                        <h3>Trinidadian Doubles</h3>
+                        <p style="font-size:14px; color:var(--mid);">Bara and curried channa. Primary source.</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="grid" id="grid">
-            <div class="pin">
-                <img src="https://thisbagogirl.com/wp-content/uploads/2021/04/Tobago-Crab-and-Callaloo-Recipe-scaled.jpg" alt="Trinidadian Callaloo">
-                <div class="pin-content">
-                    <span class="pin-tag">Sunday Lunch • Volume 1</span>
-                    <h3>Trinidadian Callaloo Protocol</h3>
-                    <p style="font-size: 14px; color: var(--mid);">Authentic dasheen bush and crab infusion. Primary source heritage.</p>
-                </div>
-            </div>
-
-            <div class="pin">
-                <img src="https://cookingwithria.com/wp-content/uploads/2013/02/IMG_1024-scaled.jpg" alt="Chicken Pelau">
-                <div class="pin-content">
-                    <span class="pin-tag">One Pot • Heritage</span>
-                    <h3>Classic Chicken Pelau</h3>
-                    <p style="font-size: 14px; color: var(--mid);">Caramelized chicken and pigeon peas.</p>
-                </div>
-            </div>
-
-            <div class="pin">
-                <img src="https://globalkitchentravels.com/wp-content/uploads/2019/12/Trinidad-Doubles-HERO-LR.jpg" alt="Doubles">
-                <div class="pin-content">
-                    <span class="pin-tag">Street Food • Authentic</span>
-                    <h3>Trinidadian Doubles</h3>
-                    <p style="font-size: 14px; color: var(--mid);">Bara and curried channa. Verified protocol.</p>
-                </div>
-            </div>
+        <div id="map" class="tab-content">
+            <h1 style="font-family: var(--font-display); margin-bottom: 24px;">Provision Discovery Grid</h1>
+            <div id="map-view"></div>
         </div>
     </main>
 </div>
 
 <script>
-    function filterItems() {
-        const query = document.getElementById('search').value.toLowerCase();
-        const items = document.querySelectorAll('.pin');
-        let found = false;
+    let map;
+    function initMap() {
+        if(map) return;
+        map = L.map('map-view').setView([10.66, -61.51], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+        L.marker([10.66, -61.51]).addTo(map).bindPopup('<b>Your Kitchen</b>').openPopup();
         
-        items.forEach(item => {
-            const text = item.innerText.toLowerCase();
-            if(text.includes(query)) {
-                item.style.display = 'block';
-                found = true;
-            } else {
-                item.style.display = 'none';
-            }
+        // Mock Market
+        L.marker([10.665, -61.518]).addTo(map).bindPopup('<b>Central Market POS</b><br>Fresh Dasheen Available');
+    }
+
+    function showMainTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'map') setTimeout(initMap, 200);
+    }
+
+    function filterFeed() {
+        const query = document.getElementById('recipe-search').value.toLowerCase();
+        const pins = document.querySelectorAll('.pin');
+        pins.forEach(p => {
+            p.style.display = p.innerText.toLowerCase().includes(query) ? 'block' : 'none';
         });
-        
-        // If searching for people/community terms
-        const communityTerms = ['priscilla', 'marcus', 'people', 'friends', 'hub', 'scout', 'chef'];
-        if(communityTerms.some(term => query.includes(term))) {
-            // Delay slightly to show local results first, then suggest community
-            setTimeout(() => {
-                if(confirm('Search for "' + query + '" in the Calalloo Community?')) {
-                    window.location.href = 'community/?q=' + query;
-                }
-            }, 1000);
+        if(['priscilla', 'marcus', 'people', 'hub'].some(t => query.includes(term))) {
+            // Suggest community
         }
     }
 </script>
-
 </body>
 </html>
