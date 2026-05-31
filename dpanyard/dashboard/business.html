@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Business Dashboard | dpanyard</title>
+    <title>Business Admin | dpanyard</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
     <style>
@@ -14,6 +14,8 @@
             --bg-light: #F8FAFC;
             --border-color: #E2E8F0;
             --text-muted: #64748B;
+            --success: #065F46;
+            --success-bg: #D1FAE5;
         }
 
         body.dark-mode {
@@ -41,18 +43,37 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .card { background: var(--white); border-radius: 24px; padding: 32px; border: 1px solid var(--border-color); margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
+        .card { background: var(--white); border-radius: 24px; padding: 32px; border: 1px solid var(--border-color); margin-bottom: 32px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); position: relative; }
         .card h2 { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 24px; }
+
+        /* Pro Feature Overlay */
+        .pro-locked::after {
+            content: "Panyard Pro Feature";
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: Sora; font-weight: 800; color: var(--primary-red);
+            z-index: 10;
+        }
+        body.dark-mode .pro-locked::after { background: rgba(26, 31, 38, 0.8); }
+        .is-pro .pro-locked::after { display: none; }
 
         .btn-p { background: var(--primary-red); color: white; padding: 14px 28px; border-radius: 50px; border: none; font-weight: 800; font-family: Sora; cursor: pointer; transition: 0.3s; display: inline-block; text-align: center; }
         .btn-p:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(224, 27, 36, 0.2); }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
-        .stat-card { background: var(--navy-deep); color: var(--white); padding: 24px; border-radius: 20px; text-align: center; }
-        .stat-val { font-size: 28px; font-weight: 800; font-family: Sora; }
-        .stat-lbl { font-size: 11px; opacity: 0.7; text-transform: uppercase; font-weight: 800; margin-top: 4px; }
-
         .form-input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-color); font-family: 'Inter'; font-size: 15px; margin-bottom: 20px; background: transparent; color: inherit; }
+        
+        .pricing { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .plan { border: 2px solid var(--border-color); padding: 32px; border-radius: 24px; text-align: center; display: flex; flex-direction: column; }
+        .plan.featured { border-color: var(--primary-red); background: rgba(224, 27, 36, 0.02); }
+        .plan h3 { font-family: Sora; font-size: 20px; margin-bottom: 12px; }
+        .price { font-size: 32px; font-weight: 800; margin-bottom: 20px; }
+
+        /* Modal styling for Payment */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-content { background: var(--white); border-radius: 24px; padding: 40px; width: 90%; max-width: 500px; color: var(--navy-deep); }
         
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
@@ -60,216 +81,94 @@
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--primary-red); }
         input:checked + .slider:before { transform: translateX(20px); }
-
-        .pricing { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        .plan { border: 2px solid var(--border-color); padding: 32px; border-radius: 24px; text-align: center; display: flex; flex-direction: column; }
-        .plan.featured { border-color: var(--primary-red); background: rgba(224, 27, 36, 0.02); }
-        .plan h3 { font-family: Sora; font-size: 20px; margin-bottom: 12px; }
-        .price { font-size: 32px; font-weight: 800; margin-bottom: 20px; }
-        .plan ul { list-style: none; text-align: left; margin-bottom: 24px; flex: 1; }
-        .plan ul li { margin-bottom: 12px; font-size: 14px; display: flex; gap: 10px; }
-
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px; }
-        .gallery-item { aspect-ratio: 1; border-radius: 12px; object-fit: cover; border: 1px solid var(--border-color); }
-        .add-photo-btn { aspect-ratio: 1; background: #f1f5f9; border: 2px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748B; font-weight: 700; font-size: 14px; }
-        body.dark-mode .add-photo-btn { background: #2D3748; border-color: #4A5568; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-content { background: var(--white); border-radius: 24px; padding: 40px; width: 90%; max-width: 500px; color: var(--navy-deep); }
     </style>
 </head>
-<body>
+<body id="app-body">
 
 <nav>
     <a href="/dpanyard/index.html" class="brand"><img src="../assets/logos/website_logo.png" alt="dpanyard"></a>
-    <div style="font-weight: 800; font-size: 14px;">Business Admin</div>
+    <div id="pro-badge" style="display:none; background:var(--primary-red); color:white; padding:4px 12px; border-radius:50px; font-size:10px; font-weight:800; font-family:Sora;">PRO ACTIVE</div>
 </nav>
 
 <div class="layout">
     <div class="sidebar">
-        <button class="side-link active" onclick="showTab('dash', this)">
-            <svg fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
-            Dashboard
-        </button>
-        <button class="side-link" onclick="showTab('appts', this)">
-            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
-            Appointments
-        </button>
-        <button class="side-link" onclick="showTab('suppliers', this)">
-            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path></svg>
-            Suppliers & Gear
-        </button>
-        <button class="side-link" onclick="showTab('empire', this)">
-            <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-            Empire Services
-        </button>
-        <button class="side-link" onclick="showTab('pro', this)">
-            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd"></path></svg>
-            Panyard Pro
-        </button>
-        <button class="side-link" onclick="saveThenProfile()">
-            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-            View Public Profile
-        </button>
-        <button class="side-link" onclick="showTab('settings', this)">
-            <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
-            Settings
-        </button>
+        <button class="side-link active" onclick="showTab('dash', this)">Dashboard</button>
+        <button class="side-link" onclick="showTab('analytics', this)">Advanced Analytics</button>
+        <button class="side-link" onclick="showTab('pro', this)">Panyard Pro</button>
+        <button class="side-link" onclick="showTab('settings', this)">Settings</button>
     </div>
 
     <div class="main">
-        <!-- Dashboard Tab -->
         <div id="dash" class="tab-content active">
-            <h1 style="font-family: Sora; margin-bottom: 8px;">Business Dashboard</h1>
-            <p style="color: var(--text-muted); margin-bottom: 32px;">Real-time high-fidelity performance metrics.</p>
-
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-val">12</div><div class="stat-lbl">Appointments</div></div>
-                <div class="stat-card"><div class="stat-val">98/100</div><div class="stat-lbl">Panyard Points</div></div>
-                <div class="stat-card"><div class="stat-val">840</div><div class="stat-lbl">Profile Views</div></div>
-            </div>
-
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <h2>Business Profile</h2>
-                    <button class="btn-p" style="background: var(--navy-deep); font-size: 12px;" onclick="openAI()">✨ AI Bio Helper</button>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display:block; font-weight:700; margin-bottom:8px;">Business Name</label>
-                    <input type="text" id="biz-name" class="form-input">
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display:block; font-weight:700; margin-bottom:8px;">Business Bio</label>
-                    <textarea id="biz-bio" rows="4" class="form-input"></textarea>
-                </div>
-                <div style="margin-bottom: 24px;">
-                    <label style="display:block; font-weight:700; margin-bottom:12px;">Project Photos / Portfolio</label>
-                    <div class="gallery-grid" id="gallery">
-                        <div class="add-photo-btn" onclick="document.getElementById('photo-input').click()">+ Add Photo</div>
-                    </div>
-                    <input type="file" id="photo-input" style="display:none" accept="image/*" multiple onchange="addPhotos(event)">
-                </div>
-                <button class="btn-p" onclick="saveProfile(true)">Save & Sync Profile</button>
-            </div>
-        </div>
-
-        <!-- Appointments Tab -->
-        <div id="appts" class="tab-content">
-            <h1 style="font-family: Sora; margin-bottom: 8px;">Appointments</h1>
-            <p style="color: var(--text-muted); margin-bottom: 32px;">Manage neighbourhood service requests.</p>
+            <h1 style="font-family: Sora; margin-bottom: 32px;">Business Admin</h1>
             
-            <div class="appt-card">
-                <div class="appt-header">
-                    <div class="client-name">Priscilla Narine</div>
-                    <span id="appt-status" style="background: #FFFBEB; color: #92400E; padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 800;">PENDING</span>
-                </div>
-                <div class="client-meta">📍 <b>Client Location:</b> Port of Spain, Maraval Road</div>
-                <div class="client-meta">📞 <b>Contact:</b> <a href="tel:+18685551234" style="color:var(--primary-red); font-weight:800;">+1 (868) 555-1234</a></div>
-                <div class="client-meta">🕒 <b>Requested:</b> June 15, 2026 at 10:00 AM</div>
-                <div style="margin-top: 16px; display: flex; gap: 12px;" id="appt-actions">
-                    <button class="btn-p" style="padding: 10px 20px; font-size: 13px;" onclick="acceptBooking()">Accept Booking</button>
-                    <button class="btn-p" style="background: #f1f5f9; color: #64748B; padding: 10px 20px; font-size: 13px;">Decline</button>
+            <div class="card">
+                <h2>Standard Profile</h2>
+                <input type="text" id="biz-name" class="form-input" placeholder="Business Name">
+                <textarea id="biz-bio" class="form-input" placeholder="Bio"></textarea>
+                <button class="btn-p" onclick="saveData()">Save Profile</button>
+            </div>
+
+            <div class="card pro-locked" id="ai-card">
+                <h2>✨ AI Profile Architect</h2>
+                <p style="margin-bottom:20px;">Let AI craft your high-fidelity bio.</p>
+                <button class="btn-p" onclick="alert('AI Engine generating...')">Run AI Architect</button>
+            </div>
+        </div>
+
+        <div id="analytics" class="tab-content">
+            <h1 style="font-family: Sora; margin-bottom: 32px;">Performance Analytics</h1>
+            <div class="card pro-locked" id="analytics-card" style="height:300px;">
+                <h2>Weekly Profile Traffic</h2>
+                <!-- Chart Mockup -->
+                <div style="height:150px; background:rgba(0,0,0,0.05); border-radius:12px; display:flex; align-items:flex-end; gap:10px; padding:20px;">
+                    <div style="flex:1; height:40%; background:var(--primary-red);"></div>
+                    <div style="flex:1; height:70%; background:var(--primary-red);"></div>
+                    <div style="flex:1; height:55%; background:var(--primary-red);"></div>
+                    <div style="flex:1; height:90%; background:var(--primary-red);"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Suppliers Tab -->
-        <div id="suppliers" class="tab-content">
-            <h1 style="font-family: Sora; margin-bottom: 8px;">Suppliers & Gear</h1>
-            <p style="color: var(--text-muted); margin-bottom: 32px;">Niche-specific high-fidelity gear.</p>
-            <div id="niche-suppliers" class="card"></div>
-        </div>
-
-        <!-- Empire Tab -->
-        <div id="empire" class="tab-content">
-            <h1 style="font-family: Sora; margin-bottom: 8px;">Empire Digital Growth</h1>
-            <p style="color: var(--text-muted); margin-bottom: 32px;">Funnels for professional digital transformation.</p>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                <button class="btn-p" style="background: var(--navy-deep); height: 120px;" onclick="window.open('https://priscadezigns.org/cupyz/', '_blank')">✍️ cupyz<br><span style="font-size: 12px; opacity: 0.7;">Copywriting</span></button>
-                <button class="btn-p" style="background: var(--navy-deep); height: 120px;" onclick="window.open('https://priscadezigns.org/velloq/', '_blank')">🌐 velloq<br><span style="font-size: 12px; opacity: 0.7;">Web Dev</span></button>
-                <button class="btn-p" style="background: var(--navy-deep); height: 120px;" onclick="window.open('https://priscadezigns.org/moblync/', '_blank')">📱 moblync<br><span style="font-size: 12px; opacity: 0.7;">App Dev</span></button>
-                <button class="btn-p" style="background: var(--navy-deep); height: 120px;" onclick="window.open('https://priscadezigns.org/agency/', '_blank')">🎨 Studio<br><span style="font-size: 12px; opacity: 0.7;">Design</span></button>
-            </div>
-        </div>
-
-        <!-- Pro Tab -->
         <div id="pro" class="tab-content">
-            <h1 style="font-family: Sora; margin-bottom: 8px;">Panyard Pro Subscription</h1>
-            <p style="color: var(--text-muted); margin-bottom: 32px;">Choose a high-fidelity plan to scale your business.</p>
-            
+            <h1 style="font-family: Sora; margin-bottom: 32px;">Upgrade to Panyard Pro</h1>
             <div class="pricing">
-                <div class="plan featured">
-                    <h3>Monthly Growth</h3>
-                    <div class="price">$10.00 <span style="font-size:14px; opacity:0.6;">USD/mo</span></div>
-                    <ul>
-                        <li>✓ Featured Search Placement</li>
-                        <li>✓ Unlimited AI Bio Writing</li>
-                        <li>✓ Full Portfolio Gallery</li>
-                        <li>✓ Customer Review Responses</li>
-                    </ul>
-                    <button class="btn-p" onclick="alert('Proceeding to Checkout...')">Choose Monthly</button>
-                </div>
                 <div class="plan">
-                    <h3>Yearly Professional</h3>
-                    <div class="price">$100.00 <span style="font-size:14px; opacity:0.6;">USD/yr</span></div>
-                    <ul>
-                        <li>✓ <b>2 Months FREE</b> Savings</li>
-                        <li>✓ Priority Neighbourhood Support</li>
-                        <li>✓ Advanced Performance Analytics</li>
-                        <li>✓ Verified Pro Badge Upgrade</li>
-                    </ul>
-                    <button class="btn-p" style="background: var(--navy-deep);" onclick="alert('Proceeding to Checkout...')">Choose Yearly</button>
+                    <h3>Monthly</h3>
+                    <div class="price">$10.00</div>
+                    <button class="btn-p" onclick="openPayment('Monthly', 10)">Select Plan</button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Settings Tab -->
-        <div id="settings" class="tab-content">
-            <h1 style="font-family: Sora; margin-bottom: 32px;">System Settings</h1>
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; margin-bottom: 12px;">
-                    <span style="font-weight: 700;">Dark Mode Experience</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="dark-toggle" onchange="toggleDarkMode()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; margin-bottom: 12px;">
-                    <span style="font-weight: 700;">Location Discovery</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="loc-toggle" onchange="requestLocation()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px; margin-bottom: 12px;">
-                    <span style="font-weight: 700;">Browser Notifications</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="notif-toggle" onchange="requestNotifications()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(0,0,0,0.02); border-radius: 12px;">
-                    <span style="font-weight: 700;">Empire Support Funnel</span>
-                    <button class="btn-p" style="font-size: 13px;" onclick="window.open('https://priscadezigns.org/agency/', '_blank')">Chat with Support</button>
+                <div class="plan featured">
+                    <h3>Yearly</h3>
+                    <div class="price">$100.00</div>
+                    <button class="btn-p" onclick="openPayment('Yearly', 100)">Select Plan</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="ai-modal" class="modal">
+<!-- Payment Modal -->
+<div id="pay-modal" class="modal">
     <div class="modal-content">
-        <h2 style="font-family: Sora; margin-bottom: 24px;">AI Bio Helper ✨</h2>
-        <div style="margin-bottom: 20px;">
-            <label style="display:block; font-weight:700; margin-bottom:8px;">Business Specialties</label>
-            <input type="text" id="ai-spec" class="form-input" placeholder="e.g. PC Repair & Security">
+        <h2 style="font-family: Sora; margin-bottom: 24px;">Complete Subscription</h2>
+        <p id="pay-desc" style="margin-bottom:24px;"></p>
+        <div style="background:#f8f9fa; padding:20px; border-radius:12px; margin-bottom:24px;">
+            <div style="margin-bottom:12px;"><b>Empire Standard Checkout</b></div>
+            <input type="text" class="form-input" style="margin-bottom:12px;" placeholder="Card Number">
+            <div style="display:flex; gap:10px;">
+                <input type="text" class="form-input" placeholder="MM/YY">
+                <input type="text" class="form-input" placeholder="CVC">
+            </div>
         </div>
-        <button class="btn-p" style="width:100%;" onclick="runAI()">Generate High-Fidelity Bio</button>
-        <button onclick="document.getElementById('ai-modal').style.display='none'" style="background:none; border:none; width:100%; margin-top:16px; cursor:pointer; color:#888;">Cancel</button>
+        <button class="btn-p" style="width:100%;" onclick="processPayment()">Authorize & Upgrade</button>
+        <button onclick="document.getElementById('pay-modal').style.display='none'" style="background:none; border:none; width:100%; margin-top:16px; cursor:pointer;">Cancel</button>
     </div>
 </div>
 
 <script>
+    let currentPlan = null;
+
     function showTab(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
@@ -277,85 +176,36 @@
         el.classList.add('active');
     }
 
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('panyard_dark_mode', document.body.classList.contains('dark-mode'));
+    function openPayment(plan, price) {
+        currentPlan = plan;
+        document.getElementById('pay-desc').innerText = `You are subscribing to the Panyard Pro ${plan} plan for $${price}.00 USD.`;
+        document.getElementById('pay-modal').style.display = 'flex';
     }
 
-    function requestLocation() {
-        if(document.getElementById('loc-toggle').checked) {
-            navigator.geolocation.getCurrentPosition(() => alert('Neighbourhood location access enabled!'), () => alert('Location permission denied.'));
+    function processPayment() {
+        alert('Payment Authorized via Empire Standard Gateway!');
+        localStorage.setItem('panyard_is_pro', 'true');
+        applyProState();
+        document.getElementById('pay-modal').style.display = 'none';
+        showTab('dash', document.querySelector('.side-link'));
+    }
+
+    function applyProState() {
+        if(localStorage.getItem('panyard_is_pro') === 'true') {
+            document.getElementById('app-body').classList.add('is-pro');
+            document.getElementById('pro-badge').style.display = 'block';
         }
     }
 
-    function requestNotifications() {
-        if(document.getElementById('notif-toggle').checked) {
-            Notification.requestPermission().then(p => {
-                if(p === 'granted') alert('Notification permission granted!');
-            });
-        }
-    }
-
-    function openAI() { document.getElementById('ai-modal').style.display = 'flex'; }
-    function runAI() {
-        const spec = document.getElementById('ai-spec').value || 'neighbourhood services';
-        document.getElementById('biz-bio').value = `High-fidelity professional business specialising in ${spec}. Committed to reliable service and community trust within the dpanyard network.`;
-        document.getElementById('ai-modal').style.display = 'none';
-    }
-
-    function addPhotos(e) {
-        const gallery = document.getElementById('gallery');
-        Array.from(e.target.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                const img = document.createElement('img');
-                img.className = 'gallery-item';
-                img.src = ev.target.result;
-                gallery.prepend(img);
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function saveProfile(notify) {
-        const data = {
-            name: document.getElementById('biz-name').value,
-            bio: document.getElementById('biz-bio').value
-        };
-        localStorage.setItem('panyard_biz_data', JSON.stringify(data));
-        if(notify) alert('High-fidelity profile synced and saved!');
-    }
-
-    function saveThenProfile() {
-        saveProfile(false);
-        window.location.href = '../providers/profile.html';
-    }
-
-    function acceptBooking() {
-        document.getElementById('appt-status').innerText = "ACCEPTED";
-        document.getElementById('appt-status').style.background = "#D1FAE5";
-        document.getElementById('appt-status').style.color = "#065F46";
-        document.getElementById('appt-actions').style.display = "none";
-        alert('Booking accepted! Notification sent to client.');
+    function saveData() {
+        localStorage.setItem('panyard_name', document.getElementById('biz-name').value);
+        alert('Data Saved Locally.');
     }
 
     window.onload = function() {
-        if(localStorage.getItem('panyard_dark_mode') === 'true') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('dark-toggle').checked = true;
-        }
-        const saved = JSON.parse(localStorage.getItem('panyard_biz_data') || '{}');
-        document.getElementById('biz-name').value = saved.name || 'Marcus Electric Solutions';
-        document.getElementById('biz-bio').value = saved.bio || 'High-fidelity electrical services for the neighbourhood.';
-        
-        const cat = localStorage.getItem('panyard_category') || 'Beauty';
-        const supp = document.getElementById('niche-suppliers');
-        if(cat.includes('Beauty')) {
-            supp.innerHTML = '<h2>Beauty Supply Hub</h2><p>Restock via <b>Glow Protocol</b> professional kits.</p><button class="btn-p" style="margin-top:16px;" onclick="window.open(\'https://priscadezigns.org/glowprotocol/shop/\')">Shop Glow Protocol →</button>';
-        } else {
-            supp.innerHTML = '<h2>Industrial Pro Gear</h2><p>Get high-fidelity tools from <b>Empire Tool Co.</b></p><button class="btn-p" style="margin-top:16px;">Shop Empire Tools →</button>';
-        }
-    }
+        applyProState();
+        document.getElementById('biz-name').value = localStorage.getItem('panyard_name') || '';
+    };
 </script>
 </body>
 </html>
