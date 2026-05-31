@@ -15,7 +15,12 @@
         #game { width: 100%; height: calc(100vh - 100px); position: relative; background: radial-gradient(circle at center, #1a0000 0%, #000 100%); overflow: hidden; }
         #game::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(211,47,47,0.1), transparent); pointer-events:none; }
         
-        #player { width: 140px; height: 140px; position: absolute; bottom: 50px; left: 100px; z-index: 10; filter: drop-shadow(0 0 10px rgba(255,107,0,0.5)); transition: transform 0.1s; }
+        #player { 
+            width: 140px; height: 140px; position: absolute; bottom: 50px; left: 100px; z-index: 10; 
+            filter: drop-shadow(0 0 10px rgba(255,107,0,0.5)); 
+            transition: transform 0.1s;
+            transform: scaleX(-1); /* Flip characters to face right/obstacles */
+        }
         .obs { width: 80px; height: 80px; background: linear-gradient(45deg, var(--red), var(--orange)); position: absolute; bottom: 50px; border-radius: 4px; box-shadow: 0 0 30px var(--red); border: 3px solid white; }
         
         #score-ui { position: absolute; top: 40px; right: 50px; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.9); padding: 15px 40px; border-radius: 0; border: 4px solid var(--orange); box-shadow: 5px 5px 0 var(--red); }
@@ -25,7 +30,7 @@
         .char-opt { text-align: center; cursor: pointer; transition: 0.3s; padding: 20px; border: 2px solid transparent; width: 180px; }
         .char-opt:hover { background: #111; border-color: var(--orange); transform: translateY(-10px); }
         .char-opt.active { background: #222; border-color: var(--white); box-shadow: 0 0 20px var(--red); }
-        .char-opt img { height: 200px; border-radius: 10px; margin-bottom: 15px; filter: grayscale(1); transition: 0.3s; }
+        .char-opt img { height: 200px; border-radius: 10px; margin-bottom: 15px; filter: grayscale(1); transition: 0.3s; object-fit: contain; }
         .char-opt:hover img, .char-opt.active img { filter: grayscale(0); }
         .char-opt p { font-family: 'Bangers'; font-size: 2.5rem; margin: 0; letter-spacing: 1px; color: var(--white); }
         
@@ -34,7 +39,9 @@
         
         .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200; }
         .modal h1 { font-family: 'Bangers'; font-size: 10rem; color: var(--red); margin: 0; text-shadow: 10px 10px 0 white; }
-        .modal p { font-size: 2rem; margin-bottom: 40px; }
+        .modal p { font-size: 2rem; margin-bottom: 20px; }
+        .modal .coin-earned { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; font-family: 'Bangers'; font-size: 3rem; color: var(--orange); }
+        .modal .coin-earned img { height: 60px; filter: drop-shadow(0 0 10px var(--orange)); }
         .modal button { background: var(--orange); color: white; border: none; padding: 20px 60px; font-family: 'Russo One'; font-size: 2rem; cursor: pointer; border: 4px solid white; }
     </style>
 </head>
@@ -46,38 +53,59 @@
 
 <div id="game">
     <div id="score-ui"><span>SCORE: </span><span id="score-text">000</span></div>
-    <img id="player" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_3d_hf.webp" alt="Character">
+    <img id="player" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_2d_hf.webp" alt="Character">
     
     <div class="char-select" id="select-screen">
-        <div class="char-opt active" onclick="sel('astra')" id="o-astra"><img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_3d_hf.webp"><p>ASTRA</p></div>
-        <div class="char-opt" onclick="sel('mimi')" id="o-mimi"><img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_3d_hf.webp"><p>MIMI</p></div>
-        <div class="char-opt" onclick="sel('nova')" id="o-nova"><img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_3d_hf.webp"><p>NOVA</p></div>
-        <div class="char-opt" onclick="sel('echo')" id="o-echo"><img src="https://priscadezigns.org/ateliagaming/assets/echo/echo_3d_hf.webp"><p>ECHO</p></div>
+        <div class="char-opt active" onclick="sel('astra')" id="o-astra"><img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_2d_hf.webp"><p>ASTRA</p></div>
+        <div class="char-opt" onclick="sel('mimi')" id="o-mimi"><img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_2d_hf_1.webp"><p>MIMI</p></div>
+        <div class="char-opt" onclick="sel('nova')" id="o-nova"><img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_2d_hf.webp"><p>NOVA</p></div>
+        <div class="char-opt" onclick="sel('echo')" id="o-echo"><img src="https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp"><p>ECHO</p></div>
         <button id="start-btn" onclick="start()">START ARENA</button>
     </div>
 
     <div class="modal" id="results-modal">
         <h1>WRECKED!</h1>
         <p>FINAL SCORE: <span id="res-score">0</span></p>
+        <div class="coin-earned">
+            <img src="https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp" alt="ATLR Coin">
+            <span id="atlr-count">+0 ATLR</span>
+        </div>
         <button onclick="location.reload()">TRY AGAIN</button>
     </div>
 </div>
 
 <script>
     const assets = {
-        astra: { r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_3d_hf.webp', j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_3d_hf.webp' },
-        mimi: { r: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp', j: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp' },
-        nova: { r: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_running.webp', j: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp' },
-        echo: { r: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp', j: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp' }
+        astra: { 
+            sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_2d_hf.webp',
+            r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp', 
+            j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp' 
+        },
+        mimi: { 
+            sel: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_2d_hf_1.webp',
+            r: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp', 
+            j: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp' 
+        },
+        nova: { 
+            sel: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_2d_hf.webp',
+            r: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_running.webp', 
+            j: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp' 
+        },
+        echo: { 
+            sel: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp',
+            r: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp', 
+            j: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp' 
+        }
     };
     let char = 'astra', jumping = false, score = 0, active = false;
     function sel(c) {
         char = c; document.querySelectorAll('.char-opt').forEach(o => o.classList.remove('active'));
         document.getElementById('o-' + c).classList.add('active');
-        document.getElementById('player').src = assets[c].r;
+        document.getElementById('player').src = assets[c].sel;
     }
     function start() {
         document.getElementById('select-screen').style.display = 'none';
+        document.getElementById('player').src = assets[char].r;
         active = true; spawn();
     }
     function jump() {
@@ -101,7 +129,10 @@
             if (r > area.clientWidth) { clearInterval(move); area.removeChild(obs); score++; document.getElementById('score-text').innerText = score.toString().padStart(3, '0'); }
             let pRect = document.getElementById('player').getBoundingClientRect(), oRect = obs.getBoundingClientRect();
             if (pRect.right > oRect.left + 20 && pRect.left < oRect.right - 20 && pRect.bottom > oRect.top + 20) {
-                active = false; document.getElementById('res-score').innerText = score; document.getElementById('results-modal').style.display = 'flex';
+                active = false; 
+                document.getElementById('res-score').innerText = score;
+                document.getElementById('atlr-count').innerText = '+' + score + ' ATLR';
+                document.getElementById('results-modal').style.display = 'flex';
             }
             obs.style.right = (r + 15 + (score/10)) + 'px';
         }, 20);
