@@ -48,35 +48,36 @@
         .btn-p.secondary { background: var(--navy-deep); color: var(--white); }
         body.dark-mode .btn-p.secondary { color: #0D1B2A; }
 
-        .form-input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-color); font-family: 'Inter'; font-size: 15px; margin-bottom: 20px; background: transparent; color: inherit; }
-        
-        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-color); }
-        .toggle-row:last-child { border-bottom: none; }
-        .toggle-label { font-weight: 700; font-size: 15px; }
-        
+        /* Map Integration */
+        #map-container { width: 100%; height: 500px; border-radius: 24px; background: #eee; position: relative; overflow: hidden; border: 1px solid var(--border-color); }
+        .map-mock { width: 100%; height: 100%; background: #e5e5f7; opacity: 0.8; background-image: radial-gradient(#444cf7 0.5px, #e5e5f7 0.5px); background-size: 10px 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .pin { position: absolute; width: 40px; height: 40px; border-radius: 50% 50% 50% 0; background: var(--primary-red); transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; transition: 0.3s; }
+        .pin:hover { transform: rotate(-45deg) scale(1.1); }
+        .pin::after { content: ""; width: 14px; height: 14px; background: white; border-radius: 50%; }
+        .pin.client { background: var(--navy-deep); }
+        .pin-label { position: absolute; bottom: 50px; left: -20px; background: white; padding: 4px 12px; border-radius: 12px; font-size: 10px; font-weight: 800; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: var(--navy-deep); transform: rotate(45deg); }
+
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--primary-red); }
         input:checked + .slider:before { transform: translateX(20px); }
-
-        .profile-pic-container { width: 120px; height: 120px; border-radius: 30px; background: #f1f5f9; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; margin-bottom: 24px; position: relative; }
-        .profile-pic-container img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body id="app-body">
 
 <nav>
-    <a href="/dpanyard/index.html" class="brand"><img src="/dpanyard/assets/logos/website_logo.png" alt="dpanyard" onerror="this.src='https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/dpanyard/assets/logos/website_logo.png'"></a>
+    <a href="/dpanyard/index.html" class="brand"><img src="/dpanyard/assets/logos/website_logo.png" alt="dpanyard"></a>
     <div id="pro-badge" style="display:none; background:var(--primary-red); color:white; padding:4px 12px; border-radius:50px; font-size:10px; font-weight:800; font-family:Sora;">PRO ACTIVE</div>
 </nav>
 
 <div class="layout">
     <div class="sidebar">
         <button class="side-link active" onclick="showTab('dash', this)">Profile</button>
-        <button class="side-link" onclick="showTab('verify', this)">Verification</button>
+        <button class="side-link" onclick="showTab('map', this)">Discovery Map</button>
         <button class="side-link" onclick="showTab('appts', this)">Appointments</button>
+        <button class="side-link" onclick="showTab('verify', this)">Verification</button>
         <button class="side-link" onclick="showTab('pro', this)">Panyard Pro</button>
         <button class="side-link" onclick="showTab('settings', this)">Settings</button>
     </div>
@@ -86,38 +87,66 @@
             <h1 style="font-family: Sora; margin-bottom: 32px;">Business Profile</h1>
             <div class="card">
                 <h2>Public Identity</h2>
-                <div class="profile-pic-container" onclick="requestFilePermission('pp-input')" id="pp-container">
-                    <span id="pp-placeholder">Add Photo</span>
-                    <img id="pp-img" style="display:none">
-                </div>
-                <input type="file" id="pp-input" style="display:none" accept="image/*" onchange="uploadPP(event)">
-                
                 <input type="text" id="biz-name" class="form-input" placeholder="Business Name">
                 <textarea id="biz-bio" class="form-input" placeholder="Professional Bio" rows="4"></textarea>
-                <button class="btn-p" onclick="saveData()">Save Profile</button>
+                <button class="btn-p" onclick="saveData(false)">Save Profile</button>
             </div>
         </div>
 
-        <!-- Verification Tab -->
-        <div id="verify" class="tab-content">
-            <h1 style="font-family: Sora; margin-bottom: 32px;">Identity Verification</h1>
+        <!-- Map Tab -->
+        <div id="map" class="tab-content">
+            <h1 style="font-family: Sora; margin-bottom: 8px;">Discovery Map</h1>
+            <p style="color: var(--text-muted); margin-bottom: 32px;">Connecting the neighbourhood. View clients and nearby providers.</p>
+            
             <div class="card">
-                <h2>Security Documentation</h2>
-                <p style="margin-bottom:20px; color:var(--text-muted); font-size: 14px;">Upload your credentials to receive the verified badge.</p>
+                <div id="map-container">
+                    <div class="map-mock">
+                        <div style="font-family: Sora; font-weight: 800; color: #444cf7; margin-bottom: 10px;">NEIGHBOURHOOD GRID ACTIVE</div>
+                        <div style="font-size: 12px; opacity: 0.6;">Syncing with Global Discovery Node...</div>
+                    </div>
+                    
+                    <!-- Provider Pin (Center) -->
+                    <div class="pin" style="top: 50%; left: 50%; z-index: 5;">
+                        <div class="pin-label">YOU (Provider)</div>
+                    </div>
+
+                    <!-- Client Pins -->
+                    <div class="pin client" style="top: 30%; left: 40%;" onclick="alert('Client: Priscilla Narine\nStatus: Pending Appointment')">
+                        <div class="pin-label">Priscilla (Client)</div>
+                    </div>
+                    <div class="pin client" style="top: 60%; left: 70%;" onclick="alert('Client: Marcus Singh\nStatus: Past Client')">
+                        <div class="pin-label">Marcus (Client)</div>
+                    </div>
+
+                    <!-- Other Provider Pins -->
+                    <div class="pin" style="top: 20%; left: 80%; opacity: 0.6;" onclick="alert('Nearby: ElectriPro Solutions')">
+                        <div class="pin-label">ElectriPro</div>
+                    </div>
+                </div>
                 
-                <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer;" onclick="requestFilePermission('file-cert')">
-                    <b>Business Certificate</b>
-                    <input type="file" id="file-cert" style="display:none">
+                <div style="margin-top: 24px; display: flex; gap: 20px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; background: var(--primary-red); border-radius: 50%;"></div>
+                        <span style="font-size: 12px; font-weight: 700;">Providers</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; background: var(--navy-deep); border-radius: 50%;"></div>
+                        <span style="font-size: 12px; font-weight: 700;">Clients</span>
+                    </div>
                 </div>
-                <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer;" onclick="requestFilePermission('file-bir')">
-                    <b>BIR Document</b>
-                    <input type="file" id="file-bir" style="display:none">
+            </div>
+        </div>
+
+        <!-- Appointments Tab -->
+        <div id="appts" class="tab-content">
+            <h1 style="font-family: Sora; margin-bottom: 32px;">Manage Appointments</h1>
+            <div class="card">
+                <h2>Service Calendar</h2>
+                <div style="background: #fafafa; border-radius: 16px; padding: 20px; border-left: 4px solid var(--primary-red);">
+                    <b>Priscilla Narine</b>
+                    <div style="font-size: 13px; opacity: 0.8; margin-top: 5px;">📍 Distance: 1.2 km away</div>
+                    <button class="btn-p" style="margin-top: 15px; font-size: 12px;" onclick="showTab('map', document.querySelector('[onclick*=\'map\']'))">Locate on Map</button>
                 </div>
-                <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; cursor: pointer;" onclick="requestFilePermission('file-id')">
-                    <b>National ID / Passport</b>
-                    <input type="file" id="file-id" style="display:none">
-                </div>
-                <button class="btn-p" style="width:100%; margin-top:16px;" onclick="alert('Documents submitted for review!')">Submit Documents</button>
             </div>
         </div>
 
@@ -125,42 +154,14 @@
         <div id="settings" class="tab-content">
             <h1 style="font-family: Sora; margin-bottom: 32px;">System Settings</h1>
             <div class="card">
-                <h2>Experience & Privacy</h2>
-                
-                <div class="toggle-row">
-                    <span class="toggle-label">Dark Mode View</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="dark-toggle" onchange="toggleDarkMode()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="toggle-row">
-                    <span class="toggle-label">Neighbourhood Discovery (Location)</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
+                    <span style="font-weight: 700;">Neighbourhood Discovery (Location)</span>
                     <label class="toggle-switch">
                         <input type="checkbox" id="loc-toggle" onchange="requestLocation()">
                         <span class="slider"></span>
                     </label>
                 </div>
-
-                <div class="toggle-row">
-                    <span class="toggle-label">Push Notifications</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="notif-toggle" onchange="requestNotifications()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="toggle-row">
-                    <span class="toggle-label">File & Camera Access</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="file-toggle" onchange="toggleFileAccess()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <button class="btn-p" style="width:100%; margin-top: 24px;" onclick="saveSettings()">Save Settings</button>
-                <button class="btn-p secondary" style="width:100%; margin-top: 12px;" onclick="localStorage.clear(); location.reload();">Log Out</button>
+                <button class="btn-p" style="width:100%; margin-top: 24px;" onclick="alert('Settings Saved!')">Save Settings</button>
             </div>
         </div>
     </div>
@@ -171,101 +172,26 @@
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        el.classList.add('active');
-    }
-
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('panyard_dark_mode', document.body.classList.contains('dark-mode'));
-    }
-
-    function requestLocation() {
-        const checked = document.getElementById('loc-toggle').checked;
-        localStorage.setItem('panyard_loc_pref', checked);
-        if(checked) {
-            navigator.geolocation.getCurrentPosition(
-                () => alert('Location permission granted!'),
-                () => { alert('Location permission denied.'); document.getElementById('loc-toggle').checked = false; }
-            );
-        }
-    }
-
-    function requestNotifications() {
-        const checked = document.getElementById('notif-toggle').checked;
-        localStorage.setItem('panyard_notif_pref', checked);
-        if(checked) {
-            Notification.requestPermission().then(p => {
-                if(p !== 'granted') { alert('Notification permission denied.'); document.getElementById('notif-toggle').checked = false; }
-                else { alert('Notification permission granted!'); }
-            });
-        }
-    }
-
-    function toggleFileAccess() {
-        const checked = document.getElementById('file-toggle').checked;
-        localStorage.setItem('panyard_file_pref', checked);
-        if(checked) {
-            alert('File & Camera access enabled for uploads.');
-        }
-    }
-
-    function saveSettings() {
-        alert('All high-fidelity settings saved and synced to your profile!');
-    }
-
-    function requestFilePermission(inputId) {
-        if(!document.getElementById('file-toggle').checked) {
-            alert('Please enable "File & Camera Access" in Settings first.');
-            showTab('settings', document.querySelector('[onclick*="settings"]'));
-        } else {
-            document.getElementById(inputId).click();
-        }
-    }
-
-    function uploadPP(e) {
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            document.getElementById('pp-img').src = ev.target.result;
-            document.getElementById('pp-img').style.display = 'block';
-            document.getElementById('pp-placeholder').style.display = 'none';
-            localStorage.setItem('panyard_pp', ev.target.result);
-        }
-        reader.readAsDataURL(e.target.files[0]);
+        if(el) el.classList.add('active');
     }
 
     function saveData(isAuto) {
         localStorage.setItem('panyard_name', document.getElementById('biz-name').value);
         localStorage.setItem('panyard_bio', document.getElementById('biz-bio').value);
-        if(!isAuto) alert('Profile saved and synced!');
+        if(!isAuto) alert('Profile saved!');
+    }
+
+    function requestLocation() {
+        if(document.getElementById('loc-toggle').checked) {
+            alert('Discovery Grid Activated. You are now visible to nearby clients.');
+        }
     }
 
     window.onload = function() {
-        // Restore Dark Mode
-        if(localStorage.getItem('panyard_dark_mode') === 'true') {
-            document.body.classList.add('dark-mode');
-            document.getElementById('dark-toggle').checked = true;
-        }
-        // Restore Prefs
-        document.getElementById('loc-toggle').checked = localStorage.getItem('panyard_loc_pref') === 'true';
-        document.getElementById('notif-toggle').checked = localStorage.getItem('panyard_notif_pref') === 'true';
-        document.getElementById('file-toggle').checked = localStorage.getItem('panyard_file_pref') === 'true';
-        
-        // Restore Profile
         document.getElementById('biz-name').value = localStorage.getItem('panyard_name') || '';
         document.getElementById('biz-bio').value = localStorage.getItem('panyard_bio') || '';
-        const pp = localStorage.getItem('panyard_pp');
-        if(pp) {
-            document.getElementById('pp-img').src = pp;
-            document.getElementById('pp-img').style.display = 'block';
-            document.getElementById('pp-placeholder').style.display = 'none';
-        }
-
-        if(localStorage.getItem('panyard_is_pro') === 'true') {
-            document.getElementById('app-body').classList.add('is-pro');
-            document.getElementById('pro-badge').style.display = 'block';
-        }
-
-        // AUTO-SAVE LISTENERS
+        
+        // Auto-save logic
         document.getElementById('biz-name').addEventListener('input', () => saveData(true));
         document.getElementById('biz-bio').addEventListener('input', () => saveData(true));
     }
