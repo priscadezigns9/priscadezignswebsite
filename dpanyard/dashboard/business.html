@@ -41,7 +41,7 @@
         .side-link { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; text-decoration: none; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; transition: 0.3s; cursor: pointer; border: none; background: none; width: 100%; text-align: left; font-size: 15px; }
         .side-link:hover, .side-link.active { background: rgba(224, 27, 36, 0.08); color: var(--primary-red); }
 
-        .main { flex: 1; padding: 40px 5%; overflow-y: auto; }
+        .main { flex: 1; margin-left: 280px; padding: 40px 5%; min-height: calc(100vh - 72px); background: var(--bg-light); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
@@ -83,13 +83,15 @@
 </nav>
 
 <div class="layout">
-    <div class="sidebar">
+    
+    <div class="sidebar" style="position: fixed; top: 72px; left: 0; width: 280px; height: calc(100vh - 72px); background: var(--white); border-right: 1px solid var(--border-color); padding: 32px 16px; overflow-y: auto; z-index: 100;">
         <button class="side-link active" onclick="showTab('business-hub', this)">🏛️ Dashboard</button>
         <button class="side-link" onclick="showTab('dash', this)">Professional Identity</button>
         <button class="side-link" onclick="showTab('map', this)">Map</button>
         <button class="side-link" onclick="showTab('verify', this)">Security Vault</button>
         <button class="side-link" onclick="showTab('settings', this)">Settings</button>
     </div>
+
 
     <div class="main">
         
@@ -289,22 +291,33 @@
     let map;
 
     // --- CORE NAVIGATION ---
+    
     function showTab(id, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        console.log("Switching to tab:", id);
+        // Hide all
+        document.querySelectorAll('.tab-content').forEach(t => {
+            t.classList.remove('active');
+            t.style.display = 'none';
+        });
         document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
         
+        // Show target
         const target = document.getElementById(id);
         if (target) {
             target.classList.add('active');
+            target.style.display = 'block';
             if(el) el.classList.add('active');
             
             if(id === 'map') {
                 setTimeout(() => {
                     initDiscoveryMap();
-                    if(map) {
-                        map.invalidateSize();
-                        map.panBy([1, 1]);
-                    }
+                    if(map) map.invalidateSize();
+                }, 400);
+            }
+            if(id === 'business-hub') loadHubData();
+        }
+    }
+
                 }, 400);
             }
             if(id === 'business-hub') loadHubData();
@@ -349,13 +362,37 @@
     }
 
     // --- MAP & DISCOVERY ---
+    
     async function initDiscoveryMap() {
         const container = document.getElementById('map-view');
         if(!container) return;
+        
+        // Ensure container is visible before initializing
+        if(container.offsetWidth === 0 || container.offsetHeight === 0) {
+            console.log("Map container hidden, delaying...");
+            setTimeout(initDiscoveryMap, 100);
+            return;
+        }
+
         if(map) {
             map.invalidateSize();
             return;
         }
+
+        const myId = localStorage.getItem('calalloo_uid');
+        let center = [10.66, -61.51];
+        if(myId) {
+            try {
+                const { data } = await sb.from('profiles').select('location_lat, location_lng').eq('id', myId).single();
+                if(data && data.location_lat && data.location_lng) center = [data.location_lat, data.location_lng];
+            } catch(e) {}
+        }
+        
+        map = L.map('map-view', { zoomControl: true, scrollWheelZoom: true }).setView(center, 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        loadNearbyBusinesses();
+    }
+
 
         const myId = localStorage.getItem('calalloo_uid');
         let center = [10.66, -61.51];
