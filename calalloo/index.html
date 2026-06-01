@@ -4,43 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calalloo | The Caribbean Food Lab</title>
-    <meta name="description" content="Universal high-fidelity discovery node for Caribbean recipes, community, and sourcing.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900;9..144,1,900&family=Inter:wght@400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
-    
-    <!-- Real Map Library -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
             --bg: #FAFAFA;
             --primary: #E87722;
-            --secondary: #FF9F58;
-            --dark: #1A0D00;
-            --mid: #666666;
-            --white: #FFFFFF;
             --calalloo-green: #2D5A27;
+            --dark: #1A0D00;
+            --white: #FFFFFF;
             --font-display: 'Fraunces', serif;
             --font-sans: 'Inter', sans-serif;
-            --font-mono: 'Space Mono', monospace;
         }
 
-        body.dark-mode {
-            --bg: #0B0E14;
-            --dark: #F8FAFC;
-            --white: #1A1F26;
-            --mid: #A0AEC0;
-        }
-        body.dark-mode p, body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode span, body.dark-mode div, body.dark-mode b, body.dark-mode small { color: #F8FAFC !important; }
+        body.dark-mode { --bg: #0B0E14; --dark: #F8FAFC; --white: #1A1F26; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); line-height: 1.6; transition: 0.3s; }
+        body { background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); }
 
         header {
             padding: 1rem 5%;
@@ -54,72 +40,46 @@
             z-index: 1000;
         }
 
-        .nav-brand {
-            font-family: var(--font-display);
-            font-weight: 900;
-            font-size: 1.8rem;
-            color: var(--calalloo-green);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .nav-brand { font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; color: var(--calalloo-green); text-decoration: none; }
 
-        .layout { display: flex; min-height: calc(100vh - 72px); }
+        .layout { display: flex; height: calc(100vh - 72px); }
         
         .sidebar {
-            width: 300px;
+            width: 350px;
             background: var(--white);
             border-right: 1px solid rgba(0,0,0,0.05);
             padding: 30px 20px;
-            position: sticky;
-            top: 72px;
-            height: calc(100vh - 72px);
             overflow-y: auto;
         }
 
-        .sidebar h2 { font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 20px; color: var(--calalloo-green); }
-        .cat-link { display: block; padding: 12px 16px; border-radius: 12px; text-decoration: none; color: var(--mid); font-weight: 600; margin-bottom: 5px; transition: 0.3s; cursor: pointer; }
-        .cat-link:hover, .cat-link.active { background: var(--calalloo-green); color: white !important; }
+        .main { flex: 1; padding: 40px 5%; overflow-y: auto; position: relative; }
 
-        .ai-suggestion-box { background: rgba(45, 90, 39, 0.05); border-radius: 20px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(45, 90, 39, 0.1); }
-        .ai-suggestion-box h3 { font-size: 14px; color: var(--calalloo-green); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
-        .suggestion-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; cursor: pointer; transition: 0.3s; }
-        .suggestion-item:hover { transform: translateX(5px); }
-        .suggestion-av { width: 35px; height: 35px; border-radius: 50%; background: var(--calalloo-green); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
-
-        .main { flex: 1; padding: 40px 5%; overflow-y: auto; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        /* Universal Search UI */
-        .search-wrapper { position: relative; width: 100%; margin-bottom: 40px; }
-        .search-input { width: 100%; padding: 1.4rem 3rem; border-radius: 100px; border: 2.5px solid var(--calalloo-green); font-size: 1.1rem; font-family: var(--font-sans); outline: none; box-shadow: 0 15px 40px rgba(45, 90, 39, 0.08); background: var(--white); color: var(--dark); font-weight: 600; }
-        .search-icon { position: absolute; left: 25px; top: 50%; transform: translateY(-50%); color: var(--calalloo-green); font-size: 20px; }
+        /* Next-Level Universal Search */
+        .universal-search-hub { position: relative; width: 100%; margin-bottom: 30px; }
+        .search-input { width: 100%; padding: 1.5rem 3.5rem; border-radius: 100px; border: 3px solid var(--calalloo-green); font-size: 1.2rem; font-family: var(--font-sans); outline: none; box-shadow: 0 20px 60px rgba(45, 90, 39, 0.12); background: var(--white); color: var(--dark); font-weight: 700; transition: 0.3s; }
+        .search-input:focus { transform: scale(1.02); border-color: var(--primary); }
         
-        .search-suggestions { position: absolute; top: 100%; left: 0; width: 100%; background: var(--white); border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); z-index: 1000; margin-top: 10px; display: none; max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); }
-        .search-suggestion-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; }
-        .search-suggestion-item:hover { background: #f8fafc; }
-        .suggestion-label { font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; background: rgba(232, 119, 34, 0.1); padding: 2px 8px; border-radius: 4px; margin-left: auto; }
+        .ai-lens-btn { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); background: var(--calalloo-green); color: white; border: none; padding: 8px 18px; border-radius: 30px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 12px; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
-        .pin { background: var(--white); border-radius: 28px; overflow: hidden; box-shadow: 0 4px 25px rgba(0,0,0,0.04); transition: 0.3s; border: 1px solid rgba(0,0,0,0.02); display: flex; flex-direction: column; }
-        .pin:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(45, 90, 39, 0.1); }
-        .pin img { width: 100%; height: 260px; object-fit: cover; }
-        .pin-content { padding: 1.5rem; flex: 1; }
-        .pin-content h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 8px; color: var(--calalloo-green); }
-        .pin-tag { font-family: var(--font-mono); font-size: 0.75rem; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; }
-        .pin-meta { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-action { padding: 8px 16px; border-radius: 50px; border: 1px solid var(--calalloo-green); background: none; color: var(--calalloo-green); font-family: var(--font-sans); font-weight: 800; font-size: 12px; cursor: pointer; transition: 0.3s; }
-        .btn-action:hover { background: var(--calalloo-green); color: white !important; }
+        .discovery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .node-card { background: var(--white); border-radius: 24px; padding: 25px; border: 1px solid rgba(0,0,0,0.05); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; overflow: hidden; }
+        .node-card:hover { transform: translateY(-10px); border-color: var(--calalloo-green); box-shadow: 0 30px 60px rgba(0,0,0,0.1); }
+        .node-type { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; display: block; }
+        .node-title { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 5px; color: var(--calalloo-green); }
+        
+        /* Vectorized Preference Engine */
+        .taste-profile-box { background: linear-gradient(135deg, var(--calalloo-green), #1a3617); border-radius: 20px; padding: 25px; color: white; margin-bottom: 30px; }
+        .taste-profile-box h2 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 15px; }
+        .preference-tag { display: inline-block; padding: 6px 12px; background: rgba(255,255,255,0.15); border-radius: 50px; font-size: 12px; font-weight: 700; margin: 4px; }
 
-        #map-view { width: 100%; height: 650px; border-radius: 32px; border: 1px solid rgba(0,0,0,0.05); z-index: 1; }
-
-        /* Modal Protocol */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .recipe-modal { background: var(--white); border-radius: 40px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 40px; position: relative; }
-        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 32px; cursor: pointer; color: var(--calalloo-green); font-weight: 800; }
-        .modal-hero { width: 100%; height: 350px; border-radius: 30px; object-fit: cover; margin-bottom: 30px; }
+        .map-container { width: 100%; height: 500px; border-radius: 30px; margin-top: 30px; border: 4px solid var(--white); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); z-index: 5000; display: none; align-items: center; justify-content: center; padding: 40px; }
+        .modal-content { background: var(--white); border-radius: 40px; max-width: 1000px; width: 100%; padding: 50px; position: relative; }
+        
+        /* High-Fidelity Suggestions */
+        .suggestion-section { margin-top: 40px; }
+        .suggestion-section h2 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
@@ -127,206 +87,136 @@
 <header>
     <a href="/" class="nav-brand">Calalloo</a>
     <nav style="display: flex; gap: 20px; align-items: center;">
-        <a href="javascript:void(0)" onclick="showMainTab('feed')" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Feed</a>
-        <a href="javascript:void(0)" onclick="showMainTab('map-tab')" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Markets</a>
-        <a href="/community/index.html" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Community</a>
-        <a href="/profile/index.html" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">Profile</a>
+        <a href="/profile/index.html" style="text-decoration:none; font-weight:800; color:var(--dark); font-size:14px;">My Kitchen</a>
     </nav>
 </header>
 
 <div class="layout">
     <aside class="sidebar">
-        <div class="ai-suggestion-box">
-            <h3>✨ AI Discovery for You</h3>
-            <div id="ai-suggestions-list">
-                <!-- AI dynamic suggestions based on preferences and location -->
+        <div class="taste-profile-box">
+            <h2>Your AI Taste Profile</h2>
+            <div id="ai-taste-tags">
+                <span class="preference-tag">Piquant</span>
+                <span class="preference-tag">Coastal Heritage</span>
+                <span class="preference-tag">Sunday Lunch Protocol</span>
+            </div>
+            <p style="font-size: 11px; margin-top: 15px; opacity: 0.8;">AI is syncing your browsing vector with local market supply.</p>
+        </div>
+
+        <div class="suggestion-section">
+            <h2 style="font-size: 1.1rem; color: var(--calalloo-green);">✨ Smart Follows</h2>
+            <div id="smart-follows">
+                <!-- AI dynamic people suggestions -->
             </div>
         </div>
 
-        <h2>Categories</h2>
-        <a class="cat-link active" onclick="filterCategory('All', this)">All Protocol</a>
-        <a class="cat-link" onclick="filterCategory('Sunday', this)">Sunday Lunch</a>
-        <a class="cat-link" onclick="filterCategory('Street', this)">Street Food Heritage</a>
-        <a class="cat-link" onclick="filterCategory('Seafood', this)">Seafood & Coastal</a>
-        <a class="cat-link" onclick="filterCategory('Provision', this)">Provision & Soil</a>
-        <a class="cat-link" onclick="filterCategory('Breakfast', this)">Caribbean Breakfast</a>
+        <div class="suggestion-section">
+            <h2 style="font-size: 1.1rem; color: var(--calalloo-green);">🍲 Recommended Dishes</h2>
+            <div id="smart-dishes">
+                <!-- AI dynamic dish suggestions -->
+            </div>
+        </div>
     </aside>
 
     <main class="main">
-        <!-- Feed Tab -->
-        <div id="feed" class="tab-content active">
-            <div class="search-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" id="universal-search" placeholder="Search people, recipes, ingredients, or locations..." oninput="handleUniversalSearch(this.value)">
-                <div class="search-suggestions" id="search-suggestions-dropdown"></div>
-            </div>
-            
-            <h2 id="feed-title" style="font-family: var(--font-display); margin-bottom: 24px;">Your Culinary Feed</h2>
-            <div class="grid" id="recipe-grid"></div>
+        <div class="universal-search-hub">
+            <input type="text" class="search-input" id="omni-search" placeholder="Ask anything: 'Where is the nearest Dasheen?' or 'Find Priscilla'..." oninput="vectorSearch(this.value)">
+            <button class="ai-lens-btn" onclick="triggerAILens()">
+                <span>📸</span> AI LENS
+            </button>
         </div>
 
-        <!-- Map Tab -->
-        <div id="map-tab" class="tab-content">
-            <h1 style="font-family: var(--font-display); margin-bottom: 24px;">Market Discovery Node</h1>
-            <div id="map-view"></div>
-        </div>
+        <h2 id="view-label" style="font-family: var(--font-display); margin-bottom: 20px;">Universal Discovery Node</h2>
+        <div class="discovery-grid" id="discovery-grid"></div>
+
+        <div id="map-node" class="map-container"></div>
     </main>
 </div>
 
-<!-- Recipe Modal (Placeholder) -->
-<div class="modal-overlay" id="recipe-overlay" onclick="closeRecipe()">
-    <div class="recipe-modal" onclick="event.stopPropagation()">
-        <span class="close-modal" onclick="closeRecipe()">&times;</span>
-        <img id="modal-img" class="modal-hero" src="">
-        <h2 id="modal-title" style="font-family: var(--font-display); margin-bottom: 10px;"></h2>
-        <p id="modal-desc"></p>
-        <button class="btn-p" onclick="locateCurrentIngredients()" style="margin-top: 20px;">Locate Ingredients Near Me</button>
-    </div>
-</div>
-
 <script>
+    // Supabase Handshake
     const supabaseUrl = 'https://sktpjacowqaedddtrhuz.supabase.co';
     const supabaseKey = '{{credential:supabase-anon-key}}';
     const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
-    const recipes = [
-        { id: 1, name: "Trinidadian Callaloo Protocol", category: "Sunday", tag: "Heritage • Vol. 1", img: "https://thisbagogirl.com/wp-content/uploads/2021/04/Tobago-Crab-and-Callaloo-Recipe-scaled.jpg", desc: "Dasheen bush, okra, and crab simmered in coconut milk.", ingredients: ["Dasheen Bush", "Okra", "Crab"] },
-        { id: 2, name: "Heritage Chicken Pelau", category: "Sunday", tag: "Classic • One Pot", img: "https://cookingwithria.com/wp-content/uploads/2013/02/IMG_1024-scaled.jpg", desc: "Caramelized chicken with pigeon peas and rice.", ingredients: ["Pigeon Peas", "Rice", "Chicken"] },
-        { id: 3, name: "Authentic Doubles Node", category: "Street", tag: "Street Food • Verified", img: "https://globalkitchentravels.com/wp-content/uploads/2019/12/Trinidad-Doubles-HERO-LR.jpg", desc: "Bara and curried channa.", ingredients: ["Channa", "Flour", "Turmeric"] }
+    // High-Fidelity Universal Dataset
+    const nodes = [
+        { type: "RECIPE", title: "Trinidadian Callaloo Protocol", meta: "Dasheen, Crab, Okra", tags: ["Piquant", "Sunday"], lat: 10.65, lng: -61.5 },
+        { type: "PERSON", title: "Priscilla Narine", meta: "Empire Architect • Chef", tags: ["Heritage"], lat: 10.68, lng: -61.51 },
+        { type: "LOCATION", title: "Central Market POS", meta: "Fresh Provision • 4.9★", tags: ["Sourcing"], lat: 10.648, lng: -61.503 },
+        { type: "DISH", title: "Curried Crab & Dumpling", meta: "Store Bay Protocol", tags: ["Coastal"], lat: 11.16, lng: -60.84 }
     ];
 
-    const people = [
-        { name: "Priscilla Narine", handle: "@prisca", role: "Heritage Chef", loc: "Maraval" },
-        { name: "Marcus Singh", handle: "@marcus", role: "Flavor Scout", loc: "Caroni" },
-        { name: "Astra Lore", handle: "@astra", role: "Protocol Specialist", loc: "Chaguanas" }
-    ];
-
-    const locations = [
-        { name: "Central Market POS", city: "Port of Spain", items: "Dasheen, Crab" },
-        { name: "Caroni Farmers Market", city: "Caroni", items: "Okra, Pumpkin" }
-    ];
-
-    function handleUniversalSearch(query) {
-        const dropdown = document.getElementById('search-suggestions-dropdown');
-        if (query.length < 1) { dropdown.style.display = 'none'; return; }
+    function vectorSearch(q) {
+        const query = q.toLowerCase();
+        const grid = document.getElementById('discovery-grid');
+        grid.innerHTML = '';
         
-        dropdown.innerHTML = '';
-        dropdown.style.display = 'block';
-        const q = query.toLowerCase();
+        const results = nodes.filter(n => 
+            n.title.toLowerCase().includes(query) || 
+            n.meta.toLowerCase().includes(query) ||
+            n.tags.some(t => t.toLowerCase().includes(query))
+        );
 
-        // 1. Search People
-        people.filter(p => p.name.toLowerCase().includes(q) || p.handle.toLowerCase().includes(q)).forEach(p => {
-            addSuggestion(p.name + " (" + p.handle + ")", "People", dropdown);
-        });
-
-        // 2. Search Recipes
-        recipes.filter(r => r.name.toLowerCase().includes(q) || r.ingredients.some(i => i.toLowerCase().includes(q))).forEach(r => {
-            addSuggestion(r.name, "Recipe", dropdown);
-        });
-
-        // 3. Search Locations
-        locations.filter(l => l.name.toLowerCase().includes(q) || l.city.toLowerCase().includes(q)).forEach(l => {
-            addSuggestion(l.name, "Location", dropdown);
-        });
-    }
-
-    function addSuggestion(text, type, container) {
-        const el = document.createElement('div');
-        el.className = 'search-suggestion-item';
-        el.innerHTML = `<span>${text}</span> <span class="suggestion-label">${type}</span>`;
-        el.onclick = () => {
-            document.getElementById('universal-search').value = text;
-            document.getElementById('search-suggestions-dropdown').style.display = 'none';
-            performSearch(text, type);
-        };
-        container.appendChild(el);
-    }
-
-    function performSearch(query, type) {
-        if(type === 'Recipe') {
-            const filtered = recipes.filter(r => r.name === query);
-            renderRecipes(filtered);
-        } else if(type === 'People') {
-            alert("Redirecting to Community Node for " + query);
-        } else if(type === 'Location') {
-            showMainTab('map-tab');
-            // Logic to highlight location on map
-        }
-    }
-
-    function renderAIRecommendations() {
-        const list = document.getElementById('ai-suggestions-list');
-        const userLoc = localStorage.getItem('calalloo_lat') ? "Near You" : "Trending";
-        
-        const suggestions = [
-            { name: "Priscilla Narine", type: "Chef to Follow", av: "PN" },
-            { name: "Curried Crab & Dumpling", type: "Try this Dish", av: "🍲" }
-        ];
-
-        list.innerHTML = suggestions.map(s => `
-            <div class="suggestion-item">
-                <div class="suggestion-av">${s.av}</div>
-                <div>
-                    <div style="font-weight:800; font-size:13px;">${s.name}</div>
-                    <div style="font-size:10px; opacity:0.6;">${s.type} • ${userLoc}</div>
+        results.forEach(n => {
+            const card = document.createElement('div');
+            card.className = 'node-card';
+            card.innerHTML = `
+                <span class="node-type">${n.type}</span>
+                <h3 class="node-title">${n.title}</h3>
+                <p style="font-size:13px; color:var(--mid);">${n.meta}</p>
+                <div style="margin-top:10px;">
+                    ${n.tags.map(t => `<span style="font-size:9px; font-weight:800; background:#f0f0f0; padding:3px 8px; border-radius:4px; margin-right:5px;">${t}</span>`).join('')}
                 </div>
-            </div>
-        `).join('');
-    }
-
-    function renderRecipes(data) {
-        const grid = document.getElementById('recipe-grid');
-        grid.innerHTML = data.map(r => `
-            <div class="pin">
-                <img src="${r.img}" alt="${r.name}">
-                <div class="pin-content">
-                    <span class="pin-tag">${r.tag}</span>
-                    <h3>${r.name}</h3>
-                    <p style="font-size:14px; color:var(--mid);">${r.desc}</p>
-                    <div class="pin-meta">
-                        <button class="btn-action" onclick="openRecipe(${r.id})">View Protocol</button>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    let currentActiveRecipe = null;
-    function openRecipe(id) {
-        const r = recipes.find(rec => rec.id === id);
-        currentActiveRecipe = r;
-        document.getElementById('modal-img').src = r.img;
-        document.getElementById('modal-title').innerText = r.name;
-        document.getElementById('modal-desc').innerText = r.desc;
-        document.getElementById('recipe-overlay').style.display = 'flex';
-    }
-
-    function closeRecipe() { document.getElementById('recipe-overlay').style.display = 'none'; }
-
-    function showMainTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(id === 'map-tab') setTimeout(initMap, 200);
-    }
-
-    function filterCategory(cat, el) {
-        document.querySelectorAll('.cat-link').forEach(l => l.classList.remove('active'));
-        if(el) el.classList.add('active');
-        const filtered = cat === 'All' ? recipes : recipes.filter(r => r.category === cat);
-        renderRecipes(filtered);
+            `;
+            card.onclick = () => focusNode(n);
+            grid.appendChild(card);
+        });
     }
 
     let map;
     function initMap() {
         if(map) return;
-        map = L.map('map-view').setView([10.66, -61.51], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+        map = L.map('map-node').setView([10.66, -61.51], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        nodes.forEach(n => {
+            L.marker([n.lat, n.lng]).addTo(map).bindPopup(`<b>${n.title}</b><br>${n.type}`);
+        });
+    }
+
+    function focusNode(n) {
+        map.setView([n.lat, n.lng], 15);
+        // AI logic: highlight on map and update sidebar suggestions
+    }
+
+    function triggerAILens() {
+        alert("AI LENS: Analyzing image protocols... Segmenting ingredients... Searching local market supply nodes.");
+    }
+
+    function renderAISuggestions() {
+        const follows = document.getElementById('smart-follows');
+        const dishes = document.getElementById('smart-dishes');
+        
+        follows.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                <div style="width:40px; height:40px; border-radius:50%; background:var(--calalloo-green); color:white; display:flex; align-items:center; justify-content:center; font-weight:800;">PN</div>
+                <div><b style="font-size:14px;">Priscilla Narine</b><br><small style="color:var(--mid);">Matches your Heritage profile</small></div>
+            </div>
+        `;
+
+        dishes.innerHTML = `
+            <div style="background:rgba(0,0,0,0.02); padding:15px; border-radius:15px;">
+                <b style="font-size:14px;">Heritage Pelau</b><br>
+                <small style="color:var(--mid);">Suggested based on your search for 'Pigeon Peas'</small>
+            </div>
+        `;
     }
 
     window.onload = () => {
-        renderRecipes(recipes);
-        renderAIRecommendations();
-        if(localStorage.getItem('calalloo_dark_persistent') === 'true') document.body.classList.add('dark-mode');
+        vectorSearch('');
+        initMap();
+        renderAISuggestions();
+        if(localStorage.getItem('calalloo_dark') === 'true') document.body.classList.add('dark-mode');
     };
 </script>
 </body>
