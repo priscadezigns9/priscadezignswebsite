@@ -1,32 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-    // HARD AUTH GUARD: Hide page until verified
-    document.documentElement.style.display = 'none';
-    (function() {
-        const session = localStorage.getItem('calalloo_uid');
-        const isAuthPage = window.location.href.includes('/login/') || window.location.href.includes('/signup/');
-        if (!session && !isAuthPage) {
-            console.log('Public Access Protocol Active');
-        } else {
-            document.addEventListener('DOMContentLoaded', () => {
-                document.documentElement.style.display = 'block';
-            });
-        }
-    })();
-</script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calalloo | The Caribbean Food Lab</title>
+    <link rel="icon" type="image/x-icon" href="https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB">
+    
+    <!-- High-Fidelity Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900;9..144,1,900&family=Inter:wght@400;600;800&family=Space+Mono&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
+    
+    <!-- Infrastructure -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --bg: #FAFAFA;
@@ -34,115 +23,328 @@
             --calalloo-green: #2D5A27;
             --dark: #1A0D00;
             --white: #FFFFFF;
+            --border: rgba(0,0,0,0.08);
             --font-display: 'Fraunces', serif;
             --font-sans: 'Inter', sans-serif;
         }
-        body.dark-mode { --bg: #0B0E14; --dark: #F8FAFC; --white: #1A1F26; }
+
+        body.dark-mode {
+            --bg: #0B0E14;
+            --dark: #F8FAFC;
+            --white: #1A1F26;
+            --border: rgba(255,255,255,0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { padding-top: 104px;  background-color: var(--bg); color: var(--dark); font-family: var(--font-sans); }
-        header { position: fixed; top: 32px; left: 0; width: 100%; z-index: 10000;  padding: 1rem 5%; background: var(--white); border-bottom: 2px solid var(--calalloo-green); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .nav-brand { font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; color: var(--calalloo-green); text-decoration: none; }
-        .layout { display: flex; height: calc(100vh - 72px); }
-        .sidebar { width: 350px; background: var(--white); border-right: 1px solid rgba(0,0,0,0.05); padding: 30px 20px; overflow-y: auto; }
-        .main { flex: 1; padding: 40px 5%; overflow-y: auto; position: relative; }
-        .universal-search-hub { position: relative; width: 100%; margin-bottom: 30px; }
-        .search-input { width: 100%; padding: 1.5rem 3.5rem; border-radius: 100px; border: 3px solid var(--calalloo-green); font-size: 1.2rem; outline: none; box-shadow: 0 20px 60px rgba(45, 90, 39, 0.12); background: var(--white); color: var(--dark); font-weight: 700; }
-        .discovery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        .node-card { background: var(--white); border-radius: 24px; padding: 25px; border: 1px solid rgba(0,0,0,0.05); transition: 0.4s; cursor: pointer; }
-        .taste-profile-box { background: linear-gradient(135deg, var(--calalloo-green), #1a3617); border-radius: 20px; padding: 25px; color: white; margin-bottom: 30px; }
-        .map-container { width: 100%; height: 500px; border-radius: 30px; margin-top: 30px; }
-    
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--dark); 
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
         #empire-mandate {
             background: #000;
             color: #4682B4;
             padding: 0;
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             letter-spacing: 1.5px;
-            border-bottom: 1px solid rgba(70,130,180,0.3);
             z-index: 10001;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-bottom: 1px solid rgba(70,130,180,0.2);
         }
-</style>
+
+        header {
+            position: fixed;
+            top: 32px;
+            left: 0;
+            width: 100%;
+            height: 72px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-brand img { height: 32px; display: block; }
+
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-links a { 
+            text-decoration: none; 
+            font-weight: 800; 
+            color: var(--dark); 
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .nav-links a:hover { color: var(--primary); }
+
+        .layout { 
+            display: flex; 
+            margin-top: 104px;
+            min-height: calc(100vh - 104px);
+        }
+
+        .sidebar { 
+            width: 360px; 
+            background: var(--white); 
+            border-right: 1px solid var(--border); 
+            padding: 40px 24px;
+            position: sticky;
+            top: 104px;
+            height: calc(100vh - 104px);
+        }
+
+        .main { 
+            flex: 1; 
+            padding: 40px 5%;
+        }
+
+        .taste-profile-card {
+            background: linear-gradient(135deg, var(--calalloo-green), #1a3617);
+            border-radius: 24px;
+            padding: 32px;
+            color: white;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(45,90,39,0.15);
+        }
+        .taste-profile-card h2 { font-family: var(--font-display); font-size: 24px; margin-bottom: 8px; }
+        .taste-profile-card p { font-size: 14px; opacity: 0.8; font-weight: 500; }
+
+        .omni-search-container { margin-bottom: 48px; }
+        .omni-search {
+            width: 100%;
+            padding: 20px 32px;
+            border-radius: 100px;
+            border: 2px solid var(--calalloo-green);
+            font-size: 16px;
+            font-weight: 700;
+            outline: none;
+            background: var(--white);
+            color: var(--dark);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: 0.3s;
+        }
+        .omni-search:focus { border-color: var(--primary); box-shadow: 0 15px 40px rgba(232,119,34,0.1); }
+
+        .discovery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .node-card {
+            background: var(--white);
+            border-radius: 28px;
+            padding: 32px;
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .node-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.06);
+            border-color: var(--calalloo-green);
+        }
+        .node-card .tag {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: block;
+        }
+        .node-card h3 { font-family: var(--font-display); font-size: 20px; margin-bottom: 12px; }
+        .node-card p { font-size: 14px; opacity: 0.7; font-weight: 500; }
+
+        .map-wrapper {
+            border-radius: 32px;
+            overflow: hidden;
+            height: 600px;
+            border: 2px solid var(--calalloo-green);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        #map-node { width: 100%; height: 100%; }
+
+        #auth-section { display: flex; gap: 16px; align-items: center; }
+        .btn-signup {
+            background: var(--primary);
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 12px;
+        }
+        
+        @media (max-width: 900px) {
+            .layout { flex-direction: column; }
+            .sidebar { width: 100%; position: static; height: auto; }
+        }
+    </style>
 </head>
-<body><div id="empire-mandate">EMPIRE MANDATE: 10% OF EVERY PURCHASE SUPPORTS <a href="https://priscadezigns.org/thewaymadeknown/" style="color:#fff; text-decoration:underline; margin-left: 5px;">THE WAY MADE KNOWN</a> MISSION.</div>
+<body>
+    <div id="empire-mandate">
+        EMPIRE MANDATE: 10% OF EVERY PURCHASE SUPPORTS 
+        <a href="https://priscadezigns.org/thewaymadeknown/" style="color:#fff; text-decoration:underline; margin-left: 5px;">
+            THE WAY MADE KNOWN
+        </a> MISSION.
+    </div>
 
-<header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: white; border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100;">
-    <a href="/calalloo/index.html" class="nav-brand">
-        <img src="https://drive.google.com/uc?export=view&id=174bHbG8JeFEtXm9bpZnJ89SfmAh4cQOm" alt="Calalloo" style="height: 32px; display: block;">
-    </a>
-    <nav style="display: flex; gap: 30px; align-items: center;">
-        <a href="/calalloo/index.html" style="text-decoration:none; font-weight:800; color:#1A0D00; font-size:14px;">Feed</a>
-        <a href="/calalloo/index.html?tab=markets" style="text-decoration:none; font-weight:800; color:#1A0D00; font-size:14px;">Markets</a>
-        
-        <div id="auth-section" style="display: flex; gap: 15px; align-items: center;">
-            <a href="/calalloo/login/index.html" id="signin-link" style="text-decoration:none; font-weight:800; color:#1A0D00; font-size:14px;">Sign In</a>
-            <a href="/calalloo/signup/index.html" id="signup-link" style="text-decoration:none; font-weight:800; background:#E87722; color:white; padding: 8px 16px; border-radius: 4px; font-size:14px;">Sign Up</a>
-        </div>
-        
-        <a href="/calalloo/profile/index.html" id="profile-link" style="display:none; text-decoration:none; font-weight:800; color:#1A0D00; font-size:14px;">My Kitchen</a>
-    </nav>
-</header>
+    <header>
+        <a href="/calalloo/index.html" class="nav-brand">
+            <img src="https://drive.google.com/uc?export=view&id=174bHbG8JeFEtXm9bpZnJ89SfmAh4cQOm" alt="Calalloo Logo">
+        </a>
+        <nav class="nav-links">
+            <a href="javascript:void(0)" onclick="switchTab('feed', this)">Feed</a>
+            <a href="javascript:void(0)" onclick="switchTab('map-tab', this)">Markets</a>
+            <div id="auth-section">
+                <a href="/calalloo/login/index.html" id="signin-link">Sign In</a>
+                <a href="/calalloo/signup/index.html" id="signup-link" class="btn-signup">Sign Up</a>
+            </div>
+            <a href="/calalloo/profile/index.html" id="profile-link" style="display:none;">My Kitchen</a>
+        </nav>
+    </header>
 
-<div class="layout">
-    <aside class="sidebar">
-        <div class="taste-profile-box">
-            <h2>Taste Profile</h2>
-            <p>AI Syncing your preferences...</p>
-        </div>
-        <h2>Smart Recommendations</h2>
-        <div id="ai-suggestions"></div>
-    </aside>
-    <main class="main">
-        <div id="feed" class="tab-content">
-            <div class="universal-search-hub">
-                <input type="text" class="search-input" id="omni-search" placeholder="Search the Empire...">
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="taste-profile-card">
+                <h2>Taste Profile</h2>
+                <p id="profile-status">AI Syncing your preferences...</p>
             </div>
-            <div class="discovery-grid" id="discovery-grid"></div>
-        </div>
-        <div id="map-tab" class="tab-content" style="display:none;">
-            <div id="map-node" class="map-container"></div>
-        </div>
-    </main>
-</div>
-<script>
-    const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{{credential:supabase-anon-key}}');
-    const nodes = [
-        { title: "Trinidadian Callaloo Protocol", meta: "Sunday Heritage", lat: 10.65, lng: -61.5 },
-        { title: "Heritage Chicken Pelau", meta: "One Pot Classic", lat: 10.6, lng: -61.4 }
-    ];
-    function renderNodes() {
-        document.getElementById('discovery-grid').innerHTML = nodes.map(n => `
-            <div class="node-card">
-                <h3>${n.title}</h3>
-                <p>${n.meta}</p>
+            <h2 style="font-family: var(--font-display); font-size: 22px; margin-bottom: 24px;">Recommended Nodes</h2>
+            <div id="smart-recommendations" style="display:flex; flex-direction:column; gap:16px;">
+                <!-- Dynamically Populated -->
             </div>
-        `).join('');
-    }
-    function showMainTab(id) {
-        document.getElementById('feed').style.display = id === 'feed' ? 'block' : 'none';
-        document.getElementById('map-tab').style.display = id === 'map-tab' ? 'block' : 'none';
-        if(id === 'map-tab') setTimeout(initMap, 200);
-    }
-    let map;
-    function initMap() {
-        if(map) return;
-        map = L.map('map-node').setView([10.66, -61.51], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    }
-    window.onload = () => { showMainTab('feed'); renderNodes(); };
-</script>
+        </aside>
+
+        <main class="main">
+            <div id="feed" class="tab-content">
+                <div class="omni-search-container">
+                    <input type="text" class="omni-search" id="omni-search" placeholder="Search the Caribbean Food Lab...">
+                </div>
+                <div class="discovery-grid" id="discovery-grid">
+                    <!-- Nodes -->
+                </div>
+            </div>
+
+            <div id="map-tab" class="tab-content" style="display:none;">
+                <div class="map-wrapper">
+                    <div id="map-node"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{credential:supabase-anon-key}');
+
+        // --- SESSION MANAGEMENT ---
+        (function() {
+            const session = localStorage.getItem('calalloo_uid');
+            const signin = document.getElementById('signin-link');
+            const signup = document.getElementById('signup-link');
+            const profile = document.getElementById('profile-link');
+            const status = document.getElementById('profile-status');
+            
+            if (session) {
+                if(signin) signin.style.display = 'none';
+                if(signup) signup.style.display = 'none';
+                if(profile) profile.style.display = 'block';
+                status.innerText = "Synchronized: High-Fidelity Taste Profile Active.";
+            } else {
+                status.innerText = "Guest Mode: Sign in to sync your culinary DNA.";
+            }
+        })();
+
+        // --- NAVIGATION ENGINE ---
+        function switchTab(id, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+            
+            if(id === 'map-tab') setTimeout(initMap, 100);
+            
+            // Highlight active link
+            if(el) {
+                document.querySelectorAll('.nav-links a').forEach(a => a.style.color = 'var(--dark)');
+                el.style.color = 'var(--primary)';
+            }
+        }
+
+        // --- DISCOVERY ENGINE ---
+        const nodes = [
+            { title: "Trinidadian Callaloo Protocol", meta: "Sunday Heritage Heritage", tag: "RECIPE" },
+            { title: "St. Lucia Street Market", meta: "Castries Central Hub", tag: "MARKET" },
+            { title: "Guyanese Pepperpot Lab", meta: "Ancestral Tech", tag: "WORKSHOP" },
+            { title: "Blue Mountain Coffee Node", meta: "High-Altitude Aroma", tag: "SOURCING" },
+            { title: "Barbadian Flying Fish Sync", meta: "Coastal Grid", tag: "RECIPE" }
+        ];
+
+        function renderNodes() {
+            const grid = document.getElementById('discovery-grid');
+            grid.innerHTML = nodes.map(n => `
+                <div class="node-card">
+                    <span class="tag">${n.tag}</span>
+                    <h3>${n.title}</h3>
+                    <p>${n.meta}</p>
+                </div>
+            `).join('');
+            
+            // Populate sidebar recs
+            document.getElementById('smart-recommendations').innerHTML = nodes.slice(0,3).map(n => `
+                <div style="padding:16px; background:var(--white); border:1px solid var(--border); border-radius:16px;">
+                    <small style="color:var(--primary); font-weight:800; font-size:10px;">${n.tag}</small>
+                    <div style="font-weight:700; font-size:14px;">${n.title}</div>
+                </div>
+            `).join('');
+        }
+
+        // --- MAP ENGINE ---
+        let map;
+        function initMap() {
+            if(map) { map.invalidateSize(); return; }
+            map = L.map('map-node').setView([10.66, -61.51], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            
+            // Add nodes to map
+            nodes.forEach(n => {
+                // Simulating coordinates for demo
+                const lat = 10.66 + (Math.random() - 0.5) * 0.5;
+                const lng = -61.51 + (Math.random() - 0.5) * 0.5;
+                L.marker([lat, lng]).addTo(map).bindPopup(`<b>${n.title}</b><br>${n.tag}`);
+            });
+        }
+
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            if(params.get('tab') === 'markets') {
+                switchTab('map-tab');
+                const marketsLink = Array.from(document.querySelectorAll('.nav-links a')).find(a => a.innerText === 'Markets');
+                if(marketsLink) marketsLink.style.color = 'var(--primary)';
+            } else {
+                switchTab('feed');
+                const feedLink = Array.from(document.querySelectorAll('.nav-links a')).find(a => a.innerText === 'Feed');
+                if(feedLink) feedLink.style.color = 'var(--primary)';
+            }
+            renderNodes();
+        };
+    </script>
 </body>
 </html>
-
-
