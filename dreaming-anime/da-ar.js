@@ -1,5 +1,5 @@
 // DREAMING ANIME - AI RECOMMENDER (DA-AR)
-// VERSION: 1.0.0 (High-Fidelity)
+// VERSION: 1.1.0 (Fixed Grid ID)
 
 let arMood = '';
 let arLen = '';
@@ -61,7 +61,7 @@ function arGoStep2Back() {
 function arGetResults() {
     const resultsDiv = document.getElementById('ar-results');
     const step3Div = document.getElementById('ar-step3');
-    const grid = document.getElementById('ar-results-grid');
+    const grid = document.getElementById('ar-cards'); // Fixed ID
     
     step3Div.style.display = 'none';
     resultsDiv.style.display = 'block';
@@ -78,6 +78,11 @@ function arGetResults() {
     } else if (arMood === 'emotional') {
         recommendations = [
             { title: 'Your Lie in April', desc: 'A beautiful, tragic story of music and love.', img: 'https://m.media-amazon.com/images/M/MV5BYThhNmFmY2ItYjVlOC00MTFlLTk0Y2UtYzQ1Zjg5ZTU5Y2I0XkEyXkFqcGdeQXVyMzg2MzE2OTE@._V1_.jpg', link: 'https://www.crunchyroll.com/series/G675XN366/your-lie-in-april' }
+        ];
+    } else if (arMood === 'dark') {
+        recommendations = [
+            { title: 'Death Note', desc: 'A notebook that kills.', img: 'https://m.media-amazon.com/images/I/71I3uS+uLSL._AC_UF1000,1000_QL80_.jpg', link: 'https://www.netflix.com/title/70204970' },
+            { title: 'Parasyte', desc: 'Aliens invading human bodies.', img: 'https://m.media-amazon.com/images/I/81+p4-v8Y2L._AC_UF1000,1000_QL80_.jpg', link: 'https://www.crunchyroll.com/series/G6W9N1NV6/parasyte-the-maxim-' }
         ];
     } else {
         recommendations = [
