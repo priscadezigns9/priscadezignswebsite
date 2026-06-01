@@ -3,8 +3,8 @@
  * Sovereignty Layer for the Vanguard
  */
 
-const SUPABASE_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
-const SUPABASE_KEY = '{{credential:supabase-trogon}}';
+const SUPABASE_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SUPABASE_KEY = '{{credential:supabase-anon-key}}';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const AteliaAuth = {
@@ -120,4 +120,3 @@ const AteliaArena = {
 };
 
 window.Atelia = { auth: AteliaAuth, arena: AteliaArena };
-
