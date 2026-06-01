@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Vanguard Identity | Atelia Gaming Lab</title>
+    <link href='https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&display=swap' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/atelia_supabase.js"></script>
+    <style>
+        :root { --red: #D32F2F; --orange: #FF6B00; --purple: #A020F0; --blue: #00BFFF; --white: #FFFFFF; --black: #050505; }
+        body { margin: 0; background: var(--black); color: white; font-family: 'Inter', sans-serif; min-height: 100vh; }
+        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--red); background: #000; }
+        .logo { height: 50px; }
+        .back-btn { color: white; text-decoration: none; font-family: 'Russo One'; border: 2px solid var(--orange); padding: 5px 15px; }
+        
+        .container { max-width: 600px; margin: 40px auto; padding: 20px; }
+        .card { background: rgba(255,255,255,0.05); border: 2px solid var(--orange); padding: 30px; border-radius: 15px; text-align: center; }
+        .avatar { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--red); margin: 0 auto 20px; background: #222; display: flex; align-items: center; justify-content: center; font-family: 'Bangers'; font-size: 3rem; color: var(--orange); }
+        
+        h1 { font-family: 'Russo One'; color: var(--white); text-transform: uppercase; margin: 10px 0; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .stat-box { background: rgba(0,0,0,0.5); padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .stat-label { font-size: 0.8rem; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-val { font-family: 'Bangers'; font-size: 2.5rem; color: var(--orange); }
+        
+        .logout-btn { margin-top: 40px; background: transparent; color: var(--red); border: 1px solid var(--red); padding: 10px 20px; cursor: pointer; font-family: 'Russo One'; }
+        .logout-btn:hover { background: var(--red); color: white; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <img src="https://priscadezigns.org/logos/atelia-logo.png" class="logo">
+    <a href="game.html" class="back-btn">RETURN TO ARENA</a>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <div id="avatar" class="avatar">?</div>
+        <h1 id="username">LOADING...</h1>
+        <div class="stat-grid">
+            <div class="stat-box">
+                <div class="stat-label">ATLR PRESTIGE</div>
+                <div id="prestige" class="stat-val">000</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">HIGH SCORE</div>
+                <div id="highscore" class="stat-val">000</div>
+            </div>
+        </div>
+        
+        <button class="logout-btn" onclick="Atelia.auth.signOut()">TERMINATE SESSION</button>
+    </div>
+</div>
+
+<script>
+    Atelia.auth.onAuthStateChange(async (event, session) => {
+        if (!session) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            const profile = await Atelia.arena.getProfile(session.user.id);
+            document.getElementById('username').innerText = (profile.username || 'Vanguard').toUpperCase();
+            document.getElementById('avatar').innerText = (profile.username || 'V').charAt(0).toUpperCase();
+            document.getElementById('prestige').innerText = profile.atlr_prestige.toString().padStart(3, '0');
+            document.getElementById('highscore').innerText = profile.high_score.toString().padStart(3, '0');
+        } catch (e) {
+            console.error(e);
+        }
+    });
+</script>
+
+</body>
+</html>
