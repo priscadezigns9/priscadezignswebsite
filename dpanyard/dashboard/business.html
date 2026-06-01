@@ -109,7 +109,7 @@
 <div class="layout">
     <div class="sidebar">
         <button class="side-link active" onclick="showTab('business-hub', this)">🏛️ Dashboard</button>
-        <button class="side-link" onclick="showTab('dash', this)">Profile Node</button> onclick="showTab('dash', this)">Profile Node</button>
+        <button class="side-link" onclick="showTab('dash', this)">Professional Identity</button>
         <button class="side-link" onclick="showTab('map', this)">Empire Discovery</button>
         <button class="side-link" onclick="showTab('verify', this)">Security Vault</button>
         <button class="side-link" onclick="showTab('settings', this)">Settings</button>
@@ -307,6 +307,30 @@
 </div>
 
 <script>
+    
+    let map;
+    function initDiscoveryMap() {
+        if (map) return;
+        map = L.map('map-view').setView([10.65, -61.5], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        
+        // Backend simulation for nearby businesses
+        loadNearbyBusinesses();
+    }
+
+    async function loadNearbyBusinesses() {
+        const { data, error } = await sb.from('profiles').select('biz_name, location_lat, location_lng, professional_niche').not('location_lat', 'is', null);
+        if (!error && data) {
+            data.forEach(biz => {
+                L.marker([biz.location_lat, biz.location_lng])
+                    .addTo(map)
+                    .bindPopup(`<b>${biz.biz_name}</b><br>${biz.professional_niche}`);
+            });
+        }
+    }
+
     const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{{credential:supabase-anon-key}}');
 
     
