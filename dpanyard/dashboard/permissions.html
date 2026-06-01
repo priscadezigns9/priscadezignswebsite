@@ -110,18 +110,24 @@
 
         <div class="perm-footer">
             <button type="button" class="btn btn-secondary" onclick="skipPermissions()">Skip</button>
-            <button type="submit" class="btn btn-primary">Confirm</button>
+            <button type="submit" class="btn btn-primary" id="confirm-btn">Confirm</button>
         </div>
     </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-config.js"></script>
 <script>
     function handleSubmit(event) {
         event.preventDefault();
         savePermissions();
     }
 
-    function savePermissions() {
+    async function savePermissions() {
+        const confirmBtn = document.getElementById('confirm-btn');
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
         const perms = {
             files: document.getElementById('files-perm').checked,
             location: document.getElementById('location-perm').checked,
@@ -129,6 +135,18 @@
             contacts: document.getElementById('contacts-perm').checked
         };
         localStorage.setItem('dpanyard_permissions', JSON.stringify(perms));
+        
+        // Sync to Supabase
+        try {
+            const { data: { session } } = await sb.auth.getSession();
+            if (session) {
+                await sb.from('profiles').update({ 
+                    permissions: perms,
+                    updated_at: new Date().toISOString()
+                }).eq('id', session.user.id);
+            }
+        } catch (e) { console.error("Supabase sync failed", e); }
+
         redirectToDashboard();
     }
 
