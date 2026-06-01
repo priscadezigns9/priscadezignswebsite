@@ -1,5 +1,5 @@
 const SUPABASE_URL = "https://sktpjacowqaedddtrhuz.supabase.co";
-const SUPABASE_KEY = "{{credential:supabase-callaloo-dpanyard}}";
+const SUPABASE_KEY = "sb_publishable_ChdrHQEJV7pVpJMKt-ZaUw_6V0WRKAR";
 
 const supabase = {
     async request(path, options = {}) {
@@ -60,3 +60,4 @@ const supabase = {
         });
     }
 };
+
