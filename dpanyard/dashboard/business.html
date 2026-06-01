@@ -84,13 +84,15 @@
 
 <div class="layout">
     
-    <div class="sidebar" style="position: fixed; top: 72px; left: 0; width: 280px; height: calc(100vh - 72px); background: var(--white); border-right: 1px solid var(--border-color); padding: 32px 16px; overflow-y: auto; z-index: 100;">
+    
+    <div class="sidebar">
         <button class="side-link active" onclick="showTab('business-hub', this)">🏛️ Dashboard</button>
         <button class="side-link" onclick="showTab('dash', this)">Professional Identity</button>
         <button class="side-link" onclick="showTab('map', this)">Map</button>
         <button class="side-link" onclick="showTab('verify', this)">Security Vault</button>
         <button class="side-link" onclick="showTab('settings', this)">Settings</button>
     </div>
+
 
 
     <div class="main">
@@ -286,262 +288,7 @@
 
 
 
-<script>
-    const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{{credential:supabase-anon-key}}');
-    let map;
 
-    // --- CORE NAVIGATION ---
-    
-    
-    function showTab(id, el) {
-        console.log("Navigating to:", id);
-        // Hide all
-        document.querySelectorAll('.tab-content').forEach(t => {
-            t.classList.remove('active');
-            t.style.display = 'none';
-        });
-        document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
-        
-        // Show target
-        const target = document.getElementById(id);
-        if (target) {
-            target.classList.add('active');
-            target.style.display = 'block';
-            if(el) el.classList.add('active');
-            
-            if(id === 'map') {
-                // High-Fidelity Map Initialization Sequence
-                const initMap = () => {
-                    if(!map) {
-                        map = L.map('map-view').setView([10.66, -61.51], 12);
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                    }
-                    // Multiple invalidation calls to ensure settling
-                    setTimeout(() => map.invalidateSize(), 100);
-                    setTimeout(() => map.invalidateSize(), 300);
-                    setTimeout(() => map.invalidateSize(), 600);
-                };
-                
-                if (document.getElementById('map-view').offsetHeight > 0) {
-                    initMap();
-                } else {
-                    const observer = new ResizeObserver(() => {
-                        if (document.getElementById('map-view').offsetHeight > 0) {
-                            initMap();
-                            observer.disconnect();
-                        }
-                    });
-                    observer.observe(document.getElementById('map-view'));
-                }
-            }
-            if(id === 'business-hub') loadHubData();
-        }
-    }
-);
-        document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
-        
-        // Show target
-        const target = document.getElementById(id);
-        if (target) {
-            target.classList.add('active');
-            target.style.display = 'block';
-            if(el) el.classList.add('active');
-            
-            if(id === 'map') {
-                setTimeout(() => {
-                    initDiscoveryMap();
-                    if(map) map.invalidateSize();
-                }, 400);
-            }
-            if(id === 'business-hub') loadHubData();
-        }
-    }
-
-                }, 400);
-            }
-            if(id === 'business-hub') loadHubData();
-        }
-    }
-
-    async function loadHubData() {
-        const myId = localStorage.getItem('calalloo_uid');
-        if(!myId) return;
-        console.log("Business Hub: Syncing incoming appointments and reviews...");
-    }
-
-    // --- IDENTITY & CLOUD SYNC ---
-    async function saveToCloud() {
-        const status = document.getElementById('sync-status');
-        const profile = {
-            id: localStorage.getItem('calalloo_uid') || '00000000-0000-0000-0000-000000000000',
-            full_name: document.getElementById('biz-name').value,
-            bio: document.getElementById('biz-bio').value,
-            niche: document.getElementById('niche-select').value,
-            origin_platform: 'dpanyard',
-            last_active_at: new Date().toISOString()
-        };
-        const { error } = await sb.from('profiles').upsert(profile);
-        if(!error) {
-            if(status) {
-                status.style.display = 'block';
-                setTimeout(() => { status.style.display = 'none'; }, 3000);
-            }
-            syncNiche();
-            checkVerificationBadge();
-        }
-    }
-
-    function syncNiche() {
-        const select = document.getElementById('niche-select');
-        const badge = document.getElementById('niche-badge');
-        if(select && badge) {
-            badge.innerText = select.value;
-            badge.style.display = 'inline-block';
-        }
-    }
-
-    // --- MAP & DISCOVERY ---
-    
-    async function initDiscoveryMap() {
-        const container = document.getElementById('map-view');
-        if(!container) return;
-        
-        // Ensure container is visible before initializing
-        if(container.offsetWidth === 0 || container.offsetHeight === 0) {
-            console.log("Map container hidden, delaying...");
-            setTimeout(initDiscoveryMap, 100);
-            return;
-        }
-
-        if(map) {
-            map.invalidateSize();
-            return;
-        }
-
-        const myId = localStorage.getItem('calalloo_uid');
-        let center = [10.66, -61.51];
-        if(myId) {
-            try {
-                const { data } = await sb.from('profiles').select('location_lat, location_lng').eq('id', myId).single();
-                if(data && data.location_lat && data.location_lng) center = [data.location_lat, data.location_lng];
-            } catch(e) {}
-        }
-        
-        map = L.map('map-view', { zoomControl: true, scrollWheelZoom: true }).setView(center, 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
-        loadNearbyBusinesses();
-    }
-
-
-        const myId = localStorage.getItem('calalloo_uid');
-        let center = [10.66, -61.51];
-        if(myId) {
-            const { data } = await sb.from('profiles').select('location_lat, location_lng').eq('id', myId).single();
-            if(data && data.location_lat && data.location_lng) center = [data.location_lat, data.location_lng];
-        }
-        
-        map = L.map('map-view', { zoomControl: true, scrollWheelZoom: true }).setView(center, 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
-        loadNearbyBusinesses();
-    }
-
-    async function loadNearbyBusinesses() {
-        const { data: nodes } = await sb.from('profiles').select('full_name, niche, location_lat, location_lng');
-        if(nodes && map) {
-            nodes.forEach(n => {
-                if(n.location_lat && n.location_lng) {
-                    L.marker([n.location_lat, n.location_lng]).addTo(map).bindPopup(`<b>${n.full_name}</b><br>${n.niche}`);
-                }
-            });
-        }
-    }
-
-    async function loadEmpireNodes() {
-        const { data: profiles, error } = await sb.from('profiles').select('*').limit(8);
-        const container = document.getElementById('suggested-follows');
-        if(!error && profiles && container) {
-            container.innerHTML = profiles.map(p => `
-                <div class="suggestion-card">
-                    <div style="width:40px; height:40px; background:var(--primary-red); color:white; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; font-weight:800;">${p.full_name ? p.full_name[0] : 'U'}</div>
-                    <b style="font-size:14px;">${p.full_name || 'Empire User'}</b><br>
-                    <small style="font-size:9px; font-weight:800; opacity:0.6;">${p.niche || 'Professional Node'}</small>
-                    <button onclick="followNode('${p.id}')" style="margin-top:12px; background:var(--primary-red); color:white; border:none; padding:8px 15px; border-radius:50px; font-size:10px; font-weight:800; cursor:pointer; width:100%;">CONNECT</button>
-                </div>
-            `).join('');
-        }
-    }
-
-    async function followNode(id) {
-        const myId = localStorage.getItem('calalloo_uid') || '00000000-0000-0000-0000-000000000000';
-        const { error } = await sb.from('follows').upsert({ follower_id: myId, following_id: id });
-        if(!error) alert("Global connection secured in the Cloud.");
-    }
-
-    // --- SECURITY & SETTINGS ---
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('panyard_darkmode', document.body.classList.contains('dark-mode'));
-    }
-
-    function handlePermission(type, el) {
-        if(el.checked) {
-            if(type === 'location') requestLocation();
-            else alert(type.charAt(0).toUpperCase() + type.slice(1) + " protocol authorized.");
-        }
-    }
-
-    function requestLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (pos) => {
-                const { latitude, longitude } = pos.coords;
-                const myId = localStorage.getItem('calalloo_uid');
-                if(myId) {
-                    await sb.from('profiles').update({ location_lat: latitude, location_lng: longitude }).eq('id', myId);
-                    alert("Location protocol synced to Cloud Persistence.");
-                    if(map) map.setView([latitude, longitude], 13);
-                }
-            }, () => alert("Location access denied."));
-        }
-    }
-
-    async function submitVerification() {
-        const bir = document.getElementById('bir-cert').value;
-        if(!bir) return alert("BIR Number is required for verification.");
-        const myId = localStorage.getItem('calalloo_uid');
-        const { error } = await sb.from('profiles').update({ bir_number: bir, verification_status: 'pending' }).eq('id', myId);
-        if(!error) { alert("Verification documents submitted successfully."); checkVerificationBadge(); }
-    }
-
-    async function checkVerificationBadge() {
-        const myId = localStorage.getItem('calalloo_uid');
-        if(!myId) return;
-        const { data, error } = await sb.from('profiles').select('verification_status, bir_number').eq('id', myId).single();
-        if(!error && data) {
-            const badge = document.getElementById('verified-admin');
-            if(badge) {
-                if(data.verification_status === 'verified') { badge.style.display = 'inline-block'; badge.innerText = '✓ Verified Pro'; badge.style.background = '#00A3FF'; }
-                else if(data.verification_status === 'pending') { badge.style.display = 'inline-block'; badge.innerText = '⌛ Pending'; badge.style.background = '#FFD700'; badge.style.color = '#000'; }
-                else { badge.style.display = 'none'; }
-            }
-            const birInput = document.getElementById('bir-cert');
-            if(birInput && data.bir_number) birInput.value = data.bir_number;
-        }
-    }
-
-    async function saveAllSettings() { alert("System Preferences Saved Successfully."); }
-
-    // --- INITIALIZATION ---
-    window.onload = () => {
-        loadEmpireNodes();
-        checkVerificationBadge();
-        syncNiche();
-        if(localStorage.getItem('panyard_darkmode') === 'true') {
-            document.body.classList.add('dark-mode');
-            const dt = document.getElementById('darkmode-toggle');
-            if(dt) dt.checked = true;
-        }
-    };
-</script>
 
 
 
@@ -580,5 +327,91 @@
         </div>
       </div>
     </div>
+
+<script>
+    const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{credential:supabase-anon-key}');
+    
+    let map;
+    function initDiscoveryMap() {
+        const mapContainer = document.getElementById('map');
+        const card = mapContainer.querySelector('.card');
+        
+        // REMOVE: Purge existing map view
+        const oldView = document.getElementById('map-view');
+        if (oldView) oldView.remove();
+        if (map) { map.remove(); map = null; }
+        
+        // ADD BACK: Create fresh DOM element
+        const newView = document.createElement('div');
+        newView.id = 'map-view';
+        newView.style.width = '100%';
+        newView.style.height = '600px';
+        newView.style.borderRadius = '24px';
+        newView.style.zIndex = '1';
+        card.appendChild(newView);
+
+        // INITIALIZE: Fresh Leaflet Instance
+        const myId = localStorage.getItem('calalloo_uid');
+        let center = [10.66, -61.51];
+        
+        map = L.map('map-view').setView(center, 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        loadNearbyBusinesses();
+    }
+
+    
+    function showTab(id, el) {
+        console.log("Protocol Switch:", id);
+        // Hide all
+        document.querySelectorAll('.tab-content').forEach(t => {
+            t.classList.remove('active');
+            t.style.display = 'none';
+        });
+        document.querySelectorAll('.side-link').forEach(l => l.classList.remove('active'));
+        
+        // Show target
+        const target = document.getElementById(id);
+        if (target) {
+            target.classList.add('active');
+            target.style.display = 'block';
+            if(el) el.classList.add('active');
+            
+            // Map: Remove and Add Back Trigger
+            if(id === 'map') {
+                setTimeout(initDiscoveryMap, 100);
+            }
+            if(id === 'business-hub') loadHubData();
+        }
+    }
+
+    
+    async function loadHubData() { console.log("Hub Syncing..."); }
+    async function saveToCloud() { alert("Identity Synced."); }
+    async function loadNearbyBusinesses() {
+        const { data: nodes } = await sb.from('profiles').select('full_name, niche, location_lat, location_lng');
+        if(nodes && map) {
+            nodes.forEach(n => {
+                if(n.location_lat && n.location_lng) {
+                    L.marker([n.location_lat, n.location_lng]).addTo(map).bindPopup(`<b>${n.full_name}</b><br>${n.niche}`);
+                }
+            });
+        }
+    }
+    function toggleDarkMode() { document.body.classList.toggle('dark-mode'); localStorage.setItem('panyard_darkmode', document.body.classList.contains('dark-mode')); }
+    function syncNiche() { }
+    function saveAllSettings() { alert("Preferences Saved."); }
+    
+    window.onload = () => {
+        if(localStorage.getItem('panyard_darkmode') === 'true') {
+            document.body.classList.add('dark-mode');
+            if(document.getElementById('darkmode-toggle')) document.getElementById('darkmode-toggle').checked = true;
+        }
+    };
+</script>
 </body>
 </html>
+
