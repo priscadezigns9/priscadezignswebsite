@@ -3,70 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Explore Neighbourhood | dpanyard | dpanyard</title>
+    <title>Explore Neighbourhood | dpanyard</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-red: #E01B24;
+            --navy-deep: #0D1B2A;
+            --white: #FFFFFF;
+            --bg-light: #F4F4F4;
+            --border-color: #EEEEEE;
+        }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--navy-deep); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        nav { background: var(--white); border-bottom: 2px solid var(--primary-red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 72px; flex-shrink: 0; }
-        .brand { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: var(--navy-deep); text-decoration: none; }
-        .brand span { color: var(--primary-red); }
+        nav { background: var(--white); border-bottom: 2px solid var(--primary-red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 72px; flex-shrink: 0; z-index: 1000; }
+        .brand { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: var(--navy-deep); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .brand img { height: 40px; }
 
         .explore-layout { display: flex; flex: 1; overflow: hidden; }
-        .search-sidebar { width: 400px; background: white; border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px; }
-        .map-view { flex: 1; background: #cbd5e1; position: relative; display: flex; align-items: center; justify-content: center; }
+        .search-sidebar { width: 400px; background: white; border-right: 1px solid var(--border-color); overflow-y: auto; padding: 24px; z-index: 900; }
+        #map { flex: 1; background: #e2e8f0; position: relative; }
         
-        .search-input { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border-color); margin-bottom: 24px; }
+        .search-container { position: sticky; top: 0; background: white; padding-bottom: 20px; z-index: 10; }
+        .search-input { width: 100%; padding: 14px 18px; border-radius: 12px; border: 1.5px solid var(--border-color); font-size: 15px; outline: none; transition: 0.3s; }
+        .search-input:focus { border-color: var(--primary-red); }
         
-        .result-card { padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 16px; cursor: pointer; transition: all 0.3s; }
-        .result-card:hover { border-color: var(--primary-red); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .result-card h3 { font-family: Sora; font-size: 16px; margin-bottom: 4px; }
-        .result-card p { font-size: 13px; color: #64748B; }
+        .result-card { padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 16px; cursor: pointer; transition: all 0.3s; background: #fff; }
+        .result-card:hover { border-color: var(--primary-red); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .result-card h3 { font-family: Sora; font-size: 16px; margin-bottom: 4px; color: var(--navy-deep); }
+        .result-card p { font-size: 13px; color: #64748B; margin-bottom: 8px; }
+        .rating { color: #f5a623; font-size: 12px; font-weight: 700; }
 
-        .pin { position: absolute; background: var(--primary-red); color: white; padding: 6px 12px; border-radius: 50px; font-weight: 800; font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    
+        .locate-btn { position: absolute; top: 20px; right: 20px; z-index: 1000; background: white; border: none; width: 44px; height: 44px; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; color: var(--navy-deep); font-size: 18px; transition: 0.3s; }
+        .locate-btn:hover { background: var(--primary-red); color: white; }
+
+        /* Custom Leaflet Markers */
+        .custom-pin { background: var(--primary-red); width: 32px; height: 32px; border-radius: 50% 50% 50% 0; border: 2px solid white; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .custom-pin i { transform: rotate(45deg); color: white; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <nav>
-    <a href="/dpanyard/index.html" class="brand"><img src="/dpanyard/assets/logos/website_logo_v3.png" alt="dpanyard"></a>
+    <a href="/dpanyard/index.html" class="brand">
+        <img src="data:image/png;base64,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 {logo_data}">
+        <span>D' PanYard</span>
+    </a>
     <a href="../dashboard/personal.html" style="font-weight: 700; text-decoration: none; color: var(--navy-deep);">Back to Dashboard</a>
 </nav>
 
 <div class="explore-layout">
     <div class="search-sidebar">
-        <h2 style="font-family: Sora; margin-bottom: 16px;">Nearby Services</h2>
-        <input type="text" class="search-input" placeholder="Search by niche or location...">
-        
-        <div class="result-card" onclick="window.location.href='../providers/profile.html'">
-            <h3>Marcus Electric Solutions</h3>
-            <p>0.8 miles away · Port of Spain</p>
-            <div style="color: #f5a623; font-size: 12px; margin-top: 8px;">★★★★★ 4.9 (127)</div>
-        </div>
-
-        <div class="result-card">
-            <h3>Kayla's Hair Studio</h3>
-            <p>1.2 miles away · St. James</p>
-            <div style="color: #f5a623; font-size: 12px; margin-top: 8px;">★★★★★ 4.9 (84)</div>
+        <div class="search-container">
+            <h2 style="font-family: Sora; margin-bottom: 16px;">Nearby Services</h2>
+            <input type="text" class="search-input" id="search-input" placeholder="Search for plumbers, tutors, security..." oninput="filterResults(this.value)">
         </div>
         
-        <div class="result-card">
-            <h3>Pure Pool Cleaning</h3>
-            <p>2.5 miles away · Maraval</p>
-            <div style="color: #f5a623; font-size: 12px; margin-top: 8px;">★★★★★ 4.7 (32)</div>
+        <div id="results-list">
+            <!-- Dynamically loaded -->
+            <div style="text-align:center; padding: 40px; color:#64748B;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px;"></i>
+                <p>Loading local network...</p>
+            </div>
         </div>
     </div>
 
-    <div class="map-view">
-        <div style="font-family: Sora; color: #64748B;">[ Neighbourhood Map Interaction Engine ]</div>
-        <div class="pin" style="top: 30%; left: 40%;">Marcus Electric</div>
-        <div class="pin" style="top: 50%; left: 60%;">Kayla's Studio</div>
-        <div class="pin" style="top: 20%; left: 70%;">Pure Pools</div>
+    <div id="map">
+        <button class="locate-btn" onclick="locateUser()" title="Center on my location">
+            <i class="fas fa-location-crosshairs"></i>
+        </button>
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-config.js"></script>
+<script>
+    let map;
+    let markers = [];
+    let userMarker;
+    let providersData = [];
+
+    function initMap() {
+        // Initialize at Port of Spain (default)
+        map = L.map('map').setView([10.6667, -61.5167], 13);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        loadProviders();
+    }
+
+    async function loadProviders() {
+        const { data, error } = await sb.from('profiles').select('*').not('latitude', 'is', null);
+        
+        if (!error && data) {
+            providersData = data;
+            renderResults(data);
+        } else {
+            // Fallback mock data if Supabase is empty
+            providersData = [
+                { id: 1, full_name: "Marcus Electric Solutions", niche: "Electrical", latitude: 10.6750, longitude: -61.5180, rating: 4.9 },
+                { id: 2, full_name: "Kayla's Hair Studio", niche: "Hair Stylist", latitude: 10.6600, longitude: -61.5250, rating: 4.8 },
+                { id: 3, full_name: "Pure Pool Cleaning", niche: "Maintenance", latitude: 10.6800, longitude: -61.5050, rating: 4.7 }
+            ];
+            renderResults(providersData);
+        }
+    }
+
+    function renderResults(data) {
+        const list = document.getElementById('results-list');
+        list.innerHTML = '';
+        
+        // Clear markers
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+
+        data.forEach(p => {
+            // Add to sidebar
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.innerHTML = `
+                <h3>${p.full_name}</h3>
+                <p><i class="fas fa-tag"></i> ${p.niche}</p>
+                <div class="rating">★★★★★ ${p.rating || 'New'}</div>
+            `;
+            card.onclick = () => {
+                map.setView([p.latitude, p.longitude], 16);
+            };
+            list.appendChild(card);
+
+            // Add marker to map
+            const customIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div class="custom-pin"><i class="fas fa-briefcase"></i></div>`,
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            });
+
+            const marker = L.marker([p.latitude, p.longitude], { icon: customIcon })
+                .bindPopup(`<b>${p.full_name}</b><br>${p.niche}`)
+                .addTo(map);
+            markers.push(marker);
+        });
+    }
+
+    function filterResults(val) {
+        const filtered = providersData.filter(p => 
+            p.full_name.toLowerCase().includes(val.toLowerCase()) || 
+            p.niche.toLowerCase().includes(val.toLowerCase())
+        );
+        renderResults(filtered);
+    }
+
+    function locateUser() {
+        if (!navigator.geolocation) {
+            alert("Geolocation is not supported by your browser.");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            
+            if (userMarker) map.removeLayer(userMarker);
+            
+            userMarker = L.circleMarker([latitude, longitude], {
+                radius: 10,
+                color: '#fff',
+                weight: 3,
+                fillColor: '#3b82f6',
+                fillOpacity: 1
+            }).addTo(map).bindPopup("You are here").openPopup();
+
+            map.setView([latitude, longitude], 15);
+            
+            // Sync location to Supabase
+            syncLocationToSupabase(latitude, longitude);
+        }, () => {
+            alert("Unable to retrieve your location. Please check your permissions.");
+        });
+    }
+
+    async function syncLocationToSupabase(lat, lng) {
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) {
+            await sb.from('profiles').update({ 
+                latitude: lat, 
+                longitude: lng,
+                last_location_sync: new Date().toISOString()
+            }).eq('id', session.user.id);
+        }
+    }
+
+    window.onload = initMap;
+</script>
 </body>
 </html>
