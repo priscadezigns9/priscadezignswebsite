@@ -4,6 +4,8 @@
     <meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>The Arena | Atelia Gaming Lab</title>
     <link href='https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&display=swap' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/atelia_supabase.js"></script>
     <style>
         :root { --red: #D32F2F; --orange: #FF6B00; --purple: #A020F0; --blue: #00BFFF; --white: #FFFFFF; --black: #050505; }
         body { margin: 0; background: var(--black); color: white; font-family: 'Russo One'; overflow: hidden; }
@@ -11,6 +13,12 @@
         .logo { height: 50px; }
         .back-btn { color: white; text-decoration: none; font-size: 1.2rem; border: 2px solid var(--orange); padding: 5px 15px; transition: 0.3s; }
         .back-btn:hover { background: var(--orange); }
+
+        #auth-ui { position: absolute; top: 20px; left: 20px; z-index: 2500; display: flex; gap: 10px; }
+        .auth-btn { background: rgba(0,0,0,0.8); color: var(--orange); border: 2px solid var(--orange); padding: 5px 15px; cursor: pointer; font-family: 'Russo One'; font-size: 0.9rem; text-decoration: none; }
+        .auth-btn:hover { background: var(--orange); color: black; }
+        #user-greeting { font-family: 'Russo One'; color: var(--white); font-size: 1rem; text-shadow: 0 0 10px var(--orange); }
+
         #game { width: 100%; height: calc(100vh - 100px); position: relative; background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80') center center / cover no-repeat; overflow: hidden; z-index: 1; }
         #game::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); pointer-events: none; z-index: 2; }
         #game::before { content: ''; position: absolute; top:0; left:0; width:200%; height:100%; background: inherit; filter: brightness(0.4) contrast(1.2); animation: scrollBg 45s linear infinite; z-index: -1; }
@@ -44,6 +52,11 @@
     <a href='index.html' class='back-btn'>EXIT TO HUB</a>
 </nav>
 <div id='game'>
+    <div id="auth-ui">
+        <span id="user-greeting">GUEST VANGUARD</span>
+        <a href="login.html" id="auth-link" class="auth-btn">SYNC PROFILE</a>
+        <a href="leaderboard.html" class="auth-btn" style="border-color: var(--white); color: var(--white);">SCORE ROOM</a>
+    </div>
     <div id='score-ui'><span>SCORE: </span><span id='score-text'>000</span></div>
     <img id='player' src='https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp' alt='Character'>
     <div class='char-select' id='select-screen'>
@@ -110,10 +123,28 @@
                     document.getElementById('res-score').innerText = score; 
                     document.getElementById('atlr-count').innerText = '+' + score + ' ATLR'; 
                     document.getElementById('results-modal').style.display = 'flex'; 
+                    Atelia.arena.saveScore(score, char); // SYNC TO DATA CORE
                 }
             } obs.style.right = (r + 15 + (score/10)) + 'px'; }, 20); setTimeout(spawn, 1000 + Math.random() * 2000); }
     window.addEventListener('keydown', e => { if (e.code === 'Space') jump(); });
     window.addEventListener('touchstart', jump);
+
+    // Auth Initialization
+    Atelia.auth.onAuthStateChange((event, session) => {
+        const greeting = document.getElementById('user-greeting');
+        const authLink = document.getElementById('auth-link');
+        if (session) {
+            greeting.innerText = (session.user.user_metadata.username || 'VANGUARD').toUpperCase();
+            authLink.innerText = 'LOGOUT';
+            authLink.href = '#';
+            authLink.onclick = (e) => { e.preventDefault(); Atelia.auth.signOut(); };
+        } else {
+            greeting.innerText = 'GUEST VANGUARD';
+            authLink.innerText = 'SYNC PROFILE';
+            authLink.href = 'login.html';
+            authLink.onclick = null;
+        }
+    });
 </script>
 </body>
 </html>
