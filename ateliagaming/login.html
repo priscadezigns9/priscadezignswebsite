@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Uplink | Atelia Gaming Lab</title>
+    <link href='https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&display=swap' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/atelia_supabase.js"></script>
+    <style>
+        :root { --red: #D32F2F; --orange: #FF6B00; --purple: #A020F0; --blue: #00BFFF; --white: #FFFFFF; --black: #050505; }
+        body { margin: 0; background: var(--black); color: white; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: radial-gradient(circle, #200 0%, #000 100%); }
+        .box { background: rgba(0,0,0,0.9); border: 4px solid var(--orange); padding: 40px; width: 400px; box-shadow: 0 0 50px rgba(255,107,0,0.2); }
+        h1 { font-family: 'Russo One'; font-size: 2.5rem; color: var(--white); text-transform: uppercase; margin-bottom: 30px; text-align: center; border-bottom: 2px solid var(--red); padding-bottom: 10px; }
+        
+        input { width: 100%; padding: 12px; margin-bottom: 20px; background: #111; border: 1px solid #333; color: white; font-family: inherit; box-sizing: border-box; }
+        input:focus { border-color: var(--orange); outline: none; }
+        
+        button { width: 100%; padding: 15px; background: var(--orange); color: black; border: none; font-family: 'Russo One'; font-size: 1.2rem; cursor: pointer; text-transform: uppercase; margin-bottom: 15px; }
+        button:hover { background: var(--white); }
+        
+        .switch { text-align: center; font-size: 0.9rem; color: #888; cursor: pointer; }
+        .switch span { color: var(--orange); text-decoration: underline; }
+        
+        #error { color: var(--red); text-align: center; margin-bottom: 15px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1 id="title">SYNC VANGUARD</h1>
+    <div id="error">UPLINK FAILED</div>
+    
+    <div id="signup-fields" style="display:none">
+        <input type="text" id="username" placeholder="CODENAME (USERNAME)">
+    </div>
+    
+    <input type="email" id="email" placeholder="EMAIL ADDRESS">
+    <input type="password" id="pass" placeholder="SECURITY TOKEN (PASSWORD)">
+    
+    <button id="main-btn" onclick="execute()">UPLINK PROFILE</button>
+    
+    <div class="switch" onclick="toggleMode()" id="toggle-text">NO PROFILE YET? <span>INITIALIZE VANGUARD</span></div>
+</div>
+
+<script>
+    let mode = 'signin';
+    function toggleMode() {
+        mode = mode === 'signin' ? 'signup' : 'signin';
+        document.getElementById('title').innerText = mode === 'signin' ? 'SYNC VANGUARD' : 'INITIALIZE VANGUARD';
+        document.getElementById('signup-fields').style.display = mode === 'signup' ? 'block' : 'none';
+        document.getElementById('main-btn').innerText = mode === 'signin' ? 'UPLINK PROFILE' : 'CONFIRM INITIALIZATION';
+        document.getElementById('toggle-text').innerHTML = mode === 'signin' ? 'NO PROFILE YET? <span>INITIALIZE VANGUARD</span>' : 'ALREADY VANGUARD? <span>SYNC PROFILE</span>';
+    }
+
+    async function execute() {
+        const err = document.getElementById('error');
+        err.style.display = 'none';
+        
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        const user = document.getElementById('username').value;
+
+        try {
+            if (mode === 'signup') {
+                await Atelia.auth.signUp(email, pass, user);
+                alert("INITIALIZATION SUCCESSFUL. CHECK EMAIL FOR VALIDATION.");
+            } else {
+                await Atelia.auth.signIn(email, pass);
+                window.location.href = 'game.html';
+            }
+        } catch (e) {
+            err.innerText = e.message.toUpperCase();
+            err.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
