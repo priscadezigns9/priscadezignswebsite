@@ -3,8 +3,8 @@
  * Sovereignty Layer for the Vanguard
  */
 
-const SUPABASE_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_UicuMabi1dRKAvQ4YGiakg_NCMnftfS';
+const SUPABASE_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const AteliaAuth = {
