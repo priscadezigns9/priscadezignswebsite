@@ -300,13 +300,25 @@
             player.style.transform = assets[c].flip ? 'scaleX(-1)' : 'scaleX(1)'; 
         }
 
-        function start() { 
-            Atelia.auth.getUser().then(({ data: { user } }) => {
+        async function start() { 
+            console.log('Initiating Arena Launch Protocol...');
+            if (!window.Atelia) {
+                console.error('Atelia Sovereignty Layer not found.');
+                alert('Connection Error: Atelia Layer not initialized. Please refresh.');
+                return;
+            }
+            try {
+                const { data, error } = await Atelia.auth.getUser();
+                if (error) throw error;
+                const user = data?.user;
+
                 if (!user) {
+                    console.log('Auth required. Opening secure portal...');
                     document.getElementById('auth-overlay').style.display = 'flex';
                     return;
                 }
                 
+                console.log('Identity Verified:', user.email);
                 active = true;
                 document.getElementById('select-screen').style.display = 'none'; 
                 document.querySelectorAll('.obs').forEach(o => o.remove());
@@ -321,8 +333,14 @@
                 player.src = assets[char].r; 
                 player.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
                 
+                if (assets[char].flip) player.style.transform = 'scaleX(-1)';
+                else player.style.transform = 'scaleX(1)';
+
                 spawn(); 
-            });
+            } catch (err) {
+                console.error('Launch Failure:', err);
+                alert('Launch Failure: ' + err.message);
+            }
         }
 
         function jump() { 
