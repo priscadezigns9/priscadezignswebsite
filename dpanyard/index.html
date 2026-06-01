@@ -12,293 +12,144 @@
     <meta name="ICBM" content="10.66, -61.51" />
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --primary-red: #E01B24;
             --navy-deep: #0D1B2A;
-            --navy-light: #1E293B;
             --white: #FFFFFF;
             --bg-light: #F4F4F4;
+            --border-color: #EEEEEE;
             --grey-mid: #666666;
             --grey-light: #888888;
-            --border-color: #EEEEEE;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--navy-deep); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--navy-deep); line-height: 1.6; }
 
-        /* Navigation */
-        nav { background: var(--white); border-bottom: 2px solid var(--primary-red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 80px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .brand { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 800; color: var(--navy-deep); text-decoration: none; display: flex; align-items: center; }
-        .brand span { color: var(--primary-red); }
-
-        .nav-links { display: flex; gap: 24px; align-items: center; }
-        .nav-links a { color: #555; text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--primary-red); }
+        nav { background: var(--white); border-bottom: 2px solid var(--primary-red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 80px; position: sticky; top: 0; z-index: 1000; }
+        .brand img { height: 45px; display: block; }
         
-        .auth-btns { display: flex; gap: 12px; align-items: center; margin-left: 20px; border-left: 1px solid var(--border-color); padding-left: 20px; }
-        .btn-signin { color: var(--navy-deep) !important; font-weight: 700 !important; }
-        .btn-signup { background: var(--navy-deep); color: var(--white) !important; padding: 10px 20px; border-radius: 50px; font-weight: 800 !important; transition: all 0.3s; }
-        .btn-signup:hover { background: var(--primary-red); transform: translateY(-1px); }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a { color: #555; text-decoration: none; font-size: 14px; font-weight: 600; }
+        .nav-cta { background: var(--primary-red); color: var(--white) !important; padding: 10px 24px; border-radius: 50px; font-weight: 800 !important; }
 
-        .nav-cta { background: var(--primary-red); color: var(--white) !important; padding: 10px 24px; border-radius: 50px; font-weight: 800 !important; transition: transform 0.3s, background 0.3s; }
-        .nav-cta:hover { background: #C0151D; transform: translateY(-2px); }
-
-        /* Hero Section */
-        .hero { background: linear-gradient(135deg, var(--navy-deep) 0%, #1B263B 100%); padding: 100px 5%; text-align: center; color: var(--white); position: relative; overflow: hidden; }
-        .hero::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 70% 30%, rgba(224, 27, 36, 0.15) 0%, transparent 60%); pointer-events: none; }
-        .tag { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 50px; padding: 8px 22px; font-size: 12px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 28px; position: relative; z-index: 1; }
-        .hero h1 { font-family: 'Sora', sans-serif; font-size: 56px; font-weight: 800; line-height: 1.1; margin-bottom: 22px; letter-spacing: -0.03em; position: relative; z-index: 1; }
+        .hero { background: linear-gradient(135deg, var(--navy-deep) 0%, #1B263B 100%); padding: 100px 5%; text-align: center; color: var(--white); }
+        .hero h1 { font-family: 'Sora', sans-serif; font-size: 56px; font-weight: 800; margin-bottom: 20px; }
         .hero h1 span { color: var(--primary-red); }
-        .hero p { font-size: 19px; opacity: 0.9; max-width: 600px; margin: 0 auto 40px; line-height: 1.8; position: relative; z-index: 1; font-weight: 400; }
-        .search-box { background: var(--white); padding: 8px; border-radius: 50px; display: flex; max-width: 700px; margin: 0 auto 40px; position: relative; z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        .search-box input { border: none; padding: 16px 24px; font-size: 16px; width: 100%; border-radius: 50px; outline: none; font-family: 'Inter', sans-serif; }
-        .search-box button { background: var(--primary-red); color: var(--white); border: none; padding: 16px 36px; border-radius: 50px; font-weight: 800; cursor: pointer; transition: all 0.3s; }
-        .search-box button:hover { background: #C0151D; }
+        .hero p { font-size: 19px; opacity: 0.9; max-width: 600px; margin: 0 auto 40px; }
 
-        /* Stats Bar */
-        .stats { background: var(--white); padding: 40px 5%; display: flex; justify-content: center; gap: 80px; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); }
+        .search-box { background: var(--white); padding: 8px; border-radius: 50px; display: flex; max-width: 700px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .search-box input { border: none; padding: 16px 24px; font-size: 16px; width: 100%; border-radius: 50px; outline: none; }
+        .search-box button { background: var(--primary-red); color: var(--white); border: none; padding: 16px 36px; border-radius: 50px; font-weight: 800; cursor: pointer; }
+
+        .stats { background: var(--white); padding: 40px 5%; display: flex; justify-content: center; gap: 80px; border-bottom: 1px solid var(--border-color); }
         .stat { text-align: center; }
         .stat-n { font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 800; color: var(--primary-red); }
-        .stat-l { font-size: 13px; color: var(--grey-light); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-l { font-size: 12px; color: var(--grey-light); font-weight: 800; text-transform: uppercase; }
 
-        /* Main Content */
         .sec { padding: 80px 5%; max-width: 1400px; margin: 0 auto; }
-        .sec-lbl { font-size: 12px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; color: var(--primary-red); margin-bottom: 12px; display: block; }
-        .sec-h { font-family: 'Sora', sans-serif; font-size: 42px; font-weight: 800; margin-bottom: 12px; color: var(--navy-deep); letter-spacing: -0.02em; }
-        .sec-sub { color: var(--grey-mid); font-size: 16px; margin-bottom: 48px; line-height: 1.8; max-width: 700px; }
+        .sec-h { font-family: 'Sora', sans-serif; font-size: 42px; font-weight: 800; margin-bottom: 40px; text-align: center; }
 
-        /* Categories Grid */
-        .cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-        .cat { background: var(--white); border: 1px solid var(--border-color); border-radius: 18px; padding: 28px; text-align: center; transition: all 0.3s; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; }
-        .cat:hover { transform: translateY(-10px); border-color: var(--primary-red); box-shadow: 0 12px 30px rgba(224, 27, 36, 0.1); }
-        .cat-ico { font-size: 36px; margin-bottom: 16px; display: block; }
-        .cat-nm { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 800; color: var(--navy-deep); }
-        .cat-cnt { font-size: 11px; color: var(--grey-light); margin-top: 6px; font-weight: 500; text-transform: uppercase; }
+        .prov-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .prov { background: var(--white); border-radius: 24px; padding: 30px; border: 1px solid var(--border-color); transition: 0.3s; }
+        .prov:hover { transform: translateY(-5px); border-color: var(--primary-red); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+        .av { width: 60px; height: 60px; border-radius: 50%; background: var(--navy-deep); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24px; margin-bottom: 20px; }
+        .pn { font-family: Sora; font-size: 20px; font-weight: 800; margin-bottom: 5px; }
+        .pb { display: inline-block; background: rgba(224, 27, 36, 0.1); color: var(--primary-red); padding: 4px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
 
-        /* Provider Cards */
-        .prov-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
-        .prov { background: var(--white); border: 1px solid var(--border-color); border-radius: 18px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.3s; }
-        .prov:hover { transform: translateY(-5px); border-color: var(--primary-red); }
-        .av { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-red), var(--navy-deep)); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: 800; font-size: 20px; margin-bottom: 16px; box-shadow: 0 4px 10px rgba(224, 27, 36, 0.2); }
-        .pn { font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 800; color: var(--navy-deep); margin-bottom: 4px; }
-        .ps { font-size: 14px; color: var(--grey-light); margin-bottom: 14px; }
-        .pb { display: inline-block; background: rgba(13,27,42,0.06); color: var(--navy-deep); border: 1.5px solid var(--navy-deep); border-radius: 50px; padding: 4px 14px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .pr { font-size: 13px; color: #f5a623; margin-top: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-
-        /* CTA Section */
-        .cta { background: linear-gradient(135deg, var(--primary-red) 0%, var(--navy-deep) 100%); padding: 80px 5%; text-align: center; color: var(--white); margin-top: 60px; position: relative; overflow: hidden; }
-        .cta h2 { font-family: 'Sora', sans-serif; font-size: 42px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.02em; }
-        .cta p { font-size: 18px; opacity: 0.9; max-width: 520px; margin: 0 auto 36px; line-height: 1.8; }
-        .btn-w { background: var(--white); color: var(--primary-red); padding: 16px 44px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 15px; transition: all 0.3s; display: inline-block; }
-        .btn-w:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-
-        /* Footer */
-        footer { background: var(--navy-deep); color: var(--white); padding: 80px 5% 40px; }
-        .footer-main { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 40px; margin-bottom: 40px; }
-        .fb { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; }
-        .fb span { color: var(--primary-red); }
-        .footer-desc { color: rgba(255,255,255,0.5); font-size: 14px; max-width: 300px; margin-top: 12px; line-height: 1.6; }
-        .fl-grp h4 { font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 800; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1.5px; }
-        .fl { display: flex; flex-direction: column; gap: 12px; }
-        .fl a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.3s; }
-        .fl a:hover { color: var(--primary-red); }
-        .fc { color: rgba(255,255,255,0.3); font-size: 13px; text-align: center; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.08); }
-
-        @media (max-width: 1024px) {
-            .hero h1 { font-size: 44px; }
-            .prov-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .nav-links, .auth-btns { display: none; }
-            .hero h1 { font-size: 36px; }
-            .stats { gap: 40px; }
-            .prov-grid { grid-template-columns: 1fr; }
-            .footer-main { flex-direction: column; }
-        }
-    
+        footer { background: var(--navy-deep); color: white; padding: 60px 5%; text-align: center; }
+        .footer-logo { height: 40px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <nav>
-    <a href="/dpanyard/index.html" class="brand"><img src="/dpanyard/assets/logos/dpanyard_logo.svg" alt="dpanyard" style="height:45px;"></a>
+    <a href="/dpanyard/index.html" class="brand"><img src="/dpanyard/assets/logos/dpanyard_logo.svg" alt="dpanyard"></a>
     <div class="nav-links">
-        <a href="#categories">Categories</a>
-        <a href="#featured">Featured</a>
         <a href="how-it-works/index.html">How It Works</a>
-        <a href="providers/register.html" class="nav-cta">List Your Business</a>
-        <div class="auth-btns">
-            <a href="auth/signin.html" class="btn-signin">Sign In</a>
-            <a href="auth/index.html" class="btn-signup">Sign Up</a>
-        </div>
+        <a href="dashboard/business.html" class="nav-cta">Go to Dashboard</a>
     </div>
 </nav>
 
 <div class="hero">
-    <div class="tag">🔥 The Caribbean Service Network</div>
-    <h1>Professional services.<br><span>Directly to your door.</span></h1>
-    <p>Connect with verified neighbourhood professionals for everything from home repairs to personal care.</p>
-    
+    <h1>The Service Network.<br><span>Verified & Local.</span></h1>
+    <p>Connecting you with the best professional nodes in your neighbourhood.</p>
     <div class="search-box">
-        <input type="text" placeholder="What service do you need? (e.g. Plumber, Barber, Tutor)">
-        <button>Search Neighbourhood</button>
-    </div>
-
-    <div class="btns">
-        <a href="#categories" class="btn-o">Browse All Categories</a>
+        <input type="text" id="main-search" placeholder="Search by niche (e.g. Beauty, Tech, Chef)..." oninput="liveSearch(this.value)">
+        <button onclick="liveSearch()">Discover</button>
     </div>
 </div>
 
 <div class="stats">
-    <div class="stat"><div class="stat-n">2,400+</div><div class="stat-l">Service Providers</div></div>
-    <div class="stat"><div class="stat-n">24</div><div class="stat-l">Categories</div></div>
-    <div class="stat"><div class="stat-n">4.9★</div><div class="stat-l">Avg Rating</div></div>
-    <div class="stat"><div class="stat-n">12k+</div><div class="stat-l">Happy Customers</div></div>
+    <div class="stat"><div class="stat-n" id="stat-nodes">10k+</div><div class="stat-l">Global Nodes</div></div>
+    <div class="stat"><div class="stat-n">24/7</div><div class="stat-l">Network Uptime</div></div>
+    <div class="stat"><div class="stat-n">TT</div><div class="stat-l">Region Hub</div></div>
 </div>
 
-<div id="categories" style="background: var(--white); padding: 80px 0;">
-    <div class="sec">
-        <span class="sec-lbl">The Marketplace</span>
-        <h2 class="sec-h">Explore Service Niches</h2>
-        <p class="sec-sub">Find the exact help you need with our comprehensive neighbourhood directories.</p>
-        <div class="cat-grid">
-            <a href="beauty-wellness/" class="cat">
-                <span class="cat-ico">💈</span>
-                <div class="cat-nm">Barbers & Stylists</div>
-                <div class="cat-cnt">340 providers</div>
-            </a>
-            <a href="home-services/" class="cat">
-                <span class="cat-ico">⚡</span>
-                <div class="cat-nm">Electricians</div>
-                <div class="cat-cnt">218 providers</div>
-            </a>
-            <a href="home-services/" class="cat">
-                <span class="cat-ico">🚰</span>
-                <div class="cat-nm">Plumbers</div>
-                <div class="cat-cnt">156 providers</div>
-            </a>
-            <a href="security/" class="cat">
-                <span class="cat-ico">🛡️</span>
-                <div class="cat-nm">Security & Cameras</div>
-                <div class="cat-cnt">84 providers</div>
-            </a>
-            <a href="tutoring/" class="cat">
-                <span class="cat-ico">🎓</span>
-                <div class="cat-nm">Tutors & Teachers</div>
-                <div class="cat-cnt">124 providers</div>
-            </a>
-            <a href="home-services/" class="cat">
-                <span class="cat-ico">🛠️</span>
-                <div class="cat-nm">Appliance Repair</div>
-                <div class="cat-cnt">92 providers</div>
-            </a>
-            <a href="delivery/" class="cat">
-                <span class="cat-ico">🛒</span>
-                <div class="cat-nm">Grocery Shoppers</div>
-                <div class="cat-cnt">110 providers</div>
-            </a>
-            <a href="transport/" class="cat">
-                <span class="cat-ico">🚗</span>
-                <div class="cat-nm">Personal Drivers</div>
-                <div class="cat-cnt">75 providers</div>
-            </a>
-            <a href="maintenance/" class="cat">
-                <span class="cat-ico">🏊</span>
-                <div class="cat-nm">Pool Cleaners</div>
-                <div class="cat-cnt">56 providers</div>
-            </a>
-            <a href="maintenance/" class="cat">
-                <span class="cat-ico">🌱</span>
-                <div class="cat-nm">Gardeners</div>
-                <div class="cat-cnt">145 providers</div>
-            </a>
-            <a href="fitness/" class="cat">
-                <span class="cat-ico">🏋️</span>
-                <div class="cat-nm">Personal Trainers</div>
-                <div class="cat-cnt">103 providers</div>
-            </a>
-            <a href="care/" class="cat">
-                <span class="cat-ico">🏠</span>
-                <div class="cat-nm">Home Sitting</div>
-                <div class="cat-cnt">68 providers</div>
-            </a>
-        </div>
+<div class="sec">
+    <h2 class="sec-h" id="results-title">Featured Professionals</h2>
+    <div class="prov-grid" id="provider-grid">
+        <!-- Live Data from Supabase -->
     </div>
-</div>
-
-<div id="featured" style="padding: 80px 0;">
-    <div class="sec">
-        <span class="sec-lbl">Neighbourhood Favourites</span>
-        <h2 class="sec-h">Verified Top Providers</h2>
-        <p class="sec-sub">Professionals who consistently deliver high-fidelity service to their community.</p>
-        <div class="prov-grid">
-            <div class="prov">
-                <div class="av">K</div>
-                <div class="pn">Kayla's Hair Studio</div>
-                <div class="ps">Hair Braiding & Styling</div>
-                <span class="pb">Beauty & Wellness</span>
-                <div class="pr">★★★★★ 4.9 · 127 reviews</div>
-            </div>
-            <div class="prov">
-                <div class="av">M</div>
-                <div class="pn">Marcus Electric Solutions</div>
-                <div class="ps">Electrical Installations</div>
-                <span class="pb">Trades & Home</span>
-                <div class="pr">★★★★★ 4.8 · 89 reviews</div>
-            </div>
-            <div class="prov">
-                <div class="av">S</div>
-                <div class="pn">Snapworthy Studios</div>
-                <div class="ps">Events & Portrait Photography</div>
-                <span class="pb">Photography</span>
-                <div class="pr">★★★★★ 5.0 · 64 reviews</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="cta">
-    <h2>Empower Your Local Business</h2>
-    <p>Sign up to list your services, manage appointments, and connect with customers looking for professional help in their area.</p>
-    <a href="providers/register.html" class="btn-w">List Your Business →</a>
 </div>
 
 <footer>
-    <div class="footer-main">
-        <div>
-            <div class="fb"><img src="assets/logos/dpanyard_logo.svg" alt="dpanyard" style="height:32px;"></div>
-            <p class="footer-desc">The ultimate bridge between local professional service providers and their neighbourhood. Built for excellence.</p>
-        </div>
-        <div class="fl-grp">
-            <h4>Marketplace</h4>
-            <div class="fl">
-                <a href="#categories">Browse Services</a>
-                <a href="#featured">Featured Providers</a>
-                <a href="how-it-works/index.html">How It Works</a>
-                <a href="auth/signup.html">Join as Customer</a>
-            </div>
-        </div>
-        <div class="fl-grp">
-            <h4>For Providers</h4>
-            <div class="fl">
-                <a href="providers/register.html">List Business</a>
-                <a href="#">Provider Portal</a>
-                <a href="#">Supplier Network</a>
-                <a href="#">Verification Help</a>
-            </div>
-        </div>
-        <div class="fl-grp">
-            <h4>Legal</h4>
-            <div class="fl">
-                <a href="legal/privacy-policy.html">Privacy Policy</a>
-                <a href="legal/terms-of-service.html">Terms of Service</a>
-                <a href="legal/affiliate-disclosure.html">Affiliate Disclosure</a>
-            </div>
-        </div>
-    </div>
-    <div class="fc">© 2026 dpanyard. A Prisca Dezigns Project. All rights reserved.</div>
+    <img src="/dpanyard/assets/logos/dpanyard_logo.svg" alt="dpanyard" class="footer-logo">
+    <p style="opacity: 0.5; font-size: 12px;">© 2026 dpanyard | Neural Brand Architecture by Prisca Dezigns</p>
 </footer>
 
+<script>
+    const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{{credential:supabase-anon-key}}');
+
+    async function loadProviders(query = '') {
+        const grid = document.getElementById('provider-grid');
+        const title = document.getElementById('results-title');
+        
+        let dbQuery = sb.from('profiles').select('*').limit(12);
+        
+        if(query) {
+            dbQuery = dbQuery.ilike('niche', `%${query}%`);
+            title.innerText = `Searching for: ${query}`;
+        } else {
+            title.innerText = "Featured Professionals";
+        }
+
+        const { data: providers, error } = await dbQuery;
+
+        if(!error && providers) {
+            grid.innerHTML = providers.map(p => `
+                <div class="prov">
+                    <div class="av">${p.full_name ? p.full_name[0] : 'U'}</div>
+                    <div class="pn">${p.full_name || 'Anonymous Node'}</div>
+                    <span class="pb">${p.niche || 'Professional'}</span>
+                    <p style="font-size:13px; color:var(--grey-mid); margin-top:15px;">${p.bio ? p.bio.substring(0, 100) : 'Verified member of the dpanyard network.'}...</p>
+                    <button style="margin-top:20px; width:100%; padding:12px; border-radius:50px; border:1.5px solid var(--navy-deep); background:none; font-family:Sora; font-weight:800; font-size:12px; cursor:pointer;">VIEW NODE</button>
+                </div>
+            `).join('');
+        }
+    }
+
+    async function syncStats() {
+        const { data } = await sb.from('profiles').select('id', { count: 'exact' });
+        if(data) document.getElementById('stat-nodes').innerText = (data.length + 2400) + "+";
+    }
+
+    let searchTimeout;
+    function liveSearch(val) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            loadProviders(val);
+        }, 300);
+    }
+
+    window.onload = () => {
+        loadProviders();
+        syncStats();
+    };
+</script>
 </body>
 </html>
