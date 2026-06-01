@@ -20,24 +20,42 @@
         #user-greeting { font-family: 'Russo One'; color: var(--white); font-size: 1rem; text-shadow: 0 0 10px var(--orange); }
 
         #game { width: 100%; height: calc(100vh - 100px); position: relative; background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80') center center / cover no-repeat; overflow: hidden; z-index: 1; }
-        #game::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%); pointer-events: none; z-index: 2; }
-        #game::before { content: ''; position: absolute; top:0; left:0; width:200%; height:100%; background: inherit; filter: brightness(0.4) contrast(1.2); animation: scrollBg 45s linear infinite; z-index: -1; }
-        @keyframes scrollBg { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        #game::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(211,47,47,0.2), rgba(0,0,0,0.4)); pointer-events:none; }
+        #game::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.9) 100%); pointer-events: none; z-index: 2; }
+        
         #player { width: 130px; height: 130px; position: absolute; bottom: 30px; left: 100px; z-index: 10; transition: transform 0.1s; }
         .obs { width: 440px; height: 440px; position: absolute; bottom: 60px; border: 12px solid var(--orange); border-radius: 50%; box-shadow: 0 0 80px var(--orange), inset 0 0 60px var(--orange); background: rgba(255,107,0,0.15); }
         .obs::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; border-radius: 50%; border: 12px dashed white; animation: rotate 4s linear infinite; }
-        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-        #score-ui { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.9); padding: 10px 30px; border: 4px solid var(--orange); z-index: 1500; pointer-events: none; }
+        
+        #score-ui { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.9); padding: 10px 30px; border: 4px solid var(--orange); z-index: 1500; pointer-events: none; display: none; }
         #score-ui span { font-family: 'Bangers'; font-size: 2.5rem; color: white; letter-spacing: 2px; }
-        .char-select { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 20px; z-index: 1000; background: rgba(0,0,0,0.95); padding: 40px; border: 5px solid var(--red); box-shadow: 20px 20px 0 var(--orange); width: 90%; justify-content: center; flex-wrap: wrap; }
-        .char-opt { text-align: center; cursor: pointer; transition: 0.3s; padding: 15px; border: 2px solid transparent; width: 180px; }
-        .char-opt:hover { background: #111; border-color: var(--orange); transform: translateY(-10px); }
-        .char-opt.active { background: #222; border-color: var(--white); box-shadow: 0 0 20px var(--red); }
-        .char-opt img { height: 180px; width: 100%; border-radius: 10px; margin-bottom: 10px; filter: grayscale(1); transition: 0.3s; object-fit: contain; }
-        .char-opt:hover img, .char-opt.active img { filter: grayscale(0); }
-        .char-opt p { font-family: 'Bangers'; font-size: 2rem; margin-top: 15px; margin-bottom: 0; letter-spacing: 1px; color: var(--white); }
-        #start-btn { width: 300px; height: 70px; background: var(--red); color: white; border: none; font-family: 'Russo One'; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; text-transform: uppercase; margin-top: 20px; }
+
+        /* COMMAND DECK UI */
+        #command-deck { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        #command-deck::before { content: ''; position: absolute; width: 200%; height: 200%; background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,107,0,0.05) 1px, rgba(255,107,0,0.05) 2px); pointer-events: none; animation: scan 10s linear infinite; }
+        @keyframes scan { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+
+        .deck-header { font-family: 'Bangers'; font-size: 5rem; color: var(--orange); margin-bottom: 20px; text-shadow: 0 0 20px var(--red); z-index: 5; }
+        .vanguard-grid { display: flex; gap: 30px; z-index: 5; max-width: 1200px; width: 90%; justify-content: center; }
+        
+        .char-card { width: 250px; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); padding: 20px; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .char-card:hover { border-color: var(--orange); background: rgba(255,107,0,0.1); transform: translateY(-10px); }
+        .char-card.active { border-color: var(--white); background: rgba(255,255,255,0.1); box-shadow: 0 0 30px var(--orange); }
+        .char-card img { width: 100%; height: 300px; object-fit: contain; filter: grayscale(1); transition: 0.3s; }
+        .char-card:hover img, .char-card.active img { filter: grayscale(0); transform: scale(1.1); }
+        .char-name { font-family: 'Bangers'; font-size: 2.5rem; text-align: center; margin-top: 15px; }
+
+        .lore-panel { width: 90%; max-width: 1200px; background: rgba(0,0,0,0.8); border: 2px solid var(--orange); margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 30px; z-index: 5; display: none; }
+        .lore-text h2 { font-family: 'Russo One'; color: var(--orange); border-bottom: 2px solid var(--red); padding-bottom: 10px; margin-top: 0; }
+        .lore-text p { font-family: 'Inter', sans-serif; font-size: 1rem; line-height: 1.6; color: #ccc; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-bar-container { background: #222; height: 12px; border-radius: 6px; margin-top: 5px; position: relative; overflow: hidden; }
+        .stat-bar { height: 100%; background: var(--orange); width: 0%; transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
+        .stat-label { font-size: 0.8rem; text-transform: uppercase; color: #888; }
+
+        #deploy-btn { margin-top: 40px; width: 400px; height: 80px; background: var(--red); color: white; font-family: 'Bangers'; font-size: 3rem; border: 4px solid white; cursor: pointer; z-index: 5; display: none; box-shadow: 0 0 20px var(--red); }
+        #deploy-btn:hover { background: white; color: var(--red); transform: scale(1.05); }
+
         .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 3000; }
         .modal h1 { font-family: 'Bangers'; font-size: 7rem; color: var(--red); margin: 0; text-shadow: 5px 5px 0 white; }
         .modal p { font-size: 1.6rem; margin-bottom: 15px; }
@@ -58,14 +76,45 @@
         <a href="leaderboard.html" class="auth-btn" style="border-color: var(--white); color: var(--white);">SCORE ROOM</a>
     </div>
     <div id='score-ui'><span>SCORE: </span><span id='score-text'>000</span></div>
-    <img id='player' src='https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp' alt='Character'>
-    <div class='char-select' id='select-screen'>
-        <div class='char-opt active' onclick='sel("astra")' id='o-astra'><img src='https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp'><p>ASTRA</p></div>
-        <div class='char-opt' onclick='sel("mimi")' id='o-mimi'><img src='https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp'><p>MIMI</p></div>
-        <div class='char-opt' onclick='sel("nova")' id='o-nova'><img src='https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp'><p>NOVA</p></div>
-        <div class='char-opt' onclick='sel("echo")' id='o-echo'><img src='https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf_1.webp'><p>ECHO</p></div>
-        <button id='start-btn' onclick='start()'>START ARENA</button>
+    
+    <div id="command-deck">
+        <h1 class="deck-header">VANGUARD COMMAND DECK</h1>
+        <div class="vanguard-grid">
+            <div class="char-card" onclick="sel('astra')" id="card-astra">
+                <img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp">
+                <div class="char-name">ASTRA</div>
+            </div>
+            <div class="char-card" onclick="sel('nova')" id="card-nova">
+                <img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp">
+                <div class="char-name">NOVA</div>
+            </div>
+            <div class="char-card" onclick="sel('mimi')" id="card-mimi">
+                <img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp">
+                <div class="char-name">MIMI</div>
+            </div>
+        </div>
+
+        <div class="lore-panel" id="lore-panel">
+            <div class="lore-text">
+                <h2 id="l-name">CHARACTER NAME</h2>
+                <p id="l-desc">Vanguard description incoming...</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label" id="s1-label">STAT 1</div>
+                    <div class="stat-bar-container"><div class="stat-bar" id="s1-bar"></div></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label" id="s2-label">STAT 2</div>
+                    <div class="stat-bar-container"><div class="stat-bar" id="s2-bar"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <button id="deploy-btn" onclick="start()">DEPLOY TO ARENA</button>
     </div>
+
+    <img id='player' src='https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp' alt='Character' style="display:none">
     <div class='modal' id='results-modal'>
         <h1>WRECKED!</h1>
         <p>FINAL SCORE: <span id='res-score'>0</span></p>
@@ -76,6 +125,9 @@
 <script>
     const assets = {
         astra: { 
+            name: 'ASTRA',
+            desc: 'The Vanguard & Signal Engineer. Expert in high-fidelity navigation and structural integrity. Her signal strength allows for precise jumps across the arena.',
+            stats: { s1: ['Signal Strength', 85], s2: ['Sync Stability', 70] },
             sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp', 
             r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp', 
             j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp', 
@@ -83,6 +135,9 @@
             flip: false 
         },
         mimi: { 
+            name: 'MIMI',
+            desc: 'The Otaku Sage. Her archival wisdom projects a shield of focus. She maneuvers through portals with a calculated grace that defies standard physics.',
+            stats: { s1: ['Archival Wisdom', 95], s2: ['Precision', 60] },
             sel: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp', 
             r: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp', 
             j: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp', 
@@ -90,28 +145,46 @@
             flip: true 
         },
         nova: { 
+            name: 'NOVA',
+            desc: 'The Signal Vanguard. A powerhouse of raw engineering energy. Nova thrives in high-speed environments where signal power is the only rule.',
+            stats: { s1: ['Signal Power', 90], s2: ['Velocity', 80] },
             sel: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp', 
             r: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_running.webp', 
             j: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp', 
             glow: 'rgba(160,32,240,0.8)', 
             flip: true 
-        },
-        echo: { 
-            sel: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf_1.webp', 
-            r: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp', 
-            j: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp', 
-            glow: 'rgba(0,191,255,0.8)', 
-            flip: true 
         }
     };
-    let char = 'astra', jumping = false, score = 0, active = false;
-    function sel(c) { char = c; document.querySelectorAll('.char-opt').forEach(o => o.classList.remove('active')); document.getElementById('o-' + c).classList.add('active'); let p = document.getElementById('player'); p.src = assets[c].sel; p.style.transform = assets[c].flip ? 'scaleX(-1)' : 'scaleX(1)'; }
-    function start() { 
-        document.getElementById('select-screen').style.display = 'none'; 
+    let char = '', jumping = false, score = 0, active = false;
+
+    function sel(c) { 
+        char = c; 
+        document.querySelectorAll('.char-card').forEach(o => o.classList.remove('active')); 
+        document.getElementById('card-' + c).classList.add('active'); 
+        
+        // Update Lore & Stats
+        document.getElementById('lore-panel').style.display = 'grid';
+        document.getElementById('deploy-btn').style.display = 'block';
+        document.getElementById('l-name').innerText = assets[c].name;
+        document.getElementById('l-desc').innerText = assets[c].desc;
+        
+        document.getElementById('s1-label').innerText = assets[c].stats.s1[0];
+        document.getElementById('s1-bar').style.width = assets[c].stats.s1[1] + '%';
+        document.getElementById('s2-label').innerText = assets[c].stats.s2[0];
+        document.getElementById('s2-bar').style.width = assets[c].stats.s2[1] + '%';
+
         let p = document.getElementById('player'); 
+        p.src = assets[c].sel; 
+        p.style.transform = assets[c].flip ? 'scaleX(-1)' : 'scaleX(1)'; 
+    }
+
+    function start() { 
+        document.getElementById('command-deck').style.display = 'none'; 
+        document.getElementById('score-ui').style.display = 'flex';
+        let p = document.getElementById('player'); 
+        p.style.display = 'block';
         p.src = assets[char].r; 
         p.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
-        // Ensure all are running right (scaling -1 if the asset faces left)
         p.style.transform = assets[char].flip ? 'scaleX(-1)' : 'scaleX(1)'; 
         active = true; spawn(); 
     }
