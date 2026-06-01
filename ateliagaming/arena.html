@@ -138,7 +138,7 @@
 
     <header id="arena-header">
         <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
-        <div style="font-family:'Russo One'; font-size:1.2rem; color:var(--red);">GALACTIC ARENA V1.0</div>                <a href="/" style="color:white; text-decoration:none; font-family:'Russo One'; font-size:0.9rem; border:1px solid rgba(255,255,255,0.3); padding:5px 12px; border-radius:4px; background:rgba(255,255,255,0.1); margin-left:15px; transition:0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">HOME</a>
+        <div style="font-family:'Russo One'; font-size:1.2rem; color:var(--red);">GALACTIC ARENA V1.0</div>                <a onclick="toggleDashboard()" style="color:white; text-decoration:none; font-family:'Russo One'; font-size:0.9rem; border:1px solid rgba(255,255,255,0.3); padding:5px 12px; border-radius:4px; background:rgba(255,255,255,0.1); margin-left:15px; cursor:pointer; transition:0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">DASHBOARD</a>                <a href="/" style="color:#888; text-decoration:none; font-family:'Russo One'; font-size:0.8rem; margin-left:15px; transition:0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#888'">EXIT ARENA</a>
     </header>
         
     <div id="game-container">
@@ -399,6 +399,25 @@
             if (window.Atelia && Atelia.arena) Atelia.arena.saveScore(score, char);
         }
 
+        
+        async function toggleDashboard() {
+            const modal = document.getElementById('dashboard-modal');
+            if (modal.style.display === 'none' || !modal.style.display) {
+                const { data, error } = await Atelia.auth.getUser();
+                if (data?.user) {
+                    try {
+                        const profile = await Atelia.arena.getProfile(data.user.id);
+                        document.getElementById('d-atlr').innerText = (profile.atlr_prestige || 0) + ' ATLR';
+                        document.getElementById('d-high').innerText = profile.high_score || 0;
+                        modal.style.display = 'flex';
+                    } catch (e) { console.error('Dashboard Fetch Failure', e); }
+                } else {
+                   document.getElementById('auth-overlay').style.display = 'flex';
+                }
+            } else {
+                modal.style.display = 'none';
+            }
+        }
         function resetGame() {
             document.getElementById('results-modal').style.display = 'none';
             document.getElementById('select-screen').style.display = 'flex';
@@ -418,5 +437,29 @@
             jump(); 
         });
     </script>
+
+    <div id="dashboard-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
+        <div style="width:90%; max-width:600px; background:#111; border:2px solid var(--orange); border-radius:15px; padding:30px; position:relative; box-shadow:0 0 50px rgba(255,107,0,0.2);">
+            <button onclick="toggleDashboard()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#888; font-size:1.5rem; cursor:pointer;">✕</button>
+            <h2 style="font-family:'Bangers'; color:white; font-size:3rem; text-align:center; margin:0 0 20px;">VANGUARD DASHBOARD</h2>
+            
+            <div style="display:flex; flex-direction:column; gap:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; padding-bottom:15px;">
+                    <span style="color:#888; font-family:'Russo One';">RANK:</span>
+                    <span id="d-rank" style="color:var(--orange); font-family:'Russo One'; font-size:1.2rem;">VANGUARD ELITE</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; padding-bottom:15px;">
+                    <span style="color:#888; font-family:'Russo One';">TOTAL ATLR:</span>
+                    <span id="d-atlr" style="color:var(--orange); font-family:'Russo One'; font-size:1.5rem;">0 ATLR</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; padding-bottom:15px;">
+                    <span style="color:#888; font-family:'Russo One';">HIGH SCORE:</span>
+                    <span id="d-high" style="color:white; font-family:'Russo One';">0</span>
+                </div>
+            </div>
+            
+            <button onclick="Atelia.auth.signOut()" style="width:100%; margin-top:30px; background:transparent; border:1px solid #333; color:#555; padding:10px; cursor:pointer; font-family:'Russo One'; border-radius:5px;">SIGN OUT SESSION</button>
+        </div>
+    </div>
 </body>
 </html>
