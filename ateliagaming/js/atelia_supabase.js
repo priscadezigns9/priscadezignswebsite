@@ -120,3 +120,4 @@ const AteliaArena = {
 };
 
 window.Atelia = { auth: AteliaAuth, arena: AteliaArena };
+
