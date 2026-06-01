@@ -6,174 +6,64 @@
     <title>Atelia Gaming | Arena</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --red: #D32F2F;
-            --orange: #FF6B00;
-            --white: #FFFFFF;
-            --black: #050505;
-        }
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--black);
-            color: var(--white);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #arena-header {
-            background: #000;
-            padding: 10px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--red);
-        }
-        .logo-img { height: 40px; filter: drop-shadow(0 0 5px var(--red)); }
-        
-        #game-container {
-            flex: 1;
-            width: 100%;
-            background: url('https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=1600&q=80') center center / cover no-repeat;
-            position: relative;
-            overflow: hidden;
-        }
-        #game-container::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(211,47,47,0.1), transparent); pointer-events:none; }
-
-        #player { width: 140px; height: 140px; position: absolute; bottom: 50px; left: 100px; z-index: 10; transition: transform 0.1s; }
-        .obs { 
-            width: 420px; height: 420px; position: absolute; bottom: 30px; 
-            border: 12px solid var(--orange); border-radius: 50%; 
-            box-shadow: 0 0 30px var(--orange), inset 0 0 20px var(--orange); 
-            background: rgba(255,107,0,0.05); 
-            z-index: 5;
-        }
-        .obs::after { 
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            width: 360px; height: 360px; border-radius: 50%; border: 4px dashed rgba(255,255,255,0.6); animation: rotate 4s linear infinite; 
-        }
-        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-
+        :root { --red: #D32F2F; --orange: #FF6B00; --white: #FFFFFF; --black: #050505; }
+        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        #arena-header { background: #000; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--red); }
+        .logo-img { height: 40px; }
+        #game-container { flex: 1; width: 100%; background: url('https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=1600&q=80') center center / cover no-repeat; position: relative; overflow: hidden; }
+        #player { width: 140px; height: 140px; position: absolute; bottom: 50px; left: 100px; z-index: 10; }
+        .obs { width: 420px; height: 420px; position: absolute; bottom: 30px; border: 12px solid var(--orange); border-radius: 50%; box-shadow: 0 0 30px var(--orange); background: rgba(255,107,0,0.05); z-index: 5; }
         .game-ui { position: absolute; top: 20px; right: 20px; z-index: 100; pointer-events: none; }
         #score-text { font-family: 'Bangers'; font-size: 3rem; color: var(--white); text-shadow: 0 0 20px var(--red); }
-
-        #select-screen { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.85); z-index: 1000; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-        }
-        .selection-grid { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; max-width: 800px; }
-        .char-opt { 
-            text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; 
-            border: 2px solid transparent; width: 140px; 
-        }
-        .char-opt:hover { background: #111; border-color: var(--orange); transform: translateY(-5px); }
+        #select-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .selection-grid { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .char-opt { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border: 2px solid transparent; width: 140px; }
         .char-opt.active { background: #222; border-color: var(--white); box-shadow: 0 0 15px var(--red); }
-        .char-opt img { height: 160px; width: 100%; object-fit: contain; filter: grayscale(1); transition: 0.3s; }
-        .char-opt:hover img, .char-opt.active img { filter: grayscale(0); }
-        .char-opt p { font-family: 'Bangers'; font-size: 1.4rem; margin: 8px 0 0; color: var(--white); }
-
-        #start-btn { 
-            margin-top: 25px; padding: 12px 40px; background: var(--red); color: white; 
-            border: none; font-family: 'Russo One'; font-size: 1.6rem; cursor: pointer; 
-            transition: 0.3s; border: 3px solid white;
-        }
-        #start-btn:hover { background: var(--orange); transform: scale(1.05); }
-
-        #results-modal { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); display: none; flex-direction: column; 
-            align-items: center; justify-content: center; z-index: 2000; 
-        }
-        #results-modal h1 { font-family: 'Bangers'; font-size: 6rem; color: var(--red); margin: 0; text-shadow: 4px 4px 0 white; }
-
-        #auth-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 2001;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
-        
-        .auth-field-wrapper { position: relative; width: 100%; margin-bottom: 15px; }
-        .eye-toggle { 
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%); 
-            cursor: pointer; color: #888; font-size: 1.2rem; user-select: none;
-            background: none; border: none; padding: 0;
-        }
-        .eye-toggle:hover { color: var(--red); }
-        .auth-form {
-            background: #111; padding: 40px; border: 2px solid var(--red);
-            display: flex; flex-direction: column; gap: 15px; width: 320px;
-        }
-        .auth-form input {
-            padding: 12px; background: #222; border: 1px solid #444; color: white;
-            font-family: 'Inter', sans-serif; outline: none;
-        }
-        .auth-form input:focus { border-color: var(--red); }
-        .auth-btn {
-            padding: 12px; background: var(--red); color: white; border: none;
-            font-family: 'Russo One'; cursor: pointer; text-transform: uppercase;
-        }
-        
-        #profile-hub {
-            position: absolute; top: 20px; left: 20px; z-index: 100;
-            display: flex; align-items: center; gap: 10px;
-            background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        #p-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--orange); }
-        #p-username { font-family: 'Russo One'; font-size: 0.9rem; color: #fff; }
-        #p-prestige { font-family: 'Bangers'; font-size: 1.2rem; color: var(--orange); }
-
-        @media (max-width: 768px) {
-            #player { width: 100px; height: 100px; }
-            .obs { width: 340px; height: 340px; }
-            .obs::after { width: 280px; height: 280px; }
-        }
+        .char-opt img { height: 160px; width: 100%; object-fit: contain; }
+        #start-btn { margin-top: 25px; padding: 12px 40px; background: var(--red); color: white; border: 3px solid white; font-family: 'Russo One'; font-size: 1.6rem; cursor: pointer; }
+        #results-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
+        #auth-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2001; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .auth-form { background: #111; padding: 40px; border: 2px solid var(--red); display: flex; flex-direction: column; gap: 15px; width: 320px; }
+        .auth-form input { padding: 12px; background: #222; border: 1px solid #444; color: white; outline: none; }
+        .auth-btn { padding: 12px; background: var(--red); color: white; border: none; font-family: 'Russo One'; cursor: pointer; }
+        #profile-hub { position: absolute; top: 20px; left: 20px; z-index: 100; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        #p-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--orange); object-fit: cover; }
+        #dashboard-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-
     <header id="arena-header">
-        <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
-        <div style="font-family:'Russo One'; font-size:1.2rem; color:var(--red);">GALACTIC ARENA V1.0</div>                <a onclick="toggleDashboard()" style="color:white; text-decoration:none; font-family:'Russo One'; font-size:0.9rem; border:1px solid rgba(255,255,255,0.3); padding:5px 12px; border-radius:4px; background:rgba(255,255,255,0.1); margin-left:15px; cursor:pointer; transition:0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">DASHBOARD</a>                <a href="/ateliagaming/" style="color:#888; text-decoration:none; font-family:'Russo One'; font-size:0.8rem; margin-left:15px; transition:0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#888'">EXIT ARENA</a>
+        <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img"></a>
+        <div style="font-family:'Russo One'; font-size:1.2rem; color:var(--red);">GALACTIC ARENA V1.0</div>                
+        <button onclick="toggleDashboard()" style="color:white; font-family:'Russo One'; font-size:0.9rem; border:1px solid rgba(255,255,255,0.3); padding:5px 12px; border-radius:4px; background:rgba(255,255,255,0.1); margin-left:15px; cursor:pointer;">DASHBOARD</button>                
+        <a href="/ateliagaming/" style="color:#888; text-decoration:none; font-family:'Russo One'; font-size:0.8rem; margin-left:15px;">EXIT ARENA</a>
     </header>
-        
     <div id="game-container">
         <div id="profile-hub" style="display: none;">
-            <img id="p-avatar" src="" alt="Avatar">
-            <div>
-                <div id="p-username">VANGUARD</div>
-                <div id="p-prestige">0 ATLR</div>
-            </div>
-            <button onclick="Atelia.auth.signOut()" style="background:none; border:none; color:#888; cursor:pointer; font-size:10px; margin-left:10px;">[LOGOUT]</button>
+            <img id="p-avatar" src="">
+            <div><div id="p-username">VANGUARD</div><div id="p-prestige">0 ATLR</div></div>
         </div>
-
         <div id="auth-overlay">
             <div class="auth-form" id="login-form">
-                <h2 style="font-family:'Bangers'; color:white; margin:0 0 10px; text-align:center;">VANGUARD LOGIN</h2>
+                <h2 style="font-family:'Bangers'; color:white; text-align:center;">VANGUARD LOGIN</h2>
                 <input type="email" id="email" placeholder="EMAIL">
-                <div class="auth-field-wrapper"><input type="password" id="password" placeholder="PASSWORD" style="margin-bottom:0"><button type="button" class="eye-toggle" onclick="togglePass('password', this)"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+                <input type="password" id="password" placeholder="PASSWORD">
                 <button class="auth-btn" onclick="login()">LOGIN</button>
                 <p style="font-size:12px; color:#888; text-align:center;">NEW? <a href="#" onclick="toggleAuth()" style="color:var(--red);">SIGN UP</a></p>
             </div>
             <div class="auth-form" id="signup-form" style="display:none;">
-                <h2 style="font-family:'Bangers'; color:white; margin:0 0 10px; text-align:center;">JOIN THE ARENA</h2>
+                <h2 style="font-family:'Bangers'; color:white; text-align:center;">JOIN THE ARENA</h2>
                 <input type="text" id="reg-user" placeholder="USERNAME">
                 <input type="email" id="reg-email" placeholder="EMAIL">
-                <div class="auth-field-wrapper"><input type="password" id="reg-password" placeholder="PASSWORD" style="margin-bottom:0"><button type="button" class="eye-toggle" onclick="togglePass('reg-password', this)"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+                <input type="password" id="reg-password" placeholder="PASSWORD">
                 <button class="auth-btn" onclick="register()">REGISTER</button>
                 <p style="font-size:12px; color:#888; text-align:center;">MEMBER? <a href="#" onclick="toggleAuth()" style="color:var(--red);">LOGIN</a></p>
             </div>
         </div>
-
         <div id="score-ui" class="game-ui"><span>SCORE: </span><span id="score-text">000</span></div>
-        <img id="player" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp" alt="Vanguard">
-        
+        <img id="player" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp">
         <div id="select-screen">
-            <h3 style="font-family: 'Bangers'; font-size: 3rem; color: #fff; margin-bottom: 10px;">SELECT YOUR VANGUARD</h3>
+            <h3 style="font-family: 'Bangers'; font-size: 3rem; color: #fff;">SELECT YOUR VANGUARD</h3>
             <div class="selection-grid">
                 <div class="char-opt active" onclick="sel('astra')" id="o-astra"><img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp"><p>ASTRA</p></div>
                 <div class="char-opt" onclick="sel('mimi')" id="o-mimi"><img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp"><p>MIMI</p></div>
@@ -182,262 +72,86 @@
             </div>
             <button id="start-btn" onclick="start()">START ARENA</button>
         </div>
-
         <div id="results-modal">
             <h1>WRECKED!</h1>
-            <p style="font-family: 'Russo One'; color: white; font-size: 2rem;">FINAL SCORE: <span id="res-score">0</span></p>
-            <div style="display: flex; align-items: center; gap: 15px; margin: 20px 0;">
-                <img src="https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp" height="80">
-                <span style="font-family: 'Bangers'; font-size: 3rem; color: var(--orange);">+<span id="atlr-count">0</span> ATLR</span>
-            </div>
-            <button onclick="resetGame()" style="background: var(--red); color: white; border: 4px solid white; padding: 15px 40px; font-family: 'Russo One'; font-size: 1.5rem; cursor: pointer;">RE-ENTER</button>
+            <p style="font-family:'Russo One'; font-size:2rem;">SCORE: <span id="res-score">0</span></p>
+            <button onclick="resetGame()" style="background:var(--red); color:white; border:4px solid white; padding:15px 40px; font-family:'Russo One'; cursor:pointer;">RE-ENTER</button>
         </div>
     </div>
-
+    <div id="dashboard-modal">
+        <div style="width:90%; max-width:600px; background:#111; border:2px solid var(--orange); border-radius:15px; padding:30px; position:relative;">
+            <button onclick="toggleDashboard()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#888; font-size:1.5rem; cursor:pointer;">✕</button>
+            <h2 style="font-family:'Bangers'; color:white; font-size:3rem; text-align:center;">VANGUARD DASHBOARD</h2>
+            <div style="display:flex; flex-direction:column; gap:20px; font-family:'Russo One';">
+                <div style="display:flex; justify-content:space-between;"><span>RANK:</span><span style="color:var(--orange);">VANGUARD ELITE</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>TOTAL ATLR:</span><span id="d-atlr" style="color:var(--orange);">0 ATLR</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>HIGH SCORE:</span><span id="d-high">0</span></div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/ateliagaming/js/atelia_supabase.js"></script>
     <script>
-        const EYE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`;
-        const EYE_OFF_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
-
-        Atelia.auth.onAuthStateChange(async (event, session) => {
-            if (session?.user) {
-                document.getElementById('profile-hub').style.display = 'flex';
-                document.getElementById('auth-overlay').style.display = 'none';
-                try {
-                    const profile = await Atelia.arena.getProfile(session.user.id);
-                    document.getElementById('p-username').innerText = (profile.username || 'Vanguard').toUpperCase();
-                    document.getElementById('p-prestige').innerText = (profile.atlr_prestige || 0) + ' ATLR';
-                    document.getElementById('p-avatar').src = assets[char].sel;
-                } catch (e) { console.error('Profile fetch failed', e); }
-            } else {
-                document.getElementById('profile-hub').style.display = 'none';
-            }
-        });
-
-        async function login() {
-            try {
-                const { error } = await Atelia.auth.signIn(document.getElementById('email').value, document.getElementById('password').value);
-                if (error) throw error;
-            } catch (e) { alert(e.message); }
-        }
-
-        async function register() {
-            try {
-                const { error } = await Atelia.auth.signUp(
-                    document.getElementById('reg-email').value, 
-                    document.getElementById('reg-password').value, 
-                    document.getElementById('reg-user').value
-                );
-                if (error) throw error;
-                alert("Check your email for confirmation!");
-            } catch (e) { alert(e.message); }
-        }
-
-        function togglePass(id, el) {
-            const input = document.getElementById(id);
-            if (input.type === "password") {
-                input.type = "text";
-                el.innerHTML = EYE_OFF_SVG;
-            } else {
-                input.type = "password";
-                el.innerHTML = EYE_SVG;
-            }
-        }
-
-        function toggleAuth() {
-            const l = document.getElementById('login-form'), s = document.getElementById('signup-form');
-            l.style.display = l.style.display === 'none' ? 'flex' : 'none';
-            s.style.display = s.style.display === 'none' ? 'flex' : 'none';
-        }
-
-        async function toggleDashboard() {
-            console.log('Toggling Dashboard...');
-            const modal = document.getElementById('dashboard-modal');
-            if (!modal) return;
-            if (modal.style.display === 'none' || !modal.style.display) {
-                const { data, error } = await Atelia.auth.getUser();
-                if (data?.user) {
-                    try {
-                        const profile = await Atelia.arena.getProfile(data.user.id);
-                        document.getElementById('d-atlr').innerText = (profile.atlr_prestige || 0) + ' ATLR';
-                        document.getElementById('d-high').innerText = profile.high_score || 0;
-                        modal.style.display = 'flex';
-                    } catch (e) { console.error('Dashboard Fetch Failure', e); }
-                } else {
-                   document.getElementById('auth-overlay').style.display = 'flex';
-                }
-            } else {
-                modal.style.display = 'none';
-            }
-        }
-
         const assets = {
-            astra: { 
-                sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp', 
-                r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp', 
-                j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp', 
-                glow: 'rgba(255,107,0,0.8)', flip: false 
-            },
-            mimi: { 
-                sel: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp', 
-                r: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp', 
-                j: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp', 
-                glow: 'rgba(255,107,0,0.8)', flip: true 
-            },
-            nova: { 
-                sel: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp', 
-                r: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_running.webp', 
-                j: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp', 
-                glow: 'rgba(160,32,240,0.8)', flip: true 
-            },
-            echo: { 
-                sel: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp', 
-                r: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp', 
-                j: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp', 
-                glow: 'rgba(0,191,255,0.8)', flip: true 
-            }
+            astra: { sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp', r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp', j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp', flip: false },
+            mimi: { sel: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp', r: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp', j: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp', flip: true },
+            nova: { sel: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp', r: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_running.webp', j: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp', flip: true },
+            echo: { sel: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp', r: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp', j: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp', flip: true }
         };
-
         let char = 'astra', jumping = false, score = 0, active = false, spawnTimeout, activeIntervals = [];
-        const player = document.getElementById('player');
-        const scoreTxt = document.getElementById('score-text');
-        const gameArea = document.getElementById('game-container');
-
-        function sel(c) { 
-            char = c; 
-            document.querySelectorAll('.char-opt').forEach(o => o.classList.remove('active')); 
-            document.getElementById('o-' + c).classList.add('active'); 
-            player.src = assets[c].sel; 
-            player.style.transform = assets[c].flip ? 'scaleX(-1)' : 'scaleX(1)'; 
+        const player = document.getElementById('player'), scoreTxt = document.getElementById('score-text'), gameArea = document.getElementById('game-container');
+        Atelia.auth.onAuthStateChange(async (e, s) => {
+            if (s?.user) {
+                document.getElementById('profile-hub').style.display = 'flex'; document.getElementById('auth-overlay').style.display = 'none';
+                const p = await Atelia.arena.getProfile(s.user.id);
+                document.getElementById('p-username').innerText = (p.username || 'Vanguard').toUpperCase();
+                document.getElementById('p-prestige').innerText = (p.atlr_prestige || 0) + ' ATLR';
+                document.getElementById('p-avatar').src = assets[char].sel;
+            } else { document.getElementById('profile-hub').style.display = 'none'; }
+        });
+        async function login() { await Atelia.auth.signIn(document.getElementById('email').value, document.getElementById('password').value); }
+        function toggleAuth() { const l = document.getElementById('login-form'), s = document.getElementById('signup-form'); l.style.display = l.style.display === 'none' ? 'flex' : 'none'; s.style.display = s.style.display === 'none' ? 'flex' : 'none'; }
+        async function toggleDashboard() {
+            const m = document.getElementById('dashboard-modal');
+            if (m.style.display === 'none' || !m.style.display) {
+                const { data } = await Atelia.auth.getUser();
+                if (data?.user) {
+                    const p = await Atelia.arena.getProfile(data.user.id);
+                    document.getElementById('d-atlr').innerText = (p.atlr_prestige || 0) + ' ATLR';
+                    document.getElementById('d-high').innerText = p.high_score || 0;
+                    m.style.display = 'flex';
+                } else { document.getElementById('auth-overlay').style.display = 'flex'; }
+            } else { m.style.display = 'none'; }
         }
-
-        async function start() { 
-            console.log('Initiating Arena Launch Protocol...');
-            if (!window.Atelia) {
-                console.error('Atelia Sovereignty Layer not found.');
-                alert('Connection Error: Atelia Layer not initialized. Please refresh.');
-                return;
-            }
-            try {
-                const { data, error } = await Atelia.auth.getUser();
-                const user = data?.user;
-
-                if (!user) {
-                    console.log('Auth required. Opening secure portal...');
-                    document.getElementById('auth-overlay').style.display = 'flex';
-                    return;
-                }
-                
-                console.log('Identity Verified:', user.email);
-                active = true;
-                document.getElementById('select-screen').style.display = 'none'; 
-                document.querySelectorAll('.obs').forEach(o => o.remove());
-                activeIntervals.forEach(clearInterval);
-                activeIntervals = [];
-                clearTimeout(spawnTimeout);
-                
-                score = 0;
-                scoreTxt.innerText = '000';
-                player.style.bottom = '50px';
-                player.style.left = '100px';
-                player.src = assets[char].r; 
-                player.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
-                
-                if (assets[char].flip) player.style.transform = 'scaleX(-1)';
-                else player.style.transform = 'scaleX(1)';
-
-                spawn(); 
-            } catch (err) {
-                console.error('Launch Failure:', err);
-                alert('Launch Failure: ' + err.message);
-            }
+        function sel(c) { char = c; document.querySelectorAll('.char-opt').forEach(o => o.classList.remove('active')); document.getElementById('o-' + c).classList.add('active'); player.src = assets[c].sel; player.style.transform = assets[c].flip ? 'scaleX(-1)' : 'scaleX(1)'; }
+        async function start() {
+            const { data } = await Atelia.auth.getUser();
+            if (!data?.user) { document.getElementById('auth-overlay').style.display = 'flex'; return; }
+            active = true; document.getElementById('select-screen').style.display = 'none';
+            score = 0; scoreTxt.innerText = '000'; player.style.bottom = '50px'; player.src = assets[char].r;
+            spawn();
         }
-
         function jump() { 
-            if (!active || jumping) return; 
-            jumping = true; 
-            player.src = assets[char].j; 
-            let pos = parseInt(player.style.bottom) || 50, 
-                leftPos = 100,
-                up = setInterval(() => { 
-                if (pos >= 220) { 
-                    clearInterval(up); 
-                    let down = setInterval(() => { 
-                        if (pos <= 50) { 
-                            clearInterval(down); jumping = false; player.src = assets[char].r; 
-                        } 
-                        pos -= 4; 
-                        leftPos -= 2;
-                        player.style.bottom = pos + 'px'; 
-                        player.style.left = leftPos + 'px';
-                    }, 25); 
-                } 
-                pos += 6; 
-                leftPos += 4;
-                player.style.bottom = pos + 'px'; 
-                player.style.left = leftPos + 'px';
-            }, 25); 
+            if (!active || jumping) return; jumping = true; player.src = assets[char].j;
+            let pos = 50, up = setInterval(() => { if (pos >= 220) { clearInterval(up); let down = setInterval(() => { if (pos <= 50) { clearInterval(down); jumping = false; player.src = assets[char].r; } pos -= 4; player.style.bottom = pos + 'px'; }, 25); } pos += 6; player.style.bottom = pos + 'px'; }, 25);
         }
-
-        function spawn() { 
-            if (!active) return; 
-            let obs = document.createElement('div'); 
-            obs.className = 'obs'; 
-            obs.style.right = '-600px'; 
-            gameArea.appendChild(obs); 
-            let move = setInterval(() => { 
-                if (!active) { clearInterval(move); return; } 
-                let r = parseInt(obs.style.right); 
-                if (r > gameArea.clientWidth + 600) { 
-                    clearInterval(move); 
-                    if (obs.parentNode) gameArea.removeChild(obs); 
-                    score++; 
-                    scoreTxt.innerText = score.toString().padStart(3, '0'); 
-                }             
-                let pRect = player.getBoundingClientRect(), oRect = obs.getBoundingClientRect(); 
-                
-                if (pRect.right > oRect.left + 100 && pRect.left < oRect.right - 100) {
-                    if (pRect.top < oRect.top + 100 || pRect.bottom > oRect.bottom - 100) {
-                        gameOver();
-                        clearInterval(move);
-                    }
-                } 
-                obs.style.right = (r + 11 + (score/5)) + 'px'; 
-            }, 20); 
-            activeIntervals.push(move);
-            spawnTimeout = setTimeout(spawn, 3000 + Math.random() * 2000); 
+        function spawn() {
+            if (!active) return;
+            let obs = document.createElement('div'); obs.className = 'obs'; obs.style.right = '-600px'; gameArea.appendChild(obs);
+            let move = setInterval(() => {
+                if (!active) { clearInterval(move); return; }
+                let r = parseInt(obs.style.right);
+                if (r > gameArea.clientWidth + 600) { clearInterval(move); if (obs.parentNode) gameArea.removeChild(obs); score++; scoreTxt.innerText = score.toString().padStart(3, '0'); }
+                let p = player.getBoundingClientRect(), o = obs.getBoundingClientRect();
+                if (p.right > o.left + 50 && p.left < o.right - 50 && p.bottom > o.top + 50) { gameOver(); clearInterval(move); }
+                obs.style.right = (r + 12 + (score/5)) + 'px';
+            }, 20);
+            activeIntervals.push(move); spawnTimeout = setTimeout(spawn, 3000 + Math.random() * 2000);
         }
-
-        function gameOver() {
-            active = false;
-            clearTimeout(spawnTimeout);
-            activeIntervals.forEach(clearInterval);
-            activeIntervals = [];
-            document.getElementById('res-score').innerText = score;
-            document.getElementById('atlr-count').innerText = score;
-            document.getElementById('results-modal').style.display = 'flex';
-            if (window.Atelia && Atelia.arena) Atelia.arena.saveScore(score, char);
-        }
-
-        function resetGame() {
-            document.getElementById('results-modal').style.display = 'none';
-            document.getElementById('select-screen').style.display = 'flex';
-            document.querySelectorAll('.obs').forEach(o => o.remove());
-        }
-
-        window.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); jump(); } });
-        
-        gameArea.addEventListener('mousedown', (e) => { 
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-            e.preventDefault(); 
-            jump(); 
-        });
-        gameArea.addEventListener('touchstart', (e) => { 
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
-            e.preventDefault(); 
-            jump(); 
-        });
+        function gameOver() { active = false; clearTimeout(spawnTimeout); activeIntervals.forEach(clearInterval); document.getElementById('res-score').innerText = score; document.getElementById('results-modal').style.display = 'flex'; Atelia.arena.saveScore(score, char); }
+        function resetGame() { document.getElementById('results-modal').style.display = 'none'; document.getElementById('select-screen').style.display = 'flex'; document.querySelectorAll('.obs').forEach(o => o.remove()); }
+        window.addEventListener('keydown', e => { if (e.code === 'Space') jump(); });
+        gameArea.addEventListener('mousedown', () => jump());
     </script>
 </body>
 </html>
