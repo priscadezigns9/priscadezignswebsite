@@ -198,6 +198,35 @@
         }
         #results-modal h1 { font-family: 'Bangers'; font-size: 6rem; color: var(--red); margin: 0; text-shadow: 4px 4px 0 white; }
 
+        /* Profile UI */
+        #auth-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2001;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .auth-form {
+            background: #111; padding: 40px; border: 2px solid var(--red);
+            display: flex; flex-direction: column; gap: 15px; width: 300px;
+        }
+        .auth-form input {
+            padding: 12px; background: #222; border: 1px solid #444; color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .auth-btn {
+            padding: 12px; background: var(--red); color: white; border: none;
+            font-family: 'Russo One'; cursor: pointer; text-transform: uppercase;
+        }
+        
+        #profile-hub {
+            position: absolute; top: 20px; left: 20px; z-index: 100;
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        #p-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--orange); }
+        #p-username { font-family: 'Russo One'; font-size: 0.9rem; color: #fff; }
+        #p-prestige { font-family: 'Bangers'; font-size: 1.2rem; color: var(--orange); }
+
         /* Back to Top Button */
         #back-to-top {
             position: fixed;
@@ -269,6 +298,33 @@
         <p style="font-family: 'Russo One'; color: #888; margin-bottom: 30px;">PASS THROUGH THE GALACTIC HOOPS TO SCORE ATLR.</p>
         
         <div id="game-container">
+            <div id="profile-hub" style="display: none;">
+                <img id="p-avatar" src="" alt="Avatar">
+                <div>
+                    <div id="p-username">VANGUARD</div>
+                    <div id="p-prestige">0 ATLR</div>
+                </div>
+                <button onclick="Atelia.auth.signOut()" style="background:none; border:none; color:#888; cursor:pointer; font-size:10px;">[LOGOUT]</button>
+            </div>
+
+            <div id="auth-overlay">
+                <div class="auth-form" id="login-form">
+                    <h2 style="font-family:'Bangers'; color:white; margin:0 0 10px;">VANGUARD LOGIN</h2>
+                    <input type="email" id="email" placeholder="EMAIL">
+                    <input type="password" id="password" placeholder="PASSWORD">
+                    <button class="auth-btn" onclick="login()">LOGIN</button>
+                    <p style="font-size:12px; color:#888; text-align:center;">NEW? <a href="#" onclick="toggleAuth()" style="color:var(--red);">SIGN UP</a></p>
+                </div>
+                <div class="auth-form" id="signup-form" style="display:none;">
+                    <h2 style="font-family:'Bangers'; color:white; margin:0 0 10px;">JOIN THE ARENA</h2>
+                    <input type="text" id="reg-user" placeholder="USERNAME">
+                    <input type="email" id="reg-email" placeholder="EMAIL">
+                    <input type="password" id="reg-password" placeholder="PASSWORD">
+                    <button class="auth-btn" onclick="register()">REGISTER</button>
+                    <p style="font-size:12px; color:#888; text-align:center;">MEMBER? <a href="#" onclick="toggleAuth()" style="color:var(--red);">LOGIN</a></p>
+                </div>
+            </div>
+
             <div id="score-ui" class="game-ui"><span>SCORE: </span><span id="score-text">000</span></div>
             <img id="player" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp" alt="Vanguard">
             
@@ -331,6 +387,43 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/ateliagaming/js/atelia_supabase.js"></script>
     <script>
+        // High-Fidelity Sync: Supabase Auth & Profile Logic
+        Atelia.auth.onAuthStateChange(async (event, session) => {
+            if (session?.user) {
+                document.getElementById('profile-hub').style.display = 'flex';
+                const profile = await Atelia.arena.getProfile(session.user.id);
+                document.getElementById('p-username').innerText = profile.username.toUpperCase();
+                document.getElementById('p-prestige').innerText = profile.atlr_prestige + ' ATLR';
+                document.getElementById('p-avatar').src = assets[char].sel; // Default to selected char
+            } else {
+                document.getElementById('profile-hub').style.display = 'none';
+            }
+        });
+
+        async function login() {
+            try {
+                await Atelia.auth.signIn(document.getElementById('email').value, document.getElementById('password').value);
+                document.getElementById('auth-overlay').style.display = 'none';
+            } catch (e) { alert(e.message); }
+        }
+
+        async function register() {
+            try {
+                await Atelia.auth.signUp(
+                    document.getElementById('reg-email').value, 
+                    document.getElementById('reg-password').value, 
+                    document.getElementById('reg-user').value
+                );
+                alert("Check your email for confirmation!");
+            } catch (e) { alert(e.message); }
+        }
+
+        function toggleAuth() {
+            const l = document.getElementById('login-form'), s = document.getElementById('signup-form');
+            l.style.display = l.style.display === 'none' ? 'flex' : 'none';
+            s.style.display = s.style.display === 'none' ? 'flex' : 'none';
+        }
+
         const assets = {
             astra: { 
                 sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp', 
@@ -372,20 +465,29 @@
         }
 
         function start() { 
-            active = true;
-            document.getElementById('select-screen').style.display = 'none'; 
-            document.querySelectorAll('.obs').forEach(o => o.remove());
-            activeIntervals.forEach(clearInterval);
-            activeIntervals = [];
-            clearTimeout(spawnTimeout);
-            
-            score = 0;
-            scoreTxt.innerText = '000';
-            player.style.bottom = '50px';
-            player.src = assets[char].r; 
-            player.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
-            
-            spawn(); 
+            // Persistence Check: Force login if not authenticated
+            Atelia.auth.getUser().then(({ data: { user } }) => {
+                if (!user) {
+                    document.getElementById('auth-overlay').style.display = 'flex';
+                    return;
+                }
+                
+                active = true;
+                document.getElementById('select-screen').style.display = 'none'; 
+                document.querySelectorAll('.obs').forEach(o => o.remove());
+                activeIntervals.forEach(clearInterval);
+                activeIntervals = [];
+                clearTimeout(spawnTimeout);
+                
+                score = 0;
+                scoreTxt.innerText = '000';
+                player.style.bottom = '50px';
+                player.style.left = '100px';
+                player.src = assets[char].r; 
+                player.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
+                
+                spawn(); 
+            });
         }
 
         function jump() { 
