@@ -29,7 +29,8 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--navy-deep); line-height: 1.6; }
 
         nav { background: var(--white); border-bottom: 2px solid var(--primary-red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 80px; position: sticky; top: 0; z-index: 1000; }
-        .brand img { height: 45px; display: block; }
+        .brand { text-decoration: none; display: flex; align-items: center; height: 100%; }
+        .brand svg { height: 35px; width: auto; }
         
         .nav-links { display: flex; gap: 24px; align-items: center; }
         .nav-links a { color: #555; text-decoration: none; font-size: 14px; font-weight: 600; }
@@ -71,7 +72,14 @@
 <body>
 
 <nav>
-    <a href="/dpanyard/index.html" class="brand"><img src="/dpanyard/assets/logos/dpanyard_logo_v2.svg" alt="dpanyard"></a>
+    <a href="/dpanyard/index.html" class="brand">
+        <!-- Inlined High-Fidelity SVG Logo (Forced Cache-Bust) -->
+        <svg width="500" height="100" viewBox="0 0 500 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="70" font-family="Sora, sans-serif" font-weight="800" font-size="60" fill="#0D1B2A">
+                <tspan fill="#E01B24">D'</tspan> PanYard
+            </text>
+        </svg>
+    </a>
     
     <!-- Dynamic Auth Links -->
     <div class="nav-links" id="auth-guest">
@@ -113,21 +121,18 @@
 
 <script>
     const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
-    const SB_KEY = '{{credential:supabase-anon-key}}'; // Uses existing verified credential
+    const SB_KEY = '{{credential:supabase-anon-key}}'; 
     const sb = supabase.createClient(SB_URL, SB_KEY);
 
-    // 1. Auth Persistence Management
     async function checkAuth() {
         const { data: { session } } = await sb.auth.getSession();
         const guestDiv = document.getElementById('auth-guest');
         const userDiv = document.getElementById('auth-user');
 
         if (session) {
-            // User is signed in (persists across tab/browser close)
             guestDiv.style.display = 'none';
             userDiv.style.display = 'flex';
         } else {
-            // No active session
             guestDiv.style.display = 'flex';
             userDiv.style.display = 'none';
         }
@@ -138,7 +143,6 @@
         window.location.reload();
     }
 
-    // 2. Data Fetching
     async function loadProviders(query = '') {
         const grid = document.getElementById('provider-grid');
         const title = document.getElementById('results-title');
@@ -181,7 +185,7 @@
     }
 
     window.onload = () => {
-        checkAuth(); // Check persistence on load
+        checkAuth();
         loadProviders();
         syncStats();
     };
