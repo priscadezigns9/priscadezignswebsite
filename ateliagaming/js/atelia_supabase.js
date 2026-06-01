@@ -66,6 +66,14 @@ const AteliaArena = {
         return data;
     },
 
+    async updateProfile(userId, profileData) {
+        const { error } = await sb
+            .from('atelia_profiles')
+            .update({ ...profileData, updated_at: new Date() })
+            .eq('id', userId);
+        if (error) throw error;
+    },
+
     async saveScore(score, charUsed) {
         const { data: { user } } = await sb.auth.getUser();
         if (!user) return null; // Non-persistent run
