@@ -54,9 +54,9 @@
         }
         .nav-links a:hover { color: var(--red); text-shadow: 0 0 15px var(--red); }
 
-        /* Hero Section - The Arena */
+        /* Hero Section */
         .hero {
-            height: 80vh;
+            height: 90vh;
             display: flex;
             align-items: center;
             justify-content: space-around;
@@ -182,20 +182,53 @@
         .card:hover img { filter: grayscale(0); transform: scale(1.05); }
         .card h3 { font-family: 'Bangers'; font-size: 3rem; margin: 0; color: var(--white); letter-spacing: 2px; }
 
-        /* Character Selector / Game */
-        .game-section { background: #000; padding: 100px 10%; text-align: center; border-top: 5px solid var(--red); }
-        .char-select-ui { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 50px; }
+        /* Embedded Game Section */
+        .game-section { 
+            background: #000; 
+            padding: 80px 10%; 
+            text-align: center; 
+            border-top: 5px solid var(--red);
+            position: relative;
+            min-height: 700px;
+            overflow: hidden;
+        }
+        #gameCanvas {
+            width: 100%;
+            height: 500px;
+            background: #080808;
+            border: 4px solid #222;
+            display: block;
+            margin: 0 auto;
+        }
+        #charSelectUI { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            pointer-events: auto; 
+        }
+        .char-grid { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
         .char-card {
-            cursor: pointer; background: #0a0a0a; border: 3px solid #222; padding: 25px; border-radius: 8px; 
-            text-align: center; width: 220px; transition: 0.3s;
+            cursor: pointer; background: #0a0a0a; border: 3px solid #222; padding: 20px; border-radius: 8px; 
+            text-align: center; width: 180px; transition: 0.3s;
         }
         .char-card:hover { border-color: var(--orange); background: #111; transform: scale(1.05); }
-        .char-card img { height: 200px; object-fit: contain; filter: drop-shadow(0 0 15px rgba(0,0,0,0.8)); }
-        .char-card p { color: #fff; margin-top: 20px; font-family: 'Russo One'; font-size: 1.5rem; }
+        .char-card img { height: 160px; object-fit: contain; filter: drop-shadow(0 0 15px rgba(0,0,0,0.8)); }
+        .char-card p { color: #fff; margin-top: 15px; font-family: 'Russo One'; font-size: 1.2rem; }
 
         footer { padding: 100px 10%; background: #000; border-top: 5px solid var(--red); text-align: center; }
         footer img { height: 100px; filter: drop-shadow(0 0 20px var(--red)); margin-bottom: 30px; }
         footer p { font-family: 'Russo One'; color: #444; font-size: 1.2rem; letter-spacing: 3px; }
+
+        /* Animation Sharpness */
+        img, #gameCanvas { image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
     </style>
 </head>
 <body>
@@ -220,7 +253,7 @@
     <section class="hero">
         <div class="hero-content">
             <h1>THE ARENA<br><span>IS LIVE.</span></h1>
-            <p>Step into the future of the Atelia Gaming Universe. Earn, play, and build with Astra.</p>
+            <p>Step into the high-fidelity future of gaming. Earn, play, and build with the Echoes of Atelia.</p>
             <a href="#game" class="cta-button">PLAY ASTRA RUN</a>
         </div>
         <img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_3d_hf.webp" class="hero-img" alt="Astra 3D">
@@ -231,7 +264,7 @@
         <div class="event-card">
             <div class="live-badge">LIVE NOW</div>
             <h3>SGF 2026: Gaming Zone Stream</h3>
-            <p>Join the Atelia Vanguard live as we break down the latest high-fidelity announcements, developer insights, and competitive roadmaps for the Atelia Gaming ecosystem. Discover the next evolution of Neural ($NRL) integration.</p>
+            <p>Join the Atelia Vanguard live as we break down the latest high-fidelity announcements, developer insights, and competitive roadmaps for the Atelia Gaming Lab. Discover the next evolution of Neural ($NRL) integration.</p>
             <a href="#" class="event-btn">JOIN THE STREAM</a>
         </div>
     </section>
@@ -258,28 +291,32 @@
     </section>
 
     <section class="game-section" id="game">
-        <h2>SELECT YOUR <span>CHARACTER</span></h2>
-        <div class="char-select-ui">
-            <div class="char-card" onclick="selectChar('astra')">
-                <img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp" alt="Astra">
-                <p>ASTRA</p>
-            </div>
-            <div class="char-card" onclick="selectChar('mimi')">
-                <img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_2d_hf_1.webp" alt="Mimi">
-                <p>MIMI</p>
-            </div>
-            <div class="char-card" onclick="selectChar('echo')">
-                <img src="https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp" alt="Echo">
-                <p>ECHO</p>
-            </div>
-            <div class="char-card" style="opacity: 0.4; cursor: not-allowed;">
-                <img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_2d_hf.webp" alt="Nova">
-                <p>NOVA (TBA)</p>
+        <div id="charSelectUI">
+            <h2 style="color: #fff; font-family: 'Bangers'; font-size: 4rem; margin-bottom: 30px;">SELECT YOUR CHARACTER</h2>
+            <div class="char-grid">
+                <div class="char-card" onclick="selectChar('astra')">
+                    <img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp" alt="Astra">
+                    <p>ASTRA</p>
+                </div>
+                <div class="char-card" onclick="selectChar('mimi')">
+                    <img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_2d_hf_1.webp" alt="Mimi">
+                    <p>MIMI</p>
+                </div>
+                <div class="char-card" onclick="selectChar('echo')">
+                    <img src="https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp" alt="Echo">
+                    <p>ECHO</p>
+                </div>
+                <div class="char-card" style="opacity: 0.4; cursor: not-allowed;">
+                    <img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_2d_hf.webp" alt="Nova">
+                    <p>NOVA (TBA)</p>
+                </div>
             </div>
         </div>
-        <div style="margin-top: 60px;">
-            <h3 style="font-family:'Bangers'; font-size: 3.5rem; color: var(--red);">ASTRA RUN: PROTOTYPE</h3>
-            <p style="font-family:'Russo One'; font-size: 1.2rem; color:#444;">PRESS [SPACE] OR CLICK TO JUMP</p>
+
+        <div class="game-ui" style="position: relative; z-index: 10;">
+            <h2 id="gameTitle" style="font-family:'Bangers'; font-size: 3.5rem; color: var(--red); margin: 0;">ASTRA RUN: PROTOTYPE</h2>
+            <p style="font-family:'Russo One'; font-size: 1.2rem; color:#888;">PRESS [SPACE] OR CLICK TO JUMP</p>
+            <canvas id="gameCanvas"></canvas>
         </div>
     </section>
 
@@ -291,11 +328,144 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/ateliagaming/js/atelia_supabase.js"></script>
     <script>
+        // --- GAME LOGIC (EMBEDDED) ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let gameActive = false;
+        let score = 0;
+        let selectedCharacter = null;
+
+        const runningImg = new Image();
+        const jumpingImg = new Image();
+        const coinImg = new Image();
+        coinImg.src = 'https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp';
+
+        const player = {
+            x: 100, y: 0, width: 100, height: 100,
+            dy: 0, jumpForce: 15, gravity: 0.8, grounded: false, state: 'running'
+        };
+
+        const obstacles = [];
+        const coins = [];
+
+        function resize() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 500;
+            player.y = canvas.height - 150;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
         function selectChar(char) {
-            window.location.href = "game.html?char=" + char;
+            selectedCharacter = char;
+            if (char === 'mimi') {
+                runningImg.src = 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp';
+                jumpingImg.src = 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp';
+                document.getElementById('gameTitle').innerText = 'Mimi Run: Prototype';
+            } else if (char === 'echo') {
+                runningImg.src = 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp';
+                jumpingImg.src = 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp';
+                document.getElementById('gameTitle').innerText = 'Echo Run: Prototype';
+            } else {
+                runningImg.src = 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp';
+                jumpingImg.src = 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp';
+                document.getElementById('gameTitle').innerText = 'Astra Run: Prototype';
+            }
+            document.getElementById('charSelectUI').style.display = 'none';
+            resetGame();
         }
 
-        // Auth State Handling
+        function resetGame() {
+            score = 0;
+            obstacles.length = 0;
+            coins.length = 0;
+            gameActive = true;
+            player.y = canvas.height - 150;
+            player.dy = 0;
+            update();
+        }
+
+        function jump() {
+            if (player.grounded && gameActive) {
+                player.dy = -player.jumpForce;
+                player.grounded = false;
+                player.state = 'jumping';
+            } else if (!gameActive && selectedCharacter) {
+                resetGame();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => { if (e.code === 'Space') jump(); });
+        canvas.addEventListener('mousedown', jump);
+
+        function update() {
+            if (!gameActive) return;
+            player.dy += player.gravity;
+            player.y += player.dy;
+
+            if (player.y + player.height > canvas.height - 50) {
+                player.y = canvas.height - 50 - player.height;
+                player.dy = 0;
+                player.grounded = true;
+                player.state = 'running';
+            }
+
+            if (Math.random() < 0.01) spawnObstacle();
+            if (Math.random() < 0.01) spawnCoin();
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= 8;
+                if (player.x < obstacles[i].x + obstacles[i].width &&
+                    player.x + player.width > obstacles[i].x &&
+                    player.y < obstacles[i].y + obstacles[i].height &&
+                    player.y + player.height > obstacles[i].y) {
+                    gameActive = false;
+                    document.getElementById('charSelectUI').style.display = 'flex';
+                    document.getElementById('gameTitle').innerText = 'Game Over! Score: ' + score;
+                    if (window.Atelia && Atelia.arena) Atelia.arena.saveScore(score, selectedCharacter);
+                }
+                if (obstacles[i].x < -50) obstacles.splice(i, 1);
+            }
+
+            for (let i = coins.length - 1; i >= 0; i--) {
+                coins[i].x -= 7;
+                if (player.x < coins[i].x + coins[i].width &&
+                    player.x + player.width > coins[i].x &&
+                    player.y < coins[i].y + coins[i].height &&
+                    player.y + player.height > coins[i].y) {
+                    coins.splice(i, 1);
+                    score += 10;
+                } else if (coins[i].x < -50) {
+                    coins.splice(i, 1);
+                }
+            }
+
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function spawnObstacle() {
+            obstacles.push({ x: canvas.width, y: canvas.height - 100, width: 40, height: 50 });
+        }
+        function spawnCoin() {
+            coins.push({ x: canvas.width, y: canvas.height - 150 - Math.random() * 100, width: 40, height: 40 });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Russo One';
+            ctx.fillText('SCORE: ' + score, 20, 40);
+            ctx.fillStyle = '#FF4444';
+            for (let ob of obstacles) ctx.fillRect(ob.x, ob.y, ob.width, ob.height);
+            for (let c of coins) ctx.drawImage(coinImg, c.x, c.y, c.width, c.height);
+            const currentImg = player.state === 'running' ? runningImg : jumpingImg;
+            ctx.drawImage(currentImg, player.x, player.y, player.width, player.height);
+        }
+
+        // --- AUTH LOGIC ---
         if (window.Atelia && Atelia.auth) {
             Atelia.auth.onAuthStateChange((event, session) => {
                 const authLink = document.getElementById('auth-link');
