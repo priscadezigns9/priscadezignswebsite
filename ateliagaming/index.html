@@ -362,7 +362,7 @@
             }
         };
 
-        let char = 'astra', jumping = false, score = 0, active = false;
+        let char = 'astra', jumping = false, score = 0, active = false, spawnTimeout;
         const player = document.getElementById('player');
         const scoreTxt = document.getElementById('score-text');
         const gameArea = document.getElementById('game-container');
@@ -377,6 +377,8 @@
 
         function start() { 
             document.getElementById('select-screen').style.display = 'none'; 
+            document.querySelectorAll('.obs').forEach(o => o.remove());
+            clearTimeout(spawnTimeout);
             player.src = assets[char].r; 
             player.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
             active = true; 
@@ -412,19 +414,22 @@
             let move = setInterval(() => { 
                 if (!active) { clearInterval(move); return; } 
                 let r = parseInt(obs.style.right); 
-                if (r > gameArea.clientWidth) { clearInterval(move); gameArea.removeChild(obs); score++; scoreTxt.innerText = score.toString().padStart(3, '0'); }             
+                if (r > gameArea.clientWidth + 600) { 
+                    clearInterval(move); 
+                    if (obs.parentNode) gameArea.removeChild(obs); 
+                    score++; 
+                    scoreTxt.innerText = score.toString().padStart(3, '0'); 
+                }             
                 let pRect = player.getBoundingClientRect(), oRect = obs.getBoundingClientRect(); 
-                // Collision Logic: If in the same horizontal window, must be within the 'hole'
-                if (pRect.right > oRect.left + 50 && pRect.left < oRect.right - 50) {
-                    // Check if player is NOT in the gap (between top+80 and bottom-80 of the hoop)
-                    if (pRect.top < oRect.top + 50 || pRect.bottom > oRect.bottom - 50) {
+                if (pRect.right > oRect.left + 80 && pRect.left < oRect.right - 80) {
+                    if (pRect.top < oRect.top + 80 || pRect.bottom > oRect.bottom - 80) {
                         gameOver();
                         clearInterval(move);
                     }
                 } 
                 obs.style.right = (r + 12 + (score/5)) + 'px'; 
             }, 20); 
-            setTimeout(spawn, 1500 + Math.random() * 2500); 
+            spawnTimeout = setTimeout(spawn, 2000 + Math.random() * 2000); 
         }
 
         function gameOver() {
