@@ -27,11 +27,45 @@ const AteliaAuth = {
         return sb.auth.getUser();
     },
     onAuthStateChange(callback) {
-        sb.auth.onAuthStateChange(callback);
+        sb.auth.onAuthStateChange(async (event, session) => {
+            if (session?.user) {
+                // Ensure profile exists in atelia_profiles
+                await AteliaArena.ensureProfile(session.user);
+            }
+            callback(event, session);
+        });
     }
 };
 
 const AteliaArena = {
+    async ensureProfile(user) {
+        const { data, error } = await sb
+            .from('atelia_profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+        if (error || !data) {
+            await sb.from('atelia_profiles').upsert({
+                id: user.id,
+                username: user.user_metadata.username || 'Vanguard',
+                atlr_prestige: 0,
+                high_score: 0,
+                updated_at: new Date()
+            });
+        }
+    },
+
+    async getProfile(userId) {
+        const { data, error } = await sb
+            .from('atelia_profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+        if (error) throw error;
+        return data;
+    },
+
     async saveScore(score, charUsed) {
         const { data: { user } } = await sb.auth.getUser();
         if (!user) return null; // Non-persistent run
