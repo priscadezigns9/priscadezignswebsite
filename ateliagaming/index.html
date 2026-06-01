@@ -142,21 +142,21 @@
         #game-container {
             width: 100%;
             height: 600px;
-            background: radial-gradient(circle at center, #1a0000 0%, #000 100%);
+            background: url('https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=1600&q=80') center center / cover no-repeat;
             border: 4px solid #222;
             position: relative;
             overflow: hidden;
             margin: 40px auto;
             box-shadow: 0 0 50px rgba(211, 47, 47, 0.2);
         }
-        #game-container::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(211,47,47,0.1), transparent); pointer-events:none; }
+        #game-container::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(0deg, rgba(211,47,47,0.2), transparent); pointer-events:none; }
 
         #player { width: 140px; height: 140px; position: absolute; bottom: 50px; left: 100px; z-index: 10; transition: transform 0.1s; }
         .obs { 
             width: 540px; height: 540px; position: absolute; bottom: 10px; 
             border: 8px solid var(--orange); border-radius: 50%; 
             box-shadow: 0 0 60px var(--orange), inset 0 0 40px var(--orange); 
-            background: rgba(255,107,0,0.1); 
+            background: rgba(255,107,0,0.05); 
             z-index: 5;
         }
         .obs::after { 
@@ -170,7 +170,7 @@
 
         #select-screen { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.98); z-index: 1000; 
+            background: rgba(0,0,0,0.8); z-index: 1000; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
         }
         .selection-grid { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; max-width: 800px; }
@@ -197,10 +197,6 @@
             align-items: center; justify-content: center; z-index: 2000; 
         }
         #results-modal h1 { font-family: 'Bangers'; font-size: 6rem; color: var(--red); margin: 0; text-shadow: 4px 4px 0 white; }
-
-        footer { padding: 80px 10%; background: #000; border-top: 5px solid var(--red); text-align: center; }
-        footer .footer-logo { height: 80px; filter: drop-shadow(0 0 20px var(--red)); margin-bottom: 20px; }
-        footer p { font-family: 'Russo One'; color: #555; font-size: 1.1rem; letter-spacing: 2px; }
 
         /* Back to Top Button */
         #back-to-top {
@@ -340,13 +336,13 @@
                 sel: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp', 
                 r: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp', 
                 j: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp', 
-                glow: 'rgba(255,107,0,0.8)', flip: true 
+                glow: 'rgba(255,107,0,0.8)', flip: false 
             },
             mimi: { 
                 sel: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp', 
                 r: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp', 
                 j: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp', 
-                glow: 'rgba(255,107,0,0.8)', flip: false 
+                glow: 'rgba(255,107,0,0.8)', flip: true 
             },
             nova: { 
                 sel: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp', 
@@ -358,11 +354,11 @@
                 sel: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp', 
                 r: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp', 
                 j: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp', 
-                glow: 'rgba(0,191,255,0.8)', flip: false 
+                glow: 'rgba(0,191,255,0.8)', flip: true 
             }
         };
 
-        let char = 'astra', jumping = false, score = 0, active = false, spawnTimeout;
+        let char = 'astra', jumping = false, score = 0, active = false, spawnTimeout, activeIntervals = [];
         const player = document.getElementById('player');
         const scoreTxt = document.getElementById('score-text');
         const gameArea = document.getElementById('game-container');
@@ -376,14 +372,19 @@
         }
 
         function start() { 
+            active = true;
             document.getElementById('select-screen').style.display = 'none'; 
             document.querySelectorAll('.obs').forEach(o => o.remove());
+            activeIntervals.forEach(clearInterval);
+            activeIntervals = [];
             clearTimeout(spawnTimeout);
-            player.src = assets[char].r; 
-            player.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
-            active = true; 
+            
             score = 0;
             scoreTxt.innerText = '000';
+            player.style.bottom = '50px';
+            player.src = assets[char].r; 
+            player.style.filter = 'drop-shadow(0 0 15px ' + assets[char].glow + ')'; 
+            
             spawn(); 
         }
 
@@ -391,7 +392,7 @@
             if (!active || jumping) return; 
             jumping = true; 
             player.src = assets[char].j; 
-            let pos = 50, up = setInterval(() => { 
+            let pos = parseInt(player.style.bottom) || 50, up = setInterval(() => { 
                 if (pos >= 400) { 
                     clearInterval(up); 
                     let down = setInterval(() => { 
@@ -421,19 +422,26 @@
                     scoreTxt.innerText = score.toString().padStart(3, '0'); 
                 }             
                 let pRect = player.getBoundingClientRect(), oRect = obs.getBoundingClientRect(); 
-                if (pRect.right > oRect.left + 80 && pRect.left < oRect.right - 80) {
-                    if (pRect.top < oRect.top + 80 || pRect.bottom > oRect.bottom - 80) {
+                
+                // Tightened Collision: Hole is much smaller now
+                if (pRect.right > oRect.left + 150 && pRect.left < oRect.right - 150) {
+                    // Check if player is NOT in the gap (between top+180 and bottom-180 of the hoop)
+                    if (pRect.top < oRect.top + 180 || pRect.bottom > oRect.bottom - 180) {
                         gameOver();
                         clearInterval(move);
                     }
                 } 
                 obs.style.right = (r + 12 + (score/5)) + 'px'; 
             }, 20); 
+            activeIntervals.push(move);
             spawnTimeout = setTimeout(spawn, 2000 + Math.random() * 2000); 
         }
 
         function gameOver() {
             active = false;
+            clearTimeout(spawnTimeout);
+            activeIntervals.forEach(clearInterval);
+            activeIntervals = [];
             document.getElementById('res-score').innerText = score;
             document.getElementById('atlr-count').innerText = score;
             document.getElementById('results-modal').style.display = 'flex';
@@ -443,6 +451,7 @@
         function resetGame() {
             document.getElementById('results-modal').style.display = 'none';
             document.getElementById('select-screen').style.display = 'flex';
+            document.querySelectorAll('.obs').forEach(o => o.remove());
         }
 
         window.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); jump(); } });
