@@ -155,7 +155,7 @@
             <div class="auth-form" id="login-form">
                 <h2 style="font-family:'Bangers'; color:white; margin:0 0 10px; text-align:center;">VANGUARD LOGIN</h2>
                 <input type="email" id="email" placeholder="EMAIL">
-                <div class="auth-field-wrapper"><input type="password" id="password" placeholder="PASSWORD" style="margin-bottom:0"><button type="button" class="eye-toggle" onclick="togglePass('password', this)">{eye_svg}</button></div>
+                <div class="auth-field-wrapper"><input type="password" id="password" placeholder="PASSWORD" style="margin-bottom:0"><button type="button" class="eye-toggle" onclick="togglePass('password', this)"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
                 <button class="auth-btn" onclick="login()">LOGIN</button>
                 <p style="font-size:12px; color:#888; text-align:center;">NEW? <a href="#" onclick="toggleAuth()" style="color:var(--red);">SIGN UP</a></p>
             </div>
@@ -163,7 +163,7 @@
                 <h2 style="font-family:'Bangers'; color:white; margin:0 0 10px; text-align:center;">JOIN THE ARENA</h2>
                 <input type="text" id="reg-user" placeholder="USERNAME">
                 <input type="email" id="reg-email" placeholder="EMAIL">
-                <div class="auth-field-wrapper"><input type="password" id="reg-password" placeholder="PASSWORD" style="margin-bottom:0"><button type="button" class="eye-toggle" onclick="togglePass('reg-password', this)">{eye_svg}</button></div>
+                <div class="auth-field-wrapper"><input type="password" id="reg-password" placeholder="PASSWORD" style="margin-bottom:0"><button type="button" class="eye-toggle" onclick="togglePass('reg-password', this)"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
                 <button class="auth-btn" onclick="register()">REGISTER</button>
                 <p style="font-size:12px; color:#888; text-align:center;">MEMBER? <a href="#" onclick="toggleAuth()" style="color:var(--red);">LOGIN</a></p>
             </div>
@@ -206,8 +206,8 @@
                 document.getElementById('auth-overlay').style.display = 'none';
                 try {
                     const profile = await Atelia.arena.getProfile(session.user.id);
-                    document.getElementById('p-username').innerText = profile.username.toUpperCase();
-                    document.getElementById('p-prestige').innerText = profile.atlr_prestige + ' ATLR';
+                    document.getElementById('p-username').innerText = (profile.username || 'Vanguard').toUpperCase();
+                    document.getElementById('p-prestige').innerText = (profile.atlr_prestige || 0) + ' ATLR';
                     document.getElementById('p-avatar').src = assets[char].sel;
                 } catch (e) { console.error('Profile fetch failed', e); }
             } else {
@@ -217,17 +217,19 @@
 
         async function login() {
             try {
-                await Atelia.auth.signIn(document.getElementById('email').value, document.getElementById('password').value);
+                const { error } = await Atelia.auth.signIn(document.getElementById('email').value, document.getElementById('password').value);
+                if (error) throw error;
             } catch (e) { alert(e.message); }
         }
 
         async function register() {
             try {
-                await Atelia.auth.signUp(
+                const { error } = await Atelia.auth.signUp(
                     document.getElementById('reg-email').value, 
                     document.getElementById('reg-password').value, 
                     document.getElementById('reg-user').value
                 );
+                if (error) throw error;
                 alert("Check your email for confirmation!");
             } catch (e) { alert(e.message); }
         }
