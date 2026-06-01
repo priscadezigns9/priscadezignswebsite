@@ -4,7 +4,7 @@
  */
 
 const SUPABASE_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+const SUPABASE_KEY = 'sb_publishable_UicuMabi1dRKAvQ4YGiakg_NCMnftfS';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const AteliaAuth = {
@@ -120,4 +120,5 @@ const AteliaArena = {
 };
 
 window.Atelia = { auth: AteliaAuth, arena: AteliaArena };
+
 
