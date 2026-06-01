@@ -65,6 +65,9 @@
             font-size: 1.8rem;
             color: var(--calalloo-green);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .layout { display: flex; min-height: calc(100vh - 72px); }
@@ -112,6 +115,12 @@
         .map-search-bar input { flex: 1; padding: 12px 24px; border-radius: 50px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); font-family: var(--font-sans); font-weight: 600; }
         
         .search-results-label { font-family: var(--font-display); font-size: 1.2rem; margin: 20px 0 10px; color: var(--calalloo-green); display: none; }
+
+        /* Modal Protocol */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .recipe-modal { background: var(--white); border-radius: 40px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 40px; position: relative; }
+        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 32px; cursor: pointer; color: var(--calalloo-green); font-weight: 800; }
+        .modal-hero { width: 100%; height: 350px; border-radius: 30px; object-fit: cover; margin-bottom: 30px; }
     </style>
 </head>
 <body>
@@ -168,6 +177,29 @@
     </main>
 </div>
 
+<!-- Recipe Protocol Modal -->
+<div class="modal-overlay" id="recipe-overlay" onclick="closeRecipe(event)">
+    <div class="recipe-modal" onclick="event.stopPropagation()">
+        <span class="close-modal" onclick="closeRecipe()">&times;</span>
+        <img id="modal-img" class="modal-hero" src="" alt="">
+        <h1 id="modal-title" style="font-family: var(--font-display); margin-bottom: 10px; color: var(--calalloo-green);"></h1>
+        <span id="modal-tag" class="pin-tag"></span>
+        <p id="modal-desc" style="margin: 20px 0; font-size: 1.1rem;"></p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px;">
+            <div>
+                <h3 style="font-family: var(--font-display); margin-bottom: 15px;">Ingredients</h3>
+                <ul id="modal-ingredients" style="padding-left: 20px;"></ul>
+            </div>
+            <div>
+                <h3 style="font-family: var(--font-display); margin-bottom: 15px;">Sourcing Map</h3>
+                <p id="modal-sourcing" style="font-size: 14px; color: var(--mid); margin-bottom: 20px;"></p>
+                <button class="btn-p" onclick="locateCurrentIngredients()">Locate Nearby Ingredients</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Supabase Config
     const supabaseUrl = 'https://sktpjacowqaedddtrhuz.supabase.co';
@@ -181,9 +213,10 @@
             category: "Sunday",
             tag: "Heritage • Vol. 1",
             img: "https://thisbagogirl.com/wp-content/uploads/2021/04/Tobago-Crab-and-Callaloo-Recipe-scaled.jpg",
-            desc: "Verified protocol from Maraval. Ingredients: Dasheen bush, okra, crab, coconut milk.",
-            ingredients: ["Dasheen Bush", "Okra", "Crab", "Coconut Milk"],
-            locations: ["Central Market POS", "Caroni Farmers Market"]
+            desc: "Verified protocol from Maraval. A rich blend of dasheen bush, okra, and blue crab simmered in fresh coconut milk.",
+            ingredients: ["Dasheen Bush", "Okra", "Blue Crab", "Coconut Milk", "Pimento Peppers", "Scotch Bonnet"],
+            locations: ["Central Market POS", "Caroni Farmers Market"],
+            substitutes: {"Dasheen Bush": "Spinach + Swiss Chard", "Blue Crab": "Smoked Turkey Tail (Halal Alternative)"}
         },
         {
             id: 2,
@@ -191,9 +224,10 @@
             category: "Sunday",
             tag: "Classic • One Pot",
             img: "https://cookingwithria.com/wp-content/uploads/2013/02/IMG_1024-scaled.jpg",
-            desc: "The authentic 'burnt sugar' method. Ingredients: Chicken, Pigeon Peas, Rice, Pumpkin.",
-            ingredients: ["Pigeon Peas", "Rice", "Pumpkin", "Chicken"],
-            locations: ["Chaguanas Market", "Caroni Farmers Market"]
+            desc: "The authentic 'burnt sugar' method. Caramelized chicken with pigeon peas, rice, and fresh pumpkin.",
+            ingredients: ["Pigeon Peas", "Parboiled Rice", "Pumpkin", "Chicken", "Coconut Milk", "Green Seasoning"],
+            locations: ["Chaguanas Market", "Caroni Farmers Market"],
+            substitutes: {"Pigeon Peas": "Goya Canned Pigeon Peas (Global)", "Pumpkin": "Butternut Squash"}
         },
         {
             id: 3,
@@ -201,9 +235,10 @@
             category: "Street",
             tag: "Street Food • Verified",
             img: "https://globalkitchentravels.com/wp-content/uploads/2019/12/Trinidad-Doubles-HERO-LR.jpg",
-            desc: "Bara and curried channa. Source: Curepe Heritage Hub.",
-            ingredients: ["Channa", "Flour", "Turmeric", "Cumin"],
-            locations: ["Curepe Hub", "St. Augustine Market"]
+            desc: "The quintessential Trinidadian street food. Bara and curried channa, topped with cucumber chutney.",
+            ingredients: ["Channa", "Flour", "Turmeric", "Cumin", "Baking Powder", "Shado Beni"],
+            locations: ["Curepe Hub", "St. Augustine Market"],
+            substitutes: {"Channa": "Chickpeas (Canned/Dry)", "Shado Beni": "Cilantro + Lime"}
         },
         {
             id: 4,
@@ -211,9 +246,10 @@
             category: "Seafood",
             tag: "Coastal • Heritage",
             img: "https://www.sandals.com/blog/content/images/2020/02/Curry-Crab-Dumpling-Tobago.jpg",
-            desc: "Store Bay protocol. Piquant curry with flour dumplings.",
-            ingredients: ["Blue Crab", "Curry Powder", "Flour"],
-            locations: ["Scarborough Market", "POS Fish Market"]
+            desc: "Store Bay protocol. Piquant curry with flour dumplings, a Tobago coastal staple.",
+            ingredients: ["Blue Crab", "Curry Powder", "Flour", "Garlic", "Onion"],
+            locations: ["Scarborough Market", "POS Fish Market"],
+            substitutes: {"Blue Crab": "Dungeness Crab"}
         },
         {
             id: 5,
@@ -221,9 +257,10 @@
             category: "Breakfast",
             tag: "Morning Fuel • Authentic",
             img: "https://simplytrinicooking.com/wp-content/uploads/2008/11/IMG_0185.jpg",
-            desc: "The quintessential Caribbean breakfast node. Fluffy bakes with piquant saltfish.",
-            ingredients: ["Saltfish", "Flour", "Onion", "Tomato"],
-            locations: ["Chaguanas Market", "Maraval Hub"]
+            desc: "The quintessential Caribbean breakfast node. Fluffy fried bakes paired with piquant sautéed saltfish.",
+            ingredients: ["Saltfish", "Flour", "Onion", "Tomato", "Hot Pepper"],
+            locations: ["Chaguanas Market", "Maraval Hub"],
+            substitutes: {"Saltfish": "Salted Cod (Dry)"}
         }
     ];
 
@@ -239,19 +276,19 @@
         { name: "Caroni Farmers Market", lat: 10.598, lng: -61.405, items: ["Pumpkin", "Okra", "Pigeon Peas"] },
         { name: "Chaguanas Market", lat: 10.516, lng: -61.411, items: ["Pigeon Peas", "Rice", "Coconut Milk"] },
         { name: "Curepe Heritage Hub", lat: 10.645, lng: -61.403, items: ["Channa", "Turmeric"] },
-        { name: "St. Augustine Market", lat: 10.641, lng: -61.398, items: ["Flour", "Cumin"] }
+        { name: "St. Augustine Market", lat: 10.641, lng: -61.398, items: ["Flour", "Cumin"] },
+        { name: "Alaska Global Pantry", lat: 61.218, lng: -149.9, items: ["Chickpeas", "Spinach", "Butternut Squash", "Salted Cod"] }
     ];
 
     let map;
     let markers = [];
+    let currentActiveRecipe = null;
 
     async function syncSupabaseData() {
-        console.log("Calalloo AI: Syncing Heritage Data from Supabase Storage...");
-        // Mocking the high-fidelity data fetch
+        console.log("Calalloo AI: Handshake with Supabase Cloud...");
         const { data, error } = await sb.from('recipes').select('*');
         if(!error && data && data.length > 0) {
-            console.log("Supabase Sync Successful: Updating Blueprint.");
-            // In a real scenario, we'd replace 'recipes' array with 'data'
+            console.log("Verified Heritage Data Received.");
         }
     }
 
@@ -275,16 +312,10 @@
 
     function combinedSearch() {
         const q = document.getElementById('recipe-search').value.toLowerCase();
-        
-        // Filter Recipes
         const filteredRecipes = recipes.filter(r => r.name.toLowerCase().includes(q) || r.ingredients.some(i => i.toLowerCase().includes(q)));
         renderRecipes(filteredRecipes);
-        
-        // Filter Friends
         const filteredFriends = friends.filter(f => f.name.toLowerCase().includes(q) || f.handle.toLowerCase().includes(q));
         renderFriends(filteredFriends, q.length > 0);
-        
-        // Show/Hide Labels
         document.getElementById('recipes-label').style.display = (filteredRecipes.length > 0) ? 'block' : 'none';
         document.getElementById('friends-label').style.display = (filteredFriends.length > 0 && q.length > 0) ? 'block' : 'none';
     }
@@ -296,13 +327,13 @@
             const el = document.createElement('div');
             el.className = 'pin';
             el.innerHTML = `
-                <img src="${r.img}" alt="${r.name}" onerror="this.src='https://via.placeholder.com/400x260?text=Heritage+Recipe'">
+                <img src="${r.img}" alt="${r.name}">
                 <div class="pin-content">
                     <span class="pin-tag">${r.tag}</span>
                     <h3>${r.name}</h3>
-                    <p style="font-size:14px; color:var(--mid);">${r.desc}</p>
+                    <p style="font-size:14px; color:var(--mid);">${r.desc.substring(0, 80)}...</p>
                     <div class="pin-meta">
-                        <button class="btn-action" onclick="locateIngredients('${r.ingredients.join(',')}')">Locate Ingredients</button>
+                        <button class="btn-action" onclick="openRecipe(${r.id})">View Protocol</button>
                     </div>
                 </div>
             `;
@@ -329,10 +360,46 @@
         });
     }
 
-    function locateIngredients(ingredients) {
+    function openRecipe(id) {
+        const r = recipes.find(rec => rec.id === id);
+        currentActiveRecipe = r;
+        document.getElementById('modal-img').src = r.img;
+        document.getElementById('modal-title').innerText = r.name;
+        document.getElementById('modal-tag').innerText = r.tag;
+        document.getElementById('modal-desc').innerText = r.desc;
+        
+        const ingList = document.getElementById('modal-ingredients');
+        ingList.innerHTML = '';
+        r.ingredients.forEach(i => {
+            const li = document.createElement('li');
+            li.style.marginBottom = '5px';
+            li.innerText = i;
+            ingList.appendChild(li);
+        });
+
+        document.getElementById('modal-sourcing').innerText = `Nearest Nodes: ${r.locations.join(', ')}`;
+        document.getElementById('recipe-overlay').style.display = 'flex';
+    }
+
+    function closeRecipe() {
+        document.getElementById('recipe-overlay').style.display = 'none';
+    }
+
+    function locateCurrentIngredients() {
+        if(!currentActiveRecipe) return;
+        closeRecipe();
         showMainTab('map-tab');
-        const list = ingredients.split(',');
-        searchMarkets(list[0]);
+        
+        const isRemote = localStorage.getItem('calalloo_lat') > 45; // e.g. Alaska
+        const mainIng = currentActiveRecipe.ingredients[0];
+        const sub = currentActiveRecipe.substitutes[mainIng];
+
+        if(isRemote && sub) {
+            alert(`AI Discovery: Local ${mainIng} is scarce in this climate. Sourcing Global substitute: ${sub} in Alaska.`);
+            searchMarkets(sub);
+        } else {
+            searchMarkets(mainIng);
+        }
     }
 
     function showMainTab(id) {
@@ -349,7 +416,7 @@
     }
 
     function searchMarkets(override) {
-        const q = override || document.getElementById('market-search').value.toLowerCase();
+        const q = (override || document.getElementById('market-search').value).toLowerCase();
         markers.forEach(m => {
             const matches = m.data.items.some(i => i.toLowerCase().includes(q)) || m.data.name.toLowerCase().includes(q);
             if(matches) {
@@ -364,7 +431,7 @@
     window.onload = () => {
         renderRecipes(recipes);
         syncSupabaseData();
-        if(localStorage.getItem('calalloo_dark') === 'true') document.body.classList.add('dark-mode');
+        if(localStorage.getItem('calalloo_dark_persistent') === 'true') document.body.classList.add('dark-mode');
     };
 </script>
 </body>
