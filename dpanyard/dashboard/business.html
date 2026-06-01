@@ -8,8 +8,58 @@
     <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('panyard_darkmode', document.body.classList.contains('dark-mode'));
+    }
+
+    function handlePermission(type, el) {
+        if(el.checked) {
+            if(type === 'location') requestLocation();
+            else alert(type.charAt(0).toUpperCase() + type.slice(1) + " protocol authorized.");
+        }
+    }
+
+    async function saveAllSettings() {
+        alert("System Preferences Saved Successfully.");
+    }
+
+    window.addEventListener('load', () => {
+        if(localStorage.getItem('panyard_darkmode') === 'true') {
+            document.body.classList.add('dark-mode');
+            const dt = document.getElementById('darkmode-toggle');
+            if(dt) dt.checked = true;
+        }
+    });
+
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('panyard_darkmode', document.body.classList.contains('dark-mode'));
+    }
+
+    function handlePermission(type, el) {
+        if(el.checked) {
+            if(type === 'location') requestLocation();
+            else alert(type.charAt(0).toUpperCase() + type.slice(1) + " protocol authorized.");
+        }
+    }
+
+    async function saveAllSettings() {
+        alert("System Preferences Saved Successfully.");
+    }
+
+    window.addEventListener('load', () => {
+        if(localStorage.getItem('panyard_darkmode') === 'true') {
+            document.body.classList.add('dark-mode');
+            const dt = document.getElementById('darkmode-toggle');
+            if(dt) dt.checked = true;
+        }
+    });
+
+</script>
 
     <style>
         :root {
@@ -59,8 +109,41 @@
         .suggestion-card { background:var(--white); padding:20px; border-radius:20px; border:1px solid rgba(0,0,0,0.05); text-align:center; transition:0.3s; }
         
         .verified-badge { background: #00A3FF; color: white; padding: 4px 12px; border-radius: 50px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-left: 10px; vertical-align: middle; }
+    
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-red); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
     </style>
-<link rel="stylesheet" href="../assets/css/payment.css"><script src="../assets/js/payment.js" defer></script></head>
+<link rel="stylesheet" href="../assets/css/payment.css"><script src="../assets/js/payment.js" defer>
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('panyard_darkmode', document.body.classList.contains('dark-mode'));
+    }
+
+    function handlePermission(type, el) {
+        if(el.checked) {
+            if(type === 'location') requestLocation();
+            else alert(type.charAt(0).toUpperCase() + type.slice(1) + " protocol authorized.");
+        }
+    }
+
+    async function saveAllSettings() {
+        alert("System Preferences Saved Successfully.");
+    }
+
+    window.addEventListener('load', () => {
+        if(localStorage.getItem('panyard_darkmode') === 'true') {
+            document.body.classList.add('dark-mode');
+            const dt = document.getElementById('darkmode-toggle');
+            if(dt) dt.checked = true;
+        }
+    });
+
+</script></head>
 <body id="app-body">
 
 <nav>
@@ -155,18 +238,49 @@
             </div>
         </div>
 
+        
         <div id="settings" class="tab-content">
             <h1 style="font-family: Sora; margin-bottom: 32px;">System Settings</h1>
+            
             <div class="card">
-                
-                
+                <h2 style="font-size:14px; font-weight:800; margin-bottom:16px; color:var(--primary-red);">INTERFACE PREFERENCES</h2>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <span style="font-size:14px; font-weight:600;">High-Fidelity Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="darkmode-toggle" onclick="toggleDarkMode()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
                 
                 <h2 style="font-size:14px; font-weight:800; margin-bottom:16px; color:var(--primary-red);">SYSTEM PERMISSIONS</h2>
-                <p style="font-size:13px; opacity:0.7; margin-bottom:20px;">Request access to hardware and location protocols for enhanced discovery.</p>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;">
-                    <button class="btn-p" style="width:100%; font-size:12px; padding:12px; background:var(--navy-deep);" onclick="requestLocation()">📍 Location Access</button>
-                    <button class="btn-p" style="width:100%; font-size:12px; padding:12px; background:var(--navy-deep);" onclick="alert('Camera protocol initialized.')">📸 Camera Sync</button>
+                <div style="display:flex; flex-direction:column; gap:15px; margin-bottom:24px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:13px; opacity:0.8;">📍 Location Protocol</span>
+                        <label class="switch">
+                            <input type="checkbox" id="perm-location" onclick="handlePermission('location', this)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:13px; opacity:0.8;">📸 Camera/Media Sync</span>
+                        <label class="switch">
+                            <input type="checkbox" id="perm-camera" onclick="handlePermission('camera', this)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:13px; opacity:0.8;">🔔 High-Priority Alerts</span>
+                        <label class="switch">
+                            <input type="checkbox" id="perm-notifications" onclick="handlePermission('notifications', this)">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
+
+                <button class="btn-p" style="width:100%;" onclick="saveAllSettings()">Save Settings</button>
+            </div>
+        </div>
+
 
 
                 <h2 style="font-size:14px; font-weight:800; margin-bottom:16px; color:var(--primary-red);">DANGER ZONE</h2>
@@ -367,6 +481,31 @@
         document.getElementById('biz-name').value = localStorage.getItem('panyard_name') || '';
         document.getElementById('biz-bio').value = localStorage.getItem('panyard_bio') || '';
     };
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('panyard_darkmode', document.body.classList.contains('dark-mode'));
+    }
+
+    function handlePermission(type, el) {
+        if(el.checked) {
+            if(type === 'location') requestLocation();
+            else alert(type.charAt(0).toUpperCase() + type.slice(1) + " protocol authorized.");
+        }
+    }
+
+    async function saveAllSettings() {
+        alert("System Preferences Saved Successfully.");
+    }
+
+    window.addEventListener('load', () => {
+        if(localStorage.getItem('panyard_darkmode') === 'true') {
+            document.body.classList.add('dark-mode');
+            const dt = document.getElementById('darkmode-toggle');
+            if(dt) dt.checked = true;
+        }
+    });
+
 </script>
 
     <!-- Payment Modal -->
