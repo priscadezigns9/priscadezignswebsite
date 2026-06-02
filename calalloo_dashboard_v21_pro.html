@@ -239,10 +239,31 @@
                 allRecipes = recipes || [];
                 renderRecipes(allRecipes);
 
-                // Load Keepers (All Profiles since public_heritage column is missing)
-                const { data: keepers, error: kError } = await sb.from('profiles').select('*').limit(50);
-                if(kError) console.error('Keepers Load Error:', kError);
-                allKeepers = keepers || [];
+                // Load Keepers (Join Profiles and Cooks)
+                // We use a left join logic: fetch cooks first (where display_name lives)
+                const { data: cooks, error: cError } = await sb.from('cooks').select('*').limit(50);
+                if(cError) console.error('Cooks Load Error:', cError);
+                
+                // If cooks is empty, fall back to profiles for IDs/Avatars
+                if(!cooks || cooks.length === 0) {
+                    const { data: profiles } = await sb.from('profiles').select('*').limit(50);
+                    allKeepers = (profiles || []).map(p => ({
+                        id: p.id,
+                        username: 'Heritage Keeper',
+                        display_name: 'Heritage Keeper',
+                        avatar_url: p.avatar_url,
+                        bio: p.bio
+                    }));
+                } else {
+                    allKeepers = cooks.map(c => ({
+                        id: c.user_id,
+                        username: c.display_name || 'Keeper',
+                        display_name: c.display_name || 'Keeper',
+                        avatar_url: c.avatar_url,
+                        bio: c.bio
+                    }));
+                }
+                
                 renderKeepers(allKeepers);
 
                 // Load Profile
@@ -269,7 +290,7 @@
             container.innerHTML = list.map(k => `
                 <div style="flex: 0 0 80px; text-align: center; cursor: pointer;" onclick="openKeeper('${k.id}')">
                     <img src="${k.avatar_url || 'https://via.placeholder.com/60'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); padding: 2px; margin-bottom: 5px;">
-                    <p style="font-size: 0.75rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dark);">${k.username || 'Keeper'}</p>
+                    <p style="font-size: 0.75rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dark);">${k.display_name || k.username || 'Keeper'}</p>
                 </div>
             `).join('');
         }
@@ -293,9 +314,8 @@
 
         function handleSearch(val) {
             const query = (val || '').toLowerCase().trim();
-            console.log('Searching Heritage for:', query);
             
-            // Filter Recipes (by title or tags)
+            // Filter Recipes
             const filteredRecipes = allRecipes.filter(r => 
                 (r.title || '').toLowerCase().includes(query) || 
                 (r.vibe_tags || []).some(t => t.toLowerCase().includes(query))
@@ -303,11 +323,10 @@
             renderRecipes(filteredRecipes);
 
             // Filter Keepers (Friends)
-            // Note: Currently searching by BIO since 'username' column is missing in Supabase profiles table.
             const filteredKeepers = allKeepers.filter(k => 
-                (k.bio || '').toLowerCase().includes(query) || 
-                (query.length > 0 && 'keeper'.includes(query)) ||
-                (k.id || '').toLowerCase().includes(query)
+                (k.display_name || '').toLowerCase().includes(query) || 
+                (k.username || '').toLowerCase().includes(query) || 
+                (k.bio || '').toLowerCase().includes(query)
             );
             renderKeepers(filteredKeepers, query.length > 0);
         }
