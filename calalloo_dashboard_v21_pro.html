@@ -254,6 +254,10 @@
                 const { data: { user } } = await sb.auth.getUser();
                 if(!user) { window.location.href = '/login/'; return; }
 
+                // Restore last active tab
+                const lastTab = localStorage.getItem('activeTab') || 'discovery';
+                showTab(lastTab);
+
                 // Load Recipes
                 const { data: recipes, error: rError } = await sb.from('recipes').select('*').eq('is_published', true);
                 if(rError) console.error('Recipes Load Error:', rError);
@@ -367,12 +371,14 @@
         // Map Init
         let googleMap;
         function showTab(id) {
+            localStorage.setItem('activeTab', id);
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.pill').forEach(p => {
                 p.classList.remove('active');
                 if(p.innerText.toLowerCase().includes(id.toLowerCase())) p.classList.add('active');
             });
-            document.getElementById(id).classList.add('active');
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
             
             if(id === 'map' && !mapInitialized) {
                 initGoogleMap();
