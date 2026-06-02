@@ -218,7 +218,7 @@
         </div>
     </div>
 
-    <div id="pro-modal" class="modal-bg" onclick="closeModals()">
+    <div id="pro-modal" class="modal-bg" style="display: none; align-items: center; justify-content: center;" onclick="closeModals()">
         <div class="modal" onclick="event.stopPropagation()">
             <div class="modal-close" onclick="closeModals()"><i data-lucide="x"></i></div>
             <div style="text-align: center; margin-bottom: 20px;">
@@ -266,12 +266,13 @@
                 allRecipes = recipes || [];
                 renderRecipes(allRecipes);
 
-                // Load Keepers (Join Profiles and Cooks)
-                const { data: cooks, error: cError } = await sb.from('cooks').select('*').limit(50);
+        // Load Keepers (Join Profiles and Cooks)
+                const { data: cooks, error: cError } = await sb.from('cooks').select('*').limit(100);
                 if(cError) console.error('Cooks Load Error:', cError);
+                console.log('Loaded Cooks:', cooks ? cooks.length : 0);
                 
                 if(!cooks || cooks.length === 0) {
-                    const { data: profiles } = await sb.from('profiles').select('*').limit(50);
+                    const { data: profiles } = await sb.from('profiles').select('*').limit(100);
                     allKeepers = (profiles || []).map(p => ({
                         id: p.id,
                         username: 'Heritage Keeper',
@@ -288,6 +289,7 @@
                         bio: c.bio
                     }));
                 }
+                console.log('Final allKeepers count:', allKeepers.length);
                 
                 renderKeepers(allKeepers);
 
@@ -321,14 +323,16 @@
             const container = document.getElementById('keepers-list');
             if(!list || !list.length) {
                 container.innerHTML = isSearch 
-                    ? '<p style="color: var(--grey-text); font-size: 0.8rem; padding: 10px;">No keepers found matching your search.</p>'
+                    ? '<p style="color: var(--grey-text); font-size: 0.8rem; padding: 10px; width: 100%;">No keepers found matching your search.</p>'
                     : '<p style="color: var(--grey-text); font-size: 0.8rem; padding: 10px;">Join as a Heritage Keeper to be featured.</p>';
                 return;
             }
+            
+            // If searching, we might want a slightly different layout, but for now we keep it consistent
             container.innerHTML = list.map(k => `
-                <div style="flex: 0 0 80px; text-align: center; cursor: pointer;" onclick="openKeeper('${k.id}')">
-                    <img src="${k.avatar_url || 'https://via.placeholder.com/60'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); padding: 2px; margin-bottom: 5px;">
-                    <p style="font-size: 0.75rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dark);">${k.display_name || k.username || 'Keeper'}</p>
+                <div style="flex: 0 0 80px; text-align: center; cursor: pointer; transition: transform 0.2s;" onclick="openKeeper('${k.id}')" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                    <img src="${k.avatar_url || 'https://via.placeholder.com/60'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); padding: 2px; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    <p style="font-size: 0.75rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dark);">${k.display_name || k.username || 'Keeper'}</p>
                 </div>
             `).join('');
         }
@@ -352,6 +356,7 @@
 
         function handleSearch(val) {
             const query = (val || '').toLowerCase().trim();
+            console.log('Searching for:', query);
             
             // Filter Recipes
             const filteredRecipes = allRecipes.filter(r => 
@@ -366,11 +371,13 @@
                 (k.username || '').toLowerCase().includes(query) || 
                 (k.bio || '').toLowerCase().includes(query)
             );
+            console.log('Filtered Keepers:', filteredKeepers.length);
             renderKeepers(filteredKeepers, query.length > 0);
         }
 
         function openKeeper(id) {
             console.log('Opening keeper:', id);
+            // Future: Show keeper profile modal
         }
 
         // Map Init
@@ -666,7 +673,16 @@
 
         // Modal Controls
         function openGroupModal() { document.getElementById('group-modal').style.display = 'flex'; }
-        function openProModal() { document.getElementById('pro-modal').style.display = 'flex'; }
+        function openProModal() { 
+            console.log('Opening Pro Modal');
+            const modal = document.getElementById('pro-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.style.zIndex = '9999';
+            } else {
+                console.error('Pro Modal not found');
+            }
+        }
         function closeModals() { 
             document.querySelectorAll('.modal-bg').forEach(m => m.style.display = 'none'); 
         }
