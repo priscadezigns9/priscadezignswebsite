@@ -293,8 +293,9 @@
 
         function handleSearch(val) {
             const query = (val || '').toLowerCase().trim();
+            console.log('Searching Heritage for:', query);
             
-            // Filter Recipes
+            // Filter Recipes (by title or tags)
             const filteredRecipes = allRecipes.filter(r => 
                 (r.title || '').toLowerCase().includes(query) || 
                 (r.vibe_tags || []).some(t => t.toLowerCase().includes(query))
@@ -302,10 +303,11 @@
             renderRecipes(filteredRecipes);
 
             // Filter Keepers (Friends)
+            // Note: Currently searching by BIO since 'username' column is missing in Supabase profiles table.
             const filteredKeepers = allKeepers.filter(k => 
-                (k.username || '').toLowerCase().includes(query) || 
-                (k.full_name || '').toLowerCase().includes(query) ||
-                (k.bio || '').toLowerCase().includes(query)
+                (k.bio || '').toLowerCase().includes(query) || 
+                (query.length > 0 && 'keeper'.includes(query)) ||
+                (k.id || '').toLowerCase().includes(query)
             );
             renderKeepers(filteredKeepers, query.length > 0);
         }
