@@ -80,6 +80,8 @@
         .messenger-bubble:hover { transform: scale(1.05); }
         .messenger-bubble img { width: 35px; height: 35px; border-radius: 0; background: transparent; }
         @media (min-width: 1101px) { .messenger-bubble { display: none; } }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body>
@@ -290,9 +292,12 @@
                 renderKeepers(allKeepers);
 
                 // Load Profile
-                const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-                const { data: cook } = await sb.from('cooks').select('*').eq('user_id', user.id).single();
+                const { data: profile, error: pError } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+                const { data: cook, error: ckError } = await sb.from('cooks').select('*').eq('user_id', user.id).maybeSingle();
                 
+                if (pError) console.error('Profile Fetch Error:', pError);
+                if (ckError) console.error('Cook Fetch Error:', ckError);
+
                 document.getElementById('profile-email').innerText = user.email;
                 if(profile) {
                     document.getElementById('p-bio').value = profile.bio || '';
@@ -487,33 +492,53 @@
         async function saveFullProfile() {
             const btn = document.getElementById('save-profile-btn');
             const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader"></i> Saving...';
+            btn.innerHTML = '<i data-lucide="loader" class="spin"></i> Saving to Supabase...';
             lucide.createIcons();
             
             try {
                 const { data: { user } } = await sb.auth.getUser();
+                if(!user) throw new Error("No authenticated user found.");
+
                 const bio = document.getElementById('p-bio').value;
                 const displayName = document.getElementById('p-display-name').value;
                 const avatarUrl = document.getElementById('p-avatar').src;
 
-                // Update Profile
-                await sb.from('profiles').upsert({ id: user.id, bio, avatar_url: avatarUrl });
+                console.log('Saving profile for:', user.id);
 
-                // Update Cook (Searchable Identity)
+                // 1. Sync to profiles table
+                const { error: pError } = await sb.from('profiles').upsert({ 
+                    id: user.id, 
+                    bio: bio, 
+                    avatar_url: avatarUrl,
+                    updated_at: new Date().toISOString()
+                });
+                if(pError) throw pError;
+
+                // 2. Sync to cooks table (The Searchable Identity)
                 const { error: cError } = await sb.from('cooks').upsert({ 
                     user_id: user.id, 
                     display_name: displayName, 
                     bio: bio,
-                    avatar_url: avatarUrl 
+                    avatar_url: avatarUrl,
+                    updated_at: new Date().toISOString()
                 }, { onConflict: 'user_id' });
 
                 if(cError) throw cError;
                 
-                alert('Heritage Profile Updated!');
-                loadData();
+                // Visual Success Feedback
+                btn.style.background = '#22c55e'; // Green success color
+                btn.innerHTML = '<i data-lucide="check"></i> Settings Synced!';
+                lucide.createIcons();
+                
+                setTimeout(() => {
+                    btn.style.background = 'var(--primary)';
+                    btn.innerHTML = originalContent;
+                    lucide.createIcons();
+                }, 3000);
+
             } catch (e) {
-                alert('Update Error: ' + e.message);
-            } finally {
+                console.error('Save Error:', e);
+                alert('Sync Failed: ' + e.message);
                 btn.innerHTML = originalContent;
                 lucide.createIcons();
             }
