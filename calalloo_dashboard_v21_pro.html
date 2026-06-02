@@ -223,6 +223,7 @@
     <script>
         const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{{credential:supabase-callaloo-dpanyard}}');
         let allRecipes = [];
+        let allKeepers = [];
         let mapInitialized = false;
         let currentFacingMode = 'environment';
         let stream = null;
@@ -237,8 +238,9 @@
             renderRecipes(allRecipes);
 
             // Load Keepers (Profiles with public_heritage = true)
-            const { data: keepers } = await sb.from('profiles').select('*').eq('public_heritage', true).limit(5);
-            renderKeepers(keepers || []);
+            const { data: keepers } = await sb.from('profiles').select('*').eq('public_heritage', true).limit(50);
+            allKeepers = keepers || [];
+            renderKeepers(allKeepers);
 
             // Load Profile
             const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
@@ -278,11 +280,21 @@
         }
 
         function handleSearch(q) {
-            const filtered = allRecipes.filter(r => 
-                r.title.toLowerCase().includes(q.toLowerCase()) || 
-                (r.vibe_tags || []).some(t => t.toLowerCase().includes(q.toLowerCase()))
+            const query = q.toLowerCase();
+            
+            // Filter Recipes
+            const filteredRecipes = allRecipes.filter(r => 
+                r.title.toLowerCase().includes(query) || 
+                (r.vibe_tags || []).some(t => t.toLowerCase().includes(query))
             );
-            renderRecipes(filtered);
+            renderRecipes(filteredRecipes);
+
+            // Filter Keepers (Friends)
+            const filteredKeepers = allKeepers.filter(k => 
+                (k.username || '').toLowerCase().includes(query) || 
+                (k.full_name || '').toLowerCase().includes(query)
+            );
+            renderKeepers(filteredKeepers);
         }
 
         function showTab(id) {
