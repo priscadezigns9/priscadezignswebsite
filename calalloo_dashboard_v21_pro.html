@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{credential:google-maps-api-key}}&libraries=places"></script>
     <style>
         :root {
             --bg: #FFFFFF; --primary: #E87722; --dark: #000000; --white: #FFFFFF;
@@ -363,6 +364,8 @@
             console.log('Opening keeper:', id);
         }
 
+        // Map Init
+        let googleMap;
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.pill').forEach(p => {
@@ -371,70 +374,73 @@
             });
             document.getElementById(id).classList.add('active');
             
-            // Map Init
             if(id === 'map' && !mapInitialized) {
-                setTimeout(() => {
-                    const map = L.map('map-container').setView([10.6918, -61.2225], 10);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(map);
-                    
-                    // Request user location for high-fidelity accuracy
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(position => {
-                            const { latitude, longitude } = position.coords;
-                            map.setView([latitude, longitude], 14);
-                            
-                            // Marker for user
-                            L.marker([latitude, longitude]).addTo(map)
-                                .bindPopup('<b>Your Kitchen</b>')
-                                .openPopup();
-                                
-                            // Find nearby groceries
-                            searchNearbyGroceries(latitude, longitude, map);
-                        }, () => {
-                            console.warn('Location access denied. Defaulting to regional view.');
-                        });
-                    }
-                    mapInitialized = true;
-                }, 200);
+                initGoogleMap();
+                mapInitialized = true;
             }
             if(id === 'profile') loadKitchen();
         }
 
-        async function searchNearbyGroceries(lat, lng, map) {
-            // High-fidelity search for groceries/markets nearby using Overpass API (OpenStreetMap)
-            const query = `
-                [out:json];
-                (
-                  node["shop"="supermarket"](around:5000, ${lat}, ${lng});
-                  node["shop"="grocery"](around:5000, ${lat}, ${lng});
-                  way["shop"="supermarket"](around:5000, ${lat}, ${lng});
-                  way["shop"="grocery"](around:5000, ${lat}, ${lng});
-                );
-                out center;
-            `;
-            const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+        function initGoogleMap() {
+            const mapOptions = {
+                zoom: 14,
+                center: { lat: 10.6918, lng: -61.2225 },
+                styles: [
+                    { "elementType": "geometry", "stylers": [{ "color": "#212121" }] },
+                    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#212121" }] },
+                    { "elementType": "labels.text.fill", "stylers": [{ "color": "#757575" }] },
+                    { "featureType": "administrative.country", "elementType": "geometry.stroke", "stylers": [{ "color": "#E87722" }] },
+                    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#000000" }] }
+                ],
+                disableDefaultUI: true
+            };
             
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                data.elements.forEach(el => {
-                    const pos = el.type === 'node' ? [el.lat, el.lon] : [el.center.lat, el.center.lon];
-                    const name = el.tags.name || 'Grocery Store';
-                    L.marker(pos, {
-                        icon: L.divIcon({
-                            html: '<i data-lucide="shopping-cart" style="color:#E87722; width:20px;"></i>',
-                            className: 'custom-map-icon',
-                            iconSize: [30, 30]
-                        })
-                    }).addTo(map).bindPopup(`<b>${name}</b><br>Heritage Groceries Nearby`);
+            googleMap = new google.maps.Map(document.getElementById('map-container'), mapOptions);
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
+                    googleMap.setCenter(pos);
+                    new google.maps.Marker({
+                        position: pos,
+                        map: googleMap,
+                        title: "Your Heritage Kitchen",
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 10,
+                            fillColor: "#E87722",
+                            fillOpacity: 1,
+                            strokeWeight: 2,
+                            strokeColor: "#FFFFFF"
+                        }
+                    });
+                    searchNearbyGroceries(pos);
                 });
-                lucide.createIcons();
-            } catch (e) {
-                console.error('Grocery Search Error:', e);
             }
+        }
+
+        function searchNearbyGroceries(pos) {
+            const service = new google.maps.places.PlacesService(googleMap);
+            const request = {
+                location: pos,
+                radius: '5000',
+                type: ['grocery_or_supermarket']
+            };
+
+            service.nearbySearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    results.forEach(place => {
+                        new google.maps.Marker({
+                            position: place.geometry.location,
+                            map: googleMap,
+                            title: place.name,
+                            icon: {
+                                url: 'https://maps.google.com/mapfiles/ms/icons/orange-dot.png'
+                            }
+                        });
+                    });
+                }
+            });
         }
 
         async function loadKitchen() {
