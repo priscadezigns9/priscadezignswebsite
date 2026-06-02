@@ -229,58 +229,70 @@
         let stream = null;
 
         async function loadData() {
-            const { data: { user } } = await sb.auth.getUser();
-            if(!user) { window.location.href = '/login/'; return; }
+            try {
+                const { data: { user } } = await sb.auth.getUser();
+                if(!user) { window.location.href = '/login/'; return; }
 
-            // Load Recipes
-            const { data: recipes } = await sb.from('recipes').select('*').eq('is_published', true);
-            allRecipes = recipes || [];
-            renderRecipes(allRecipes);
+                // Load Recipes
+                const { data: recipes, error: rError } = await sb.from('recipes').select('*').eq('is_published', true);
+                if(rError) console.error('Recipes Load Error:', rError);
+                allRecipes = recipes || [];
+                renderRecipes(allRecipes);
 
-            // Load Keepers (Profiles with public_heritage = true)
-            const { data: keepers } = await sb.from('profiles').select('*').eq('public_heritage', true).limit(50);
-            allKeepers = keepers || [];
-            renderKeepers(allKeepers);
+                // Load Keepers (Profiles with public_heritage = true)
+                const { data: keepers, error: kError } = await sb.from('profiles').select('*').eq('public_heritage', true).limit(50);
+                if(kError) console.error('Keepers Load Error:', kError);
+                allKeepers = keepers || [];
+                renderKeepers(allKeepers);
 
-            // Load Profile
-            const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
-            if(profile) {
-                document.getElementById('p-bio').value = profile.bio || '';
-                document.getElementById('p-avatar').src = profile.avatar_url || 'https://via.placeholder.com/100';
-                document.getElementById('profile-name').innerText = user.email.split('@')[0];
+                // Load Profile
+                const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+                if(profile) {
+                    document.getElementById('p-bio').value = profile.bio || '';
+                    document.getElementById('p-avatar').src = profile.avatar_url || 'https://via.placeholder.com/100';
+                    document.getElementById('profile-name').innerText = user.email.split('@')[0];
+                }
+                lucide.createIcons();
+            } catch (e) {
+                console.error('System Load Error:', e);
             }
-            lucide.createIcons();
         }
 
-        function renderKeepers(list) {
+        function renderKeepers(list, isSearch = false) {
             const container = document.getElementById('keepers-list');
-            if(!list.length) {
-                container.innerHTML = '<p style="color: var(--grey-text); font-size: 0.9rem;">Join as a Heritage Keeper to be featured.</p>';
+            if(!list || !list.length) {
+                container.innerHTML = isSearch 
+                    ? '<p style="color: var(--grey-text); font-size: 0.8rem; padding: 10px;">No keepers found matching your search.</p>'
+                    : '<p style="color: var(--grey-text); font-size: 0.8rem; padding: 10px;">Join as a Heritage Keeper to be featured.</p>';
                 return;
             }
             container.innerHTML = list.map(k => `
-                <div style="flex: 0 0 80px; text-align: center;">
+                <div style="flex: 0 0 80px; text-align: center; cursor: pointer;" onclick="openKeeper('${k.id}')">
                     <img src="${k.avatar_url || 'https://via.placeholder.com/60'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); padding: 2px; margin-bottom: 5px;">
-                    <p style="font-size: 0.75rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${k.username || 'Keeper'}</p>
+                    <p style="font-size: 0.75rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dark);">${k.username || 'Keeper'}</p>
                 </div>
             `).join('');
         }
 
         function renderRecipes(list) {
             const grid = document.getElementById('discovery-grid');
+            if(!list || !list.length) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--grey-text); padding: 40px;">No heritage dishes found.</p>';
+                return;
+            }
             grid.innerHTML = list.map(r => `
                 <div class="recipe-card" onclick="openRecipe('${r.id}')">
                     <div class="recipe-image" style="background-image: url(${r.cover_photo_url || 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=800'})"></div>
                     <div class="recipe-info">
-                        <h3>${r.title}</h3>
-                        <span class="tag">${(r.vibe_tags || []).join(' • ')}</span>
+                        <h3 style="margin:0; font-size: 1rem;">${r.title}</h3>
+                        <span class="tag" style="font-size: 0.7rem;">${(r.vibe_tags || []).join(' • ')}</span>
                     </div>
                 </div>
             `).join('');
         }
 
-        function handleSearch(q) {
-            const query = (q || '').toLowerCase().trim();
+        function handleSearch(val) {
+            const query = (val || '').toLowerCase().trim();
             
             // Filter Recipes
             const filteredRecipes = allRecipes.filter(r => 
@@ -292,9 +304,15 @@
             // Filter Keepers (Friends)
             const filteredKeepers = allKeepers.filter(k => 
                 (k.username || '').toLowerCase().includes(query) || 
-                (k.full_name || '').toLowerCase().includes(query)
+                (k.full_name || '').toLowerCase().includes(query) ||
+                (k.bio || '').toLowerCase().includes(query)
             );
-            renderKeepers(filteredKeepers);
+            renderKeepers(filteredKeepers, query.length > 0);
+        }
+
+        function openKeeper(id) {
+            console.log('Opening keeper:', id);
+            // Future implementation: show keeper profile
         }
 
         function showTab(id) {
