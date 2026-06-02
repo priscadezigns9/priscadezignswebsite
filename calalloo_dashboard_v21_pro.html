@@ -317,11 +317,66 @@
             if(id === 'map' && !mapInitialized) {
                 setTimeout(() => {
                     const map = L.map('map-container').setView([10.6918, -61.2225], 10);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; OpenStreetMap contributors'
+                    }).addTo(map);
+                    
+                    // Request user location for high-fidelity accuracy
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(position => {
+                            const { latitude, longitude } = position.coords;
+                            map.setView([latitude, longitude], 14);
+                            
+                            // Marker for user
+                            L.marker([latitude, longitude]).addTo(map)
+                                .bindPopup('<b>Your Kitchen</b>')
+                                .openPopup();
+                                
+                            // Find nearby groceries
+                            searchNearbyGroceries(latitude, longitude, map);
+                        }, () => {
+                            console.warn('Location access denied. Defaulting to regional view.');
+                        });
+                    }
                     mapInitialized = true;
                 }, 200);
             }
             if(id === 'profile') loadKitchen();
+        }
+
+        async function searchNearbyGroceries(lat, lng, map) {
+            // High-fidelity search for groceries/markets nearby using Overpass API (OpenStreetMap)
+            const query = `
+                [out:json];
+                (
+                  node["shop"="supermarket"](around:5000, ${lat}, ${lng});
+                  node["shop"="grocery"](around:5000, ${lat}, ${lng});
+                  way["shop"="supermarket"](around:5000, ${lat}, ${lng});
+                  way["shop"="grocery"](around:5000, ${lat}, ${lng});
+                );
+                out center;
+            `;
+            const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                data.elements.forEach(el => {
+                    const pos = el.type === 'node' ? [el.lat, el.lon] : [el.center.lat, el.center.lon];
+                    const name = el.tags.name || 'Grocery Store';
+                    L.marker(pos, {
+                        icon: L.divIcon({
+                            html: '<i data-lucide="shopping-cart" style="color:#E87722; width:20px;"></i>',
+                            className: 'custom-map-icon',
+                            iconSize: [30, 30]
+                        })
+                    }).addTo(map).bindPopup(`<b>${name}</b><br>Heritage Groceries Nearby`);
+                });
+                lucide.createIcons();
+            } catch (e) {
+                console.error('Grocery Search Error:', e);
+            }
         }
 
         async function loadKitchen() {
