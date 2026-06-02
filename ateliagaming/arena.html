@@ -28,8 +28,14 @@
         .auth-btn { padding: 10px; background: var(--red); color: white; border: none; font-family: 'Russo One'; cursor: pointer; }
         
         #profile-hub { position: absolute; top: 15px; left: 15px; z-index: 1000; display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.85); padding: 8px 18px; border-radius: 40px; border: 2px solid var(--orange); box-shadow: 0 0 15px rgba(255,107,0,0.4); }
-        #p-avatar-wrap { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--white); background: #000; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        #p-avatar { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; transform: scale(2.2); }
+        #p-avatar-wrap { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--white); background: #000; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; }
+        #p-avatar { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+        
+        /* FACE-ONLY PRECISION CROPS */
+        .crop-astra { object-position: 50% 12%; transform: scale(3.5); }
+        .crop-mimi { object-position: 50% 10%; transform: scale(3.2); }
+        .crop-nova { object-position: 50% 8%; transform: scale(3.8); }
+        .crop-echo { object-position: 50% 15%; transform: scale(3.0); }
         
         #dashboard-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 20000; flex-direction: column; align-items: center; justify-content: center; }
         .stat-card { background: #1a1a1a; padding: 15px; border-radius: 8px; border: 1px solid #333; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
@@ -132,15 +138,22 @@
 
         async function syncProfile() {
             try {
-                // Set avatar immediately from selection if possible
-                document.getElementById('p-avatar').src = assets[char].sel;
+                const img = document.getElementById('p-avatar');
+                img.src = assets[char].sel;
+                img.className = 'crop-' + char; // Apply character-specific face crop
+                
                 const { data } = await Atelia.auth.getUser();
                 if (data?.user) {
                     const p = await Atelia.arena.getProfile(data.user.id);
                     document.getElementById('p-username').innerText = (p.username || 'Vanguard').toUpperCase();
-                    document.getElementById('p-prestige').innerText = (p.atlr_prestige || 0) + ' ATLR';
+                    
+                    const atlrDisplay = (p.atlr_prestige || 0) + ' ATLR';
+                    document.getElementById('p-prestige').innerText = atlrDisplay;
                     document.getElementById('d-atlr').innerText = p.atlr_prestige || 0;
                     document.getElementById('d-high').innerText = p.high_score || 0;
+                    
+                    // Signal the Global HUD to refresh its numbers too
+                    window.dispatchEvent(new CustomEvent('vanguard-sync', { detail: p }));
                 }
             } catch(e) { console.error("Sync Blip:", e); }
         }
@@ -184,7 +197,11 @@
                     opt.classList.add('active');
                     player.src = assets[char].sel;
                     player.style.transform = assets[char].flip ? 'scaleX(-1)' : 'scaleX(1)';
-                    if(document.getElementById('p-avatar')) document.getElementById('p-avatar').src = assets[char].sel;
+                    if(document.getElementById('p-avatar')) {
+                        const img = document.getElementById('p-avatar');
+                        img.src = assets[char].sel;
+                        img.className = 'crop-' + char;
+                    }
                 };
             });
         };
