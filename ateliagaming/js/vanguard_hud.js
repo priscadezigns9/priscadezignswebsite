@@ -2,7 +2,7 @@
     // Create the HUD element
     const hud = document.createElement('div');
     hud.id = 'vanguard-hud';
-    hud.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:32px; background:#000; color:#FF6B00; display:none; align-items:center; justify-content:space-between; padding:0 20px; z-index:30000; font-family:"Russo One", sans-serif; font-size:12px; border-bottom:1px solid #D32F2F; box-shadow:0 0 15px rgba(211,47,47,0.4); box-sizing:border-box;';
+    hud.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:32px; background:#000; color:#FF6B00; display:none; align-items:center; justify-content:space-between; padding:0 20px; z-index:20000; font-family:"Russo One", sans-serif; font-size:12px; border-bottom:1px solid #D32F2F; box-shadow:0 0 15px rgba(211,47,47,0.4); box-sizing:border-box;';
     hud.innerHTML = `
         <div style="display:flex; align-items:center; gap:10px;">
             <img src="https://priscadezigns.org/logos/atelier-gaming.png" style="height:18px;">
