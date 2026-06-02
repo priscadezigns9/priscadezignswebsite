@@ -861,33 +861,28 @@
       </div>
     </div>
 
-    <script>
-    // Show Ebook Modal after 3s
-    setTimeout(() => {
-        document.getElementById('ebookModal').style.display = 'flex';
-    }, 3000);
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{{credential:supabase-anon-key}}');
 
-    // Scroll Reveal Animation
-    const observerOptions = {
-        threshold: 0.1
-    };
+    async function captureLead(email, type, domain = null, metadata = {}) {
+      try {
+        await sb.from('leads').insert([{ email, type, domain, metadata }]);
+      } catch (e) { console.error(e); }
+    }
+
+    setTimeout(() => {
+        const modal = document.getElementById('ebookModal');
+        if(modal) modal.style.display = 'flex';
+    }, 3000);
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
+            if (entry.isIntersecting) entry.target.classList.add('visible');
         });
-    }, observerOptions);
+    }, { threshold: 0.1 });
 
     document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
-
-    // Fallback timer
-    setTimeout(() => { 
-        document.querySelectorAll(".reveal-on-scroll").forEach(el => { 
-            if (!el.classList.contains("visible")) el.classList.add("visible"); 
-        }); 
-    }, 2000); 
 
     function generateRef() { 
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
@@ -896,54 +891,39 @@
       return ref; 
     } 
 
-    function openPayModal(plan, price) { 
+    async function openPayModal(plan, price) { 
       const ref = generateRef(); 
-      document.getElementById("modal-plan-name").textContent = plan + (price ? " — " + price : ""); 
-      document.getElementById("auto-ref-bank").textContent = ref; 
-      document.getElementById("auto-ref-eth").textContent = ref; 
-      document.getElementById("auto-ref-intl").textContent = ref; 
-
-      if (plan.includes("Bank")) { togglePay('bank'); }
-      else if (plan.includes("Crypto") || plan.includes("Web3")) { togglePay('eth'); }
-      else { togglePay('intl'); }
-
-      document.getElementById("payModal").classList.add("open"); 
-      document.getElementById('ebookModal').style.display = 'none';
+      document.getElementById("plan-name").innerText = plan; 
+      document.getElementById("plan-price").innerText = price; 
+      document.getElementById("order-ref").innerText = ref; 
+      document.getElementById("payModal").style.display = "flex"; 
     } 
 
     function closePayModal() { 
-      document.getElementById("payModal").classList.remove("open"); 
-    } 
+      document.getElementById("payModal").style.display = "none"; 
+    }
 
-    function togglePay(id, el) { 
+    function togglePay(id) { 
       document.querySelectorAll(".pay-detail").forEach(d => d.classList.remove("open")); 
       const target = document.getElementById("pay-" + id);
       if (target) target.classList.add("open"); 
       document.querySelectorAll(".modal-tab").forEach(t => t.classList.remove("active")); 
-      
-      const tabBtn = document.querySelector(`.modal-tab[onclick*="'${id}'"]`);
-      if (tabBtn) tabBtn.classList.add("active");
-      
-      if (event && event.target) {
-        event.target.classList.add("active"); 
-      }
     } 
 
     function copyAddr(id, event) {
       const text = document.getElementById(id).textContent;
       navigator.clipboard.writeText(text);
-      if (event && event.target) {
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.textContent = "Copied!";
-        setTimeout(() => btn.textContent = originalText, 2000);
-      }
     }
 
-    window.addEventListener("click", function(event) { 
-      const modal = document.getElementById("payModal"); 
-      if (event.target == modal) closePayModal(); 
-    });
+    async function submitCompendiumLead() {
+        const emailInput = document.getElementById('compendium-email');
+        const email = emailInput ? emailInput.value : null;
+        if(!email) return alert('Enter email to proceed');
+        await captureLead(email, 'ebook_compendium');
+        openPayModal('Neural Prompt Compendium', '$29.00');
+    }
+
+    window.onclick = (e) => { if(e.target == document.getElementById('payModal')) closePayModal(); }
 </script>
 </body></html>
 
