@@ -65,7 +65,14 @@
 
         .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; display: none; flex-direction: column; padding: 40px; }
         .menu-item { font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 20px; cursor: pointer; display: flex; align-items: center; gap: 15px; }
+        .menu-item.pro { color: var(--primary); font-weight: 900; }
         .close-btn { background: none; border: none; cursor: pointer; }
+
+        /* Modals */
+        .modal-bg { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal { background: white; border-radius: 20px; width: 100%; max-width: 400px; padding: 30px; position: relative; animation: modalIn 0.3s ease; }
+        @keyframes modalIn { from { opacity:0; scale:0.9; } to { opacity:1; scale:1; } }
+        .modal-close { position: absolute; top: 20px; right: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -85,9 +92,14 @@
 
     <div id="discovery" class="tab-content active">
         <div class="search-bar">
-            <div style="position: relative;">
-                <input type="text" class="search-input" placeholder="Search dishes or keepers..." oninput="handleSearch(this.value)">
-                <i data-lucide="search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--grey-text); width: 20px;"></i>
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                <div style="position: relative; flex: 1;">
+                    <input type="text" class="search-input" placeholder="Search dishes or keepers..." oninput="handleSearch(this.value)">
+                    <i data-lucide="search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--grey-text); width: 20px;"></i>
+                </div>
+                <button class="btn btn-primary" style="padding: 12px; border-radius: 12px; height: 50px; width: 50px; justify-content: center;" onclick="openGroupModal()">
+                    <i data-lucide="users"></i>
+                </button>
             </div>
         </div>
 
@@ -175,11 +187,47 @@
         <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
             <button class="close-btn" onclick="toggleMenu()"><i data-lucide="x" style="width: 32px; height: 32px;"></i></button>
         </div>
+        <div class="menu-item pro" onclick="openProModal(); toggleMenu()"><i data-lucide="zap"></i>Calalloo Pro</div>
         <div class="menu-item" onclick="showTab('discovery'); toggleMenu()"><i data-lucide="search"></i>Discovery</div>
         <div class="menu-item" onclick="openHub(); toggleMenu()"><i data-lucide="message-square"></i>Heritage Hub (Chat)</div>
         <div class="menu-item" onclick="showTab('map'); toggleMenu()"><i data-lucide="map"></i>Heritage Map</div>
         <div class="menu-item" onclick="showTab('profile'); toggleMenu()"><i data-lucide="user"></i>My Profile</div>
         <div class="menu-item" onclick="signOut()"><i data-lucide="log-out"></i>Sign Out</div>
+    </div>
+
+    <!-- Modals -->
+    <div id="group-modal" class="modal-bg" onclick="closeModals()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="closeModals()"><i data-lucide="x"></i></div>
+            <h2 class="display-font" style="font-size: 1.8rem; margin-bottom: 10px;">Create Group</h2>
+            <p style="color: var(--grey-text); font-size: 0.9rem; margin-bottom: 20px;">Gather your heritage circle.</p>
+            <input type="text" id="group-name" class="search-input" placeholder="Group Name" style="margin-bottom: 15px;">
+            <textarea id="group-desc" class="search-input" placeholder="Group Description" style="height: 100px; margin-bottom: 20px; resize: none;"></textarea>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="createHeritageGroup()">
+                Create Heritage Group
+            </button>
+        </div>
+    </div>
+
+    <div id="pro-modal" class="modal-bg" onclick="closeModals()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-close" onclick="closeModals()"><i data-lucide="x"></i></div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <i data-lucide="zap" style="width: 32px; height: 32px;"></i>
+                </div>
+                <h2 class="display-font" style="font-size: 2rem;">Calalloo Pro</h2>
+                <p style="color: var(--primary); font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px;">Heritage Excellence</p>
+            </div>
+            <ul style="list-style: none; margin-bottom: 30px;">
+                <li style="margin-bottom: 15px; display: flex; gap: 10px;"><i data-lucide="check-circle" style="color: var(--primary); width: 20px;"></i> Unlimited Vision AI Scans</li>
+                <li style="margin-bottom: 15px; display: flex; gap: 10px;"><i data-lucide="check-circle" style="color: var(--primary); width: 20px;"></i> Global Heritage Marketplace</li>
+                <li style="margin-bottom: 15px; display: flex; gap: 10px;"><i data-lucide="check-circle" style="color: var(--primary); width: 20px;"></i> Exclusive Keepers Events</li>
+            </ul>
+            <button class="btn btn-dark" style="width: 100%; justify-content: center; background: black; color: white;" onclick="initPayment()">
+                Unlock Pro — $9.99/mo
+            </button>
+        </div>
     </div>
 
     <script>
@@ -568,6 +616,39 @@
             const menu = document.getElementById('menu-overlay');
             menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
         }
+
+        // Modal Controls
+        function openGroupModal() { document.getElementById('group-modal').style.display = 'flex'; }
+        function openProModal() { document.getElementById('pro-modal').style.display = 'flex'; }
+        function closeModals() { 
+            document.querySelectorAll('.modal-bg').forEach(m => m.style.display = 'none'); 
+        }
+
+        async function createHeritageGroup() {
+            const name = document.getElementById('group-name').value;
+            if(!name) return alert('Please enter a group name.');
+            
+            try {
+                const { data: { user } } = await sb.auth.getUser();
+                const { data, error } = await sb.from('groups').insert({
+                    name: name,
+                    description: document.getElementById('group-desc').value,
+                    creator_id: user.id
+                }).select();
+                
+                if(error) throw error;
+                alert('Group Created: ' + name);
+                closeModals();
+            } catch (e) {
+                alert('Group Error: ' + e.message);
+            }
+        }
+
+        function initPayment() {
+            alert('Redirecting to secure heritage payment gateway...');
+            // Future: Stripe integration
+        }
+
         function openRecipe(id) { console.log('Opening recipe:', id); }
         function openHub() { console.log('Opening hub'); }
         function signOut() { sb.auth.signOut(); window.location.href = '/login/'; }
