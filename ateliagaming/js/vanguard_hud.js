@@ -50,6 +50,14 @@
         if (window.Atelia) {
             clearInterval(checkAtelia);
             Atelia.auth.onAuthStateChange(() => updateHUD());
+            window.addEventListener('vanguard-sync', (e) => {
+                if (e.detail) {
+                    document.getElementById('hud-rank').innerText = (e.detail.username || "Vanguard").toUpperCase();
+                    document.getElementById('hud-atlr').innerText = (e.detail.atlr_prestige || 0) + " ATLR";
+                } else {
+                    updateHUD();
+                }
+            });
             updateHUD();
         }
     }, 500);
