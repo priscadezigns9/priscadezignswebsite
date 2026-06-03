@@ -1,255 +1,87 @@
-<!DOCTYPE html><html><head>
-  <meta name="p:domain_verify" content="d553c6dc2c67c118bdce743593a28b29"/>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>The Escapist — Curated Travel Gear, Stays & Experiences</title>
-  <meta name="keywords" content="best adventure travel destinations 2026, coolcations cool climate travel, intentional travel off-grid, human-powered trips hiking biking" />
-<meta name="description" content="The Escapist: curated travel gear, dream destinations, trip planning concierge, and everything you need to escape in style.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --teal:#006B6B;
-  --teal-light:#7EC8C8;
-  --ocean:#0B3D6B;
-  --sand:#C8A96E;
-  --white:#FFFFFF;
-  --black:#050505;
-  --text-overlay:rgba(5,5,5,0.55);
-  --glass:rgba(255,255,255,0.10);
-  --glass-border:rgba(255,255,255,0.20);
-}
-html{scroll-behavior:smooth;}
-body{font-family:'Lato',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden;}
+body{margin:0;font-family:sans-serif;background:#fff;color:#111}
+nav{background:#fff;padding:25px;border-bottom:3px solid #000;display:flex;justify-content:space-between;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:40px;padding:60px 5%}
+.card{background:#fafafa;border:1px solid #eee;border-radius:16px;padding:40px;text-align:center;transition:0.4s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-10px);border-color:#000;box-shadow:0 20px 40px rgba(0,0,0,0.05)}
+.category{font-size:0.9rem;color:#666;font-weight:700;text-transform:uppercase;margin-bottom:10px}
+.img-box{height:400px;display:flex;align-items:center;justify-content:center;margin-bottom:30px;background:#fff;border-radius:12px;overflow:hidden}
+img{max-width:90%;max-height:90%;object-fit:contain;transition:0.5s}
+.card:hover img{transform:scale(1.05)}
+h3{font-size:1.4rem;margin:0 0 15px;font-weight:800}
+.price{color:#000;font-weight:900;font-size:1.6rem;margin-bottom:30px}
+.btn{display:block;background:#000;color:#fff;padding:20px;border-radius:10px;text-decoration:none;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-top:auto}
+footer{padding:60px;text-align:center;opacity:0.5;font-size:0.8rem}
+</style></head>
+<body>
+<nav><img id="logo" src="" height="50"></nav>
+<div class="grid" id="grid"></div>
+<footer id="footer"></footer>
+<script>
+const CONFIG = {
+  "Glow Protocol": { logo: "https://priscadezigns.org/logos/prisca-dezigns-logo.png", color: "#000", btn: "Acquire Solution" },
+  "Atelia Gaming": { logo: "https://priscadezigns.org/logos/atelier-gaming.png", color: "#D32F2F", btn: "Acquire Armory" },
+  "The Gen Play": { logo: "https://priscadezigns.org/logos/thegenplay.png", color: "#6366f1", btn: "Acquire Object" },
+  "Pantriq": { logo: "https://priscadezigns.org/logos/pantriq.png", color: "#10b981", btn: "Acquire Gear" },
+  "The Autodrome": { logo: "https://priscadezigns.org/logos/the-autodrome.jpg", color: "#ef4444", btn: "Acquire Tech" },
+  "My Baby Dumpling": { logo: "https://priscadezigns.org/logos/mybabydumpling.png", color: "#ec4899", btn: "Acquire Essential" },
+  "Riddiim": { logo: "https://priscadezigns.org/logos/riddiim.png", color: "#8b5cf6", btn: "Acquire Audio" },
+  "Sole Prestige": { logo: "https://priscadezigns.org/logos/sole-prestige.jpg", color: "#1f2937", btn: "Acquire Exclusive" },
+  "The Tech Scout HQ": { logo: "https://priscadezigns.org/logos/tech-scout.png", color: "#3b82f6", btn: "Acquire Innovation" },
+  "Essence Elite": { logo: "https://priscadezigns.org/logos/essenceelite.png", color: "#4b5563", btn: "Acquire Scent" },
+  "Shelfly": { logo: "https://priscadezigns.org/logos/shelfly.png", color: "#2563eb", btn: "Acquire System" }
+};
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(0,0,0,0.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.08);padding:0 2rem;}
-.nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;}
-.nav-links{display:flex;gap:2rem;list-style:none;}
-.nav-links a{color:rgba(255,255,255,0.82);text-decoration:none;font-family:'Lato',sans-serif;font-size:0.85rem;letter-spacing:0.05em;font-weight:400;transition:color 0.2s;}
-.nav-links a:hover{color:var(--teal-light);}
-.nav-cta{background:var(--teal);color:#fff;padding:0.5rem 1.25rem;border-radius:6px;font-weight:700;font-size:0.8rem;letter-spacing:0.04em;text-decoration:none;transition:background 0.2s;}
-.nav-cta:hover{background:#008080;}
-@media(max-width:768px){.nav-links{display:none;}.nav-cta{display:none;}}
+const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
 
-/* HERO */
-#hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=1600&q=85');background-size:cover;background-position:center;z-index:0;}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.45) 0%,rgba(0,0,0,0.65) 100%);z-index:1;}
-.hero-content{position:relative;z-index:2;padding:2rem;max-width:900px;}
-.hero-eyebrow{font-family:'Lato',sans-serif;font-size:0.7rem;letter-spacing:0.4em;color:rgba(255,255,255,0.9);text-transform:uppercase;margin-bottom:1.5rem;}
-.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,9vw,7rem);line-height:1.05;margin-bottom:1.5rem;}
-.hero-h1 .line1{display:block;font-style:italic;font-weight:400;color:#fff;}
-.hero-h1 .line2{display:block;font-weight:700;color:var(--sand);}
-.hero-sub{font-family:'Lato',sans-serif;font-weight:300;font-size:1.1rem;color:rgba(255,255,255,0.85);max-width:560px;margin:0 auto 2.5rem;}
-.hero-ctas{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
-.btn-teal{background:var(--teal);color:#fff;padding:0.9rem 2rem;border-radius:8px;text-decoration:none;font-family:'Lato',sans-serif;font-weight:700;font-size:0.95rem;transition:background 0.2s,transform 0.15s;}
-.btn-teal:hover{background:#008080;transform:translateY(-2px);}
-.btn-glass{background:rgba(255,255,255,0.08);color:#fff;padding:0.9rem 2rem;border-radius:8px;text-decoration:none;font-family:'Lato',sans-serif;font-weight:700;font-size:0.95rem;border:1.5px solid rgba(255,255,255,0.3);transition:background 0.2s,transform 0.15s;}
-.btn-glass:hover{background:rgba(255,255,255,0.15);transform:translateY(-2px);}
-.scroll-arrow{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:2;animation:bounce 2s infinite;}
-.scroll-arrow svg{width:32px;height:32px;opacity:0.7;}
-@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
-.section-fade{position:absolute;bottom:0;left:0;right:0;height:140px;background:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,0.9) 100%);pointer-events:none;z-index:3;}
+async function load() {
+  const path = window.location.pathname.toLowerCase();
+  let brand = "Glow Protocol";
+  if(path.includes("atelia")) brand = "Atelia Gaming";
+  else if(path.includes("genplay")) brand = "The Gen Play";
+  else if(path.includes("pantriq")) brand = "Pantriq";
+  else if(path.includes("autodrome")) brand = "The Autodrome";
+  else if(path.includes("baby")) brand = "My Baby Dumpling";
+  else if(path.includes("ridd")) brand = "Riddiim";
+  else if(path.includes("prestige")) brand = "Sole Prestige";
+  else if(path.includes("scout")) brand = "The Tech Scout HQ";
+  else if(path.includes("essence")) brand = "Essence Elite";
+  else if(path.includes("shelfly")) brand = "Shelfly";
 
-/* DESTINATIONS */
-#destinations{position:relative;min-height:100vh;display:flex;align-items:center;padding:6rem 2rem;}
-.dest-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=85');background-size:cover;background-position:center;z-index:0;}
-.dest-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.62);z-index:1;}
-.section-inner{position:relative;z-index:2;max-width:1200px;margin:0 auto;width:100%;}
-.section-eyebrow{font-family:'Lato',sans-serif;font-size:0.75rem;letter-spacing:0.35em;color:var(--teal-light);text-transform:uppercase;margin-bottom:0.6rem;text-align:center;}
-.section-h2{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(2rem,5vw,3.5rem);color:#fff;text-align:center;margin-bottom:0.75rem;}
-.section-sub{font-family:'Lato',sans-serif;font-weight:300;font-size:1rem;color:rgba(255,255,255,0.72);text-align:center;margin-bottom:3.5rem;max-width:550px;margin-left:auto;margin-right:auto;}
-.dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
-@media(max-width:900px){.dest-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:580px){.dest-grid{grid-template-columns:1fr;}}
-.dest-card{background:rgba(255,255,255,0.10);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.20);border-radius:16px;padding:2.5rem 1.5rem 2rem;text-align:center;text-decoration:none;transition:transform 0.25s,background 0.25s;display:block;}
-.dest-card:hover{transform:translateY(-6px);background:rgba(255,255,255,0.16);}
-.dest-emoji{font-size:3rem;display:block;margin-bottom:1rem;}
-.dest-name{font-family:'Playfair Display',serif;font-style:italic;font-size:1.35rem;color:#fff;margin-bottom:0.5rem;}
-.dest-tag{font-family:'Lato',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.65);margin-bottom:1.25rem;font-weight:300;}
-.dest-cta{font-family:'Lato',sans-serif;font-size:0.8rem;font-weight:700;color:var(--teal-light);letter-spacing:0.06em;}
+  const conf = CONFIG[brand] || CONFIG["Glow Protocol"];
+  document.getElementById("logo").src = conf.logo;
+  document.body.style.setProperty("--brand-color", conf.color);
+  document.getElementById("footer").innerText = `© 2026 ${brand.toUpperCase()}`;
+  
+  // Apply brand colors
+  const style = document.createElement('style');
+  style.innerHTML = `
+    nav { border-bottom-color: ${conf.color} !important; }
+    .card:hover { border-color: ${conf.color} !important; }
+    .price { color: ${conf.color} !important; }
+    .btn { background: ${conf.color} !important; }
+    .category { color: ${conf.color} !important; opacity: 0.8; }
+  `;
+  document.head.appendChild(style);
 
-/* TRIP PLANNER */
-#plan{position:relative;min-height:100vh;display:flex;align-items:center;padding:6rem 2rem;}
-.plan-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1600&q=85');background-size:cover;background-position:center;z-index:0;}
-.plan-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.72);z-index:1;}
-.plan-steps{position:relative;z-index:2;max-width:900px;margin:0 auto;width:100%;}
-.step-block{background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);border-radius:16px;padding:2rem;margin-bottom:1.5rem;}
-.step-h3{color:var(--teal-light);font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1rem;}
-.step-p{color:rgba(255,255,255,0.7);font-size:0.9rem;margin-bottom:1.25rem;}
-.btn-row{display:flex;flex-wrap:wrap;gap:0.75rem;}
-.btn-step{flex:1;min-width:120px;text-align:center;padding:0.85rem 1rem;background:rgba(0,107,107,0.4);border:1px solid var(--teal-light);border-radius:8px;text-decoration:none;color:#fff;font-family:'Lato',sans-serif;font-weight:700;font-size:0.85rem;transition:background 0.2s;}
-.btn-step:hover{background:rgba(0,107,107,0.75);}
-.dest-btn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.75rem;}
-.dest-btn{text-align:center;padding:1rem 0.5rem;background:rgba(0,107,107,0.3);border:1px solid rgba(126,200,200,0.3);border-radius:8px;text-decoration:none;color:#fff;font-family:'Lato',sans-serif;font-size:0.85rem;transition:background 0.2s;display:block;}
-.dest-btn:hover{background:rgba(0,107,107,0.6);}
-.plan-footer{text-align:center;margin-top:2rem;padding:1.5rem;background:rgba(0,107,107,0.2);border:1px solid rgba(126,200,200,0.3);border-radius:12px;}
-.plan-footer p{color:rgba(255,255,255,0.85);font-family:'Playfair Display',serif;font-style:italic;font-size:1.1rem;margin:0;}
-
-/* GEAR SHOP */
-#gear{position:relative;min-height:100vh;padding:6rem 2rem;}
-.gear-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=85');background-size:cover;background-position:center;z-index:0;}
-.gear-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.72);z-index:1;}
-.gear-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto;width:100%;}
-.filter-bar{display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;margin-bottom:2.5rem;}
-.filter-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.8);padding:0.5rem 1.2rem;border-radius:30px;cursor:pointer;font-family:'Lato',sans-serif;font-size:0.82rem;font-weight:700;letter-spacing:0.04em;transition:all 0.2s;}
-.filter-btn:hover,.filter-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
-.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.5rem;}
-.product-card{background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:14px;overflow:hidden;transition:transform 0.25s,border-color 0.25s;}
-.product-card:hover{transform:translateY(-5px);border-color:rgba(126,200,200,0.4);}
-.product-img-wrap{height:180px;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.product-img-wrap img{width:100%;height:100%;object-fit:cover;}
-.product-info{padding:1.1rem;}
-.product-name{font-family:'Playfair Display',serif;font-size:0.95rem;color:#fff;margin-bottom:0.3rem;font-style:italic;}
-.product-desc{font-family:'Lato',sans-serif;font-size:0.78rem;color:rgba(255,255,255,0.62);margin-bottom:0.85rem;line-height:1.4;}
-.product-price{font-family:'Lato',sans-serif;font-weight:700;font-size:0.95rem;color:var(--sand);margin-bottom:0.85rem;}
-.btn-shop{display:block;text-align:center;background:var(--teal);color:#fff;padding:0.6rem 1rem;border-radius:6px;text-decoration:none;font-family:'Lato',sans-serif;font-weight:700;font-size:0.78rem;transition:background 0.2s;}
-.btn-shop:hover{background:#008080;}
-.product-card.hidden{display:none;}
-
-/* INSPIRATION */
-#inspiration{position:relative;min-height:80vh;display:flex;align-items:center;padding:6rem 2rem;}
-.insp-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1600&q=85');background-size:cover;background-position:center;z-index:0;}
-.insp-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.68);z-index:1;}
-.insp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;position:relative;z-index:2;max-width:1200px;margin:0 auto;width:100%;}
-@media(max-width:768px){.insp-grid{grid-template-columns:1fr;}}
-.insp-card{border-radius:16px;overflow:hidden;position:relative;min-height:360px;display:flex;align-items:flex-end;text-decoration:none;transition:transform 0.3s;}
-.insp-card:hover{transform:scale(1.02);}
-.insp-card-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;transition:transform 0.4s;}
-.insp-card:hover .insp-card-bg{transform:scale(1.05);}
-.insp-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 60%,transparent 100%);z-index:1;}
-.insp-card-content{position:relative;z-index:2;padding:1.5rem;}
-.insp-label{font-family:'Lato',sans-serif;font-size:0.65rem;letter-spacing:0.3em;color:var(--teal-light);text-transform:uppercase;margin-bottom:0.5rem;}
-.insp-title{font-family:'Playfair Display',serif;font-style:italic;font-size:1.3rem;color:#fff;margin-bottom:0.75rem;}
-.insp-link{font-family:'Lato',sans-serif;font-size:0.78rem;font-weight:700;color:var(--sand);}
-
-/* TICKER */
-#ticker{background:rgba(0,0,0,0.92);border-top:1px solid rgba(255,255,255,0.07);border-bottom:1px solid rgba(255,255,255,0.07);padding:1rem 0;overflow:hidden;position:relative;z-index:10;}
-.ticker-track{display:flex;width:max-content;animation:ticker 30s linear infinite;}
-.ticker-track:hover{animation-play-state:paused;}
-.ticker-item{white-space:nowrap;padding:0 3rem;font-family:'Lato',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.7);letter-spacing:0.1em;}
-.ticker-item span{color:var(--teal-light);margin-right:0.5rem;}
-@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-
-/* NEWSLETTER */
-#newsletter{position:relative;min-height:60vh;display:flex;align-items:center;justify-content:center;padding:6rem 2rem;text-align:center;}
-.nl-bg{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1531168556467-80aace0d0144?w=1600&q=85');background-size:cover;background-position:center;z-index:0;}
-.nl-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.62);z-index:1;}
-.nl-content{position:relative;z-index:2;max-width:560px;width:100%;}
-.nl-form{display:flex;gap:0.75rem;margin-top:2rem;flex-wrap:wrap;}
-.nl-input{flex:1;min-width:220px;padding:0.9rem 1.25rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:8px;color:#fff;font-family:'Lato',sans-serif;font-size:0.95rem;outline:none;}
-.nl-input::placeholder{color:rgba(255,255,255,0.5);}
-.nl-input:focus{border-color:var(--teal-light);}
-.nl-btn{background:var(--teal);color:#fff;padding:0.9rem 1.75rem;border:none;border-radius:8px;font-family:'Lato',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:background 0.2s;}
-.nl-btn:hover{background:#008080;}
-.nl-fine{font-family:'Lato',sans-serif;font-size:0.75rem;color:rgba(255,255,255,0.45);margin-top:1rem;}
-
-/* FOOTER */
-footer{background:rgba(0,0,0,0.95);padding:3.5rem 2rem 2rem;border-top:1px solid rgba(255,255,255,0.07);}
-.footer-inner{max-width:1200px;margin:0 auto;}
-.footer-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:2rem;margin-bottom:3rem;}
-.footer-links{display:flex;gap:2rem;flex-wrap:wrap;}
-.footer-links a{color:rgba(255,255,255,0.55);text-decoration:none;font-family:'Lato',sans-serif;font-size:0.85rem;transition:color 0.2s;}
-.footer-links a:hover{color:var(--teal-light);}
-.footer-bottom{border-top:1px solid rgba(255,255,255,0.07);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
-.footer-copy{font-family:'Lato',sans-serif;font-size:0.75rem;color:rgba(255,255,255,0.35);}
-.footer-disc{font-family:'Lato',sans-serif;font-size:0.7rem;color:rgba(255,255,255,0.3);max-width:600px;line-height:1.5;}
-.footer-tagline{font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:var(--sand);margin-top:0.75rem;}
-</style>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What travel experiences and destinations does The Escapist specialise in?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Escapist curates adventure and lifestyle travel content and products focused on immersive experiences, from off-the-beaten-path destinations and outdoor adventures to cultural deep-dives and slow travel across all seven continents."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What travel gear and accessories does The Escapist offer?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Escapist stocks carefully selected travel essentials including lightweight luggage, packing cubes, travel wallets, portable chargers, adventure cameras, travel pillows, and destination-inspired apparel for every type of traveller."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How do I plan an adventure trip using The Escapist?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Browse our destination guides, itinerary templates, and curated gear lists tailored to your travel style, whether you're backpacking Southeast Asia, road-tripping through Patagonia, or seeking a remote island escape. We simplify the planning process so you can focus on the journey."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Does The Escapist cater to solo travellers as well as groups?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. The Escapist provides resources, gear recommendations, and community insights for solo travellers, couples, families, and group adventures alike. Solo travel tips and safety resources are featured prominently in our content hub."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What makes The Escapist different from a standard travel gear store?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Escapist is built around the adventure mindset. Every product is hand-picked for real-world use, and our editorial content is created by travellers who have actually been there. We blend inspiration, practical advice, and quality gear into one platform."
-      }
-    }
-  ]
-}
-</script>
-<style>.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px;padding:50px 5%}.product-card{background:#fff;border:1px solid #eee;border-radius:10px;overflow:hidden;text-align:center;padding-bottom:20px}.product-image{width:100%;height:200px;object-fit:cover}.buy-link{background:#000;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px}</style></head><body><nav><div style="position:fixed; top:100px; right:5%; z-index:100;"><a href="scout/" style="background:#000; color:#fff; padding:10px 20px; text-decoration:none; font-weight:700; font-size:0.7rem; letter-spacing:2px; text-transform:uppercase;">Sanctuary AI</a></div>
-  <div class="nav-inner">
-    <a href="/the-escapist/" style="text-decoration:none;display:flex;flex-direction:column;line-height:1.1;gap:2px;">
-      <span style="font-family:'Playfair Display',serif;font-weight:400;font-style:italic;font-size:0.65rem;letter-spacing:0.35em;color:var(--teal-light);text-transform:uppercase;">The</span>
-      <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.35rem;letter-spacing:0.1em;color:#FFFFFF;text-transform:uppercase;">Escapist</span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#destinations">Destinations</a></li>
-      <li><a href="/theescapist/shop/">Shop</a></li>
-      <li><a href="/theescapist/blog/" style="color:#FF9800; font-weight:700;">Blogs</a></li>
-    </ul>
-    <a href="#plan" class="nav-cta">Plan My Trip</a>
-  </div>
-</nav><div class='product-grid'><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=1" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #01</h3><span class="price">$21.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=2" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #02</h3><span class="price">$33.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=3" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #03</h3><span class="price">$45.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=4" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #04</h3><span class="price">$57.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=5" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #05</h3><span class="price">$69.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=6" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #06</h3><span class="price">$81.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=7" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #07</h3><span class="price">$93.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=8" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #08</h3><span class="price">$105.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=9" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #09</h3><span class="price">$117.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=10" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #10</h3><span class="price">$129.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=11" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #11</h3><span class="price">$141.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=12" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #12</h3><span class="price">$153.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=13" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #13</h3><span class="price">$165.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=14" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #14</h3><span class="price">$177.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=15" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #15</h3><span class="price">$189.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=16" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #16</h3><span class="price">$201.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=17" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #17</h3><span class="price">$213.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=18" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #18</h3><span class="price">$225.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=19" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #19</h3><span class="price">$237.99</span><a href="#" class="buy-link">View on Amazon</a></div><div class="product-card"><img src="https://images.unsplash.com/photo-1469813008292-35bd3dc654f9?w=500&q=80&sig=20" class="product-image"><h3>Luxury Travel & Sanctuaries Travel Essential #20</h3><span class="price">$249.99</span><a href="#" class="buy-link">View on Amazon</a></div>
-</div><footer>
-  <div class="footer-inner">
-    <div class="footer-top">
-      <div>
-        <a href="/the-escapist/" style="text-decoration:none;display:flex;flex-direction:column;line-height:1.1;gap:2px;">
-          <span style="font-family:'Playfair Display',serif;font-weight:400;font-style:italic;font-size:0.65rem;letter-spacing:0.35em;color:var(--teal-light);text-transform:uppercase;">The</span>
-          <span style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.35rem;letter-spacing:0.1em;color:#FFFFFF;text-transform:uppercase;">Escapist</span>
-        </a>
-        <p class="footer-tagline">Your adventure starts here.</p>
+  const { data } = await sb.from("empire_inventory").select("*").eq("brand", brand);
+  
+  if (data && data.length > 0) {
+    document.getElementById("grid").innerHTML = data.map(p => `
+      <div class="card">
+        <div class="category">${p.category}</div>
+        <div class="img-box"><img src="${p.image_url}"></div>
+        <h3>${p.title}</h3>
+        <p class="price">${p.price}</p>
+        <a href="${p.affiliate_link}" class="btn" target="_blank">${conf.btn}</a>
       </div>
-      <div class="footer-links">
-        <a href="#destinations">Destinations</a>
-        <a href="/the-escapist/shop/">Gear</a>
-        <a href="#plan">Plan Trip</a>
-        <a href="https://www.booking.com" target="_blank" rel="noopener">Stays</a>
-        <a href="https://www.viator.com" target="_blank" rel="noopener">Experiences</a>
-        <a href="/the-escapist/shop/">Shop</a>
-        <a href="/theescapist/blog/">Blog</a>
-      </nav>
-    </div>
-    <div class="footer-bottom">
-      <p class="footer-copy">&copy; 2026 The Escapist &mdash; A Prisca Dezigns Brand. All rights reserved.</p>
-      <p class="footer-disc">Participates in the Amazon Services LLC Associates Program. As an Amazon Associate, we earn from qualifying purchases at no additional cost to you. This helps keep The Escapist free and independent.</p>
-      <div style="margin-top:0.75rem;display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;">
-  <a href="/legal/privacy/" style="color:#666;font-size:0.75rem;text-decoration:none;">Privacy Policy</a>
-  <a href="/legal/terms/" style="color:#666;font-size:0.75rem;text-decoration:none;">Terms of Use</a>
-  <a href="/legal/affiliate-disclosure/" style="color:#666;font-size:0.75rem;text-decoration:none;">Affiliate Disclosure</a>
-</div>
-    </div>
-  </div>
-<p style="margin-top:16px;"><a href="mailto:hello@priscadezigns.org?subject=Advertise%20with%20The%20Escapist" style="color:var(--teal-light);font-size:0.8rem;">Advertise with us →</a></p>
-</footer></body></html>
+    `).join("");
+  } else {
+    document.getElementById("grid").innerHTML = "<h3>Inventory Syncing...</h3>";
+  }
+}
+load();
+</script>
+</body></html>
