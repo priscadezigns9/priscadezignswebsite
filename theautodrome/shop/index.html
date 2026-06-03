@@ -1,90 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE AUTODROME | Official Shop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --accent: #FF0000;
-            --bg: #ffffff;
-            --text: #000000;
-            --card-bg: #ffffff;
-            --border: rgba(0,0,0,0.05);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
-        nav { padding: 2rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; letter-spacing: -1px; }
-        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; padding: 4rem 2rem; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.3s ease; display: flex; flex-direction: column; }
-        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .card-image { width: 100%; aspect-ratio: 1; background: #f9f9f9; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .card-image img { width: 100%; height: 100%; object-fit: cover; }
-        .card-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 1rem; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .price { font-weight: 700; font-size: 1.2rem; color: var(--accent); }
-        .shop-btn { background: #000; color: #fff; padding: 0.8rem 1.5rem; border-radius: 6px; text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: 0.3s; }
-        .shop-btn:hover { background: var(--accent); }
-        footer { padding: 4rem 2rem; border-top: 1px solid var(--border); text-align: center; font-size: 0.8rem; opacity: 0.5; }
-    </style>
-</head>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{margin:0;font-family:sans-serif;background:#fff;color:#111}
+nav{background:#fff;padding:25px;border-bottom:3px solid #000;display:flex;justify-content:space-between;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:40px;padding:60px 5%}
+.card{background:#fafafa;border:1px solid #eee;border-radius:16px;padding:40px;text-align:center;transition:0.4s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-10px);border-color:#000;box-shadow:0 20px 40px rgba(0,0,0,0.05)}
+.category{font-size:0.9rem;color:#666;font-weight:700;text-transform:uppercase;margin-bottom:10px}
+.img-box{height:400px;display:flex;align-items:center;justify-content:center;margin-bottom:30px;background:#fff;border-radius:12px;overflow:hidden}
+img{max-width:90%;max-height:90%;object-fit:contain;transition:0.5s}
+.card:hover img{transform:scale(1.05)}
+h3{font-size:1.4rem;margin:0 0 15px;font-weight:800}
+.price{color:#000;font-weight:900;font-size:1.6rem;margin-bottom:30px}
+.btn{display:block;background:#000;color:#fff;padding:20px;border-radius:10px;text-decoration:none;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-top:auto}
+footer{padding:60px;text-align:center;opacity:0.5;font-size:0.8rem}
+</style></head>
 <body>
-    <nav>
-        <div class="logo">THE AUTODROME</div>
-    </nav>
+<nav><img id="logo" src="" height="50"></nav>
+<div class="grid" id="grid"></div>
+<footer id="footer"></footer>
+<script>
+const CONFIG = {
+  "Glow Protocol": { logo: "https://priscadezigns.org/logos/prisca-dezigns-logo.png", color: "#000", btn: "Acquire Solution" },
+  "Atelia Gaming": { logo: "https://priscadezigns.org/logos/atelier-gaming.png", color: "#D32F2F", btn: "Acquire Armory" },
+  "The Gen Play": { logo: "https://priscadezigns.org/logos/thegenplay.png", color: "#6366f1", btn: "Acquire Object" },
+  "Pantriq": { logo: "https://priscadezigns.org/logos/pantriq.png", color: "#10b981", btn: "Acquire Gear" },
+  "The Autodrome": { logo: "https://priscadezigns.org/logos/the-autodrome.jpg", color: "#ef4444", btn: "Acquire Tech" },
+  "My Baby Dumpling": { logo: "https://priscadezigns.org/logos/mybabydumpling.png", color: "#ec4899", btn: "Acquire Essential" },
+  "Riddiim": { logo: "https://priscadezigns.org/logos/riddiim.png", color: "#8b5cf6", btn: "Acquire Audio" },
+  "Sole Prestige": { logo: "https://priscadezigns.org/logos/sole-prestige.jpg", color: "#1f2937", btn: "Acquire Exclusive" },
+  "The Tech Scout HQ": { logo: "https://priscadezigns.org/logos/tech-scout.png", color: "#3b82f6", btn: "Acquire Innovation" },
+  "Essence Elite": { logo: "https://priscadezigns.org/logos/essenceelite.png", color: "#4b5563", btn: "Acquire Scent" },
+  "Shelfly": { logo: "https://priscadezigns.org/logos/shelfly.png", color: "#2563eb", btn: "Acquire System" }
+};
 
-    <main>
-        <section class="shop-grid" id="grid">
-            <!-- Dynamic Injection -->
-        </section>
-    </main>
+const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
 
-    <footer>
-        &copy; 2026 The Autodrome. Part of the Prisca Dezigns Empire.
-    </footer>
+async function load() {
+  const path = window.location.pathname.toLowerCase();
+  let brand = "Glow Protocol";
+  if(path.includes("atelia")) brand = "Atelia Gaming";
+  else if(path.includes("genplay")) brand = "The Gen Play";
+  else if(path.includes("pantriq")) brand = "Pantriq";
+  else if(path.includes("autodrome")) brand = "The Autodrome";
+  else if(path.includes("baby")) brand = "My Baby Dumpling";
+  else if(path.includes("ridd")) brand = "Riddiim";
+  else if(path.includes("prestige")) brand = "Sole Prestige";
+  else if(path.includes("scout")) brand = "The Tech Scout HQ";
+  else if(path.includes("essence")) brand = "Essence Elite";
+  else if(path.includes("shelfly")) brand = "Shelfly";
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        (function() {
-            const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
-            const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
-            const sb = supabase.createClient(SB_URL, SB_KEY);
+  const conf = CONFIG[brand] || CONFIG["Glow Protocol"];
+  document.getElementById("logo").src = conf.logo;
+  document.body.style.setProperty("--brand-color", conf.color);
+  document.getElementById("footer").innerText = `© 2026 ${brand.toUpperCase()}`;
+  
+  // Apply brand colors
+  const style = document.createElement('style');
+  style.innerHTML = `
+    nav { border-bottom-color: ${conf.color} !important; }
+    .card:hover { border-color: ${conf.color} !important; }
+    .price { color: ${conf.color} !important; }
+    .btn { background: ${conf.color} !important; }
+    .category { color: ${conf.color} !important; opacity: 0.8; }
+  `;
+  document.head.appendChild(style);
 
-            async function loadInventory() {
-                const { data, error } = await sb
-                    .from('empire_inventory')
-                    .select('*')
-                    .eq('brand', 'The Autodrome')
-                    .order('created_at', { ascending: false });
-                
-                if (error) {
-                    console.error('Inventory Sync Error:', error);
-                    return;
-                }
-                
-                const grid = document.getElementById('grid');
-                if (!grid) return;
-                
-                grid.innerHTML = '';
-                data.forEach(p => {
-                    grid.innerHTML += `
-                        <div class="card">
-                            <div class="card-image"><img src="${p.image_url}" loading="lazy"></div>
-                            <div class="card-content">
-                                <h3 class="card-title">${p.title}</h3>
-                                <div class="card-footer">
-                                    <span class="price">${p.price}</span>
-                                    <a href="${p.affiliate_link}" class="shop-btn" target="_blank">DRIVE</a>
-                                </div>
-                            </div>
-                        </div>`;
-                });
-            }
-            document.addEventListener('DOMContentLoaded', loadInventory);
-        })();
-    </script>
-</body>
-</html>
+  const { data } = await sb.from("empire_inventory").select("*").eq("brand", brand);
+  
+  if (data && data.length > 0) {
+    document.getElementById("grid").innerHTML = data.map(p => `
+      <div class="card">
+        <div class="category">${p.category}</div>
+        <div class="img-box"><img src="${p.image_url}"></div>
+        <h3>${p.title}</h3>
+        <p class="price">${p.price}</p>
+        <a href="${p.affiliate_link}" class="btn" target="_blank">${conf.btn}</a>
+      </div>
+    `).join("");
+  } else {
+    document.getElementById("grid").innerHTML = "<h3>Inventory Syncing...</h3>";
+  }
+}
+load();
+</script>
+</body></html>
