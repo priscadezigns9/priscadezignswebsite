@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#E01B24">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/dpanyard/manifest.json">
+    <title>Business Hub Login | dpanyard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-red: #E01B24;
+            --navy-deep: #0D1B2A;
+            --white: #FFFFFF;
+            --bg-light: #F8FAFC;
+            --text-dark: #0D1B2A;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--text-dark); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        
+        .auth-card { background: var(--white); border-radius: 32px; padding: 48px; width: 100%; max-width: 440px; text-align: center; box-shadow: 0 20px 50px rgba(13, 27, 42, 0.08); border: 1px solid #f1f5f9; }
+        .logo-img { height: 48px; margin-bottom: 32px; }
+        h1 { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+        p { color: #64748B; margin-bottom: 32px; font-size: 14px; }
+        
+        .btn-main { width: 100%; padding: 18px; border-radius: 16px; border: none; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 15px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+        .btn-primary { background: var(--navy-deep); color: white; margin-bottom: 12px; }
+        .btn-primary:hover { background: var(--primary-red); transform: translateY(-2px); }
+        .btn-google { background: white; color: var(--navy-deep); border: 1.5px solid #E2E8F0; margin-bottom: 24px; }
+        .btn-google:hover { background: #F8FAFC; }
+        .btn-google img { width: 20px; }
+
+        .form-group { text-align: left; margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--navy-deep); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .form-group input { width: 100%; padding: 16px; border-radius: 12px; border: 1.5px solid #E2E8F0; font-family: 'Inter', sans-serif; font-size: 15px; outline: none; transition: border-color 0.3s; }
+        .form-group input:focus { border-color: var(--primary-red); }
+
+        .divider { display: flex; align-items: center; gap: 10px; color: #94A3B8; font-size: 12px; font-weight: 600; margin-bottom: 24px; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #E2E8F0; }
+        
+        .footer-link { margin-top: 32px; font-size: 14px; color: #64748B; }
+        .footer-link a { color: var(--primary-red); text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <a href="../index.html"><img src="/dpanyard/assets/logos/dpanyard-logo-new.png" alt="dpanyard" class="logo-img"></a>
+        <h1>Business Hub Login</h1>
+        <p>Sign in to your business account.</p>
+        <form id="login-form">
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="email" required placeholder="name@domain.com">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" required placeholder="••••••••">
+        </div>
+        <button type="submit" id="submit-btn" class="btn-main btn-primary">Sign In</button>
+    </form>
+    
+
+        <div class="footer-link">
+            
+        </div>
+        
+    <script>
+        const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
+        
+        function getRedirectURL() {
+            const hostname = window.location.hostname;
+            const href = window.location.href;
+            if (hostname === 'calalloo.com') return 'https://calalloo.com/calalloo/dashboard';
+            if (href.includes('priscadezigns.org/dpanyard')) return 'https://priscadezigns.org/dpanyard/dashboard/business';
+            return window.location.origin + '/dpanyard/dashboard/business';
+        }
+
+        document.getElementById('login-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = 'Signing in...';
+            const { error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) { alert(error.message); btn.innerText = 'Sign In'; }
+            else { localStorage.setItem('dpanyard_role', 'business'); window.location.href = getRedirectURL(); }
+        };
+    </script>
+    
+    </div>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/dpanyard/sw.js', { scope: '/dpanyard/' })
+              .then((reg) => console.log('SW registered'))
+              .catch((err) => console.error('SW failed:', err));
+        }
+    </script>
+</body>
+</html>
