@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Neural Deck | RIDDIIM</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -26,33 +25,51 @@
 
     main { flex: 1; display: flex; flex-direction: column; padding: 20px 40px; overflow-y: auto; align-items: center; }
     
-    .tabs { display: flex; gap: 20px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; width: 100%; max-width: 800px; }
-    .tab { font-family: var(--font-mono); font-size: 10px; color: var(--muted); cursor: pointer; letter-spacing: 2px; text-transform: uppercase; transition: color 0.3s; }
-    .tab.active { color: #fff; }
-
     .search-container { width: 100%; max-width: 600px; margin-bottom: 20px; position: relative; }
-    input { width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 16px 24px; color: #fff; font-family: var(--font-sans); font-size: 16px; border-radius: 4px; outline: none; transition: border 0.3s; }
-    input:focus { border-color: rgba(255,255,255,0.3); }
+    input { width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 18px 24px; color: #fff; font-family: var(--font-sans); font-size: 16px; border-radius: 8px; outline: none; transition: all 0.3s; }
+    input:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
 
     /* Results Panel */
-    #search-results { width: 100%; max-width: 600px; max-height: 200px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); border-top: none; display: none; margin-bottom: 20px; }
-    .result-item { padding: 12px 20px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 15px; }
+    #search-results { 
+      position: absolute; top: 100%; left: 0; width: 100%; max-height: 400px; overflow-y: auto; 
+      background: #0A0A0F; border: 1px solid var(--border); border-radius: 0 0 12px 12px; 
+      display: none; z-index: 200; box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+    }
+    .result-item { padding: 16px 20px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 15px; transition: background 0.2s; }
     .result-item:hover { background: rgba(255,255,255,0.05); }
-    .result-item img { width: 40px; height: 40px; border-radius: 2px; object-fit: cover; }
+    .result-item img { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; }
     .result-info { flex: 1; overflow: hidden; }
-    .result-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .result-artist { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+    .result-title { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+    .result-artist { font-size: 11px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 1px; }
     
-    .deck-container { width: 100%; max-width: 800px; background: rgba(10,10,15,0.8); border: 1px solid var(--border); border-radius: 8px; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; min-height: 300px; display: flex; flex-direction: column; }
+    .deck-container { 
+      width: 100%; max-width: 800px; background: rgba(10,10,15,0.8); border: 1px solid var(--border); 
+      border-radius: 12px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+      position: relative; min-height: 450px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
     
-    #player-mount { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; }
-    iframe { border: none; border-radius: 4px; width: 100%; height: 380px; }
+    .player-ui { width: 100%; text-align: center; display: none; }
+    .art-stack { position: relative; width: 220px; height: 220px; margin: 0 auto 40px; }
+    .art-stack img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    
+    .track-meta h2 { font-size: 28px; font-weight: 700; margin-bottom: 8px; letter-spacing: -1px; }
+    .track-meta p { font-family: var(--font-mono); color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 4px; }
 
-    .deck-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; }
-    .pulse-dot { width: 8px; height: 8px; background: #22C55E; border-radius: 50%; box-shadow: 0 0 10px #22C55E; animation: blink 2s infinite; }
-    @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+    .controls { margin-top: 40px; display: flex; align-items: center; justify-content: center; gap: 30px; }
+    .play-btn { 
+      width: 64px; height: 64px; border-radius: 50%; background: #fff; color: #000; 
+      display: flex; align-items: center; justify-content: center; font-size: 24px; 
+      cursor: pointer; transition: transform 0.2s; border: none;
+    }
+    .play-btn:hover { transform: scale(1.05); }
 
-    #feedback { font-family: var(--font-mono); font-size: 10px; color: #ff3d00; margin-top: 10px; text-align: center; display: none; }
+    .visualizer { width: 100%; height: 40px; display: flex; align-items: center; justify-content: center; gap: 3px; margin-top: 40px; opacity: 0.5; }
+    .v-bar { width: 3px; height: 10px; background: #fff; transition: height 0.1s; border-radius: 10px; }
+
+    #feedback { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 10px; text-transform: uppercase; letter-spacing: 2px; }
+
+    /* Empty State */
+    #empty-state { text-align: center; opacity: 0.3; font-family: var(--font-mono); font-size: 12px; letter-spacing: 4px; }
   </style>
 </head>
 <body>
@@ -62,113 +79,147 @@
     <div class="nav-vinyl"></div>
     <span class="nav-wordmark">RIDDIIM</span>
   </a>
-  <div style="font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px;">NEURAL DECK V.1.2</div>
+  <div style="font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px;">NEURAL_DECK_ACTIVE</div>
 </header>
 
 <main>
-  <div class="tabs">
-    <div class="tab active" data-source="soundcloud">Universal Search</div>
-    <div class="tab" data-source="native">Vault</div>
-  </div>
-
   <div class="search-container">
-    <input type="text" placeholder="Search Artist or Song..." id="query">
+    <input type="text" placeholder="Search Artist or Track..." id="query" autocomplete="off">
     <div id="search-results"></div>
-    <div id="feedback">SEARCHING_GLOBAL_SIGNALS...</div>
+    <div id="feedback">Ready to analyze signals...</div>
   </div>
 
   <div class="deck-container">
-    <div class="deck-header">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <div class="pulse-dot"></div>
-        SIGNAL_STATUS: <span id="source-label">READY</span>
-      </div>
-      <div>CORE_STABLE</div>
-    </div>
+    <div id="empty-state">SEARCH_AND_SELECT_TRACK</div>
     
-    <div id="player-mount">
-      <div style="text-align: center; color: var(--muted); font-family: var(--font-mono); font-size: 12px; letter-spacing: 4px;">INITIALIZING_NEURAL_DECK...</div>
+    <div class="player-ui" id="player-ui">
+      <div class="art-stack">
+        <img id="track-art" src="" alt="Art">
+      </div>
+      <div class="track-meta">
+        <h2 id="track-name">Track Name</h2>
+        <p id="artist-name">Artist Name</p>
+      </div>
+      
+      <div class="visualizer" id="visualizer"></div>
+      
+      <div class="controls">
+        <button class="play-btn" id="play-trigger">▶</button>
+      </div>
+
+      <div style="margin-top: 40px;">
+        <a id="full-signal" href="" target="_blank" style="font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-decoration: none; letter-spacing: 2px; border: 1px solid var(--border); padding: 10px 20px; border-radius: 4px;">OPEN_FULL_SIGNAL</a>
+      </div>
     </div>
   </div>
 
-  <div style="margin-top: 40px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-align: center;">
-    SOVEREIGN AUDIO INTERFACE • POWERED BY RIDDIIM
-  </div>
+  <audio id="core-audio"></audio>
 </main>
 
 <script>
-  const queryInput = document.getElementById('query');
-  const resultsPanel = document.getElementById('search-results');
+  const query = document.getElementById('query');
+  const results = document.getElementById('search-results');
   const feedback = document.getElementById('feedback');
-  const mount = document.getElementById('player-mount');
-  const sourceLabel = document.getElementById('source-label');
-
-  // SoundCloud Public Search Proxy (Simulation of Universal Search Bridge)
-  async function performSearch(q) {
-    feedback.style.display = 'block';
-    resultsPanel.style.display = 'none';
-    
-    try {
-      // In a production environment, this calls the Riddiim Search Bridge.
-      // For this high-fidelity demonstration, we simulate the "Neural Recognition" of results.
-      const mockResults = [
-        { title: q + " - Neural Mix", artist: "Riddiim Labs", id: "track1", url: "https://soundcloud.com/riddiim/vibe1" },
-        { title: "Burna Boy - Last Last", artist: "Burna Boy", id: "bb1", url: "https://soundcloud.com/burnaboy/last-last" },
-        { title: "Burna Boy - Ye", artist: "Burna Boy", id: "bb2", url: "https://soundcloud.com/burnaboy/ye" },
-        { title: "Tems - Free Mind", artist: "Tems", id: "t1", url: "https://soundcloud.com/tems/free-mind" }
-      ].filter(r => r.title.toLowerCase().includes(q.toLowerCase()) || r.artist.toLowerCase().includes(q.toLowerCase()));
-
-      renderResults(mockResults);
-    } catch (e) {
-      feedback.textContent = 'SIGNAL_ERROR';
-    }
+  const ui = document.getElementById('player-ui');
+  const empty = document.getElementById('empty-state');
+  const audio = document.getElementById('core-audio');
+  const playBtn = document.getElementById('play-trigger');
+  
+  // Visualizer Bars
+  const viz = document.getElementById('visualizer');
+  for(let i=0; i<32; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'v-bar';
+    viz.appendChild(bar);
   }
 
-  function renderResults(items) {
-    feedback.style.display = 'none';
-    if(items.length === 0) {
-      resultsPanel.innerHTML = '<div style="padding:20px; font-size:10px; color:var(--muted);">NO_SIGNALS_FOUND</div>';
+  // Deezer Search via JSONP
+  let searchTimeout;
+  query.oninput = (e) => {
+    clearTimeout(searchTimeout);
+    const val = e.target.value.trim();
+    if(val.length < 2) {
+      results.style.display = 'none';
+      return;
+    }
+    
+    searchTimeout = setTimeout(() => {
+      feedback.textContent = 'Analyzing signal: ' + val.toUpperCase();
+      const script = document.createElement('script');
+      script.src = `https://api.deezer.com/search?q=${encodeURIComponent(val)}&limit=10&output=jsonp&callback=handleSearch`;
+      document.body.appendChild(script);
+      setTimeout(() => script.remove(), 1000);
+    }, 400);
+  };
+
+  window.handleSearch = (data) => {
+    if(!data.data || data.data.length === 0) {
+      feedback.textContent = 'NO_SIGNALS_DETECTED';
+      results.innerHTML = '<div style="padding:20px; text-align:center; color:var(--muted); font-size:10px;">ZERO_RESULTS</div>';
     } else {
-      resultsPanel.innerHTML = items.map(item => `
-        <div class="result-item" onclick="loadTrack('${item.url}', '${item.title}')">
+      feedback.textContent = data.total + ' Signals Found';
+      results.innerHTML = data.data.map(item => `
+        <div class="result-item" onclick='loadTrack(${JSON.stringify({
+          title: item.title,
+          artist: item.artist.name,
+          art: item.album.cover_big,
+          preview: item.preview,
+          link: item.link
+        }).replace(/'/g, "&apos;")})'>
+          <img src="${item.album.cover_small}" alt="Art">
           <div class="result-info">
             <div class="result-title">${item.title}</div>
-            <div class="result-artist">${item.artist}</div>
+            <div class="result-artist">${item.artist.name}</div>
           </div>
         </div>
       `).join('');
     }
-    resultsPanel.style.display = 'block';
-  }
+    results.style.display = 'block';
+  };
 
-  function loadTrack(url, title) {
-    resultsPanel.style.display = 'none';
-    sourceLabel.textContent = 'ACTIVE_SIGNAL';
+  window.loadTrack = (track) => {
+    results.style.display = 'none';
+    empty.style.display = 'none';
+    ui.style.display = 'block';
     
-    // We use the SoundCloud Widget API to host the song within Riddiim
-    mount.innerHTML = `<iframe scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23050508&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>`;
+    document.getElementById('track-art').src = track.art;
+    document.getElementById('track-name').textContent = track.title;
+    document.getElementById('artist-name').textContent = track.artist;
+    document.getElementById('full-signal').href = track.link;
     
-    queryInput.value = title;
-  }
+    audio.src = track.preview;
+    audio.play();
+    playBtn.textContent = '||';
+  };
 
-  queryInput.oninput = (e) => {
-    const val = e.target.value.trim();
-    if(val.length > 2) {
-      performSearch(val);
+  playBtn.onclick = () => {
+    if(audio.paused) {
+      audio.play();
+      playBtn.textContent = '||';
     } else {
-      resultsPanel.style.display = 'none';
-      feedback.style.display = 'none';
+      audio.pause();
+      playBtn.textContent = '▶';
     }
   };
 
-  queryInput.onkeydown = (e) => {
-    if(e.key === 'Enter') {
-      const val = queryInput.value.trim();
-      if(val.includes('http')) {
-        loadTrack(val, "Bridged Signal");
-      }
+  // Neural Visualizer Logic
+  function animateViz() {
+    if(!audio.paused) {
+      const bars = document.querySelectorAll('.v-bar');
+      bars.forEach(bar => {
+        const h = 5 + Math.random() * 35;
+        bar.style.height = h + 'px';
+        bar.style.opacity = h/40;
+      });
     }
+    requestAnimationFrame(animateViz);
   }
+  animateViz();
+
+  // Close results on click outside
+  document.onclick = (e) => {
+    if(!e.target.closest('.search-container')) results.style.display = 'none';
+  };
 </script>
 </body>
 </html>
