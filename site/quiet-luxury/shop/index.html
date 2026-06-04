@@ -1,451 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop All — Quiet Luxury</title>
-<meta name="description" content="All 36 curated home decor pieces across 9 rooms. Filter by category and find your perfect piece.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiet Luxury Shop - Gold Standard v4.2</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --cream: #FAFAF8;
-    --warm-grey: #E8E4DF;
-    --gold: #C9A84C;
-    --charcoal: #2C2C2C;
-    --mid-grey: #8C8880;
-    --light-gold: #F0E8D4;
-  }
-  html { scroll-behavior: smooth; }
-  body { font-family: "Inter", sans-serif; background: var(--cream); color: var(--charcoal); }
-
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    background: rgba(250,250,248,0.96); backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--warm-grey);
-    padding: 0 5%; height: 72px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .nav-links { display: flex; align-items: center; gap: 2.5rem; list-style: none; }
-  .nav-links a { font-family: "Inter", sans-serif; font-size: 0.8rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; color: var(--charcoal); transition: color 0.2s; }
-  .nav-links a:hover { color: var(--gold); }
-  .btn-back {
-    font-family: "Inter", sans-serif; font-size: 0.75rem; font-weight: 400;
-    letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none;
-    color: var(--mid-grey); transition: color 0.2s;
-  }
-  .btn-back:hover { color: var(--gold); }
-
-  /* PAGE HEADER */
-  .shop-header {
-    padding: 120px 5% 60px; text-align: center;
-    background: var(--cream); border-bottom: 1px solid var(--warm-grey);
-  }
-  .shop-eyebrow { font-family: "Inter", sans-serif; font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--mid-grey); margin-bottom: 1rem; }
-  .shop-title { font-family: "Cormorant Garamond", serif; font-weight: 300; font-style: italic; font-size: clamp(2.5rem, 4vw, 4rem); color: var(--charcoal); margin-bottom: 0.5rem; }
-  .shop-sub { font-family: "Inter", sans-serif; font-size: 0.85rem; color: var(--mid-grey); }
-
-  /* FILTER TABS */
-  .filter-bar {
-    padding: 0 5%; background: var(--cream);
-    border-bottom: 1px solid var(--warm-grey);
-    display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
-  }
-  .filter-bar::-webkit-scrollbar { height: 0; }
-  .filter-tab {
-    flex-shrink: 0; padding: 1.2rem 1.5rem; cursor: pointer;
-    font-family: "Inter", sans-serif; font-size: 0.72rem; font-weight: 400;
-    letter-spacing: 0.12em; text-transform: uppercase; color: var(--mid-grey);
-    border-bottom: 2px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none;
-    white-space: nowrap;
-  }
-  .filter-tab:hover { color: var(--charcoal); }
-  .filter-tab.active { color: var(--gold); border-bottom-color: var(--gold); font-weight: 500; }
-
-  /* PRODUCT GRID */
-  .shop-main { padding: 60px 5% 100px; }
-  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem 2.5rem; }
-  .product-card { }
-  .product-card.hidden { display: none; }
-  .prod-img-wrap {
-    background: var(--warm-grey); aspect-ratio: 1; overflow: hidden;
-    margin-bottom: 1.25rem; position: relative;
-  }
-  .prod-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s; }
-  .product-card:hover .prod-img-wrap img { transform: scale(1.04); }
-  .prod-cat { font-family: "Inter", sans-serif; font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
-  .prod-name { font-family: "Cormorant Garamond", serif; font-size: 1.1rem; color: var(--charcoal); margin-bottom: 0.3rem; line-height: 1.3; }
-  .prod-price { font-family: "Inter", sans-serif; font-size: 0.85rem; font-weight: 500; color: var(--mid-grey); margin-bottom: 1rem; }
-  .btn-shop {
-    display: inline-block; font-family: "Inter", sans-serif; font-size: 0.7rem;
-    font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
-    text-decoration: none; color: var(--charcoal); border-bottom: 1px solid var(--charcoal);
-    padding-bottom: 2px; transition: all 0.2s;
-  }
-  .btn-shop:hover { color: var(--gold); border-color: var(--gold); }
-
-  /* FOOTER */
-  .shop-footer { background: var(--charcoal); padding: 40px 5%; text-align: center; }
-  .shop-footer p { font-family: "Inter", sans-serif; font-size: 0.72rem; color: rgba(255,255,255,0.4); line-height: 1.7; max-width: 600px; margin: 0 auto 1rem; }
-  .shop-footer a { color: rgba(255,255,255,0.6); text-decoration: none; }
-  .shop-footer a:hover { color: var(--gold); }
-
-  @media (max-width: 900px) { .product-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
-  @media (max-width: 600px) {
-    .nav-links { display: none; }
-    .product-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1rem; }
-    .filter-tab { padding: 1rem 1rem; font-size: 0.65rem; }
-  }
+:root { --brand-color: #44403c; --bg-dark: #0a0a0a; --card-bg: #141414; --text-light: #f0f0f0; --border-color: #222; }
+body{margin:0;font-family:'Inter', sans-serif;background:var(--bg-dark);color:var(--text-light);line-height:1.6}
+nav{background:var(--bg-dark);padding:20px 5%;border-bottom:3px solid var(--brand-color);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.5)}
+#logo { height: 50px; max-width: 200px; object-fit: contain; }
+#upBtn { position: fixed; bottom: 30px; right: 30px; background: var(--brand-color); color: #fff; width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.5rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000; transition: 0.3s; }
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:40px;padding:40px 5%}
+.card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:20px;padding:30px;text-align:center;transition:0.4s;display:flex;flex-direction:column;position:relative}
+.card:hover{transform:translateY(-10px);box-shadow:0 20px 40px rgba(0,0,0,0.4);border-color:var(--brand-color)}
+.img-box{height:300px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:#fff;border-radius:12px;overflow:hidden}
+img.product-img{max-width:90%;max-height:90%;object-fit:contain;transition:0.5s}
+h3{font-size:1rem;margin:0 0 15px;font-weight:800;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:3em;color:var(--text-light)}
+.price{color:var(--brand-color);font-weight:900;font-size:1.5rem;margin-bottom:20px}
+.btn{display:block;background:var(--brand-color);color: #fff;padding:18px;border-radius:12px;text-decoration:none;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-top:auto;font-size:0.85rem;transition:0.3s}
+#loader { position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:1000; display:flex; flex-direction: column; justify-content:center; align-items:center; transition: 0.5s; }
+#loaderText { color: var(--brand-color); font-weight: 900; letter-spacing: 5px; }
+#loader.hidden { opacity:0; pointer-events:none; }
 </style>
 </head>
 <body>
-
-<!-- NAV -->
+<div id="loader"><h2 id="loaderText">QUIET LUXURY</h2></div>
 <nav>
-  <a href="/quiet-luxury/" style="text-decoration:none;display:flex;align-items:baseline;gap:8px;">
-    <span style="font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;font-size:1.4rem;letter-spacing:0.08em;color:#2C2C2C;">Quiet</span>
-    <span style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:1rem;letter-spacing:0.4em;color:#C9A84C;text-transform:uppercase;">LUXURY</span>
-  </a>
-  <ul class="nav-links">
-    <li><a href="/quiet-luxury/#rooms">Rooms</a></li>
-    <li><a href="/quiet-luxury/#quiz">Design Quiz</a></li>
-    <li><a href="/quiet-luxury/">Home</a></li>
-  </ul>
-  <a href="/quiet-luxury/" class="btn-back">&larr; Back</a>
+    <img id="logo" src="https://priscadezigns.org/logos/quiet-luxury.jpg" alt="Quiet Luxury Logo">
 </nav>
-
-<!-- HEADER -->
-<div class="shop-header">
-  <p class="shop-eyebrow">The Full Collection</p>
-  <h1 class="shop-title">All 36 Pieces.</h1>
-  <p class="shop-sub">Filter by room &mdash; or browse everything.</p>
-</div>
-
-<!-- FILTER TABS -->
-<div class="filter-bar" id="filterBar">
-  <button class="filter-tab active" data-filter="all">All</button>
-  <button class="filter-tab" data-filter="living-room">Living Room</button>
-  <button class="filter-tab" data-filter="bedroom">Bedroom</button>
-  <button class="filter-tab" data-filter="dining">Dining</button>
-  <button class="filter-tab" data-filter="office">Office</button>
-  <button class="filter-tab" data-filter="bathroom">Bathroom</button>
-  <button class="filter-tab" data-filter="kitchen">Kitchen</button>
-  <button class="filter-tab" data-filter="entryway">Entryway</button>
-  <button class="filter-tab" data-filter="outdoor">Outdoor</button>
-  <button class="filter-tab" data-filter="accents">Accents</button>
-</div>
-
-<!-- PRODUCT GRID -->
-<div class="shop-main">
-  <div class="product-grid" id="productGrid">
-
-    <!-- Living Room -->
-    <div class="product-card" data-cat="living-room">
-      <div class="prod-img-wrap"><img src="https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=1000&q=80" alt="Ceramic Table Lamp" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Living Room</p>
-      <h3 class="prod-name">Ceramic Table Lamp</h3>
-      <p class="prod-price">$67.99</p>
-      <a href="https://www.amazon.com/dp/B0D5D3JT4R?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="living-room">
-      <div class="prod-img-wrap"><img src="https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=1000&q=80" alt="Linen Throw Blanket" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Living Room</p>
-      <h3 class="prod-name">Linen Throw Blanket</h3>
-      <p class="prod-price">$44.99</p>
-      <a href="https://www.amazon.com/dp/B0BXB92PQP?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="living-room">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/A1fjnLAcWxL._AC_SL1500_.jpg" alt="Marble Coaster Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Living Room</p>
-      <h3 class="prod-name">Marble Coaster Set</h3>
-      <p class="prod-price">$28.99</p>
-      <a href="https://www.amazon.com/dp/B0BVJN5F7Q?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="living-room">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61hqkMOWUgL._AC_SL1500_.jpg" alt="Minimal Wall Clock" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Living Room</p>
-      <h3 class="prod-name">Minimal Wall Clock</h3>
-      <p class="prod-price">$34.99</p>
-      <a href="https://www.amazon.com/dp/B0BZYKDK5W?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-    <!-- Bedroom -->
-    <div class="product-card" data-cat="bedroom">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/71EltwQJF2L._AC_SL1500_.jpg" alt="Bamboo Duvet Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Bedroom</p>
-      <h3 class="prod-name">Bamboo Duvet Set</h3>
-      <p class="prod-price">$89.99</p>
-      <a href="https://www.amazon.com/dp/B0CB9Q9S57?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="bedroom">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61JO4BBpcgL._AC_SL1500_.jpg" alt="Linen Pillow Cover Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Bedroom</p>
-      <h3 class="prod-name">Linen Pillow Cover Set</h3>
-      <p class="prod-price">$34.99</p>
-      <a href="https://www.amazon.com/dp/B0CVQNNSN7?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="bedroom">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/71nuSLJAt7L._AC_SL1500_.jpg" alt="Scented Soy Candle" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Bedroom</p>
-      <h3 class="prod-name">Scented Soy Candle</h3>
-      <p class="prod-price">$27.99</p>
-      <a href="https://www.amazon.com/dp/B0BS1QN27R?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="bedroom">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/81OnD3aFcaL._AC_SL1500_.jpg" alt="Wooden Bedside Tray" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Bedroom</p>
-      <h3 class="prod-name">Wooden Bedside Tray</h3>
-      <p class="prod-price">$23.99</p>
-      <a href="https://www.amazon.com/dp/B0BZYKDK5W?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-    <!-- Dining -->
-    <div class="product-card" data-cat="dining">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/71EltwQJF2L._AC_SL1500_.jpg" alt="Linen Napkin Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Dining Room</p>
-      <h3 class="prod-name">Linen Napkin Set</h3>
-      <p class="prod-price">$24.99</p>
-      <a href="https://www.amazon.com/dp/B0D14RSYDD?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="dining">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/81Pfie6bSzL._AC_SL1500_.jpg" alt="Ceramic Bowl Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Dining Room</p>
-      <h3 class="prod-name">Ceramic Bowl Set</h3>
-      <p class="prod-price">$38.99</p>
-      <a href="https://www.amazon.com/dp/B07PJJJBNC?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="dining">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61wL5qaR1LL._AC_SL1500_.jpg" alt="Oak Wood Serving Board" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Dining Room</p>
-      <h3 class="prod-name">Oak Wood Serving Board</h3>
-      <p class="prod-price">$44.99</p>
-      <a href="https://www.amazon.com/dp/B07DFB1SSM?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="dining">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/A1H4doXiuTL._AC_SL1500_.jpg" alt="Glass Carafe Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Dining Room</p>
-      <h3 class="prod-name">Glass Carafe Set</h3>
-      <p class="prod-price">$32.99</p>
-      <a href="https://www.amazon.com/dp/B0CVQG1R8M?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-    <!-- Office -->
-    <div class="product-card" data-cat="office">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/71nuSLJAt7L._AC_SL1500_.jpg" alt="Minimalist Desk Lamp" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Home Office</p>
-      <h3 class="prod-name">Minimalist Desk Lamp</h3>
-      <p class="prod-price">$54.99</p>
-      <a href="https://www.amazon.com/dp/B0D5D3JT4R?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="office">
-      <div class="prod-img-wrap"><img src="https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=1000&q=80" alt="Leather Desk Pad" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Home Office</p>
-      <h3 class="prod-name">Leather Desk Pad</h3>
-      <p class="prod-price">$39.99</p>
-      <a href="https://www.amazon.com/dp/B0BXB92PQP?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="office">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/A1fjnLAcWxL._AC_SL1500_.jpg" alt="Ceramic Pen Holder" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Home Office</p>
-      <h3 class="prod-name">Ceramic Pen Holder</h3>
-      <p class="prod-price">$19.99</p>
-      <a href="https://www.amazon.com/dp/B07PJJJBNC?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="office">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61wL5qaR1LL._AC_SL1500_.jpg" alt="Linen Storage Basket" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Home Office</p>
-      <h3 class="prod-name">Linen Storage Basket</h3>
-      <p class="prod-price">$29.99</p>
-      <a href="https://www.amazon.com/dp/B0BVJN5F7Q?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-    <!-- Bathroom -->
-    <div class="product-card" data-cat="bathroom">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61hqkMOWUgL._AC_SL1500_.jpg" alt="Waffle Towel Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Bathroom</p>
-      <h3 class="prod-name">Waffle Towel Set</h3>
-      <p class="prod-price">$44.99</p>
-      <a href="https://www.amazon.com/dp/B0CB9Q9S57?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="bathroom">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61JO4BBpcgL._AC_SL1500_.jpg" alt="Bamboo Soap Dish" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Bathroom</p>
-      <h3 class="prod-name">Bamboo Soap Dish</h3>
-      <p class="prod-price">$14.99</p>
-      <a href="https://www.amazon.com/dp/B0CVQNNSN7?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="bathroom">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/71nuSLJAt7L._AC_SL1500_.jpg" alt="Reed Diffuser" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Bathroom</p>
-      <h3 class="prod-name">Reed Diffuser</h3>
-      <p class="prod-price">$27.99</p>
-      <a href="https://www.amazon.com/dp/B0BS1QN27R?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="bathroom">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61Rcbz1VrLL._AC_SL1500_.jpg" alt="Minimal Mirror Frame" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Bathroom</p>
-      <h3 class="prod-name">Minimal Mirror Frame</h3>
-      <p class="prod-price">$67.99</p>
-      <a href="https://www.amazon.com/dp/B0D5D3JT4R?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-    <!-- Kitchen -->
-    <div class="product-card" data-cat="kitchen">
-      <div class="prod-img-wrap"><img src="https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=1000&q=80" alt="Ceramic Mug Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Kitchen</p>
-      <h3 class="prod-name">Ceramic Mug Set</h3>
-      <p class="prod-price">$34.99</p>
-      <a href="https://www.amazon.com/dp/B07PJJJBNC?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="kitchen">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61wL5qaR1LL._AC_SL1500_.jpg" alt="Marble Rolling Pin" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Kitchen</p>
-      <h3 class="prod-name">Marble Rolling Pin</h3>
-      <p class="prod-price">$38.99</p>
-      <a href="https://www.amazon.com/dp/B0BVJN5F7Q?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="kitchen">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61hqkMOWUgL._AC_SL1500_.jpg" alt="Linen Apron" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Kitchen</p>
-      <h3 class="prod-name">Linen Apron</h3>
-      <p class="prod-price">$29.99</p>
-      <a href="https://www.amazon.com/dp/B07DFB1SSM?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="kitchen">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/A1H4doXiuTL._AC_SL1500_.jpg" alt="Wooden Utensil Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Kitchen</p>
-      <h3 class="prod-name">Wooden Utensil Set</h3>
-      <p class="prod-price">$24.99</p>
-      <a href="https://www.amazon.com/dp/B0D14RSYDD?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-    <!-- Entryway -->
-    <div class="product-card" data-cat="entryway">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/81Pfie6bSzL._AC_SL1500_.jpg" alt="Rattan Storage Basket" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Entryway</p>
-      <h3 class="prod-name">Rattan Storage Basket</h3>
-      <p class="prod-price">$44.99</p>
-      <a href="https://www.amazon.com/dp/B0BXB92PQP?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="entryway">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/A1fjnLAcWxL._AC_SL1500_.jpg" alt="Minimal Key Hook" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Entryway</p>
-      <h3 class="prod-name">Minimal Key Hook</h3>
-      <p class="prod-price">$19.99</p>
-      <a href="https://www.amazon.com/dp/B0BZYKDK5W?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="entryway">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/71EltwQJF2L._AC_SL1500_.jpg" alt="Small Console Vase" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Entryway</p>
-      <h3 class="prod-name">Small Console Vase</h3>
-      <p class="prod-price">$28.99</p>
-      <a href="https://www.amazon.com/dp/B0BVJN5F7Q?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="entryway">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61hqkMOWUgL._AC_SL1500_.jpg" alt="Seagrass Table Mat" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Entryway</p>
-      <h3 class="prod-name">Seagrass Table Mat</h3>
-      <p class="prod-price">$17.99</p>
-      <a href="https://www.amazon.com/dp/B0D14RSYDD?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-    <!-- Outdoor -->
-    <div class="product-card" data-cat="outdoor">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/81Pfie6bSzL._AC_SL1500_.jpg" alt="Ceramic Plant Pot" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Garden &amp; Outdoor</p>
-      <h3 class="prod-name">Ceramic Plant Pot</h3>
-      <p class="prod-price">$32.99</p>
-      <a href="https://www.amazon.com/dp/B07PJJJBNC?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="outdoor">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61wL5qaR1LL._AC_SL1500_.jpg" alt="Outdoor Linen Pillow" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Garden &amp; Outdoor</p>
-      <h3 class="prod-name">Outdoor Linen Pillow</h3>
-      <p class="prod-price">$38.99</p>
-      <a href="https://www.amazon.com/dp/B0BXB92PQP?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="outdoor">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/A1fjnLAcWxL._AC_SL1500_.jpg" alt="Terracotta Planter" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Garden &amp; Outdoor</p>
-      <h3 class="prod-name">Terracotta Planter</h3>
-      <p class="prod-price">$22.99</p>
-      <a href="https://www.amazon.com/dp/B0CVQG1R8M?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="outdoor">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/71nuSLJAt7L._AC_SL1500_.jpg" alt="Garden Lantern" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Garden &amp; Outdoor</p>
-      <h3 class="prod-name">Garden Lantern</h3>
-      <p class="prod-price">$44.99</p>
-      <a href="https://www.amazon.com/dp/B0D5D3JT4R?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-    <!-- Accents -->
-    <div class="product-card" data-cat="accents">
-      <div class="prod-img-wrap"><img src="https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=1000&q=80" alt="Abstract Print" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Accents &amp; Art</p>
-      <h3 class="prod-name">Abstract Print (unframed)</h3>
-      <p class="prod-price">$24.99</p>
-      <a href="https://www.amazon.com/dp/B0BVJN5F7Q?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="accents">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/61hqkMOWUgL._AC_SL1500_.jpg" alt="Sculptural Vase" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Accents &amp; Art</p>
-      <h3 class="prod-name">Sculptural Vase</h3>
-      <p class="prod-price">$38.99</p>
-      <a href="https://www.amazon.com/dp/B0BS1QN27R?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="accents">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/81wizdyRK1L._AC_SL1500_.jpg" alt="Woven Wall Hanging" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Accents &amp; Art</p>
-      <h3 class="prod-name">Woven Wall Hanging</h3>
-      <p class="prod-price">$44.99</p>
-      <a href="https://www.amazon.com/dp/B0BXB92PQP?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-    <div class="product-card" data-cat="accents">
-      <div class="prod-img-wrap"><img src="https://m.media-amazon.com/images/I/A1fjnLAcWxL._AC_SL1500_.jpg" alt="Brass Candleholder Set" onerror="this.parentElement.style.background='#E8E4DF';this.remove()"></div>
-      <p class="prod-cat">Accents &amp; Art</p>
-      <h3 class="prod-name">Brass Candleholder Set</h3>
-      <p class="prod-price">$34.99</p>
-      <a href="https://www.amazon.com/dp/B0BZYKDK5W?tag=priscadezigns-20" target="_blank" class="btn-shop">Shop on Amazon &rarr;</a>
-    </div>
-
-  </div><!-- /product-grid -->
-</div><!-- /shop-main -->
-
-<!-- FOOTER -->
-<div class="shop-footer">
-  <p><strong style="color:rgba(255,255,255,0.6);">Affiliate Disclosure:</strong> Quiet Luxury participates in the Amazon Services LLC Associates Program. As an Amazon Associate we earn from qualifying purchases.</p>
-  <p><a href="/quiet-luxury/">&larr; Back to Quiet Luxury</a> &nbsp;&middot;&nbsp; <a href="https://priscadezigns.com" target="_blank">Prisca Dezigns</a></p>
-</div>
-
+<div class="grid" id="grid"></div>
+<button id="upBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
+<footer style="padding:60px 5%; text-align:center; background:#000; color:#fff; border-top: 1px solid #222;">
+    <div style="font-weight:900; font-size:1.5rem">QUIET LUXURY</div>
+    <div style="font-size: 0.7rem; letter-spacing: 2px; opacity: 0.6; margin-top: 20px;">A PRISCA DEZIGNS EMPIRE VENTURE - GOLD STANDARD RESTORATION v4.2</div>
+</footer>
 <script>
-// Filter
-var tabs = document.querySelectorAll('.filter-tab');
-var cards = document.querySelectorAll('.product-card');
-tabs.forEach(function(tab){
-  tab.addEventListener('click', function(){
-    tabs.forEach(function(t){t.classList.remove('active');});
-    tab.classList.add('active');
-    var f = tab.getAttribute('data-filter');
-    cards.forEach(function(c){
-      if(f==='all'||c.getAttribute('data-cat')===f){c.classList.remove('hidden');}
-      else{c.classList.add('hidden');}
-    });
-  });
-});
-
-// Pre-select from URL ?cat=
-(function(){
-  var params = new URLSearchParams(window.location.search);
-  var cat = params.get('cat');
-  if(cat){
-    var target = document.querySelector('[data-filter="'+cat+'"]');
-    if(target) target.click();
+const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
+async function load() {
+  try {
+    const { data, error } = await sb.from("empire_inventory").select("*").eq("brand", "Quiet Luxury");
+    if (error) throw error;
+    const items = data || [];
+    if (items.length === 0) {
+        document.getElementById("grid").innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:100px; opacity:0.5;'><h3>No items found in the vault.</h3></div>";
+    } else {
+        document.getElementById("grid").innerHTML = items.map(p => `
+          <div class="card">
+            <div class="img-box"><img class="product-img" src="${p.image_url}" loading="lazy" onerror="this.src='https://priscadezigns.org/logos/pd_mark_sq.png'"></div>
+            <h3>${p.title}</h3>
+            <div class="price">${p.price === "$--" ? "" : p.price}</div>
+            <a href="${p.affiliate_link}" class="btn" target="_blank">Acquire Sanctuary</a>
+          </div>
+        `).join("");
+    }
+  } catch (e) {
+    console.error(e);
+    document.getElementById("grid").innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:100px;'><h3>Connection Error</h3></div>";
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
   }
-})();
-</script>
-<div class="view-all-wrap"><a href="https://www.amazon.com/s?k=luxury+home+decor&tag=priscadezigns-20">See More</a></div></body>
-</html>
+}
+window.onload = load;
+</script></body></html>
