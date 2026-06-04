@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="Riddiim">
   <link rel="apple-touch-icon" href="https://priscadezigns.org/assets/logos/riddiim_icon.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="neural_engine.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -66,6 +67,7 @@
     .player-ui { width: 100%; text-align: center; display: none; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
     .art-wrap { width: 65vw; height: 65vw; max-width: 250px; max-height: 250px; margin: 0 auto 20px; position: relative; }
     .art-wrap img { width: 100%; height: 100%; border-radius: 15px; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    #neural-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 15px; pointer-events: none; opacity: 0.8; display: none; }
     
     .track-meta h2 { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
     .track-meta p { font-family: var(--font-mono); color: var(--muted); font-size: 11px; letter-spacing: 2px; }
@@ -118,7 +120,10 @@
     <div id="empty-state" style="opacity: 0.3; text-align: center; font-family: var(--font-mono); font-size: 11px;">SEARCH_TO_BEGIN</div>
     
     <div class="player-ui" id="player-ui">
-      <div class="art-wrap"><img id="track-art" src="" alt=""></div>
+      <div class="art-wrap">
+        <img id="track-art" src="" alt="">
+        <canvas id="neural-canvas"></canvas>
+      </div>
       <div class="track-meta">
         <h2 id="track-name">Track Name</h2>
         <p id="artist-name">Artist Name</p>
@@ -144,6 +149,7 @@
   const audio = document.getElementById('audio-core');
   const playBtn = document.getElementById('play-trigger');
   
+  let isHumming = false;
   let currentTrack = null;
   let favorites = JSON.parse(localStorage.getItem('riddiim_favs') || '[]');
 
@@ -156,28 +162,28 @@
   window.addEventListener('online', () => document.getElementById('offline-mode').style.display = 'none');
   window.addEventListener('offline', () => document.getElementById('offline-mode').style.display = 'block');
 
-  // Neural Recognition (Sing to Find Simulation)
-  let isHumming = false;
-  humBtn.onclick = () => {
-    isHumming = !isHumming;
-    humBtn.classList.toggle('active', isHumming);
-    if(isHumming) {
-      feedback.textContent = 'Listening for Neural Frequencies...';
-      setTimeout(() => {
-        if(isHumming) {
-          feedback.textContent = 'Analyzing Voice Signal...';
-          setTimeout(() => {
-            if(isHumming) {
-              const script = document.createElement('script');
-              script.src = `https://api.deezer.com/search?q=humming&limit=5&output=jsonp&callback=handleSearch`;
-              document.body.appendChild(script);
-              humBtn.classList.remove('active');
-              isHumming = false;
-            }
-          }, 3000);
-        }
-      }, 2000);
+  // Neural Recognition (Real Sovereign Analysis)
+  humBtn.onclick = async () => {
+    if(isHumming) return; // Prevent double click
+    isHumming = true;
+    humBtn.classList.add('active');
+    feedback.textContent = 'Listening for Neural Frequencies...';
+    document.getElementById('neural-canvas').style.display = 'block';
+    
+    const signature = await NeuralEngine.startAnalysis();
+    
+    if(signature) {
+      feedback.textContent = `Found Neural Signature: ${signature.toUpperCase()}`;
+      const s = document.createElement('script');
+      s.src = `https://api.deezer.com/search?q=${encodeURIComponent(signature)}&limit=5&output=jsonp&callback=handleSearch`;
+      document.body.appendChild(s);
+    } else {
+      feedback.textContent = 'Signal Lost. Try again.';
     }
+    
+    humBtn.classList.remove('active');
+    document.getElementById('neural-canvas').style.display = 'none';
+    isHumming = false;
   };
 
   // Search Logic
