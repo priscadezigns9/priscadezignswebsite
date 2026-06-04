@@ -73,6 +73,75 @@
             color: #FFFFFF !important;
         }
 
+        /* Availability Calendar Styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+        .calendar-day {
+            padding: 15px;
+            background: rgba(13, 27, 42, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+        .calendar-day:hover {
+            background: rgba(224, 27, 36, 0.05);
+            border-color: var(--primary-red);
+        }
+        .calendar-day.active {
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
+        }
+        .calendar-day.has-hours::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--primary-red);
+            border-radius: 50%;
+        }
+        .calendar-day.active.has-hours::after {
+            background: white;
+        }
+        .calendar-header {
+            font-weight: 800;
+            font-size: 11px;
+            opacity: 0.5;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .day-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy-deep);
+        }
+        .day-btn.active {
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
+        }
+        body.dark-mode .calendar-day { background: rgba(255, 255, 255, 0.05); }
+        body.dark-mode .day-btn { background: var(--white); color: var(--navy-deep); }
+
     </style>
 <link rel="stylesheet" href="../assets/css/payment.css"><script src="../assets/js/payment.js" defer></script></head>
 <body id="app-body">
@@ -87,6 +156,7 @@
     <div class="sidebar" style="position: fixed; top: 64px; left: 0; width: 240px; height: calc(100vh - 64px); background: var(--white); border-right: 1px solid var(--border-color); padding: 20px 12px; overflow-y: auto; z-index: 100;">
         <button class="side-link active" onclick="showTab('business-hub', this)">🏛️ Dashboard</button>
         <button class="side-link" onclick="showTab('dash', this)">Professional Identity</button>
+        <button class="side-link" onclick="showTab('availability', this)">📅 Availability</button>
         <button class="side-link" onclick="showTab('map', this)">Map</button>
         <button class="side-link" onclick="showTab('verify', this)">Security Vault</button>
         <button class="side-link" onclick="showTab('settings', this)">Settings</button>
@@ -173,6 +243,59 @@
                 <h2 style="font-family: Sora; color: var(--primary-red); margin-bottom: 10px;">✨ Empire Professional Network</h2>
                 <p style="font-size:13px; opacity:0.7; margin-bottom:25px;">AI is cross-referencing niches across your 10,000+ member ecosystem.</p>
                 <div id="suggested-follows" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:20px;"></div>
+            </div>
+        </div>
+
+        <div id="availability" class="tab-content">
+            <h1 style="font-family: Sora; margin-bottom: 24px; font-size: 24px;">Manage Schedule</h1>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>Calendar View</h2>
+                        <span id="current-month" style="font-weight: 800; text-transform: uppercase; color: var(--primary-red);"></span>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- JS injected -->
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2 id="schedule-target">Recurring Hours</h2>
+                    <div id="hours-form">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display:block; font-size:11px; font-weight:800; margin-bottom:8px; opacity:0.6;">WORKING HOURS</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="time" id="start-time" class="form-input" value="09:00">
+                                <span>to</span>
+                                <input type="time" id="end-time" class="form-input" value="17:00">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px; display:flex; align-items:center; gap:12px; background: rgba(13, 27, 42, 0.03); padding: 12px; border-radius: 12px;">
+                            <label class="switch">
+                                <input type="checkbox" id="is-available" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            <span style="font-size:13px; font-weight:700;">Active / Available</span>
+                        </div>
+                        
+                        <div id="recurring-section" style="margin-top:24px;">
+                            <label style="display:block; font-size:11px; font-weight:800; margin-bottom:12px; opacity:0.6;">APPLY TO DAYS</label>
+                            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                <button class="day-btn" onclick="toggleDaySelection(0)" data-day="0">S</button>
+                                <button class="day-btn" onclick="toggleDaySelection(1)" data-day="1">M</button>
+                                <button class="day-btn" onclick="toggleDaySelection(2)" data-day="2">T</button>
+                                <button class="day-btn" onclick="toggleDaySelection(3)" data-day="3">W</button>
+                                <button class="day-btn" onclick="toggleDaySelection(4)" data-day="4">T</button>
+                                <button class="day-btn" onclick="toggleDaySelection(5)" data-day="5">F</button>
+                                <button class="day-btn" onclick="toggleDaySelection(6)" data-day="6">S</button>
+                            </div>
+                        </div>
+
+                        <button class="btn-p" style="width:100%; margin-top:30px; height: 48px;" onclick="saveSchedule()">Save Schedule</button>
+                        <p style="font-size: 11px; text-align: center; color: var(--text-muted); margin-top: 15px;">Specific dates override recurring hours.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -306,6 +429,7 @@
             if(id === 'map') {
                 setTimeout(initDiscoveryHub, 100);
             }
+            if(id === 'availability') initAvailability();
             if(id === 'business-hub') loadHubData();
         }
     }
@@ -313,6 +437,166 @@
     // --- BUSINESS HUB (APPOINTMENTS/REVIEWS) ---
     async function loadHubData() {
         console.log("Business Hub: Syncing incoming appointments and reviews...");
+    }
+
+    // --- AVAILABILITY & SCHEDULING ---
+    let selectedDate = null;
+    let selectedDays = [];
+    let availabilityData = [];
+
+    async function initAvailability() {
+        const now = new Date();
+        document.getElementById('current-month').innerText = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+        renderCalendar();
+        await loadAvailability();
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = '';
+        
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        days.forEach(d => {
+            const h = document.createElement('div');
+            h.className = 'calendar-header';
+            h.innerText = d;
+            grid.appendChild(h);
+        });
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+            grid.appendChild(document.createElement('div'));
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day';
+            dayEl.innerText = d;
+            
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            if (availabilityData.some(a => a.day_of_week === dateStr)) {
+                dayEl.classList.add('has-hours');
+            }
+
+            dayEl.onclick = () => selectDate(dateStr, dayEl);
+            grid.appendChild(dayEl);
+        }
+    }
+
+    function selectDate(dateStr, el) {
+        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+        el.classList.add('active');
+        selectedDate = dateStr;
+        document.getElementById('schedule-target').innerText = `Hours for ${dateStr}`;
+        document.getElementById('recurring-section').style.display = 'none';
+        
+        const existing = availabilityData.find(a => a.day_of_week === dateStr);
+        if (existing) {
+            document.getElementById('start-time').value = existing.start_time;
+            document.getElementById('end-time').value = existing.end_time;
+            document.getElementById('is-available').checked = existing.is_available;
+        } else {
+            // Default to recurring if available
+            const dayOfWeek = new Date(dateStr).getDay().toString();
+            const recurring = availabilityData.find(a => a.day_of_week === dayOfWeek);
+            if (recurring) {
+                document.getElementById('start-time').value = recurring.start_time;
+                document.getElementById('end-time').value = recurring.end_time;
+                document.getElementById('is-available').checked = recurring.is_available;
+            }
+        }
+    }
+
+    function toggleDaySelection(day) {
+        selectedDate = null;
+        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+        document.getElementById('schedule-target').innerText = "Recurring Hours";
+        document.getElementById('recurring-section').style.display = 'block';
+
+        const idx = selectedDays.indexOf(day);
+        if (idx > -1) {
+            selectedDays.splice(idx, 1);
+            document.querySelector(`.day-btn[data-day="${day}"]`).classList.remove('active');
+        } else {
+            selectedDays.push(day);
+            document.querySelector(`.day-btn[data-day="${day}"]`).classList.add('active');
+        }
+        
+        const existing = availabilityData.find(a => a.day_of_week === day.toString());
+        if (existing) {
+            document.getElementById('start-time').value = existing.start_time;
+            document.getElementById('end-time').value = existing.end_time;
+            document.getElementById('is-available').checked = existing.is_available;
+        }
+    }
+
+    async function loadAvailability() {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await sb.from('availability').select('*').eq('business_id', user.id);
+        if (data) {
+            availabilityData = data;
+            renderCalendar();
+            // Reset active buttons
+            document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+            selectedDays = [];
+            
+            data.filter(a => a.day_of_week.length === 1).forEach(a => {
+                const dayInt = parseInt(a.day_of_week);
+                const btn = document.querySelector(`.day-btn[data-day="${dayInt}"]`);
+                if (btn) btn.classList.add('active');
+                if (!selectedDays.includes(dayInt)) selectedDays.push(dayInt);
+            });
+        }
+    }
+
+    async function saveSchedule() {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return alert("Please login first");
+
+        const startTime = document.getElementById('start-time').value;
+        const endTime = document.getElementById('end-time').value;
+        const isAvailable = document.getElementById('is-available').checked;
+
+        let payloads = [];
+
+        if (selectedDate) {
+            payloads.push({
+                business_id: user.id,
+                day_of_week: selectedDate,
+                start_time: startTime,
+                end_time: endTime,
+                is_available: isAvailable
+            });
+        } else if (selectedDays.length > 0) {
+            selectedDays.forEach(day => {
+                payloads.push({
+                    business_id: user.id,
+                    day_of_week: day.toString(),
+                    start_time: startTime,
+                    end_time: endTime,
+                    is_available: isAvailable
+                });
+            });
+        } else {
+            return alert("Please select a date on the calendar or specific recurring days.");
+        }
+
+        const { error } = await sb.from('availability').upsert(payloads);
+        
+        if (error) {
+            console.error(error);
+            alert("Error saving schedule. (Protocol: Check 'availability' table schema)");
+        } else {
+            alert("Schedule successfully synced to Empire Cloud.");
+            loadAvailability();
+        }
     }
 
     // --- DISCOVERY HUB (MAP & DIRECTORY) ---
