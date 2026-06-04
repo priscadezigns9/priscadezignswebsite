@@ -467,6 +467,8 @@
     const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
     let map;
 
+    let appointmentSubscription = null;
+
     // --- NAVIGATION ENGINE ---
     function showTab(id, el) {
         document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
@@ -475,7 +477,10 @@
         const target = document.getElementById(id);
         if (target) {
             target.style.display = 'block';
-            if(el) el.classList.add('active');
+            if(el) {
+                el.classList.add('active');
+                if (id === 'business-hub') el.innerHTML = '🏛️ Dashboard';
+            }
             
             if(id === 'map') {
                 setTimeout(initDiscoveryHub, 100);
@@ -487,7 +492,61 @@
 
     // --- BUSINESS HUB (APPOINTMENTS/REVIEWS) ---
     async function loadHubData() {
-        console.log("Business Hub: Syncing incoming appointments and reviews...");
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await sb.from('appointments')
+            .select('*, profiles:personal_id(*)')
+            .eq('business_id', user.id)
+            .order('date', { ascending: false });
+
+        if (data) {
+            const container = document.getElementById('appointment-list');
+            container.innerHTML = data.map(a => `
+                <div style="padding:20px; background:rgba(13, 27, 42, 0.03); border-radius:15px; border:1px solid var(--border-color); margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <div>
+                            <b style="display:block; font-size:16px;">${a.profiles?.full_name || 'Client'}</b>
+                            <span style="font-size:12px; opacity:0.6;">${a.date} @ ${a.time_start} - ${a.time_end}</span>
+                        </div>
+                        <div style="text-align:right;">
+                             <span style="font-size:12px; font-weight:800; color:var(--primary-red);">${a.status.toUpperCase()}</span>
+                             <div style="margin-top:5px;">
+                                <button class="btn-p" style="padding:5px 10px; font-size:10px;" onclick="viewClientMap('${a.profiles?.location_lat}', '${a.profiles?.location_lng}', '${a.id}')">View Client Location</button>
+                             </div>
+                        </div>
+                    </div>
+                    <div id="apt-map-${a.id}" style="display:none; width:100%; height:200px; border-radius:10px; margin-top:10px;"></div>
+                    <p style="font-size:13px; margin-top:10px;"><i>"${a.message || 'No message provided'}"</i></p>
+                </div>
+            `).join('');
+        }
+    }
+
+    function viewClientMap(lat, lng, aptId) {
+        const container = document.getElementById(`apt-map-${aptId}`);
+        if (container.style.display === 'block') {
+            container.style.display = 'none';
+            return;
+        }
+        
+        container.style.display = 'block';
+        if (!lat || !lng || lat === 'undefined' || lng === 'undefined' || lat === 'null' || lng === 'null') {
+            container.innerHTML = '<p style="padding:20px; text-align:center; font-size:12px; color:var(--text-muted);">Client location not available.</p>';
+            return;
+        }
+
+        const map = new google.maps.Map(container, {
+            center: { lat: parseFloat(lat), lng: parseFloat(lng) },
+            zoom: 14,
+            disableDefaultUI: true
+        });
+
+        new google.maps.Marker({
+            position: { lat: parseFloat(lat), lng: parseFloat(lng) },
+            map: map,
+            title: "Client Location"
+        });
     }
 
     // --- AVAILABILITY & SCHEDULING ---
@@ -874,11 +933,30 @@
             .subscribe();
     }
 
-    window.onload = () => {
+    window.onload = async () => {
         loadContacts();
         if(localStorage.getItem('panyard_darkmode') === 'true') {
             document.body.classList.add('dark-mode');
             if(document.getElementById('darkmode-toggle')) document.getElementById('darkmode-toggle').checked = true;
+        }
+
+        // Notification Listener
+        const { data: { user } } = await sb.auth.getUser();
+        if (user) {
+            if (appointmentSubscription) sb.removeChannel(appointmentSubscription);
+            appointmentSubscription = sb.channel('public:appointments')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'appointments', filter: `business_id=eq.${user.id}` }, payload => {
+                    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                    audio.play().catch(() => {});
+                    alert("New Appointment Booked!");
+                    loadHubData(); // Refresh list
+                    // Add badge to tab if not on it
+                    const aptTab = document.querySelector('[onclick*="business-hub"]');
+                    if (aptTab && !aptTab.classList.contains('active')) {
+                        aptTab.innerHTML = '🏛️ Dashboard <span style="background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px;">!</span>';
+                    }
+                })
+                .subscribe();
         }
     };
 
