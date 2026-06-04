@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Business Admin | dpanyard</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico?v=2">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -180,7 +180,7 @@
 <div class="layout">
     
     <div class="sidebar" style="position: fixed; top: 64px; left: 0; width: 240px; height: calc(100vh - 64px); background: var(--white); border-right: 1px solid var(--border-color); padding: 20px 12px; overflow-y: auto; z-index: 100;">
-        <button class="side-link active" onclick="showTab('business-hub', this)"><i data-lucide="layout-dashboard" size="18"></i> Dashboard</button>
+        <button class="side-link active" onclick="showTab('business-hub', this)"><i data-lucide="layout-dashboard" size="18"></i> Dashboard <span id="reschedule-badge" style="display:none; margin-left:auto; background:var(--primary-red); color:white; font-size:10px; font-weight:800; padding:2px 6px; border-radius:10px; height:16px; align-items:center; justify-content:center;">0</span></button>
         <button class="side-link" onclick="showTab('dash', this)"><i data-lucide="briefcase" size="18"></i> Professional Identity</button>
         <button class="side-link" onclick="showTab('availability', this)"><i data-lucide="calendar" size="18"></i> Availability</button>
         <button class="side-link" onclick="showTab('messages', this)"><i data-lucide="message-square" size="18"></i> Messages</button>
@@ -235,6 +235,17 @@
 
         <div id="dash" class="tab-content">
             <h1 style="font-family: Sora; margin-bottom: 24px; font-size: 24px;">Professional Identity <span id="niche-badge" class="verified-badge" style="background:var(--primary-red); display:none;"></span> <span id="brand-badge" class="verified-badge" style="background:var(--navy-deep); display:none; margin-left:10px;"></span></h1>
+
+            <div style="display: flex; gap: 40px; margin-bottom: 32px; padding: 20px; background: rgba(224, 27, 36, 0.05); border-radius: 16px; border: 1px solid var(--primary-red); max-width: fit-content;">
+                <div>
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Status</div>
+                    <div style="font-weight: 800; color: var(--primary-red); font-size: 14px;">VERIFIED</div>
+                </div>
+                <div>
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Listing</div>
+                    <div style="font-weight: 800; color: var(--primary-red); font-size: 14px;">FEATURED</div>
+                </div>
+            </div>
             
             <div class="card">
                 <h2>Public Profile</h2>
@@ -288,7 +299,14 @@
                     <option value="Calalloo">Calalloo</option>
                 </select>
 
-                <button class="btn-p" onclick="saveToCloud()">Save Profile</button>
+                <div id="custom-fields-container" style="margin-top: 20px;">
+                    <label style="display:block; font-weight:800; font-size:12px; margin-bottom:12px; color: var(--primary-red);">NICHE SPECIFIC ATTRIBUTES</label>
+                    <div id="custom-fields-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- JS injected based on niche -->
+                    </div>
+                </div>
+
+                <button class="btn-p" style="margin-top: 30px;" onclick="saveToCloud()">Save Profile</button>
                 <p id="sync-status" style="font-size:10px; font-weight:800; margin-top:15px; color:var(--primary-red); display:none;"><i data-lucide="check" size="10"></i> CHANGES SAVED</p>
             </div>
 
@@ -665,6 +683,14 @@
 
         allAppointments = data || [];
         renderAppointments(allAppointments);
+
+        // Notify for reschedule requests
+        const rescheds = allAppointments.filter(a => a.status === 'reschedule_requested').length;
+        const badge = document.getElementById('reschedule-badge');
+        if (badge) {
+            badge.innerText = rescheds;
+            badge.style.display = rescheds > 0 ? 'inline-flex' : 'none';
+        }
     }
 
     function renderAppointments(list) {
@@ -677,6 +703,19 @@
         container.innerHTML = list.map(a => {
             let paymentStatusHtml = '';
             let actions = '';
+
+            if (a.status === 'reschedule_requested' && a.reschedule_request) {
+                actions += `
+                    <div style="margin-top:10px; padding:15px; background:rgba(224, 27, 36, 0.05); border-radius:12px; border:1px solid rgba(224, 27, 36, 0.1);">
+                        <p style="font-size:11px; font-weight:800; color:var(--primary-red); margin-bottom:8px; text-transform:uppercase;">Reschedule Requested</p>
+                        <p style="font-size:12px; margin-bottom:12px;">New proposed: <b>${a.reschedule_request.new_date} @ ${a.reschedule_request.new_start} - ${a.reschedule_request.new_end}</b></p>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-p" style="flex:1; font-size:11px; padding:8px;" onclick="handleReschedule('${a.id}', 'approve')">Approve</button>
+                            <button class="btn-p" style="flex:1; font-size:11px; padding:8px; background:#64748B;" onclick="handleReschedule('${a.id}', 'decline')">Decline</button>
+                        </div>
+                    </div>
+                `;
+            }
 
             if (a.payment_status === 'escrow_held') {
                 paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#059669;">ESCROW SECURED</span>`;
@@ -719,6 +758,29 @@
             `;
         }).join('');
         if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    async function handleReschedule(id, action) {
+        const { data: apt } = await sb.from('appointments').select('*').eq('id', id).single();
+        if (!apt) return;
+
+        if (action === 'approve') {
+            const { error } = await sb.from('appointments').update({
+                date: apt.reschedule_request.new_date,
+                time_start: apt.reschedule_request.new_start,
+                time_end: apt.reschedule_request.new_end,
+                reschedule_request: null,
+                status: 'confirmed'
+            }).eq('id', id);
+            if (!error) alert("Reschedule approved!");
+        } else {
+            const { error } = await sb.from('appointments').update({
+                reschedule_request: null,
+                status: 'confirmed'
+            }).eq('id', id);
+            if (!error) alert("Reschedule declined.");
+        }
+        loadHubData();
     }
 
     async function updateAptStatus(id, newStatus) {
