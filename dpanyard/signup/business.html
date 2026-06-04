@@ -77,6 +77,10 @@
                 <option value="Other">Other</option>
             </select>
         </div>
+        <div id="custom-niche-container" class="form-group" style="display: none;">
+            <label>Specify your niche</label>
+            <input type="text" id="custom-niche" placeholder="Enter your specific profession">
+        </div>
         <button type="submit" id="submit-btn" class="btn-main btn-primary">Create Account</button>
     </form>
     
@@ -86,12 +90,29 @@
         </div>
         
     <script>
+        const nicheSelect = document.getElementById('niche');
+        const customNicheContainer = document.getElementById('custom-niche-container');
+        const customNicheInput = document.getElementById('custom-niche');
+
+        nicheSelect.addEventListener('change', () => {
+            if (nicheSelect.value === 'Other') {
+                customNicheContainer.style.display = 'block';
+                customNicheInput.setAttribute('required', 'true');
+            } else {
+                customNicheContainer.style.display = 'none';
+                customNicheInput.removeAttribute('required');
+            }
+        });
+
         document.getElementById('signup-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const fullname = document.getElementById('fullname').value;
-            const niche = document.getElementById('niche').value;
+            let niche = nicheSelect.value;
+            if (niche === 'Other') {
+                niche = customNicheInput.value;
+            }
             const btn = document.getElementById('submit-btn');
             btn.innerText = 'Creating account...';
             const { data, error } = await sb.auth.signUp({ 
