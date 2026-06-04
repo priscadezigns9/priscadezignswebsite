@@ -595,13 +595,14 @@
         }
 
         async function handleSearch(val) {
-            if (!val.trim()) {
+            const query = (val || '').trim().toLowerCase();
+            if (!query) {
                 renderList(businesses);
                 return;
             }
-            const terms = val.toLowerCase().split(' ').filter(t => t.length > 0);
+            const terms = query.split(/\s+/).filter(t => t.length > 0);
             const filtered = businesses.filter(b => {
-                const name = b.full_name.toLowerCase();
+                const name = (b.full_name || '').toLowerCase();
                 const niche = (b.niche || '').toLowerCase();
                 return terms.every(term => name.includes(term) || niche.includes(term));
             });
@@ -658,6 +659,21 @@
 
         function renderList(list) {
             const container = document.getElementById('biz-list');
+            
+            if (!list || list.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i data-lucide="search-x" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p style="font-weight: 700;">No results found</p>
+                        <p style="font-size: 13px;">Try adjusting your search terms</p>
+                    </div>
+                `;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                markers.forEach(m => m.setMap(null));
+                markers = [];
+                return;
+            }
+
             container.innerHTML = list.map(b => {
                 const isHighRated = parseFloat(b.avgRating) >= 4.5;
                 const ratingDisplay = b.totalReviews > 0 ? `<span style="font-size: 12px; color: ${isHighRated ? '#f59e0b' : 'var(--text-muted)'}; font-weight: 700; margin-left: 8px; display: flex; align-items: center; gap: 4px;"><i data-lucide="star" size="12" style="fill: currentColor;"></i> ${b.avgRating} (${b.totalReviews})</span>` : '';
@@ -673,16 +689,22 @@
                     </div>
                 `;
             }).join('');
+
             markers.forEach(m => m.setMap(null));
             markers = list.map(b => {
+                const lat = parseFloat(b.location_lat);
+                const lng = parseFloat(b.location_lng);
+                if (isNaN(lat) || isNaN(lng)) return null;
+
                 const m = new google.maps.Marker({ 
-                    position: { lat: parseFloat(b.location_lat) || 10.65, lng: parseFloat(b.location_lng) || -61.51 }, 
+                    position: { lat, lng }, 
                     map,
                     icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#E87722', fillOpacity: 1, strokeWeight: 4, strokeColor: 'white' }
                 });
                 m.addListener('click', () => openDetail(b.id));
                 return m;
-            });
+            }).filter(m => m !== null);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         let currentReviewApt = null;
