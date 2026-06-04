@@ -24,7 +24,7 @@ h3{font-size:1rem;margin:0 0 15px;font-weight:800;display:-webkit-box;-webkit-li
 <body>
 <div id="loader"><h2 id="loaderText">THE TECH SCOUT HQ</h2></div>
 <nav>
-    <img id="logo" src="https://priscadezigns.org/assets/logos/tech-scout.png" alt="The Tech Scout HQ Logo">
+    <img id="logo" src="https://priscadezigns.org/logos/tech-scout.png" alt="The Tech Scout HQ Logo">
 </nav>
 <div class="grid" id="grid"></div>
 <button id="upBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
@@ -35,21 +35,28 @@ h3{font-size:1rem;margin:0 0 15px;font-weight:800;display:-webkit-box;-webkit-li
 <script>
 const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
 async function load() {
-  const { data } = await sb.from("empire_inventory").select("*").eq("brand", "The Tech Scout HQ");
-  const items = data || [];
-  if (items.length === 0) {
-      document.getElementById("grid").innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:100px; opacity:0.5;'><h3>No items found in the vault.</h3></div>";
-  } else {
-      document.getElementById("grid").innerHTML = items.map(p => `
-        <div class="card">
-          <div class="img-box"><img class="product-img" src="${p.image_url}" loading="lazy" onerror="this.src='https://priscadezigns.org/assets/logos/pd_mark_sq.png'"></div>
-          <h3>${p.title}</h3>
-          <div class="price">${p.price === "$--" ? "" : p.price}</div>
-          <a href="${p.affiliate_link}" class="btn" target="_blank">Acquire Innovation</a>
-        </div>
-      `).join("");
+  try {
+    const { data, error } = await sb.from("empire_inventory").select("*").eq("brand", "The Tech Scout HQ");
+    if (error) throw error;
+    const items = data || [];
+    if (items.length === 0) {
+        document.getElementById("grid").innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:100px; opacity:0.5;'><h3>No items found in the vault.</h3></div>";
+    } else {
+        document.getElementById("grid").innerHTML = items.map(p => `
+          <div class="card">
+            <div class="img-box"><img class="product-img" src="${p.image_url}" loading="lazy" onerror="this.src='https://priscadezigns.org/logos/pd_mark_sq.png'"></div>
+            <h3>${p.title}</h3>
+            <div class="price">${p.price === "$--" ? "" : p.price}</div>
+            <a href="${p.affiliate_link}" class="btn" target="_blank">Acquire Innovation</a>
+          </div>
+        `).join("");
+    }
+  } catch (e) {
+    console.error(e);
+    document.getElementById("grid").innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:100px;'><h3>Connection Error</h3></div>";
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
   }
-  document.getElementById("loader").classList.add("hidden");
 }
 window.onload = load;
 </script></body></html>
