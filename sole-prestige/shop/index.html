@@ -1,6 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 body{margin:0;font-family:sans-serif;background:#fff;color:#111}
 nav{background:#fff;padding:25px;border-bottom:3px solid #000;display:flex;justify-content:space-between;align-items:center}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:40px;padding:60px 5%}
@@ -8,9 +9,9 @@ nav{background:#fff;padding:25px;border-bottom:3px solid #000;display:flex;justi
 .card:hover{transform:translateY(-10px);border-color:#000;box-shadow:0 20px 40px rgba(0,0,0,0.05)}
 .category{font-size:0.9rem;color:#666;font-weight:700;text-transform:uppercase;margin-bottom:10px}
 .img-box{height:400px;position:relative;margin-bottom:30px;background:#fff;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.placeholder-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30%;opacity:0.2;z-index:0}
-.product-img{position:relative;z-index:1;max-width:90%;max-height:90%;object-fit:contain;opacity:0;transition:opacity 0.5s ease-in-out}
-h3{font-size:1.4rem;margin:0 0 15px;font-weight:800}
+.placeholder-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:30%;opacity:0.2;z-index:0;transition: opacity 0.3s;}
+.product-img{position:relative;z-index:1;max-width:95%;max-height:95%;object-fit:contain;opacity:0;transition:opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)}
+h3{font-size:1.3rem;margin:0 0 15px;font-weight:800;min-height: 3.2em; display: flex; align-items: center; justify-content: center;}
 .price{color:#000;font-weight:900;font-size:1.6rem;margin-bottom:30px}
 .btn{display:block;background:#000;color:#fff;padding:20px;border-radius:10px;text-decoration:none;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-top:auto}
 footer{padding:60px;text-align:center;opacity:0.5;font-size:0.8rem}
@@ -21,37 +22,14 @@ footer{padding:60px;text-align:center;opacity:0.5;font-size:0.8rem}
 <footer id="footer"></footer>
 <script>
 const CONFIG = {
-  "Glow Protocol": { logo: "https://priscadezigns.org/logos/prisca-dezigns-logo.png", color: "#000", btn: "Acquire Solution" },
-  "Atelia Gaming": { logo: "https://priscadezigns.org/logos/atelier-gaming.png", color: "#D32F2F", btn: "Acquire Armory" },
-  "The Gen Play": { logo: "https://priscadezigns.org/logos/thegenplay.png", color: "#6366f1", btn: "Acquire Object" },
-  "Pantriq": { logo: "https://priscadezigns.org/logos/pantriq.png", color: "#10b981", btn: "Acquire Gear" },
-  "The Autodrome": { logo: "https://priscadezigns.org/logos/the-autodrome.jpg", color: "#ef4444", btn: "Acquire Tech" },
-  "My Baby Dumpling": { logo: "https://priscadezigns.org/logos/mybabydumpling.png", color: "#ec4899", btn: "Acquire Essential" },
-  "Riddiim": { logo: "https://priscadezigns.org/logos/riddiim.png", color: "#8b5cf6", btn: "Acquire Audio" },
-  "Sole Prestige": { logo: "https://priscadezigns.org/assets/logos/sole_prestige_2026.jpg", color: "#1f2937", btn: "Acquire Exclusive" },
-  "The Tech Scout HQ": { logo: "https://priscadezigns.org/logos/tech-scout.png", color: "#3b82f6", btn: "Acquire Innovation" },
-  "Essence Elite": { logo: "https://priscadezigns.org/logos/essenceelite.png", color: "#4b5563", btn: "Acquire Scent" },
-  "Shelfly": { logo: "https://priscadezigns.org/logos/shelfly.png", color: "#2563eb", btn: "Acquire System" }
+  "Sole Prestige": { logo: "https://priscadezigns.org/assets/logos/sole_prestige_2026.jpg", color: "#000", btn: "Acquire Exclusive" }
 };
 
-const sbAuth = supabase.createClient("https://sktpjacowqaedddtrhuz.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs");
 const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
 
 async function load() {
-  const path = window.location.pathname.toLowerCase();
-  let brand = "Glow Protocol";
-  if(path.includes("atelia")) brand = "Atelia Gaming";
-  else if(path.includes("genplay")) brand = "The Gen Play";
-  else if(path.includes("pantriq")) brand = "Pantriq";
-  else if(path.includes("autodrome")) brand = "The Autodrome";
-  else if(path.includes("baby")) brand = "My Baby Dumpling";
-  else if(path.includes("ridd")) brand = "Riddiim";
-  else if(path.includes("prestige")) brand = "Sole Prestige";
-  else if(path.includes("scout")) brand = "The Tech Scout HQ";
-  else if(path.includes("essence")) brand = "Essence Elite";
-  else if(path.includes("shelfly")) brand = "Shelfly";
-
-  const conf = CONFIG[brand] || CONFIG["Glow Protocol"];
+  const brand = "Sole Prestige";
+  const conf = CONFIG[brand];
   document.getElementById("logo").src = conf.logo;
   document.body.style.setProperty("--brand-color", conf.color);
   document.getElementById("footer").innerText = `© 2026 ${brand.toUpperCase()}`;
@@ -66,16 +44,20 @@ async function load() {
   `;
   document.head.appendChild(style);
 
-  // Fetch with cache-buster logic via ordering
   const { data } = await sb.from("empire_inventory").select("*").eq("brand", brand);
   
   if (data && data.length > 0) {
-    document.getElementById("grid").innerHTML = data.map(p => `
-      <div class="card">
+    document.getElementById("grid").innerHTML = data.map((p, index) => `
+      <div class="card" style="animation: fadeIn 0.5s ease forwards; animation-delay: ${index * 0.05}s; opacity: 0;">
         <div class="category">${p.category}</div>
         <div class="img-box">
           <img src="https://priscadezigns.org/assets/logo.png" class="placeholder-logo">
-          <img src="${p.image_url}" class="product-img" loading="lazy" onload="this.style.opacity=1" onerror="this.remove()">
+          <img src="${p.image_url}" 
+               class="product-img" 
+               loading="lazy" 
+               alt="${p.title}"
+               onload="this.style.opacity=1" 
+               onerror="this.style.display='none'; this.parentElement.querySelector('.placeholder-logo').style.opacity=0.4;">
         </div>
         <h3>${p.title}</h3>
         <p class="price">${p.price}</p>
