@@ -12,6 +12,11 @@
   <link rel="apple-touch-icon" href="https://priscadezigns.org/assets/logos/riddiim_favicon.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="neural_engine.js"></script>
+  <script>
+    const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
+    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
+    const sb = supabase.createClient(SB_URL, SB_KEY);
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -101,13 +106,13 @@
     <div class="nav-vinyl"></div>
     <span class="nav-wordmark">RIDDIIM</span>
   </a>
-  <div style="font-family: var(--font-mono); font-size: 9px; color: var(--muted); letter-spacing: 1px;">V1.4_PWA</div>
+  <div id="auth-status" style="font-family: var(--font-mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; cursor:pointer;" onclick="toggleAuthModal()">[HANDSHAKE_REQUIRED]</div>
 </header>
 
 <main>
   <div class="tabs">
     <div class="tab active" onclick="switchTab('search')">Search</div>
-    <div class="tab" onclick="switchTab('library')">My Library</div>
+    <div class="tab" onclick="switchTab('library')">Vault</div>
   </div>
 
   <div class="search-row">
@@ -257,19 +262,92 @@
     playBtn.textContent = '||';
   };
 
-  window.saveToLibrary = () => {
+  // --- Sovereign Auth Handshake ---
+  let user = null;
+  window.toggleAuthModal = () => {
+    const m = document.getElementById('auth-modal');
+    m.style.display = m.style.display === 'none' ? 'flex' : 'none';
+  };
+
+  const updateAuthUI = (u) => {
+    user = u;
+    const status = document.getElementById('auth-status');
+    if(user) {
+      status.textContent = `[IDENTITY_LOCKED: ${user.email.split('@')[0].toUpperCase()}]`;
+      status.style.color = '#fff';
+      syncVault();
+    } else {
+      status.textContent = '[HANDSHAKE_REQUIRED]';
+      status.style.color = 'var(--muted)';
+    }
+  };
+
+  window.handleAuth = async (type) => {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-pass').value;
+    if(!email || !password) return alert('MISSING_CREDENTIALS');
+
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'CONNECTING...';
+
+    try {
+      const { data, error } = type === 'signup' 
+        ? await sb.auth.signUp({ email, password })
+        : await sb.auth.signInWithPassword({ email, password });
+
+      if(error) throw error;
+      updateAuthUI(data.user);
+      toggleAuthModal();
+      if(type === 'signup') alert('IDENTITY_CREATED. CHECK EMAIL FOR HANDSHAKE.');
+    } catch(e) {
+      alert(`AUTH_ERROR: ${e.message}`);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = type === 'signup' ? 'CREATE_IDENTITY' : 'SIGN_IN';
+    }
+  };
+
+  const syncVault = async () => {
+    if(!user) return;
+    const { data, error } = await sb.from('riddiim_favorites').select('*').eq('user_id', user.id);
+    if(!error && data) {
+      favorites = data.map(f => f.metadata);
+      localStorage.setItem('riddiim_favs', JSON.stringify(favorites));
+    }
+  };
+
+  // Check initial session
+  sb.auth.getSession().then(({data}) => {
+    if(data.session) updateAuthUI(data.session.user);
+  });
+
+  window.saveToLibrary = async () => {
     if(!currentTrack) return;
+    
+    // Save to Local first (Sovereign redundancy)
     if(!favorites.find(f => f.title === currentTrack.title)) {
       favorites.push(currentTrack);
       localStorage.setItem('riddiim_favs', JSON.stringify(favorites));
+      
+      // Sync to Supabase if logged in
+      if(user) {
+        await sb.from('riddiim_favorites').upsert({
+          user_id: user.id,
+          track_id: currentTrack.title + currentTrack.artist,
+          metadata: currentTrack
+        });
+      }
       alert('SIGNAL_SAVED_TO_VAULT');
     }
   };
 
-  window.switchTab = (tab) => {
+  window.switchTab = async (tab) => {
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     event.target.classList.add('active');
+    
     if(tab === 'library') {
+      if(user) await syncVault();
       const data = { data: favorites };
       handleSearch(data);
       results.style.display = 'block';
@@ -303,6 +381,21 @@
     else { audio.pause(); playBtn.textContent = '▶'; }
   };
 </script>
+  <!-- Sovereign Vault Modal -->
+  <div id="auth-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#0A0A0F; border:1px solid var(--border); padding:40px; width:100%; max-width:400px; border-radius:12px; text-align:center;">
+      <div style="font-family:'Space Grotesk'; font-size:2rem; color:#fff; margin-bottom:10px; font-weight:700;">SOVEREIGN VAULT</div>
+      <p style="font-size:10px; color:var(--muted); margin-bottom:30px; letter-spacing:1px; font-family:var(--font-mono);">SECURE YOUR SIGNAL ACROSS THE EMPIRE</p>
+      
+      <input type="email" id="auth-email" placeholder="NEURAL_EMAIL" style="width:100%; background:#111; border:1px solid var(--border); padding:15px; color:#fff; border-radius:8px; margin-bottom:15px; font-family:var(--font-mono); outline:none;">
+      <input type="password" id="auth-pass" placeholder="VAULT_KEY" style="width:100%; background:#111; border:1px solid var(--border); padding:15px; color:#fff; border-radius:8px; margin-bottom:30px; font-family:var(--font-mono); outline:none;">
+      
+      <button onclick="handleAuth('signin')" id="signin-btn" style="width:100%; background:#fff; color:#000; padding:15px; border-radius:8px; font-weight:700; border:none; margin-bottom:15px; cursor:pointer; font-family:var(--font-mono);">SIGN_IN</button>
+      <button onclick="handleAuth('signup')" id="signup-btn" style="width:100%; background:transparent; color:#fff; padding:15px; border-radius:8px; font-weight:700; border:1px solid #333; cursor:pointer; font-family:var(--font-mono);">CREATE_IDENTITY</button>
+      
+      <div onclick="toggleAuthModal()" style="margin-top:30px; font-size:10px; color:#555; cursor:pointer; letter-spacing:2px; font-family:var(--font-mono);">CANCEL_HANDSHAKE</div>
+    </div>
+  </div>
 </body>
 </html>
 
