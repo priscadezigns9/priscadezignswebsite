@@ -259,7 +259,7 @@
             console.error(msg);
         }
 
-        let sb, map, user, businesses = [], markers = [], selectedSlotTime = null;
+        let sb, map, user, businesses = [], markers = [], selectedSlotTime = null, userMarker = null;
 
         try {
             sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
@@ -293,6 +293,34 @@
                     disableDefaultUI: true,
                     styles: mapStyles
                 });
+                
+                // Get User Location
+                navigator.geolocation.getCurrentPosition(async pos => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    
+                    if (userMarker) userMarker.setMap(null);
+                    userMarker = new google.maps.Marker({
+                        position: { lat, lng },
+                        map,
+                        title: "You are here",
+                        icon: {
+                            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                            scale: 6,
+                            fillColor: '#3B82F6',
+                            fillOpacity: 1,
+                            strokeWeight: 2,
+                            strokeColor: 'white'
+                        }
+                    });
+                    map.setCenter({ lat, lng });
+                    
+                    // Sync location to Supabase
+                    if (user) {
+                        await sb.from('profiles').update({ location_lat: lat, location_lng: lng }).eq('id', user.id);
+                    }
+                }, () => console.log("Location access denied"));
+
                 loadBusinesses();
             } catch(e) { logError("Map Interface Error"); }
         }
@@ -354,10 +382,16 @@
         }
 
         async function handleSearch(val) {
-            const filtered = businesses.filter(b => 
-                b.full_name.toLowerCase().includes(val.toLowerCase()) || 
-                (b.niche && b.niche.toLowerCase().includes(val.toLowerCase()))
-            );
+            if (!val.trim()) {
+                renderList(businesses);
+                return;
+            }
+            const terms = val.toLowerCase().split(' ').filter(t => t.length > 0);
+            const filtered = businesses.filter(b => {
+                const name = b.full_name.toLowerCase();
+                const niche = (b.niche || '').toLowerCase();
+                return terms.every(term => name.includes(term) || niche.includes(term));
+            });
             renderList(filtered);
         }
 
