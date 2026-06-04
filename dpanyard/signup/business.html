@@ -48,27 +48,10 @@
         <p>Join the Caribbean's premier talent network.</p>
         
         
-    <button onclick="loginWithGoogle()" class="btn-main btn-google">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-        Sign up with Google
-    </button>
-    <div class="divider">OR</div>
     <form id="signup-form">
         <div class="form-group">
             <label>Full Name</label>
             <input type="text" id="fullname" required placeholder="John Doe">
-        </div>
-        <div class="form-group">
-            <label>Professional Category</label>
-            <select id="category" required style="width: 100%; padding: 16px; border-radius: 12px; border: 1.5px solid #E2E8F0; font-family: 'Inter', sans-serif; font-size: 15px; outline: none; transition: border-color 0.3s; background: white;">
-                <option value="" disabled selected>Select Category</option>
-                <option value="Doctor">Doctor</option>
-                <option value="Nurse">Nurse</option>
-                <option value="Engineer">Engineer</option>
-                <option value="Teacher">Teacher</option>
-                <option value="Student">Student</option>
-                <option value="Other">Other</option>
-            </select>
         </div>
         <div class="form-group">
             <label>Email Address</label>
@@ -77,6 +60,22 @@
         <div class="form-group">
             <label>Password</label>
             <input type="password" id="password" required placeholder="Min. 8 characters">
+        </div>
+        <div class="form-group">
+            <label>Professional Category</label>
+            <select id="niche" required style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif;">
+                <option value="">Select your niche...</option>
+                <option value="Doctor">Doctor</option>
+                <option value="Beauty">Beauty & Wellness</option>
+                <option value="Tech">Tech & IT</option>
+                <option value="Chef">Chef & Culinary</option>
+                <option value="Fitness">Fitness & Training</option>
+                <option value="Design">Design & Creative</option>
+                <option value="Consulting">Consulting</option>
+                <option value="Education">Education & Tutoring</option>
+                <option value="Business">Business Services</option>
+                <option value="Other">Other</option>
+            </select>
         </div>
         <button type="submit" id="submit-btn" class="btn-main btn-primary">Create Account</button>
     </form>
@@ -92,15 +91,16 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const fullname = document.getElementById('fullname').value;
+            const niche = document.getElementById('niche').value;
             const btn = document.getElementById('submit-btn');
             btn.innerText = 'Creating account...';
             const { data, error } = await sb.auth.signUp({ 
                 email, password, 
-                options: { data: { full_name: fullname, role: 'business' } } 
+                options: { data: { full_name: fullname, role: 'business', niche: niche } } 
             });
             if (error) { alert(error.message); btn.innerText = 'Create Account'; }
             else { 
-                await sb.from('profiles').insert([{ id: data.user.id, full_name: fullname, role: 'business' }]);
+                await sb.from('profiles').insert([{ id: data.user.id, full_name: fullname, role: 'business', niche: niche }]);
                 localStorage.setItem('dpanyard_role', 'business'); 
                 window.location.href = '../dashboard/permissions.html'; 
             }
@@ -112,16 +112,6 @@
     <script>
         const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
         
-        async function loginWithGoogle() {
-            const role = localStorage.getItem('dpanyard_role') || 'personal';
-            const { error } = await sb.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin + '/dpanyard/dashboard/personal'
-                }
-            });
-            if (error) alert("Error: " + error.message);
-        }
     </script>
 </body>
 </html>
