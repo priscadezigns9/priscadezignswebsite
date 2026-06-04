@@ -1,343 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shop — Tech Scout | Gadgets, Audio & Smart Home</title>
-<meta name="description" content="Tech Scout curated shop — the best productivity gadgets, audio gear, and smart home tech. Reviewed and hand-picked for tech enthusiasts.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Tech Scout HQ Shop - Gold Standard v4.2</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#080c14;
-  --surface:#0c1220;
-  --card:#101828;
-  --border:rgba(0,195,255,0.12);
-  --accent:#00C3FF;
-  --accent2:#4D9FFF;
-  --accent-dim:rgba(0,195,255,0.12);
-  --text:#e8f4ff;
-  --text-dim:rgba(232,244,255,0.5);
-  --glow:rgba(0,195,255,0.18);
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden}
-
-/* NAV */
-.nav{position:sticky;top:0;z-index:100;background:rgba(8,12,20,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nav-inner{max-width:1280px;margin:0 auto;padding:0 6%;height:64px;display:flex;align-items:center;justify-content:space-between}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.nav-brand-text{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent);letter-spacing:.5px}
-.nav-brand-sub{font-size:.65rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace;letter-spacing:2px;text-transform:uppercase}
-.nav-back{color:var(--accent);font-size:.8rem;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:5px;transition:opacity .2s;font-family:'JetBrains Mono',monospace}
-.nav-back:hover{opacity:.7}
-
-/* HERO */
-.hero{padding:80px 6% 50px;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -5%,rgba(0,195,255,0.1) 0%,transparent 55%);pointer-events:none}
-.circuit-line{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.3}
-.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,195,255,0.07);border:1px solid rgba(0,195,255,0.2);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:500;letter-spacing:2px;text-transform:uppercase;padding:5px 16px;border-radius:3px;margin-bottom:24px}
-.hero-tag::before{content:'//';opacity:.6}
-.hero h1{font-size:clamp(2.5rem,6.5vw,5rem);font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin-bottom:18px}
-.hero h1 .hl{color:var(--accent);position:relative}
-.hero h1 .hl::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:2px;background:var(--accent);opacity:.4}
-.hero p{color:var(--text-dim);font-size:.97rem;max-width:500px;margin:0 auto 30px;line-height:1.7}
-.hero-cta{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700;letter-spacing:.5px;padding:13px 32px;border-radius:3px;text-decoration:none;transition:transform .2s,box-shadow .2s}
-.hero-cta:hover{transform:translateY(-2px);box-shadow:0 12px 36px var(--glow)}
-.affiliate-note{display:inline-flex;align-items:center;gap:6px;background:rgba(255,165,0,0.06);border:1px solid rgba(255,165,0,0.18);color:rgba(255,200,80,0.7);font-family:'JetBrains Mono',monospace;font-size:.68rem;padding:5px 14px;border-radius:3px;margin-top:22px}
-
-/* FILTERS */
-.filters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:40px 6% 28px}
-.fbtn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:500;letter-spacing:1px;text-transform:uppercase;padding:8px 20px;border-radius:3px;cursor:pointer;transition:all .2s}
-.fbtn.active,.fbtn:hover{background:rgba(0,195,255,0.08);border-color:var(--accent);color:var(--accent)}
-
-/* GRID */
-.shop-section{padding:0 6% 80px}
-.shop-inner{max-width:1280px;margin:0 auto}
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:22px}
-
-/* CARD */
-.pcard{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,border-color .3s;position:relative}
-.pcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .3s}
-.pcard:hover::before{opacity:1}
-.pcard.hidden{display:none}
-.pcard:hover{transform:translateY(-8px) scale(1.01);box-shadow:0 24px 60px rgba(0,195,255,0.1);border-color:rgba(0,195,255,0.25)}
-.pcard-img-wrap{display:block;width:100%;aspect-ratio:1;overflow:hidden;background:#0c1220;text-decoration:none}
-.pcard-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
-.pcard:hover .pcard-img{transform:scale(1.06)}
-.pcard-body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:8px;flex:1}
-.pcard-tag{font-family:'JetBrains Mono',monospace;font-size:.62rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);background:rgba(0,195,255,0.07);border:1px solid rgba(0,195,255,0.18);padding:3px 10px;border-radius:2px;display:inline-block;width:fit-content}
-.pcard-body h3{font-size:1rem;font-weight:700;line-height:1.3;color:#fff}
-.pcard-body p{font-size:.8rem;color:var(--text-dim);line-height:1.6;flex:1}
-.pcard-btn{display:block;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;letter-spacing:.5px;text-decoration:none;padding:9px 16px;border-radius:3px;text-align:center;transition:all .2s;margin-top:12px}
-.pcard-btn:hover{background:var(--accent);color:#000}
-
-/* FOOTER */
-footer{text-align:center;padding:50px 6%;border-top:1px solid var(--border);color:var(--text-dim);font-size:.82rem}
-.footer-brand{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:700;margin-bottom:10px;color:var(--accent)}
-footer a{color:var(--accent);text-decoration:none}
-footer p{margin-top:6px}
-.footer-legal{font-size:.7rem;opacity:.45;margin-top:8px}
-
-/* FLOATING BUTTONS */
-.float-group{position:fixed;bottom:28px;right:24px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
-.fab{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 18px rgba(0,0,0,0.4);transition:transform .2s,box-shadow .2s;cursor:pointer;border:none;font-family:'Space Grotesk',sans-serif}
-.fab:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(0,0,0,0.5)}
-.fab-wa{background:#25D366}
-.fab-wa svg{width:26px;height:26px;fill:#fff}
-.fab-top{background:var(--card);border:1px solid var(--border);color:var(--accent);font-size:1.1rem;line-height:1}
-.fab-top:hover{background:rgba(0,195,255,0.1)}
-.translate-pill{background:rgba(8,12,20,0.95);border:1px solid var(--border);color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:500;padding:6px 14px;border-radius:3px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;transition:all .2s}
-.translate-pill:hover{border-color:var(--accent);color:var(--accent)}
-
-/* ANIMATIONS */
-@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-.anim-ready{opacity:0}.anim-ready.anim-visible{animation:fadeUp .55s cubic-bezier(.22,1,.36,1) forwards}
-
-@media(max-width:640px){.pgrid{grid-template-columns:1fr 1fr}}
-@media(max-width:400px){.pgrid{grid-template-columns:1fr}}
+:root { --brand-color: #3b82f6; --bg-dark: #0a0a0a; --card-bg: #141414; --text-light: #f0f0f0; --border-color: #222; }
+body{margin:0;font-family:'Inter', sans-serif;background:var(--bg-dark);color:var(--text-light);line-height:1.6}
+nav{background:var(--bg-dark);padding:20px 5%;border-bottom:3px solid var(--brand-color);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.5)}
+#logo { height: 50px; max-width: 200px; object-fit: contain; }
+#upBtn { position: fixed; bottom: 30px; right: 30px; background: var(--brand-color); color: #fff; width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.5rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000; transition: 0.3s; }
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:40px;padding:40px 5%}
+.card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:20px;padding:30px;text-align:center;transition:0.4s;display:flex;flex-direction:column;position:relative}
+.card:hover{transform:translateY(-10px);box-shadow:0 20px 40px rgba(0,0,0,0.4);border-color:var(--brand-color)}
+.img-box{height:300px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:#fff;border-radius:12px;overflow:hidden}
+img.product-img{max-width:90%;max-height:90%;object-fit:contain;transition:0.5s}
+h3{font-size:1rem;margin:0 0 15px;font-weight:800;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:3em;color:var(--text-light)}
+.price{color:var(--brand-color);font-weight:900;font-size:1.5rem;margin-bottom:20px}
+.btn{display:block;background:var(--brand-color);color: #fff;padding:18px;border-radius:12px;text-decoration:none;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-top:auto;font-size:0.85rem;transition:0.3s}
+#loader { position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:1000; display:flex; flex-direction: column; justify-content:center; align-items:center; transition: 0.5s; }
+#loaderText { color: var(--brand-color); font-weight: 900; letter-spacing: 5px; }
+#loader.hidden { opacity:0; pointer-events:none; }
 </style>
 </head>
 <body>
-
-<nav class="nav">
-  <div class="nav-inner">
-    <a href="/tech-scout/" class="nav-brand">
-      <div>
-        <div class="nav-brand-text">Tech Scout</div>
-        <div class="nav-brand-sub">Gadget Reviews</div>
-      </div>
-    </a>
-    <a href="/tech-scout/" class="nav-back">← Back</a>
-  </div>
+<div id="loader"><h2 id="loaderText">THE TECH SCOUT HQ</h2></div>
+<nav>
+    <img id="logo" src="https://priscadezigns.org/logos/tech-scout.png" alt="The Tech Scout HQ Logo">
 </nav>
-
-<section class="hero">
-  <div class="circuit-line"></div>
-  <div class="hero-tag">Tech Scout · Shop Picks</div>
-  <h1>Gear Up.<br>Level <span class="hl">Up.</span></h1>
-  <p>Curated tech picks across productivity, audio, and smart home — reviewed, tested, and approved by real enthusiasts.</p>
-  <a href="#shop" class="hero-cta">⚡ Shop Now</a>
-  <br>
-  <div class="affiliate-note">// Amazon affiliate links — we earn a small commission at no extra cost to you</div>
-</section>
-
-<div class="filters">
-  <button class="fbtn active" data-f="all">All Gear</button>
-  <button class="fbtn" data-f="productivity">Productivity</button>
-  <button class="fbtn" data-f="audio">Audio</button>
-  <button class="fbtn" data-f="smarthome">Smart Home</button>
-</div>
-
-<section class="shop-section" id="shop">
-  <div class="shop-inner">
-    <div class="pgrid">
-
-      <!-- PRODUCTIVITY -->
-      <div class="pcard" data-cat="productivity">
-        <a href="https://www.amazon.com/dp/B07PFFMQ64?tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07PFFMQ64&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Mechanical Keyboard" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07PFFMQ64&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Productivity</span>
-          <h3>Compact Mechanical Keyboard</h3>
-          <p>Tactile clicky switches, RGB backlight, tenkeyless design. Built for coders and power users. 4.6★ · 50K+ reviews.</p>
-          <a href="https://www.amazon.com/dp/B07PFFMQ64?tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <div class="pcard" data-cat="productivity">
-        <a href="https://www.amazon.com/dp/B08J5F3G18?tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B08J5F3G18&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Ergonomic Laptop Stand" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B08J5F3G18&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Productivity</span>
-          <h3>Ergonomic Aluminum Laptop Stand</h3>
-          <p>6-angle adjustable, portable, compatible with all laptops. Keeps your screen at eye level and your neck pain-free. 4.6★.</p>
-          <a href="https://www.amazon.com/dp/B08J5F3G18?tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <div class="pcard" data-cat="productivity">
-        <a href="https://www.amazon.com/s?k=USB+hub+10+port+USB+C+multi+port+adapter&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09GK8LBWS&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="USB-C Hub Multi-Port" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09GK8LBWS&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Productivity</span>
-          <h3>USB-C Multi-Port Hub</h3>
-          <p>10-in-1 USB hub with HDMI 4K, USB-A, SD card, and Ethernet. The essential desktop companion. 4.5★ · 70K+ reviews.</p>
-          <a href="https://www.amazon.com/s?k=USB+hub+10+port+USB+C+multi+port+adapter&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <div class="pcard" data-cat="productivity">
-        <a href="https://www.amazon.com/s?k=webcam+1080p+HD+streaming+autofocus&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07K986YLL&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="1080p HD Webcam" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07K986YLL&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Productivity</span>
-          <h3>1080p HD Webcam with Autofocus</h3>
-          <p>Crisp video for calls, streams, and recordings. Built-in noise-cancelling mic, plug-and-play. 4.5★ bestseller for remote workers.</p>
-          <a href="https://www.amazon.com/s?k=webcam+1080p+HD+streaming+autofocus&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <!-- AUDIO -->
-      <div class="pcard" data-cat="audio">
-        <a href="https://www.amazon.com/dp/B09G9FPHY6?tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09G9FPHY6&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="True Wireless Earbuds ANC" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09G9FPHY6&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Audio</span>
-          <h3>True Wireless ANC Earbuds</h3>
-          <p>Active noise cancellation, 30hr battery with case, IPX5 water resistance. Crystal clear calls. 4.6★ · 90K+ reviews.</p>
-          <a href="https://www.amazon.com/dp/B09G9FPHY6?tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-
-      <!-- WEARABLES -->
-      <div class="pcard" data-cat="wearables">
-        <a href="https://www.amazon.com/dp/B08N5LNQCX?tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B08N5LNQCX&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Smart Watch" class="pcard-img" loading="lazy">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Wearables</span>
-          <h3>Smart Watch Fitness Tracker</h3>
-          <p>GPS, heart rate monitor, sleep tracking, 7-day battery. Compatible with iOS and Android. 4.5&#9733; &middot; 40K+ reviews.</p>
-          <a href="https://www.amazon.com/dp/B08N5LNQCX?tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon &#8594;</a>
-        </div>
-      </div>
-      </div>
-
-      <div class="pcard" data-cat="audio">
-        <a href="https://www.amazon.com/s?k=portable+bluetooth+speaker+waterproof+loud&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09RK8KLYH&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Portable Bluetooth Speaker" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09RK8KLYH&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Audio</span>
-          <h3>Portable Waterproof Bluetooth Speaker</h3>
-          <p>360° sound, IPX7 waterproof, 24hr battery, pairs to two devices. The go-anywhere speaker. 4.6★ customer favourite.</p>
-          <a href="https://www.amazon.com/s?k=portable+bluetooth+speaker+waterproof+loud&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <div class="pcard" data-cat="audio">
-        <a href="https://www.amazon.com/s?k=noise+cancelling+over+ear+headphones+wireless&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09G9FPHY6&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Noise Cancelling Headphones" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B0BDHB9Y8H&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Audio</span>
-          <h3>Over-Ear Noise Cancelling Headphones</h3>
-          <p>Premium ANC, 40hr battery, hi-res audio. Foldable design for travel. Deep bass, studio-quality mids. 4.7★ top-rated.</p>
-          <a href="https://www.amazon.com/s?k=noise+cancelling+over+ear+headphones+wireless&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <div class="pcard" data-cat="audio">
-        <a href="https://www.amazon.com/s?k=USB+condenser+microphone+podcast+streaming&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B074BZKD3F&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="USB Condenser Microphone" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B074BZKD3F&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Audio</span>
-          <h3>USB Condenser Microphone</h3>
-          <p>Studio-grade for podcasting, streaming, and calls. Cardioid pickup, built-in gain control. 4.5★ · 100K+ reviews.</p>
-          <a href="https://www.amazon.com/s?k=USB+condenser+microphone+podcast+streaming&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <!-- SMART HOME -->
-      <div class="pcard" data-cat="smarthome">
-        <a href="https://www.amazon.com/s?k=smart+plug+wifi+energy+monitoring+alexa+google&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B01M1J8OGY&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Smart WiFi Plug" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B01M1J8OGY&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Smart Home</span>
-          <h3>Smart WiFi Plug with Energy Monitor</h3>
-          <p>Control any device remotely. Alexa & Google compatible, voice control, scheduling, energy usage tracking. 4.6★.</p>
-          <a href="https://www.amazon.com/s?k=smart+plug+wifi+energy+monitoring+alexa+google&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <div class="pcard" data-cat="smarthome">
-        <a href="https://www.amazon.com/s?k=smart+LED+strip+lights+color+changing+wifi&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09MJ4K1W9&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Smart LED Strip Lights" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B09MJ4K1W9&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Smart Home</span>
-          <h3>Smart LED RGB Strip Lights</h3>
-          <p>16 million colours, music sync, app & voice controlled. Transforms any room instantly. 4.5★ · 200K+ reviews worldwide.</p>
-          <a href="https://www.amazon.com/s?k=smart+LED+strip+lights+color+changing+wifi&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <div class="pcard" data-cat="smarthome">
-        <a href="https://www.amazon.com/s?k=mini+portable+projector+1080p+home+cinema&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07QDPR6DX&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Mini Portable Projector" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07QDPR6DX&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Smart Home</span>
-          <h3>Mini Portable Projector</h3>
-          <p>200" display, 1080p support, built-in speaker, HDMI/USB. Cinema in your pocket — goes anywhere you do. 4.4★.</p>
-          <a href="https://www.amazon.com/s?k=mini+portable+projector+1080p+home+cinema&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-      <div class="pcard" data-cat="smarthome">
-        <a href="https://www.amazon.com/s?k=tablet+stand+adjustable+desk+holder+ipad&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-img-wrap">
-          <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07GBFB1CZ&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20" alt="Adjustable Tablet Stand" class="pcard-img" loading="lazy" onerror="this.src='https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B07GBFB1CZ&Format=_SL250_&ID=AsinImage&MarketPlace=US&ServiceVersion=20070822&WS=1&tag=priscadezigns-20';this.onerror=null">
-        </a>
-        <div class="pcard-body">
-          <span class="pcard-tag">Smart Home</span>
-          <h3>Adjustable Tablet & Phone Stand</h3>
-          <p>360° rotation, foldable, works with iPad, tablets, phones. Sturdy desk companion for work, cooking, or entertainment. 4.6★.</p>
-          <a href="https://www.amazon.com/s?k=tablet+stand+adjustable+desk+holder+ipad&tag=priscadezigns-20" target="_blank" rel="noopener" class="pcard-btn">Shop on Amazon →</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-brand">Tech Scout</div>
-  <p><a href="/tech-scout/">← Back to Tech Scout</a></p>
-  <p class="footer-legal">As an Amazon Associate we earn from qualifying purchases. © 2026 Tech Scout · Prisca Dezigns</p>
+<div class="grid" id="grid"></div>
+<button id="upBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
+<footer style="padding:60px 5%; text-align:center; background:#000; color:#fff; border-top: 1px solid #222;">
+    <div style="font-weight:900; font-size:1.5rem">THE TECH SCOUT HQ</div>
+    <div style="font-size: 0.7rem; letter-spacing: 2px; opacity: 0.6; margin-top: 20px;">A PRISCA DEZIGNS EMPIRE VENTURE - GOLD STANDARD RESTORATION v4.2</div>
 </footer>
-
-<!-- FLOATING BUTTONS -->
-<div class="float-group">
-  <div class="translate-pill" onclick="translatePage()">🌐 Translate</div>
-  <a href="https://wa.me/447576505652" target="_blank" rel="noopener" class="fab fab-wa" aria-label="WhatsApp">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.859L.057 23.514a.5.5 0 0 0 .614.63l5.783-1.516A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.66-.5-5.191-1.374l-.371-.218-3.843 1.007 1.025-3.734-.24-.386A9.944 9.944 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-  </a>
-  <button class="fab fab-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
-</div>
-
 <script>
-document.querySelectorAll('.fbtn').forEach(function(btn){
-  btn.addEventListener('click',function(){
-    document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('active');});
-    btn.classList.add('active');
-    var f=btn.dataset.f;
-    document.querySelectorAll('.pcard').forEach(function(c){
-      c.classList.toggle('hidden',f!=='all'&&c.dataset.cat!==f);
-    });
-  });
-});
-(function(){
-  var io=new IntersectionObserver(function(entries){
-    entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('anim-visible');io.unobserve(e.target);}});
-  },{threshold:0.06,rootMargin:'0px 0px -20px 0px'});
-  document.querySelectorAll('.pcard').forEach(function(el,i){
-    el.classList.add('anim-ready');
-    el.style.animationDelay=(Math.min(i%4,3)*0.07)+'s';
-    io.observe(el);
-  });
-})();
-function translatePage(){
-  window.open('https://translate.google.com/translate?sl=auto&tl=es&u='+encodeURIComponent(window.location.href),'_blank');
+const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
+async function load() {
+  try {
+    const { data, error } = await sb.from("empire_inventory").select("*").eq("brand", "The Tech Scout HQ");
+    if (error) throw error;
+    const items = data || [];
+    if (items.length === 0) {
+        document.getElementById("grid").innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:100px; opacity:0.5;'><h3>No items found in the vault.</h3></div>";
+    } else {
+        document.getElementById("grid").innerHTML = items.map(p => `
+          <div class="card">
+            <div class="img-box"><img class="product-img" src="${p.image_url}" loading="lazy" onerror="this.src='https://priscadezigns.org/logos/pd_mark_sq.png'"></div>
+            <h3>${p.title}</h3>
+            <div class="price">${p.price === "$--" ? "" : p.price}</div>
+            <a href="${p.affiliate_link}" class="btn" target="_blank">Acquire Innovation</a>
+          </div>
+        `).join("");
+    }
+  } catch (e) {
+    console.error(e);
+    document.getElementById("grid").innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:100px;'><h3>Connection Error</h3></div>";
+  } finally {
+    document.getElementById("loader").classList.add("hidden");
+  }
 }
-</script>
-<div class="view-all-wrap"><a href="https://www.amazon.com/s?k=tech+gadgets&tag=priscadezigns-20">See More</a></div></body>
-</html>
+window.onload = load;
+</script></body></html>
