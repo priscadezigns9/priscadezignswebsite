@@ -2,149 +2,392 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>My Dashboard | dpanyard | dpanyard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
-    <link rel="stylesheet" href="../assets/css/payment.css">
-    <script src="../assets/js/payment.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Hub | dpanyard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABy0lEQVRYhe2Xv0sCYRjHPw9SCDNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSB6Ab4Bf0K6C83mF2EAAAAASUVORK5CYII=">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-light); color: var(--navy-deep); }
+        :root {
+            --primary: #E87722; --primary-soft: #FFF7ED;
+            --bg: #FFFFFF; --text: #0F172A; --text-muted: #64748B;
+            --grey-light: #F8FAFC; --border: #F1F5F9;
+            --font-display: 'Fraunces', serif; --font-sans: 'Inter', sans-serif;
+            --white: #FFFFFF;
+            --radius-xl: 24px; --radius-lg: 16px;
+        }
 
-        nav { background: var(--white); border-bottom: 2px solid var(--primary-red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 72px; position: sticky; top: 0; z-index: 1000; }
-        .brand { font-family: 'Sora', sans-serif; font-size: 24px; font-weight: 800; color: var(--navy-deep); text-decoration: none; }
-        .brand span { color: var(--primary-red); }
+        [data-theme="dark"] {
+            --bg: #0F172A; --text: #F1F5F9; --text-muted: #94A3B8;
+            --grey-light: #1E293B; --border: #334155; --white: #1E293B;
+            --primary-soft: rgba(232, 119, 34, 0.1);
+        }
 
-        .user-nav { display: flex; align-items: center; gap: 20px; }
-        .av-small { width: 40px; height: 40px; border-radius: 50%; background: var(--navy-deep); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background 0.3s, color 0.3s; }
+        body { font-family: var(--font-sans); background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
-        .layout { display: flex; min-height: calc(100vh - 72px); }
-        .sidebar { width: 260px; background: var(--white); border-right: 1px solid var(--border-color); padding: 32px 16px; }
-        .side-link { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; text-decoration: none; color: #64748B; font-weight: 600; margin-bottom: 4px; transition: all 0.3s; }
-        .side-link:hover, .side-link.active { background: rgba(224, 27, 36, 0.05); color: var(--primary-red); }
+        .sidebar { width: 280px; border-right: 1px solid var(--border); padding: 40px 24px; display: flex; flex-direction: column; gap: 40px; background: var(--white); z-index: 10; }
+        .logo { font-family: var(--font-display); font-size: 26px; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 12px; font-weight: 900; }
+        .logo-d { background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        
+        .nav-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; }
+        .nav-list { display: flex; flex-direction: column; gap: 4px; }
+        .nav-item { padding: 12px 16px; border-radius: var(--radius-lg); cursor: pointer; transition: 0.2s; font-weight: 600; font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 12px; }
+        .nav-item:hover { background: var(--grey-light); color: var(--text); }
+        .nav-item.active { background: var(--primary-soft); color: var(--primary); }
 
-        .main { flex: 1; padding: 40px 5%; }
-        .welcome h1 { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 8px; }
-        .welcome p { color: #64748B; margin-bottom: 32px; }
+        .main { flex: 1; display: flex; flex-direction: column; background: var(--bg); position: relative; }
+        .topbar { height: 80px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; flex-shrink: 0; }
+        
+        .section { padding: 40px; display: none; height: calc(100vh - 80px); overflow-y: auto; }
+        .section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
-        .card { background: var(--white); border-radius: 20px; padding: 32px; border: 1px solid var(--border-color); }
-        .card h2 { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .discovery-grid { display: flex; height: 100%; overflow: hidden; }
+        .list-view { width: 420px; padding: 32px; overflow-y: auto; background: var(--white); border-right: 1px solid var(--border); }
+        .map-view { flex: 1; position: relative; border-radius: 30px 0 0 0; overflow: hidden; }
+        #map { width: 100%; height: 100%; }
 
-        .cat-pills { display: flex; flex-wrap: wrap; gap: 12px; }
-        .pill { background: #f1f5f9; padding: 10px 20px; border-radius: 50px; text-decoration: none; color: var(--navy-deep); font-weight: 700; font-size: 14px; transition: all 0.3s; }
-        .pill:hover { background: var(--navy-deep); color: white; }
+        .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 30px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .input-group label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+        input, select, textarea { padding: 14px; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--grey-light); color: var(--text); outline: none; width: 100%; font-size: 15px; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
 
-        .appt-list { display: flex; flex-direction: column; gap: 16px; }
-        .appt { border-left: 4px solid var(--primary-red); padding: 16px; background: #fafafa; border-radius: 0 12px 12px 0; }
-        .appt-title { font-weight: 800; font-size: 15px; }
-        .appt-meta { font-size: 13px; color: #64748B; margin-top: 4px; }
+        .btn-main { padding: 14px 24px; border-radius: var(--radius-lg); border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 14px rgba(232, 119, 34, 0.25); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232, 119, 34, 0.35); }
+        .btn-secondary { background: var(--grey-light); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
 
-        .map-preview { height: 300px; background: #e2e8f0; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-weight: 700; cursor: pointer; }
-        .map-preview:hover { background: #cbd5e1; color: var(--navy-deep); }
-    
+        .biz-card { padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 16px; cursor: pointer; transition: 0.2s; background: var(--white); }
+        .biz-card:hover { border-color: var(--primary); transform: translateX(4px); background: var(--primary-soft); }
+
+        #detail-overlay { position: fixed; top: 0; right: 0; width: 500px; height: 100%; background: var(--white); z-index: 1000; box-shadow: -20px 0 60px rgba(0,0,0,0.1); transform: translateX(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); padding: 48px; overflow-y: auto; }
+        #detail-overlay.active { transform: translateX(0); }
+
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        #error-log { position: fixed; bottom: 20px; right: 20px; background: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 8px; font-size: 12px; display: none; z-index: 9999; }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
-<nav>
-    <a href="/dpanyard/index.html" class="brand"><img src="data:image/png;base64,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" alt="dpanyard"><div class="pro-label" style="display:inline-block; background:linear-gradient(135deg, #0D1B2A, #2c3e50); color:#FFD700; padding:4px 12px; border-radius:50px; font-size:10px; font-weight:800; text-transform:uppercase; border:1px solid #FFD700; margin-left:10px; vertical-align:middle; cursor:pointer;" onclick="event.preventDefault(); openPayModal('Panyard Pro', '9/yr')">Panyard Pro</div></a>
-    <div class="user-nav">
-        <span style="font-weight: 700;">Hello, Prisca</span>
-        <div class="av-small">P</div>
-    </div>
-</nav>
+    <div id="error-log"></div>
 
-<div class="layout">
-    <div class="sidebar">
-        <a href="#" class="side-link active"><span>🏠</span> Dashboard</a>
-        <a href="../explore/map.html" class="side-link"><span>📍</span> Neighbourhood Map</a>
-        <a href="#" class="side-link"><span>📅</span> My Appointments</a>
-        <a href="#" class="side-link"><span>👤</span> My Profile</a>
-        <a href="../index.html" class="side-link" style="margin-top: 40px;"><span>⬅️</span> Logout</a>
-    </div>
-
-    <div class="main">
-        <div class="welcome">
-            <h1>Welcome back, Prisca!</h1>
-            <p>Your neighbourhood is busy today. Find a professional for your next project.</p>
-        </div>
-
-        <div class="dash-grid">
-            <div class="card">
-                <h2>Browse Categories</h2>
-                <div class="cat-pills">
-                    <a href="#" class="pill">Plumbers</a>
-                    <a href="#" class="pill">Electricians</a>
-                    <a href="#" class="pill">Barbers</a>
-                    <a href="#" class="pill">Hair Stylists</a>
-                    <a href="#" class="pill">Tutors</a>
-                    <a href="#" class="pill">Personal Trainers</a>
-                    <a href="#" class="pill">Security Services</a>
-                    <a href="#" class="pill">Gardeners</a>
-                </div>
-                
-                <h2 style="margin-top: 48px;">Nearby Businesses</h2>
-                <div class="map-preview" onclick="window.location.href='../explore/map.html';">
-                    Click to Open Neighbourhood Map
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>Upcoming Appointments</h2>
-                <div class="appt-list">
-                    <div class="appt">
-                        <div class="appt-title">Marcus Electric Solutions</div>
-                        <div class="appt-meta">June 15, 2026 · 10:00 AM</div>
-                        <div class="appt-meta">Service: Electrical Installation</div>
-                    </div>
-                    <div class="appt" style="border-color: var(--navy-deep);">
-                        <div class="appt-title">Kayla's Hair Studio</div>
-                        <div class="appt-meta">June 20, 2026 · 2:00 PM</div>
-                        <div class="appt-meta">Service: Hair Braiding</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-    <!-- Payment Modal -->
-    <div class="modal-overlay" id="payModal">
-      <div class="modal-box">
-        <span class="modal-close" onclick="closePayModal()">✕</span>
-        <div class="modal-tabs">
-          <button class="modal-tab active" onclick="togglePay('bank', this)">Bank</button>
-          <button class="modal-tab" onclick="togglePay('eth', this)">Crypto</button>
-          <button class="modal-tab" onclick="togglePay('intl', this)">PayPal</button>
-        </div>
-        <h3 id="modal-plan-name" style="font-family: Sora; font-size: 1.1rem; margin-bottom: 20px; color: #111;">Panyard Pro Settlement</h3>
+    <aside class="sidebar">
+        <a href="../index.html" class="logo">
+            <div class="logo-d">D</div>
+            dpanyard
+        </a>
         
-        <div id="pay-bank" class="pay-detail open">
-          <p style="font-size:0.75rem; font-weight:700; color:#E01B24; margin-bottom:12px; text-transform: uppercase;">Citibank (US Payoneer)</p>
-          <div class="copy-group"><span>Routing: <span id="bank-routing">031100209</span></span><button class="copy-btn" onclick="copyAddr('bank-routing', event)">Copy</button></div>
-          <div class="copy-group"><span>Account: <span id="bank-account">70580060002427728</span></span><button class="copy-btn" onclick="copyAddr('bank-account', event)">Copy</button></div>
-          <div class="copy-group"><span>Beneficiary: <span id="bank-ben">Prisca Dezigns</span></span><button class="copy-btn" onclick="copyAddr('bank-ben', event)">Copy</button></div>
-          <p style="font-size:0.75rem; color:#666; margin-top: 15px;">Ref: <span id="auto-ref-bank" style="font-weight:700; color:#E01B24;">[REF]</span></p>
+        <div>
+            <div class="nav-label">Navigation</div>
+            <div class="nav-list">
+                <div class="nav-item active" onclick="showSection('discovery', this)"><i data-lucide="layout-dashboard"></i> Dashboard</div>
+                <div class="nav-item" onclick="showSection('discovery', this, 'map-focus')"><i data-lucide="map-pin"></i> My Neighborhood</div>
+                <div class="nav-item" onclick="showSection('appointments', this)"><i data-lucide="calendar-days"></i> My Appointments</div>
+                <div class="nav-item" onclick="showSection('profile', this)"><i data-lucide="user"></i> My Profile</div>
+            </div>
         </div>
 
-        <div id="pay-eth" class="pay-detail">
-          <p style="font-size:0.8rem;color:#666;margin-bottom:12px;">USDT / ETH / BTC (ERC-20)</p>
-          <div style="background:#f8f9fa;padding:15px;border-radius:12px;border:1px solid #eee;word-break:break-all;font-family:monospace;font-size:0.8rem; position: relative; display: flex; justify-content: space-between; align-items: center;">
-            <span id="eth-addr">0xcef857e82c306b3d0f2db080e7794f4bb376049e</span>
-            <button class="copy-btn" onclick="copyAddr('eth-addr', event)">Copy</button>
-          </div>
-          <p style="font-size:0.75rem;color:#999;margin-top:10px;">Ref: <span id="auto-ref-eth" style="font-weight:700; color:#E01B24;">[REF]</span></p>
+        <div style="margin-top: auto;">
+            <div class="nav-label">System</div>
+            <div class="nav-list">
+                <div class="nav-item" onclick="showSection('settings', this)"><i data-lucide="settings"></i> Settings</div>
+                <div class="nav-item" onclick="signOut()"><i data-lucide="log-out"></i> Log Out</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <h2 id="header-title" style="font-family: var(--font-display);">Dashboard</h2>
+            <div id="user-display" style="display: flex; align-items: center; gap: 12px; font-weight: 800; background: var(--grey-light); padding: 8px 16px; border-radius: 30px; border: 1px solid var(--border);">
+                <div id="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 14px;">U</div>
+                <span id="user-name" style="font-size: 14px;">Loading...</span>
+            </div>
         </div>
 
-        <div id="pay-intl" class="pay-detail">
-          <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=QXE9PL58QPU9L&item_name=Panyard+Pro+Subscription&currency_code=USD" class="pay-btn-primary" target="_blank">Proceed to PayPal</a>
-          <p style="font-size:0.75rem;color:#666;">Include reference ID in payment note.</p>
-          <p style="font-size:0.75rem;color:#999;margin-top:10px;">Ref: <span id="auto-ref-intl" style="font-weight:700; color:#E01B24;">[REF]</span></p>
+        <section id="discovery" class="section active" style="padding: 0;">
+            <div class="discovery-grid">
+                <div class="list-view">
+                    <div style="position: relative; margin-bottom: 24px;">
+                        <input type="text" id="biz-search" placeholder="Search by niche or name..." style="padding-left: 45px;" oninput="handleSearch(this.value)">
+                        <i data-lucide="search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);" size="18"></i>
+                    </div>
+                    <div id="biz-list"></div>
+                </div>
+                <div class="map-view"><div id="map"></div></div>
+            </div>
+        </section>
+
+        <section id="appointments" class="section">
+            <h1 style="font-family: var(--font-display); font-size: 36px; margin-bottom: 30px;">Your Schedule</h1>
+            <div id="apt-list">
+                <div class="card" style="text-align: center; padding: 60px;">
+                    <i data-lucide="calendar-x" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                    <p style="color: var(--text-muted); font-weight: 600;">No upcoming appointments yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="profile" class="section">
+            <h1 style="font-family: var(--font-display); font-size: 36px; margin-bottom: 30px;">Account Settings</h1>
+            <div class="card">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="p-name" placeholder="Enter your name">
+                </div>
+                <div class="input-group">
+                    <label>WhatsApp Number</label>
+                    <input type="text" id="p-phone" placeholder="+1 868 ...">
+                </div>
+                <div class="input-group">
+                    <label>Profile Picture</label>
+                    <input type="file" id="p-avatar-file" style="background: none; border: none; padding: 0;" onchange="uploadAvatar(this)">
+                </div>
+                <button class="btn-main btn-primary" onclick="saveProfile(event)"><i data-lucide="save"></i> Save Profile Details</button>
+            </div>
+        </section>
+
+        <section id="settings" class="section">
+            <h1 style="font-family: var(--font-display); font-size: 36px; margin-bottom: 30px;">System Preferences</h1>
+            <div class="card">
+                <h3 style="margin-bottom: 24px; font-family: var(--font-display); font-size: 20px;">UI Theme</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: var(--grey-light); border-radius: var(--radius-lg);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i data-lucide="palette"></i>
+                        <span>Dark Mode Integration</span>
+                    </div>
+                    <button class="btn-main btn-secondary" id="dark-toggle" onclick="toggleDark()"><i data-lucide="moon"></i> Enable</button>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 30px 0;">
+                <h3 style="margin-bottom: 24px; font-family: var(--font-display); font-size: 20px;">Device Permissions</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--grey-light); border-radius: var(--radius-lg);">
+                        <span>Location Access</span>
+                        <button class="btn-main btn-secondary" onclick="requestPermission('location', event)">Grant Access</button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--grey-light); border-radius: var(--radius-lg);">
+                        <span>Camera Access</span>
+                        <button class="btn-main btn-secondary" onclick="requestPermission('camera', event)">Grant Access</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="detail-overlay">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <div style="background: var(--primary-soft); color: var(--primary); padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 800; text-transform: uppercase;">Professional Node</div>
+            <button onclick="closeDetail()" style="border:none; background:var(--grey-light); width: 40px; height: 40px; border-radius: 50%; cursor:pointer; color: var(--text-dark); display: flex; align-items: center; justify-content: center;"><i data-lucide="x"></i></button>
         </div>
-      </div>
+        <div id="detail-content"></div>
     </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key={{credential:google-maps-api-key}}&callback=initMap" async defer></script>
+    <script>
+        function logError(msg) {
+            const el = document.getElementById('error-log');
+            el.innerText = msg;
+            el.style.display = 'block';
+            console.error(msg);
+        }
+
+        let sb, map, user, businesses = [], markers = [];
+
+        try {
+            sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{{credential:supabase-callaloo-dpanyard}}');
+        } catch(e) { logError("Supabase Connection Failed"); }
+
+        async function init() {
+            try {
+                const { data, error } = await sb.auth.getUser();
+                if(error || !data.user) return window.location.href = '../login/';
+                user = data.user;
+                document.getElementById('user-name').innerText = user.email.split('@')[0];
+                document.getElementById('user-avatar').innerText = user.email[0].toUpperCase();
+                loadProfile();
+                lucide.createIcons();
+            } catch(e) { logError("System Initialization Error"); }
+        }
+
+        async function initMap() {
+            try {
+                const mapStyles = [
+                    { "featureType": "all", "elementType": "labels.text.fill", "stylers": [{ "color": "#7c93a3" }] },
+                    { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "color": "#f8fafc" }] },
+                    { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }] },
+                    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#e2e8f0" }] }
+                ];
+                map = new google.maps.Map(document.getElementById("map"), { 
+                    zoom: 13, 
+                    center: { lat: 10.65, lng: -61.51 }, 
+                    disableDefaultUI: true,
+                    styles: mapStyles
+                });
+                loadBusinesses();
+            } catch(e) { logError("Map Interface Error"); }
+        }
+
+        function showSection(id, el, mode) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
+            if(el) el.classList.add('active');
+            document.getElementById('header-title').innerText = el ? el.innerText.trim() : id;
+            
+            if(id === 'discovery' && map) {
+                setTimeout(() => {
+                    google.maps.event.trigger(map, 'resize');
+                    if(mode === 'map-focus') {
+                        navigator.geolocation.getCurrentPosition(pos => {
+                            map.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+                            map.setZoom(15);
+                        });
+                    }
+                }, 300);
+            }
+            lucide.createIcons();
+        }
+
+        async function loadProfile() {
+            try {
+                const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
+                if(data) {
+                    document.getElementById('p-name').value = data.full_name || '';
+                    document.getElementById('p-phone').value = data.bio?.split('WA:')[1] || '';
+                    if(data.avatar_url) {
+                        document.getElementById('user-avatar').innerHTML = `<img src="${data.avatar_url}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        async function saveProfile(e) {
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Saving...';
+            lucide.createIcons();
+            
+            const name = document.getElementById('p-name').value;
+            const wa = document.getElementById('p-phone').value;
+            
+            const { error } = await sb.from('profiles').upsert({ id: user.id, full_name: name, bio: `WA:${wa}` });
+            
+            if(!error) {
+                btn.innerHTML = '<i data-lucide="check"></i> Changes Saved';
+                setTimeout(() => { btn.innerHTML = originalText; lucide.createIcons(); }, 2000);
+            } else {
+                btn.innerHTML = '<i data-lucide="alert-circle"></i> Error Saving';
+                setTimeout(() => { btn.innerHTML = originalText; lucide.createIcons(); }, 2000);
+            }
+            lucide.createIcons();
+        }
+
+        async function handleSearch(val) {
+            const filtered = businesses.filter(b => 
+                b.full_name.toLowerCase().includes(val.toLowerCase()) || 
+                (b.niche && b.niche.toLowerCase().includes(val.toLowerCase()))
+            );
+            renderList(filtered);
+        }
+
+        async function requestPermission(type, e) {
+            const btn = e.currentTarget;
+            btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Pending...';
+            lucide.createIcons();
+            try {
+                if(type === 'location') {
+                    navigator.geolocation.getCurrentPosition(() => {
+                        btn.innerHTML = '<i data-lucide="check"></i> Enabled';
+                        btn.classList.add('btn-success');
+                    }, () => {
+                        btn.innerHTML = '<i data-lucide="x"></i> Blocked';
+                    });
+                } else if(type === 'camera') {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    stream.getTracks().forEach(track => track.stop());
+                    btn.innerHTML = '<i data-lucide="check"></i> Enabled';
+                }
+            } catch(err) { btn.innerHTML = '<i data-lucide="x"></i> Failed'; }
+            lucide.createIcons();
+        }
+
+        async function uploadAvatar(el) {
+            const file = el.files[0];
+            if(!file) return;
+            const path = `avatars/${user.id}_${Date.now()}.jpg`;
+            const { error } = await sb.storage.from('avatars').upload(path, file);
+            if(!error) {
+                const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(path);
+                await sb.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
+                document.getElementById('user-avatar').innerHTML = `<img src="${publicUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            }
+        }
+
+        async function loadBusinesses() {
+            try {
+                const { data } = await sb.from('profiles').select('*').not('niche', 'is', null);
+                businesses = data || [];
+                renderList(businesses);
+            } catch(e) {}
+        }
+
+        function renderList(list) {
+            const container = document.getElementById('biz-list');
+            container.innerHTML = list.map(b => `
+                <div class="biz-card" onclick="openDetail('${b.id}')">
+                    <div style="font-weight: 800; font-family: var(--font-display); font-size: 18px; margin-bottom: 4px;">${b.full_name}</div>
+                    <div style="font-size: 13px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">${b.niche || 'Professional Node'}</div>
+                </div>
+            `).join('');
+            markers.forEach(m => m.setMap(null));
+            markers = list.map(b => {
+                const m = new google.maps.Marker({ 
+                    position: { lat: parseFloat(b.location_lat) || 10.65, lng: parseFloat(b.location_lng) || -61.51 }, 
+                    map,
+                    icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#E87722', fillOpacity: 1, strokeWeight: 4, strokeColor: 'white' }
+                });
+                m.addListener('click', () => openDetail(b.id));
+                return m;
+            });
+        }
+
+        function openDetail(id) {
+            const b = businesses.find(item => item.id === id);
+            document.getElementById('detail-content').innerHTML = `
+                <h2 style="font-family: var(--font-display); font-size: 32px; margin-bottom: 8px;">${b.full_name}</h2>
+                <p style="color: var(--primary); font-weight: 800; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px;">${b.niche || 'Professional Node'}</p>
+                <div style="padding: 24px; background: var(--grey-light); border-radius: var(--radius-lg); margin-bottom: 32px; line-height: 1.6;">
+                    ${b.bio || 'This professional has not provided a bio yet.'}
+                </div>
+                <button class="btn-main btn-primary" style="width: 100%; height: 60px; font-size: 16px;" onclick="bookApt()">
+                    <i data-lucide="calendar"></i> Secure Appointment
+                </button>
+            `;
+            document.getElementById('detail-overlay').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function closeDetail() { document.getElementById('detail-overlay').classList.remove('active'); }
+
+        function toggleDark() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('dark-toggle').innerHTML = isDark ? '<i data-lucide="moon"></i> Enable' : '<i data-lucide="sun"></i> Disable';
+            lucide.createIcons();
+        }
+
+        function signOut() { sb.auth.signOut(); window.location.href = '../login/'; }
+        function bookApt() { alert("Your booking request has been transmitted to the professional node."); }
+
+        init();
+    </script>
 </body>
 </html>
