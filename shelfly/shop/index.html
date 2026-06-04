@@ -1,87 +1,55 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shelfly Shop - Gold Standard v4.2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-body{margin:0;font-family:sans-serif;background:#fff;color:#111}
-nav{background:#fff;padding:25px;border-bottom:3px solid #000;display:flex;justify-content:space-between;align-items:center}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:40px;padding:60px 5%}
-.card{background:#fafafa;border:1px solid #eee;border-radius:16px;padding:40px;text-align:center;transition:0.4s;display:flex;flex-direction:column}
-.card:hover{transform:translateY(-10px);border-color:#000;box-shadow:0 20px 40px rgba(0,0,0,0.05)}
-.category{font-size:0.9rem;color:#666;font-weight:700;text-transform:uppercase;margin-bottom:10px}
-.img-box{height:400px;display:flex;align-items:center;justify-content:center;margin-bottom:30px;background:#fff;border-radius:12px;overflow:hidden}
-img{max-width:90%;max-height:90%;object-fit:contain;transition:0.5s}
-.card:hover img{transform:scale(1.05)}
-h3{font-size:1.4rem;margin:0 0 15px;font-weight:800}
-.price{color:#000;font-weight:900;font-size:1.6rem;margin-bottom:30px}
-.btn{display:block;background:#000;color:#fff;padding:20px;border-radius:10px;text-decoration:none;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-top:auto}
-footer{padding:60px;text-align:center;opacity:0.5;font-size:0.8rem}
-</style></head>
+:root { --brand-color: #2563eb; --bg-dark: #0a0a0a; --card-bg: #141414; --text-light: #f0f0f0; --border-color: #222; }
+body{margin:0;font-family:'Inter', sans-serif;background:var(--bg-dark);color:var(--text-light);line-height:1.6}
+nav{background:var(--bg-dark);padding:20px 5%;border-bottom:3px solid var(--brand-color);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.5)}
+#logo { height: 50px; max-width: 200px; object-fit: contain; }
+#upBtn { position: fixed; bottom: 30px; right: 30px; background: var(--brand-color); color: #fff; width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.5rem; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000; transition: 0.3s; }
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:40px;padding:40px 5%}
+.card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:20px;padding:30px;text-align:center;transition:0.4s;display:flex;flex-direction:column;position:relative}
+.card:hover{transform:translateY(-10px);box-shadow:0 20px 40px rgba(0,0,0,0.4);border-color:var(--brand-color)}
+.img-box{height:300px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:#fff;border-radius:12px;overflow:hidden}
+img.product-img{max-width:90%;max-height:90%;object-fit:contain;transition:0.5s}
+h3{font-size:1rem;margin:0 0 15px;font-weight:800;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:3em;color:var(--text-light)}
+.price{color:var(--brand-color);font-weight:900;font-size:1.5rem;margin-bottom:20px}
+.btn{display:block;background:var(--brand-color);color:#fff;padding:18px;border-radius:12px;text-decoration:none;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-top:auto;font-size:0.85rem;transition:0.3s}
+#loader { position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:1000; display:flex; flex-direction: column; justify-content:center; align-items:center; transition: 0.5s; }
+#loaderText { color: var(--brand-color); font-weight: 900; letter-spacing: 5px; }
+#loader.hidden { opacity:0; pointer-events:none; }
+</style>
+</head>
 <body>
-<nav><img id="logo" src="" height="50"></nav>
+<div id="loader"><h2 id="loaderText">SHELFLY</h2></div>
+<nav>
+    <img id="logo" src="https://priscadezigns.org/assets/logos/shelfly.png" alt="Shelfly Logo">
+</nav>
 <div class="grid" id="grid"></div>
-<footer id="footer"></footer>
+<button id="upBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
+<footer style="padding:60px 5%; text-align:center; background:#000; color:#fff; border-top: 1px solid #222;">
+    <div style="font-weight:900; font-size:1.5rem">SHELFLY</div>
+    <div style="font-size: 0.7rem; letter-spacing: 2px; opacity: 0.6; margin-top: 20px;">A PRISCA DEZIGNS EMPIRE VENTURE - GOLD STANDARD RESTORATION v4.2</div>
+</footer>
 <script>
-const CONFIG = {
-  "Glow Protocol": { logo: "https://priscadezigns.org/logos/prisca-dezigns-logo.png", color: "#000", btn: "Acquire Solution" },
-  "Atelia Gaming": { logo: "https://priscadezigns.org/logos/atelier-gaming.png", color: "#D32F2F", btn: "Acquire Armory" },
-  "The Gen Play": { logo: "https://priscadezigns.org/logos/thegenplay.png", color: "#6366f1", btn: "Acquire Object" },
-  "Pantriq": { logo: "https://priscadezigns.org/logos/pantriq.png", color: "#10b981", btn: "Acquire Gear" },
-  "The Autodrome": { logo: "https://priscadezigns.org/logos/the-autodrome.jpg", color: "#ef4444", btn: "Acquire Tech" },
-  "My Baby Dumpling": { logo: "https://priscadezigns.org/logos/mybabydumpling.png", color: "#ec4899", btn: "Acquire Essential" },
-  "Riddiim": { logo: "https://priscadezigns.org/logos/riddiim.png", color: "#8b5cf6", btn: "Acquire Audio" },
-  "Sole Prestige": { logo: "https://priscadezigns.org/logos/sole-prestige.jpg", color: "#1f2937", btn: "Acquire Exclusive" },
-  "The Tech Scout HQ": { logo: "https://priscadezigns.org/logos/tech-scout.png", color: "#3b82f6", btn: "Acquire Innovation" },
-  "Essence Elite": { logo: "https://priscadezigns.org/logos/essenceelite.png", color: "#4b5563", btn: "Acquire Scent" },
-  "Shelfly": { logo: "https://priscadezigns.org/logos/shelfly.png", color: "#2563eb", btn: "Acquire System" }
-};
-
 const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
-
 async function load() {
-  const path = window.location.pathname.toLowerCase();
-  let brand = "Glow Protocol";
-  if(path.includes("atelia")) brand = "Atelia Gaming";
-  else if(path.includes("genplay")) brand = "The Gen Play";
-  else if(path.includes("pantriq")) brand = "Pantriq";
-  else if(path.includes("autodrome")) brand = "The Autodrome";
-  else if(path.includes("baby")) brand = "My Baby Dumpling";
-  else if(path.includes("ridd")) brand = "Riddiim";
-  else if(path.includes("prestige")) brand = "Sole Prestige";
-  else if(path.includes("scout")) brand = "The Tech Scout HQ";
-  else if(path.includes("essence")) brand = "Essence Elite";
-  else if(path.includes("shelfly")) brand = "Shelfly";
-
-  const conf = CONFIG[brand] || CONFIG["Glow Protocol"];
-  document.getElementById("logo").src = conf.logo;
-  document.body.style.setProperty("--brand-color", conf.color);
-  document.getElementById("footer").innerText = `© 2026 ${brand.toUpperCase()}`;
-  
-  // Apply brand colors
-  const style = document.createElement('style');
-  style.innerHTML = `
-    nav { border-bottom-color: ${conf.color} !important; }
-    .card:hover { border-color: ${conf.color} !important; }
-    .price { color: ${conf.color} !important; }
-    .btn { background: ${conf.color} !important; }
-    .category { color: ${conf.color} !important; opacity: 0.8; }
-  `;
-  document.head.appendChild(style);
-
-  const { data } = await sb.from("empire_inventory").select("*").eq("brand", brand);
-  
-  if (data && data.length > 0) {
-    document.getElementById("grid").innerHTML = data.map(p => `
-      <div class="card">
-        <div class="category">${p.category}</div>
-        <div class="img-box"><img src="${p.image_url}"></div>
-        <h3>${p.title}</h3>
-        <p class="price">${p.price}</p>
-        <a href="${p.affiliate_link}" class="btn" target="_blank">${conf.btn}</a>
-      </div>
-    `).join("");
+  const { data } = await sb.from("empire_inventory").select("*").eq("brand", "Shelfly");
+  const items = data || [];
+  if (items.length === 0) {
+      document.getElementById("grid").innerHTML = "<div style='grid-column: 1/-1; text-align:center; padding:100px; opacity:0.5;'><h3>No items found in the repository.</h3></div>";
   } else {
-    document.getElementById("grid").innerHTML = "<h3>Inventory Syncing...</h3>";
+      document.getElementById("grid").innerHTML = items.map(p => `
+        <div class="card">
+          <div class="img-box"><img class="product-img" src="${p.image_url}" loading="lazy"></div>
+          <h3>${p.title}</h3>
+          <div class="price">${p.price}</div>
+          <a href="${p.affiliate_link}" class="btn" target="_blank">Acquire System</a>
+        </div>
+      `).join("");
   }
+  document.getElementById("loader").classList.add("hidden");
 }
-load();
-</script>
-</body></html>
+window.onload = load;
+</script></body></html>
