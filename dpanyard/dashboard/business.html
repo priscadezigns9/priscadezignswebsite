@@ -234,37 +234,61 @@
         </div>
 
         <div id="dash" class="tab-content">
-            <h1 style="font-family: Sora; margin-bottom: 24px; font-size: 24px;">Professional Identity <span id="niche-badge" class="verified-badge" style="background:var(--primary-red); display:none;"></span></h1>
+            <h1 style="font-family: Sora; margin-bottom: 24px; font-size: 24px;">Professional Identity <span id="niche-badge" class="verified-badge" style="background:var(--primary-red); display:none;"></span> <span id="brand-badge" class="verified-badge" style="background:var(--navy-deep); display:none; margin-left:10px;"></span></h1>
             
             <div class="card">
                 <h2>Public Profile</h2>
                 <input type="text" id="biz-name" class="form-input" placeholder="Professional Name">
                 <textarea id="biz-bio" class="form-input" placeholder="Empire Bio / Professional Summary" rows="4"></textarea>
                 
-                <label style="display:block; font-weight:800; font-size:12px; margin-bottom:8px;">PROFESSIONAL NICHE (EMPIRE MAPPING)</label>
-                <select id="niche-select" class="form-input" onchange="syncNiche()">
-                    <option value="Couture Gallery">Purses and Bags</option>
-                    <option value="Quiet Luxury">Minimalist Luxury & Home Decor</option>
-                    <option value="Sole Prestige">Sneakers & High-end Streetwear</option>
-                    <option value="Atelia Gaming">PC Gaming & Tech Performance</option>
-                    <option value="The Autodrome">Formula 1 & Motorsport Engineering</option>
-                    <option value="Peak Fit">Fitness, Biohacking & Recovery</option>
-                    <option value="The Escapist">Luxury Travel & Sanctuaries</option>
-                    <option value="Paw Vault">Pet Care & Smart Nutrition</option>
-                    <option value="Glow Protocol">Skincare & Longevity Tech</option>
-                    <option value="Essence Elite">Fragrance & Artisanal Scent</option>
-                    <option value="My Baby Dumpling">Maternity & Baby Care</option>
-                    <option value="Riddiim">Music Engineering & Audio SaaS</option>
-                    <option value="Prime Land Network">Real Estate & Property Investment</option>
-                    <option value="The Tech Scout HQ">Tech News & Innovation Scout</option>
-                    <option value="Dreaming Anime">Anime Culture & Aesthetics</option>
-                    <option value="Verdant Co.">Sustainability & Landscaping</option>
-                    <option value="Pantriq">Smart Kitchen Logistics</option>
-                    <option value="The Gen Play">Collectibles & Generational Play</option>
-                    <option value="Calalloo">Professional Services (Legal/HR)</option>
+                <label style="display:block; font-weight:800; font-size:12px; margin-bottom:8px;">BUSINESS NICHE</label>
+                <select id="niche-select" class="form-input">
+                    <option value="Mechanic">Mechanic</option>
+                    <option value="Plumber">Plumber</option>
+                    <option value="Event Planner">Event Planner</option>
+                    <option value="Painter">Painter</option>
+                    <option value="Computer Technician">Computer Technician</option>
+                    <option value="Pool Cleaner">Pool Cleaner</option>
+                    <option value="House Decorator">House Decorator</option>
+                    <option value="Technician">Technician</option>
+                    <option value="Tutor">Tutor</option>
+                    <option value="Doctor">Doctor</option>
+                    <option value="Lawyer">Lawyer</option>
+                    <option value="Electrician">Electrician</option>
+                    <option value="Hairdresser">Hairdresser</option>
+                    <option value="Carpenter">Carpenter</option>
+                    <option value="Cleaner">Cleaner</option>
+                    <option value="Gardener">Gardener</option>
+                    <option value="Photographer">Photographer</option>
+                    <option value="Caterer">Caterer</option>
+                    <option value="Other">Other</option>
                 </select>
 
-                <button class="btn-p" onclick="saveToCloud()">Save</button>
+                <label style="display:block; font-weight:800; font-size:12px; margin-bottom:8px; margin-top:15px;">PRISCION TOOLS & BRAND MAPPING</label>
+                <select id="tools-select" class="form-input" onchange="handleToolSelection(this.value)">
+                    <option value="">Select a tool / brand...</option>
+                    <option value="Couture Gallery">Couture Gallery</option>
+                    <option value="Quiet Luxury">Quiet Luxury</option>
+                    <option value="Sole Prestige">Sole Prestige</option>
+                    <option value="Atelia Gaming">Atelia Gaming</option>
+                    <option value="The Autodrome">The Autodrome</option>
+                    <option value="Peak Fit">Peak Fit</option>
+                    <option value="The Escapist">The Escapist</option>
+                    <option value="Paw Vault">Paw Vault</option>
+                    <option value="Glow Protocol">Glow Protocol</option>
+                    <option value="Essence Elite">Essence Elite</option>
+                    <option value="My Baby Dumpling">My Baby Dumpling</option>
+                    <option value="Riddiim">Riddiim</option>
+                    <option value="Prime Land Network">Prime Land Network</option>
+                    <option value="The Tech Scout HQ">The Tech Scout HQ</option>
+                    <option value="Dreaming Anime">Dreaming Anime</option>
+                    <option value="Verdant Co.">Verdant Co.</option>
+                    <option value="Pantriq">Pantriq</option>
+                    <option value="The Gen Play">The Gen Play</option>
+                    <option value="Calalloo">Calalloo</option>
+                </select>
+
+                <button class="btn-p" onclick="saveToCloud()">Save Profile</button>
                 <p id="sync-status" style="font-size:10px; font-weight:800; margin-top:15px; color:var(--primary-red); display:none;"><i data-lucide="check" size="10"></i> CHANGES SAVED</p>
             </div>
 
@@ -990,16 +1014,86 @@
 
     // --- IDENTITY & SYSTEM LOGIC ---
     async function saveToCloud() {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return alert("Session expired. Please login again.");
+
         const profile = {
-            id: localStorage.getItem('calalloo_uid') || '00000000-0000-0000-0000-000000000000',
+            id: user.id,
             full_name: document.getElementById('biz-name').value,
             bio: document.getElementById('biz-bio').value,
             niche: document.getElementById('niche-select').value,
+            priscion_brand: document.getElementById('tools-select').value,
             last_active_at: new Date().toISOString()
         };
         const { error } = await sb.from('profiles').upsert(profile);
-        if(!error) alert("Professional Identity Synced to Cloud Persistence.");
+        if(!error) {
+            alert("Professional Identity Synced to Cloud Persistence.");
+            loadProfileData(); // Refresh badges
+        } else {
+            alert("Error syncing identity: " + error.message);
+        }
     }
+
+    const brandUrls = {
+        "Couture Gallery": "https://couturegallery.site",
+        "Quiet Luxury": "https://quietluxury.site",
+        "Sole Prestige": "https://soleprestige.online",
+        "Atelia Gaming": "https://priscadezigns.org/ateliagaming/",
+        "The Autodrome": "https://autodrome.site",
+        "Peak Fit": "https://peakfit.com",
+        "The Escapist": "https://escapist.site",
+        "Paw Vault": "https://pawvault.site",
+        "Glow Protocol": "https://glowprotocol.tech",
+        "Essence Elite": "https://essenceelite.online",
+        "My Baby Dumpling": "https://mybabydumpling.site",
+        "Riddiim": "https://riddiim.com",
+        "Prime Land Network": "https://primelandnetwork.site",
+        "The Tech Scout HQ": "https://techscouthq.site",
+        "Dreaming Anime": "https://dreaminganime.com",
+        "Verdant Co.": "https://verdantco.site",
+        "Pantriq": "https://pantriq.site",
+        "The Gen Play": "https://thegenplay.site",
+        "Calalloo": "https://calalloo.site"
+    };
+
+    async function handleToolSelection(brandName) {
+        if (!brandName) return;
+        const url = brandUrls[brandName];
+        if (url) {
+            if (confirm(`Redirect to ${brandName} shop? Your changes will be saved.`)) {
+                await saveToCloud();
+                window.location.href = url;
+            }
+        }
+    }
+
+    async function loadProfileData() {
+        const { data: { user } } = await sb.auth.getUser();
+        if (!user) return;
+
+        const { data: profile, error } = await sb.from('profiles').select('*').eq('id', user.id).single();
+        if (profile) {
+            document.getElementById('biz-name').value = profile.full_name || '';
+            document.getElementById('biz-bio').value = profile.bio || '';
+            if (profile.niche) document.getElementById('niche-select').value = profile.niche;
+            if (profile.priscion_brand) document.getElementById('tools-select').value = profile.priscion_brand;
+
+            // Update badges
+            const nicheBadge = document.getElementById('niche-badge');
+            if (profile.niche) {
+                nicheBadge.innerText = profile.niche;
+                nicheBadge.style.display = 'inline-block';
+            }
+            
+            const brandBadge = document.getElementById('brand-badge');
+            if (profile.priscion_brand) {
+                brandBadge.innerText = profile.priscion_brand;
+                brandBadge.style.display = 'inline-block';
+            }
+        }
+    }
+
+    function syncNiche() {}
 
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
@@ -1011,7 +1105,6 @@
     }
 
     async function saveAllSettings() { alert("System Preferences Saved."); }
-    function syncNiche() {}
 
     // --- MESSAGING LOGIC ---
     let activeChatId = null;
@@ -1143,6 +1236,7 @@
     }
 
     window.onload = async () => {
+        loadProfileData();
         loadContacts();
         if(localStorage.getItem('panyard_darkmode') === 'true') {
             document.body.classList.add('dark-mode');
