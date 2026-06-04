@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Hub | dpanyard</title>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico?v=2">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -217,18 +217,41 @@
     <main class="main">
         <div class="topbar">
             <h2 id="header-title" style="font-family: var(--font-display);">Dashboard</h2>
-            <div id="user-display" style="display: flex; align-items: center; gap: 12px; font-weight: 800; background: var(--grey-light); padding: 8px 16px; border-radius: 30px; border: 1px solid var(--border);">
-                <div id="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 14px;">U</div>
-                <span id="user-name" style="font-size: 14px;">Loading...</span>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="position: relative; cursor: pointer;" onclick="toggleNotifPanel()">
+                    <i data-lucide="bell" style="width: 20px; height: 20px; color: var(--text-muted);"></i>
+                    <span id="notif-badge" style="display: none; position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid var(--white);">0</span>
+                </div>
+                <div id="user-display" style="display: flex; align-items: center; gap: 12px; font-weight: 800; background: var(--grey-light); padding: 8px 16px; border-radius: 30px; border: 1px solid var(--border);">
+                    <div id="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 14px;">U</div>
+                    <span id="user-name" style="font-size: 14px;">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Notifications Panel -->
+            <div id="notif-panel" style="display: none; position: absolute; top: 70px; right: 40px; width: 320px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 1100; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="font-size: 14px; font-weight: 800;">Notifications</h3>
+                    <button onclick="markAllRead()" style="border: none; background: none; color: var(--primary); font-size: 11px; font-weight: 700; cursor: pointer;">Mark all as read</button>
+                </div>
+                <div id="notif-list" style="max-height: 300px; overflow-y: auto;">
+                    <p style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">No new alerts.</p>
+                </div>
             </div>
         </div>
 
         <section id="discovery" class="section active" style="padding: 0;">
             <div class="discovery-grid">
                 <div class="list-view">
-                    <div style="position: relative; margin-bottom: 24px;">
-                        <input type="text" id="biz-search" placeholder="Search by niche or name..." style="padding-left: 45px;" oninput="handleSearch(this.value)">
-                        <i data-lucide="search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);" size="18"></i>
+                    <div style="margin-bottom: 24px;">
+                        <div style="position: relative; margin-bottom: 12px;">
+                            <input type="text" id="biz-search" placeholder="Search by niche or name..." style="padding-left: 45px;" oninput="handleSearch(this.value)">
+                            <i data-lucide="search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);" size="18"></i>
+                        </div>
+                        <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;">
+                            <button onclick="toggleOpenNow()" id="filter-open" class="btn-main" style="flex: none; font-size: 11px; padding: 8px 12px; height: auto; background: var(--grey-light); color: var(--text); border: 1px solid var(--border);">Open Now</button>
+                            <button onclick="toggleProximity()" id="filter-near" class="btn-main" style="flex: none; font-size: 11px; padding: 8px 12px; height: auto; background: var(--grey-light); color: var(--text); border: 1px solid var(--border);">Nearby First</button>
+                        </div>
                     </div>
                     <div id="biz-list"></div>
                 </div>
@@ -389,6 +412,28 @@
         </div>
     </div>
 
+    <div id="reschedule-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="card" style="width: 90%; max-width: 400px; padding: 32px; background: var(--white); border-radius: 24px;">
+            <h2 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 20px;">Request Reschedule</h2>
+            <div class="input-group">
+                <label>New Date</label>
+                <input type="date" id="resched-date">
+            </div>
+            <div class="input-group">
+                <label>Start Time</label>
+                <input type="time" id="resched-start">
+            </div>
+            <div class="input-group">
+                <label>End Time</label>
+                <input type="time" id="resched-end">
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="btn-main btn-secondary" style="flex: 1;" onclick="closeReschedule()">Cancel</button>
+                <button class="btn-main btn-primary" style="flex: 1;" onclick="submitReschedule()">Submit Request</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://maps.googleapis.com/maps/api/js?key={{credential:google-maps-api-key}}&callback=initMap" async defer></script>
     <!-- Checkout Modal -->
     <div id="checkout-modal" class="checkout-modal">
@@ -473,6 +518,8 @@
         }
 
         let sb, map, user, businesses = [], markers = [], selectedSlotTime = null, userMarker = null;
+        let notifications = [], currentReschedId = null;
+        let filterOpenNow = false, filterProximity = false;
 
         try {
             sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
@@ -487,7 +534,24 @@
                 document.getElementById('user-avatar').innerText = user.email[0].toUpperCase();
                 loadProfile();
                 loadAppointments();
+                loadBusinesses();
                 loadContacts();
+                fetchNotifications();
+                
+                // Subscriptions
+                sb.channel('public:appointments')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
+                        loadAppointments();
+                        fetchNotifications();
+                    })
+                    .subscribe();
+
+                sb.channel('public:notifications')
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, () => {
+                        fetchNotifications();
+                    })
+                    .subscribe();
+
                 lucide.createIcons();
             } catch(e) { logError("System Initialization Error"); }
         }
@@ -596,16 +660,61 @@
 
         async function handleSearch(val) {
             const query = (val || '').trim().toLowerCase();
-            if (!query) {
-                renderList(businesses);
-                return;
+            let filtered = [...businesses];
+            
+            if (query) {
+                const terms = query.split(/\s+/).filter(t => t.length > 0);
+                filtered = filtered.filter(b => {
+                    const name = (b.full_name || '').toLowerCase();
+                    const niche = (b.niche || '').toLowerCase();
+                    return terms.every(term => name.includes(term) || niche.includes(term));
+                });
             }
-            const terms = query.split(/\s+/).filter(t => t.length > 0);
-            const filtered = businesses.filter(b => {
-                const name = (b.full_name || '').toLowerCase();
-                const niche = (b.niche || '').toLowerCase();
-                return terms.every(term => name.includes(term) || niche.includes(term));
-            });
+
+            if (filterOpenNow) {
+                const now = new Date();
+                const day = now.getDay().toString();
+                const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                const { data: openBiz } = await sb.from('availability')
+                    .select('business_id')
+                    .eq('day_of_week', day)
+                    .lte('start_time', time)
+                    .gte('end_time', time)
+                    .eq('is_available', true);
+                
+                const openIds = (openBiz || []).map(o => o.business_id);
+                filtered = filtered.filter(b => openIds.includes(b.id));
+            }
+
+            if (filterProximity) {
+                await new Promise(resolve => {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        const { latitude: lat1, longitude: lon1 } = pos.coords;
+                        filtered.forEach(b => {
+                            if (b.location_lat && b.location_lng) {
+                                const R = 6371; // km
+                                const dLat = (b.location_lat - lat1) * Math.PI / 180;
+                                const dLon = (b.location_lng - lon1) * Math.PI / 180;
+                                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                                          Math.cos(lat1 * Math.PI / 180) * Math.cos(b.location_lat * Math.PI / 180) * 
+                                          Math.sin(dLon/2) * Math.sin(dLon/2);
+                                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                                b.distance = R * c;
+                            } else {
+                                b.distance = 9999;
+                            }
+                        });
+                        // Sort primarily by distance when Nearby First is active
+                        filtered.sort((a, b) => a.distance - b.distance);
+                        resolve();
+                    }, resolve);
+                });
+            } else {
+                // Default sort: featured first
+                filtered.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+            }
+
             renderList(filtered);
         }
 
@@ -675,17 +784,26 @@
             }
 
             container.innerHTML = list.map(b => {
-                const isHighRated = parseFloat(b.avgRating) >= 4.5;
+                const isHighRated = parseFloat(b.avgRating) >= 4.5 || b.is_featured;
                 const ratingDisplay = b.totalReviews > 0 ? `<span style="font-size: 12px; color: ${isHighRated ? '#f59e0b' : 'var(--text-muted)'}; font-weight: 700; margin-left: 8px; display: flex; align-items: center; gap: 4px;"><i data-lucide="star" size="12" style="fill: currentColor;"></i> ${b.avgRating} (${b.totalReviews})</span>` : '';
-                const highRatedBadge = isHighRated ? `<span style="background: linear-gradient(135deg, #FFD700, #FFA500); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; margin-left: 8px; box-shadow: 0 2px 4px rgba(255, 165, 0, 0.3);">ELITE</span>` : '';
+                const featuredBadge = b.is_featured ? `<span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; margin-left: 8px;">FEATURED</span>` : '';
+                const verificationIcon = b.is_verified ? `<i data-lucide="check-circle" style="width:14px; height:14px; color:var(--primary); margin-left:4px;"></i>` : '';
+                const distanceDisplay = b.distance && b.distance < 9999 ? `<span style="font-size: 10px; color: var(--text-muted); margin-left: auto;">${b.distance.toFixed(1)} km</span>` : '';
 
                 return `
-                    <div class="biz-card" onclick="openDetail('${b.id}')" style="${isHighRated ? 'border: 2px solid #FFD700; background: rgba(255, 215, 0, 0.03);' : ''}">
+                    <div class="biz-card" onclick="openDetail('${b.id}')" style="${b.is_featured ? 'border: 2px solid var(--primary); background: rgba(224, 27, 36, 0.03);' : (isHighRated ? 'border: 2px solid #FFD700; background: rgba(255, 215, 0, 0.03);' : '')}">
                         <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <div style="font-weight: 800; font-family: var(--font-display); font-size: 18px; margin-bottom: 4px;">${b.full_name}${highRatedBadge}</div>
+                            <div style="display: flex; align-items: center;">
+                                <div style="font-weight: 800; font-family: var(--font-display); font-size: 18px;">${b.full_name}</div>
+                                ${verificationIcon}
+                                ${featuredBadge}
+                            </div>
                             ${ratingDisplay}
                         </div>
-                        <div style="font-size: 13px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">${b.niche || 'Professional Node'}</div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+                            <div style="font-size: 13px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">${b.niche || 'Professional Node'}</div>
+                            ${distanceDisplay}
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1066,6 +1184,45 @@
 
             if (data) {
                 renderAppointments(data);
+                checkReminders(data);
+            }
+        }
+
+        function checkReminders(apts) {
+            const now = new Date();
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            
+            const upcoming = apts.filter(a => {
+                if (a.status === 'cancelled' || a.status === 'disputed') return false;
+                const aptDate = new Date(`${a.date}T${a.time_start}`);
+                return aptDate > now && aptDate <= tomorrow;
+            });
+
+            if (upcoming.length > 0) {
+                const aptBtn = document.querySelector('.nav-item[onclick*="appointments"]');
+                if (aptBtn) {
+                    const existingBadge = aptBtn.querySelector('.reminder-badge');
+                    if (!existingBadge) {
+                        const badge = document.createElement('span');
+                        badge.className = 'reminder-badge';
+                        badge.style = "background:var(--primary); color:white; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:9px; margin-left:8px;";
+                        badge.innerText = upcoming.length;
+                        aptBtn.appendChild(badge);
+                    } else {
+                        existingBadge.innerText = upcoming.length;
+                    }
+                }
+                
+                if ("Notification" in window) {
+                    if (Notification.permission === "granted") {
+                        new Notification("Panyard Reminder", {
+                            body: `You have ${upcoming.length} upcoming appointment(s) within 24 hours.`,
+                            icon: "/dpanyard/favicon.ico"
+                        });
+                    } else if (Notification.permission !== "denied") {
+                        Notification.requestPermission();
+                    }
+                }
             }
         }
 
@@ -1102,6 +1259,22 @@
                     actions += `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'disputed', 'DISPUTED')" style="height: 35px; font-size: 12px; background: #FEE2E2; color: #991B1B; border: none; margin-top: 5px; width: 100%;">Report Issue</button>`;
                 }
 
+                // Add Reschedule button for non-completed/cancelled/released appointments
+                if (!['completed', 'cancelled', 'disputed'].includes(a.status) && a.payment_status !== 'FUNDS RELEASED') {
+                    actions += `<button class="btn-main" onclick="openRescheduleModal('${a.id}', '${a.date}', '${a.time_start}', '${a.time_end}')" style="height: 35px; font-size: 12px; background: var(--grey-light); color: var(--text); border: 1px solid var(--border); margin-top: 5px; width: 100%;">Reschedule</button>`;
+                }
+
+                let rescheduleRequestInfo = '';
+                if (a.status === 'reschedule_requested') {
+                    const req = a.reschedule_request;
+                    rescheduleRequestInfo = `
+                        <div style="margin-top: 10px; padding: 10px; background: #FFF7ED; border-radius: 8px; border: 1px solid #FFEDD5;">
+                            <p style="font-size: 11px; font-weight: 800; color: #9A3412;">Reschedule Pending</p>
+                            <p style="font-size: 11px; color: #9A3412;">Requested: ${req.new_date} @ ${req.new_start}</p>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="card" style="margin-bottom: 15px; padding: 24px; border: 1px solid var(--border); background: var(--white);">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -1116,6 +1289,7 @@
                                     <span class="status-badge status-${a.status}">${a.status.replace('_', ' ')}</span>
                                     ${paymentBadge}
                                 </div>
+                                ${rescheduleRequestInfo}
                             </div>
                             <div style="width: 150px; display: flex; flex-direction: column; gap: 5px;">
                                 ${actions}
@@ -1273,6 +1447,100 @@
             body.setAttribute('data-theme', isDark ? 'light' : 'dark');
             document.getElementById('dark-toggle').innerHTML = isDark ? '<i data-lucide="moon"></i> Enable' : '<i data-lucide="sun"></i> Disable';
             lucide.createIcons();
+        }
+
+        async function fetchNotifications() {
+            const { data: { session } } = await sb.auth.getSession();
+            const { data } = await sb.from('notifications')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .order('created_at', { ascending: false });
+            notifications = data || [];
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notif-list');
+            const unread = notifications.filter(n => !n.is_read).length;
+            const badge = document.getElementById('notif-badge');
+            
+            badge.innerText = unread;
+            badge.style.display = unread > 0 ? 'flex' : 'none';
+
+            if (notifications.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">No new alerts.</p>';
+                return;
+            }
+
+            list.innerHTML = notifications.map(n => `
+                <div style="padding: 12px; border-bottom: 1px solid var(--border); ${!n.is_read ? 'background: var(--primary-soft);' : ''} border-radius: 8px; margin-bottom: 5px;">
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text);">${n.message}</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${new Date(n.created_at).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notif-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function markAllRead() {
+            const { data: { session } } = await sb.auth.getSession();
+            await sb.from('notifications')
+                .update({ is_read: true })
+                .eq('user_id', session.user.id);
+            fetchNotifications();
+        }
+
+        function toggleOpenNow() {
+            filterOpenNow = !filterOpenNow;
+            document.getElementById('filter-open').style.background = filterOpenNow ? 'var(--primary)' : 'var(--grey-light)';
+            document.getElementById('filter-open').style.color = filterOpenNow ? 'white' : 'var(--text)';
+            handleSearch(document.getElementById('biz-search').value);
+        }
+
+        function toggleProximity() {
+            filterProximity = !filterProximity;
+            document.getElementById('filter-near').style.background = filterProximity ? 'var(--primary)' : 'var(--grey-light)';
+            document.getElementById('filter-near').style.color = filterProximity ? 'white' : 'var(--text)';
+            handleSearch(document.getElementById('biz-search').value);
+        }
+
+        function openRescheduleModal(id, date, start, end) {
+            currentReschedId = id;
+            document.getElementById('resched-date').value = date;
+            document.getElementById('resched-start').value = start;
+            document.getElementById('resched-end').value = end;
+            document.getElementById('reschedule-modal').style.display = 'flex';
+        }
+
+        function closeReschedule() {
+            document.getElementById('reschedule-modal').style.display = 'none';
+        }
+
+        async function submitReschedule() {
+            const date = document.getElementById('resched-date').value;
+            const start = document.getElementById('resched-start').value;
+            const end = document.getElementById('resched-end').value;
+
+            const { data: { session } } = await sb.auth.getSession();
+            const { error } = await sb.from('appointments').update({
+                reschedule_request: {
+                    new_date: date,
+                    new_start: start,
+                    new_end: end,
+                    requested_by: session.user.id,
+                    requested_at: new Date().toISOString()
+                },
+                status: 'reschedule_requested'
+            }).eq('id', currentReschedId);
+
+            if (!error) {
+                alert('Reschedule request sent to business.');
+                closeReschedule();
+                loadAppointments();
+            }
         }
 
         function signOut() { sb.auth.signOut(); window.location.href = '../login/'; }
