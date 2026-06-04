@@ -39,7 +39,43 @@
         
         .footer-link { margin-top: 32px; font-size: 14px; color: #64748B; }
         .footer-link a { color: var(--primary-red); text-decoration: none; font-weight: 600; }
+        .avatar-upload {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 32px;
+            cursor: pointer;
+        }
+        .avatar-preview {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s;
+        }
+        .avatar-preview:hover {
+            border-color: var(--primary-red);
+            background: #f8fafc;
+        }
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-preview i {
+            font-size: 24px;
+            color: #94a3b8;
+        }
+        .avatar-upload input {
+            display: none;
+        }
     </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="auth-card">
@@ -47,7 +83,13 @@
         <h1>Create Personal Node</h1>
         <p>Join the Caribbean's premier talent network.</p>
         
-        
+        <div class="avatar-upload" onclick="document.getElementById('avatar-input').click()">
+            <div class="avatar-preview" id="avatar-preview">
+                <i data-lucide="camera"></i>
+            </div>
+            <input type="file" id="avatar-input" accept="image/*" onchange="previewAvatar(this)">
+        </div>
+
     <form id="signup-form">
         <div class="form-group">
             <label>Full Name</label>
@@ -94,6 +136,16 @@
         const customNicheContainer = document.getElementById('custom-niche-container');
         const customNicheInput = document.getElementById('custom-niche');
 
+        function previewAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatar-preview').innerHTML = `<img src="${e.target.result}">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         nicheSelect.addEventListener('change', () => {
             if (nicheSelect.value === 'Other') {
                 customNicheContainer.style.display = 'block';
@@ -115,16 +167,39 @@
             }
             const btn = document.getElementById('submit-btn');
             btn.innerText = 'Creating account...';
+            
             const { data, error } = await sb.auth.signUp({ 
                 email, password, 
                 options: { data: { full_name: fullname, role: 'personal', niche: niche } } 
             });
-            if (error) { alert(error.message); btn.innerText = 'Create Account'; }
-            else { 
-                await sb.from('profiles').insert([{ id: data.user.id, full_name: fullname, role: 'personal', niche: niche }]);
-                localStorage.setItem('dpanyard_role', 'personal'); 
-                window.location.href = '../dashboard/permissions.html'; 
+
+            if (error) { 
+                alert(error.message); 
+                btn.innerText = 'Create Account'; 
+                return;
             }
+
+            let avatarUrl = null;
+            const avatarFile = document.getElementById('avatar-input').files[0];
+            if (avatarFile) {
+                const path = `avatars/${data.user.id}_${Date.now()}.jpg`;
+                const { error: uploadError } = await sb.storage.from('avatars').upload(path, avatarFile);
+                if (!uploadError) {
+                    const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(path);
+                    avatarUrl = publicUrl;
+                }
+            }
+
+            await sb.from('profiles').insert([{ 
+                id: data.user.id, 
+                full_name: fullname, 
+                role: 'personal', 
+                niche: niche,
+                avatar_url: avatarUrl
+            }]);
+            
+            localStorage.setItem('dpanyard_role', 'personal'); 
+            window.location.href = '../dashboard/permissions.html'; 
         };
     </script>
     
@@ -132,7 +207,7 @@
     
     <script>
         const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
-        
+        lucide.createIcons();
     </script>
 </body>
 </html>
