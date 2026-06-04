@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neural Deck | RIDDIIM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050508;
+      --accent: #FFFFFF;
+      --muted: #5A5A70;
+      --border: rgba(255, 255, 255, 0.08);
+      --font-mono: 'Space Mono', monospace;
+      --font-sans: 'Space Grotesk', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: #fff; font-family: var(--font-sans); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+    /* ── NAV ── */
+    header { height: 80px; padding: 0 48px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); backdrop-filter: blur(20px); z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; }
+    .nav-vinyl { width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle, #222 30%, #000 30%); border: 1px solid rgba(255,255,255,0.1); animation: spin 4s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .nav-wordmark { font-family: var(--font-mono); font-size: 16px; font-weight: 700; letter-spacing: 4px; }
+
+    /* ── PLAYER ── */
+    main { flex: 1; display: flex; flex-direction: column; padding: 40px; overflow-y: auto; align-items: center; }
+    
+    .search-container { width: 100%; max-width: 600px; margin-bottom: 40px; }
+    input { width: 100%; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 16px 24px; color: #fff; font-family: var(--font-sans); font-size: 16px; border-radius: 4px; outline: none; }
+    
+    .deck-container { width: 100%; max-width: 800px; background: rgba(10,10,15,0.8); border: 1px solid var(--border); border-radius: 8px; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    
+    iframe { border: none; border-radius: 4px; width: 100%; }
+
+    .deck-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; }
+    .pulse-dot { width: 8px; height: 8px; background: #22C55E; border-radius: 50%; box-shadow: 0 0 10px #22C55E; animation: blink 2s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    .tabs { display: flex; gap: 20px; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px; width: 100%; max-width: 800px; }
+    .tab { font-family: var(--font-mono); font-size: 10px; color: var(--muted); cursor: pointer; letter-spacing: 2px; text-transform: uppercase; }
+    .tab.active { color: #fff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../" class="nav-brand">
+    <div class="nav-vinyl"></div>
+    <span class="nav-wordmark">RIDDIIM</span>
+  </a>
+  <div style="font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px;">NEURAL DECK V.1.0</div>
+</header>
+
+<main>
+  <div class="tabs">
+    <div class="tab active" onclick="switchSource('soundcloud')">SoundCloud Bridge</div>
+    <div class="tab" onclick="switchSource('spotify')">Spotify Signal</div>
+  </div>
+
+  <div class="search-container">
+    <input type="text" placeholder="Enter Artist, Track, or URL..." id="query" onkeydown="if(event.key==='Enter') search()">
+  </div>
+
+  <div class="deck-container">
+    <div class="deck-header">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="pulse-dot"></div>
+        STREAMING_ACTIVE: <span id="source-label">SOUNDCLOUD</span>
+      </div>
+      <div>CORE_READY</div>
+    </div>
+    
+    <div id="player-mount">
+      <!-- Default SoundCloud Embed -->
+      <iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/123456789&color=%23050508&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
+    </div>
+  </div>
+
+  <div style="margin-top: 40px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; text-align: center;">
+    SOVEREIGN AUDIO BRIDGE • POWERED BY RIDDIIM NEURAL CORE
+  </div>
+</main>
+
+<script>
+  let currentSource = 'soundcloud';
+
+  function switchSource(source) {
+    currentSource = source;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('source-label').textContent = source.toUpperCase();
+    
+    if(source === 'spotify') {
+      document.getElementById('player-mount').innerHTML = `
+        <iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM3M?utm_source=generator&theme=0" width="100%" height="380" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+      `;
+    } else {
+      document.getElementById('player-mount').innerHTML = `
+        <iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/123456789&color=%23050508&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
+      `;
+    }
+  }
+
+  function search() {
+    const q = document.getElementById('query').value;
+    if(!q) return;
+    
+    if(currentSource === 'soundcloud') {
+      // Basic SoundCloud URL bridge
+      if(q.includes('soundcloud.com')) {
+        document.getElementById('player-mount').innerHTML = `
+          <iframe width="100%" height="450" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(q)}&color=%23050508&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>
+        `;
+      } else {
+        // Search fallback
+        alert("Enter a full SoundCloud URL to bridge the signal.");
+      }
+    } else {
+      alert("Spotify search requires API activation. Use URLs for now.");
+    }
+  }
+</script>
+</body>
+</html>
