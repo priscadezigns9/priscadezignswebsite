@@ -165,26 +165,39 @@
 
   // Neural Recognition (Real Sovereign Analysis)
   humBtn.onclick = async () => {
-    if(isHumming) return; // Prevent double click
-    isHumming = true;
-    humBtn.classList.add('active');
-    feedback.textContent = 'Listening for Neural Frequencies...';
-    document.getElementById('neural-canvas').style.display = 'block';
+    if(isHumming) return;
     
-    const signature = await NeuralEngine.startAnalysis();
-    
-    if(signature) {
-      feedback.textContent = `Found Neural Signature: ${signature.toUpperCase()}`;
-      const s = document.createElement('script');
-      s.src = `https://api.deezer.com/search?q=${encodeURIComponent(signature)}&limit=5&output=jsonp&callback=handleSearch`;
-      document.body.appendChild(s);
-    } else {
-      feedback.textContent = 'Signal Lost. Try again.';
+    try {
+      isHumming = true;
+      humBtn.classList.add('active');
+      feedback.textContent = 'HANDSHAKING NEURAL FREQUENCIES...';
+      document.getElementById('neural-canvas').style.display = 'block';
+      
+      // Start a countdown for UX
+      let count = 5;
+      const timer = setInterval(() => {
+        count--;
+        if(count > 0) feedback.textContent = `LISTENING [SIGNAL_STRENGTH_98%] ... ${count}S`;
+        else clearInterval(timer);
+      }, 1000);
+
+      const signature = await NeuralEngine.startAnalysis();
+      
+      if(signature && signature !== 'UNKNOWN_SIGNAL') {
+        feedback.textContent = `FOUND NEURAL VIBE: ${signature.toUpperCase()}`;
+        const s = document.createElement('script');
+        s.src = `https://api.deezer.com/search?q=${encodeURIComponent(signature)}&limit=10&output=jsonp&callback=handleSearch`;
+        document.body.appendChild(s);
+      } else {
+        feedback.textContent = 'SIGNAL_TOO_WEAK. PLEASE SING LOUDER.';
+      }
+    } catch (e) {
+      feedback.textContent = 'NEURAL_HARDWARE_ERROR. CHECK PERMISSIONS.';
+    } finally {
+      humBtn.classList.remove('active');
+      document.getElementById('neural-canvas').style.display = 'none';
+      isHumming = false;
     }
-    
-    humBtn.classList.remove('active');
-    document.getElementById('neural-canvas').style.display = 'none';
-    isHumming = false;
   };
 
   // Search Logic
@@ -280,4 +293,5 @@
 </script>
 </body>
 </html>
+
 
