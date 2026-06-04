@@ -3,7 +3,10 @@
 <style>
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 body{margin:0;font-family:sans-serif;background:#fff;color:#111}
-nav{background:#fff;padding:25px;border-bottom:3px solid #000;display:flex;justify-content:space-between;align-items:center}
+nav{background:#fff;padding:25px;border-bottom:3px solid #000;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.cat-bar{background:#f9f9f9;padding:15px 5%;display:flex;gap:15px;overflow-x:auto;border-bottom:1px solid #eee;position:sticky;top:103px;z-index:99;white-space:nowrap}
+.cat-btn{padding:8px 20px;border-radius:20px;background:#fff;border:1px solid #ddd;font-size:0.8rem;font-weight:700;cursor:pointer;transition:0.3s}
+.cat-btn.active{background:#000;color:#fff;border-color:#000}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:40px;padding:60px 5%}
 .card{background:#fafafa;border:1px solid #eee;border-radius:16px;padding:40px;text-align:center;transition:0.4s;display:flex;flex-direction:column}
 .card:hover{transform:translateY(-10px);border-color:#000;box-shadow:0 20px 40px rgba(0,0,0,0.05)}
@@ -18,6 +21,9 @@ footer{padding:60px;text-align:center;opacity:0.5;font-size:0.8rem}
 </style></head>
 <body>
 <nav><img id="logo" src="" height="50"></nav>
+<div class="cat-bar" id="cat-bar">
+  <button class="cat-btn active" onclick="filterCat('all')">ALL_VAULT</button>
+</div>
 <div class="grid" id="grid"></div>
 <footer id="footer"></footer>
 <script>
@@ -27,8 +33,10 @@ const CONFIG = {
 
 const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
 
+let allData = [];
+const brand = "Sole Prestige";
+
 async function load() {
-  const brand = "Sole Prestige";
   const conf = CONFIG[brand];
   document.getElementById("logo").src = conf.logo;
   document.body.style.setProperty("--brand-color", conf.color);
@@ -37,6 +45,7 @@ async function load() {
   const style = document.createElement('style');
   style.innerHTML = `
     nav { border-bottom-color: ${conf.color} !important; }
+    .cat-btn.active { background: ${conf.color} !important; color: #fff !important; border-color: ${conf.color} !important; }
     .card:hover { border-color: ${conf.color} !important; }
     .price { color: ${conf.color} !important; }
     .btn { background: ${conf.color} !important; }
@@ -44,30 +53,50 @@ async function load() {
   `;
   document.head.appendChild(style);
 
-  const { data } = await sb.from("empire_inventory").select("*").eq("brand", brand);
+  const { data } = await sb.from("empire_inventory").select("*").eq("brand", brand).order("category", { ascending: true });
+  allData = data || [];
   
-  if (data && data.length > 0) {
-    document.getElementById("grid").innerHTML = data.map((p, index) => `
-      <div class="card" style="animation: fadeIn 0.5s ease forwards; animation-delay: ${index * 0.05}s; opacity: 0;">
-        <div class="category">${p.category}</div>
-        <div class="img-box">
-          <img src="https://priscadezigns.org/assets/logo.png" class="placeholder-logo">
-          <img src="${p.image_url}" 
-               class="product-img" 
-               loading="lazy" 
-               alt="${p.title}"
-               onload="this.style.opacity=1" 
-               onerror="this.style.display='none'; this.parentElement.querySelector('.placeholder-logo').style.opacity=0.4;">
-        </div>
-        <h3>${p.title}</h3>
-        <p class="price">${p.price}</p>
-        <a href="${p.affiliate_link}" class="btn" target="_blank">${conf.btn}</a>
-      </div>
+  if (allData.length > 0) {
+    const categories = ["all", ...new Set(allData.map(p => p.category))];
+    document.getElementById("cat-bar").innerHTML = categories.map(c => `
+      <button class="cat-btn ${c === 'all' ? 'active' : ''}" onclick="filterCat('${c}', this)">${c.toUpperCase()}</button>
     `).join("");
+    render(allData);
   } else {
     document.getElementById("grid").innerHTML = "<h3>Inventory Syncing...</h3>";
   }
 }
+
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else document.querySelector('.cat-btn').classList.add('active');
+
+  const filtered = cat === 'all' ? allData : allData.filter(p => p.category === cat);
+  render(filtered);
+}
+
+function render(data) {
+  const conf = CONFIG[brand];
+  document.getElementById("grid").innerHTML = data.map((p, index) => `
+    <div class="card" style="animation: fadeIn 0.5s ease forwards; animation-delay: ${index * 0.05}s; opacity: 0;">
+      <div class="category">${p.category}</div>
+      <div class="img-box">
+        <img src="https://priscadezigns.org/assets/logo.png" class="placeholder-logo">
+        <img src="${p.image_url}" 
+             class="product-img" 
+             loading="lazy" 
+             alt="${p.title}"
+             onload="this.style.opacity=1" 
+             onerror="this.style.display='none'; this.parentElement.querySelector('.placeholder-logo').style.opacity=0.4;">
+      </div>
+      <h3>${p.title}</h3>
+      <p class="price">${p.price}</p>
+      <a href="${p.affiliate_link}" class="btn" target="_blank">${conf.btn}</a>
+    </div>
+  `).join("");
+}
+
 load();
 </script>
 </body></html>
