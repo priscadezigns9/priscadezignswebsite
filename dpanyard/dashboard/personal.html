@@ -18,6 +18,85 @@
             --radius-xl: 24px; --radius-lg: 16px;
         }
 
+        /* Checkout Modal Styles */
+        .checkout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            padding: 20px;
+        }
+        .checkout-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 32px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .payment-method-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .payment-method-btn {
+            padding: 20px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            background: var(--grey-light);
+            color: var(--text);
+        }
+        .payment-method-btn.active {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+        }
+        .stripe-form, .crypto-info {
+            display: none;
+            margin-top: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+        .stripe-form.active, .crypto-info.active {
+            display: block;
+        }
+        .crypto-address-box {
+            background: var(--grey-light);
+            padding: 16px;
+            border-radius: 12px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 12px 0;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+        .status-escrow { background: #E0F2FE; color: #0369A1; }
+        .status-pending-crypto { background: #FEF3C7; color: #92400E; }
+        .status-released { background: #DCFCE7; color: #166534; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         [data-theme="dark"] {
             --bg: #0F172A; --text: #F1F5F9; --text-muted: #94A3B8;
             --grey-light: #1E293B; --border: #334155; --white: #1E293B;
@@ -311,6 +390,80 @@
     </div>
 
     <script src="https://maps.googleapis.com/maps/api/js?key={{credential:google-maps-api-key}}&callback=initMap" async defer></script>
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="checkout-modal">
+        <div class="checkout-card">
+            <button onclick="closeCheckout()" style="position: absolute; top: 24px; right: 24px; border:none; background:var(--grey-light); width: 40px; height: 40px; border-radius: 50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color: var(--text);"><i data-lucide="x"></i></button>
+            
+            <div id="checkout-step-1">
+                <h2 style="font-family: var(--font-display); font-size: 28px; margin-bottom: 8px; color: var(--text);">Checkout</h2>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Select your preferred payment method to secure your booking.</p>
+                
+                <div class="payment-method-grid">
+                    <div class="payment-method-btn" id="method-stripe" onclick="selectPaymentMethod('stripe')">
+                        <i data-lucide="credit-card" style="margin-bottom: 8px;"></i>
+                        <div style="font-weight: 600;">Stripe</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Card</div>
+                    </div>
+                    <div class="payment-method-btn" id="method-crypto" onclick="selectPaymentMethod('crypto')">
+                        <i data-lucide="bitcoin" style="margin-bottom: 8px;"></i>
+                        <div style="font-weight: 600;">Crypto</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">USDT/BTC</div>
+                    </div>
+                </div>
+
+                <!-- Stripe Form -->
+                <div id="stripe-form-container" class="stripe-form">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="color: var(--text); display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600;">Card Number</label>
+                        <input type="text" placeholder="xxxx xxxx xxxx xxxx" id="stripe-card" style="width:100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text);">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label style="color: var(--text); display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600;">Expiry Date</label>
+                            <input type="text" placeholder="MM/YY" id="stripe-expiry" style="width:100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text);">
+                        </div>
+                        <div class="form-group">
+                            <label style="color: var(--text); display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600;">CVC</label>
+                            <input type="text" placeholder="123" id="stripe-cvc" style="width:100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text);">
+                        </div>
+                    </div>
+                    <button onclick="processStripePayment()" class="btn-main btn-primary" id="stripe-pay-btn" style="margin-top: 24px; width: 100%; height: 56px; border-radius: 16px;">Pay & Confirm Booking</button>
+                </div>
+
+                <!-- Crypto Info -->
+                <div id="crypto-info-container" class="crypto-info">
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Amount to Send</label>
+                        <div style="font-size: 24px; font-weight: 800; color: var(--primary);" id="crypto-amount">$0.00 USD</div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Wallet Address (USDT - TRC20)</label>
+                        <div class="crypto-address-box">T9yD9sP7N3A6H2n6G1H5M4S3L2V1B0C9X8</div>
+                    </div>
+                    <div style="margin-bottom: 24px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Reference ID</label>
+                        <div style="font-family: monospace; font-weight: 700; color: var(--text);" id="crypto-ref-id">REF-000000</div>
+                    </div>
+                    <button onclick="processCryptoPayment()" class="btn-main btn-primary" id="crypto-confirm-btn" style="width: 100%; height: 56px; border-radius: 16px;">I've sent the payment</button>
+                </div>
+            </div>
+
+            <!-- Processing / Success State -->
+            <div id="checkout-status" style="display: none; text-align: center; padding: 20px 0;">
+                <div id="status-loader" style="margin-bottom: 24px;">
+                    <i data-lucide="loader" class="animate-spin" style="width: 48px; height: 48px; color: var(--primary); margin: 0 auto;"></i>
+                </div>
+                <div id="status-icon-success" style="display: none; margin-bottom: 24px;">
+                    <i data-lucide="check-circle" style="width: 48px; height: 48px; color: #10B981; margin: 0 auto;"></i>
+                </div>
+                <h3 id="status-title" style="font-family: var(--font-display); font-size: 24px; margin-bottom: 12px; color: var(--text);">Processing payment...</h3>
+                <p id="status-desc" style="color: var(--text-muted);">Please wait while we secure your transaction.</p>
+                <button onclick="closeCheckout()" id="status-close-btn" class="btn-main" style="display: none; margin-top: 24px; width: 100%; background: var(--grey-light); color: var(--text); border-radius: 16px; padding: 16px;">Back to Hub</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function logError(msg) {
             const el = document.getElementById('error-log');
@@ -735,7 +888,7 @@
             selectedSlotTime = time;
         }
 
-        let currentBooking = null;
+        let currentBookingData = null;
 
         async function submitBooking(businessId) {
             const date = document.getElementById('book-date').value;
@@ -755,7 +908,7 @@
             let endMin = totalMin % 60;
             const endTime = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
 
-            currentBooking = {
+            const booking = {
                 personal_id: session.user.id,
                 business_id: businessId,
                 date: date,
@@ -763,83 +916,120 @@
                 time_end: endTime,
                 status: 'pending',
                 message: message,
-                amount: 50.00
+                amount: 49.00
             };
 
-            showCheckout();
+            showCheckout(booking);
         }
 
-        function showCheckout() {
-            const container = document.getElementById('booking-section');
-            container.id = 'booking-flow-container';
-            container.innerHTML = `
-                <div id="checkout-section">
-                    <h3 style="font-family: var(--font-display); margin-bottom: 5px; font-size: 20px;">Escrow Checkout</h3>
-                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Funds are held securely and only released when you confirm completion.</p>
-                    
-                    <div style="background: var(--grey-light); padding: 15px; border-radius: var(--radius-lg); margin-bottom: 20px; border: 1px solid var(--border);">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="font-weight: 600;">Service Deposit</span>
-                            <span style="font-weight: 800;">$${currentBooking.amount.toFixed(2)}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 800;">
-                            <span>Reference</span>
-                            <span>#${Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px;">Payment Method</label>
-                        
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <button class="btn-main" onclick="processEscrow('stripe')" style="background: white; border: 1px solid var(--border); justify-content: space-between; height: 55px; width: 100%;">
-                                <span style="display: flex; align-items: center; gap: 10px;"><i data-lucide="credit-card"></i> Card (Stripe)</span>
-                                <i data-lucide="chevron-right"></i>
-                            </button>
-                            
-                            <button class="btn-main" onclick="document.getElementById('crypto-details').style.display='block'" style="background: white; border: 1px solid var(--border); justify-content: space-between; height: 55px; width: 100%;">
-                                <span style="display: flex; align-items: center; gap: 10px;"><i data-lucide="bitcoin"></i> Crypto (USDT/BTC/ETH)</span>
-                                <i data-lucide="chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="crypto-details" style="display: none; background: #fef3c7; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #fcd34d;">
-                        <p style="font-size: 12px; font-weight: 700; color: #92400e; margin-bottom: 10px;">Transfer $${currentBooking.amount} to wallet below:</p>
-                        <div style="background: white; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; word-break: break-all; border: 1px solid #fcd34d; margin-bottom: 10px;">
-                            0x71C7656EC7ab88b098defB751B7401B5f6d8976F
-                        </div>
-                        <button class="btn-main" onclick="processEscrow('crypto')" style="width: 100%; background: #f59e0b; color: white; height: 45px; border: none;">
-                            Confirm Payment Sent
-                        </button>
-                    </div>
-
-                    <button class="btn-main" style="width: 100%; margin-top: 20px; font-size: 14px; opacity: 0.6; height: 45px;" onclick="openDetail('${currentBooking.business_id}')">
-                        Cancel
-                    </button>
-                </div>
-            `;
+        function showCheckout(booking) {
+            currentBookingData = booking;
+            document.getElementById('checkout-modal').style.display = 'flex';
+            document.getElementById('checkout-step-1').style.display = 'block';
+            document.getElementById('checkout-status').style.display = 'none';
+            
+            // Reset forms
+            document.getElementById('stripe-form-container').classList.remove('active');
+            document.getElementById('crypto-info-container').classList.remove('active');
+            document.getElementById('method-stripe').classList.remove('active');
+            document.getElementById('method-crypto').classList.remove('active');
+            
+            // Set crypto details
+            const refId = 'REF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            document.getElementById('crypto-ref-id').innerText = refId;
+            document.getElementById('crypto-amount').innerText = `$${booking.amount.toFixed(2)} USD`;
+            
             lucide.createIcons();
         }
 
-        async function processEscrow(method) {
-            const status = method === 'stripe' ? 'escrow_held' : 'pending_verification';
+        function closeCheckout() {
+            document.getElementById('checkout-modal').style.display = 'none';
+            loadAppointments();
+        }
+
+        function selectPaymentMethod(method) {
+            document.getElementById('method-stripe').classList.remove('active');
+            document.getElementById('method-crypto').classList.remove('active');
+            document.getElementById('stripe-form-container').classList.remove('active');
+            document.getElementById('crypto-info-container').classList.remove('active');
+            
+            if (method === 'stripe') {
+                document.getElementById('method-stripe').classList.add('active');
+                document.getElementById('stripe-form-container').classList.add('active');
+            } else {
+                document.getElementById('method-crypto').classList.add('active');
+                document.getElementById('crypto-info-container').classList.add('active');
+            }
+        }
+
+        async function processStripePayment() {
+            const card = document.getElementById('stripe-card').value;
+            if (!card) return alert('Please enter card details');
+            
+            document.getElementById('checkout-step-1').style.display = 'none';
+            document.getElementById('checkout-status').style.display = 'block';
+            document.getElementById('status-title').innerText = 'Processing payment...';
+            document.getElementById('status-desc').innerText = 'Please wait while we secure your transaction.';
+            document.getElementById('status-loader').style.display = 'block';
+            document.getElementById('status-icon-success').style.display = 'none';
+            document.getElementById('status-close-btn').style.display = 'none';
+            
+            // Simulate processing
+            await new Promise(r => setTimeout(r, 2500));
             
             const { error } = await sb.from('appointments').insert([{
-                ...currentBooking,
-                payment_method: method,
-                payment_status: status,
+                ...currentBookingData,
+                status: 'escrow_held',
+                payment_method: 'stripe',
+                payment_status: 'ESCROW HELD',
                 escrow_id: 'ESC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
             }]);
-
-            if (error) {
-                console.error(error);
-                alert("Error sending request.");
+            
+            if (!error) {
+                document.getElementById('status-loader').style.display = 'none';
+                document.getElementById('status-icon-success').style.display = 'block';
+                document.getElementById('status-title').innerText = 'Payment Secured';
+                document.getElementById('status-desc').innerText = 'Payment secured in escrow. Business notified.';
+                document.getElementById('status-close-btn').style.display = 'block';
             } else {
-                alert(method === 'stripe' ? "Escrow Payment Secured!" : "Payment submitted for verification.");
-                closeDetail();
-                loadAppointments();
-                showSection('appointments');
+                alert('Error processing payment. Please try again.');
+                document.getElementById('checkout-step-1').style.display = 'block';
+                document.getElementById('checkout-status').style.display = 'none';
+            }
+            lucide.createIcons();
+        }
+
+        async function processCryptoPayment() {
+            document.getElementById('checkout-step-1').style.display = 'none';
+            document.getElementById('checkout-status').style.display = 'block';
+            document.getElementById('status-title').innerText = 'Verifying Transaction...';
+            document.getElementById('status-desc').innerText = 'Awaiting payment verification from the blockchain.';
+            document.getElementById('status-loader').style.display = 'block';
+            document.getElementById('status-icon-success').style.display = 'none';
+            document.getElementById('status-close-btn').style.display = 'none';
+            
+            const { error } = await sb.from('appointments').insert([{
+                ...currentBookingData,
+                status: 'pending_verification',
+                payment_method: 'crypto',
+                payment_status: 'PENDING CRYPTO',
+                reference_id: document.getElementById('crypto-ref-id').innerText,
+                escrow_id: 'ESC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            }]);
+            
+            if (!error) {
+                setTimeout(() => {
+                    document.getElementById('status-loader').style.display = 'none';
+                    document.getElementById('status-icon-success').style.display = 'block';
+                    document.getElementById('status-title').innerText = 'Payment Initiated';
+                    document.getElementById('status-desc').innerText = 'We are now verifying your transfer. This usually takes 5-10 minutes.';
+                    document.getElementById('status-close-btn').style.display = 'block';
+                    lucide.createIcons();
+                }, 2000);
+            } else {
+                alert('Error: ' + error.message);
+                document.getElementById('checkout-step-1').style.display = 'block';
+                document.getElementById('checkout-status').style.display = 'none';
             }
         }
 
@@ -874,40 +1064,38 @@
                 let paymentBadge = '';
                 let actions = '';
 
-                if (a.payment_status === 'escrow_held') {
-                    paymentBadge = `<span class="status-badge" style="background: #D1FAE5; color: #065F46;">Escrow Held</span>`;
-                    if (a.status === 'request_release') {
-                        actions = `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'completed_released')" style="height: 35px; font-size: 12px; background: var(--primary); color: white; border: none; margin-top: 10px; width: 100%;">Release Payment</button>`;
-                    }
-                } else if (a.payment_status === 'pending_verification') {
-                    paymentBadge = `<span class="status-badge" style="background: #FEF3C7; color: #92400E;">Verifying Crypto</span>`;
-                } else if (a.payment_status === 'completed_released') {
-                    paymentBadge = `<span class="status-badge" style="background: #DBEAFE; color: #1E40AF;">Released</span>`;
-                    actions = `<button class="btn-main" onclick="openReviewModal('${a.id}', '${a.business_id}')" style="height: 35px; font-size: 12px; background: #10b981; color: white; border: none; margin-top: 10px; width: 100%;">Leave Review</button>`;
-                } else if (a.payment_status === 'disputed') {
+                if (a.payment_status === 'ESCROW HELD') {
+                    paymentBadge = `<span class="status-badge status-escrow">Escrow Held</span>`;
+                    actions = `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'completed', 'FUNDS RELEASED')" style="height: 35px; font-size: 12px; background: #10B981; color: white; border: none; margin-top: 10px; width: 100%;">Release Payment</button>`;
+                } else if (a.payment_status === 'PENDING CRYPTO') {
+                    paymentBadge = `<span class="status-badge status-pending-crypto">Pending Crypto</span>`;
+                } else if (a.payment_status === 'FUNDS RELEASED') {
+                    paymentBadge = `<span class="status-badge status-released">Released</span>`;
+                    actions = `<button class="btn-main" onclick="openReviewModal('${a.id}', '${a.business_id}')" style="height: 35px; font-size: 12px; background: var(--grey-light); color: var(--text); border: 1px solid var(--border); margin-top: 10px; width: 100%;">Leave Review</button>`;
+                } else if (a.payment_status === 'DISPUTED') {
                     paymentBadge = `<span class="status-badge" style="background: #FEE2E2; color: #991B1B;">Disputed</span>`;
                 }
 
-                if (a.payment_status === 'escrow_held' && a.payment_status !== 'disputed') {
-                    actions += `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'disputed')" style="height: 35px; font-size: 12px; background: #ef4444; color: white; border: none; margin-top: 5px; width: 100%;">Report Issue</button>`;
+                if (a.payment_status === 'ESCROW HELD') {
+                    actions += `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'disputed', 'DISPUTED')" style="height: 35px; font-size: 12px; background: #FEE2E2; color: #991B1B; border: none; margin-top: 5px; width: 100%;">Report Issue</button>`;
                 }
 
                 return `
-                    <div class="card" style="margin-bottom: 15px; padding: 24px; border: 1px solid var(--border);">
+                    <div class="card" style="margin-bottom: 15px; padding: 24px; border: 1px solid var(--border); background: var(--white);">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div>
-                                <h4 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px;">${a.profiles?.full_name || 'Professional'}</h4>
+                            <div style="flex: 1;">
+                                <h4 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px; color: var(--text);">${a.profiles?.full_name || 'Professional'}</h4>
                                 <p style="font-size: 14px; color: var(--text-muted); font-weight: 500;">
                                     <i data-lucide="calendar" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> ${a.date} 
                                     &nbsp;&bull;&nbsp; 
                                     <i data-lucide="clock" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> ${a.time_start} - ${a.time_end}
                                 </p>
-                                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
-                                    <span class="status-badge status-${a.status}">${a.status}</span>
+                                <div style="margin-top: 12px; display: flex; gap: 8px; align-items: center;">
+                                    <span class="status-badge status-${a.status}">${a.status.replace('_', ' ')}</span>
                                     ${paymentBadge}
                                 </div>
                             </div>
-                            <div style="width: 150px;">
+                            <div style="width: 150px; display: flex; flex-direction: column; gap: 5px;">
                                 ${actions}
                             </div>
                         </div>
@@ -917,18 +1105,15 @@
             lucide.createIcons();
         }
 
-        async function updateAptStatus(id, newStatus) {
+        async function updateAptStatus(id, newStatus, newPaymentStatus) {
+            if(newStatus === 'completed' && !confirm('Release funds to business? This action cannot be undone.')) return;
+            
             const updates = { status: newStatus };
-            if (newStatus === 'completed_released') {
-                updates.payment_status = 'completed_released';
-            } else if (newStatus === 'disputed') {
-                updates.payment_status = 'disputed';
-            }
+            if (newPaymentStatus) updates.payment_status = newPaymentStatus;
 
             const { error } = await sb.from('appointments').update(updates).eq('id', id);
             if (error) alert("Update Error: " + error.message);
             else {
-                alert("Appointment updated: " + newStatus.replace('_', ' '));
                 loadAppointments();
             }
         }
