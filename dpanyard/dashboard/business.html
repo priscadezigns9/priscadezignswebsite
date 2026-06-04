@@ -197,8 +197,16 @@
             <h1 style="font-family: Sora; margin-bottom: 24px; font-size: 24px;">Business Hub</h1>
             
             <div class="card">
-                <h2>Incoming Appointments</h2>
-                <p style="font-size:13px; opacity:0.7; margin-bottom:20px;">Real-time sync with personal account bookings.</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <h2>Incoming Appointments</h2>
+                        <p style="font-size:13px; opacity:0.7;">Real-time sync with personal account bookings.</p>
+                    </div>
+                    <div style="position: relative; width: 250px;">
+                        <i data-lucide="search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; opacity: 0.5;"></i>
+                        <input type="text" placeholder="Search appointments..." oninput="handleAppointmentSearch(this.value)" style="width: 100%; padding: 10px 10px 10px 36px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-light); font-size: 13px; outline: none;">
+                    </div>
+                </div>
                 <div id="appointment-list" style="display:flex; flex-direction:column; gap:15px;">
                     <div style="padding:15px; background:rgba(13, 27, 42, 0.03); border-radius:15px; border:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
                         <div>
@@ -331,8 +339,17 @@
         <div id="messages" class="tab-content">
             <h1 style="font-family: Sora; margin-bottom: 24px; font-size: 24px;">Messages</h1>
             <div class="messages-grid">
-                <div class="contact-list" id="contact-list">
-                    <!-- Contacts will be loaded here -->
+                <div class="contact-list">
+                    <div style="padding: 20px; border-bottom: 1px solid var(--border-color);">
+                        <h2 style="font-family: Sora; font-size: 16px; margin-bottom: 12px;">Conversations</h2>
+                        <div style="position: relative;">
+                            <i data-lucide="search" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; opacity: 0.5;"></i>
+                            <input type="text" placeholder="Search contacts..." oninput="handleContactSearch(this.value)" style="width: 100%; padding: 8px 8px 8px 32px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-light); font-size: 12px; outline: none;">
+                        </div>
+                    </div>
+                    <div id="contact-list" style="overflow-y: auto; flex: 1;">
+                        <!-- Contacts will be loaded here -->
+                    </div>
                 </div>
                 <div class="chat-area" id="chat-area" style="display: none;">
                     <div class="chat-header">
@@ -500,6 +517,8 @@
 <script>
     const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
     let map;
+    let allAppointments = [];
+    let allContacts = [];
 
     let appointmentSubscription = null;
 
@@ -590,6 +609,22 @@
     }
 
     // --- BUSINESS HUB (APPOINTMENTS/REVIEWS) ---
+    function handleAppointmentSearch(val) {
+        const query = (val || '').trim().toLowerCase();
+        if (!query) {
+            renderAppointments(allAppointments);
+            return;
+        }
+        const filtered = allAppointments.filter(a => {
+            const clientName = (a.profiles?.full_name || 'Client').toLowerCase();
+            const service = (a.service_type || '').toLowerCase();
+            const status = (a.status || '').toLowerCase();
+            const message = (a.message || '').toLowerCase();
+            return clientName.includes(query) || service.includes(query) || status.includes(query) || message.includes(query);
+        });
+        renderAppointments(filtered);
+    }
+
     async function loadHubData() {
         const { data: { user } } = await sb.auth.getUser();
         if (!user) return;
@@ -599,53 +634,67 @@
             .eq('business_id', user.id)
             .order('date', { ascending: false });
 
-        if (data) {
-            const container = document.getElementById('appointment-list');
-            container.innerHTML = data.map(a => {
-                let paymentStatusHtml = '';
-                let actions = '';
+        if (error) {
+            document.getElementById('appointment-list').innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+            return;
+        }
 
-                if (a.payment_status === 'escrow_held') {
-                    paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#059669;">ESCROW SECURED</span>`;
-                    if (a.status !== 'request_release' && a.status !== 'completed_released') {
-                        actions = `<button class="btn-p" style="margin-top:10px; width:100%; background:#0D1B2A;" onclick="updateAptStatus('${a.id}', 'request_release')">Complete Service & Request Release</button>`;
-                    }
-                } else if (a.payment_status === 'pending_verification') {
-                    paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#D97706;">CRYPTO PENDING</span>`;
-                } else if (a.payment_status === 'completed_released') {
-                    paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#2563EB;">FUNDS RELEASED</span>`;
-                } else if (a.payment_status === 'disputed') {
-                    paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#DC2626;">DISPUTED</span>`;
+        allAppointments = data || [];
+        renderAppointments(allAppointments);
+    }
+
+    function renderAppointments(list) {
+        const container = document.getElementById('appointment-list');
+        if (!list || list.length === 0) {
+            container.innerHTML = '<p style="opacity:0.5; text-align:center; padding:20px; font-size:13px;">No appointments match your search.</p>';
+            return;
+        }
+
+        container.innerHTML = list.map(a => {
+            let paymentStatusHtml = '';
+            let actions = '';
+
+            if (a.payment_status === 'escrow_held') {
+                paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#059669;">ESCROW SECURED</span>`;
+                if (a.status !== 'request_release' && a.status !== 'completed_released') {
+                    actions = `<button class="btn-p" style="margin-top:10px; width:100%; background:#0D1B2A;" onclick="updateAptStatus('${a.id}', 'request_release')">Complete Service & Request Release</button>`;
                 }
+            } else if (a.payment_status === 'pending_verification') {
+                paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#D97706;">CRYPTO PENDING</span>`;
+            } else if (a.payment_status === 'completed_released') {
+                paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#2563EB;">FUNDS RELEASED</span>`;
+            } else if (a.payment_status === 'disputed') {
+                paymentStatusHtml = `<span style="display:block; font-size:11px; font-weight:800; color:#DC2626;">DISPUTED</span>`;
+            }
 
-                if (a.payment_status === 'escrow_held' && a.payment_status !== 'disputed') {
-                    actions += `<button class="btn-p" style="margin-top:5px; width:100%; background:#ef4444;" onclick="updateAptStatus('${a.id}', 'disputed')">Report Issue / Dispute</button>`;
-                }
+            if (a.payment_status === 'escrow_held' && a.payment_status !== 'disputed') {
+                actions += `<button class="btn-p" style="margin-top:5px; width:100%; background:#ef4444;" onclick="updateAptStatus('${a.id}', 'disputed')">Report Issue / Dispute</button>`;
+            }
 
-                return `
-                    <div style="padding:20px; background:rgba(13, 27, 42, 0.03); border-radius:15px; border:1px solid var(--border-color); margin-bottom:10px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                            <div>
-                                <b style="display:block; font-size:16px;">${a.profiles?.full_name || 'Client'}</b>
-                                <span style="font-size:12px; opacity:0.6;">${a.date} @ ${a.time_start} - ${a.time_end}</span>
-                                ${paymentStatusHtml}
-                            </div>
-                            <div style="text-align:right;">
-                                 <span style="font-size:12px; font-weight:800; color:var(--primary-red);">${a.status.toUpperCase()}</span>
-                                 <div style="margin-top:5px;">
-                                    <button class="btn-p" style="padding:5px 10px; font-size:10px;" onclick="viewClientMap('${a.profiles?.location_lat}', '${a.profiles?.location_lng}', '${a.id}')">View Client Location</button>
-                                 </div>
-                            </div>
+            return `
+                <div style="padding:20px; background:rgba(13, 27, 42, 0.03); border-radius:15px; border:1px solid var(--border-color); margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <div>
+                            <b style="display:block; font-size:16px;">${a.profiles?.full_name || 'Client'}</b>
+                            <span style="font-size:12px; opacity:0.6;">${a.date} @ ${a.time_start} - ${a.time_end}</span>
+                            ${paymentStatusHtml}
                         </div>
-                        <div id="apt-map-${a.id}" style="display:none; width:100%; height:200px; border-radius:10px; margin-top:10px;"></div>
-                        <p style="font-size:13px; margin-top:10px;"><i>"${a.message || 'No message provided'}"</i></p>
-                        <div style="margin-top:15px; border-top:1px solid rgba(0,0,0,0.05); padding-top:15px;">
-                            ${actions}
+                        <div style="text-align:right;">
+                             <span style="font-size:12px; font-weight:800; color:var(--primary-red);">${a.status.toUpperCase()}</span>
+                             <div style="margin-top:5px;">
+                                <button class="btn-p" style="padding:5px 10px; font-size:10px;" onclick="viewClientMap('${a.profiles?.location_lat}', '${a.profiles?.location_lng}', '${a.id}')">View Client Location</button>
+                             </div>
                         </div>
                     </div>
-                `;
-            }).join('');
-        }
+                    <div id="apt-map-${a.id}" style="display:none; width:100%; height:200px; border-radius:10px; margin-top:10px;"></div>
+                    <p style="font-size:13px; margin-top:10px;"><i>"${a.message || 'No message provided'}"</i></p>
+                    <div style="margin-top:15px; border-top:1px solid rgba(0,0,0,0.05); padding-top:15px;">
+                        ${actions}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 
     async function updateAptStatus(id, newStatus) {
@@ -968,6 +1017,20 @@
     let activeChatId = null;
     let messageSubscription = null;
 
+    function handleContactSearch(val) {
+        const query = (val || '').trim().toLowerCase();
+        if (!query) {
+            renderContacts(allContacts);
+            return;
+        }
+        const filtered = allContacts.filter(c => {
+            const name = (c.full_name || 'Client').toLowerCase();
+            const lastMsg = (c.last_msg || '').toLowerCase();
+            return name.includes(query) || lastMsg.includes(query);
+        });
+        renderContacts(filtered);
+    }
+
     async function loadContacts() {
         const userId = localStorage.getItem('calalloo_uid');
         if (!userId) return;
@@ -989,12 +1052,19 @@
                 }
             }
         }
-        renderContacts(contacts);
+        allContacts = contacts;
+        renderContacts(allContacts);
     }
 
     function renderContacts(contacts) {
         const container = document.getElementById('contact-list');
         if (!container) return;
+        
+        if (!contacts || contacts.length === 0) {
+            container.innerHTML = '<p style="opacity:0.5; text-align:center; padding:20px; font-size:12px;">No contacts found.</p>';
+            return;
+        }
+
         container.innerHTML = contacts.map(c => `
             <div class="contact-item ${c.id === activeChatId ? 'active' : ''}" onclick="openChat('${c.id}')">
                 <div style="width:40px; height:40px; background:var(--primary-red); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800;">${(c.full_name || 'U')[0]}</div>
