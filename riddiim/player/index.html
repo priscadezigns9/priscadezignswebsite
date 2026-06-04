@@ -215,20 +215,26 @@
 
   window.handleSearch = (data) => {
     if(!data.data) return;
-    results.innerHTML = data.data.map(i => `
-      <div class="result-item" onclick='loadTrack(${JSON.stringify({
+    results.innerHTML = data.data.map(i => {
+      // Normalize data for both API and Local Library
+      const track = {
         title: i.title,
-        artist: i.artist.name,
-        art: i.album.cover_big,
+        artist: i.artist.name || i.artist,
+        art: (i.album ? i.album.cover_big : i.art),
+        thumb: (i.album ? i.album.cover_small : i.art),
         preview: i.preview
-      }).replace(/'/g, "&apos;")})'>
-        <img src="${i.album.cover_small}">
-        <div class="res-info">
-          <div class="result-title">${i.title}</div>
-          <div class="result-artist">${i.artist.name}</div>
+      };
+      
+      return `
+        <div class="result-item" onclick='loadTrack(${JSON.stringify(track).replace(/'/g, "&apos;")})'>
+          <img src="${track.thumb || 'https://priscadezigns.org/assets/logos/riddiim_favicon.png'}">
+          <div class="res-info">
+            <div class="result-title">${track.title}</div>
+            <div class="result-artist">${track.artist}</div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
     results.style.display = 'block';
   };
 
