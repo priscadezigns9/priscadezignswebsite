@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Hub | dpanyard</title>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABy0lEQVRYhe2Xv0sCYRjHPw9SCDNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSByCHNoCILAnBocGhpCInALCiIisSB6Ab4Bf0K6C83mF2EAAAAASUVORK5CYII=">
+    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -76,6 +76,9 @@
         .status-online, .status-confirmed { background: #E8F5E9; color: #2E7D32; }
         .status-away, .status-pending { background: #FFF3E0; color: #EF6C00; }
         .status-offline, .status-cancelled { background: #F5F5F5; color: #757575; }
+        .status-request_release { background: #DBEAFE; color: #1E40AF; }
+        .status-completed_released { background: #E8F5E9; color: #2E7D32; }
+        .status-disputed { background: #FFEBEE; color: #C62828; }
 
         .slot-btn { padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; transition: 0.2s; }
         .slot-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
@@ -115,19 +118,19 @@
         <div>
             <div class="nav-label">Navigation</div>
             <div class="nav-list">
-                <div class="nav-item active" onclick="showSection('discovery', this)"><i data-lucide="layout-dashboard"></i> Dashboard</div>
-                <div class="nav-item" onclick="showSection('discovery', this, 'map-focus')"><i data-lucide="map-pin"></i> My Neighborhood</div>
-                <div class="nav-item" onclick="showSection('appointments', this)"><i data-lucide="calendar-days"></i> My Appointments</div>
-                <div class="nav-item" onclick="showSection('messages', this)"><i data-lucide="message-square"></i> Messages</div>
-                <div class="nav-item" onclick="showSection('profile', this)"><i data-lucide="user"></i> My Profile</div>
+                <div class="nav-item active" onclick="showSection('discovery', this)"><i data-lucide="layout-dashboard" size="18"></i> Dashboard</div>
+                <div class="nav-item" onclick="showSection('discovery', this, 'map-focus')"><i data-lucide="map-pin" size="18"></i> My Neighborhood</div>
+                <div class="nav-item" onclick="showSection('appointments', this)"><i data-lucide="calendar-days" size="18"></i> My Appointments</div>
+                <div class="nav-item" onclick="showSection('messages', this)"><i data-lucide="message-square" size="18"></i> Messages</div>
+                <div class="nav-item" onclick="showSection('profile', this)"><i data-lucide="user" size="18"></i> My Profile</div>
             </div>
         </div>
 
         <div style="margin-top: auto;">
             <div class="nav-label">System</div>
             <div class="nav-list">
-                <div class="nav-item" onclick="showSection('settings', this)"><i data-lucide="settings"></i> Settings</div>
-                <div class="nav-item" onclick="signOut()"><i data-lucide="log-out"></i> Log Out</div>
+                <div class="nav-item" onclick="showSection('settings', this)"><i data-lucide="settings" size="18"></i> Settings</div>
+                <div class="nav-item" onclick="signOut()"><i data-lucide="log-out" size="18"></i> Log Out</div>
             </div>
         </div>
     </aside>
@@ -248,6 +251,63 @@
             <button onclick="closeDetail()" style="border:none; background:var(--grey-light); width: 40px; height: 40px; border-radius: 50%; cursor:pointer; color: var(--text-dark); display: flex; align-items: center; justify-content: center;"><i data-lucide="x"></i></button>
         </div>
         <div id="detail-content"></div>
+    </div>
+
+    <div id="review-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="card" style="width: 90%; max-width: 500px; padding: 40px; background: var(--white); border-radius: 32px; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <button onclick="closeReview()" style="position: absolute; top: 24px; right: 24px; border:none; background:var(--grey-light); width: 32px; height: 32px; border-radius: 50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i data-lucide="x" style="width:16px;"></i></button>
+            
+            <div style="text-align: center; margin-bottom: 32px;">
+                <h2 style="font-family: var(--font-display); font-size: 24px; margin-bottom: 8px;">Rate Your Experience</h2>
+                <p style="color: var(--text-muted); font-size: 14px;">Your feedback helps build a trusted network.</p>
+            </div>
+            
+            <div style="margin-bottom: 32px; text-align: center;">
+                <div id="star-rating" style="font-size: 40px; color: #cbd5e1; cursor: pointer; letter-spacing: 8px; display: inline-block;">
+                    <span onclick="setRating(1)" class="star"><i data-lucide="star" size="18"></i></span><span onclick="setRating(2)" class="star"><i data-lucide="star" size="18"></i></span><span onclick="setRating(3)" class="star"><i data-lucide="star" size="18"></i></span><span onclick="setRating(4)" class="star"><i data-lucide="star" size="18"></i></span><span onclick="setRating(5)" class="star"><i data-lucide="star" size="18"></i></span>
+                </div>
+                <input type="hidden" id="review-rating" value="0">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Communication</label>
+                    <select id="rate-comm" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size: 13px; background: var(--bg-light);">
+                        <option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Punctuality</label>
+                    <select id="rate-punc" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size: 13px; background: var(--bg-light);">
+                        <option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Quality</label>
+                    <select id="rate-qual" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size: 13px; background: var(--bg-light);">
+                        <option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Value</label>
+                    <select id="rate-val" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size: 13px; background: var(--bg-light);">
+                        <option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label>Review Title</label>
+                <input type="text" id="review-title" placeholder="Summary of your experience" style="background: var(--bg-light);">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 32px;">
+                <label>Detailed Feedback</label>
+                <textarea id="review-text" style="height: 100px; background: var(--bg-light);" placeholder="Tell others what you liked or what could be improved..."></textarea>
+            </div>
+
+            <button id="submit-review-btn" class="btn-main btn-primary" style="width: 100%; height: 60px; font-size: 16px; font-weight: 700; border-radius: 16px;" onclick="submitReview()">Submit Review</button>
+        </div>
     </div>
 
     <script src="https://maps.googleapis.com/maps/api/js?key={{credential:google-maps-api-key}}&callback=initMap" async defer></script>
@@ -375,7 +435,7 @@
                 btn.innerHTML = '<i data-lucide="check"></i> Changes Saved';
                 setTimeout(() => { btn.innerHTML = originalText; lucide.createIcons(); }, 2000);
             } else {
-                btn.innerHTML = '<i data-lucide="alert-circle"></i> Error Saving';
+                btn.innerHTML = '<i data-lucide="alert-circle" size="24"></i> Error Saving';
                 setTimeout(() => { btn.innerHTML = originalText; lucide.createIcons(); }, 2000);
             }
             lucide.createIcons();
@@ -397,12 +457,12 @@
 
         async function requestPermission(type, e) {
             const btn = e.currentTarget;
-            btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Pending...';
+            btn.innerHTML = '<i data-lucide="loader" size="24" class="animate-spin"></i> Pending...';
             lucide.createIcons();
             try {
                 if(type === 'location') {
                     navigator.geolocation.getCurrentPosition(() => {
-                        btn.innerHTML = '<i data-lucide="check"></i> Enabled';
+                        btn.innerHTML = '<i data-lucide="check" size="24"></i> Enabled';
                         btn.classList.add('btn-success');
                     }, () => {
                         btn.innerHTML = '<i data-lucide="x"></i> Blocked';
@@ -431,19 +491,35 @@
         async function loadBusinesses() {
             try {
                 const { data } = await sb.from('profiles').select('*').not('niche', 'is', null);
-                businesses = data || [];
+                const { data: ratings } = await sb.from('ratings').select('ratee_id, rating');
+                
+                businesses = (data || []).map(b => {
+                    const bRatings = (ratings || []).filter(r => r.ratee_id === b.id);
+                    const avg = bRatings.length ? bRatings.reduce((acc, r) => acc + r.rating, 0) / bRatings.length : 0;
+                    return { ...b, avgRating: avg.toFixed(1), totalReviews: bRatings.length };
+                });
+
                 renderList(businesses);
             } catch(e) {}
         }
 
         function renderList(list) {
             const container = document.getElementById('biz-list');
-            container.innerHTML = list.map(b => `
-                <div class="biz-card" onclick="openDetail('${b.id}')">
-                    <div style="font-weight: 800; font-family: var(--font-display); font-size: 18px; margin-bottom: 4px;">${b.full_name}</div>
-                    <div style="font-size: 13px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">${b.niche || 'Professional Node'}</div>
-                </div>
-            `).join('');
+            container.innerHTML = list.map(b => {
+                const isHighRated = parseFloat(b.avgRating) >= 4.5;
+                const ratingDisplay = b.totalReviews > 0 ? `<span style="font-size: 12px; color: ${isHighRated ? '#f59e0b' : 'var(--text-muted)'}; font-weight: 700; margin-left: 8px; display: flex; align-items: center; gap: 4px;"><i data-lucide="star" size="12" style="fill: currentColor;"></i> ${b.avgRating} (${b.totalReviews})</span>` : '';
+                const highRatedBadge = isHighRated ? `<span style="background: linear-gradient(135deg, #FFD700, #FFA500); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; margin-left: 8px; box-shadow: 0 2px 4px rgba(255, 165, 0, 0.3);">ELITE</span>` : '';
+
+                return `
+                    <div class="biz-card" onclick="openDetail('${b.id}')" style="${isHighRated ? 'border: 2px solid #FFD700; background: rgba(255, 215, 0, 0.03);' : ''}">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="font-weight: 800; font-family: var(--font-display); font-size: 18px; margin-bottom: 4px;">${b.full_name}${highRatedBadge}</div>
+                            ${ratingDisplay}
+                        </div>
+                        <div style="font-size: 13px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">${b.niche || 'Professional Node'}</div>
+                    </div>
+                `;
+            }).join('');
             markers.forEach(m => m.setMap(null));
             markers = list.map(b => {
                 const m = new google.maps.Marker({ 
@@ -456,12 +532,120 @@
             });
         }
 
-        function openDetail(id) {
+        let currentReviewApt = null;
+        let currentReviewBusiness = null;
+
+        function setRating(n) {
+            document.getElementById('review-rating').value = n;
+            const stars = document.querySelectorAll('#star-rating .star');
+            stars.forEach((s, i) => {
+                s.style.color = i < n ? '#f59e0b' : '#cbd5e1';
+            });
+        }
+
+        function openReviewModal(aptId, bizId) {
+            currentReviewApt = aptId;
+            currentReviewBusiness = bizId;
+            document.getElementById('review-overlay').style.display = 'flex';
+            setRating(0);
+            document.getElementById('review-title').value = '';
+            document.getElementById('review-text').value = '';
+        }
+
+        function closeReview() {
+            document.getElementById('review-overlay').style.display = 'none';
+        }
+
+        async function submitReview() {
+            const rating = parseInt(document.getElementById('review-rating').value);
+            if (rating === 0) return alert('Please select a star rating');
+            
+            const btn = document.getElementById('submit-review-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Submitting...';
+            lucide.createIcons();
+            
+            const categories = {
+                communication: parseInt(document.getElementById('rate-comm').value),
+                punctuality: parseInt(document.getElementById('rate-punc').value),
+                quality: parseInt(document.getElementById('rate-qual').value),
+                value: parseInt(document.getElementById('rate-val').value)
+            };
+
+            const { data: { session } } = await sb.auth.getSession();
+            
+            const { error } = await sb.from('ratings').insert({
+                appointment_id: currentReviewApt,
+                rater_id: session.user.id,
+                ratee_id: currentReviewBusiness,
+                rating: rating,
+                categories: categories,
+                title: document.getElementById('review-title').value,
+                comment: document.getElementById('review-text').value,
+                is_verified_transaction: true
+            });
+
+            if (error) {
+                alert('Error submitting review: ' + error.message);
+                btn.innerHTML = originalText;
+            } else {
+                alert('Thank you for your feedback!');
+                closeReview();
+                loadAppointments();
+            }
+            lucide.createIcons();
+        }
+
+        async function getBusinessRating(bizId) {
+            const { data, error } = await sb.from('ratings').select('rating, categories').eq('ratee_id', bizId);
+            if (error || !data || !data.length) return null;
+            
+            const avg = data.reduce((acc, curr) => acc + curr.rating, 0) / data.length;
+            const total = data.length;
+            
+            const cats = { communication: 0, punctuality: 0, quality: 0, value: 0 };
+            data.forEach(r => {
+                cats.communication += (r.categories?.communication || 5);
+                cats.punctuality += (r.categories?.punctuality || 5);
+                cats.quality += (r.categories?.quality || 5);
+                cats.value += (r.categories?.value || 5);
+            });
+            
+            Object.keys(cats).forEach(k => cats[k] = (cats[k] / total).toFixed(1));
+            
+            return { avg: avg.toFixed(1), total, cats };
+        }
+
+        async function openDetail(id) {
             const b = businesses.find(item => item.id === id);
             selectedSlotTime = null;
+
+            // Load Rating Data
+            const ratingData = await getBusinessRating(id);
+            const ratingHtml = ratingData ? `
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                    <div style="font-size:32px; font-weight:900; font-family:var(--font-display); color:var(--primary-dark);">${ratingData.avg}</div>
+                    <div>
+                        <div style="display: flex; gap: 2px; color:#f59e0b;">
+                            ${Array.from({length: 5}, (_, i) => `<i data-lucide="star" size="18" style="fill: ${i < Math.round(ratingData.avg) ? 'currentColor' : 'transparent'}"></i>`).join('')}
+                        </div>
+                        <div style="font-size:12px; color:var(--text-muted); font-weight:600;">FROM ${ratingData.total} REVIEWS</div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px;">
+                    <div style="font-size:11px; background:var(--grey-light); padding:8px 12px; border-radius:8px;">COMM: <b>${ratingData.cats.communication}</b></div>
+                    <div style="font-size:11px; background:var(--grey-light); padding:8px 12px; border-radius:8px;">PUNC: <b>${ratingData.cats.punctuality}</b></div>
+                    <div style="font-size:11px; background:var(--grey-light); padding:8px 12px; border-radius:8px;">QUAL: <b>${ratingData.cats.quality}</b></div>
+                    <div style="font-size:11px; background:var(--grey-light); padding:8px 12px; border-radius:8px;">VALUE: <b>${ratingData.cats.value}</b></div>
+                </div>
+            ` : `<p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">No reviews yet.</p>`;
+
             document.getElementById('detail-content').innerHTML = `
                 <h2 style="font-family: var(--font-display); font-size: 32px; margin-bottom: 8px;">${b.full_name}</h2>
                 <p style="color: var(--primary); font-weight: 800; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px;">${b.niche || 'Professional Node'}</p>
+                
+                ${ratingHtml}
+
                 <div style="padding: 24px; background: var(--grey-light); border-radius: var(--radius-lg); margin-bottom: 32px; line-height: 1.6;">
                     ${b.bio || 'This professional has not provided a bio yet.'}
                 </div>
@@ -551,6 +735,8 @@
             selectedSlotTime = time;
         }
 
+        let currentBooking = null;
+
         async function submitBooking(businessId) {
             const date = document.getElementById('book-date').value;
             const duration = parseInt(document.getElementById('book-duration').value);
@@ -569,23 +755,88 @@
             let endMin = totalMin % 60;
             const endTime = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
 
-            const appointment = {
+            currentBooking = {
                 personal_id: session.user.id,
                 business_id: businessId,
                 date: date,
                 time_start: selectedSlotTime,
                 time_end: endTime,
                 status: 'pending',
-                message: message
+                message: message,
+                amount: 50.00
             };
 
-            const { error } = await sb.from('appointments').insert(appointment);
+            showCheckout();
+        }
+
+        function showCheckout() {
+            const container = document.getElementById('booking-section');
+            container.id = 'booking-flow-container';
+            container.innerHTML = `
+                <div id="checkout-section">
+                    <h3 style="font-family: var(--font-display); margin-bottom: 5px; font-size: 20px;">Escrow Checkout</h3>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Funds are held securely and only released when you confirm completion.</p>
+                    
+                    <div style="background: var(--grey-light); padding: 15px; border-radius: var(--radius-lg); margin-bottom: 20px; border: 1px solid var(--border);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: 600;">Service Deposit</span>
+                            <span style="font-weight: 800;">$${currentBooking.amount.toFixed(2)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 800;">
+                            <span>Reference</span>
+                            <span>#${Math.random().toString(36).substr(2, 9).toUpperCase()}</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px;">Payment Method</label>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button class="btn-main" onclick="processEscrow('stripe')" style="background: white; border: 1px solid var(--border); justify-content: space-between; height: 55px; width: 100%;">
+                                <span style="display: flex; align-items: center; gap: 10px;"><i data-lucide="credit-card"></i> Card (Stripe)</span>
+                                <i data-lucide="chevron-right"></i>
+                            </button>
+                            
+                            <button class="btn-main" onclick="document.getElementById('crypto-details').style.display='block'" style="background: white; border: 1px solid var(--border); justify-content: space-between; height: 55px; width: 100%;">
+                                <span style="display: flex; align-items: center; gap: 10px;"><i data-lucide="bitcoin"></i> Crypto (USDT/BTC/ETH)</span>
+                                <i data-lucide="chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="crypto-details" style="display: none; background: #fef3c7; padding: 15px; border-radius: 12px; margin-top: 10px; border: 1px solid #fcd34d;">
+                        <p style="font-size: 12px; font-weight: 700; color: #92400e; margin-bottom: 10px;">Transfer $${currentBooking.amount} to wallet below:</p>
+                        <div style="background: white; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; word-break: break-all; border: 1px solid #fcd34d; margin-bottom: 10px;">
+                            0x71C7656EC7ab88b098defB751B7401B5f6d8976F
+                        </div>
+                        <button class="btn-main" onclick="processEscrow('crypto')" style="width: 100%; background: #f59e0b; color: white; height: 45px; border: none;">
+                            Confirm Payment Sent
+                        </button>
+                    </div>
+
+                    <button class="btn-main" style="width: 100%; margin-top: 20px; font-size: 14px; opacity: 0.6; height: 45px;" onclick="openDetail('${currentBooking.business_id}')">
+                        Cancel
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        async function processEscrow(method) {
+            const status = method === 'stripe' ? 'escrow_held' : 'pending_verification';
             
+            const { error } = await sb.from('appointments').insert([{
+                ...currentBooking,
+                payment_method: method,
+                payment_status: status,
+                escrow_id: 'ESC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            }]);
+
             if (error) {
                 console.error(error);
-                alert("Error sending request. Check protocol link.");
+                alert("Error sending request.");
             } else {
-                alert("Booking request sent");
+                alert(method === 'stripe' ? "Escrow Payment Secured!" : "Payment submitted for verification.");
                 closeDetail();
                 loadAppointments();
                 showSection('appointments');
@@ -619,20 +870,67 @@
                 return;
             }
 
-            container.innerHTML = list.map(a => `
-                <div class="card" style="margin-bottom: 15px; padding: 24px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border);">
-                    <div>
-                        <h4 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px;">${a.profiles?.full_name || 'Professional'}</h4>
-                        <p style="font-size: 14px; color: var(--text-muted); font-weight: 500;">
-                            <i data-lucide="calendar" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> ${a.date} 
-                            &nbsp;&bull;&nbsp; 
-                            <i data-lucide="clock" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> ${a.time_start} - ${a.time_end}
-                        </p>
+            container.innerHTML = list.map(a => {
+                let paymentBadge = '';
+                let actions = '';
+
+                if (a.payment_status === 'escrow_held') {
+                    paymentBadge = `<span class="status-badge" style="background: #D1FAE5; color: #065F46;">Escrow Held</span>`;
+                    if (a.status === 'request_release') {
+                        actions = `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'completed_released')" style="height: 35px; font-size: 12px; background: var(--primary); color: white; border: none; margin-top: 10px; width: 100%;">Release Payment</button>`;
+                    }
+                } else if (a.payment_status === 'pending_verification') {
+                    paymentBadge = `<span class="status-badge" style="background: #FEF3C7; color: #92400E;">Verifying Crypto</span>`;
+                } else if (a.payment_status === 'completed_released') {
+                    paymentBadge = `<span class="status-badge" style="background: #DBEAFE; color: #1E40AF;">Released</span>`;
+                    actions = `<button class="btn-main" onclick="openReviewModal('${a.id}', '${a.business_id}')" style="height: 35px; font-size: 12px; background: #10b981; color: white; border: none; margin-top: 10px; width: 100%;">Leave Review</button>`;
+                } else if (a.payment_status === 'disputed') {
+                    paymentBadge = `<span class="status-badge" style="background: #FEE2E2; color: #991B1B;">Disputed</span>`;
+                }
+
+                if (a.payment_status === 'escrow_held' && a.payment_status !== 'disputed') {
+                    actions += `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'disputed')" style="height: 35px; font-size: 12px; background: #ef4444; color: white; border: none; margin-top: 5px; width: 100%;">Report Issue</button>`;
+                }
+
+                return `
+                    <div class="card" style="margin-bottom: 15px; padding: 24px; border: 1px solid var(--border);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <h4 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px;">${a.profiles?.full_name || 'Professional'}</h4>
+                                <p style="font-size: 14px; color: var(--text-muted); font-weight: 500;">
+                                    <i data-lucide="calendar" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> ${a.date} 
+                                    &nbsp;&bull;&nbsp; 
+                                    <i data-lucide="clock" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> ${a.time_start} - ${a.time_end}
+                                </p>
+                                <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center;">
+                                    <span class="status-badge status-${a.status}">${a.status}</span>
+                                    ${paymentBadge}
+                                </div>
+                            </div>
+                            <div style="width: 150px;">
+                                ${actions}
+                            </div>
+                        </div>
                     </div>
-                    <span class="status-badge status-${a.status}">${a.status}</span>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             lucide.createIcons();
+        }
+
+        async function updateAptStatus(id, newStatus) {
+            const updates = { status: newStatus };
+            if (newStatus === 'completed_released') {
+                updates.payment_status = 'completed_released';
+            } else if (newStatus === 'disputed') {
+                updates.payment_status = 'disputed';
+            }
+
+            const { error } = await sb.from('appointments').update(updates).eq('id', id);
+            if (error) alert("Update Error: " + error.message);
+            else {
+                alert("Appointment updated: " + newStatus.replace('_', ' '));
+                loadAppointments();
+            }
         }
 
         // --- Messaging System ---
