@@ -325,20 +325,29 @@
   window.saveToLibrary = async () => {
     if(!currentTrack) return;
     
+    // Check for Identity Handshake
+    if(!user) {
+      alert('IDENTITY_REQUIRED: Please log in to your SOVEREIGN VAULT to save signals.');
+      toggleAuthModal();
+      return;
+    }
+    
     // Save to Local first (Sovereign redundancy)
     if(!favorites.find(f => f.title === currentTrack.title)) {
       favorites.push(currentTrack);
       localStorage.setItem('riddiim_favs', JSON.stringify(favorites));
       
-      // Sync to Supabase if logged in
-      if(user) {
+      // Sync to Supabase
+      try {
         await sb.from('riddiim_favorites').upsert({
           user_id: user.id,
           track_id: currentTrack.title + currentTrack.artist,
           metadata: currentTrack
         });
+        alert('SIGNAL_SECURED_TO_CLOUD_VAULT 🛡️');
+      } catch(e) {
+        alert('SIGNAL_SAVED_LOCALLY (Sync Pending)');
       }
-      alert('SIGNAL_SAVED_TO_VAULT');
     }
   };
 
