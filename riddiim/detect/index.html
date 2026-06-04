@@ -42,6 +42,15 @@
     .btn-stream { background: #fff; color: #000; padding: 12px 20px; text-decoration: none; font-weight: 800; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; display: inline-block; }
 
     canvas { position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; pointer-events: none; opacity: 0.3; }
+    
+    @media(max-width:600px){
+      header { padding: 0 20px; }
+      .nav-wordmark { font-size: 14px; }
+      .scanner-ring { width: 150px; height: 150px; }
+      .mic-icon { width: 48px; height: 48px; }
+      .result-box { width: 100%; padding: 15px; }
+      .result-box h3 { font-size: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -71,77 +80,56 @@
     </div>
   </div>
 
-  <canvas id="visualizer"></canvas>
+<canvas id="neural-canvas" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; pointer-events: none; opacity: 0.3;"></canvas>
 </main>
 
+<script src="../player/neural_engine.js"></script>
 <script>
   const micBtn = document.getElementById('micBtn');
   const status = document.getElementById('status');
   const resultBox = document.getElementById('resultBox');
-  const canvas = document.getElementById('visualizer');
-  const ctx = canvas.getContext('2d');
-  
-  let isRecording = false;
-  let audioContext, analyser, dataArray;
 
-  function initVisualizer() {
-    canvas.width = window.innerWidth;
-    canvas.height = 150;
-    analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
-  }
-
-  function draw() {
-    if(!isRecording) return;
-    requestAnimationFrame(draw);
-    analyser.getByteFrequencyData(dataArray);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const barWidth = (canvas.width / dataArray.length) * 2.5;
-    let x = 0;
-    for(let i = 0; i < dataArray.length; i++) {
-      const barHeight = dataArray[i] / 2;
-      ctx.fillStyle = `rgba(255, 255, 255, ${barHeight/100})`;
-      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-      x += barWidth + 1;
+  window.handleSearch = (data) => {
+    if(data && data.data && data.data.length > 0) {
+      const track = data.data[0];
+      document.getElementById('trackTitle').textContent = track.title;
+      document.getElementById('trackArtist').textContent = track.artist.name;
+      if(track.album && track.album.cover_medium) {
+         document.getElementById('art').style.backgroundImage = `url(${track.album.cover_medium})`;
+         document.getElementById('art').style.backgroundSize = 'cover';
+      }
+      resultBox.style.display = 'block';
+      status.textContent = 'MATCH_FOUND';
+    } else {
+      status.textContent = 'NO_SIGNAL_MATCH';
     }
-  }
+  };
 
   micBtn.onclick = async () => {
-    if(isRecording) return;
+    if(micBtn.classList.contains('active')) return;
+    
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioContext.createAnalyser();
-      const source = audioContext.createMediaStreamSource(stream);
-      source.connect(analyser);
-      
-      initVisualizer();
-      isRecording = true;
       micBtn.classList.add('active');
-      status.textContent = 'Analyzing Frequencies...';
-      draw();
-
-      // MOCK DETECTION ENGINE (While awaiting API keys)
-      setTimeout(() => {
-        isRecording = false;
-        micBtn.classList.remove('active');
-        status.textContent = 'Match Found';
-        
-        // Show result
-        document.getElementById('trackTitle').textContent = "Sovereign Echoes";
-        document.getElementById('trackArtist').textContent = "Priscion Labs ft. Digital Rhythms";
-        resultBox.style.display = 'block';
-        
-        // Stop stream
-        stream.getTracks().forEach(t => t.stop());
-      }, 5000);
-
+      status.textContent = 'LISTENING...';
+      resultBox.style.display = 'none';
+      
+      const signature = await NeuralEngine.startAnalysis();
+      
+      if(signature && signature !== 'UNKNOWN_SIGNAL') {
+        status.textContent = 'MATCHING...';
+        const s = document.createElement('script');
+        s.src = `https://api.deezer.com/search?q=${encodeURIComponent(signature)}&limit=1&output=jsonp&callback=handleSearch`;
+        document.body.appendChild(s);
+      } else {
+        status.textContent = 'SIGNAL_TOO_WEAK';
+      }
     } catch (err) {
-      status.textContent = 'Mic Access Required';
-      console.error(err);
+      status.textContent = 'HARDWARE_ERROR';
+    } finally {
+      micBtn.classList.remove('active');
     }
   };
 </script>
 </body>
 </html>
+
