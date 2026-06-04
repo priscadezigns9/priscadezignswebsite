@@ -80,6 +80,26 @@
         .slot-btn { padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; transition: 0.2s; }
         .slot-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
         .slot-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Messaging Styles */
+        .messages-grid { display: flex; height: 100%; background: var(--white); border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border); }
+        .contact-list { width: 320px; border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
+        .contact-item { padding: 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px; }
+        .contact-item:hover, .contact-item.active { background: var(--primary-soft); }
+        .contact-info { flex: 1; }
+        .contact-name { font-weight: 800; font-size: 15px; margin-bottom: 2px; }
+        .contact-last-msg { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
+        .chat-header { padding: 20px 30px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .chat-messages { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .msg { max-width: 70%; padding: 12px 18px; border-radius: 18px; font-size: 14px; line-height: 1.5; position: relative; }
+        .msg-sent { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .msg-received { align-self: flex-start; background: var(--white); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+        .msg-time { font-size: 10px; opacity: 0.6; margin-top: 4px; text-align: right; }
+        
+        .chat-input { padding: 20px 30px; background: var(--white); border-top: 1px solid var(--border); display: flex; gap: 12px; }
+        .chat-input input { flex: 1; }
     </style>
 </head>
 <body data-theme="light">
@@ -98,6 +118,7 @@
                 <div class="nav-item active" onclick="showSection('discovery', this)"><i data-lucide="layout-dashboard"></i> Dashboard</div>
                 <div class="nav-item" onclick="showSection('discovery', this, 'map-focus')"><i data-lucide="map-pin"></i> My Neighborhood</div>
                 <div class="nav-item" onclick="showSection('appointments', this)"><i data-lucide="calendar-days"></i> My Appointments</div>
+                <div class="nav-item" onclick="showSection('messages', this)"><i data-lucide="message-square"></i> Messages</div>
                 <div class="nav-item" onclick="showSection('profile', this)"><i data-lucide="user"></i> My Profile</div>
             </div>
         </div>
@@ -139,6 +160,38 @@
                 <div class="card" style="text-align: center; padding: 60px;">
                     <i data-lucide="calendar-x" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
                     <p style="color: var(--text-muted); font-weight: 600;">No upcoming appointments yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages Section -->
+        <section id="messages" class="section">
+            <h1 class="page-title">Messages</h1>
+            <div class="messages-grid" style="height: calc(100vh - 250px);">
+                <div class="contact-list" id="contact-list">
+                    <!-- Contacts will be loaded here -->
+                </div>
+                <div class="chat-area" id="chat-area" style="display: none;">
+                    <div class="chat-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="avatar" id="active-chat-avatar" style="width: 40px; height: 40px;"></div>
+                            <div>
+                                <div class="contact-name" id="active-chat-name">Select a contact</div>
+                                <div style="font-size: 11px; color: var(--primary); font-weight: 800;">ENCRYPTED CHANNEL</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <form class="chat-input" onsubmit="handleSendMessage(event)">
+                        <input type="text" id="msg-input" placeholder="Type a message..." class="input-main">
+                        <button type="submit" class="btn-main"><i data-lucide="send"></i></button>
+                    </form>
+                </div>
+                <div id="no-chat-selected" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.5;">
+                    <i data-lucide="message-square" style="width: 64px; height: 64px; margin-bottom: 16px;"></i>
+                    <p style="font-weight: 700;">Select a business to start messaging</p>
                 </div>
             </div>
         </section>
@@ -221,6 +274,7 @@
                 document.getElementById('user-avatar').innerText = user.email[0].toUpperCase();
                 loadProfile();
                 loadAppointments();
+                loadContacts();
                 lucide.createIcons();
             } catch(e) { logError("System Initialization Error"); }
         }
@@ -409,6 +463,9 @@
                     <button class="btn-main btn-primary" style="width: 100%; height: 60px; font-size: 16px;" onclick="submitBooking('${id}')">
                         <i data-lucide="calendar"></i> Send Booking Request
                     </button>
+                    <button class="btn-main" style="width: 100%; height: 60px; font-size: 16px; margin-top: 10px; background: var(--primary-dark); color: white;" onclick="startChat('${id}')">
+                        <i data-lucide="message-square"></i> Message Business
+                    </button>
                 </div>
             `;
             document.getElementById('detail-overlay').classList.add('active');
@@ -542,6 +599,131 @@
                 </div>
             `).join('');
             lucide.createIcons();
+        }
+
+        // --- Messaging System ---
+        let activeChatId = null;
+        let messageSubscription = null;
+
+        async function startChat(businessId) {
+            closeDetail();
+            showSection('messages', document.querySelector('[onclick*="messages"]'));
+            await openChat(businessId);
+        }
+
+        async function openChat(businessId) {
+            activeChatId = businessId;
+            document.getElementById('no-chat-selected').style.display = 'none';
+            document.getElementById('chat-area').style.display = 'flex';
+            
+            const b = businesses.find(x => x.id === businessId) || await fetchProfile(businessId);
+            document.getElementById('active-chat-name').innerText = b?.full_name || 'Business';
+            document.getElementById('active-chat-avatar').innerText = (b?.full_name || 'B')[0];
+            
+            loadMessages(businessId);
+            subscribeToMessages(businessId);
+            loadContacts(); // Refresh contact list
+        }
+
+        async function fetchProfile(id) {
+            const { data } = await sb.from('profiles').select('*').eq('id', id).single();
+            return data;
+        }
+
+        async function loadContacts() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return;
+
+            // Get unique contacts from messages
+            const { data: msgs } = await sb.from('messages')
+                .select('sender_id, receiver_id, text, created_at')
+                .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
+                .order('created_at', { ascending: false });
+
+            const contactIds = new Set();
+            const contacts = [];
+            
+            for (const m of msgs) {
+                const otherId = m.sender_id === session.user.id ? m.receiver_id : m.sender_id;
+                if (!contactIds.has(otherId)) {
+                    contactIds.add(otherId);
+                    // Fetch profile for this contact
+                    const { data: profile } = await sb.from('profiles').select('*').eq('id', otherId).single();
+                    if (profile) {
+                        contacts.push({ ...profile, last_msg: m.text });
+                    }
+                }
+            }
+
+            renderContacts(contacts);
+        }
+
+        function renderContacts(contacts) {
+            const container = document.getElementById('contact-list');
+            container.innerHTML = contacts.map(c => `
+                <div class="contact-item ${c.id === activeChatId ? 'active' : ''}" onclick="openChat('${c.id}')">
+                    <div class="avatar" style="width: 40px; height: 40px; font-size: 14px;">${c.full_name[0]}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${c.full_name}</div>
+                        <div class="contact-last-msg">${c.last_msg}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadMessages(otherId) {
+            const { data: { session } } = await sb.auth.getSession();
+            const { data: msgs } = await sb.from('messages')
+                .select('*')
+                .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${session.user.id})`)
+                .order('created_at', { ascending: true });
+
+            renderMessages(msgs, session.user.id);
+        }
+
+        function renderMessages(msgs, userId) {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = msgs.map(m => `
+                <div class="msg ${m.sender_id === userId ? 'msg-sent' : 'msg-received'}">
+                    ${m.text}
+                    <div class="msg-time">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if (!text || !activeChatId) return;
+
+            const { data: { session } } = await sb.auth.getSession();
+            const { error } = await sb.from('messages').insert({
+                sender_id: session.user.id,
+                receiver_id: activeChatId,
+                text: text
+            });
+
+            if (!error) {
+                input.value = '';
+                loadMessages(activeChatId);
+                loadContacts();
+            }
+        }
+
+        function subscribeToMessages(otherId) {
+            if (messageSubscription) sb.removeChannel(messageSubscription);
+            
+            messageSubscription = sb.channel('public:messages')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                    const m = payload.new;
+                    if ((m.sender_id === otherId) || (m.receiver_id === otherId)) {
+                        loadMessages(otherId);
+                    }
+                    loadContacts();
+                })
+                .subscribe();
         }
 
         function closeDetail() { document.getElementById('detail-overlay').classList.remove('active'); }
