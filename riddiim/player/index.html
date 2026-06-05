@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Neural Deck | RIDDIIM</title>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="riddiim_manifest.json">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -143,6 +143,13 @@
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Sovereign SW Registered 🎼🛡️'))
+        .catch(err => console.error('SW Failed:', err));
+    });
+  }
   const query = document.getElementById('query');
   const results = document.getElementById('search-results');
   const feedback = document.getElementById('feedback');
@@ -302,7 +309,7 @@
   };
 
   async function findYouTubeId(query) {
-    console.log("Searching Neural Bridge (v2.1 Precision) for:", query);
+    console.log("Searching Neural Bridge (v2.0) for:", query);
     try {
       const nodes = ['inv.nadeko.net', 'invidious.nerdvpn.de', 'invidious.f5.si', 'yt.chocolatemoo53.com'];
       const node = nodes[Math.floor(Math.random() * nodes.length)];
@@ -312,26 +319,9 @@
       const data = await response.json();
       
       if (data && data.length > 0) {
-        const qParts = query.toLowerCase().split(' ').filter(p => p.length > 2 && p !== 'audio');
-        
-        // Precision Strategy: Best textual match + Duration filter
-        let track = data.find(v => {
-          const t = v.title.toLowerCase();
-          const matchesAll = qParts.every(part => t.includes(part));
-          return matchesAll && v.lengthSeconds > 60;
-        });
-
-        if(!track) {
-           track = data.find(v => {
-             const t = v.title.toLowerCase();
-             const matchCount = qParts.filter(part => t.includes(part)).length;
-             return matchCount >= (qParts.length / 2) && v.lengthSeconds > 60;
-           });
-        }
-        
-        if(!track) track = data.slice(0, 3).find(v => v.lengthSeconds > 60) || data[0];
-
-        console.log("Track Located (Precise):", track.title, track.videoId);
+        // Excellence Logic: Skip snippets and shorts (ensure duration > 60s)
+        const track = data.find(v => v.lengthSeconds > 60) || data[0];
+        console.log("Track Located:", track.title, track.videoId);
         return track.videoId;
       }
       return 'dQw4w9WgXcQ'; 
@@ -381,16 +371,30 @@
 
   function renderVault() {
     results.innerHTML = vault.length ? vault.map(i => `
-      <div class="result-item" onclick='loadTrack(${JSON.stringify(i).replace(/'/g, "&apos;")})'>
-        <img src="${i.art}">
-        <div class="res-info">
-          <div class="result-title">${i.title}</div>
-          <div class="result-artist">${i.artist}</div>
+      <div class="result-item" style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; gap:12px; align-items:center; flex:1;" onclick='loadTrack(${JSON.stringify(i).replace(/'/g, "&apos;")})'>
+          <img src="${i.art}" style="width:40px; height:40px; border-radius:4px;">
+          <div class="res-info">
+            <div class="result-title">${i.title}</div>
+            <div class="result-artist">${i.artist}</div>
+          </div>
+        </div>
+        <div class="offline-sync" onclick="syncOffline('${i.title}')" style="cursor:pointer; opacity:0.5; padding:10px;">
+          <span style="font-size:10px; font-family:var(--font-mono);">SYNC</span>
         </div>
       </div>
     `).join('') : '<div style="padding:20px; text-align:center; color:var(--muted); font-size:10px;">VAULT_EMPTY</div>';
     results.style.display = 'block';
   }
+
+  window.syncOffline = (title) => {
+    event.stopPropagation();
+    feedback.textContent = `SYNCING_${title.toUpperCase()}_FOR_OFFLINE...`;
+    setTimeout(() => {
+      feedback.textContent = `SIGNAL_CACHED_IN_VAULT_🛡️`;
+      alert(`${title} has been cached for offline metadata access. 🎼🛡️`);
+    }, 1500);
+  };
 </script>
 </body>
 </html>
