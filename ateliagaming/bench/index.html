@@ -1,62 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Atelia Gaming | Performance Bench Diagnostic</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelia Gaming | Neural Bench AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #00F0FF; --bg: #050508; --text: #FFFFFF; --red: #FF003C; --border: rgba(0,240,255,0.1); }
-        body { background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; padding: 100px 6%; }
-        h1 { font-family: 'Syncopate', sans-serif; font-size: 2.5rem; margin-bottom: 40px; color: var(--accent); text-transform: uppercase; border-bottom: 2px solid var(--accent); display: inline-block; padding-bottom: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card { background: rgba(0,240,255,0.02); border: 1px solid var(--border); padding: 30px; border-radius: 2px; position: relative; overflow: hidden; }
-        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 2px; height: 100%; background: var(--accent); }
-        .card h3 { font-size: 0.8rem; text-transform: uppercase; color: var(--accent); margin-bottom: 15px; letter-spacing: 2px; }
-        .item { margin-bottom: 15px; font-size: 0.85rem; line-height: 1.6; }
-        .item strong { color: var(--accent); display: block; margin-bottom: 2px; }
-        .item p { color: #888; }
-        .scan-box { margin-bottom: 50px; background: rgba(255,0,60,0.05); padding: 40px; border: 1px solid rgba(255,0,60,0.2); }
-        textarea { width: 100%; background: #000; border: 1px solid var(--border); padding: 15px; color: var(--accent); font-family: inherit; height: 100px; margin-bottom: 20px; outline: none; }
-        button { background: var(--accent); color: #000; padding: 15px 30px; border: none; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; }
-        #results { display: none; }
-        .logo-img { height: 40px; margin-bottom: 30px; display: block; }
+        :root {
+            --red: #D32F2F;
+            --white: #FFFFFF;
+            --black: #050505;
+            --dark-gray: #111111;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+        }
+        nav {
+            background: rgba(5, 5, 5, 0.98);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--red);
+        }
+        .logo-img { height: 60px; filter: drop-shadow(0 0 10px var(--red)); }
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-family: 'Russo One', sans-serif;
+            font-size: 1.1rem;
+            margin-left: 25px;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .nav-links a:hover { color: var(--red); }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 60px 5%; }
+        .header { text-align: center; margin-bottom: 60px; }
+        .header h1 { font-family: 'Bangers'; font-size: 4rem; margin: 0; color: var(--white); letter-spacing: 2px; }
+        .header h1 span { color: var(--red); }
+        
+        .ai-section {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            padding: 40px;
+            border-radius: 4px;
+            margin-bottom: 40px;
+        }
+        .ai-section h2 { font-family: 'Russo One'; color: var(--red); margin-top: 0; }
+        
+        .input-box {
+            background: #111;
+            border: 2px solid #222;
+            color: #fff;
+            width: 100%;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .input-box:focus { border-color: var(--red); outline: none; }
+        
+        .btn-ai {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-family: 'Russo One';
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+        .btn-ai:hover { background: #ff0000; box-shadow: 0 0 20px rgba(211, 47, 47, 0.5); }
+
+        .explanation { color: #888; font-size: 0.95rem; margin-top: 20px; }
+        .prompts { margin-top: 40px; }
+        .prompt-card {
+            background: #111;
+            padding: 15px;
+            border-left: 4px solid var(--red);
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .prompt-card:hover { background: #1a1a1a; }
+        .prompt-card code { color: #ccc; }
+
+        footer { background: #000; padding: 60px 5%; border-top: 5px solid var(--red); text-align: center; color: #888; }
     </style>
 </head>
 <body>
-    <img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia">
-    <h1>System Performance Bench</h1>
-    <div class="scan-box">
-        <textarea id="q" placeholder="Analyzing hardware signature... Input specs for telemetry."></textarea>
-        <button onclick="scan()">Initiate Neural Audit</button>
-    </div>
-    <div id="results">
-        <div class="grid">
-            <div class="card">
-                <h3>Hardware Telemetry</h3>
-                <div class="item"><strong>Input Latency (Click-to-Photon)</strong><p>Analyzed at 0.8ms. Neural bypass protocol active. Zero buffer drag detected.</p></div>
-                <div class="item"><strong>Visual Throughput</strong><p>Stable at 360Hz. G-Sync synchronization verified at 99.9% consistency.</p></div>
+    <nav>
+        <div class="header-brand">
+            <a href="/ateliagaming/"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        </div>
+        <div class="nav-links">
+            <a href="/ateliagaming/">Hub</a>
+            <a href="/ateliagaming/bench/">Neural AI</a>
+            <a href="/ateliagaming/shop/">Armory</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>NEURAL <span>BENCH AI</span></h1>
+            <p style="font-family: 'Russo One'; color: #666;">High-Fidelity Performance Diagnostics</p>
+        </div>
+
+        <div class="ai-section">
+            <h2>System Audit Console</h2>
+            <textarea class="input-box" rows="5" placeholder="Analyzing hardware signature... Input your CPU, GPU, and RAM specs for a performance audit."></textarea>
+            <button class="btn-ai">Initiate Neural Audit</button>
+            <p class="explanation">Neural Bench AI analyzes your hardware telemetry against the latest 2026 gaming benchmarks to provide bottleneck analysis and optimization vectors.</p>
+        </div>
+
+        <div class="ai-section">
+            <h2>How to Use</h2>
+            <p>1. <strong>Input Specs:</strong> Enter your core components (CPU, GPU, RAM) into the console above.<br>
+            2. <strong>Neural Processing:</strong> The AI cross-references your hardware with our database of AAA game requirements.<br>
+            3. <strong>Output:</strong> Receive a detailed report on expected FPS, potential bottlenecks, and recommended upgrades.</p>
+        </div>
+
+        <div class="prompts">
+            <h2 style="font-family: 'Russo One'; color: var(--red);">Suggested Prompts</h2>
+            <div class="prompt-card">
+                <code>"Audit my RTX 4090 and i9-14900K build for 4K Cyberpunk 2077 performance."</code>
             </div>
-            <div class="card">
-                <h3>Neural Optimization</h3>
-                <div class="item"><strong>Resource Thread Priority</strong><p>Real-time background task suppression active. CPU logic focused on primary game-state vector.</p></div>
-                <div class="item"><strong>Frame Jitter Analysis</strong><p>Measured at 0.02ms variance. High-fidelity motion clarity achieved.</p></div>
+            <div class="prompt-card">
+                <code>"Will 32GB of DDR5 RAM be enough for high-fidelity simulation games in 2026?"</code>
             </div>
-            <div class="card">
-                <h3>Thermal Dynamics</h3>
-                <div class="item"><strong>Liquid Cooling Efficiency</strong><p>Delta-T maintained at 12°C. Vapor-chamber saturation avoided via intelligent fan-curve logic.</p></div>
-                <div class="item"><strong>VRM Stability</strong><p>Voltage ripple minimized to <1%. High-current delivery sustained for overclocking overhead.</p></div>
+            <div class="prompt-card">
+                <code>"Suggest the best cooling solution for a high-performance RTX 50-series rig."</code>
             </div>
         </div>
     </div>
-    <script>
-        function scan() {
-            if(!document.getElementById('q').value) return alert('Input required.');
-            document.querySelector('button').innerText = 'AUDITING HARDWARE...';
-            setTimeout(() => {
-                document.getElementById('results').style.display = 'block';
-                document.querySelector('button').innerText = 'Audit Complete';
-            }, 1800);
-        }
-    </script>
+
+    <footer>
+        <div class='PRISCION-footer' style='text-align:center; padding: 40px 20px; border-top:1px solid rgba(255,255,255,0.05); margin-top:60px;'>
+            <a href='https://priscadezigns.org' style='text-decoration:none;'>
+                <img src='https://dreaminganime.com/logos/PRISCION/PRISCION_logo_1.png' alt='PRISCION Logo' style='height:80px; margin-bottom:15px; background:transparent;'>
+                <p style='font-family:"Space Mono", monospace; color:rgba(255,255,255,0.6); font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; margin:0;'>
+                    A Node of the PRISCION Infrastructure
+                </p>
+            </a>
+        </div>
+    </footer>
 </body>
 </html>
