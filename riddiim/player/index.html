@@ -372,7 +372,7 @@
     results.style.display = 'block';
   };
 
-  window.loadTrack = async (t) => {
+  window.loadTrack = (t) => {
     currentTrack = t;
     results.style.display = 'none';
     emptyState.style.display = 'none';
@@ -393,60 +393,25 @@
       await new Promise(r => setTimeout(r, 2000));
     }
     
-    const searchQuery = `${t.artist} ${t.title} audio`;
-    const ytId = await findYouTubeId(searchQuery);
-    if(ytId && isReady) {
-      player.loadVideoById(ytId);
-      feedback.textContent = 'STREAM_STABILIZED';
-    } else {
-      feedback.textContent = 'SIGNAL_LOST_USING_PREVIEW';
-    }
+    playTrackOnYouTube(t.artist, t.title);
   };
 
-  async function findYouTubeId(query) {
-    console.log("Searching Neural Bridge (v3.0) for:", query);
-    const nodes = [
-      'iv.datura.network',
-      'invidious.privacydev.net',
-      'vid.puffyan.us',
-      'invidious.lunar.icu',
-      'inv.nadeko.net',
-      'invidious.nerdvpn.de'
-    ];
-    // Try each node in sequence until one works
-    for (const node of nodes) {
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 4000);
-        const searchUrl = `https://${node}/api/v1/search?q=${encodeURIComponent(query)}&type=video`;
-        const response = await fetch(searchUrl, { signal: controller.signal });
-        clearTimeout(timeout);
-        if (!response.ok) continue;
-        const data = await response.json();
-        if (data && data.length > 0) {
-          const searchTerms = query.toLowerCase().split(' ').filter(t => t.length > 1);
-          const matches = data.filter(v =>
-            searchTerms.some(term => (v.title || '').toLowerCase().includes(term)) &&
-            v.lengthSeconds > 60
-          );
-          const track = matches.length > 0 ? matches[0] : (data.find(v => v.lengthSeconds > 60) || data[0]);
-          if (track && track.videoId) {
-            console.log("Track Located via", node, ":", track.title, track.videoId);
-            return track.videoId;
-          }
-        }
-      } catch(e) {
-        console.warn("Node failed:", node, e.message);
-        continue;
-      }
+  function playTrackOnYouTube(artist, title) {
+    // Use YouTube IFrame API native playlist search — no external bridge needed
+    const searchQuery = artist + ' ' + title + ' official audio';
+    feedback.textContent = 'TUNING_FREQUENCY...';
+    if (isReady && player && player.loadPlaylist) {
+      player.loadPlaylist({
+        listType: 'search',
+        list: searchQuery,
+        index: 0
+      });
+      player.playVideo();
+      feedback.textContent = 'STREAM_STABILIZED';
+    } else {
+      // Player not ready yet — wait and retry
+      setTimeout(function() { playTrackOnYouTube(artist, title); }, 500);
     }
-    // All nodes failed — use YouTube oEmbed as final fallback
-    try {
-      const ytSearch = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-      feedback.textContent = 'SIGNAL_REROUTING...';
-    } catch(e) {}
-    console.error("All Neural Bridge nodes failed.");
-    return null;
   }
 
   // Visualizer bars
