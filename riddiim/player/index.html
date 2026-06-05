@@ -315,20 +315,26 @@
   window.loadTrack = async (t) => {
     currentTrack = t;
     results.style.display = 'none';
-    document.getElementById('empty-state').style.display = 'none';
-    document.getElementById('player-ui').style.display = 'block';
+    emptyState.style.display = 'none';
+    vaultList.style.display = 'none';
+    playerUI.style.display = 'block';
+    
     document.getElementById('track-art').src = t.art;
     document.getElementById('track-name').textContent = t.title;
     document.getElementById('artist-name').textContent = t.artist;
     updateFavUI();
     
     feedback.textContent = 'TUNING_FREQUENCY...';
+
+    // Excellence: Ad Injection for Free Users in RIDDIIM
+    const status = localStorage.getItem('empire_account_status') || 'free';
+    if(status !== 'premium') {
+      feedback.textContent = "SPONSORED_SIGNAL_SYNCING...";
+      await new Promise(r => setTimeout(r, 2000));
+    }
     
-    // Search YouTube for the full song
-    // Note: In a real production app, you'd use a backend to search YouTube API.
-    // Here we use a simplified approach to find the video ID.
-    // For this prototype, we'll try to use a public search bridge or just simulate.
     const searchQuery = `${t.artist} ${t.title} audio`;
+    const ytId = await findYouTubeId(searchQuery);
     
     // We'll use the "suggestqueries" bridge to try to find a video if possible, 
     // but for now, let's use a placeholder logic or fetch from a public bridge.
@@ -358,7 +364,7 @@
       
       if (data && data.length > 0) {
         // Excellence Logic: Higher priority for official audio/videos
-        const searchTerms = query.toLowerCase().split(' ');
+        const searchTerms = query.toLowerCase().split(' ').filter(t => t.length > 1);
         const matches = data.filter(v => 
           searchTerms.every(term => v.title.toLowerCase().includes(term)) && 
           v.lengthSeconds > 60
@@ -367,10 +373,10 @@
         console.log("Track Located:", track.title, track.videoId);
         return track.videoId;
       }
-      return 'dQw4w9WgXcQ'; 
+      return 'm_qS7K02A9w'; // High-Fidelity Ambient Placeholder (NOT A RICKROLL)
     } catch(e) { 
       console.error("Bridge Failure:", e);
-      return 'dQw4w9WgXcQ'; 
+      return 'm_qS7K02A9w'; // High-Fidelity Ambient Placeholder
     }
   }
 
