@@ -1,723 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Calalloo | Beta</title>
-    <link rel="icon" type="image/png" href="assets/logo.png">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{credential:google-maps-api-key}}&libraries=places"></script>
-    <style>
-        :root {
-            --bg: #FFFFFF; --primary: #E87722; --dark: #000000; --white: #FFFFFF;
-            --border: #F2F2F2; --grey-text: #666666; --light-bg: #FAF9F6;
-            --font-display: 'Fraunces', serif; --font-main: 'Inter', sans-serif;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-        body { font-family: var(--font-main); background: var(--bg); color: var(--dark); overflow-x: hidden; }
-        .display-font { font-family: var(--font-display); font-weight: 900; }
-        
-        header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 1000; border-bottom: 1px solid var(--border); }
-        .logo { height: 32px; }
-        
-        .nav-pills { display: flex; gap: 8px; padding: 15px 20px; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; border-bottom: 1px solid var(--border); }
-        .pill { padding: 8px 20px; border-radius: 100px; font-weight: 700; font-size: 0.85rem; background: var(--light-bg); color: var(--grey-text); border: none; cursor: pointer; transition: 0.2s; }
-        .pill.active { background: var(--primary); color: white; }
-
-        .tab-content { display: none; padding-bottom: 80px; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Discovery Grid */
-        .search-bar { padding: 20px; position: sticky; top: 63px; background: white; z-index: 900; }
-        .search-input { width: 100%; padding: 14px 45px 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 1rem; outline: none; }
-        .search-input:focus { border-color: var(--primary); }
-        .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 0 20px 20px; }
-        .recipe-card { border-radius: 12px; overflow: hidden; cursor: pointer; background: white; border: 1px solid var(--border); transition: transform 0.2s; }
-        .recipe-card:active { transform: scale(0.98); }
-        .recipe-image { height: 160px; background-size: cover; background-position: center; }
-        .recipe-info { padding: 12px; }
-        .recipe-info h3 { font-family: var(--font-display); font-size: 1rem; margin-bottom: 4px; }
-        .tag { font-size: 0.7rem; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* Profile */
-        .profile-header { text-align: center; padding: 40px 20px; background: var(--light-bg); border-bottom: 1px solid var(--border); }
-        .avatar-main { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 15px; }
-        .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
-        .stat-item { text-align: center; }
-        .stat-val { display: block; font-weight: 800; font-size: 1.2rem; }
-        .stat-label { font-size: 0.7rem; color: var(--grey-text); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Vision AI */
-        .vision-container { padding: 30px 20px; text-align: center; }
-        .btn { padding: 14px 28px; border-radius: 100px; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: var(--dark); color: white; }
-        
-        /* Map */
-        #map-container { height: calc(100vh - 180px); width: 100%; }
-
-        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; display: none; flex-direction: column; padding: 40px; }
-        .menu-item { font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 20px; cursor: pointer; display: flex; align-items: center; gap: 15px; }
-        .menu-item.pro { color: var(--primary); font-weight: 900; }
-        .close-btn { background: none; border: none; cursor: pointer; }
-
-        /* Modals */
-        .modal-bg { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal { background: white; border-radius: 20px; width: 100%; max-width: 400px; padding: 30px; position: relative; animation: modalIn 0.3s ease; }
-        @keyframes modalIn { from { opacity:0; scale:0.9; } to { opacity:1; scale:1; } }
-        .modal-close { position: absolute; top: 20px; right: 20px; cursor: pointer; }
-
-        /* Floating Messenger */
-        .messenger-bubble { position: fixed; bottom: 30px; right: 30px; background: var(--primary); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(232,119,34,0.4); z-index: 2000; overflow: hidden; transition: transform 0.2s; }
-        .messenger-bubble:hover { transform: scale(1.05); }
-        .messenger-bubble img { width: 35px; height: 35px; border-radius: 0; background: transparent; }
-        @media (min-width: 1101px) { .messenger-bubble { display: none; } }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .spin { animation: spin 1s linear infinite; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title><!-- v40.8.8 -->Calalloo | Heritage Hub v40.3.0 Sovereign Marketplace Edition</title>
+<meta name="description" content="Calalloo | Heritage Hub: The definitive Caribbean culinary social network. Discover, share, and preserve authentic recipes from across the Caribbean islands, including Trinidad and Tobago, Jamaica, Barbados, Guyana, Grenada, Saint Lucia, and more. Use our AI Heritage Scanner to analyze dishes and sweets, and find local ingredients with our real-time Heritage Map.">
+<meta name="keywords" content="Calalloo, Heritage Hub, Caribbean food, Caribbean recipes, Trinidadian cuisine, Jamaican food, Guyanese recipes, Barbadian food, Grenadian cuisine, Saint Lucian food, Callaloo recipe, Doubles, Jerk Chicken, Ackee and Saltfish, Oil Down, Pepperpot, Mofongo, Cou-cou, Pelau, Curried Goat, Roti, Caribbean cooking, food scanner, heritage map, Caribbean social network, Caribbean culture, Caribbean heritage, Antigua and Barbuda, Bahamas, Cuba, Dominica, Dominican Republic, Haiti, Saint Kitts and Nevis, Saint Vincent and the Grenadines, Puerto Rico, Cayman Islands, Virgin Islands">
+<meta name="geo.region" content="TT-SIP, JM, BB, GY, GD, LC, AG, BS, CU, DM, DO, HT, KN, VC, PR, KY, VG" />
+<meta name="geo.placename" content="Caribbean Islands, West Indies, Port of Spain, Kingston, Bridgetown, Georgetown, Castries, Saint George's" />
+<meta property="og:title" content="Calalloo | Heritage Hub - Caribbean Culinary Sovereignty" />
+<meta property="og:description" content="Join the definitive Caribbean culinary social network. Discover, share, and preserve authentic recipes from across the islands. Analyze dishes with AI and find local markets." />
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Calalloo | Heritage Hub">
+<meta name="twitter:description" content="The definitive Caribbean culinary social network. Discover and preserve authentic heritage recipes.">
+<link rel="icon" type="image/png" href="/assets/logo.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,700;9..144,0,900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest?v=39.7.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2?v=39.7.2"></script>
+<style>
+:root {
+--bg: #FFFFFF; --primary: #E87722; --dark: #000000; --white: #FFFFFF;
+--border: #F2F2F2; --grey-text: #666666; --light-bg: #FAF9F6;
+--font-display: 'Fraunces', serif; --font-main: 'Inter', sans-serif;
+--transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-theme="dark"] {
+--bg: #0A0A0A; --white: #0A0A0A; --dark: #FFFFFF;
+--border: #1F1F1F; --grey-text: #A0A0A0; --light-bg: #141414;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+body { font-family: var(--font-main); background: var(--bg); color: var(--dark); transition: var(--transition); min-height: 100vh; overflow-x: hidden; }
+header { position: sticky; top: 0; background: var(--bg); border-bottom: 1px solid var(--border); padding: 12px 20px; z-index: 1000; display: flex; align-items: center; justify-content: space-between; }
+.logo-container { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.logo-container img { width: 32px; height: 32px; border-radius: 50%; }
+.logo-container span { font-family: var(--font-display); font-weight: 900; font-size: 1.3rem; letter-spacing: -0.02em; }
+.pro-badge { background: linear-gradient(135deg, #FFD700, #E87722); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-left: 6px; cursor: pointer; }
+.desktop-tabs { display: flex; gap: 25px; margin-left: 30px; }
+.tab-btn { font-weight: 700; font-size: 0.85rem; color: var(--grey-text); cursor: pointer; transition: 0.2s; white-space: nowrap; }
+.tab-btn.active { color: var(--primary); }
+.tab-content { display: none; padding-bottom: 100px; }
+.pinterest-grid { columns: 4; column-gap: 15px; padding: 15px; max-width: 1400px; margin: 0 auto; }
+.recipe-pin { break-inside: avoid; margin-bottom: 15px; border-radius: 16px; overflow: hidden; background: var(--light-bg); border: 1px solid var(--border); cursor: pointer; transition: var(--transition); position: relative; }
+.recipe-pin img { width: 100%; height: 280px; display: block; object-fit: cover; }
+.pin-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.8)); opacity: 0; transition: 0.3s; display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: white; }
+.recipe-pin:hover .pin-overlay { opacity: 1; }
+.settings-card { background: var(--light-bg); border: 1px solid var(--border); border-radius: 24px; padding: 25px; margin-bottom: 24px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--grey-text); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg); color: var(--dark); font-family: inherit; }
+nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; height: 75px; z-index: 1000; padding-bottom: 10px; }
+.nav-item { color: var(--grey-text); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.6rem; font-weight: 700; transition: 0.2s; }
+.nav-item.active { color: var(--primary); }
+.modal { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: none; flex-direction: column; overflow-y: auto; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-header { position: sticky; top: 0; background: var(--bg); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.k-tab { flex: 1; text-align: center; padding: 12px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; color: var(--grey-text); transition: 0.2s; position: relative; z-index: 10; }
+.k-tab.active { background: var(--primary); color: white !important; }
+.panel-slam { background: var(--light-bg); border: 1px solid var(--border); border-radius: 24px; transition: var(--transition); }
+.panel-slam:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+@media (max-width: 768px) {
+.desktop-tabs { display: none; }
+.pinterest-grid { columns: 2; column-gap: 10px; padding: 10px; }
+.recipe-pin img { height: 240px; }
+#heritage-blog { padding-bottom: 120px !important; }
+.panel-slam { padding: 15px !important; gap: 15px !important; }
+}
+</style>
 </head>
 <body>
-    <header>
-        <img src="assets/logo.png" class="logo" alt="Calalloo">
-        <div class="close-btn" onclick="toggleMenu()">
-            <i data-lucide="menu"></i>
-        </div>
-    </header>
-
-    <div class="nav-pills">
-        <button class="pill active" onclick="showTab('discovery')">Discovery</button>
-        <button class="pill" onclick="showTab('vision')">Vision AI</button>
-        <button class="pill" onclick="showTab('map')">Heritage Map</button>
-        <button class="pill" onclick="showTab('profile')">My Profile</button>
-    </div>
-
-    <div id="discovery" class="tab-content active">
-        <div class="search-bar">
-            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
-                <div style="position: relative; flex: 1;">
-                    <input type="text" class="search-input" placeholder="Search dishes or keepers..." oninput="handleSearch(this.value)">
-                    <i data-lucide="search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--grey-text); width: 20px;"></i>
-                </div>
-                <button class="btn btn-primary" style="padding: 12px; border-radius: 12px; height: 50px; width: 50px; justify-content: center;" onclick="openGroupModal()">
-                    <i data-lucide="users"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Featured Heritage Keepers -->
-        <div style="padding: 10px 20px;">
-            <h2 class="display-font" style="font-size: 1.2rem; margin-bottom: 12px; color: var(--dark);">Featured Keepers</h2>
-            <div style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch;" id="keepers-list">
-                <!-- Keepers rendered via JS -->
-            </div>
-        </div>
-
-        <div style="padding: 10px 20px;">
-            <h2 class="display-font" style="font-size: 1.2rem; margin-bottom: 12px; color: var(--dark);">Discovery Feed</h2>
-            <div id="discovery-grid" class="recipe-grid"></div>
-        </div>
-    </div>
-
-    <div id="vision" class="tab-content">
-        <div class="vision-container">
-            <h2 class="display-font" style="font-size: 1.5rem; margin-bottom: 20px;">Heritage Vision AI</h2>
-            <div id="vision-stage" style="position: relative; max-width: 500px; margin: 0 auto 20px;">
-                <video id="video-feed" autoplay playsinline style="width: 100%; border-radius: 12px; aspect-ratio: 4/3; object-fit: cover; background: #000; display: none;"></video>
-                <img id="upload-preview" style="width: 100%; border-radius: 12px; margin-bottom: 20px; display: none;">
-            </div>
-            
-            <div id="vision-controls" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 30px;">
-                <button class="btn btn-secondary" id="camera-btn" onclick="startCamera()">
-                    <i data-lucide="camera"></i> Open Eye
-                </button>
-                <button class="btn btn-primary" id="capture-btn" onclick="captureImage()" style="display: none;">
-                    <i data-lucide="aperture"></i> Capture
-                </button>
-                <button class="btn btn-secondary" onclick="document.getElementById('file-upload').click()">
-                    <i data-lucide="upload"></i> From Vault
-                </button>
-                <input type="file" id="file-upload" style="display: none;" accept="image/*" onchange="handleUpload(this)">
-            </div>
-
-            <div id="ai-loading" style="display: none; padding: 40px;">
-                <div style="width: 40px; height: 40px; border: 4px solid var(--primary); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
-                <p style="font-weight: 700; color: var(--primary);">Analyzing Heritage Profile...</p>
-            </div>
-
-            <div id="vision-results"></div>
-        </div>
-    </div>
-
-    <div id="map" class="tab-content">
-        <div id="map-container"></div>
-    </div>
-
-    <div id="profile" class="tab-content">
-        <div class="profile-header">
-            <div style="position: relative; display: inline-block;">
-                <img id="p-avatar" class="avatar-main" src="https://via.placeholder.com/100">
-                <div style="position: absolute; bottom: 15px; right: 0; background: var(--primary); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="document.getElementById('avatar-upload').click()">
-                    <i data-lucide="plus" style="width: 16px;"></i>
-                </div>
-                <input type="file" id="avatar-upload" style="display: none;" onchange="handleAvatarUpload(this)">
-            </div>
-            
-            <input type="text" id="p-display-name" class="display-font" style="width: 100%; text-align: center; border: none; font-size: 1.8rem; margin-bottom: 5px; background: transparent; outline: none;" placeholder="Heritage Name">
-            <p id="profile-email" style="color: var(--grey-text); font-size: 0.8rem; margin-bottom: 20px; opacity: 0.7;">...</p>
-            
-            <div class="stats">
-                <div class="stat-item"><span class="stat-val" id="p-recipes-count">0</span><span class="stat-label">Recipes</span></div>
-                <div class="stat-item"><span class="stat-val" id="p-followers-count">0</span><span class="stat-label">Followers</span></div>
-                <div class="stat-item"><span class="stat-val" id="p-following-count">0</span><span class="stat-label">Following</span></div>
-            </div>
-            
-            <textarea id="p-bio" placeholder="Tell your heritage story..." style="width: 100%; padding: 15px; border: 1.5px solid var(--border); border-radius: 12px; resize: none; min-height: 100px; margin-bottom: 20px; font-family: var(--font-main); font-size: 0.95rem;"></textarea>
-            
-            <button id="save-profile-btn" class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="saveFullProfile()">
-                <i data-lucide="save"></i> Update Profile
-            </button>
-        </div>
-        <div style="padding: 30px 20px;">
-            <h3 class="display-font" style="margin-bottom: 20px; font-size: 1.4rem;">Your Heritage Kitchen</h3>
-            <div id="kitchen-grid" class="recipe-grid"></div>
-        </div>
-    </div>
-
-    <!-- Menu Overlay -->
-    <div id="menu-overlay" class="menu-overlay">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
-            <button class="close-btn" onclick="toggleMenu()"><i data-lucide="x" style="width: 32px; height: 32px;"></i></button>
-        </div>
-        <div class="menu-item pro" onclick="openProModal(); toggleMenu()"><i data-lucide="zap"></i>Calalloo Pro</div>
-        <div class="menu-item" onclick="showTab('discovery'); toggleMenu()"><i data-lucide="search"></i>Discovery</div>
-        <div class="menu-item" onclick="openHub(); toggleMenu()"><i data-lucide="message-square"></i>Heritage Hub (Chat)</div>
-        <div class="menu-item" onclick="showTab('map'); toggleMenu()"><i data-lucide="map"></i>Heritage Map</div>
-        <div class="menu-item" onclick="showTab('profile'); toggleMenu()"><i data-lucide="user"></i>My Profile</div>
-        <div class="menu-item" onclick="signOut()"><i data-lucide="log-out"></i>Sign Out</div>
-    </div>
-
-    <!-- Modals -->
-    <div id="group-modal" class="modal-bg" onclick="closeModals()">
-        <div class="modal" onclick="event.stopPropagation()">
-            <div class="modal-close" onclick="closeModals()"><i data-lucide="x"></i></div>
-            <h2 class="display-font" style="font-size: 1.8rem; margin-bottom: 10px;">Create Group</h2>
-            <p style="color: var(--grey-text); font-size: 0.9rem; margin-bottom: 20px;">Gather your heritage circle.</p>
-            <input type="text" id="group-name" class="search-input" placeholder="Group Name" style="margin-bottom: 15px;">
-            <textarea id="group-desc" class="search-input" placeholder="Group Description" style="height: 100px; margin-bottom: 20px; resize: none;"></textarea>
-            <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="createHeritageGroup()">
-                Create Heritage Group
-            </button>
-        </div>
-    </div>
-
-    <div id="pro-modal" class="modal-bg" style="display: none; align-items: center; justify-content: center;" onclick="closeModals()">
-        <div class="modal" onclick="event.stopPropagation()">
-            <div class="modal-close" onclick="closeModals()"><i data-lucide="x"></i></div>
-            <div style="text-align: center; margin-bottom: 20px;">
-                <div style="background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-                    <i data-lucide="zap" style="width: 32px; height: 32px;"></i>
-                </div>
-                <h2 class="display-font" style="font-size: 2rem;">Calalloo Pro</h2>
-                <p style="color: var(--primary); font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px;">Heritage Excellence</p>
-            </div>
-            <ul style="list-style: none; margin-bottom: 30px;">
-                <li style="margin-bottom: 15px; display: flex; gap: 10px;"><i data-lucide="check-circle" style="color: var(--primary); width: 20px;"></i> Unlimited Vision AI Scans</li>
-                <li style="margin-bottom: 15px; display: flex; gap: 10px;"><i data-lucide="check-circle" style="color: var(--primary); width: 20px;"></i> Global Heritage Marketplace</li>
-                <li style="margin-bottom: 15px; display: flex; gap: 10px;"><i data-lucide="check-circle" style="color: var(--primary); width: 20px;"></i> Exclusive Keepers Events</li>
-            </ul>
-            <button class="btn btn-dark" style="width: 100%; justify-content: center; background: black; color: white;" onclick="initPayment()">
-                Unlock Pro — $9.99/mo
-            </button>
-        </div>
-    </div>
-
-    <div class="messenger-bubble" onclick="openHub()">
-        <img src="assets/logo.png" alt="Messenger" style="mix-blend-mode: color-burn; filter: brightness(1.1) contrast(1.1);">
-    </div>
-
-    <script>
-        const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', '{{credential:supabase-callaloo-dpanyard}}');
-        let allRecipes = [];
-        let allKeepers = [];
-        let mapInitialized = false;
-        let currentFacingMode = 'environment';
-        let stream = null;
-
-        async function loadData() {
-            try {
-                const { data: { user } } = await sb.auth.getUser();
-                if(!user) { window.location.href = '/login/'; return; }
-
-                // Restore last active tab
-                const lastTab = localStorage.getItem('activeTab') || 'discovery';
-                showTab(lastTab);
-
-                // Load Recipes
-                const { data: recipes, error: rError } = await sb.from('recipes').select('*').eq('is_published', true);
-                if(rError) console.error('Recipes Load Error:', rError);
-                allRecipes = recipes || [];
-                renderRecipes(allRecipes);
-
-        // Load Keepers (Join Profiles and Cooks)
-                const { data: cooks, error: cError } = await sb.from('cooks').select('*').limit(100);
-                if(cError) console.error('Cooks Load Error:', cError);
-                console.log('Loaded Cooks:', cooks ? cooks.length : 0);
-                
-                if(!cooks || cooks.length === 0) {
-                    const { data: profiles } = await sb.from('profiles').select('*').limit(100);
-                    allKeepers = (profiles || []).map(p => ({
-                        id: p.id,
-                        username: 'Heritage Keeper',
-                        display_name: 'Heritage Keeper',
-                        avatar_url: p.avatar_url,
-                        bio: p.bio
-                    }));
-                } else {
-                    allKeepers = cooks.map(c => ({
-                        id: c.user_id,
-                        username: c.display_name || 'Keeper',
-                        display_name: c.display_name || 'Keeper',
-                        avatar_url: c.avatar_url,
-                        bio: c.bio
-                    }));
-                }
-                console.log('Final allKeepers count:', allKeepers.length);
-                
-                renderKeepers(allKeepers);
-
-                // Load Profile
-                const { data: profile, error: pError } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
-                const { data: cook, error: ckError } = await sb.from('cooks').select('*').eq('user_id', user.id).maybeSingle();
-                
-                if (pError) console.error('Profile Fetch Error:', pError);
-                if (ckError) console.error('Cook Fetch Error:', ckError);
-
-                document.getElementById('profile-email').innerText = user.email;
-                if(profile) {
-                    document.getElementById('p-bio').value = profile.bio || '';
-                    document.getElementById('p-avatar').src = profile.avatar_url || 'https://via.placeholder.com/100';
-                }
-                if(cook) {
-                    document.getElementById('p-display-name').value = cook.display_name || '';
-                    document.getElementById('p-recipes-count').innerText = cook.recipe_count || 0;
-                    document.getElementById('p-followers-count').innerText = cook.follower_count || 0;
-                } else {
-                    document.getElementById('p-display-name').value = user.email.split('@')[0];
-                }
-                
-                lucide.createIcons();
-            } catch (e) {
-                console.error('System Load Error:', e);
-            }
-        }
-
-        function renderKeepers(list, isSearch = false) {
-            const container = document.getElementById('keepers-list');
-            if(!list || !list.length) {
-                container.innerHTML = isSearch 
-                    ? '<p style="color: var(--grey-text); font-size: 0.8rem; padding: 10px; width: 100%;">No keepers found matching your search.</p>'
-                    : '<p style="color: var(--grey-text); font-size: 0.8rem; padding: 10px;">Join as a Heritage Keeper to be featured.</p>';
-                return;
-            }
-            
-            // If searching, we might want a slightly different layout, but for now we keep it consistent
-            container.innerHTML = list.map(k => `
-                <div style="flex: 0 0 80px; text-align: center; cursor: pointer; transition: transform 0.2s;" onclick="openKeeper('${k.id}')" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                    <img src="${k.avatar_url || 'https://via.placeholder.com/60'}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); padding: 2px; margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                    <p style="font-size: 0.75rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dark);">${k.display_name || k.username || 'Keeper'}</p>
-                </div>
-            `).join('');
-        }
-
-        function renderRecipes(list) {
-            const grid = document.getElementById('discovery-grid');
-            if(!list || !list.length) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--grey-text); padding: 40px;">No heritage dishes found.</p>';
-                return;
-            }
-            grid.innerHTML = list.map(r => `
-                <div class="recipe-card" onclick="openRecipe('${r.id}')">
-                    <div class="recipe-image" style="background-image: url(${r.cover_photo_url || 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=800'})"></div>
-                    <div class="recipe-info">
-                        <h3 style="margin:0; font-size: 1rem;">${r.title}</h3>
-                        <span class="tag" style="font-size: 0.7rem;">${(r.vibe_tags || []).join(' • ')}</span>
+<header>
+<div class="logo-container" onclick="showTab('discovery')">
+<img src="/assets/logo.png" alt="Calalloo">
+<span>Calalloo<span class="pro-badge" onclick="openProModal(event)">PRO</span></span>
+</div>
+<div style="display:flex; align-items:center; gap:15px; flex:1; max-width:400px; margin: 0 20px;">
+<div style="display:flex; align-items:center; gap:10px; background:var(--light-bg); padding:8px 15px; border-radius:12px; border:1px solid var(--border); width:100%;">
+<i data-lucide="search" style="width:18px; color:var(--grey-text); cursor:pointer;" onclick="performSearch()"></i>
+<input type="text" id="header-search" placeholder="Search heritage & cooks..." style="background:none; border:none; width:100%; font-size:0.9rem;" oninput="performSearch()">
+</div>
+</div>
+<div class="desktop-tabs">
+<div class="tab-btn active" id="d-tab-discovery" onclick="showTab('discovery')">Discovery</div>
+<div class="tab-btn" id="d-tab-map" onclick="showTab('map')">Map</div>
+<div class="tab-btn" id="d-tab-heritage-blog" onclick="showTab('heritage-blog')">Blog</div>
+<div class="tab-btn" id="d-tab-kitchen" onclick="showTab('kitchen')">Kitchen</div>
+<div class="tab-btn" id="d-tab-settings" onclick="showTab('settings')">Settings</div>
+</div>
+<i data-lucide="plus-circle" style="color:var(--primary); cursor:pointer;" onclick="openAddModal()"></i>
+</header>
+<div id="discovery" class="tab-content" style="display:block;">
+        <div id="heritage-reels" style="padding: 15px 0 25px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px;">
+            <div style="display: flex; gap: 15px; overflow-x: auto; padding: 0 15px; scrollbar-width: none; -ms-overflow-style: none;">
+                <!-- Add Button -->
+                <div class="reel-circle" style="flex: 0 0 75px; text-align: center; cursor: pointer;" onclick="openAddModal()">
+                    <div style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content:center; background: var(--light-bg);">
+                        <i data-lucide="plus" style="color: var(--primary);"></i>
                     </div>
+                    <p style="font-size: 0.65rem; font-weight: 700; margin-top: 5px; color: var(--grey-text);">Add</p>
                 </div>
-            `).join('');
-        }
+            </div>
+        </div>
+<div class="pinterest-grid" id="discovery-pins"></div>
+</div>
+<div id="map" class="tab-content">
+<div id="map-container" style="height:calc(100vh - 150px); width:100%; min-height: 400px; background: var(--light-bg); position: relative; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+<div id="actual-map" style="width:100%; height:100%; display:none;">
+<iframe id="map-frame" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
+</div>
+<div id="map-placeholder" style="text-align:center;">
+<i data-lucide="map" style="width:40px; color:var(--primary);"></i>
+<p style="font-weight:700; margin-top:10px;">Heritage Map</p>
+<p style="font-size:0.8rem; color:var(--grey-text); text-align:center; padding: 0 20px;">Establishing connection to Google Heritage Satellites...<br>Please ensure Location Permissions are enabled in Settings.</p>
+<button onclick="showTab('settings')" style="margin-top:15px; background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:700; cursor:pointer;">Enable Access</button>
+</div>
+</div>
+</div>
+<div id="kitchen" class="tab-content">
+<div style="padding: 25px;">
+<div style="display:flex; align-items:flex-start; gap:25px; margin-bottom:30px;">
+<div style="position:relative; cursor:pointer;" onclick="document.getElementById('avatar-input').click()">
+<img id="profile-avatar" src="https://via.placeholder.com/120" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:4px solid var(--primary);">
+<div style="position:absolute; bottom:0; right:0; background:var(--primary); color:white; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:3px solid var(--bg);">
+<i data-lucide="camera" style="width:14px; height:14px;"></i>
+</div>
+<input type="file" id="avatar-input" style="display:none;" accept="image/*" onchange="previewAvatar(this)">
+</div>
+<div style="flex:1;">
+<h1 class="display-font" style="font-size:1.8rem; line-height:1;" id="prof-name"></h1>
+<p style="color:var(--grey-text); font-size:0.9rem; margin-top:8px;" id="prof-username"></p>
+<div style="display: flex; gap: 15px; margin-top: 15px;">
+<i data-lucide="message-circle" style="width:18px; cursor:pointer;"></i>
+<i data-lucide="facebook" style="width:18px; cursor:pointer;"></i>
+<i data-lucide="instagram" style="width:18px; cursor:pointer;"></i>
+</div>
+<button id="sync-avatar-btn" onclick="syncAvatarToVault()" style="display:none; margin-top:15px; background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:8px; font-weight:700; font-size:0.8rem; cursor:pointer;">Save New Picture</button>
+</div>
+</div>
+<div style="display: flex; gap: 15px; margin: 20px 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; position: relative; z-index: 100;">
+<div class="k-tab active" id="k-tab-saved" onclick="switchKitchenTab('saved')">Saved</div>
+<div class="k-tab" id="k-tab-public" onclick="switchKitchenTab('public')">Public</div>
+<div class="k-tab" id="k-tab-private" onclick="switchKitchenTab('private')">Private</div>
+</div>
+<div class="pinterest-grid" id="kitchen-pins" style="padding:0;"></div>
+</div>
+</div>
+<div id="settings" class="tab-content">
+<div style="padding:20px; max-width:650px; margin: 0 auto;">
+<h2 class="display-font" style="margin-bottom:30px; font-size:2rem;">Settings</h2>
+<div class="settings-card">
+<h3 style="margin-bottom:20px; color:var(--primary); font-size:0.9rem; text-transform:uppercase;">Account Details</h3>
+<div class="form-group"><label>Profile Name</label><input type="text" id="edit-name" value="" placeholder="Your Name"></div>
+<div class="form-group"><label>Username</label><input type="text" id="edit-username" value="" placeholder="@username"></div>
+<div class="form-group"><label>WhatsApp Number</label><input type="text" id="edit-whatsapp" placeholder="+1 868 ..."></div>
+<div class="form-group"><label>Facebook</label><input type="text" id="edit-facebook" placeholder="facebook.com/yourprofile"></div>
+<div class="form-group"><label>Instagram</label><input type="text" id="edit-instagram" placeholder="@yourinstagram"></div>
+<div class="form-group"><label>Language</label>
+<select id="edit-lang">
+<option value="en">English</option><option value="es">Español</option><option value="pt">Português</option>
+<option value="fr">Français</option><option value="hi">Hindi</option><option value="zh">Chinese</option>
+<option value="ar">Arabic</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="nl">Nederlands</option>
+</select>
+</div>
+<div style="margin:25px 0; border-top:1px solid var(--border); padding-top:25px;">
+<label style="font-size:0.75rem; font-weight:800; color:var(--grey-text); text-transform:uppercase; margin-bottom:20px; display:block;">Permissions & UI</label>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+<div><p style="font-weight:700;">Night Mode</p><p style="font-size:0.8rem; color:var(--grey-text);">Sync UI with your light</p></div>
+<input type="checkbox" id="set-dark" onchange="toggleDarkMode()" style="width:auto;">
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+<div><p style="font-weight:700;">Location Permissions</p><p style="font-size:0.8rem; color:var(--grey-text);">Required for Heritage Map</p></div>
+<input type="checkbox" id="set-location" style="width:auto;" onchange="syncLocationImmediate()">
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<div><p style="font-weight:700;">Camera Permissions</p><p style="font-size:0.8rem; color:var(--grey-text);">Required for AI scanner</p></div>
+<input type="checkbox" id="set-camera" style="width:auto;">
+</div>
+</div>
+<div style="margin:25px 0; border-top:1px solid var(--border); padding-top:25px;">
+<label style="font-size:0.75rem; font-weight:800; color:var(--grey-text); text-transform:uppercase; margin-bottom:20px; display:block;">Heritage Resources</label>
+<div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; margin-bottom:15px;" onclick="showTab('heritage-blog')">
+<div><p style="font-weight:700;">Heritage Blog & Stories</p><p style="font-size:0.8rem; color:var(--grey-text);">Discover the roots of your favorite dishes</p></div>
+<i data-lucide="chevron-right" style="width:18px;"></i>
+</div>
+</div>
+<button onclick="saveSettings()" style="width:100%; padding:16px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; cursor:pointer;">Save Changes</button>
+</div>
+<button onclick="signOut()" style="color:red; background:none; border:none; width:100%; font-weight:700; margin-top:20px; cursor:pointer;">Sign Out</button>
+</div>
+</div>
+<div id="heritage-blog" class="tab-content" style="padding:20px;">
+<div style="max-width:650px; margin: 0 auto;">
+<header style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
+<i data-lucide="arrow-left" onclick="showTab('settings')" style="cursor:pointer; width:24px;"></i>
+<h2 class="display-font" style="font-size:2rem;">Heritage Blog</h2>
+</header>
+<div id="blog-posts-container">
+<div class="blog-card" style="margin-bottom:30px; padding:0; border-radius:24px; background:var(--light-bg); border:1px solid var(--border); overflow:hidden;">
+<div style="height:300px; width:100%; overflow:hidden;">
+<img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&q=80&w=1200" style="width:100%; height:100%; object-fit:cover;" alt="Heritage Callaloo">
+</div>
+<div style="padding:25px;">
+<span style="font-size:0.7rem; font-weight:800; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em;">Featured Discovery</span>
+<h3 class="display-font" style="font-size:1.8rem; margin:15px 0;">The Ancestral Soul of Sunday Callaloo</h3>
+<p style="font-size:0.95rem; color:var(--grey-text); line-height:1.7; margin-bottom:20px;">Beyond the ingredients lies a story of survival and fusion. We trace the dasheen bush (Colocasia esculenta) from West African shores to the heart of the Trinidadian kitchen. A diagnostic of the chemical bond between coconut milk, okra, and blue crab.</p>
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span style="font-size:0.8rem; font-weight:600; opacity:0.6;">6 min read • By Heritage Archive</span>
+<button style="background:var(--primary); color:white; border:none; padding:12px 25px; border-radius:12px; font-size:0.85rem; font-weight:700; cursor:pointer;">Read Story</button>
+</div>
+</div>
+</div>
+<div class="blog-card" style="margin-bottom:30px; padding:0; border-radius:24px; background:var(--light-bg); border:1px solid var(--border); overflow:hidden;">
+<div style="height:250px; width:100%; overflow:hidden;">
+<img src="https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&q=80&w=1200" style="width:100%; height:100%; object-fit:cover;" alt="Curry Geera">
+</div>
+<div style="padding:25px;">
+<span style="font-size:0.7rem; font-weight:800; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em;">Culinary Science</span>
+<h3 class="display-font" style="font-size:1.8rem; margin:15px 0;">The Chemistry of Curry: Why Geera Matters</h3>
+<p style="font-size:0.95rem; color:var(--grey-text); line-height:1.7; margin-bottom:20px;">An analytical look at how toasted cumin (geera) transforms the flavor profile through the Maillard reaction, aiding in the "Cohesion of Taste" in Indo-Caribbean cooking.</p>
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span style="font-size:0.8rem; font-weight:600; opacity:0.6;">4 min read • By Analytical Faith</span>
+<button style="background:var(--text); color:var(--bg); border:none; padding:12px 25px; border-radius:12px; font-size:0.85rem; font-weight:700; cursor:pointer;">Read Story</button>
+</div>
+</div>
+</div>
+<div class="blog-card" style="margin-bottom:30px; padding:0; border-radius:24px; background:var(--light-bg); border:1px solid var(--border); overflow:hidden;">
+<div style="height:250px; width:100%; overflow:hidden;">
+<img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=1200" style="width:100%; height:100%; object-fit:cover;" alt="Heritage Provisions">
+</div>
+<div style="padding:25px;">
+<span style="font-size:0.7rem; font-weight:800; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em;">Heritage Diagnostics</span>
+<h3 class="display-font" style="font-size:1.8rem; margin:15px 0;">The Silent Strength of Ground Provisions</h3>
+<p style="font-size:0.95rem; color:var(--grey-text); line-height:1.7; margin-bottom:20px;">From Cassava to Yam, we analyze the starchy backbone of the Caribbean diet and its role in sustainable heritage agriculture.</p>
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span style="font-size:0.8rem; font-weight:600; opacity:0.6;">5 min read • By Sovereign Hub</span>
+<button style="background:var(--text); color:var(--bg); border:none; padding:12px 25px; border-radius:12px; font-size:0.85rem; font-weight:700; cursor:pointer;">Read Story</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="user-profile-modal" class="modal">
+<div class="modal-header">
+<i data-lucide="arrow-left" onclick="closeModal('user-profile-modal')"></i>
+<h3 class="display-font" id="u-prof-name"></h3>
+<i data-lucide="more-vertical" style="width:18px;"></i>
+</div>
+<div style="padding:25px;">
+<div style="display:flex; align-items:center; gap:20px; margin-bottom:25px;">
+<img id="u-prof-avatar" src="" style="width:80px; height:80px; border-radius:50%; border:3px solid var(--primary); object-fit:cover;">
+<div style="flex:1;">
+<h2 class="display-font" id="u-prof-title" style="font-size:1.5rem;"></h2>
+<p id="u-prof-handle" style="color:var(--grey-text); font-size:0.85rem;"></p>
+<div style="display:flex; gap:15px; margin-top:10px;">
+<div style="text-align:center;"><p id="count-followers" style="font-weight:900;">0</p><p style="font-size:0.6rem; text-transform:uppercase; opacity:0.6;">Followers</p></div>
+<div style="text-align:center;"><p id="count-following" style="font-weight:900;">0</p><p style="font-size:0.6rem; text-transform:uppercase; opacity:0.6;">Following</p></div>
+<div style="text-align:center;"><p id="count-likes" style="font-weight:900;">0</p><p style="font-size:0.6rem; text-transform:uppercase; opacity:0.6;">Likes</p></div>
+</div>
+</div>
+</div>
+<div style="display:flex; gap:10px; margin-bottom:30px;">
+<button id="follow-btn" onclick="toggleFollow()" style="flex:1; padding:12px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:800; cursor:pointer;">Follow</button>
+<button onclick="openChat()" style="flex:1; padding:12px; background:var(--dark); color:white; border:none; border-radius:12px; font-weight:800; cursor:pointer;">Message</button>
+</div>
+<h3 class="display-font" style="font-size:1.1rem; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">Public Kitchen</h3>
+<div class="pinterest-grid" id="user-public-pins" style="padding:0;"></div>
+</div>
+</div>
+<div id="chat-modal" class="modal">
+<div class="modal-header">
+<i data-lucide="arrow-left" onclick="closeModal('chat-modal')"></i>
+<div style="display:flex; align-items:center; gap:10px;">
+<img id="chat-avatar" src="" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">
+<h3 class="display-font" id="chat-user-name" style="font-size:1rem;"></h3>
+</div>
+<i data-lucide="phone" style="width:18px; opacity:0.5;"></i>
+</div>
+<div id="chat-messages" style="flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:15px; background:var(--light-bg);"></div>
+<div style="padding:15px; background:var(--bg); border-top:1px solid var(--border); display:flex; gap:10px; align-items:center;">
+<input type="text" id="chat-input" placeholder="Message..." style="flex:1; padding:12px; border-radius:20px; border:1px solid var(--border); background:var(--light-bg);">
+<button onclick="sendMessage()" style="background:var(--primary); color:white; border:none; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+<i data-lucide="send" style="width:18px;"></i>
+</button>
+</div>
+</div>
+<div id="detail-modal" class="modal">
+<div class="modal-header"><i data-lucide="arrow-left" onclick="closeModal('detail-modal')"></i><h3 class="display-font">Recipe Details</h3><i data-lucide="share" style="width:18px;"></i></div>
+<img id="m-img" style="width:100%; height:45vh; object-fit:cover;">
+<div style="padding:25px;">
+<h1 class="display-font" id="m-title" style="font-size:2.2rem; margin-bottom:10px;"></h1>
+<p style="color:var(--primary); font-weight:800; margin-bottom:30px;">Heritage Gold</p>
+<div style="display:flex; gap:10px; margin-bottom:20px;">
+<button onclick="saveToKitchen()" style="flex:1; padding:12px; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+<i data-lucide="heart" style="width:18px;"></i> Save to Kitchen
+</button>
+<button id="map-redirect-btn" style="flex:1; padding:12px; background:var(--dark); color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+<i data-lucide="map-pin" style="width:18px;"></i> View on Map
+</button>
+</div>
+<div id="m-ingredients" style="margin-bottom:30px;">
+<h3 style="text-transform:uppercase; font-size:0.8rem; color:var(--grey-text); margin-bottom:15px;">Ingredients</h3>
+<div id="ing-list" style="line-height:1.8; color:var(--dark);"></div>
+</div>
+<div id="m-instructions">
+<h3 style="text-transform:uppercase; font-size:0.8rem; color:var(--grey-text); margin-bottom:15px;">Instructions</h3>
+<div id="inst-list" style="line-height:1.8; color:var(--dark);"></div>
+</div>
+        <div id="m-video" style="margin-top:30px; display:none;">
+            <h3 style="text-transform:uppercase; font-size:0.7rem; color:var(--grey-text); margin-bottom:15px; letter-spacing:1px; font-weight:800;">
+                <i data-lucide="video" style="width:12px; height:12px; vertical-align:middle; margin-right:5px;"></i>
+                Heritage Cinema (Master Video Signal)
+            </h3>
+            <div id="video-wrap" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:16px; background:#000; border:1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <iframe id="recipe-video" style="position:absolute; top:0; left:0; width:100%; height:100%;" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <p style="font-size:0.75rem; color:var(--grey-text); margin-top:10px; font-style:italic;">Powered by the Neural Extraction Bridge v2.0</p>
+        </div>
+</div>
+</div>
+<div id="add-modal" class="modal">
+<div class="modal-header">
+<h2 class="display-font">Add to Heritage Vault</h2>
+<i data-lucide="x" onclick="closeModal('add-modal')" style="cursor:pointer;"></i>
+</div>
+<div style="padding:25px; max-width:600px; margin:0 auto; width:100%;">
+<div class="form-group">
+<label>Dish Photo</label>
+<div style="width:100%; height:180px; border:2px dashed var(--border); border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; position:relative;" onclick="document.getElementById('dish-img').click()">
+<i data-lucide="camera" style="color:var(--grey-text);"></i>
+<img id="dish-preview" style="display:none; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:18px;">
+</div>
+<input type="file" id="dish-img" style="display:none;" onchange="previewDish(this)">
+</div>
+<div class="form-group"><label>Dish Title</label><input type="text" id="dish-title" placeholder="e.g. Grandma's Callaloo"></div>
+<div class="form-group"><label>Ingredients</label><textarea id="dish-ingredients" rows="4" placeholder="List ingredients..."></textarea></div>
+<div class="form-group"><label>Instructions</label><textarea id="dish-instructions" rows="6" placeholder="Cooking steps..."></textarea></div>
+<div class="form-group" style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+<label style="margin-bottom:0;">Privacy Status:</label>
+<select id="dish-privacy" style="flex:1; padding:10px; border-radius:10px; border:1px solid var(--border); background:var(--light-bg); font-weight:600;">
+<option value="public">Public (Everyone can see)</option>
+<option value="private">Private (Only me)</option>
+</select>
+</div>
+<button onclick="submitDish()" style="width:100%; padding:18px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; cursor:pointer;">Post to Discovery</button>
+</div>
+</div>
+<div id="pro-modal" class="modal" style="background: rgba(0,0,0,0.85);">
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; padding:20px;">
+<div id="pro-intro" style="background:var(--bg); padding:35px; border-radius:28px; text-align:center; width:100%; max-width:420px; box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+<div style="background:var(--primary); color:white; width:60px; height:60px; border-radius:18px; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;"><i data-lucide="zap" style="width:32px; height:32px;"></i></div>
+<h1 class="display-font" style="font-size:2rem; margin-bottom:10px;">Calalloo <span style="color:var(--primary);">PRO</span></h1>
+<p style="color:var(--grey-text); margin-bottom:25px; line-height:1.5;">Unlock the AI Heritage Camera, real-time Map Sync, and the Private Vault.</p>
+<button onclick="showPaymentOverlay()" style="width:100%; padding:18px; background:var(--dark); color:white; border:none; border-radius:16px; font-weight:800; font-size:1.1rem; cursor:pointer;">Upgrade to PRO</button>
+<p onclick="closeModal('pro-modal')" style="margin-top:20px; color:var(--grey-text); cursor:pointer; font-size:0.9rem; font-weight:600;">Not now</p>
+</div>
+<div id="payment-overlay" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.95); flex-direction:column; align-items:center; justify-content:center; padding:20px; z-index:5100; animation: fadeIn 0.3s ease;">
+<div style="background:#000; color:white; border-radius:24px; width:100%; max-width:420px; overflow:hidden; border:1px solid #333; position:relative;">
+<i data-lucide="x" onclick="hidePaymentOverlay()" style="position:absolute; top:20px; right:20px; cursor:pointer; opacity:0.5; z-index:10;"></i>
+<div style="background:#111; padding:30px; text-align:center; border-bottom:1px solid #222;">
+<img src="/assets/logo.png" style="width:50px; border-radius:50%; margin-bottom:15px;">
+<h2 class="display-font" style="color:var(--primary); margin-bottom:5px;">Calalloo</h2>
+<p style="font-size:0.8rem; opacity:0.6; text-transform:uppercase; letter-spacing:0.1em;">Secure Heritage Payment</p>
+</div>
+<div style="padding:30px;">
+<div style="display:flex; gap:10px; margin-bottom:25px; background:#111; padding:5px; border-radius:12px;">
+<div id="tab-card" class="pay-tab active" onclick="setPayTab('card')" style="flex:1; padding:10px; text-align:center; border-radius:10px; cursor:pointer; font-size:0.8rem; font-weight:700;">Card/PayPal</div>
+<div id="tab-crypto" class="pay-tab" onclick="setPayTab('crypto')" style="flex:1; padding:10px; text-align:center; border-radius:10px; cursor:pointer; font-size:0.8rem; font-weight:700;">Crypto</div>
+<div id="tab-bank" class="pay-tab" onclick="setPayTab('bank')" style="flex:1; padding:10px; text-align:center; border-radius:10px; cursor:pointer; font-size:0.8rem; font-weight:700;">Bank</div>
+</div>
+<div id="pay-card" class="pay-view">
+<div style="font-size:2.5rem; font-weight:900; text-align:center; margin-bottom:20px;">$9.99<span style="font-size:1rem; opacity:0.5;">/mo</span></div>
+<button onclick="confirmUpgrade()" style="width:100%; padding:18px; background:var(--primary); color:white; border:none; border-radius:14px; font-weight:900; cursor:pointer;">Pay with PayPal / Card</button>
+</div>
+<div id="pay-crypto" class="pay-view" style="display:none;">
+<div style="font-size:0.8rem; text-align:center; margin-bottom:15px;">
+<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #222;"><span>Bitcoin (BTC)</span><b>0.00017 BTC</b></div>
+<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #222;"><span>Ethereum (ETH)</span><b>0.0033 ETH</b></div>
+<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #222;"><span>Polygon (MATIC)</span><b>20.0 MATIC</b></div>
+</div>
+<p style="font-size:0.7rem; opacity:0.6; margin-bottom:10px; text-align:center;">Send to Empire Multi-Chain Wallet:</p>
+<div style="background:#111; padding:12px; border-radius:12px; font-family:monospace; font-size:0.65rem; word-break:break-all; border:1px solid #333; margin-bottom:15px;">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+<button onclick="alert('Verifying on-chain...')" style="width:100%; padding:14px; background:#f7931a; color:white; border:none; border-radius:12px; font-weight:800; cursor:pointer;">Verify Transaction</button>
+</div>
+<div id="pay-bank" class="pay-view" style="display:none;">
+<div style="text-align:left; font-size:0.85rem; line-height:1.6; opacity:0.9;">
+<p><b>Bank:</b> First Century Bank (Payoneer)</p>
+<p><b>Account Type:</b> Checking / Business</p>
+<p><b>Country:</b> United States (USD)</p>
+<p style="margin-top:10px; font-size:0.75rem; opacity:0.6;">Contact support via WhatsApp for Routing/Account numbers.</p>
+</div>
+<button onclick="alert('US Bank details sent to your registered email.')" style="width:100%; padding:14px; background:#fff; color:#000; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:20px;">Get Full Details</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<nav>
+<div class="nav-item active" id="nav-discovery" onclick="showTab('discovery')"><i data-lucide="compass"></i>Discovery</div>
+<div class="nav-item" id="nav-map" onclick="showTab('map')"><i data-lucide="map"></i>Map</div>
+<div class="nav-item" id="nav-heritage-blog" onclick="showTab('heritage-blog')"><i data-lucide="book-open"></i>Blog</div>
+<div class="nav-item" id="nav-scan" onclick="triggerScanPro()"><i data-lucide="scan"></i>Scan</div>
+<div class="nav-item" id="nav-kitchen" onclick="showTab('kitchen')"><i data-lucide="user"></i>Kitchen</div>
+<div class="nav-item" id="nav-settings" onclick="showTab('settings')"><i data-lucide="settings"></i>Settings</div>
+</nav>
+<div id="market-listing-modal" class="modal">
+<div class="modal-header">
+<i data-lucide="arrow-left" onclick="closeModal('market-listing-modal')"></i>
+<h3 class="display-font">Announce Heritage Sale</h3>
+<div></div>
+</div>
+<div style="padding:25px;">
+<p style="font-size:0.85rem; color:var(--grey-text); margin-bottom:25px;">Advertise your food, sweets, or event to the community.</p>
+<div class="form-group">
+<label>What are you selling?</label>
+<select id="market-item-type" style="width:100%; padding:14px; border-radius:12px; border:1px solid var(--border); background:var(--light-bg);">
+<option value="ready-food">Ready-to-eat Food (BBQ, Curry Q, Lunch)</option>
+<option value="sweets">Sweets & Treats (Fudge, Toolum, Kurma)</option>
+<option value="goods">Heritage Goods (Green Seasoning, Pepper Sauce)</option>
+<option value="event">Culinary Event / Pop-up</option>
+</select>
+</div>
+<div class="form-group">
+<label>Listing Title</label>
+<input type="text" id="market-item-title" placeholder="e.g. Sunday BBQ Sale at Siparia">
+</div>
+<div class="form-group">
+<label>Price / Ticket Cost</label>
+<input type="text" id="market-item-price" placeholder="e.g. $50 TTD / Contribution">
+</div>
+<div class="form-group">
+<label>Description & Pickup Details</label>
+<textarea id="market-item-desc" style="width:100%; padding:14px; border-radius:12px; border:1px solid var(--border); background:var(--light-bg); height:100px;" placeholder="Tell them about the food and where to collect it..."></textarea>
+</div>
+<div style="background:var(--light-bg); border:2px dashed var(--border); border-radius:18px; padding:30px; text-align:center; margin-bottom:30px; cursor:pointer;" onclick="alert('Image Selector Opening...')">
+<i data-lucide="camera" style="color:var(--grey-text); margin-bottom:10px;"></i>
+<p style="font-size:0.8rem; font-weight:700; color:var(--grey-text);">Upload Dish/Poster Image</p>
+</div>
+<button onclick="publishMarketListing()" style="width:100%; padding:18px; background:var(--primary); color:white; border:none; border-radius:16px; font-weight:800; cursor:pointer;">Publish Advertisement</button>
+</div>
+</div>
 
-        function handleSearch(val) {
-            const query = (val || '').toLowerCase().trim();
-            console.log('Searching for:', query);
-            
-            // Filter Recipes
-            const filteredRecipes = allRecipes.filter(r => 
-                (r.title || '').toLowerCase().includes(query) || 
-                (r.vibe_tags || []).some(t => t.toLowerCase().includes(query))
-            );
-            renderRecipes(filteredRecipes);
 
-            // Filter Keepers (Friends)
-            const filteredKeepers = allKeepers.filter(k => 
-                (k.display_name || '').toLowerCase().includes(query) || 
-                (k.username || '').toLowerCase().includes(query) || 
-                (k.bio || '').toLowerCase().includes(query)
-            );
-            console.log('Filtered Keepers:', filteredKeepers.length);
-            renderKeepers(filteredKeepers, query.length > 0);
-        }
-
-        function openKeeper(id) {
-            console.log('Opening keeper:', id);
-            // Future: Show keeper profile modal
-        }
-
-        // Map Init
-        let googleMap;
-        function showTab(id) {
-            localStorage.setItem('activeTab', id);
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.pill').forEach(p => {
-                p.classList.remove('active');
-                if(p.innerText.toLowerCase().includes(id.toLowerCase())) p.classList.add('active');
-            });
-            const target = document.getElementById(id);
-            if(target) target.classList.add('active');
-            
-            if(id === 'map' && !mapInitialized) {
-                initGoogleMap();
-                mapInitialized = true;
-            }
-            if(id === 'profile') loadKitchen();
-        }
-
-        function initGoogleMap() {
-            const mapOptions = {
-                zoom: 14,
-                center: { lat: 10.6918, lng: -61.2225 },
-                styles: [
-                    { "elementType": "geometry", "stylers": [{ "color": "#212121" }] },
-                    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#212121" }] },
-                    { "elementType": "labels.text.fill", "stylers": [{ "color": "#757575" }] },
-                    { "featureType": "administrative.country", "elementType": "geometry.stroke", "stylers": [{ "color": "#E87722" }] },
-                    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#000000" }] }
-                ],
-                disableDefaultUI: true
-            };
-            
-            googleMap = new google.maps.Map(document.getElementById('map-container'), mapOptions);
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
-                    const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
-                    googleMap.setCenter(pos);
-                    new google.maps.Marker({
-                        position: pos,
-                        map: googleMap,
-                        title: "Your Heritage Kitchen",
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 10,
-                            fillColor: "#E87722",
-                            fillOpacity: 1,
-                            strokeWeight: 2,
-                            strokeColor: "#FFFFFF"
-                        }
-                    });
-                    searchNearbyGroceries(pos);
-                });
-            }
-        }
-
-        function searchNearbyGroceries(pos) {
-            const service = new google.maps.places.PlacesService(googleMap);
-            const request = {
-                location: pos,
-                radius: '5000',
-                type: ['grocery_or_supermarket']
-            };
-
-            service.nearbySearch(request, (results, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    results.forEach(place => {
-                        new google.maps.Marker({
-                            position: place.geometry.location,
-                            map: googleMap,
-                            title: place.name,
-                            icon: {
-                                url: 'https://maps.google.com/mapfiles/ms/icons/orange-dot.png'
-                            }
-                        });
-                    });
-                }
-            });
-        }
-
-        async function loadKitchen() {
-            try {
-                const { data: { user } } = await sb.auth.getUser();
-                const { data: saved } = await sb.from('saved_recipes').select('recipe_id').eq('user_id', user.id);
-                if(!saved || saved.length === 0) return;
-                
-                const ids = saved.map(s => s.recipe_id);
-                const { data: recipes } = await sb.from('recipes').select('*').in('id', ids);
-                
-                const grid = document.getElementById('kitchen-grid');
-                grid.innerHTML = (recipes || []).map(r => `
-                    <div class="recipe-card" onclick="openRecipe('${r.id}')">
-                        <div class="recipe-image" style="background-image: url(${r.cover_photo_url || 'https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=800'})"></div>
-                        <div class="recipe-info">
-                            <h3 style="font-size:0.9rem;">${r.title}</h3>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (e) { console.error(e); }
-        }
-
-        async function handleAvatarUpload(el) {
-            const file = el.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const base64 = e.target.result;
-                document.getElementById('p-avatar').src = base64;
-                const { data: { user } } = await sb.auth.getUser();
-                await sb.from('profiles').upsert({ id: user.id, avatar_url: base64 });
-                await sb.from('cooks').upsert({ user_id: user.id, avatar_url: base64 }, { onConflict: 'user_id' });
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function saveFullProfile() {
-            const btn = document.getElementById('save-profile-btn');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader" class="spin"></i> Saving to Supabase...';
-            lucide.createIcons();
-            
-            try {
-                const { data: { user } } = await sb.auth.getUser();
-                if(!user) throw new Error("No authenticated user found.");
-
-                const bio = document.getElementById('p-bio').value;
-                const displayName = document.getElementById('p-display-name').value;
-                const avatarUrl = document.getElementById('p-avatar').src;
-
-                console.log('Saving profile for:', user.id);
-
-                // 1. Sync to profiles table
-                const { error: pError } = await sb.from('profiles').upsert({ 
-                    id: user.id, 
-                    bio: bio, 
-                    avatar_url: avatarUrl,
-                    updated_at: new Date().toISOString()
-                });
-                if(pError) throw pError;
-
-                // 2. Sync to cooks table (The Searchable Identity)
-                const { error: cError } = await sb.from('cooks').upsert({ 
-                    user_id: user.id, 
-                    display_name: displayName, 
-                    bio: bio,
-                    avatar_url: avatarUrl,
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'user_id' });
-
-                if(cError) throw cError;
-                
-                // Visual Success Feedback
-                btn.style.background = '#22c55e'; // Green success color
-                btn.innerHTML = '<i data-lucide="check"></i> Settings Synced!';
-                lucide.createIcons();
-                
-                setTimeout(() => {
-                    btn.style.background = 'var(--primary)';
-                    btn.innerHTML = originalContent;
-                    lucide.createIcons();
-                }, 3000);
-
-            } catch (e) {
-                console.error('Save Error:', e);
-                alert('Sync Failed: ' + e.message);
-                btn.innerHTML = originalContent;
-                lucide.createIcons();
-            }
-        }
-
-        // Vision AI Logic
-        async function startCamera() {
-            const video = document.getElementById('video-feed');
-            const preview = document.getElementById('upload-preview');
-            const camBtn = document.getElementById('camera-btn');
-            const capBtn = document.getElementById('capture-btn');
-            
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: currentFacingMode } 
-                });
-                video.srcObject = stream;
-                video.style.display = 'block';
-                preview.style.display = 'none';
-                camBtn.style.display = 'none';
-                capBtn.style.display = 'inline-flex';
-            } catch (err) {
-                alert("Camera access denied.");
-            }
-        }
-
-        async function captureImage() {
-            const video = document.getElementById('video-feed');
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            const dataUrl = canvas.toDataURL('image/jpeg');
-            
-            stopCamera();
-            const preview = document.getElementById('upload-preview');
-            preview.src = dataUrl;
-            preview.style.display = 'block';
-            video.style.display = 'none';
-            
-            processVision(dataUrl);
-        }
-
-        function stopCamera() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-            document.getElementById('camera-btn').style.display = 'inline-flex';
-            document.getElementById('capture-btn').style.display = 'none';
-        }
-
-        async function handleUpload(el) {
-            const file = el.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const dataUrl = e.target.result;
-                document.getElementById('upload-preview').src = dataUrl;
-                document.getElementById('upload-preview').style.display = 'block';
-                document.getElementById('video-feed').style.display = 'none';
-                processVision(dataUrl);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function processVision(image) {
-            const loader = document.getElementById('ai-loading');
-            const results = document.getElementById('vision-results');
-            loader.style.display = 'block';
-            results.innerHTML = '';
-
-            try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer {{credential:openai-calalloo-vision}}'
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-4o-mini",
-                        messages: [
-                            {
-                                role: "user",
-                                content: [
-                                    { type: "text", text: "Identify this Caribbean dish. Provide: Name, Origin, Key Ingredients, and a brief cultural heritage fact. Format: Concise paragraphs." },
-                                    { type: "image_url", image_url: { url: image } }
-                                ]
-                            }
-                        ]
-                    })
-                });
-                
-                const data = await response.json();
-                const aiAnalysis = data.choices[0].message.content;
-                
-                loader.style.display = 'none';
-                results.innerHTML = `
-                    <div style="background:var(--light-bg); padding:25px; border-radius:16px; text-align:left; border:1px solid rgba(0,0,0,0.05);">
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                            <div style="background:var(--primary); color:white; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
-                                <i data-lucide="brain-circuit" style="width:20px;"></i>
-                            </div>
-                            <div>
-                                <h3 class="display-font" style="font-size:1.1rem; color:var(--dark);">Neural Analysis</h3>
-                                <p style="font-size:0.65rem; opacity:0.6; font-weight:800; text-transform:uppercase;">Vision AI v21.1</p>
-                            </div>
-                        </div>
-                        <div style="line-height:1.6; font-size:0.9rem; color:var(--dark);">
-                            ${aiAnalysis.replace(/\n/g, '<br>')}
-                        </div>
-                    </div>
-                `;
-                lucide.createIcons();
-            } catch (err) {
-                loader.style.display = 'none';
-                alert("Analysis failed. Check your network.");
-            }
-        }
-
-        function toggleMenu() {
-            const menu = document.getElementById('menu-overlay');
-            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
-        }
-
-        // Modal Controls
-        function openGroupModal() { document.getElementById('group-modal').style.display = 'flex'; }
-        function openProModal() { 
-            console.log('Opening Pro Modal');
-            const modal = document.getElementById('pro-modal');
-            if (modal) {
-                modal.style.display = 'flex';
-                modal.style.zIndex = '9999';
-            } else {
-                console.error('Pro Modal not found');
-            }
-        }
-        function closeModals() { 
-            document.querySelectorAll('.modal-bg').forEach(m => m.style.display = 'none'); 
-        }
-
-        async function createHeritageGroup() {
-            const name = document.getElementById('group-name').value;
-            if(!name) return alert('Please enter a group name.');
-            
-            try {
-                const { data: { user } } = await sb.auth.getUser();
-                const { data, error } = await sb.from('groups').insert({
-                    name: name,
-                    description: document.getElementById('group-desc').value,
-                    creator_id: user.id
-                }).select();
-                
-                if(error) throw error;
-                alert('Group Created: ' + name);
-                closeModals();
-            } catch (e) {
-                alert('Group Error: ' + e.message);
-            }
-        }
-
-        function initPayment() {
-            alert('Redirecting to secure heritage payment gateway...');
-            // Future: Stripe integration
-        }
-
-        function openRecipe(id) { console.log('Opening recipe:', id); }
-        function openHub() { console.log('Opening hub'); }
-        function signOut() { sb.auth.signOut(); window.location.href = '/login/'; }
-
-        window.onload = loadData;
-        lucide.createIcons();
-    </script>
+<script src="app.js"></script>
+<script>
+function openMarketListingModal() {
+openModal('market-listing-modal');
+}
+function publishMarketListing() {
+alert('Your Heritage Sale is now live in the Marketplace and Discovery feed! 🥘🚀');
+closeModal('market-listing-modal');
+}
+</script>
 </body>
 </html>
