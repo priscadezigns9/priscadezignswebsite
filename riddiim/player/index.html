@@ -142,8 +142,12 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const sb_r = window.supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'sb_publishable_ChdrHQEJV7pVpJMKt-ZaUw_6V0WRKAR');
-    window.supabase = sb_r; 
+    window.addEventListener('load', () => {
+      const sb_r = window.supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'sb_publishable_ChdrHQEJV7pVpJMKt-ZaUw_6V0WRKAR');
+      window.sb_vault = sb_r; 
+      console.log("Supabase Sovereign Vault Linked 🛡️");
+      loadVaultFromSupabase();
+    });
   </script>
 
   <script src="https://www.youtube.com/iframe_api"></script>
@@ -193,9 +197,10 @@
   };
 
   async function updateAccountStatus(status) {
-    const { data: { session } } = await window.supabase.auth.getSession();
+    if(!window.sb_vault) return alert("Vault Offline");
+    const { data: { session } } = await window.sb_vault.auth.getSession();
     if (!session) return;
-    await window.supabase.from('profiles').update({ account_status: status }).eq('id', session.user.id);
+    await window.sb_vault.from('profiles').update({ account_status: status }).eq('id', session.user.id);
     localStorage.setItem('empire_account_status', status);
     alert(`Excellence: Your account is now ${status.toUpperCase()}. Ad-Shield Activated! 🛡️✨`);
     location.reload();
@@ -242,24 +247,22 @@
   };
 
   async function syncVaultToSupabase() {
-    // Excellence: Check for session then push to public.profiles.favorites
-    const { data: { session } } = await window.supabase.auth.getSession();
+    if(!window.sb_vault) return;
+    const { data: { session } } = await window.sb_vault.auth.getSession();
     if (!session) return;
     
-    const { error } = await window.supabase
+    await window.sb_vault
       .from('profiles')
       .update({ music_favorites: vault })
       .eq('id', session.user.id);
-      
-    if (error) console.error("Sovereign Sync Error:", error);
-    else console.log("Vault Persisted to Supabase 🛡️");
   }
 
   async function loadVaultFromSupabase() {
-    const { data: { session } } = await window.supabase.auth.getSession();
+    if(!window.sb_vault) return;
+    const { data: { session } } = await window.sb_vault.auth.getSession();
     if (!session) return;
     
-    const { data, error } = await window.supabase
+    const { data, error } = await window.sb_vault
       .from('profiles')
       .select('music_favorites')
       .eq('id', session.user.id)
@@ -268,10 +271,9 @@
     if (data && data.music_favorites) {
       vault = data.music_favorites;
       localStorage.setItem('riddiim_vault', JSON.stringify(vault));
-      console.log("Vault Restored from Supabase 🛡️");
+      if(document.querySelector('.tab[onclick*="library"]').classList.contains('active')) renderVault();
     }
   }
-  loadVaultFromSupabase();
 
   function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
