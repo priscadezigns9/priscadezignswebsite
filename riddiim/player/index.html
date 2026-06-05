@@ -319,8 +319,13 @@
       const data = await response.json();
       
       if (data && data.length > 0) {
-        // Excellence Logic: Skip snippets and shorts (ensure duration > 60s)
-        const track = data.find(v => v.lengthSeconds > 60) || data[0];
+        // Excellence Logic: Higher priority for official audio/videos
+        const searchTerms = query.toLowerCase().split(' ');
+        const matches = data.filter(v => 
+          searchTerms.every(term => v.title.toLowerCase().includes(term)) && 
+          v.lengthSeconds > 60
+        );
+        const track = matches.length > 0 ? matches[0] : (data.find(v => v.lengthSeconds > 60) || data[0]);
         console.log("Track Located:", track.title, track.videoId);
         return track.videoId;
       }
