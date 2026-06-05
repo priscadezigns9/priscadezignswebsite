@@ -1110,6 +1110,7 @@ if(status) status.innerText = "Processing via Neural Stream (Local)...";
 setTimeout(() => {
 const mockDiscovery = {
 title: "Heritage Analysis (Live Stream)",
+    source: "Sovereign Uplink",
 source: "Sovereign Uplink",
 authenticity: "94% (Neural Capture)",
 calories: 320,
@@ -1189,7 +1190,7 @@ hub.innerHTML = `
 <i data-lucide="x" onclick="document.body.removeChild(document.getElementById('analysis-hub'))" style="position:absolute; top:20px; left:20px; cursor:pointer; width:24px; height:24px;"></i>
 <h1 class="display-font" style="font-size:2rem; margin-bottom:10px;">Analysis Hub</h1>
 <div style="display:inline-block; background:rgba(255,255,255,0.2); padding:8px 20px; border-radius:20px; font-weight:800; font-size:0.8rem;">
-WEB SOURCE: ${data.source} (${data.authenticity})
+WEB SOURCE: ${data.source || "Sovereign Uplink"} (${data.authenticity})
 </div>
 </div>
 <div style="padding:20px; margin-top:-30px;">
