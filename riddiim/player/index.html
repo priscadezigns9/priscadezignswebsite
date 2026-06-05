@@ -385,49 +385,58 @@
     
     const searchQuery = `${t.artist} ${t.title} audio`;
     const ytId = await findYouTubeId(searchQuery);
-    
-    // We'll use the "suggestqueries" bridge to try to find a video if possible, 
-    // but for now, let's use a placeholder logic or fetch from a public bridge.
-    // Since we don't have a direct YT search API here, I'll use a simulation 
-    // that informs the user we are bridging.
-    
-    // Attempting to use a public fetch to get a YouTube ID (Example: YTSearch simulation)
-    const ytId = await findYouTubeId(searchQuery);
     if(ytId && isReady) {
       player.loadVideoById(ytId);
       feedback.textContent = 'STREAM_STABILIZED';
     } else {
       feedback.textContent = 'SIGNAL_LOST_USING_PREVIEW';
-      // Fallback or alert
     }
   };
 
   async function findYouTubeId(query) {
-    console.log("Searching Neural Bridge (v2.0) for:", query);
-    try {
-      const nodes = ['inv.nadeko.net', 'invidious.nerdvpn.de', 'invidious.f5.si', 'yt.chocolatemoo53.com'];
-      const node = nodes[Math.floor(Math.random() * nodes.length)];
-      const searchUrl = `https://${node}/api/v1/search?q=${encodeURIComponent(query)}&type=video`;
-      
-      const response = await fetch(searchUrl);
-      const data = await response.json();
-      
-      if (data && data.length > 0) {
-        // Excellence Logic: Higher priority for official audio/videos
-        const searchTerms = query.toLowerCase().split(' ').filter(t => t.length > 1);
-        const matches = data.filter(v => 
-          searchTerms.every(term => v.title.toLowerCase().includes(term)) && 
-          v.lengthSeconds > 60
-        );
-        const track = matches.length > 0 ? matches[0] : (data.find(v => v.lengthSeconds > 60) || data[0]);
-        console.log("Track Located:", track.title, track.videoId);
-        return track.videoId;
+    console.log("Searching Neural Bridge (v3.0) for:", query);
+    const nodes = [
+      'iv.datura.network',
+      'invidious.privacydev.net',
+      'vid.puffyan.us',
+      'invidious.lunar.icu',
+      'inv.nadeko.net',
+      'invidious.nerdvpn.de'
+    ];
+    // Try each node in sequence until one works
+    for (const node of nodes) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+        const searchUrl = `https://${node}/api/v1/search?q=${encodeURIComponent(query)}&type=video`;
+        const response = await fetch(searchUrl, { signal: controller.signal });
+        clearTimeout(timeout);
+        if (!response.ok) continue;
+        const data = await response.json();
+        if (data && data.length > 0) {
+          const searchTerms = query.toLowerCase().split(' ').filter(t => t.length > 1);
+          const matches = data.filter(v =>
+            searchTerms.some(term => (v.title || '').toLowerCase().includes(term)) &&
+            v.lengthSeconds > 60
+          );
+          const track = matches.length > 0 ? matches[0] : (data.find(v => v.lengthSeconds > 60) || data[0]);
+          if (track && track.videoId) {
+            console.log("Track Located via", node, ":", track.title, track.videoId);
+            return track.videoId;
+          }
+        }
+      } catch(e) {
+        console.warn("Node failed:", node, e.message);
+        continue;
       }
-      return 'm_qS7K02A9w'; // High-Fidelity Ambient Placeholder (NOT A RICKROLL)
-    } catch(e) { 
-      console.error("Bridge Failure:", e);
-      return 'm_qS7K02A9w'; // High-Fidelity Ambient Placeholder
     }
+    // All nodes failed — use YouTube oEmbed as final fallback
+    try {
+      const ytSearch = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+      feedback.textContent = 'SIGNAL_REROUTING...';
+    } catch(e) {}
+    console.error("All Neural Bridge nodes failed.");
+    return null;
   }
 
   // Visualizer bars
