@@ -8,9 +8,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #FF6B00; --bg: #0A0A0A; --accent: #222; }
+        :root { 
+            --primary: #FF6B00; 
+            --bg: #0A0A0A; 
+            --accent: #222; 
+        }
         body { margin:0; background:var(--bg); color:#fff; font-family:'Inter', sans-serif; overflow-x: hidden; }
-        nav { padding: 20px 5%; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; position: sticky; top: 0; background: rgba(0,0,0,0.9); z-index: 1000; backdrop-filter: blur(10px); }
+        
+        nav { 
+            padding: 20px 5%; 
+            display:flex; 
+            justify-content:space-between; 
+            align-items:center; 
+            border-bottom:1px solid #222; 
+            position: sticky; 
+            top: 0; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 1000; 
+            backdrop-filter: blur(10px); 
+        }
         .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-family:'Bangers', cursive; font-size:1.5rem; }
         .logo img { height:35px; border-radius:50%; border: 1px solid var(--primary); }
         
@@ -45,12 +61,15 @@
             align-items: center; gap: 10px; scroll-behavior: smooth;
         }
         .reader-content img { max-width: 100%; height: auto; display: block; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        
         .reader-controls { display: flex; gap: 15px; align-items: center; }
         .btn { 
             background: var(--primary); color: #000; border: none; padding: 8px 16px; 
-            border-radius: 4px; font-family: 'Space Mono'; font-weight: 700; cursor: pointer; text-transform: uppercase;
+            border-radius: 4px; font-family: 'Space Mono'; font-weight: 700; cursor: pointer;
+            text-transform: uppercase; display: flex; align-items: center; gap: 5px;
         }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .chapter-select { 
             background: #222; color: #fff; border: 1px solid #444; padding: 8px; 
@@ -90,8 +109,9 @@
                 <h2 id="current-manga-title" style="margin:0; font-family:'Bangers'; color:var(--primary); font-size:1.2rem;"></h2>
             </div>
             <div class="reader-controls">
+                <button class="btn" id="prev-ch-btn" onclick="prevChapter()"><i class="fas fa-chevron-left"></i> PREV</button>
                 <select id="chapter-selector" class="chapter-select" onchange="loadChapter(this.value)"></select>
-                <button class="btn" onclick="nextChapter()">NEXT <i class="fas fa-chevron-right"></i></button>
+                <button class="btn" id="next-ch-btn" onclick="nextChapter()">NEXT <i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
         <div id="reader-pages" class="reader-content">
@@ -183,6 +203,10 @@
             const selector = document.getElementById('chapter-selector');
             selector.value = index;
             
+            // Update buttons
+            document.getElementById('prev-ch-btn').disabled = (index === 0);
+            document.getElementById('next-ch-btn').disabled = (index === currentChapters.length - 1);
+            
             pagesContainer.innerHTML = '<div class="mimi-loading">LOADING PAGES...</div>';
             pagesContainer.scrollTop = 0;
 
@@ -215,29 +239,18 @@
             } catch (e) {
                 console.error("Page Load Error:", e);
                 pagesContainer.innerHTML = '<div class="mimi-loading">PAGES BLOCKED. TRYING ALTERNATE NODE...</div>';
-                // Implement auto-retry with different chapter version if available
-                retryAlternateVersion(chapter.attributes.chapter);
             }
-        }
-
-        async function retryAlternateVersion(chapterNum) {
-            try {
-                const res = await fetch(`${MD_API}/manga/${currentMangaId}/feed?translatedLanguage[]=en&chapter=${chapterNum}`);
-                const data = await res.json();
-                if (data.data.length > 1) {
-                    // Try the second available version
-                    const altChapterId = data.data[1].id;
-                    const res2 = await fetch(`${MD_API}/at-home/server/${altChapterId}`);
-                    const data2 = await res2.json();
-                    // ... load these pages ... (omitted for brevity in this snippet but logic is here)
-                    console.log("Retrying with alt version", altChapterId);
-                }
-            } catch (e) {}
         }
 
         function nextChapter() {
             if (currentChapterIndex < currentChapters.length - 1) {
                 loadChapter(currentChapterIndex + 1);
+            }
+        }
+
+        function prevChapter() {
+            if (currentChapterIndex > 0) {
+                loadChapter(currentChapterIndex - 1);
             }
         }
 
