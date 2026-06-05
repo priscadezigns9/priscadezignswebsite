@@ -674,7 +674,7 @@
                     <label style="font-size:0.7rem; color:#7B35D4; text-transform:uppercase; font-weight:700;">From</label>
                     <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
                         <input type="number" value="1.00" step="any" style="border:none; font-size:1.5rem; font-weight:700; width:60%; outline:none; color:#333;" id="swapAmount">
-                        <select style="border:none; background:#FDF8F2; padding:8px 12px; border-radius:10px; font-weight:700; color:#7B35D4; cursor:pointer;">
+                        <select id="fromAsset" onchange="checkBridgeAsset()" style="border:none; background:#FDF8F2; padding:8px 12px; border-radius:10px; font-weight:700; color:#7B35D4; cursor:pointer;">
                             <option>USDT</option>
                             <option>BTC</option>
                             <option>ADA</option>
@@ -698,7 +698,9 @@
                     </div>
                 </div>
 
-                <button onclick="executeSwap()" style="width:100%; background:#7B35D4; color:white; border:none; padding:18px; border-radius:18px; font-weight:700; margin-top:24px; cursor:pointer; box-shadow:0 12px 25px rgba(123,53,212,0.3); font-size:1rem; letter-spacing:0.5px;">Confirm Sovereign Swap</button>
+                
+    <button id="bridgeConnectBtn" onclick="connectBinance()" style="display:none; width:100%; background:#000; color:#F3BA2F; border:1px solid #F3BA2F; padding:10px; border-radius:12px; font-weight:700; margin-top:15px; cursor:pointer; font-size:0.8rem;">Connect Binance Wallet</button>
+    <button onclick="executeSwap()" style="width:100%; background:#7B35D4; color:white; border:none; padding:18px; border-radius:18px; font-weight:700; margin-top:24px; cursor:pointer; box-shadow:0 12px 25px rgba(123,53,212,0.3); font-size:1rem; letter-spacing:0.5px;">Confirm Sovereign Swap</button>
                 <p style="font-size:0.65rem; color:#999; text-align:center; margin-top:15px; line-height:1.4;">Swapping triggers an Atomic Treasury Deposit into the Priscion Multi-Sig Registry.</p>
             </div>
         </div>
@@ -745,6 +747,36 @@
             btn.style.opacity = '1';
             showWalletTab('assets');
         }, 2000);
+    }
+    </script>
+    
+    <script>
+    function checkBridgeAsset() {
+        const fromAsset = document.getElementById('fromAsset').value;
+        const bridgeBtn = document.getElementById('bridgeConnectBtn');
+        if (fromAsset === 'BNB' || fromAsset === 'USDT') {
+            bridgeBtn.style.display = 'block';
+        } else {
+            bridgeBtn.style.display = 'none';
+        }
+    }
+
+    async function connectBinance() {
+        const btn = document.getElementById('bridgeConnectBtn');
+        btn.innerText = 'Connecting to Binance Smart Chain...';
+        
+        // Simulating the Binance Wallet / MetaMask injection check
+        setTimeout(() => {
+            if (window.ethereum || window.BinanceChain) {
+                alert('Priscion Wallet: Binance Smart Chain detected. Ready for Atomic Bridge.');
+                btn.innerText = 'Binance Connected ✓';
+                btn.style.background = '#F3BA2F'; // Binance Yellow
+                btn.style.color = '#000';
+            } else {
+                alert('Binance Extension not detected. Please install Binance Wallet or use a compatible browser.');
+                btn.innerText = 'Connect Binance Wallet';
+            }
+        }, 1500);
     }
     </script>
     </body></html>
