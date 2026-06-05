@@ -170,31 +170,37 @@
     <div id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
 
     <script>
-        const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
-
         async function loadInventory() {
-            const { data, error } = await sb.from('empire_inventory')
-                .select('*')
-                .eq('brand', 'Atelia Gaming')
-                .neq('category', 'Internal');
-            
-            if (error) {
-                console.error(error);
-                document.getElementById('grid').innerHTML = '<p>Error connecting to Armory Vault.</p>';
-                return;
+            try {
+                const sb = window.supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
+
+                const { data, error } = await sb.from('empire_inventory')
+                    .select('*')
+                    .eq('brand', 'Atelia Gaming')
+                    .neq('category', 'Internal');
+                
+                if (error) throw error;
+                
+                const grid = document.getElementById('grid');
+                if (data && data.length > 0) {
+                    grid.innerHTML = data.map(p => `
+                        <div class="product-card">
+                            <img src="${p.image_url}" class="product-image" loading="lazy" onerror="this.src='https://priscadezigns.org/logos/pd_mark_sq.png'">
+                            <h3>${p.title}</h3>
+                            <span class="price">${p.price === '$--' ? 'Price Signal Pending' : p.price}</span>
+                            <a href="${p.affiliate_link}" class="buy-link" target="_blank">Acquire Item</a>
+                        </div>
+                    `).join('');
+                } else {
+                    grid.innerHTML = '<p>No items found in the Armory.</p>';
+                }
+            } catch (err) {
+                console.error("Vault Connection Error:", err);
+                document.getElementById('grid').innerHTML = `<p>Error connecting to Armory Vault: ${err.message || 'Unknown Error'}</p>`;
             }
-            const grid = document.getElementById('grid');
-            grid.innerHTML = data.map(p => `
-                <div class="product-card">
-                    <img src="${p.image_url}" class="product-image" loading="lazy" onerror="this.src='https://priscadezigns.org/logos/pd_mark_sq.png'">
-                    <h3>${p.title}</h3>
-                    <span class="price">${p.price === '$--' ? 'Price Signal Pending' : p.price}</span>
-                    <a href="${p.affiliate_link}" class="buy-link" target="_blank">Acquire Item</a>
-                </div>
-            `).join('');
         }
 
-        window.onload = loadInventory;
+        window.addEventListener('load', loadInventory);
 
         window.onscroll = function() {
             const btn = document.getElementById('back-to-top');
