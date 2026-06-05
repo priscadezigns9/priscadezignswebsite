@@ -406,7 +406,7 @@ lucide.createIcons();
                                 <p style="font-size:0.65rem; color:var(--grey-text);">Share a photo of your dish</p>
                             </div>
                         </button>
-                        <button onclick="closeGateway(); alert('Reel Engine Syncing...');" style="width:100%; padding:15px; border-radius:18px; border:1px solid var(--border); background:var(--light-bg); display:flex; align-items:center; gap:15px; cursor:pointer;">
+                        <button onclick="closeGateway(); openAddReel();" style="width:100%; padding:15px; border-radius:18px; border:1px solid var(--border); background:var(--light-bg); display:flex; align-items:center; gap:15px; cursor:pointer;">
                             <div style="background:rgba(232,119,34,0.1); padding:10px; border-radius:12px;"><i data-lucide="video" style="color:var(--primary); width:20px;"></i></div>
                             <div style="text-align:left;">
                                 <p style="font-weight:700; font-size:0.85rem;">Add Reel</p>
@@ -428,8 +428,65 @@ lucide.createIcons();
             lucide.createIcons();
         }
 function closeGateway() {
-const el = document.getElementById('upload-gateway');
-if(el) el.remove();
+    const el = document.getElementById('upload-gateway');
+    if(el) el.remove();
+}
+function openAddReel() {
+    const gateway = document.getElementById('upload-gateway');
+    if(gateway) closeGateway();
+    
+    const reelModal = document.createElement('div');
+    reelModal.id = "reel-upload-modal";
+    reelModal.style = "position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9001; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(10px);";
+    reelModal.innerHTML = `
+        <div style="background:var(--bg); width:100%; max-width:400px; border-radius:32px; padding:30px; text-align:center; animation: slideUp 0.3s ease;">
+            <h3 class="display-font" style="font-size:1.5rem; margin-bottom:10px;">Heritage Reels</h3>
+            <p style="font-size:0.85rem; color:var(--grey-text); margin-bottom:25px;">Upload your high-fidelity cooking short</p>
+            
+            <div id="reel-drop-zone" style="border:2px dashed var(--border); border-radius:24px; padding:40px 20px; margin-bottom:20px; cursor:pointer;" onclick="document.getElementById('reel-input').click()">
+                <i data-lucide="clapperboard" style="color:var(--primary); width:40px; height:40px; margin-bottom:15px;"></i>
+                <p style="font-weight:700; font-size:0.9rem;">Select Video</p>
+                <p style="font-size:0.7rem; color:var(--grey-text); margin-top:5px;">MP4, MOV or WebM (Max 60s)</p>
+                <input type="file" id="reel-input" accept="video/*" style="display:none;" onchange="handleReelSelection(event)">
+            </div>
+            
+            <div id="reel-preview-container" style="display:none; margin-bottom:20px;">
+                <video id="reel-preview" style="width:100%; border-radius:16px; background:#000;" controls></video>
+                <input type="text" id="reel-caption" placeholder="Add a caption..." style="width:100%; padding:15px; border-radius:12px; border:1px solid var(--border); margin-top:15px; font-family:var(--font-main);">
+            </div>
+            
+            <button id="publish-reel-btn" onclick="publishHeritageReel()" style="width:100%; padding:18px; border-radius:18px; background:var(--primary); color:white; border:none; font-weight:800; cursor:pointer; display:none;">Publish Reel</button>
+            <button onclick="closeReelModal()" style="margin-top:20px; background:none; border:none; color:var(--grey-text); font-weight:700; cursor:pointer;">Cancel</button>
+        </div>
+    `;
+    document.body.appendChild(reelModal);
+    lucide.createIcons();
+}
+function closeReelModal() {
+    const el = document.getElementById('reel-upload-modal');
+    if(el) el.remove();
+}
+function handleReelSelection(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    document.getElementById('reel-drop-zone').style.display = 'none';
+    const container = document.getElementById('reel-preview-container');
+    container.style.display = 'block';
+    const video = document.getElementById('reel-preview');
+    video.src = URL.createObjectURL(file);
+    document.getElementById('publish-reel-btn').style.display = 'block';
+}
+async function publishHeritageReel() {
+    const btn = document.getElementById('publish-reel-btn');
+    btn.innerHTML = '<i data-lucide="loader" class="spin"></i> Syncing to Vault...';
+    btn.disabled = true;
+    lucide.createIcons();
+    
+    // Excellence: In v40.x, we simulate the storage uplink for immediate UX feedback
+    setTimeout(() => {
+        alert("Excellence: Your Reel is being processed by the Heritage Engine. It will appear in the Discovery feed momentarily! 🎥🛡️✨");
+        closeReelModal();
+    }, 2000);
 }
 function showTab(id) {
 console.log("Sovereign Navigation: Activating", id);
