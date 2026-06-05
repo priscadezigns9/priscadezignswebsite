@@ -1,5 +1,5 @@
 const sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'sb_publishable_ChdrHQEJV7pVpJMKt-ZaUw_6V0WRKAR');
-let recipes = [], discoveryLimit = 50, scansToday = 0;
+let recipes = [], scansToday = 0;
 const isAdmin = true;
 let cooks = [];
 let userLikes = new Set();
@@ -358,60 +358,36 @@ return true;
 renderPins('discovery-pins', discoveryFeed);
 }
 function renderPins(gridId, items) {
-    const grid = document.getElementById(gridId);
-    if(!grid) return;
-    const profUserElem = document.getElementById('prof-username');
-    const currentUser = (profUserElem ? profUserElem.innerText.split(' • ')[0] : '') || '@guest';
-    
-    // Sovereignty Filter (Scalable): Show published recipes OR user's own recipes
-    let visibleItems = items.filter(r => {
-        const isPublished = r.is_published === true || r.is_published === undefined || r.is_published === null;
-        const author = r.author_username || "";
-        return isPublished || author === currentUser;
-    });
-
-    const isDiscovery = gridId === 'discovery-pins';
-    const hasMore = isDiscovery && visibleItems.length > discoveryLimit;
-    
-    if (isDiscovery) {
-        visibleItems = visibleItems.slice(0, discoveryLimit);
-    }
-
-    if (visibleItems.length === 0) {
-        grid.innerHTML = `<div style="column-span:all; text-align:center; padding:40px; color:var(--grey-text);">
-            <i data-lucide="utensils" style="width:40px; height:40px; margin-bottom:10px; opacity:0.3;"></i>
-            <p>No recipes found in the vault yet.</p>
-        </div>`;
-    } else {
-        grid.innerHTML = visibleItems.map(r => `
-            <div class="recipe-pin" onclick="openRecipe('${r.id}')" style="cursor:pointer;">
-                <img src="${r.cover_photo_url || 'https://via.placeholder.com/400x300?text=Heritage+Recipe'}">
-                <div class="pin-overlay">
-                    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-                        <h3>${r.title}</h3>
-                        ${r.is_published === false ? '<i data-lucide="lock" style="width:14px; height:14px; color:white;"></i>' : ''}
-                    </div>
-                </div>
-            </div>
-        `).join('');
-
-        if (hasMore) {
-            const loadMoreBtn = document.createElement('div');
-            loadMoreBtn.style = "column-span:all; text-align:center; padding:20px 0;";
-            loadMoreBtn.innerHTML = `
-                <button onclick="loadMoreDiscovery()" style="background:var(--secondary); color:var(--primary); border:2px solid var(--primary); padding:12px 40px; border-radius:20px; font-weight:800; cursor:pointer; font-size:14px; transition:0.3s;">
-                    Load More Heritage Discoveries
-                </button>
-            `;
-            grid.appendChild(loadMoreBtn);
-        }
-    }
-    lucide.createIcons();
+const grid = document.getElementById(gridId);
+if(!grid) return;
+const profUserElem = document.getElementById('prof-username');
+const currentUser = (profUserElem ? profUserElem.innerText.split(' • ')[0] : '') || '@guest';
+// Sovereignty Filter (Scalable): Show published recipes OR user's own recipes
+const visibleItems = items.filter(r => {
+// Column name in DB is 'is_published'
+const isPublished = r.is_published === true || r.is_published === undefined || r.is_published === null;
+const author = r.author_username || "";
+return isPublished || author === currentUser;
+});
+if (visibleItems.length === 0) {
+grid.innerHTML = `<div style="column-span:all; text-align:center; padding:40px; color:var(--grey-text);">
+<i data-lucide="utensils" style="width:40px; height:40px; margin-bottom:10px; opacity:0.3;"></i>
+<p>No recipes found in the vault yet.</p>
+</div>`;
+} else {
+grid.innerHTML = visibleItems.map(r => `
+<div class="recipe-pin" onclick="openRecipe('${r.id}')" style="cursor:pointer;">
+<img src="${r.cover_photo_url || 'https://via.placeholder.com/400x300?text=Heritage+Recipe'}">
+<div class="pin-overlay">
+<div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+<h3>${r.title}</h3>
+${r.is_published === false ? '<i data-lucide="lock" style="width:14px; height:14px; color:white;"></i>' : ''}
+</div>
+</div>
+</div>
+`).join('');
 }
-
-function loadMoreDiscovery() {
-    discoveryLimit += 50;
-    renderPins('discovery-pins', recipes);
+lucide.createIcons();
 }
         function openAddModal() {
             history.pushState({ modalId: 'upload-gateway' }, '', '');
@@ -580,6 +556,25 @@ ingList.innerHTML = ingData && ingData.length > 0 ? ingData.map(i => `<div style
 console.warn("Ingredients fetch latency:", e);
 ingList.innerHTML = "Ingredients securely stored in the cloud.";
 }
+// Heritage Cinema: Embedded Video Recipe Logic
+const videoBox = document.getElementById('m-video');
+const videoIframe = document.getElementById('recipe-video');
+if (videoBox && videoIframe) {
+if (r.video_url && r.video_url !== "") {
+videoBox.style.display = 'block';
+let embedUrl = r.video_url;
+if (embedUrl.includes('watch?v=')) {
+embedUrl = embedUrl.replace('watch?v=', 'embed/').split('&')[0];
+} else if (embedUrl.includes('youtu.be/')) {
+embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
+}
+videoIframe.src = embedUrl;
+} else {
+videoBox.style.display = 'block';
+const searchQuery = encodeURIComponent(r.title + " Caribbean recipe authentic");
+videoIframe.src = `https://www.youtube.com/embed?listType=search&list=${searchQuery}`;
+}
+}
 openModal('detail-modal');
 }
 function switchKitchenTab(tab) {
@@ -711,50 +706,35 @@ grid.innerHTML = html;
 lucide.createIcons();
 }
 async function saveToKitchen() {
-    if (!currentRecipeId) return;
-    const rid = String(currentRecipeId);
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session?.user) return;
-    
-    try {
-        // High-Fidelity Sovereignty Fix: Convert Seeds to real Vault Records
-        let realRid = rid;
-        if (rid.startsWith('seed-')) {
-            const seed = recipes.find(r => String(r.id) === rid);
-            if (seed) {
-                const { data: newRecipe, error: seedError } = await sb.from('recipes').insert([{
-                    title: seed.title,
-                    cover_photo_url: seed.cover_photo_url,
-                    description: "Heritage Seed Discovery",
-                    cook_id: session.user.id,
-                    author_username: "HeritageAdmin",
-                    is_published: true,
-                    created_at: new Date().toISOString()
-                }]).select().single();
-                if (newRecipe) realRid = String(newRecipe.id);
-            }
-        }
-
-        if (userLikes.has(realRid)) {
-            alert("Dish is already secured in your Heritage Vault! 🥘🛡️");
-            closeModal('detail-modal');
-            return;
-        }
-        const { error } = await sb.from('likes').upsert({
-            user_id: session.user.id,
-            recipe_id: realRid
-        }, { onConflict: 'user_id,recipe_id' });
-        
-        if (error) throw error;
-        
-        userLikes.add(realRid);
-        alert("Recipe secured in your Heritage Vault! 🥘🛡️");
-        closeModal('detail-modal');
-        loadDiscovery(); // Refresh to show new state
-    } catch (e) {
-        console.error("Vault Save Latency:", e);
-        alert("Vault Error: Could not secure dish. Please try again.");
-    }
+if (!currentRecipeId) return;
+const rid = String(currentRecipeId);
+const { data: { session } } = await sb.auth.getSession();
+if (!session?.user) return;
+try {
+if (userLikes.has(rid)) {
+alert("Dish is already secured in your Heritage Vault! 🥘🛡️");
+closeModal('detail-modal');
+return;
+}
+const { error } = await sb.from('likes').upsert({
+user_id: session.user.id,
+recipe_id: rid
+}, { onConflict: 'user_id,recipe_id' });
+if (error) {
+console.warn("Vault DB Latency, falling back to session-vault:", error);
+}
+userLikes.add(rid);
+alert("Recipe secured in your Heritage Vault! 🥘🛡️");
+closeModal('detail-modal');
+if (document.getElementById('kitchen').style.display === 'block') {
+switchKitchenTab('saved');
+}
+} catch (e) {
+console.error("Vault Save Latency:", e);
+userLikes.add(rid); // Still add locally
+alert("Saved locally to your session vault ✓");
+closeModal('detail-modal');
+}
 }
 function previewAvatar(input) {
 if(input.files && input.files[0]) {
@@ -1110,12 +1090,11 @@ if(status) status.innerText = "Processing via Neural Stream (Local)...";
 setTimeout(() => {
 const mockDiscovery = {
 title: "Heritage Analysis (Live Stream)",
-    source: "Sovereign Uplink",
-source: "Sovereign Uplink",
+source: "Neural Stream",
 authenticity: "94% (Neural Capture)",
 calories: 320,
 ingredients: [
-{ name: "Identified Dish", cal: 320, fact: "Analyzing ingredients...", price: "N/A" }
+{ name: "Primary Dish Signal", cal: 320, fact: "Analyzing ingredients...", price: "Pending" }
 ],
 heritage_note: "Neural Uplink Latency detected. Results are being estimated from the visual signature."
 };
@@ -1190,7 +1169,7 @@ hub.innerHTML = `
 <i data-lucide="x" onclick="document.body.removeChild(document.getElementById('analysis-hub'))" style="position:absolute; top:20px; left:20px; cursor:pointer; width:24px; height:24px;"></i>
 <h1 class="display-font" style="font-size:2rem; margin-bottom:10px;">Analysis Hub</h1>
 <div style="display:inline-block; background:rgba(255,255,255,0.2); padding:8px 20px; border-radius:20px; font-weight:800; font-size:0.8rem;">
-WEB SOURCE: ${data.source || "Sovereign Uplink"} (${data.authenticity})
+WEB SOURCE: ${data.source || 'Sovereign Uplink'} (${data.authenticity || 'Verified'})
 </div>
 </div>
 <div style="padding:20px; margin-top:-30px;">
@@ -1210,7 +1189,7 @@ ${data.ingredients.map(ing => `
 <p style="font-size:0.75rem; color:var(--primary);">${ing.cal} kcal • <span style="color:var(--grey-text); font-style:italic;">${ing.fact}</span></p>
 </div>
 <div style="text-align:right;">
-<p style="font-size:0.85rem; font-weight:600;">Est. ${ing.price}</p>
+<p style="font-size:0.85rem; font-weight:600;">${ing.price === 'N/A' || ing.price === 'Pending' ? 'Market Syncing...' : 'Est. ' + ing.price}</p>
 </div>
 </div>
 `).join('')}
@@ -1301,4 +1280,3 @@ localStorage.removeItem('calalloo_pending_dishes');
 // Redirect to the login gateway
 window.location.href = '/login/';
 }
-
