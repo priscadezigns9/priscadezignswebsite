@@ -302,7 +302,7 @@
   };
 
   async function findYouTubeId(query) {
-    console.log("Searching Neural Bridge (v2.0) for:", query);
+    console.log("Searching Neural Bridge (v2.1 Precision) for:", query);
     try {
       const nodes = ['inv.nadeko.net', 'invidious.nerdvpn.de', 'invidious.f5.si', 'yt.chocolatemoo53.com'];
       const node = nodes[Math.floor(Math.random() * nodes.length)];
@@ -312,9 +312,26 @@
       const data = await response.json();
       
       if (data && data.length > 0) {
-        // Excellence Logic: Skip snippets and shorts (ensure duration > 60s)
-        const track = data.find(v => v.lengthSeconds > 60) || data[0];
-        console.log("Track Located:", track.title, track.videoId);
+        const qParts = query.toLowerCase().split(' ').filter(p => p.length > 2 && p !== 'audio');
+        
+        // Precision Strategy: Best textual match + Duration filter
+        let track = data.find(v => {
+          const t = v.title.toLowerCase();
+          const matchesAll = qParts.every(part => t.includes(part));
+          return matchesAll && v.lengthSeconds > 60;
+        });
+
+        if(!track) {
+           track = data.find(v => {
+             const t = v.title.toLowerCase();
+             const matchCount = qParts.filter(part => t.includes(part)).length;
+             return matchCount >= (qParts.length / 2) && v.lengthSeconds > 60;
+           });
+        }
+        
+        if(!track) track = data.slice(0, 3).find(v => v.lengthSeconds > 60) || data[0];
+
+        console.log("Track Located (Precise):", track.title, track.videoId);
         return track.videoId;
       }
       return 'dQw4w9WgXcQ'; 
