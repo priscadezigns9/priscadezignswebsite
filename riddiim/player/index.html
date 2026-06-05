@@ -128,6 +128,7 @@
         <button class="nav-btn">⏮</button>
         <button class="main-btn" id="play-trigger">▶</button>
         <button class="nav-btn">⏭</button>
+        <button class="nav-btn" id="fav-btn" style="margin-left:15px; font-size:18px;">♡</button>
       </div>
 
       <div class="visualizer" id="viz"></div>
@@ -149,11 +150,35 @@
   const progressBar = document.getElementById('progress');
   const currentTimeLabel = document.getElementById('current-time');
   const durationLabel = document.getElementById('total-duration');
+  const favBtn = document.getElementById('fav-btn');
   
   let player;
   let isReady = false;
   let currentTrack = null;
   let progressInterval;
+  let vault = JSON.parse(localStorage.getItem('riddiim_vault') || '[]');
+
+  function updateFavUI() {
+    if(!currentTrack) return;
+    const isSaved = vault.some(t => t.title === currentTrack.title && t.artist === currentTrack.artist);
+    favBtn.textContent = isSaved ? '♥' : '♡';
+    favBtn.style.color = isSaved ? '#ff3e3e' : '#fff';
+  }
+
+  favBtn.onclick = () => {
+    if(!currentTrack) return;
+    const index = vault.findIndex(t => t.title === currentTrack.title && t.artist === currentTrack.artist);
+    if(index > -1) {
+      vault.splice(index, 1);
+      feedback.textContent = 'REMOVED_FROM_VAULT';
+    } else {
+      vault.push(currentTrack);
+      feedback.textContent = 'SAVED_TO_VAULT';
+    }
+    localStorage.setItem('riddiim_vault', JSON.stringify(vault));
+    updateFavUI();
+    if(document.querySelector('.tab[onclick*="library"]').classList.contains('active')) renderVault();
+  };
 
   function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
@@ -250,6 +275,7 @@
     document.getElementById('track-art').src = t.art;
     document.getElementById('track-name').textContent = t.title;
     document.getElementById('artist-name').textContent = t.artist;
+    updateFavUI();
     
     feedback.textContent = 'TUNING_FREQUENCY...';
     
@@ -332,7 +358,22 @@
   window.switchTab = (tab) => {
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     event.target.classList.add('active');
+    if(tab === 'library') renderVault();
+    else if(tab === 'search') results.style.display = 'none';
   };
+
+  function renderVault() {
+    results.innerHTML = vault.length ? vault.map(i => `
+      <div class="result-item" onclick='loadTrack(${JSON.stringify(i).replace(/'/g, "&apos;")})'>
+        <img src="${i.art}">
+        <div class="res-info">
+          <div class="result-title">${i.title}</div>
+          <div class="result-artist">${i.artist}</div>
+        </div>
+      </div>
+    `).join('') : '<div style="padding:20px; text-align:center; color:var(--muted); font-size:10px;">VAULT_EMPTY</div>';
+    results.style.display = 'block';
+  }
 </script>
 </body>
 </html>
