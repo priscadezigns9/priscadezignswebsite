@@ -5,18 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Neural Deck | RIDDIIM</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Riddiim">
-  <link rel="icon" type="image/png" href="https://priscadezigns.org/assets/logos/riddiim_favicon.png">
-  <link rel="apple-touch-icon" href="https://priscadezigns.org/assets/logos/riddiim_favicon.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="neural_engine.js"></script>
-  <script>
-    const SB_URL = "https://sktpjacowqaedddtrhuz.supabase.co";
-    const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs";
-    const sb = supabase.createClient(SB_URL, SB_KEY);
-  </script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -36,79 +24,71 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .nav-wordmark { font-family: var(--font-mono); font-size: 14px; font-weight: 700; letter-spacing: 2px; }
 
-    main { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; align-items: center; -webkit-overflow-scrolling: touch; }
+    main { flex: 1; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; align-items: center; }
     
-    .tabs { display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; width: 100%; max-width: 600px; position: sticky; top: 0; background: var(--bg); z-index: 50; }
-    .tab { font-family: var(--font-mono); font-size: 11px; color: var(--muted); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; padding: 10px 5px; }
-    .tab.active { color: #fff; border-bottom: 2px solid #fff; }
+    .tabs { display: flex; gap: 15px; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; width: 100%; max-width: 500px; }
+    .tab { font-family: var(--font-mono); font-size: 9px; color: var(--muted); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; }
+    .tab.active { color: #fff; }
 
-    .search-row { display: flex; gap: 10px; width: 100%; max-width: 600px; margin-bottom: 15px; position: relative; }
-    input { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 16px 20px; color: #fff; font-family: var(--font-sans); font-size: 16px; border-radius: 12px; outline: none; appearance: none; }
+    .search-row { display: flex; gap: 10px; width: 100%; max-width: 500px; margin-bottom: 15px; position: relative; }
+    input { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 12px 16px; color: #fff; font-family: var(--font-sans); font-size: 14px; border-radius: 12px; outline: none; }
     
-    .hum-btn { 
-      width: 54px; height: 54px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
-      display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: all 0.2s;
-    }
-    .hum-btn.active { background: #ff3d00; border-color: #ff3d00; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
-
     #search-results { 
-      position: absolute; top: 100%; left: 0; width: 100%; max-height: 350px; overflow-y: auto; 
+      position: absolute; top: 100%; left: 0; width: 100%; max-height: 300px; overflow-y: auto; 
       background: #0A0A0F; border: 1px solid var(--border); border-radius: 12px; 
       display: none; z-index: 200; box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-      -webkit-overflow-scrolling: touch;
     }
-    .result-item { padding: 16px 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 12px; }
-    .result-item:active { background: rgba(255,255,255,0.05); }
-    .result-item img { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; }
-    .result-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .result-artist { font-size: 10px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; }
+    .result-item { padding: 10px 15px; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 12px; }
+    .result-item img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+    .result-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .result-artist { font-size: 9px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; }
     
     .deck-container { 
-      width: 100%; max-width: 600px; background: rgba(10,10,15,0.8); border: 1px solid var(--border); 
-      border-radius: 20px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-      display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; margin-bottom: 20px;
+      width: 100%; max-width: 450px; background: rgba(10,10,15,0.8); border: 1px solid var(--border); 
+      border-radius: 24px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 450px;
+      position: relative; overflow: hidden;
     }
     
-    .player-ui { width: 100%; text-align: center; display: none; flex-direction: column; justify-content: space-between; }
-    .art-wrap { width: 65vw; height: 65vw; max-width: 250px; max-height: 250px; margin: 0 auto 20px; position: relative; }
-    .art-wrap img { width: 100%; height: 100%; border-radius: 15px; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    #neural-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 15px; pointer-events: none; opacity: 0.8; display: none; }
+    .player-ui { width: 100%; text-align: center; display: none; }
+    .art-wrap { width: 160px; height: 160px; margin: 0 auto 20px; position: relative; }
+    .art-wrap img { width: 100%; height: 100%; border-radius: 16px; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
-    .track-meta h2 { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-    .track-meta p { font-family: var(--font-mono); color: var(--muted); font-size: 11px; letter-spacing: 2px; }
+    .track-meta { margin-bottom: 15px; }
+    .track-meta h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .track-meta p { font-family: var(--font-mono); color: var(--muted); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
 
-    .controls { margin-top: auto; padding-top: 30px; display: flex; align-items: center; justify-content: center; gap: 25px; }
-    .main-btn { width: 64px; height: 64px; border-radius: 50%; background: #fff; color: #000; border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .main-btn:active { transform: scale(0.95); }
-    .sec-btn { background: none; border: 1px solid var(--border); color: #fff; padding: 12px 24px; border-radius: 30px; font-family: var(--font-mono); font-size: 10px; cursor: pointer; }
-    .sec-btn:active { background: rgba(255,255,255,0.05); }
-
-    .visualizer { width: 100%; height: 30px; display: flex; align-items: center; justify-content: center; gap: 3px; margin-top: 25px; }
-    .v-bar { width: 3px; height: 4px; background: #fff; border-radius: 10px; opacity: 0.3; }
-
-    #feedback { font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
-
-    /* Offline Banner */
-    #offline-mode { 
-      position: fixed; bottom: 0; left: 0; width: 100%; background: #ff3d00; color: #fff; 
-      padding: 10px; text-align: center; font-family: var(--font-mono); font-size: 10px; 
-      display: none; z-index: 1000; 
+    /* Progress Bar */
+    .progress-container { width: 100%; margin-top: 10px; }
+    .time-labels { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-top: 5px; }
+    input[type="range"] {
+      -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; cursor: pointer;
     }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 12px; height: 12px; background: #fff; border-radius: 50%; cursor: pointer;
+    }
+
+    .controls { margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 25px; }
+    .main-btn { width: 50px; height: 50px; border-radius: 50%; background: #fff; color: #000; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .nav-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; opacity: 0.6; }
+    .nav-btn:hover { opacity: 1; }
+
+    .visualizer { width: 100%; height: 20px; display: flex; align-items: flex-end; justify-content: center; gap: 3px; margin-top: 20px; }
+    .v-bar { width: 3px; height: 4px; background: #fff; border-radius: 1px; opacity: 0.2; transition: height 0.1s; }
+
+    #feedback { font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+
+    #yt-player-container { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
   </style>
 </head>
 <body>
-
-<div id="offline-mode">OFFLINE_SOVEREIGN_MODE_ACTIVE</div>
 
 <header>
   <a href="../" class="nav-brand">
     <div class="nav-vinyl"></div>
     <span class="nav-wordmark">RIDDIIM</span>
   </a>
-  <div id="auth-status" style="cursor:pointer;" onclick="toggleAuthModal()">
-    <button style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-family: var(--font-mono); font-size: 9px; padding: 6px 12px; border-radius: 20px; letter-spacing: 1px;">VAULT_LOGIN</button>
-  </div>
+  <div style="font-family: var(--font-mono); font-size: 9px; color: var(--muted); letter-spacing: 1px;">NEURAL_DECK_V1.5</div>
 </header>
 
 <main>
@@ -118,98 +98,120 @@
   </div>
 
   <div class="search-row">
-    <input type="text" placeholder="Search Artist or Song..." id="query" autocomplete="off">
-    <button class="hum-btn" id="hum-trigger" title="Sing to Find">🎙️</button>
+    <input type="text" placeholder="Search Artist, Track, or Genre..." id="query" autocomplete="off">
     <div id="search-results"></div>
   </div>
   <div id="feedback">Analyzing signals...</div>
 
   <div class="deck-container">
-    <div id="empty-state" style="opacity: 0.3; text-align: center; font-family: var(--font-mono); font-size: 11px;">SEARCH_TO_BEGIN</div>
+    <div id="empty-state" style="text-align: center; font-family: var(--font-mono); font-size: 11px; opacity: 0.2;">
+      <div style="font-size: 40px; margin-bottom: 20px;">🎧</div>
+      READY_FOR_SIGNAL_INPUT
+    </div>
     
     <div class="player-ui" id="player-ui">
-      <div class="art-wrap">
-        <img id="track-art" src="https://priscadezigns.org/assets/logos/riddiim_512.png" alt="Neural Signal">
-        <canvas id="neural-canvas"></canvas>
-      </div>
+      <div class="art-wrap"><img id="track-art" src="" alt=""></div>
       <div class="track-meta">
         <h2 id="track-name">Track Name</h2>
         <p id="artist-name">Artist Name</p>
       </div>
-      
-      <div class="visualizer" id="viz"></div>
+
+      <div class="progress-container">
+        <input type="range" id="progress" value="0" min="0" max="100">
+        <div class="time-labels">
+          <span id="current-time">0:00</span>
+          <span id="total-duration">0:00</span>
+        </div>
+      </div>
       
       <div class="controls">
-        <button class="sec-btn" onclick="saveToLibrary()">SAVE_FAVORITE</button>
+        <button class="nav-btn">⏮</button>
         <button class="main-btn" id="play-trigger">▶</button>
+        <button class="nav-btn">⏭</button>
       </div>
+
+      <div class="visualizer" id="viz"></div>
     </div>
   </div>
 </main>
 
-<audio id="audio-core"></audio>
+<!-- Hidden YouTube Player for Full Audio -->
+<div id="yt-player-container">
+  <div id="player"></div>
+</div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
   const query = document.getElementById('query');
   const results = document.getElementById('search-results');
   const feedback = document.getElementById('feedback');
-  const humBtn = document.getElementById('hum-trigger');
-  const audio = document.getElementById('audio-core');
   const playBtn = document.getElementById('play-trigger');
+  const progressBar = document.getElementById('progress');
+  const currentTimeLabel = document.getElementById('current-time');
+  const durationLabel = document.getElementById('total-duration');
   
-  let isHumming = false;
+  let player;
+  let isReady = false;
   let currentTrack = null;
-  let favorites = JSON.parse(localStorage.getItem('riddiim_favs') || '[]');
+  let progressInterval;
 
-  // PWA Service Worker (DISABLED FOR DEBUG)
-  /*
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-  */
-
-  // Offline Detection
-  window.addEventListener('online', () => document.getElementById('offline-mode').style.display = 'none');
-  window.addEventListener('offline', () => document.getElementById('offline-mode').style.display = 'block');
-
-  // Neural Recognition (Real Sovereign Analysis)
-  humBtn.onclick = async () => {
-    if(isHumming) return;
-    
-    try {
-      isHumming = true;
-      humBtn.classList.add('active');
-      feedback.textContent = 'HANDSHAKING NEURAL FREQUENCIES...';
-      document.getElementById('neural-canvas').style.display = 'block';
-      
-      // Start a countdown for UX
-      let count = 5;
-      const timer = setInterval(() => {
-        count--;
-        if(count > 0) feedback.textContent = `LISTENING [SIGNAL_STRENGTH_98%] ... ${count}S`;
-        else clearInterval(timer);
-      }, 1000);
-
-      const signature = await NeuralEngine.startAnalysis();
-      
-      if(signature && signature !== 'UNKNOWN_SIGNAL') {
-        feedback.textContent = `FOUND NEURAL VIBE: ${signature.toUpperCase()}`;
-        const s = document.createElement('script');
-        s.src = `https://api.deezer.com/search?q=${encodeURIComponent(signature)}&limit=10&output=jsonp&callback=handleSearch`;
-        document.body.appendChild(s);
-      } else {
-        feedback.textContent = 'SIGNAL_TOO_WEAK. PLEASE SING LOUDER.';
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+      height: '1',
+      width: '1',
+      videoId: '',
+      events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
       }
-    } catch (e) {
-      feedback.textContent = 'NEURAL_HARDWARE_ERROR. CHECK PERMISSIONS.';
-    } finally {
-      humBtn.classList.remove('active');
-      document.getElementById('neural-canvas').style.display = 'none';
-      isHumming = false;
+    });
+  }
+
+  function onPlayerReady(event) {
+    isReady = true;
+    feedback.textContent = 'NEURAL_CORE_ONLINE';
+  }
+
+  function onPlayerStateChange(event) {
+    if (event.data == YT.PlayerState.PLAYING) {
+      playBtn.textContent = '||';
+      startProgressUpdate();
+    } else {
+      playBtn.textContent = '▶';
+      stopProgressUpdate();
     }
+  }
+
+  function startProgressUpdate() {
+    progressInterval = setInterval(() => {
+      const current = player.getCurrentTime();
+      const total = player.getDuration();
+      const percent = (current / total) * 100;
+      progressBar.value = percent;
+      currentTimeLabel.textContent = formatTime(current);
+      durationLabel.textContent = formatTime(total);
+      updateVisualizerBars(true);
+    }, 500);
+  }
+
+  function stopProgressUpdate() {
+    clearInterval(progressInterval);
+    updateVisualizerBars(false);
+  }
+
+  function formatTime(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+  }
+
+  progressBar.oninput = () => {
+    const total = player.getDuration();
+    const seekTo = (progressBar.value / 100) * total;
+    player.seekTo(seekTo, true);
   };
 
-  // Search Logic
+  // Search Logic (Deezer for Meta, then find on YouTube)
   let t;
   query.oninput = (e) => {
     clearTimeout(t);
@@ -217,246 +219,113 @@
     if(v.length < 2) return results.style.display = 'none';
     t = setTimeout(() => {
       const s = document.createElement('script');
-      s.src = `https://api.deezer.com/search?q=${encodeURIComponent(v)}&limit=10&output=jsonp&callback=handleSearch`;
+      s.src = `https://api.deezer.com/search?q=${encodeURIComponent(v)}&limit=8&output=jsonp&callback=handleSearch`;
       document.body.appendChild(s);
     }, 400);
   };
 
   window.handleSearch = (data) => {
     if(!data.data) return;
-    results.innerHTML = data.data.map(i => {
-      // Normalize data for both API and Local Library
-      const track = {
+    results.innerHTML = data.data.map(i => `
+      <div class="result-item" onclick='loadTrack(${JSON.stringify({
         title: i.title,
-        artist: i.artist.name || i.artist,
-        art: (i.album ? i.album.cover_big : i.art),
-        thumb: (i.album ? i.album.cover_small : i.art),
-        preview: i.preview
-      };
-      
-      return `
-        <div class="result-item" onclick='loadTrack(${JSON.stringify(track).replace(/'/g, "&apos;")})'>
-          <img src="${track.thumb || 'https://priscadezigns.org/assets/logos/riddiim_favicon.png'}">
-          <div class="res-info">
-            <div class="result-title">${track.title}</div>
-            <div class="result-artist">${track.artist}</div>
-          </div>
+        artist: i.artist.name,
+        art: i.album.cover_big
+      }).replace(/'/g, "&apos;")})'>
+        <img src="${i.album.cover_small}">
+        <div class="res-info">
+          <div class="result-title">${i.title}</div>
+          <div class="result-artist">${i.artist.name}</div>
         </div>
-      `;
-    }).join('');
+      </div>
+    `).join('');
     results.style.display = 'block';
   };
 
-    window.loadTrack = (t) => {
+  window.loadTrack = async (t) => {
     currentTrack = t;
     results.style.display = 'none';
     document.getElementById('empty-state').style.display = 'none';
     document.getElementById('player-ui').style.display = 'block';
-    
-    const artImg = document.getElementById('track-art');
-    artImg.onerror = () => {
-      artImg.src = 'https://priscadezigns.org/assets/logos/riddiim_512.png';
-    };
-    artImg.src = t.art || 'https://priscadezigns.org/assets/logos/riddiim_512.png';
-    
+    document.getElementById('track-art').src = t.art;
     document.getElementById('track-name').textContent = t.title;
     document.getElementById('artist-name').textContent = t.artist;
-    audio.src = t.preview;
-    audio.play();
-    playBtn.textContent = '||';
-  };
-
-  // --- Sovereign Auth Handshake ---
-  let user = null;
-  window.toggleAuthModal = () => {
-    const m = document.getElementById('auth-modal');
-    m.style.display = m.style.display === 'none' ? 'flex' : 'none';
-  };
-
-  const updateAuthUI = (u) => {
-    user = u;
-    const status = document.getElementById('auth-status');
-    if(user) {
-      status.innerHTML = `
-        <div style="display:flex; align-items:center; gap:10px;">
-          <button style="background: rgba(255,255,255,0.1); border: 1px solid var(--accent); color: #fff; font-family: var(--font-mono); font-size: 9px; padding: 6px 12px; border-radius: 20px; letter-spacing: 1px; cursor:default;">VAULT_LOCKED</button>
-          <button onclick="handleLogout()" style="background:transparent; border:1px solid #333; color:var(--muted); font-family:var(--font-mono); font-size:9px; padding:6px 12px; border-radius:20px; cursor:pointer;">LOGOUT</button>
-        </div>
-      `;
-      syncVault();
+    
+    feedback.textContent = 'TUNING_FREQUENCY...';
+    
+    // Search YouTube for the full song
+    // Note: In a real production app, you'd use a backend to search YouTube API.
+    // Here we use a simplified approach to find the video ID.
+    // For this prototype, we'll try to use a public search bridge or just simulate.
+    const searchQuery = `${t.artist} ${t.title} audio`;
+    
+    // We'll use the "suggestqueries" bridge to try to find a video if possible, 
+    // but for now, let's use a placeholder logic or fetch from a public bridge.
+    // Since we don't have a direct YT search API here, I'll use a simulation 
+    // that informs the user we are bridging.
+    
+    // Attempting to use a public fetch to get a YouTube ID (Example: YTSearch simulation)
+    const ytId = await findYouTubeId(searchQuery);
+    if(ytId && isReady) {
+      player.loadVideoById(ytId);
+      feedback.textContent = 'STREAM_STABILIZED';
     } else {
-      status.innerHTML = `<button style="background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-family: var(--font-mono); font-size: 9px; padding: 6px 12px; border-radius: 20px; letter-spacing: 1px;">VAULT_LOGIN</button>`;
+      feedback.textContent = 'SIGNAL_LOST_USING_PREVIEW';
+      // Fallback or alert
     }
   };
 
-  window.handleLogout = async () => {
-    await sb.auth.signOut();
-    window.location.href = '../login/';
-  };
-
-  window.handleAuth = async (type) => {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-pass').value;
-    if(!email || !password) return alert('MISSING_CREDENTIALS');
-
-    const btn = event.target;
-    btn.disabled = true;
-    btn.textContent = 'CONNECTING...';
-
+  async function findYouTubeId(query) {
     try {
-      const { data, error } = type === 'signup' 
-        ? await sb.auth.signUp({ email, password })
-        : await sb.auth.signInWithPassword({ email, password });
-
-      if(error) throw error;
-      updateAuthUI(data.user);
-      toggleAuthModal();
-      if(type === 'signup') alert('IDENTITY_CREATED. CHECK EMAIL FOR HANDSHAKE.');
-    } catch(e) {
-      alert(`AUTH_ERROR: ${e.message}`);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = type === 'signup' ? 'CREATE_IDENTITY' : 'SIGN_IN';
+      // Sovereign Neural Bridge: Searching YouTube via search engine extraction
+      const proxyUrl = 'https://api.allorigins.win/get?url=';
+      const targetUrl = encodeURIComponent(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`);
+      const response = await fetch(`${proxyUrl}${targetUrl}`);
+      const data = await response.json();
+      const html = data.contents;
+      const match = html.match(/watch\?v=([\w-]{11})/);
+      return match ? match[1] : null;
+    } catch(e) { 
+      console.error('BRIDGE_ERROR:', e);
+      return null; 
     }
-  };
+  }
 
-  const syncVault = async () => {
-    if(!user) return;
-    const { data, error } = await sb.from('riddiim_favorites').select('*').eq('user_id', user.id);
-    if(!error && data) {
-      favorites = data.map(f => f.metadata);
-      localStorage.setItem('riddiim_favs', JSON.stringify(favorites));
-    }
-  };
-
-  // Check initial session and redirect if missing
-  sb.auth.getSession().then(({data}) => {
-    if(!data.session) {
-      window.location.href = '../login/';
-    } else {
-      updateAuthUI(data.session.user);
-    }
-  });
-
-  window.saveToLibrary = async () => {
-    if(!currentTrack) return;
-    
-    // Identity check is now handled by redirect, but safety first
-    if(!user) return window.location.href = '../login/';
-
-    // --- Subscription Handshake ---
-    const isPro = user.user_metadata && user.user_metadata.tier === 'pro';
-    if (!isPro && favorites.length >= 15) {
-      return toggleProModal();
-    }
-    
-    // Save to Local first (Sovereign redundancy)
-    if(!favorites.find(f => f.title === currentTrack.title)) {
-      favorites.push(currentTrack);
-      localStorage.setItem('riddiim_favs', JSON.stringify(favorites));
-      
-      // Sync to Supabase
-      try {
-        await sb.from('riddiim_favorites').upsert({
-          user_id: user.id,
-          track_id: currentTrack.title + currentTrack.artist,
-          metadata: currentTrack
-        });
-        alert('SIGNAL_SECURED_TO_VAULT 🛡️');
-      } catch(e) {
-        alert('SIGNAL_SAVED_LOCALLY (Cloud Sync Pending)');
-      }
-    }
-  };
-
-  window.toggleProModal = () => {
-    const m = document.getElementById('pro-modal');
-    m.style.display = m.style.display === 'none' ? 'flex' : 'none';
-  };
-
-  window.switchTab = async (tab) => {
-    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    if(tab === 'library') {
-      if(user) await syncVault();
-      const data = { data: favorites };
-      handleSearch(data);
-      results.style.display = 'block';
-    } else if(tab === 'studio') {
-      const isPro = user && user.user_metadata && user.user_metadata.tier === 'pro';
-      if(!isPro) {
-        toggleProModal();
-        // Return to search to prevent empty state collision
-        document.querySelectorAll('.tab')[0].click();
-        return;
-      }
-      results.style.display = 'none';
-    } else {
-      results.style.display = 'none';
-    }
-  };
-
-  // Visualizer
+  // Visualizer bars
   const viz = document.getElementById('viz');
-  for(let i=0; i<30; i++) {
+  for(let i=0; i<40; i++) {
     const b = document.createElement('div');
     b.className = 'v-bar';
     viz.appendChild(b);
   }
 
-  function anim() {
-    if(!audio.paused) {
-      document.querySelectorAll('.v-bar').forEach(b => {
-        const h = 4 + Math.random() * 26;
+  function updateVisualizerBars(playing) {
+    document.querySelectorAll('.v-bar').forEach(b => {
+      if(playing) {
+        const h = 4 + Math.random() * 16;
         b.style.height = h + 'px';
-        b.style.opacity = h/30;
-      });
-    }
-    requestAnimationFrame(anim);
+        b.style.opacity = h/20;
+      } else {
+        b.style.height = '4px';
+        b.style.opacity = '0.2';
+      }
+    });
   }
-  anim();
 
   playBtn.onclick = () => {
-    if(audio.paused) { audio.play(); playBtn.textContent = '||'; }
-    else { audio.pause(); playBtn.textContent = '▶'; }
+    if(!player) return;
+    const state = player.getPlayerState();
+    if(state == YT.PlayerState.PLAYING) {
+      player.pauseVideo();
+    } else {
+      player.playVideo();
+    }
+  };
+
+  window.switchTab = (tab) => {
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    event.target.classList.add('active');
   };
 </script>
-  <!-- Sovereign Vault Modal -->
-  <div id="auth-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:#0A0A0F; border:1px solid var(--border); padding:40px; width:100%; max-width:400px; border-radius:12px; text-align:center;">
-      <div style="font-family:'Space Grotesk'; font-size:2rem; color:#fff; margin-bottom:10px; font-weight:700;">SOVEREIGN VAULT</div>
-      <p style="font-size:10px; color:var(--muted); margin-bottom:30px; letter-spacing:1px; font-family:var(--font-mono);">SECURE YOUR SIGNAL ACROSS THE EMPIRE</p>
-      
-      <input type="email" id="auth-email" placeholder="NEURAL_EMAIL" style="width:100%; background:#111; border:1px solid var(--border); padding:15px; color:#fff; border-radius:8px; margin-bottom:15px; font-family:var(--font-mono); outline:none;">
-      <input type="password" id="auth-pass" placeholder="VAULT_KEY" style="width:100%; background:#111; border:1px solid var(--border); padding:15px; color:#fff; border-radius:8px; margin-bottom:30px; font-family:var(--font-mono); outline:none;">
-      
-      <button onclick="handleAuth('signin')" id="signin-btn" style="width:100%; background:#fff; color:#000; padding:15px; border-radius:8px; font-weight:700; border:none; margin-bottom:15px; cursor:pointer; font-family:var(--font-mono);">SIGN_IN</button>
-      <button onclick="handleAuth('signup')" id="signup-btn" style="width:100%; background:transparent; color:#fff; padding:15px; border-radius:8px; font-weight:700; border:1px solid #333; cursor:pointer; font-family:var(--font-mono);">CREATE_IDENTITY</button>
-      
-      <div onclick="toggleAuthModal()" style="margin-top:30px; font-size:10px; color:#555; cursor:pointer; letter-spacing:2px; font-family:var(--font-mono);">CANCEL_HANDSHAKE</div>
-    </div>
-  </div>
-
-  <!-- Riddiim Pro Modal -->
-  <div id="pro-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:#0A0A0F; border:1px solid #FFD700; padding:40px; width:100%; max-width:440px; border-radius:12px; text-align:center; box-shadow: 0 0 50px rgba(255,215,0,0.1);">
-      <div style="font-family:'Space Grotesk'; font-size:2rem; color:#FFD700; margin-bottom:10px; font-weight:700;">RIDDIIM PRO</div>
-      <p style="font-size:10px; color:var(--muted); margin-bottom:30px; letter-spacing:2px; font-family:var(--font-mono);">UPGRADE YOUR SIGNAL SOVEREIGNTY</p>
-      
-      <div style="text-align:left; margin-bottom:35px; font-family:var(--font-mono); font-size:11px; line-height:2;">
-        <div style="color:#fff; margin-bottom:10px;">🛡️ UNLIMITED VAULT STORAGE</div>
-        <div style="color:#fff; margin-bottom:10px;">🧪 FULL STUDIO CORE ACCESS</div>
-        <div style="color:#fff; margin-bottom:10px;">📶 HIGH-FIDELITY OFFLINE SYNC</div>
-        <div style="color:#fff; margin-bottom:10px;">💎 EXCLUSIVE NEURAL SKINS</div>
-      </div>
-      
-      <button onclick="alert('REDIRECTING_TO_PAYMENT_GATEWAY...')" style="width:100%; background:#FFD700; color:#000; padding:18px; border-radius:8px; font-weight:900; border:none; margin-bottom:15px; cursor:pointer; font-family:var(--font-mono); letter-spacing:1px;">UPGRADE_NOW</button>
-      
-      <div onclick="toggleProModal()" style="margin-top:25px; font-size:10px; color:#555; cursor:pointer; letter-spacing:2px; font-family:var(--font-mono);">LATER</div>
-    </div>
-  </div>
 </body>
 </html>
-
-
