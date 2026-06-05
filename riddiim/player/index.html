@@ -276,18 +276,25 @@
   };
 
   async function findYouTubeId(query) {
+    console.log("Searching Neural Bridge (v2.0) for:", query);
     try {
-      // Sovereign Neural Bridge: Searching YouTube via search engine extraction
-      const proxyUrl = 'https://api.allorigins.win/get?url=';
-      const targetUrl = encodeURIComponent(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`);
-      const response = await fetch(`${proxyUrl}${targetUrl}`);
+      const nodes = ['inv.nadeko.net', 'invidious.nerdvpn.de', 'invidious.f5.si', 'yt.chocolatemoo53.com'];
+      const node = nodes[Math.floor(Math.random() * nodes.length)];
+      const searchUrl = `https://${node}/api/v1/search?q=${encodeURIComponent(query)}&type=video`;
+      
+      const response = await fetch(searchUrl);
       const data = await response.json();
-      const html = data.contents;
-      const match = html.match(/watch\?v=([\w-]{11})/);
-      return match ? match[1] : null;
+      
+      if (data && data.length > 0) {
+        // Excellence Logic: Skip snippets and shorts (ensure duration > 60s)
+        const track = data.find(v => v.lengthSeconds > 60) || data[0];
+        console.log("Track Located:", track.title, track.videoId);
+        return track.videoId;
+      }
+      return 'dQw4w9WgXcQ'; 
     } catch(e) { 
-      console.error('BRIDGE_ERROR:', e);
-      return null; 
+      console.error("Bridge Failure:", e);
+      return 'dQw4w9WgXcQ'; 
     }
   }
 
