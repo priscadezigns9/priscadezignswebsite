@@ -109,6 +109,8 @@
       READY_FOR_SIGNAL_INPUT
     </div>
     
+    <div id="vault-list" style="display:none; padding:10px 20px;"></div>
+
     <div class="player-ui" id="player-ui">
       <div class="art-wrap"><img id="track-art" src="" alt=""></div>
       <div class="track-meta">
@@ -152,6 +154,9 @@
   }
   const query = document.getElementById('query');
   const results = document.getElementById('search-results');
+  const vaultList = document.getElementById('vault-list');
+  const emptyState = document.getElementById('empty-state');
+  const playerUI = document.getElementById('player-ui');
   const feedback = document.getElementById('feedback');
   const playBtn = document.getElementById('play-trigger');
   const progressBar = document.getElementById('progress');
@@ -184,8 +189,41 @@
     }
     localStorage.setItem('riddiim_vault', JSON.stringify(vault));
     updateFavUI();
+    syncVaultToSupabase();
     if(document.querySelector('.tab[onclick*="library"]').classList.contains('active')) renderVault();
   };
+
+  async function syncVaultToSupabase() {
+    // Excellence: Check for session then push to public.profiles.favorites
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update({ music_favorites: vault })
+      .eq('id', session.user.id);
+      
+    if (error) console.error("Sovereign Sync Error:", error);
+    else console.log("Vault Persisted to Supabase 🛡️");
+  }
+
+  async function loadVaultFromSupabase() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('music_favorites')
+      .eq('id', session.user.id)
+      .single();
+      
+    if (data && data.music_favorites) {
+      vault = data.music_favorites;
+      localStorage.setItem('riddiim_vault', JSON.stringify(vault));
+      console.log("Vault Restored from Supabase 🛡️");
+    }
+  }
+  loadVaultFromSupabase();
 
   function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
@@ -370,26 +408,43 @@
   window.switchTab = (tab) => {
     document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
     event.target.classList.add('active');
-    if(tab === 'library') renderVault();
-    else if(tab === 'search') results.style.display = 'none';
+    
+    if(tab === 'library') {
+      results.style.display = 'none';
+      emptyState.style.display = 'none';
+      playerUI.style.display = 'none';
+      vaultList.style.display = 'block';
+      renderVault();
+    } else {
+      vaultList.style.display = 'none';
+      if(!currentTrack) {
+        emptyState.style.display = 'block';
+        playerUI.style.display = 'none';
+      } else {
+        emptyState.style.display = 'none';
+        playerUI.style.display = 'block';
+      }
+    }
   };
 
   function renderVault() {
-    results.innerHTML = vault.length ? vault.map(i => `
-      <div class="result-item" style="display:flex; justify-content:space-between; align-items:center;">
-        <div style="display:flex; gap:12px; align-items:center; flex:1;" onclick='loadTrack(${JSON.stringify(i).replace(/'/g, "&apos;")})'>
-          <img src="${i.art}" style="width:40px; height:40px; border-radius:4px;">
-          <div class="res-info">
-            <div class="result-title">${i.title}</div>
-            <div class="result-artist">${i.artist}</div>
+    vaultList.innerHTML = vault.length ? `
+      <div style="font-family:var(--font-mono); font-size:9px; color:var(--muted); margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">SOVEREIGN_VAULT_DECK</div>
+      ${vault.map(i => `
+        <div class="result-item" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); margin-bottom:10px; border-radius:12px; padding:10px;">
+          <div style="display:flex; gap:12px; align-items:center; flex:1;" onclick='loadTrack(${JSON.stringify(i).replace(/'/g, "&apos;")})'>
+            <img src="${i.art}" style="width:50px; height:50px; border-radius:8px; border:1px solid var(--border);">
+            <div class="res-info">
+              <div class="result-title" style="font-size:12px; font-weight:700;">${i.title}</div>
+              <div class="result-artist" style="font-size:10px; color:var(--muted);">${i.artist}</div>
+            </div>
+          </div>
+          <div class="offline-sync" onclick="syncOffline('${i.title}')" style="cursor:pointer; background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; border:1px solid var(--border);">
+            <span style="font-size:9px; font-family:var(--font-mono); font-weight:700;">OFFLINE</span>
           </div>
         </div>
-        <div class="offline-sync" onclick="syncOffline('${i.title}')" style="cursor:pointer; opacity:0.5; padding:10px;">
-          <span style="font-size:10px; font-family:var(--font-mono);">SYNC</span>
-        </div>
-      </div>
-    `).join('') : '<div style="padding:20px; text-align:center; color:var(--muted); font-size:10px;">VAULT_EMPTY</div>';
-    results.style.display = 'block';
+      `).join('')}
+    ` : '<div style="padding:40px; text-align:center; color:var(--muted); font-family:var(--font-mono); font-size:10px;">VAULT_EMPTY_READY_FOR_SIGNAL</div>';
   }
 
   window.syncOffline = (title) => {
