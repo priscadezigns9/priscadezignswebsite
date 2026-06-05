@@ -460,7 +460,7 @@
             <div id="view-connect" style="display:none;">
                 <p style="font-size:0.9rem; color:#666; text-align:center; margin-bottom:25px; font-weight:600;">Securely bridge your external assets to the Priscion Node.</p>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                    <button onclick="connectHardware('Cardano (Vespr)')" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center; transition:transform 0.2s;">
+                    <button onclick="connectVespr()" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center; transition:transform 0.2s;">
                         <div style="font-size:1.8rem; margin-bottom:5px;">₳</div>
                         <div style="font-size:0.75rem; font-weight:800; color:#333;">VESPR</div>
                     </button>
@@ -540,6 +540,53 @@
             }
         });
     });
+    </script>
+    
+    <script>
+    async function connectVespr() {
+        const status = document.getElementById('walletStatus');
+        status.innerHTML = '⚡ Searching for Vespr...';
+        status.style.color = '#F3BA2F';
+
+        try {
+            // CIP-30: Check if cardano is injected and vespr is available
+            if (typeof window.cardano !== 'undefined' && window.cardano.vespr) {
+                const vespr = window.cardano.vespr;
+                status.innerHTML = '⚡ Connecting to Vespr...';
+                
+                // Request connection
+                const enabled = await vespr.enable();
+                
+                if (enabled) {
+                    // Fetch the stake address to prove connection
+                    const rewardAddr = await vespr.getRewardAddresses();
+                    const stakeAddr = rewardAddr[0]; // This is the real unique ID
+                    
+                    alert('Priscion Hub: Vespr Connected Successfully.\\nStake ID: ' + stakeAddr.substring(0,15) + '...');
+                    status.innerHTML = '● Vespr Linked (' + stakeAddr.substring(0,8) + ')';
+                    status.style.color = '#00FF88';
+                    
+                    // Here we would typically fetch the balance
+                    // const balance = await vespr.getBalance();
+                    
+                    showWalletTab('assets');
+                }
+            } else {
+                // If not found, we show the Deep Link for the mobile app
+                const userChoice = confirm('Vespr Wallet not detected in browser. \\n\\nIf you are on mobile, would you like to open the Vespr App?');
+                if (userChoice) {
+                    window.location.href = "vespr://"; // Deep link trigger
+                }
+                status.innerHTML = '● Vespr Not Found';
+                status.style.color = '#FF4B2B';
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Vespr Connection Refused or Timed Out.');
+            status.innerHTML = '● Connection Failed';
+            status.style.color = '#FF4B2B';
+        }
+    }
     </script>
     </body>
 </html>
