@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUIET LUXURY | The Sophisticated Sanctuary</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand-color: #44403c; --bg-dark: #0a0a0a; --text-light: #f0f0f0; --accent: #D4AF37; --card-bg: #141414; }
+        html { scroll-behavior: smooth; }
+        body { margin:0; font-family:'Inter', sans-serif; background:var(--bg-dark); color:var(--text-light); overflow-x: hidden; }
+        nav { background:rgba(10,10,10,0.9); padding:10px 5%; display:flex; justify-content:space-between; align-items:center; position:fixed; width:90%; top:0; z-index:1000; backdrop-filter: blur(10px); border-bottom: 1px solid #222; }
+        .logo-img { height: 60px; cursor: pointer; }
+        .nav-links a { color:var(--text-light); text-decoration:none; margin-left:30px; font-size:0.8rem; text-transform:uppercase; letter-spacing:2px; transition:0.3s; }
+        .nav-links a:hover { color:var(--accent); }
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://media.architecturaldigest.com/photos/55e78266302ba71f30176fcf/master/w_1920%2Cc_limit/dam-images-daily-2015-07-david-rockwell-ian-schrager-david-rockwel-new-york-edition-04-slideshow.jpg'); background-size: cover; background-position: center; background-attachment: fixed; }
+        .hero h1 { font-size: 5rem; font-weight: 900; letter-spacing: 15px; margin: 0; color: var(--accent); text-transform: uppercase; }
+        .hero p { font-size: 1.2rem; letter-spacing: 5px; text-transform: uppercase; opacity: 0.8; margin-top: 20px; }
+        .cta-btn { margin-top: 50px; padding: 22px 45px; background: linear-gradient(135deg, #D4AF37, #F5D76E); color: #000; text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; border-radius: 4px; transition: 0.4s; box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3); border: none; cursor: pointer; display: inline-block; }
+        .cta-btn:hover { transform: scale(1.05); filter: brightness(1.1); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5); }
+        .section { padding: 150px 10%; display: flex; align-items: center; gap: 80px; min-height: 60vh; }
+        .section:nth-child(even) { flex-direction: row-reverse; background: #080808; }
+        .section-text { flex: 1; }
+        .section-text h2 { font-size: 3rem; color: var(--accent); margin-bottom: 30px; font-weight: 900; text-transform: uppercase; letter-spacing: 5px; }
+        .section-text p { font-size: 1.15rem; line-height: 2; opacity: 0.75; font-weight: 300; }
+        .events-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 50px 10%; }
+        .event-card { background: #111; padding: 30px; border-left: 4px solid var(--accent); }
+        .event-card h3 { color: var(--accent); margin-top: 0; }
+        .event-card .date { font-weight: 900; opacity: 0.5; font-size: 0.8rem; margin-bottom: 10px; }
+        .trending { padding: 120px 5%; text-align: center; }
+        .trending h2 { font-size: 2.5rem; color: var(--accent); margin-bottom: 60px; text-transform: uppercase; letter-spacing: 8px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 40px; }
+        .p-card { background: var(--card-bg); padding: 25px; border-radius: 8px; border: 1px solid #222; text-align: left; transition: 0.3s; }
+        .p-card:hover { border-color: var(--accent); transform: translateY(-10px); }
+        .p-img { height: 280px; background: #fff; border-radius: 4px; margin-bottom: 20px; overflow: hidden; display:flex; align-items:center; justify-content:center; }
+        .p-img img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .p-card h3 { font-size: 0.95rem; margin: 15px 0; color: var(--text-light); height: 2.5em; overflow: hidden; letter-spacing: 1px; }
+        .p-price { color: var(--accent); font-weight: 900; margin-bottom: 20px; font-size: 1.2rem; }
+        .p-btn { display: block; background: #000; border: 1px solid var(--accent); color: var(--accent); text-align: center; padding: 12px; text-decoration: none; border-radius: 4px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .p-btn:hover { background: var(--accent); color: #000; }
+        footer { padding: 100px 10% 50px; border-top: 1px solid #111; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 60px; margin-bottom: 80px; }
+        .footer-col h4 { color: var(--accent); margin-bottom: 30px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 3px; }
+        .footer-col a { display: block; color: var(--text-light); opacity: 0.6; text-decoration: none; margin-bottom: 15px; font-size: 0.85rem; transition: 0.3s; }
+        .footer-bottom { text-align: center; opacity: 0.4; font-size: 0.75rem; border-top: 1px solid #111; padding-top: 50px; display: flex; align-items: center; justify-content: center; gap: 30px; letter-spacing: 2px; }
+        #ai-status { position: fixed; bottom: 20px; left: 20px; background: var(--accent); color: #000; padding: 8px 20px; border-radius: 30px; font-size: 0.75rem; font-weight: 900; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div id="ai-status">NEURAL DIAGNOSTICS: SYNCHRONIZED</div>
+    <nav>
+        <img src="https://priscadezigns.org/assets/logos/quiet_luxury.svg" class="logo-img" alt="Quiet Luxury" onclick="window.location.href='#'">
+        <div class="nav-links">
+            <a href="shop/">Vault</a>
+            <a href="https://priscadezigns.org/quiet-luxury/magazine/">Editorial</a>
+            <a href="#events">Events</a>
+            <a href="mailto:priscadezigns9@gmail.com">Join</a>
+        </div>
+    </nav>
+    <section class="hero">
+        <p>Priscion Engineering | High-Fidelity Signal</p>
+        <h1>QUIET LUXURY</h1>
+        <p>The Sophisticated Sanctuary | 2026 Archive</p>
+        <a href="#trending" class="cta-btn" id="cta-main">Enter The Sanctuary</a>
+    </section>
+    
+    <section id="events" class="section">
+        <div class="section-text">
+            <h2>Global Sanctuary Events</h2>
+            <p>Curated architectural summits and design weeks defining the 2026 luxury landscape.</p>
+        </div>
+    </section>
+    
+    <div class="events-grid">
+        <div class="event-card">
+            <div class="date">JAN 14–18, 2026</div>
+            <h3>Maison & Objet</h3>
+            <p>Paris, France | The first major stop on the global interior design calendar.</p>
+        </div>
+        <div class="event-card">
+            <div class="date">FEB 3–7, 2026</div>
+            <h3>Stockholm Furniture Fair</h3>
+            <p>Stockholm, Sweden | The leading event for Scandinavian furniture design.</p>
+        </div>
+        <div class="event-card">
+            <div class="date">MAY 17–19, 2026</div>
+            <h3>ICFF (NYCxDESIGN)</h3>
+            <p>New York City | North America's premier fair for contemporary furniture.</p>
+        </div>
+    </div>
+
+    <section id="trending" class="trending">
+        <h2 id="trending-anchor">Trending Signals</h2>
+        <div class="product-grid" id="trending-grid"></div>
+    </section>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Navigation</h4>
+                <a href="shop/">Sanctuary Vault</a>
+                <a href="https://priscadezigns.org/quiet-luxury/magazine/">Editorial Archive</a>
+                <a href="#events">Upcoming Events</a>
+                <a href="https://priscadezigns.org">Return to Hub</a>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <a href="legal/affiliate.html">Affiliate Disclosure</a>
+                <a href="legal/privacy.html">Privacy Policy</a>
+                <a href="legal/terms.html">Terms of Sanctuary</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <img src="https://priscadezigns.org/logos/pd_mark_sq.png" height="35" alt="Priscion">
+            PRISCION 2026
+        </div>
+    </footer>
+    <script>
+        const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
+        async function loadTrending() {
+            const { data } = await sb.from("empire_inventory").select("*").eq("brand", "Quiet Luxury").limit(6);
+            if (data) {
+                document.getElementById("trending-grid").innerHTML = data.map(p => {
+                    const priceDisplay = (p.price === "$--" || !p.price) ? "Price on Request" : p.price;
+                    return `
+                        <div class="p-card">
+                            <div class="p-img"><img src="${p.image_url}"></div>
+                            <h3>${p.title}</h3>
+                            <div class="p-price">${priceDisplay}</div>
+                            <a href="${p.affiliate_link}" class="p-btn" target="_blank">Acquire Asset</a>
+                        </div>
+                    `;
+                }).join("");
+            }
+        }
+        window.onload = loadTrending;
+        
+        document.getElementById('cta-main').addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.getElementById('trending-anchor');
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
