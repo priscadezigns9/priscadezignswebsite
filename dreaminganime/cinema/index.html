@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINEMA | DREAMING ANIME</title>
+    <link rel="icon" type="image/png" href="/logos/dreaming-anime-logo-round.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #FF6B00; --bg: #000; --accent: #111; --success: #00ff88; --danger: #ff4444; }
+        body { margin:0; background:var(--bg); color:#fff; font-family:'Inter', sans-serif; overflow-x: hidden; }
+        nav { padding: 20px 5%; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; position: sticky; top: 0; background: rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(10px); }
+        .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--primary); font-family:'Bangers', cursive; font-size:1.5rem; }
+        .logo img { height:35px; border-radius:50%; border:1px solid var(--primary); }
+        
+        .hero { height:30vh; display:flex; align-items:center; justify-content:center; text-align:center; background:linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://priscadezigns.org/assets/cinema_bg.jpg'); background-size:cover; border-bottom: 2px solid var(--primary); }
+        .theater-title { font-family:'Bangers',cursive; font-size:4rem; margin:0; letter-spacing: 2px; }
+        
+        .main-container { padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
+        
+        /* Player Section */
+        #player-section { display: none; margin-bottom: 50px; background: #080808; border-radius: 15px; border: 1px solid #222; overflow: hidden; }
+        .player-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        .node-info { display: flex; align-items: center; gap: 15px; }
+        .health-badge { padding: 4px 10px; border-radius: 4px; font-family: 'Space Mono'; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .online { background: rgba(0,255,136,0.2); color: var(--success); border: 1px solid var(--success); }
+        .offline { background: rgba(255,68,68,0.2); color: var(--danger); border: 1px solid var(--danger); }
+        
+        .video-wrapper { position:relative; padding-bottom:56.25%; height:0; background: #000; }
+        .video-wrapper iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+        
+        /* Grid Section */
+        .theater-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:25px; }
+        .video-card { background:#111; border-radius:12px; overflow:hidden; border:1px solid #222; transition: 0.3s; cursor: pointer; position: relative; }
+        .video-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .card-img { width: 100%; height: 180px; object-fit: cover; opacity: 0.7; transition: 0.3s; }
+        .video-card:hover .card-img { opacity: 1; }
+        .card-body { padding:15px; }
+        .card-body h3 { font-family:'Bangers', cursive; color:var(--primary); font-size:1.2rem; margin:0 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .live-tag { font-family: 'Space Mono'; font-size: 0.6rem; background: var(--primary); color: #000; padding: 2px 6px; border-radius: 3px; font-weight: 700; display: inline-block; margin-bottom: 8px; }
+        
+        .btn-switch { background: #222; color: #fff; border: 1px solid #444; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-family: 'Space Mono'; font-size: 0.8rem; }
+        .btn-switch:hover { border-color: var(--primary); color: var(--primary); }
+
+        .loading-mimi { text-align: center; padding: 50px; font-family: 'Bangers'; color: var(--primary); font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <img src="/logos/dreaming-anime-logo-round.png" alt="Logo">
+            DREAMING ANIME
+        </a>
+        <div style="display: flex; gap: 20px;">
+            <a href="/manga/" style="color:#fff; text-decoration:none; font-family:'Space Mono';">Manga</a>
+            <a href="/shop/" style="color:#fff; text-decoration:none; font-family:'Space Mono';">Shop</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="theater-title">SOVEREIGN CINEMA</h1>
+    </section>
+
+    <div class="main-container">
+        <!-- Player View -->
+        <div id="player-section">
+            <div class="player-header">
+                <div>
+                    <h2 id="playing-title" style="margin:0; font-family:'Bangers'; color:var(--primary);">SELECT A FEED</h2>
+                    <p id="playing-meta" style="margin:5px 0 0; font-size:0.8rem; color:#888; font-family:'Space Mono';">Waiting for Node Synchronization...</p>
+                </div>
+                <div class="node-info">
+                    <span id="health-monitor" class="health-badge online">Node 1: Online</span>
+                    <select id="node-selector" class="btn-switch" onchange="switchNode(this.value)">
+                        <option value="0">Node 1 (Fast)</option>
+                        <option value="1">Node 2 (Stable)</option>
+                        <option value="2">Node 3 (Backup)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="video-wrapper" id="video-wrapper">
+                <iframe id="main-player" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="font-family:'Bangers'; color:var(--primary); font-size:2rem; margin:0;">LIVE BROADCASTS</h2>
+            <span style="font-family:'Space Mono'; font-size:0.8rem; color:var(--success);">● AUTO-NODE SWITCHING ACTIVE</span>
+        </div>
+
+        <div id="live-cinema" class="theater-grid">
+            <div class="loading-mimi">INITIALIZING SOVEREIGN NODES...</div>
+        </div>
+    </div>
+
+    <script>
+        const nodes = [
+            "https://vidsrc.to/embed/anime/", // Mal ID
+            "https://vidsrc.me/embed/anime?id=",
+            "https://animeapi.com/embed/"
+        ];
+        
+        let currentNodeIndex = 0;
+        let currentMalId = null;
+        let switchTimeout = null;
+
+        async function loadLiveCinema() {
+            const grid = document.getElementById('live-cinema');
+            try {
+                const res = await fetch('https://api.jikan.moe/v4/seasons/now?limit=24');
+                const data = await res.json();
+                
+                grid.innerHTML = '';
+                data.data.forEach(anime => {
+                    const card = document.createElement('div');
+                    card.className = 'video-card';
+                    card.onclick = () => playAnime(anime.mal_id, anime.title, `${anime.type} • ${anime.status}`);
+                    card.innerHTML = `
+                        <img src="${anime.images.jpg.large_image_url}" class="card-img" alt="${anime.title}">
+                        <div class="card-body">
+                            <span class="live-tag">DIRECT FEED</span>
+                            <h3>${anime.title}</h3>
+                            <p style="color:#666; font-size:0.8rem; margin:0;">${anime.type} &mdash; ${anime.status}</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (e) {
+                console.error("Cinema API Sync Error:", e);
+                grid.innerHTML = '<div class="loading-mimi">SYNC DELAYED... RECONNECTING.</div>';
+            }
+        }
+
+        function playAnime(malId, title, meta) {
+            currentMalId = malId;
+            currentNodeIndex = 0;
+            
+            document.getElementById('player-section').style.display = 'block';
+            document.getElementById('playing-title').innerText = title;
+            document.getElementById('playing-meta').innerText = meta;
+            document.getElementById('node-selector').value = "0";
+            
+            loadIframe(malId, 0);
+            window.scrollTo({ top: document.getElementById('player-section').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        function loadIframe(malId, nodeIdx) {
+            const iframe = document.getElementById('main-player');
+            const health = document.getElementById('health-monitor');
+            const baseUrl = nodes[nodeIdx];
+            
+            clearTimeout(switchTimeout);
+            
+            // Health Monitor Badge
+            health.className = "health-badge online";
+            health.innerText = `Node ${nodeIdx + 1}: Syncing...`;
+            
+            iframe.src = nodeIdx === 1 ? `${baseUrl}${malId}` : `${baseUrl}${malId}`; // Logic varies per node if needed
+            
+            // Auto-Node Switcher Logic
+            // If iframe doesn't load or remains blank (simulated by timeout for cross-origin)
+            switchTimeout = setTimeout(() => {
+                console.warn(`Node ${nodeIdx + 1} timeout. Switching...`);
+                autoSwitch();
+            }, 6000); // 6 seconds threshold
+        }
+
+        function autoSwitch() {
+            if (currentNodeIndex < nodes.length - 1) {
+                currentNodeIndex++;
+                const health = document.getElementById('health-monitor');
+                health.className = "health-badge offline";
+                health.innerText = `Node ${currentNodeIndex}: Failed. Switching...`;
+                
+                document.getElementById('node-selector').value = currentNodeIndex;
+                loadIframe(currentMalId, currentNodeIndex);
+            } else {
+                const health = document.getElementById('health-monitor');
+                health.className = "health-badge offline";
+                health.innerText = "All Nodes Down";
+            }
+        }
+
+        function switchNode(idx) {
+            currentNodeIndex = parseInt(idx);
+            loadIframe(currentMalId, currentNodeIndex);
+        }
+
+        // Monitoring for iframe errors (limited by SOP, but we use the timeout)
+        window.onload = loadLiveCinema;
+    </script>
+</body>
+</html>
