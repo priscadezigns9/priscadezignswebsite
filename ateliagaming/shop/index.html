@@ -171,8 +171,12 @@
 
     <script>
         async function loadInventory() {
+            const grid = document.getElementById('grid');
             try {
-                const sb = window.supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
+                if (typeof supabase === 'undefined') {
+                    throw new Error("Supabase Library Not Loaded");
+                }
+                const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
 
                 const { data, error } = await sb.from('empire_inventory')
                     .select('*')
@@ -181,7 +185,6 @@
                 
                 if (error) throw error;
                 
-                const grid = document.getElementById('grid');
                 if (data && data.length > 0) {
                     grid.innerHTML = data.map(p => `
                         <div class="product-card">
@@ -196,7 +199,7 @@
                 }
             } catch (err) {
                 console.error("Vault Connection Error:", err);
-                document.getElementById('grid').innerHTML = `<p>Error connecting to Armory Vault: ${err.message || 'Unknown Error'}</p>`;
+                grid.innerHTML = `<p style="color: var(--red); font-family: 'Russo One';">CRITICAL ERROR: Connection to Armory Vault failed.<br><small>${err.message || ''}</small></p>`;
             }
         }
 
