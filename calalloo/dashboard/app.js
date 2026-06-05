@@ -93,6 +93,8 @@ const name = profile.full_name || initialName;
 const username = profile.username || initialUser;
 const avatar = profile.avatar_url || initialAvatar;
 const preferences = profile.taste_preferences || cache.settings || {};
+const account_status = profile.account_status || 'free';
+localStorage.setItem('empire_account_status', account_status);
 if (profile.whatsapp_pin) {
 if (!preferences.socials) preferences.socials = {};
 preferences.socials.whatsapp = profile.whatsapp_pin;
@@ -358,36 +360,55 @@ return true;
 renderPins('discovery-pins', discoveryFeed);
 }
 function renderPins(gridId, items) {
-const grid = document.getElementById(gridId);
-if(!grid) return;
-const profUserElem = document.getElementById('prof-username');
-const currentUser = (profUserElem ? profUserElem.innerText.split(' • ')[0] : '') || '@guest';
-// Sovereignty Filter (Scalable): Show published recipes OR user's own recipes
-const visibleItems = items.filter(r => {
-// Column name in DB is 'is_published'
-const isPublished = r.is_published === true || r.is_published === undefined || r.is_published === null;
-const author = r.author_username || "";
-return isPublished || author === currentUser;
-});
-if (visibleItems.length === 0) {
-grid.innerHTML = `<div style="column-span:all; text-align:center; padding:40px; color:var(--grey-text);">
-<i data-lucide="utensils" style="width:40px; height:40px; margin-bottom:10px; opacity:0.3;"></i>
-<p>No recipes found in the vault yet.</p>
-</div>`;
-} else {
-grid.innerHTML = visibleItems.map(r => `
-<div class="recipe-pin" onclick="openRecipe('${r.id}')" style="cursor:pointer;">
-<img src="${r.cover_photo_url || 'https://via.placeholder.com/400x300?text=Heritage+Recipe'}">
-<div class="pin-overlay">
-<div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-<h3>${r.title}</h3>
-${r.is_published === false ? '<i data-lucide="lock" style="width:14px; height:14px; color:white;"></i>' : ''}
-</div>
-</div>
-</div>
-`).join('');
-}
-lucide.createIcons();
+  const grid = document.getElementById(gridId);
+  if(!grid) return;
+  const status = localStorage.getItem('empire_account_status') || 'free';
+  const profUserElem = document.getElementById('prof-username');
+  const currentUser = (profUserElem ? profUserElem.innerText.split(' • ')[0] : '') || '@guest';
+  
+  // Excellence: High-Fidelity Amazon Ad
+  let adHTML = '';
+  if (status !== 'premium') {
+    adHTML = `
+      <div class="recipe-pin ad-pin" style="border: 1px solid var(--primary); border-radius: 20px; padding: 15px; background: rgba(232,119,34,0.05); position:relative; grid-row: span 2;">
+        <div style="font-size: 0.5rem; color: var(--primary); font-weight: 800; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Sponsored Signal</div>
+        <img src="https://m.media-amazon.com/images/I/817OiZZIi6L._AC_SL1500_.jpg" style="width: 100%; border-radius: 12px; margin-bottom: 10px; height: auto;">
+        <p style="font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; color: var(--text);">Zoom H6 Handy Recorder</p>
+        <p style="font-size: 0.6rem; color: var(--grey-text); margin-bottom: 12px; line-height: 1.2;">Master-grade audio for your studio sessions.</p>
+        <a href="https://www.amazon.com/dp/B082798T21?tag=priscadezigns-20" target="_blank" style="display: block; width: 100%; padding: 8px; background: var(--primary); color: white; text-align: center; border-radius: 10px; font-size: 0.65rem; font-weight: 700; text-decoration: none;">View Gear</a>
+      </div>
+    `;
+  }
+
+  // Sovereignty Filter (Scalable): Show published recipes OR user's own recipes
+  const visibleItems = items.filter(r => {
+    // Column name in DB is 'is_published'
+    const isPublished = r.is_published === true || r.is_published === undefined || r.is_published === null;
+    const author = r.author_username || "";
+    return isPublished || author === currentUser;
+  });
+
+  if (visibleItems.length === 0 && adHTML === '') {
+    grid.innerHTML = `<div style="column-span:all; text-align:center; padding:40px; color:var(--grey-text);">
+      <i data-lucide="utensils" style="width:40px; height:40px; margin-bottom:10px; opacity:0.3;"></i>
+      <p>No recipes found in the vault yet.</p>
+    </div>`;
+  } else {
+    let html = adHTML;
+    html += visibleItems.map(r => `
+      <div class="recipe-pin" onclick="openRecipe('${r.id}')" style="cursor:pointer;">
+        <img src="${r.cover_photo_url || 'https://via.placeholder.com/400x300?text=Heritage+Recipe'}">
+        <div class="pin-overlay">
+          <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+            <h3>${r.title}</h3>
+            ${r.is_published === false ? '<i data-lucide="lock" style="width:14px; height:14px; color:white;"></i>' : ''}
+          </div>
+        </div>
+      </div>
+    `).join('');
+    grid.innerHTML = html;
+  }
+  lucide.createIcons();
 }
         function openAddModal() {
             history.pushState({ modalId: 'upload-gateway' }, '', '');
