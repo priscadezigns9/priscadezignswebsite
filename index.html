@@ -810,6 +810,8 @@
     });
     </script>
     
+    
+    
     <script>
     async function connectVespr() {
         const status = document.getElementById('walletStatus');
@@ -817,40 +819,36 @@
         status.style.color = '#F3BA2F';
 
         try {
-            // CIP-30: Check if cardano is injected and vespr is available
             if (typeof window.cardano !== 'undefined' && window.cardano.vespr) {
                 const vespr = window.cardano.vespr;
-                status.innerHTML = '⚡ Connecting to Vespr...';
+                status.innerHTML = '⚡ Requesting Permission...';
                 
-                // Request connection
-                const enabled = await vespr.enable();
+                // Request connection - returns the CIP-30 API object
+                const api = await vespr.enable();
                 
-                if (enabled) {
-                    // Fetch the stake address to prove connection
-                    const rewardAddr = await vespr.getRewardAddresses();
-                    const stakeAddr = rewardAddr[0]; // This is the real unique ID
+                if (api) {
+                    status.innerHTML = '⚡ Syncing Stake ID...';
+                    // The API object (api) is where the CIP-30 methods live
+                    const rewardAddr = await api.getRewardAddresses();
+                    const stakeAddr = rewardAddr[0]; 
                     
-                    alert('Priscion Hub: Vespr Connected Successfully.\\nStake ID: ' + stakeAddr.substring(0,15) + '...');
-                    status.innerHTML = '● Vespr Linked (' + stakeAddr.substring(0,8) + ')';
+                    alert('Priscion Hub: Vespr Connected Successfully.\nStake ID: ' + stakeAddr.substring(0,25) + '...');
+                    status.innerHTML = '● Vespr Linked (' + stakeAddr.substring(0,10) + ')';
                     status.style.color = '#00FF88';
-                    
-                    // Here we would typically fetch the balance
-                    // const balance = await vespr.getBalance();
                     
                     showWalletTab('assets');
                 }
             } else {
-                // If not found, we show the Deep Link for the mobile app
-                const userChoice = confirm('Vespr Wallet not detected in browser. \\n\\nIf you are on mobile, would you like to open the Vespr App?');
+                const userChoice = confirm('Vespr Wallet not detected. \n\nIf you are on mobile, would you like to open the Vespr App?');
                 if (userChoice) {
-                    window.location.href = "vespr://"; // Deep link trigger
+                    window.location.href = "vespr://";
                 }
                 status.innerHTML = '● Vespr Not Found';
                 status.style.color = '#FF4B2B';
             }
         } catch (err) {
             console.error(err);
-            alert('Vespr Connection Refused or Timed Out.');
+            alert('Vespr Connection Error: ' + err.message);
             status.innerHTML = '● Connection Failed';
             status.style.color = '#FF4B2B';
         }
