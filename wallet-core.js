@@ -293,6 +293,23 @@ function createNewWallet() {
 
 function saveWallets() { localStorage.setItem('prn_wallets', JSON.stringify(WALLETS)); }
 
+function earnPRN(amount, reason) {
+    WALLETS[currentWalletIndex].balance += amount;
+    saveWallets();
+    console.log(`Earned ${amount} PRN for: ${reason}`);
+    // Optional: Show a small toast notification in the UI
+    const toast = document.createElement('div');
+    toast.style = "position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#00FF88; color:black; padding:10px 20px; border-radius:100px; font-weight:900; font-size:0.7rem; z-index:10000; box-shadow:0 0 20px rgba(0,255,136,0.3);";
+    toast.innerText = `+${amount} PRN EARNED: ${reason}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+    
+    // Update top bar if it exists in the page
+    const balanceEl = document.getElementById('top-prn-balance');
+    if(balanceEl) balanceEl.innerText = WALLETS[currentWalletIndex].balance.toLocaleString();
+}
+
+
 function renderSettingsView() {
     const view = document.getElementById('wallet-main-view');
     view.innerHTML = `
@@ -356,3 +373,4 @@ style.textContent = `
     input:checked + .slider:before { transform: translateX(20px); }
 `;
 document.head.appendChild(style);
+
