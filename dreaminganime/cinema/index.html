@@ -149,6 +149,7 @@
                 <div class="node-status">
                     <span id="health-monitor" class="health-badge online">Node 1: Optimal</span>
                     <select id="node-selector" class="source-selector" onchange="switchNode(this.value)">
+                        <option value="ipfs" disabled>⛓️ IPFS Sovereign (auto)</option>
                         <option value="0">Node 1: vidsrc.me</option>
                         <option value="1">Node 2: vidsrc.to</option>
                         <option value="2">Node 3: vidsrc.xyz</option>
@@ -193,6 +194,20 @@
     </div>
 
     <script>
+        // ⛓️ SOVEREIGN IPFS MANIFEST — Pinata-hosted anime content
+        // Format: { malId: { episodes: { "1": "ipfs://CID", "2": "ipfs://CID" }, title, poster } }
+        // Add entries here as content is uploaded to IPFS via Pinata
+        const SOVEREIGN_MANIFEST = {};
+
+        // IPFS Gateway priority list (fastest public gateways)
+        const IPFS_GATEWAYS = [
+            "https://gateway.pinata.cloud/ipfs/",
+            "https://cloudflare-ipfs.com/ipfs/",
+            "https://ipfs.io/ipfs/",
+            "https://dweb.link/ipfs/"
+        ];
+
+        // Fallback vidsrc nodes (used if no IPFS content available)
         const nodes = [
             "https://vidsrc.me/embed/anime/",
             "https://vidsrc.to/embed/anime/",
@@ -201,11 +216,13 @@
             "https://vidsrc.net/embed/anime/",
             "https://vidsrc.icu/embed/anime/"
         ];
-        
+
         let currentNodeIndex = 0;
         let currentMalId = null;
         let healthCheckTimeout = null;
         let currentEpisode = 1;
+        let currentIpfsGateway = 0;
+        let usingIPFS = false;
 
         async function loadLiveCinema() {
             const grid = document.getElementById('live-cinema');
@@ -255,31 +272,84 @@
             window.scrollTo({ top: document.getElementById('theater-view').offsetTop - 100, behavior: 'smooth' });
         }
 
-        function loadNode(malId, nodeIdx) {
+        async function loadNode(malId, nodeIdx) {
+            const iframe = document.getElementById('main-player');
+            const health = document.getElementById('health-monitor');
+            clearTimeout(healthCheckTimeout);
+
+            // ⛓️ IPFS SOVEREIGN CHECK — Try Priscion IPFS manifest first
+            const manifest = SOVEREIGN_MANIFEST[malId];
+            if (manifest && manifest.episodes && manifest.episodes[currentEpisode]) {
+                const cid = manifest.episodes[currentEpisode].replace('ipfs://', '');
+                usingIPFS = true;
+                health.className = "health-badge online";
+                health.innerText = "⛓️ Sovereign IPFS: Active";
+
+                // Try IPFS gateways in order
+                const tryGateway = async (gwIdx) => {
+                    if (gwIdx >= IPFS_GATEWAYS.length) {
+                        // All IPFS gateways failed — fall through to vidsrc
+                        usingIPFS = false;
+                        loadVidsrcNode(malId, 0);
+                        return;
+                    }
+                    const url = IPFS_GATEWAYS[gwIdx] + cid;
+                    try {
+                        const test = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(4000) });
+                        if (test.ok) {
+                            // Use video element for direct IPFS playback
+                            iframe.src = '';
+                            iframe.style.display = 'none';
+                            let vid = document.getElementById('ipfs-video-player');
+                            if (!vid) {
+                                vid = document.createElement('video');
+                                vid.id = 'ipfs-video-player';
+                                vid.controls = true;
+                                vid.autoplay = true;
+                                vid.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;background:#000;';
+                                iframe.parentNode.appendChild(vid);
+                            }
+                            vid.src = url;
+                            vid.style.display = 'block';
+                            health.innerText = "⛓️ Sovereign IPFS: Streaming";
+                        } else {
+                            tryGateway(gwIdx + 1);
+                        }
+                    } catch(e) {
+                        tryGateway(gwIdx + 1);
+                    }
+                };
+                tryGateway(0);
+                return;
+            }
+
+            // FALLBACK — No IPFS content yet, use vidsrc nodes
+            usingIPFS = false;
+            loadVidsrcNode(malId, nodeIdx);
+        }
+
+        function loadVidsrcNode(malId, nodeIdx) {
             const iframe = document.getElementById('main-player');
             const health = document.getElementById('health-monitor');
             const baseUrl = nodes[nodeIdx];
-            
-            clearTimeout(healthCheckTimeout);
-            
+
+            // Hide IPFS player if visible
+            const vid = document.getElementById('ipfs-video-player');
+            if (vid) vid.style.display = 'none';
+            iframe.style.display = 'block';
+
             health.className = "health-badge switching";
             health.innerText = `Node ${nodeIdx + 1}: Synchronizing...`;
-            
-            // Build URL with MAL ID and Episode
-            // Most of these nodes follow a pattern: /embed/anime/{mal_id}/{episode}
+
             iframe.src = `${baseUrl}${malId}/${currentEpisode}`;
-            
-            // Node Health Check: If doesn't load in 5 seconds, auto-jump
+
             healthCheckTimeout = setTimeout(() => {
                 console.warn(`Node ${nodeIdx + 1} timed out. Attempting failover.`);
                 autoSwitchNode();
             }, 5000);
 
-            // If we could detect load success, we would set health to "online"
-            // Since we can't easily detect iframe load success across origins, 
-            // we assume success after a few seconds if no failure is reported.
             setTimeout(() => {
-                if(currentNodeIndex === nodeIdx) {
+                if(currentNodeIndex === nodeIdx && !usingIPFS) {
                     health.className = "health-badge online";
                     health.innerText = `Node ${nodeIdx + 1}: Optimal`;
                 }
