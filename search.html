@@ -54,9 +54,24 @@
             runHandleSearch(query);
         }
 
+        
         async function runHandleSearch(q) {
-            const brands = [
-                { name: 'Dreaming Anime', handle: '.prn', path: 'dreaminganime', desc: 'Sovereign Cinema and Manga Vault.', category: 'Empire Hub' },
+            try {
+                const res = await fetch('vault_manifest.json');
+                const data = await res.json();
+                const nodes = data.filter(i => i.type === 'Empire/Node');
+                const matches = nodes.filter(n => n.name.toLowerCase().includes(q.toLowerCase()) || n.handle.toLowerCase().includes(q.toLowerCase()));
+                if(matches.length > 0) {
+                    let h = '<div class="ai-summary"><div class="ai-text">Sovereign Handles detected. Resolving results to LEGGO Explorer nodes.</div></div>';
+                    matches.forEach(m => {
+                        h += '<a href="javascript:void(0)" onclick="navigateToNode(' + "'" + m.handle + "'" + ')" class="result-card"><div class="res-type"><span>' + m.category + '</span><span class="v-badge">LEDGER VERIFIED</span></div><div class="res-title">' + m.name + '</div><div class="res-handle">' + m.handle + '</div><div class="res-desc">Sovereign Node hosted on the Priscion Ledger.</div></a>';
+                    });
+                    resultsView.innerHTML = h;
+                } else { resultsView.innerHTML = '<div class="empty-view">NO SOVEREIGN HANDLES FOUND FOR "' + q + '"</div>'; }
+            } catch(e) { resultsView.innerHTML = '<div class="empty-view">LEDGER OFFLINE</div>'; }
+        }
+        function navigateToNode(handle) { if(typeof recordSearch === 'function') recordSearch(); window.location.href = 'leggo.html?node=' + handle; }
+,
                 { name: 'The Way Made Known', handle: '.prn', path: 'thewaymadeknown', desc: 'Biblical Apologetics and Gospel Mission.', category: 'Foundation Node' },
                 { name: 'Atelia Gaming', handle: '.prn', path: 'ateliagaming', desc: 'High-fidelity PC gaming and hardware engineering.', category: 'Engineering' },
                 { name: 'Riddiim', handle: '.prn', path: 'riddiim', desc: 'Digital music super-app and audio engineering.', category: 'Media Node' },
