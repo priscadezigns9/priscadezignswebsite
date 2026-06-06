@@ -183,6 +183,10 @@
                     <span class="vpn-dot"></span>
                     <span>NURASEN ACTIVE</span>
                 </div>
+                <div id="wallet-status-bar" style="display:flex; align-items:center; gap:15px; border-left:1px solid #222; padding-left:15px; cursor:pointer;" onclick="toggleSidebar()">
+                    <div style="font-size:0.6rem; font-weight:800; color:#aaa;">$PRN: <span id="top-prn-balance" style="color:#7B35D4;">0.00</span></div>
+                    <img id="top-wallet-pfp" src="assets/p-logo.png" style="width:24px; height:24px; border-radius:50%; border:1px solid #7B35D4;">
+                </div>
                 <div style="color: #333; font-size: 0.6rem; font-weight: 800;">UK-EDGE-NODE-01</div>
             </div>
             <div class="dashboard">
@@ -326,13 +330,26 @@
                 if(val.startsWith('$') && val.endsWith('.prn')) {
                     window.location.href = '/' + val.replace('$', '').replace('.prn', '') + '/';
                 } else {
-                    window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(val);
+                    if(typeof earnPRN === 'function') earnPRN(0.01, 'Neural Search');
+                    setTimeout(() => {
+                        window.location.href = 'search.html?q=' + encodeURIComponent(val);
+                    }, 500);
                 }
             }
         }
+
+        // Sync Balance UI
+        window.addEventListener('load', () => {
+            const wallet = JSON.parse(localStorage.getItem('prn_wallets'))?.[0];
+            if(wallet) {
+                const bal = document.getElementById('top-prn-balance');
+                if(bal) bal.innerText = wallet.balance.toLocaleString();
+            }
+        });
     </script>
 </body>
 </html>
+
 
 
 
