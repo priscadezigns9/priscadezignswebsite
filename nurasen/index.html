@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NURASEN | Sovereign Neural dVPN</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Playfair+Display:wght@900&family=Space+Mono:wght@700&display=swap">
-    <script src="../wallet-core.js"></script>
-    <style>.sidebar { position: fixed; right: -400px; top: 0; width: 400px; height: 100vh; background: rgba(5,5,5,0.98); backdrop-filter: blur(25px); border-left: 1px solid #222; transition: 0.5s cubic-bezier(0.8,0,0.2,1); z-index: 10000; overflow-y: auto; font-family: sans-serif; } .sidebar.active { right: 0; } .sidebar-header { padding: 30px; border-bottom: 1px solid #111; display: flex; justify-content: space-between; align-items: center; color: white; } .close-btn { background: none; border: none; color: #555; font-size: 2rem; cursor: pointer; } .sidebar-tabs { display: flex; border-bottom: 1px solid #111; } .sidebar-tabs button { flex: 1; background: none; border: none; color: #444; padding: 15px; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.3s; } @media (max-width: 480px) { .sidebar { width: 100%; right: -100%; } }</style><style>
+    
+    <style>
         :root { --accent: #00FF88; --bg: #050505; --surface: #111; }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
         header { padding: 30px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a1a1a; }
@@ -48,58 +48,41 @@
         </div>
     </main>
 
-    <!-- Wallet Sidebar -->
-    <div id="sidebar" class="sidebar">
-        <div style="padding: 30px; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="color:white; margin:0; font-size:1.1rem;">PRISCION WALLET</h2>
-            <button onclick="toggleSidebar()" style="background:none; border:none; color:#555; font-size:2rem; cursor:pointer;">&times;</button>
-        </div>
-        <div class="sidebar-tabs" style="display:flex; border-bottom:1px solid #111;">
-            <button onclick="switchWalletTabCore('assets')" style="flex:1; background:none; border:none; color:#444; padding:15px; font-size:0.6rem; font-weight:800; cursor:pointer;">Assets</button>
-            <button onclick="switchWalletTabCore('vault')" style="flex:1; background:none; border:none; color:#444; padding:15px; font-size:0.6rem; font-weight:800; cursor:pointer;">Vault</button>
-            <button onclick="switchWalletTabCore('sync')" style="flex:1; background:none; border:none; color:#444; padding:15px; font-size:0.6rem; font-weight:800; cursor:pointer;">Security</button>
-        </div>
-        <div id="wallet-main-view"></div>
+    
+
+<style>
+    .sidebar { position: fixed; right: -400px; top: 0; width: 400px; height: 100vh; background: rgba(5,5,5,0.98); backdrop-filter: blur(25px); border-left: 1px solid #222; transition: 0.5s cubic-bezier(0.8,0,0.2,1); z-index: 10000; overflow-y: auto; font-family: sans-serif; }
+    .sidebar.active { right: 0; }
+    .sidebar-header { padding: 30px; border-bottom: 1px solid #111; display: flex; justify-content: space-between; align-items: center; color: white; }
+    .close-btn { background: none; border: none; color: #555; font-size: 2rem; cursor: pointer; }
+    .sidebar-tabs { display: flex; border-bottom: 1px solid #111; }
+    .sidebar-tabs button { flex: 1; background: none; border: none; color: #444; padding: 15px; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+    @media (max-width: 480px) { .sidebar { width: 100%; right: -100%; } }
+</style>
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+        <h2 style="font-size:1.1rem; margin:0; font-weight: 900;">PRISCION WALLET</h2>
+        <button onclick="toggleSidebar()" class="close-btn">&times;</button>
     </div>
-
-    <script>
-        function toggleSidebar() { 
-            const s = document.getElementById('sidebar');
-            s.classList.toggle('active'); 
-            if(s.classList.contains('active')) {
-                // Ensure the container exists and wallet-main-view is inside it
-                const sidebar = document.getElementById('sidebar');
-                if (!document.getElementById('wallet-main-view')) {
-                    sidebar.innerHTML += '<div id="wallet-main-view"></div>';
-                }
-                initializeWallet('sidebar');
-                document.getElementById('connection-status').innerText = 'Wallet Linked';
-                document.getElementById('connection-status').classList.add('active');
-            }
+    <div class="sidebar-tabs">
+        <button id="tab-assets" onclick="switchWalletTabCore('assets')">Assets</button>
+        <button id="tab-vault" onclick="switchWalletTabCore('vault')">Vault</button>
+        <button id="tab-shop" onclick="switchWalletTabCore('shop')">Hub</button>
+        <button id="tab-sync" onclick="switchWalletTabCore('sync')">Security</button>
+    </div>
+    <div id="wallet-main-view"></div>
+</div>
+<script src="../wallet-core.js"></script>
+<script>
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        sb.classList.toggle('active');
+        if(sb.classList.contains('active')) {
+            if(typeof initializeWallet === 'function') initializeWallet('sidebar');
         }
-
-        // Core UI helpers usually expected by wallet-core.js
-        function switchWalletTabCore(tab) {
-            console.log("Switching to tab:", tab);
-            if(tab === 'assets') renderAssetsView();
-            if(tab === 'vault') renderVaultView();
-            if(tab === 'sync') renderSettingsView();
-        }
-
-        function renderVaultView() {
-            const view = document.getElementById('wallet-main-view');
-            view.innerHTML = '<div style="padding:20px; color:#444; font-size:0.7rem; text-align:center;">VAULT SYNCHRONIZING...</div>';
-            fetch('../vault_manifest.json').then(r => r.json()).then(data => {
-                view.innerHTML = '<div style="padding:20px;"><h2 style="color:white; font-size:1.2rem; margin-bottom:20px;">Sovereign Vault</h2>' + 
-                data.map(f => `
-                    <div style="background:#111; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid #222;">
-                        <div style="color:white; font-weight:800; font-size:0.75rem;">${f.name}</div>
-                        <div style="color:#444; font-size:0.5rem; text-transform:uppercase;">${f.category}</div>
-                    </div>
-                `).join('') + '</div>';
-            });
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
+
 
