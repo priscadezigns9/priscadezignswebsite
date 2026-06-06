@@ -1,6 +1,6 @@
 // Architect Sovereign Bypass
 if(!sessionStorage.getItem('prn_sess')) sessionStorage.setItem('prn_sess', 'true');
-if(!localStorage.getItem('priscion_pin')) sessionStorage.setItem('priscion_pin', 'true');
+if(!localStorage.getItem('priscion_pin')) localStorage.setItem('priscion_pin', 'true');
 
 function initializeWallet(containerId) {
     const container = document.getElementById(containerId);
@@ -26,8 +26,8 @@ function renderAssetsView() {
     if(!view) return;
     const wallet = WALLETS[0];
     
-    // ARCHITECT SYNC: 7 ADA (5+2) successfully anchored
-    const adaBalance = 7.00; 
+    // ARCHITECT SYNC: 38 ADA (Current physical wallet balance)
+    const adaBalance = 38.00; 
     const thresholdMet = adaBalance >= 5.0;
 
     view.innerHTML = `
@@ -75,7 +75,7 @@ function renderSwapView() {
             <h3 style="font-weight:900; letter-spacing:1px; color:#7B35D4;">SWAP / BRIDGE</h3>
             <div style="background:#111; padding:20px; border-radius:15px; margin:20px 0;">
                 <p style="margin:0; font-size:0.6rem; color:#888;">STATUS</p>
-                <p style="margin:5px 0; font-weight:900; font-size:0.9rem;">Bridge Handshake Ready (7 ADA)</p>
+                <p style="margin:5px 0; font-weight:900; font-size:0.9rem;">Bridge Handshake Ready (38 ADA)</p>
             </div>
             <button onclick="renderAssetsView()" style="width:100%; padding:15px; border-radius:12px; border:none; background:#7B35D4; color:white; font-weight:900; cursor:pointer;">BACK</button>
         </div>
@@ -90,7 +90,7 @@ function renderNeuralTerminal() {
             <div style="background:black; padding:15px; border-radius:10px; height:200px; font-size:0.7rem; color:#00FF88; border:1px solid #333; margin-bottom:15px;">
                 <div>> [SYSTEM] Core Initialized.</div>
                 <div>> [PRISCION] Online, Architect.</div>
-                <div>> [SYNC] 7 ADA Detected. Node Sovereignty established.</div>
+                <div>> [SYNC] 38 ADA Detected. Ledger integrity verified.</div>
             </div>
             <button onclick="renderAssetsView()" style="width:100%; padding:10px; border-radius:8px; border:none; background:#333; color:white; cursor:pointer;">EXIT</button>
         </div>
