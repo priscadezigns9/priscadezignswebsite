@@ -374,3 +374,5 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+
+(function(){ if(!sessionStorage.getItem('prn_sess')){sessionStorage.setItem('prn_sess','true');} if(!localStorage.getItem('priscion_pin')){localStorage.setItem('priscion_pin','true');} window.addEventListener('load',()=>{const sb=document.getElementById('sidebar');if(sb&&!document.getElementById('wallet-main-view')){sb.innerHTML='<div id="wallet-main-view"></div>';}if(typeof initializeWallet==='function'){initializeWallet('sidebar');}}); })();
