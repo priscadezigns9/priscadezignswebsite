@@ -655,5 +655,73 @@
         }
     }
     </script>
+    
+    <script>
+    async function connectHardware(name) {
+        if (name !== 'Ledger Hardware') {
+            // Default mockup for other wallets
+            const status = document.getElementById('walletStatus');
+            status.innerHTML = '⚡ Syncing ' + name + '...';
+            status.style.color = '#F3BA2F';
+            setTimeout(() => {
+                alert('Priscion Wallet: Link Secure with ' + name + '. Assets Synced.');
+                status.innerHTML = '● ' + name + ' Linked';
+                status.style.color = '#00FF88';
+                showWalletTab('assets');
+            }, 2000);
+            return;
+        }
+
+        // REAL LEDGER WEBHID PROTOCOL
+        const status = document.getElementById('walletStatus');
+        status.innerHTML = '⚡ Searching for Ledger Device...';
+        status.style.color = '#F3BA2F';
+
+        try {
+            if (!navigator.hid) {
+                throw new Error('WebHID not supported in this browser. Please use Chrome, Brave, or Edge.');
+            }
+
+            // Request permission to access Ledger
+            // Ledger Vendor ID: 0x2c97
+            const devices = await navigator.hid.requestDevice({
+                filters: [{ vendorId: 0x2c97 }]
+            });
+
+            if (devices.length > 0) {
+                const ledger = devices[0];
+                status.innerHTML = '⚡ Opening ' + ledger.productName + '...';
+                
+                await ledger.open();
+                
+                alert('Priscion Hub: ' + ledger.productName + ' Detected.\n\nPlease open the Cardano or Ethereum app on your device to finalize the Sovereign Link.');
+                
+                status.innerHTML = '● Ledger Hardware Linked';
+                status.style.color = '#00FF88';
+                
+                // Add Ledger to Assets UI
+                const assetList = document.getElementById('wallet-assets');
+                const ledgerInfo = '<div style="background:rgba(123,53,212,0.1); border-radius:18px; padding:15px; margin-bottom:15px; border:1px solid #7B35D4;">' +
+                                  '<span style="font-size:0.7rem; color:#7B35D4; font-weight:800; text-transform:uppercase;">Hardware Guard (Ledger)</span><br>' +
+                                  '<span style="font-size:0.75rem; color:#333; font-weight:700;">' + ledger.productName + ' Active</span>' +
+                                  '</div>';
+                
+                if (!assetList.innerHTML.includes('Hardware Guard')) {
+                    assetList.innerHTML = ledgerInfo + assetList.innerHTML;
+                }
+
+                showWalletTab('assets');
+            } else {
+                status.innerHTML = '● No Device Selected';
+                status.style.color = '#FF4B2B';
+            }
+        } catch (err) {
+            console.error('Ledger Error:', err);
+            alert('Ledger Connection Failed: ' + err.message);
+            status.innerHTML = '● Link Failed';
+            status.style.color = '#FF4B2B';
+        }
+    }
+    </script>
     </body>
 </html>
