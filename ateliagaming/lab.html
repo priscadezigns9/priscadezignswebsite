@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanguard Lab | Genetic Breeding</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--red); z-index: 100; }
+        .logo-img { height: 35px; filter: drop-shadow(0 0 5px var(--red)); }
+
+        #lab-floor {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            perspective: 1200px; position: relative;
+        }
+
+        /* 3D Incubator Pod */
+        #pod-wrap {
+            position: relative; width: 350px; height: 450px;
+            transform-style: preserve-3d;
+            animation: floatPod 4s ease-in-out infinite;
+        }
+        @keyframes floatPod { 0%, 100% { transform: translateY(0) rotateY(0deg); } 50% { transform: translateY(-20px) rotateY(5deg); } }
+
+        .pod-glass {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 150px 150px 20px 20px;
+            backdrop-filter: blur(10px);
+            z-index: 10; overflow: hidden;
+        }
+        .pod-base {
+            position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+            width: 380px; height: 60px; background: #222;
+            border-top: 4px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,1);
+        }
+
+        /* The Creature */
+        #creature-container {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            z-index: 5;
+        }
+        .creature-body {
+            width: 220px; height: 220px; position: relative;
+            filter: drop-shadow(0 0 20px rgba(255,107,0,0.4));
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .creature-img {
+            width: 100%; height: 100%; object-fit: contain;
+            animation: breathe 3s ease-in-out infinite;
+        }
+        @keyframes breathe { 
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.05) translateY(-10px); }
+        }
+
+        /* Breeding Interface */
+        #side-panel {
+            position: absolute; left: 40px; top: 120px; width: 280px;
+            background: var(--glass); border: 1px solid rgba(211,47,47,0.3);
+            padding: 25px; border-radius: 15px; backdrop-filter: blur(5px);
+        }
+        h3 { font-family: 'Russo One'; font-size: 0.9rem; color: var(--orange); margin-top: 0; letter-spacing: 2px; }
+        
+        .parent-slot {
+            height: 100px; background: rgba(0,0,0,0.4); border: 1px dashed #444;
+            margin: 15px 0; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .parent-slot:hover { border-color: var(--red); background: rgba(211,47,47,0.05); }
+        .parent-slot img { height: 70px; }
+
+        .breed-btn {
+            width: 100%; padding: 15px; background: var(--red); color: white;
+            border: none; font-family: 'Russo One'; font-size: 1.1rem; cursor: pointer;
+            transition: 0.3s; margin-top: 10px;
+        }
+        .breed-btn:hover { background: var(--orange); box-shadow: 0 0 20px var(--orange); }
+
+        #results-panel {
+            position: absolute; right: 40px; top: 120px; width: 280px;
+            background: var(--glass); border: 1px solid rgba(255,255,255,0.1);
+            padding: 25px; border-radius: 15px; backdrop-filter: blur(5px);
+        }
+
+        .gene-tag {
+            display: inline-block; padding: 4px 10px; background: #333; font-size: 0.6rem;
+            font-family: 'Russo One'; margin: 2px; border-radius: 4px;
+        }
+
+        /* Genetic Aura */
+        .aura {
+            position: absolute; inset: -50px;
+            background: radial-gradient(circle, rgba(255,107,0,0.15) 0%, transparent 70%);
+            animation: pulseAura 4s infinite;
+        }
+        @keyframes pulseAura { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.3); opacity: 0.6; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.1rem; color:var(--orange);">VANGUARD GENETIC LAB</div>
+    </nav>
+
+    <div id="lab-floor">
+        
+        <div id="side-panel">
+            <h3>SOVEREIGN PARENTS</h3>
+            <div class="parent-slot" id="p1" onclick="selectParent(1)">
+                <span id="p1-label">SELECT MATRIARCH</span>
+            </div>
+            <div class="parent-slot" id="p2" onclick="selectParent(2)">
+                <span id="p2-label">SELECT PATRIARCH</span>
+            </div>
+            <button class="breed-btn" onclick="initiateBreeding()">INITIATE BREEDING</button>
+        </div>
+
+        <div id="pod-wrap">
+            <div class="pod-glass">
+                <div class="aura"></div>
+                <div id="creature-container">
+                    <div class="creature-body" id="target-creature">
+                        <img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp" class="creature-img" id="main-asset">
+                    </div>
+                </div>
+            </div>
+            <div class="pod-base"></div>
+        </div>
+
+        <div id="results-panel">
+            <h3>GENETIC PROFILE</h3>
+            <div id="gene-list">
+                <div class="gene-tag">NEURAL-CORE</div>
+                <div class="gene-tag">ALPHA-VANGUARD</div>
+                <div class="gene-tag">CHIBI-TYPE</div>
+            </div>
+            <div style="margin-top:20px; font-family:'Bangers'; font-size:2rem; color:var(--orange);">PUP #001</div>
+            <p style="font-size:0.7rem; color:#888; font-family:'Russo One';">RARITY: <span style="color:var(--white);">COMMON</span></p>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        const assets = {
+            astra: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp',
+            mimi: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp',
+            nova: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp',
+            echo: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp'
+        };
+
+        let parent1 = null, parent2 = null;
+
+        function selectParent(slot) {
+            const keys = Object.keys(assets);
+            const randomChar = keys[Math.floor(Math.random()*keys.length)];
+            
+            if(slot === 1) {
+                parent1 = randomChar;
+                document.getElementById('p1').innerHTML = `<img src="${assets[randomChar]}">`;
+            } else {
+                parent2 = randomChar;
+                document.getElementById('p2').innerHTML = `<img src="${assets[randomChar]}">`;
+            }
+        }
+
+        async function initiateBreeding() {
+            if(!parent1 || !parent2) return alert("SELECT BOTH PARENTS FOR THE SOVEREIGN PROTOCOL");
+
+            const target = document.getElementById('target-creature');
+            const asset = document.getElementById('main-asset');
+
+            // Flash effect
+            asset.style.filter = 'brightness(5) blur(10px)';
+            target.style.transform = 'scale(0.1) rotate(360deg)';
+
+            setTimeout(() => {
+                const keys = Object.keys(assets);
+                const result = keys[Math.floor(Math.random()*keys.length)];
+                
+                asset.src = assets[result];
+                asset.style.filter = '';
+                target.style.transform = 'scale(1) rotate(0deg)';
+                
+                // Randomize Genes
+                const rarity = Math.random() > 0.8 ? 'ELITE' : 'COMMON';
+                document.getElementById('results-panel').querySelector('span').innerText = rarity;
+                document.getElementById('results-panel').querySelector('span').style.color = rarity === 'ELITE' ? '#FF6B00' : '#FFF';
+                
+                if(window.Atelia) Atelia.arena.updatePrestige(null, 25); // Bonus for breeding
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
