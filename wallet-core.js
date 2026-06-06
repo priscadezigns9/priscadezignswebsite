@@ -16,7 +16,7 @@ const ASSETS = [
     { id: 'nrl', name: 'NEURAL ($NRL)', symbol: 'NRL', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/neural_coin_hf.png', balance: 0.00 },
     { id: 'atlr', name: 'ATELIA ($ATLR)', symbol: 'ATLR', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/atlr_coin.png', balance: 0.00 },
     { id: 'musd', name: 'MUSTARD ($MUSD)', symbol: 'MUSD', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/musd_coin.png', balance: 0.00 },
-    { id: 'gl', name: 'JELLO ($GL)', symbol: 'GL', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/jello_coin.png', balance: 0.00 }
+    { id: 'jlo', name: 'JELLO ($GL)', symbol: 'JLO', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/jlo_coin.png', balance: 0.00 }
 ];
 
 let WALLETS = JSON.parse(localStorage.getItem('prn_wallets')) || [
