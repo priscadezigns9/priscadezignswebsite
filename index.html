@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Sovereign Singularity v4.3.7 [Neural Gateway] -->
+<!-- Sovereign Singularity v4.3.8 [Neural Gateway] -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,7 @@
     <!-- OG Tags -->
     <meta property="og:title" content="PRISCION | Neural AI & Sovereign Blockchain" />
     <meta property="og:description" content="Enter the Empire. High-fidelity AI products, Web3 settlement, and the Sovereign Ledger." />
-    <meta property="og:image" content="" />
+    <meta property="og:image" content="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_official.jpg" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://priscadezigns.org/" />
 
@@ -189,21 +189,72 @@
             letter-spacing: 1px;
         }
 
-        /* Wallet Prompt */
-        #walletPrompt {
-            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-            background:rgba(0,0,0,0.9); z-index:9999; 
-            backdrop-filter: blur(30px); align-items:center; justify-content:center;
-        }
-        .prompt-box {
+        /* Wallet Sidebar */
+        .wallet-sidebar {
+            position: fixed;
+            top: 0; right: 0;
+            width: 380px; height: 100%;
             background: var(--surface);
-            border: 1px solid var(--accent);
-            width: 90%; max-width: 400px;
-            padding: 40px;
-            border-radius: 32px;
-            text-align: center;
-            box-shadow: 0 0 50px var(--neural-glow);
+            border-left: 1px solid var(--border);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -20px 0 60px rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
         }
+        .wallet-sidebar.active { transform: translateX(0); }
+
+        .sidebar-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-header h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .asset-card {
+            background: #000;
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+        .asset-card:hover { border-color: var(--accent); }
+        .asset-info { display: flex; align-items: center; gap: 12px; }
+        .asset-info img { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
+        .asset-name { font-weight: 700; font-size: 0.85rem; }
+        .asset-val { text-align: right; font-weight: 800; color: var(--accent); font-size: 0.85rem; }
+
+        .sidebar-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid var(--border);
+        }
+        .s-tab {
+            padding: 15px;
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .s-tab.active { color: var(--accent); border-top: 2px solid var(--accent); background: rgba(123, 53, 212, 0.05); }
+
     </style>
 </head>
 <body>
@@ -212,7 +263,7 @@
 
     <header>
         <a href="/" class="logo">
-            <img src="" alt="Mustard Tree Logo">
+            <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_official.jpg" alt="Official Logo">
             <span>PRISCION</span>
         </a>
         <nav>
@@ -221,21 +272,68 @@
             <a href="wallet/vault.html">Vault</a>
         </nav>
         <div style="display:flex; gap:12px;">
-            <a href="wallet/auth.html" class="btn btn-outline">Connect</a>
+            <button onclick="toggleSidebar()" class="btn btn-outline">Sovereign Wallet</button>
             <a href="leggo.html" class="btn btn-primary">Launch LEGGO</a>
         </div>
     </header>
 
     <main class="hero">
-        <div class="hero-badge">SOVEREIGN PROTOCOL v4.3.7</div>
+        <div class="hero-badge">SOVEREIGN PROTOCOL v4.3.8</div>
         <h1>Architecting <br><span style="color:var(--accent);">Autonomous</span> Identity.</h1>
         <p>Welcome to the High-Fidelity Gateway. We are bridging the gap between human intent and high-fidelity blockchain settlement.</p>
         
         <div style="display:flex; gap:20px;">
-            <a href="leggo.html" class="btn btn-primary" style="padding: 18px 40px; font-size: 0.85rem;">Enter Web3 Environment</a>
-            <a href="#brands" class="btn btn-outline" style="padding: 18px 40px; font-size: 0.85rem;">Explore Brands</a>
+            <a href="leggo.html" class="btn btn-primary" style="padding: 18px 40px; font-size: 0.85rem;">Launch LEGGO Browser</a>
+            <button onclick="toggleSidebar()" class="btn btn-outline" style="padding: 18px 40px; font-size: 0.85rem;">Open Sovereign Wallet</button>
         </div>
     </main>
+
+    <div class="wallet-sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Neural Vault</h2>
+            <button onclick="toggleSidebar()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <div class="sidebar-content">
+            <div id="view-assets">
+                <div style="text-align:center; margin-bottom:30px;">
+                    <div style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:5px;">Sovereign Balance</div>
+                    <div style="font-size:2.2rem; font-weight:900;">2,540.00 <span style="font-size:0.8rem; color:var(--accent);">$PRN</span></div>
+                </div>
+
+                <div class="asset-card">
+                    <div class="asset-info"><img src="https://drive.google.com/uc?export=view&id=1Q3xqSqxA5QciLWWAXEXzDSUTWNiJzeI4"><span class="asset-name">$PRN (Priscion)</span></div>
+                    <div class="asset-val">2,540.00</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-info"><img src="https://drive.google.com/uc?export=view&id=1To_XBjrXDO6ZRoQ2YzTleweTg6sEHgOL"><span class="asset-name">$NRL (Neural)</span></div>
+                    <div class="asset-val">15,000</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-info"><img src="https://drive.google.com/uc?export=view&id=1DJqBy1SThRorrgD87rbkDCQ8W4ygyGC-"><span class="asset-name">$ATLR (Atelia)</span></div>
+                    <div class="asset-val">82,400</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-info"><img src="https://drive.google.com/uc?export=view&id=1RJfigGY8p5kg0-4WV8_DExrDd4Hj2mtz"><span class="asset-name">$MUSD (Mustard)</span></div>
+                    <div class="asset-val">867.85</div>
+                </div>
+                
+                <h4 style="font-size:0.55rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin:20px 0 10px;">Your Handles</h4>
+                <div style="background:#000; padding:12px; border-radius:12px; border:1px solid var(--border); font-size:0.75rem;">
+                    <div style="color:var(--accent); margin-bottom:5px;">$priscion.prn</div>
+                    <div style="color:var(--accent); margin-bottom:5px;">$prisca.prn</div>
+                    <div style="color:var(--muted);">$priscionai.prn</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-tabs">
+            <div class="s-tab active">Assets</div>
+            <div class="s-tab" onclick="window.location.href='leggo.html'">Nodes</div>
+            <div class="s-tab" onclick="window.location.href='wallet/vault.html'">Vault</div>
+            <a href="wallet/auth.html" style="text-decoration:none; color:white; font-size:0.6rem; padding:15px;">Connect</a>
+        </div>
+    </div>
 
     <footer>
         <p>&copy; 2026 PRISCION. ARCHITECTED BY THE ARCHITECT. ANCHORED TO THE LEDGER.</p>
@@ -252,31 +350,15 @@
         </div>
     </div>
 
-    <!-- Wallet Prompt -->
-    <div id="walletPrompt">
-        <div class="prompt-box">
-            <img src="" style="height:80px; margin-bottom:20px; border-radius:50%; border: 2px solid var(--accent);">
-            <h2 style="margin-bottom:10px;">Identity Required</h2>
-            <p style="color:var(--muted); font-size:0.85rem; margin-bottom:30px; line-height: 1.6;">No Sovereign Identity detected. Initialize your wallet to access the Ledger.</p>
-            <a href="wallet/auth.html" class="btn btn-primary" style="width:100%; margin-bottom:15px; justify-content: center;">Initialize Wallet</a>
-            <button onclick="document.getElementById('walletPrompt').style.display='none'" style="background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.75rem;">Continue as Guest</button>
-        </div>
-    </div>
-
     <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        
         function closeEbook() { 
             document.getElementById('ebookSidePopup').classList.remove('show'); 
             localStorage.setItem('ebook_dismissed', 'true');
         }
 
         window.onload = () => {
-            // Check for wallet
-            if(!localStorage.getItem('priscion_identity')) {
-                setTimeout(() => {
-                    document.getElementById('walletPrompt').style.display = 'flex';
-                }, 2000);
-            }
-
             // E-book popup
             if(!localStorage.getItem('ebook_dismissed')) {
                 setTimeout(() => {
