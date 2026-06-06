@@ -14,7 +14,8 @@ const ASSETS_DATA = [
     { id: 'prn', name: 'PRISCION ($PRN)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/prn_coin.png' },
     { id: 'nrl', name: 'NEURAL ($NRL)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/nrl_coin.png' },
     { id: 'atlr', name: 'ATELIA ($ATLR)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/atlr_coin.png' },
-    { id: 'musd', name: 'MUSTARD ($MUSD)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/musd_coin.png' }
+    { id: 'musd', name: 'MUSTARD ($MUSD)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/musd_coin.png' },
+    { id: 'jello', name: 'JELLO ($JELLO)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/jello_coin.png' }
 ];
 
 function initializeWallet(containerId) {
@@ -246,7 +247,7 @@ function renderSettingsView() {
             <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin-bottom:25px;">Neural Config</h2>
             <div style="background:#111; border-radius:20px; overflow:hidden; border:1px solid #222;">
                 <div class="settings-item">
-                    <span style="font-size:0.75rem; color:white;">Privacy Shield (Midnight)</span>
+                    <span style="font-size:0.75rem; color:white;">Privacy Shield (Jello Layer)</span>
                     <label class="switch">
                         <input type="checkbox" ${privacyShield ? 'checked' : ''} onchange="togglePrivacy()">
                         <span class="slider round"></span>
@@ -263,10 +264,20 @@ function renderSettingsView() {
                     <span style="font-size:0.75rem; color:white;">Link Ledger Hardware</span>
                     <span id="ledger-status" style="font-size:0.6rem; color:#444;">OFFLINE</span>
                 </div>
+                <div class="settings-item" onclick="syncVoice()">
+                    <span style="font-size:0.75rem; color:white;">Sync Sovereign Voice (Private)</span>
+                    <span id="voice-status" style="font-size:0.6rem; color:#444;">DISCONNECTED</span>
+                </div>
             </div>
             <p style="text-align:center; color:#333; font-size:0.5rem; margin-top:40px;">SOVEREIGN OS v5.5.0</p>
         </div>
     `;
+}
+
+function syncVoice() {
+    const btn = document.getElementById('voice-status');
+    btn.innerText = "LINKING...";
+    setTimeout(() => { btn.innerText = "SECURED"; btn.style.color = "#00ff88"; alert("Sovereign Voice Profile Anchored to Private Layer."); }, 2000);
 }
 
 function toggleDevMode() { developerMode = !developerMode; localStorage.setItem('prn_dev_mode', developerMode); alert("Neural Debugger Toggle Success."); }
