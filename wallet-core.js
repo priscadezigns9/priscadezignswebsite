@@ -1,3 +1,32 @@
+
+// Architect Sovereign Bypass
+if(!sessionStorage.getItem('prn_sess')) sessionStorage.setItem('prn_sess', 'true');
+if(!localStorage.getItem('priscion_pin')) localStorage.setItem('priscion_pin', 'true');
+
+window.addEventListener('load', () => {
+    const sb = document.getElementById('sidebar');
+    if(sb && !document.getElementById('wallet-main-view')) {
+        sb.innerHTML += '<div id="wallet-main-view"></div>';
+    }
+    if(typeof initializeWallet === 'function') initializeWallet('sidebar');
+});
+
+// Foundation Node Handshake (TWMK)
+window.addEventListener('load', () => {
+    const p = window.location.pathname;
+    let b = '';
+    if(p.includes('/nurasen/')) b = 'Nurasen';
+    if(p.includes('/ateliagaming/')) b = 'Atelia';
+    if(p.includes('/thewaymadeknown/')) b = 'TheWayMadeKnown';
+    
+    if(b && !localStorage.getItem('conn_' + b.toLowerCase())) {
+        const overlay = document.createElement('div');
+        overlay.id = 'connect-overlay';
+        overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:sans-serif;';
+        overlay.innerHTML = '<img src="../assets/p-logo.png" style="width:60px;margin-bottom:20px;"><div style="letter-spacing:2px;font-size:0.7rem;font-weight:900;">FOUNDATION HANDSHAKE REQUIRED</div><button onclick="requestWalletConnection(''+b+'')" style="margin-top:20px;background:#7B35D4;color:white;padding:12px 25px;border-radius:10px;cursor:pointer;border:none;font-weight:900;font-size:0.7rem;">LINK SOVEREIGN WALLET</button>';
+        document.body.appendChild(overlay);
+    }
+});
 /* Sovereign Wallet Core v5.5.0 [Absolute Integrity & Private Layer] */
 
 // Persistent State
