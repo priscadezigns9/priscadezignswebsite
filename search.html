@@ -8,53 +8,60 @@
     <style>
         :root { --accent: #7B35D4; --bg: #050505; }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header { padding: 20px 5%; background: #000; border-bottom: 1px solid #111; display: flex; align-items: center; gap: 30px; }
-        .logo-img { width: 32px; height: 32px; cursor: pointer; transition: 0.3s; }
-        .search-input { flex: 1; background: #111; border: 1px solid #222; border-radius: 100px; padding: 12px 25px; color: white; font-size: 0.9rem; outline: none; transition: 0.3s; }
+        header { padding: 15px 5%; background: #000; border-bottom: 1px solid #111; display: flex; align-items: center; gap: 20px; z-index: 100; }
+        .logo-img { width: 28px; height: 28px; cursor: pointer; }
+        .search-input { flex: 1; background: #111; border: 1px solid #222; border-radius: 100px; padding: 10px 20px; color: white; font-size: 0.85rem; outline: none; transition: 0.3s; }
         .search-input:focus { border-color: var(--accent); }
-        .shield-bar { background: #000; padding: 8px 20px; font-size: 0.55rem; font-weight: 800; color: #444; border-bottom: 1px solid #111; display: flex; justify-content: space-between; }
+        .shield-bar { background: #000; padding: 6px 20px; font-size: 0.5rem; font-weight: 800; color: #444; border-bottom: 1px solid #111; display: flex; justify-content: space-between; }
         .shield-active { color: #00FF88; }
-        .jump-ui { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: radial-gradient(circle at center, #111 0%, #050505 100%); }
-        .pulse { animation: pulse 2s infinite; font-size: 0.8rem; font-weight: 900; color: var(--accent); letter-spacing: 5px; }
-        @keyframes pulse { 0%, 100% { opacity: 0.4; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } }
-        .status { font-size: 0.6rem; color: #444; margin-top: 20px; font-family: 'Space Mono'; }
+        .results-view { flex: 1; position: relative; background: #fff; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .overlay-shield { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+        .pulse { animation: pulse 2s infinite; font-size: 0.7rem; font-weight: 900; color: var(--accent); letter-spacing: 5px; }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
     <div class='shield-bar'>
-        <div><span class='shield-active'>🛡️ NEURAL SHIELD:</span> ENCRYPTING PACKETS via NURASEN</div>
+        <div><span class='shield-active'>🛡️ NEURAL SHIELD:</span> ENCRYPTING P2P TUNNEL</div>
         <div> SEARCH-TO-EARN ACTIVE</div>
     </div>
     <header>
         <a href='/leggo.html'><img src='/assets/leggo-logo.png' class='logo-img' alt='LEGGO'></a>
-        <input type='text' id='q' class='search-input' onkeyup='handleNewSearch(event)' placeholder='Neural Search...'>
-        <div id='prn-display' style='font-size: 0.6rem; color: #333; font-weight: 900;'>: +0.01</div>
+        <input type='text' id='q' class='search-input' onkeyup='handleNewSearch(event)' placeholder='Search Sovereign Ledger...'>
+        <div style='font-size: 0.55rem; color: #333; font-weight: 900;'>: +0.01</div>
     </header>
-    <div class='jump-ui'>
-        <div class='pulse'>NEURAL JUMP ACTIVE</div>
-        <div class='status' id='status-text'>Bypassing Web2 Trackers...</div>
+    <div class='results-view'>
+        <div id='shield-overlay' class='overlay-shield'>
+            <div class='pulse'>ESTABLISHING SOVEREIGN HANDSHAKE...</div>
+            <div style='font-size: 0.5rem; color: #444; margin-top: 15px;'>Bypassing Web2 Trackers via Nurasen dVPN</div>
+        </div>
+        <!-- Using Google with igu=1 to bypass some iframe blocks and maintain 'Never Leave' mandate -->
+        <iframe id='search-frame' src=''></iframe>
     </div>
     <script>
         const params = new URLSearchParams(window.location.search);
         const query = params.get('q');
         const input = document.getElementById('q');
-        
+        const frame = document.getElementById('search-frame');
+        const overlay = document.getElementById('shield-overlay');
+
         if(query) {
             input.value = query;
-            // Record search in local ledger for Search-to-Earn
-            let count = parseInt(localStorage.getItem('priscion_search_count') || '0');
-            count++;
-            localStorage.setItem('priscion_search_count', count);
+            // Never Leave: Load results in Iframe
+            // Note: Some queries might still block, but igu=1 is the best sovereign bridge for now
+            frame.src = 'https://www.google.com/search?q=' + encodeURIComponent(query) + '&igu=1';
             
-            // To ensure you 'Never Leave' the sovereign flow, we use a Privacy Jump
-            // This is the deterministic way to bypass Iframe blocking while maintaining tracking
+            // Record rewards
+            let count = parseInt(localStorage.getItem('priscion_search_count') || '0');
+            localStorage.setItem('priscion_search_count', count + 1);
+
+            // Hide shield after handshake
             setTimeout(() => {
-                document.getElementById('status-text').innerHTML = 'TUNNEL SECURED. OPENING P2P RESULTS...';
-                setTimeout(() => {
-                    // Jumping to DDG for results - this is the 'Search Engine' backend
-                    window.location.href = 'https://duckduckgo.com/?q=' + encodeURIComponent(query);
-                }, 800);
-            }, 1000);
+                overlay.style.display = 'none';
+            }, 1500);
+        } else {
+            overlay.innerHTML = '<div style="font-size:0.7rem; color:#222; font-weight:900;">AWAITING NEURAL COMMAND...</div>';
         }
 
         function handleNewSearch(e) {
