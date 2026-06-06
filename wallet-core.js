@@ -145,7 +145,7 @@ async function renderVaultView() {
         const resp = await fetch('https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/vault_manifest.json');
         const data = await resp.json();
         document.getElementById('vault-items-grid-core').innerHTML = data.map(item => `
-            <div style="background:#111; border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:12px; text-align:center; cursor:pointer;" onclick="window.open('https://drive.google.com/uc?export=view&id=${item.id}')">
+            <div style="background:#111; border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:12px; text-align:center; cursor:pointer;" onclick="window.open('${item.url}')">
                 <div style="font-size:1.2rem;">${item.type.includes('image') ? '🖼️' : (item.type.includes('pdf') ? '🪪' : '📄')}</div>
                 <div style="font-size:0.5rem; font-weight:800; color:#fff; margin-top:8px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${item.name}</div>
             </div>
