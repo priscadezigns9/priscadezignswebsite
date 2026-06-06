@@ -1,4 +1,4 @@
-/* Sovereign Wallet Core v4.7.3 [High-Fidelity & Rowcell Fix] */
+/* Sovereign Wallet Core v4.7.4 [High-Fidelity & Rowcell Final] */
 
 const ASSETS_DATA = [
     { id: 'prn', name: 'PRISCION ($PRN)', balance: '2,540.00', usd: '$2,540.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg' },
@@ -27,11 +27,11 @@ const EMPIRE_NODES = [
 ];
 
 const SAAS_NODES = [
-    { name: 'CUPYX', handle: '$cupyx.prn', url: '/cupyx/', icon: '☕' },
-    { name: 'MOBLYNC', handle: '$moblync.prn', url: '/moblync/', icon: '📱' },
-    { name: 'KARJOV', handle: '$karjov.prn', url: '/karjov/', icon: '⚔️' },
-    { name: 'ROWCELL', handle: '$rowcell.prn', url: '/rowcell/', icon: '🌹' },
-    { name: 'VELLOQ', handle: '$velloq.prn', url: '/velloq/', icon: '⚡' }
+    { name: 'CUPYX', handle: '$cupyx.prn', url: '/cupyx/', logo: 'https://drive.google.com/uc?export=view&id=1MFeoBty54LMd5tTK5Z6D32nMumc0LTD6' },
+    { name: 'MOBLYNC', handle: '$moblync.prn', url: '/moblync/', logo: 'https://drive.google.com/uc?export=view&id=1QV6Cwpt0ng-V0gawbumCEHtmZMhqs9wb' },
+    { name: 'KARJOV', handle: '$karjov.prn', url: '/karjov/', logo: 'https://drive.google.com/uc?export=view&id=1QYpTqBOMGTeaz7A-IFB5C2Ee_qn6840f' },
+    { name: 'ROWCELL', handle: '$rowcell.prn', url: '/rowcell/', logo: 'https://drive.google.com/uc?export=view&id=1uYllyU4Tmi5NAGoOzbFLBg7Owy-7vLJ0' },
+    { name: 'VELLOQ', handle: '$velloq.prn', url: '/velloq/', logo: 'https://drive.google.com/uc?export=view&id=1PjxvX2yBeVzMDguMbilJIrAtgtUvpjGG' }
 ];
 
 function initializeWallet(containerId) {
@@ -207,11 +207,11 @@ function renderEmpireHub() {
             <h3 style="font-size:0.6rem; color:#888; text-transform:uppercase; margin:30px 0 15px; letter-spacing:2px; font-weight:900;">Blockchain SaaS</h3>
             <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;">
                 ${SAAS_NODES.map(s => `
-                    <div onclick="window.location.href='${s.url}'" style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:15px; border-radius:18px; text-align:center; cursor:pointer;">
-                        <div style="font-size:1.5rem; margin-bottom:8px;">${s.icon}</div>
+                    <a href="${s.url}" style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:15px; border-radius:18px; text-align:center; text-decoration:none; color:white; display:block;">
+                        <img src="${s.logo}" style="width:40px; height:40px; border-radius:10px; margin-bottom:8px;">
                         <div style="font-size:0.55rem; font-weight:900; color:white;">${s.name}</div>
                         <div style="font-size:0.4rem; color:#7B35D4; margin-top:3px; font-weight:800;">${s.handle}</div>
-                    </div>
+                    </a>
                 `).join('')}
             </div>
         </div>
@@ -240,7 +240,7 @@ function renderSettingsView() {
             <div style="background:#111; border-radius:20px; overflow:hidden;">
                 <div class="settings-item" onclick="alert('Neural Sync Active')">
                     <span style="font-size:0.75rem; color:white;">Neural Engine</span>
-                    <span style="color:#7B35D4; font-size:0.6rem;">v4.7.3</span>
+                    <span style="color:#7B35D4; font-size:0.6rem;">v4.7.4</span>
                 </div>
                 <div class="settings-item" onclick="alert('Nurasen Shield Active')">
                     <span style="font-size:0.75rem; color:white;">Security Shield</span>
