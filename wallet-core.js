@@ -18,17 +18,56 @@ const ASSETS_DATA = [
     { id: 'jello', name: 'JELLO ($JELLO)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/jello_coin.png' }
 ];
 
+function saveWallets() { localStorage.setItem('prn_wallets', JSON.stringify(WALLETS)); }
+
+function earnPRN(amount, reason) {
+    WALLETS[currentWalletIndex].balance += amount;
+    saveWallets();
+    const toast = document.createElement('div');
+    toast.style = "position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#00FF88; color:black; padding:10px 20px; border-radius:100px; font-weight:900; font-size:0.7rem; z-index:10000; box-shadow:0 0 20px rgba(0,255,136,0.3);";
+    toast.innerText = `+${amount} PRN EARNED: ${reason}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+    const balanceEl = document.getElementById('top-prn-balance');
+    if(balanceEl) balanceEl.innerText = WALLETS[currentWalletIndex].balance.toLocaleString();
+}
+
 function initializeWallet(containerId) {
     const sidebar = document.getElementById(containerId);
     if(!sidebar) return;
-    const hasPin = localStorage.getItem('priscion_pin');
-    const isSess = sessionStorage.getItem('prn_sess');
-    if(!hasPin) renderOnboarding(sidebar);
-    else if(!isSess) renderAuth(sidebar);
-    else renderWalletMain(sidebar);
+    if(!sessionStorage.getItem('prn_sess')) sessionStorage.setItem('prn_sess', 'true');
+    if(!localStorage.getItem('priscion_pin')) localStorage.setItem('priscion_pin', 'true');
+    renderWalletMain(sidebar);
+}
+
+function switchWalletTabCore(tab) {
+    const view = document.getElementById('wallet-main-view');
+    if(!view) return;
+    
+    // UI Feedback for Tabs
+    const tabs = ['tab-assets', 'tab-vault', 'tab-shop', 'tab-sync'];
+    tabs.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.style.color = '#444';
+    });
+    const activeTab = document.getElementById('tab-' + tab);
+    if(activeTab) activeTab.style.color = '#7B35D4';
+
+    if(tab === 'assets') {
+        renderAssetsView();
+    } else if(tab === 'vault') {
+        renderVaultView();
+    } else if(tab === 'shop') {
+        renderHubView();
+    } else if(tab === 'sync') {
+        renderSecurityView();
+    }
 }
 
 function renderWalletMain(sidebar) {
+    if(!document.getElementById('wallet-main-view')) {
+        sidebar.innerHTML += '<div id="wallet-main-view"></div>';
+    }
     renderAssetsView();
 }
 
@@ -70,7 +109,6 @@ function renderAssetsView() {
         </div>
     `;
     
-    // Logic-based Assets
     const assets = [
         { ...ASSETS_DATA[0], balance: wallet.balance, usd: wallet.balance },
         { ...ASSETS_DATA[1], balance: 0.00, usd: 0.00 },
@@ -94,270 +132,112 @@ function renderAssetsView() {
     `).join('');
 }
 
-function renderSendView() {
+function renderVaultView() {
     const view = document.getElementById('wallet-main-view');
-    view.innerHTML = `
-        <div style="padding:20px;">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-                <button class="btn" onclick="renderAssetsView()" style="background:none; border:none; color:#7B35D4; font-size:1.5rem; cursor:pointer;">←</button>
-                <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin:0;">Send</h2>
-            </div>
-            <div style="background:#111; padding:25px; border-radius:24px; border:1px solid #222;">
-                <input type="text" id="send-to" placeholder="Recipient (.prn or address)" style="width:100%; background:black; border:1px solid #333; padding:15px; border-radius:12px; color:white; margin-bottom:20px;">
-                <select id="send-asset" style="width:100%; background:black; border:1px solid #333; padding:15px; border-radius:12px; color:white; margin-bottom:20px;">
-                    ${ASSETS_DATA.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
-                </select>
-                <input type="number" id="send-amount" placeholder="0.00" style="width:100%; background:black; border:1px solid #333; padding:15px; border-radius:12px; color:white; margin-bottom:30px; font-size:1.5rem;">
-                <button class="btn btn-primary" style="width:100%; padding:18px;" onclick="executeSend()">CONFIRM TRANSACTION</button>
-            </div>
-        </div>
-    `;
-}
-
-function executeSend() {
-    const amount = parseFloat(document.getElementById('send-amount').value);
-    if(amount > WALLETS[currentWalletIndex].balance) { alert("Insufficient Ledger Funds."); return; }
-    WALLETS[currentWalletIndex].balance -= amount;
-    saveWallets();
-    alert("Neural Transaction Anchored to Ledger.");
-    renderAssetsView();
-}
-
-function renderReceiveView() {
-    const view = document.getElementById('wallet-main-view');
-    const wallet = WALLETS[currentWalletIndex];
-    view.innerHTML = `
-        <div style="padding:20px;">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-                <button class="btn" onclick="renderAssetsView()" style="background:none; border:none; color:#7B35D4; font-size:1.5rem; cursor:pointer;">←</button>
-                <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin:0;">Receive</h2>
-            </div>
-            <div style="background:#111; padding:30px; border-radius:24px; border:1px solid #222; text-align:center;">
-                <div style="background:white; padding:15px; border-radius:15px; width:180px; height:180px; margin:0 auto 25px;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${wallet.address}" style="width:100%;">
-                </div>
-                <div style="margin-bottom:20px;">
-                    <div style="color:#666; font-size:0.5rem; text-transform:uppercase; font-weight:800;">Sovereign Handle</div>
-                    <div style="color:white; font-size:1.2rem; font-weight:900;">$prisca</div>
-                </div>
-                <div style="margin-bottom:30px;">
-                    <div style="color:#666; font-size:0.5rem; text-transform:uppercase; font-weight:800;">Address</div>
-                    <div style="background:black; border:1px solid #333; padding:12px; border-radius:10px; font-family:'Space Mono'; font-size:0.6rem; color:#888; overflow:hidden;">${wallet.address}</div>
-                </div>
-                <button class="btn btn-primary" style="width:100%; padding:18px;" onclick="navigator.clipboard.writeText('${wallet.address}'); alert('Address Copied.')">COPY ADDRESS</button>
-            </div>
-        </div>
-    `;
-}
-
-function renderBuyView() {
-    const view = document.getElementById('wallet-main-view');
-    view.innerHTML = `
-        <div style="padding:20px;">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-                <button class="btn" onclick="renderAssetsView()" style="background:none; border:none; color:#7B35D4; font-size:1.5rem; cursor:pointer;">←</button>
-                <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin:0;">Buy Crypto</h2>
-            </div>
-            <div style="background:#111; padding:25px; border-radius:24px; border:1px solid #222;">
-                <label style="color:#666; font-size:0.5rem; text-transform:uppercase; font-weight:800; display:block; margin-bottom:10px;">Select Asset</label>
-                <select id="buy-asset" style="width:100%; background:black; border:1px solid #333; padding:15px; border-radius:12px; color:white; margin-bottom:20px;">
-                    ${ASSETS_DATA.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
-                </select>
-                
-                <label style="color:#666; font-size:0.5rem; text-transform:uppercase; font-weight:800; display:block; margin-bottom:10px;">Amount (USD)</label>
-                <input type="number" id="buy-amount" placeholder="100.00" style="width:100%; background:black; border:1px solid #333; padding:15px; border-radius:12px; color:white; margin-bottom:20px; font-size:1.5rem;">
-                
-                <label style="color:#666; font-size:0.5rem; text-transform:uppercase; font-weight:800; display:block; margin-bottom:10px;">Payment Method</label>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:30px;">
-                    <div onclick="selectPayment('visa')" id="pay-visa" style="background:black; border:1px solid #7B35D4; padding:15px; border-radius:12px; text-align:center; cursor:pointer;">
-                        <div style="font-size:0.8rem; font-weight:900;">VISA / DEBIT</div>
+    view.innerHTML = '<div style="padding:40px; color:#444; font-size:0.65rem; text-align:center;">VAULT SYNCHRONIZING...</div>';
+    fetch('/vault_manifest.json').then(r => r.json()).then(data => {
+        view.innerHTML = `
+            <div style="padding:20px;">
+                <h2 style="color:white; font-size:1.2rem; margin-bottom:20px; font-family:'Playfair Display';">Sovereign Vault</h2>
+                ${data.map(i => `
+                    <div onclick="window.open('${i.url}')" style="background:#080808; padding:18px; border-radius:15px; margin-bottom:12px; border:1px solid #222; cursor:pointer; transition:0.3s;">
+                        <div style="display:flex; justify-content:space-between; align-items:start;">
+                            <div>
+                                <div style="color:white; font-weight:800; font-size:0.75rem;">${i.name}</div>
+                                <div style="color:#666; font-size:0.5rem; margin-top:4px;">${i.category} • ${i.type}</div>
+                            </div>
+                            <div style="color:#00FF88; font-size:0.45rem; font-weight:900; text-transform:uppercase; background:rgba(0,255,136,0.1); padding:4px 8px; border-radius:4px;">${i.ledger_status}</div>
+                        </div>
                     </div>
-                    <div onclick="selectPayment('apple')" id="pay-apple" style="background:black; border:1px solid #222; padding:15px; border-radius:12px; text-align:center; cursor:pointer; opacity:0.5;">
-                        <div style="font-size:0.8rem; font-weight:900;">APPLE PAY</div>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" style="width:100%; padding:18px;" onclick="executeBuy()">INITIATE SOVEREIGN PURCHASE</button>
-                <p style="font-size:0.5rem; color:#444; text-align:center; margin-top:15px;">Secure Visa/Debit Bridge via Jello Privacy Layer</p>
+                `).join('')}
             </div>
-        </div>
-    `;
+        `;
+    });
 }
 
-function selectPayment(method) {
-    document.getElementById('pay-visa').style.borderColor = method === 'visa' ? '#7B35D4' : '#222';
-    document.getElementById('pay-apple').style.borderColor = method === 'apple' ? '#7B35D4' : '#222';
-}
-
-function executeBuy() {
-    const amount = parseFloat(document.getElementById('buy-amount').value);
-    if(!amount || amount < 10) { alert("Minimum purchase is $10."); return; }
-    alert(`Redirecting to Secure Visa Bridge...\nAmount: $${amount}\nLayer: Jello Node`);
-    // Logic to simulate addition to balance after "success"
-    setTimeout(() => {
-        WALLETS[currentWalletIndex].balance += amount;
-        saveWallets();
-        renderAssetsView();
-        alert("Sovereign Purchase Successful. Assets Anchored to Ledger.");
-    }, 2000);
-}
-
-function renderSwapView() {
+function renderHubView() {
     const view = document.getElementById('wallet-main-view');
+    const brands = [
+        { name: "Dreaming Anime", url: "/dreaminganime/", desc: "Media & Cinema Node" },
+        { name: "Atelia Gaming", url: "/ateliagaming/", desc: "Gaming Lab Node" },
+        { name: "Nurasen", url: "/nurasen/", desc: "Cybersecurity Node" },
+        { name: "Calalloo", url: "/calalloo/", desc: "Heritage Node" },
+        { name: "The Way Made Known", url: "/thewaymadeknown/", desc: "Mission Backbone" }
+    ];
     view.innerHTML = `
         <div style="padding:20px;">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-                <button class="btn" onclick="renderAssetsView()" style="background:none; border:none; color:#7B35D4; font-size:1.5rem; cursor:pointer;">←</button>
-                <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin:0;">Swap</h2>
-            </div>
-            <div style="background:#111; padding:25px; border-radius:24px; border:1px solid #222;">
-                <div style="background:black; padding:20px; border-radius:18px; margin-bottom:10px; border:1px solid #333;">
-                    <label style="color:#666; font-size:0.5rem; text-transform:uppercase;">Pay</label>
-                    <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                        <input type="number" id="swap-pay" value="100" style="background:none; border:none; color:white; font-size:1.5rem; width:100px;">
-                        <span style="font-weight:900; color:white;">PRN</span>
-                    </div>
-                </div>
-                <div style="text-align:center; margin:-20px 0; position:relative; z-index:5;"><div style="width:40px; height:40px; background:#7B35D4; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; border:4px solid #111;">↓</div></div>
-                <div style="background:black; padding:20px; border-radius:18px; margin-top:10px; border:1px solid #333;">
-                    <label style="color:#666; font-size:0.5rem; text-transform:uppercase;">Receive</label>
-                    <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                        <input type="number" value="100" disabled style="background:none; border:none; color:#444; font-size:1.5rem; width:100px;">
-                        <span style="font-weight:900; color:white;">MUSD</span>
-                    </div>
-                </div>
-                <button class="btn btn-primary" style="width:100%; padding:18px; margin-top:30px;" onclick="alert('Swap Executed on PRX.')">SWAP ASSETS</button>
-            </div>
-        </div>
-    `;
-}
-
-function renderStakingView() {
-    const view = document.getElementById('wallet-main-view');
-    view.innerHTML = `
-        <div style="padding:20px;">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-                <button class="btn" onclick="renderAssetsView()" style="background:none; border:none; color:#7B35D4; font-size:1.5rem; cursor:pointer;">←</button>
-                <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin:0;">Staking</h2>
-            </div>
-            <div style="background:linear-gradient(135deg, #00ff88 0%, #00a058 100%); padding:25px; border-radius:24px; color:white; margin-bottom:25px; text-align:center;">
-                <div style="font-size:0.6rem; text-transform:uppercase; font-weight:800; opacity:0.8;">Live APY</div>
-                <div style="font-size:3rem; font-weight:900;">12.5%</div>
-            </div>
-            <div style="background:#111; padding:25px; border-radius:24px; border:1px solid #222;">
-                <h3 style="color:white; font-size:0.9rem; margin-bottom:15px;">Anchor to Mother Node</h3>
-                <input type="number" placeholder="Amount to Stake" style="width:100%; background:black; border:1px solid #333; padding:15px; border-radius:12px; color:white; margin-bottom:20px;">
-                <button class="btn btn-primary" style="width:100%; padding:15px;" onclick="alert('Staking Pool Verified.')">STAKE $PRN</button>
-            </div>
-        </div>
-    `;
-}
-
-function renderMultiWalletView() {
-    const view = document.getElementById('wallet-main-view');
-    view.innerHTML = `
-        <div style="padding:20px;">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-                <button class="btn" onclick="renderAssetsView()" style="background:none; border:none; color:#7B35D4; font-size:1.5rem; cursor:pointer;">←</button>
-                <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin:0;">Wallets</h2>
-            </div>
-            ${WALLETS.map((w, i) => `
-                <div style="background:#111; border:1px solid ${i === currentWalletIndex ? '#7B35D4' : '#222'}; padding:20px; border-radius:18px; margin-bottom:15px; position:relative;">
-                    <div onclick="switchWallet(${i})" style="cursor:pointer;">
-                        <div style="font-weight:900; color:white; font-size:1rem;">${w.name}</div>
-                        <div style="color:#7B35D4; font-size:0.7rem;">${w.handle}</div>
-                    </div>
-                    <button onclick="renameWallet(${i})" style="position:absolute; top:20px; right:20px; background:none; border:none; color:#444; font-size:0.8rem; cursor:pointer;">✏️</button>
+            <h2 style="color:white; font-size:1.2rem; margin-bottom:20px; font-family:'Playfair Display';">Empire Hub</h2>
+            ${brands.map(b => `
+                <div onclick="window.open('${b.url}')" style="background:#080808; padding:18px; border-radius:15px; margin-bottom:12px; border:1px solid #222; cursor:pointer;">
+                    <div style="color:white; font-weight:800; font-size:0.75rem;">${b.name}</div>
+                    <div style="color:#666; font-size:0.55rem; margin-top:4px;">${b.desc}</div>
                 </div>
             `).join('')}
-            <button class="btn btn-outline" style="width:100%; padding:15px; margin-top:20px;" onclick="createNewWallet()">+ NEW SOVEREIGN NODE</button>
         </div>
     `;
 }
 
-function switchWallet(i) { currentWalletIndex = i; renderAssetsView(); }
-
-function renameWallet(i) {
-    const newName = prompt("Enter New Node Name:", WALLETS[i].name);
-    if(newName) { WALLETS[i].name = newName; saveWallets(); renderMultiWalletView(); }
-}
-
-function createNewWallet() {
-    const handle = prompt("Enter Sovereign Handle ($name.prn):");
-    if(handle) {
-        WALLETS.push({ name: 'New Node', handle: handle, address: 'addr1...' + Math.random().toString(36).substring(7), balance: 0 });
-        saveWallets();
-        renderMultiWalletView();
-    }
-}
-
-function saveWallets() { localStorage.setItem('prn_wallets', JSON.stringify(WALLETS)); }
-
-function earnPRN(amount, reason) {
-    WALLETS[currentWalletIndex].balance += amount;
-    saveWallets();
-    console.log(`Earned ${amount} PRN for: ${reason}`);
-    // Optional: Show a small toast notification in the UI
-    const toast = document.createElement('div');
-    toast.style = "position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#00FF88; color:black; padding:10px 20px; border-radius:100px; font-weight:900; font-size:0.7rem; z-index:10000; box-shadow:0 0 20px rgba(0,255,136,0.3);";
-    toast.innerText = `+${amount} PRN EARNED: ${reason}`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-    
-    // Update top bar if it exists in the page
-    const balanceEl = document.getElementById('top-prn-balance');
-    if(balanceEl) balanceEl.innerText = WALLETS[currentWalletIndex].balance.toLocaleString();
-}
-
-
-function renderSettingsView() {
+function renderSecurityView() {
     const view = document.getElementById('wallet-main-view');
     view.innerHTML = `
         <div style="padding:20px;">
-            <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin-bottom:25px;">Neural Config</h2>
-            <div style="background:#111; border-radius:20px; overflow:hidden; border:1px solid #222;">
-                <div class="settings-item">
-                    <span style="font-size:0.75rem; color:white;">Privacy Shield (Jello Layer)</span>
-                    <label class="switch">
-                        <input type="checkbox" ${privacyShield ? 'checked' : ''} onchange="togglePrivacy()">
-                        <span class="slider round"></span>
-                    </label>
+            <h2 style="color:white; font-size:1.2rem; margin-bottom:20px; font-family:'Playfair Display';">Security & Privacy</h2>
+            <div class="settings-item">
+                <div>
+                    <div style="color:white; font-weight:800; font-size:0.75rem;">Neural Shield</div>
+                    <div style="color:#666; font-size:0.55rem;">Advanced AI Threat Protection</div>
                 </div>
-                <div class="settings-item">
-                    <span style="font-size:0.75rem; color:white;">Developer Mode</span>
-                    <label class="switch">
-                        <input type="checkbox" ${developerMode ? 'checked' : ''} onchange="toggleDevMode()">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <div class="settings-item" onclick="bridgeLedger()">
-                    <span style="font-size:0.75rem; color:white;">Link Ledger Hardware</span>
-                    <span id="ledger-status" style="font-size:0.6rem; color:#444;">OFFLINE</span>
-                </div>
-                <div class="settings-item" onclick="syncVoice()">
-                    <span style="font-size:0.75rem; color:white;">Sync Sovereign Voice (Private)</span>
-                    <span id="voice-status" style="font-size:0.6rem; color:#444;">DISCONNECTED</span>
-                </div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
             </div>
-            <p style="text-align:center; color:#333; font-size:0.5rem; margin-top:40px;">SOVEREIGN OS v5.5.0</p>
+            <div class="settings-item">
+                <div>
+                    <div style="color:white; font-weight:800; font-size:0.75rem;">Private Layer</div>
+                    <div style="color:#666; font-size:0.55rem;">$JELLO Privacy Protocol</div>
+                </div>
+                <label class="switch"><input type="checkbox" onchange="togglePrivacy()" ${privacyShield ? 'checked' : ''}><span class="slider"></span></label>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <div style="color:white; font-weight:800; font-size:0.75rem;">Hardware Bridge</div>
+                    <div style="color:#666; font-size:0.55rem;">Anchored to Sovereign Hardware</div>
+                </div>
+                <div id="ledger-status" onclick="bridgeLedger()" style="color:#00ff88; font-size:0.5rem; font-weight:900; cursor:pointer;">ANCHORED</div>
+            </div>
         </div>
     `;
 }
 
-function syncVoice() {
-    const btn = document.getElementById('voice-status');
-    btn.innerText = "LINKING...";
-    setTimeout(() => { btn.innerText = "SECURED"; btn.style.color = "#00ff88"; alert("Sovereign Voice Profile Anchored to Private Layer."); }, 2000);
+function togglePrivacy() { 
+    privacyShield = !privacyShield; 
+    localStorage.setItem('prn_privacy_shield', privacyShield); 
+    alert("Midnight Private Layer Active."); 
 }
-
-function toggleDevMode() { developerMode = !developerMode; localStorage.setItem('prn_dev_mode', developerMode); alert("Neural Debugger Toggle Success."); }
-function togglePrivacy() { privacyShield = !privacyShield; localStorage.setItem('prn_privacy_shield', privacyShield); alert("Midnight Private Layer Active."); }
 
 function bridgeLedger() {
     const btn = document.getElementById('ledger-status');
     btn.innerText = "CONNECTING...";
     setTimeout(() => { btn.innerText = "ANCHORED"; btn.style.color = "#00ff88"; alert("Sovereign Hardware Bridge Active."); }, 2000);
 }
+
+// Wallet Connect Protocol
+function requestWalletConnection(b) {
+    const sb = document.getElementById('sidebar'); if (!sb) return;
+    sb.classList.add('active');
+    renderWalletMain(sb);
+    const view = document.getElementById('wallet-main-view');
+    view.innerHTML = '<div style="padding:20px;text-align:center;background:#050505;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;"><img src="../assets/p-logo.png" style="width:80px;margin-bottom:20px;"><div style="color:white;font-weight:900;">Connect to '+b+'?</div><button onclick=\'localStorage.setItem("conn_"+ "'+b.toLowerCase()+'", "true");location.reload();\' style="width:100%;padding:15px;background:#7B35D4;color:white;border-radius:12px;margin-top:20px;cursor:pointer;border:none;font-weight:900;">APPROVE</button></div>';
+}
+
+window.addEventListener('load', () => {
+    const p = window.location.pathname;
+    let b = p.includes('/nurasen/') ? "Nurasen" : p.includes('/ateliagaming/') ? "Atelia" : "";
+    if(b && !localStorage.getItem('conn_' + b.toLowerCase())) {
+        const overlay = document.createElement('div');
+        overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:sans-serif;';
+        overlay.innerHTML = '<img src="../assets/p-logo.png" style="width:60px;margin-bottom:20px;"><div>AWAITING WALLET HANDSHAKE</div><button onclick="requestWalletConnection(\''+b+'\')" style="margin-top:20px;background:#7B35D4;color:white;padding:10px 20px;border-radius:8px;cursor:pointer;border:none;font-weight:900;">LINK WALLET</button>';
+        document.body.appendChild(overlay);
+    }
+});
 
 // Global Styles Injection
 const style = document.createElement('style');
@@ -373,25 +253,3 @@ style.textContent = `
     input:checked + .slider:before { transform: translateX(20px); }
 `;
 document.head.appendChild(style);
-
-
-(function(){ if(!sessionStorage.getItem('prn_sess')){sessionStorage.setItem('prn_sess','true');} if(!localStorage.getItem('priscion_pin')){localStorage.setItem('priscion_pin','true');} window.addEventListener('load',()=>{const sb=document.getElementById('sidebar');if(sb&&!document.getElementById('wallet-main-view')){sb.innerHTML='<div id="wallet-main-view"></div>';}if(typeof initializeWallet==='function'){initializeWallet('sidebar');}}); })();
-
-// Sovereign Wallet Connect Protocol
-function requestWalletConnection(b) {
-    const sb = document.getElementById('sidebar'); if (!sb) return;
-    sb.classList.add('active');
-    const view = document.getElementById('wallet-main-view');
-    if(!view) return;
-    view.innerHTML = '<div style="padding:20px;text-align:center;background:#050505;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;"><img src="../assets/p-logo.png" style="width:80px;margin-bottom:20px;"><div style="color:white;font-weight:900;">Connect to '+b+'?</div><button onclick='localStorage.setItem("conn_"+ "'+b.toLowerCase()+'", "true");location.reload();' style="width:100%;padding:15px;background:#7B35D4;color:white;border-radius:12px;margin-top:20px;cursor:pointer;border:none;font-weight:900;">APPROVE</button></div>';
-}
-window.addEventListener('load', () => {
-    const p = window.location.pathname;
-    let b = p.includes('/nurasen/') ? 'Nurasen' : p.includes('/ateliagaming/') ? 'Atelia' : '';
-    if(b && !localStorage.getItem('conn_' + b.toLowerCase())) {
-        const overlay = document.createElement('div');
-        overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:sans-serif;';
-        overlay.innerHTML = '<img src="../assets/p-logo.png" style="width:60px;margin-bottom:20px;"><div style="letter-spacing:2px;font-size:0.7rem;font-weight:900;">AWAITING WALLET HANDSHAKE</div><button onclick="requestWalletConnection(''+b+'')" style="margin-top:20px;background:#7B35D4;color:white;padding:12px 25px;border-radius:10px;cursor:pointer;border:none;font-weight:900;font-size:0.7rem;">LINK SOVEREIGN WALLET</button>';
-        document.body.appendChild(overlay);
-    }
-});
