@@ -27,7 +27,7 @@ function initializeWallet(containerId) {
     const container = document.getElementById(containerId);
     if(!container) return;
     if(!document.getElementById('wallet-main-view')) {
-    container.classList.add('active');
+    
         container.innerHTML = '<div id="wallet-main-view"></div>';
     }
     
@@ -249,7 +249,9 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-window.addEventListener('load', () => { initializeWallet('sidebar'); });
+
+
+
 
 
 window.addEventListener('load', () => { if(document.getElementById('sidebar')) initializeWallet('sidebar'); });
