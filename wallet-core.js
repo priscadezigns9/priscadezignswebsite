@@ -376,3 +376,22 @@ document.head.appendChild(style);
 
 
 (function(){ if(!sessionStorage.getItem('prn_sess')){sessionStorage.setItem('prn_sess','true');} if(!localStorage.getItem('priscion_pin')){localStorage.setItem('priscion_pin','true');} window.addEventListener('load',()=>{const sb=document.getElementById('sidebar');if(sb&&!document.getElementById('wallet-main-view')){sb.innerHTML='<div id="wallet-main-view"></div>';}if(typeof initializeWallet==='function'){initializeWallet('sidebar');}}); })();
+
+// Sovereign Wallet Connect Protocol
+function requestWalletConnection(b) {
+    const sb = document.getElementById('sidebar'); if (!sb) return;
+    sb.classList.add('active');
+    const view = document.getElementById('wallet-main-view');
+    if(!view) return;
+    view.innerHTML = '<div style="padding:20px;text-align:center;background:#050505;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;"><img src="../assets/p-logo.png" style="width:80px;margin-bottom:20px;"><div style="color:white;font-weight:900;">Connect to '+b+'?</div><button onclick='localStorage.setItem("conn_"+ "'+b.toLowerCase()+'", "true");location.reload();' style="width:100%;padding:15px;background:#7B35D4;color:white;border-radius:12px;margin-top:20px;cursor:pointer;border:none;font-weight:900;">APPROVE</button></div>';
+}
+window.addEventListener('load', () => {
+    const p = window.location.pathname;
+    let b = p.includes('/nurasen/') ? 'Nurasen' : p.includes('/ateliagaming/') ? 'Atelia' : '';
+    if(b && !localStorage.getItem('conn_' + b.toLowerCase())) {
+        const overlay = document.createElement('div');
+        overlay.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.98);z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:sans-serif;';
+        overlay.innerHTML = '<img src="../assets/p-logo.png" style="width:60px;margin-bottom:20px;"><div style="letter-spacing:2px;font-size:0.7rem;font-weight:900;">AWAITING WALLET HANDSHAKE</div><button onclick="requestWalletConnection(''+b+'')" style="margin-top:20px;background:#7B35D4;color:white;padding:12px 25px;border-radius:10px;cursor:pointer;border:none;font-weight:900;font-size:0.7rem;">LINK SOVEREIGN WALLET</button>';
+        document.body.appendChild(overlay);
+    }
+});
