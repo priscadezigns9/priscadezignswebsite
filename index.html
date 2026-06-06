@@ -727,25 +727,26 @@
             <!-- View: Connect -->
             <div id="view-connect" style="display:none;">
                 <p style="font-size:0.9rem; color:#666; text-align:center; margin-bottom:25px; font-weight:600;">Securely bridge your external assets to the Priscion Node.</p>
+                
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                    <button onclick="connectVespr()" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center; transition:transform 0.2s;">
+                    <button onclick="connectVespr()" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center;">
                         <img src="https://vespr.xyz/apple-touch-icon.png" style="height:45px; margin-bottom:10px; border-radius:10px;">
                         <div style="font-size:0.75rem; font-weight:800; color:#333;">VESPR</div>
                     </button>
-                    <button onclick="connectHardware('Ledger Hardware')" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center;">
-                        <img src="https://www.ledger.com/wp-content/uploads/2021/11/Ledger_logo.png" style="height:45px; width:auto; margin-bottom:10px; object-fit:contain;">
-                        <div style="font-size:0.75rem; font-weight:800; color:#333;">LEDGER</div>
-                    </button>
-                    <button onclick="connectHardware('MetaMask')" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center;">
+                    <button onclick="connectMetaMask()" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center;">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" style="height:45px; margin-bottom:10px;">
                         <div style="font-size:0.75rem; font-weight:800; color:#333;">METAMASK</div>
                     </button>
-                    <button onclick="connectHardware('Trust Wallet')" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center;">
-                        <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png" style="height:45px; margin-bottom:10px;">
-                        <div style="font-size:0.75rem; font-weight:800; color:#333;">TRUST</div>
+                    <button onclick="connectBinance()" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center;">
+                        <img src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png" style="height:45px; margin-bottom:10px;">
+                        <div style="font-size:0.75rem; font-weight:800; color:#333;">BINANCE</div>
+                    </button>
+                    <button onclick="connectHardware('Ledger')" style="background:#FFF; border:1px solid rgba(0,0,0,0.1); padding:20px; border-radius:22px; cursor:pointer; text-align:center;">
+                        <img src="https://www.ledger.com/wp-content/uploads/2021/11/Ledger_logo.png" style="height:45px; width:auto; margin-bottom:10px; object-fit:contain;">
+                        <div style="font-size:0.75rem; font-weight:800; color:#333;">LEDGER</div>
                     </button>
                 </div>
-                <div style="text-align:center; margin-top:25px;">
+    <div style="text-align:center; margin-top:25px;">
                     <small style="color:#AAA; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Secured by Neural Handshake v5.0</small>
                 </div>
             </div>
@@ -988,6 +989,56 @@
             alert('Ledger Connection Failed: ' + err.message);
             status.innerHTML = '● Link Failed';
             status.style.color = '#FF4B2B';
+        }
+    }
+    </script>
+    
+    <script>
+    async function connectMetaMask() {
+        const status = document.getElementById('walletStatus');
+        status.innerHTML = '⚡ Syncing MetaMask...';
+        status.style.color = '#F3BA2F';
+
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const account = accounts[0];
+                status.innerHTML = '● MetaMask Linked: ' + account.substring(0,8) + '...';
+                status.style.color = '#00FF88';
+                updateAssetsUI('MetaMask (EVM)', account);
+                alert('Priscion Hub: MetaMask connected successfully.');
+                showWalletTab('assets');
+            } catch (err) {
+                status.innerHTML = '● MetaMask Refused';
+                status.style.color = '#FF4B2B';
+            }
+        } else {
+            alert('MetaMask not detected. Please install the extension.');
+        }
+    }
+
+    async function connectBinance() {
+        const status = document.getElementById('walletStatus');
+        status.innerHTML = '⚡ Syncing Binance...';
+        status.style.color = '#F3BA2F';
+
+        // Binance Smart Chain usually uses MetaMask or Binance Wallet
+        if (typeof window.ethereum !== 'undefined' || typeof window.BinanceChain !== 'undefined') {
+            const provider = window.ethereum || window.BinanceChain;
+            try {
+                const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                const account = accounts[0];
+                status.innerHTML = '● Binance Linked: ' + account.substring(0,8) + '...';
+                status.style.color = '#00FF88';
+                updateAssetsUI('Binance (BSC)', account);
+                alert('Priscion Hub: Binance Wallet connected successfully.');
+                showWalletTab('assets');
+            } catch (err) {
+                status.innerHTML = '● Binance Refused';
+                status.style.color = '#FF4B2B';
+            }
+        } else {
+            alert('Binance-compatible wallet not detected.');
         }
     }
     </script>
