@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelia Bubbles | Neural Cleanup</title>
+    <title>Atelia Bubbles | Neural Blast</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,49 +21,40 @@
         .logo-img { height: 40px; filter: drop-shadow(0 0 5px var(--red)); }
 
         #game-area {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(45deg, #050505 0%, #111 100%);
-            position: relative;
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            background: linear-gradient(180deg, #050505 0%, #1a1a1a 100%);
+            position: relative; overflow: hidden;
         }
 
-        #grid {
-            display: grid;
-            grid-template-columns: repeat(8, 50px);
-            grid-template-rows: repeat(8, 50px);
-            gap: 5px;
-            padding: 10px;
-            background: rgba(255,255,255,0.02);
-            border: 2px solid rgba(255,107,0,0.2);
-        }
-
+        #bubbles-container { position: absolute; top: 0; width: 100%; height: 70%; }
         .bubble {
-            width: 50px; height: 50px; border-radius: 50%;
-            cursor: pointer; transition: 0.2s;
-            border: 2px solid rgba(255,255,255,0.1);
-            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.5);
+            position: absolute; width: 40px; height: 40px; border-radius: 50%;
+            transition: transform 0.2s, top 0.5s;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .bubble:hover { transform: scale(1.1); z-index: 10; border-color: white; }
+        .bubble.dropping { transform: translateY(500px); opacity: 0; }
+        .bubble.bursting { transform: scale(1.5); opacity: 0; }
 
         .red { background: radial-gradient(circle at 30% 30%, #ff5555, #D32F2F); }
         .orange { background: radial-gradient(circle at 30% 30%, #ff9955, #FF6B00); }
         .blue { background: radial-gradient(circle at 30% 30%, #55aaff, #2979FF); }
         .purple { background: radial-gradient(circle at 30% 30%, #aa55ff, #6200EA); }
 
-        #ui {
-            position: absolute; top: 30px; right: 30px; text-align: right;
+        #car-launcher {
+            width: 150px; height: 200px;
+            background: url('https://priscadezigns.org/ateliagaming/assets/nova/nova_drive_v2.webp');
+            background-size: contain; background-repeat: no-repeat;
+            position: relative; z-index: 100; margin-bottom: 20px;
+            transition: transform 0.1s;
         }
+
+        #ui { position: absolute; top: 30px; right: 30px; text-align: right; }
         .score-box { font-family: 'Bangers'; font-size: 3rem; color: var(--white); }
-        .atlr-box { font-family: 'Russo One'; font-size: 1.2rem; color: var(--orange); }
-
-        #timer-bar {
-            width: 400px; height: 10px; background: #222; margin-top: 20px;
-            position: relative; overflow: hidden;
-        }
-        #timer-fill { height: 100%; width: 100%; background: var(--red); transition: linear; }
-
+        
         #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 100;
+            background: rgba(0,0,0,0.9); z-index: 200;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .btn {
@@ -71,29 +62,35 @@
             border: 3px solid white; font-family: 'Russo One'; font-size: 1.5rem;
             cursor: pointer; margin-top: 20px;
         }
+
+        #projectile {
+            position: absolute; width: 30px; height: 30px; border-radius: 50%;
+            z-index: 90; display: none;
+        }
     </style>
 </head>
 <body>
 
     <nav>
         <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
-        <div style="font-family:'Russo One'; font-size:1.2rem; color:var(--red);">ATELIA BUBBLES</div>
+        <div style="font-family:'Russo One'; font-size:1.2rem; color:var(--red);">NEURAL BLAST</div>
     </nav>
 
     <div id="game-area">
         <div id="ui">
             <div class="score-box" id="score">000</div>
-            <div class="atlr-box"><img src="https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp" height="25"> <span id="atlr">0</span> EARNED</div>
+            <div style="font-family:'Bangers'; color:var(--orange); font-size:1.5rem;">+<span id="atlr">0</span> ATLR</div>
         </div>
 
-        <div id="grid"></div>
-
-        <div id="timer-bar"><div id="timer-fill"></div></div>
+        <div id="bubbles-container"></div>
+        
+        <div id="projectile"></div>
+        <div id="car-launcher"></div>
 
         <div id="overlay">
-            <h1 style="font-family:'Bangers'; font-size:5rem;">NEURAL CLEANUP</h1>
-            <p style="font-family:'Russo One'; color:var(--orange);">MATCH COLORS TO CLEAR DEBRIS</p>
-            <button class="btn" onclick="start()">START PROTOCOL</button>
+            <h1 style="font-family:'Bangers'; font-size:5rem; margin:0;">NEURAL BLAST</h1>
+            <p style="font-family:'Russo One'; color:var(--orange);">CLEAR THE NETWORK · SECURE ATLR</p>
+            <button class="btn" onclick="start()">INITIATE CLEANUP</button>
         </div>
     </div>
 
@@ -101,65 +98,128 @@
     <script src="/ateliagaming/js/atelia_supabase.js"></script>
     <script>
         const colors = ['red', 'orange', 'blue', 'purple'];
-        let score = 0, atlr = 0, timeLeft = 60, active = false;
+        let score = 0, atlr = 0, active = false;
+        const container = document.getElementById('bubbles-container');
+        const launcher = document.getElementById('car-launcher');
+        const projectile = document.getElementById('projectile');
+        let projX, projY, projColor;
 
-        function createGrid() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
-            for(let i=0; i<64; i++) {
-                const b = document.createElement('div');
-                b.className = 'bubble ' + colors[Math.floor(Math.random()*colors.length)];
-                b.onclick = () => pop(b);
-                grid.appendChild(b);
+        function createBubbles() {
+            container.innerHTML = '';
+            for(let r=0; r<5; r++) {
+                for(let c=0; c<12; c++) {
+                    const b = document.createElement('div');
+                    b.className = 'bubble ' + colors[Math.floor(Math.random()*colors.length)];
+                    b.style.left = (c * 8) + '%';
+                    b.style.top = (r * 50) + 'px';
+                    b.dataset.row = r;
+                    b.dataset.col = c;
+                    container.appendChild(b);
+                }
             }
-        }
-
-        function pop(el) {
-            if(!active) return;
-            const color = el.className.split(' ')[1];
-            el.style.transform = 'scale(0)';
-            score += 10;
-            atlr = Math.floor(score / 50);
-            document.getElementById('score').innerText = score.toString().padStart(3, '0');
-            document.getElementById('atlr').innerText = atlr;
-            
-            setTimeout(() => {
-                el.className = 'bubble ' + colors[Math.floor(Math.random()*colors.length)];
-                el.style.transform = 'scale(1)';
-            }, 500);
         }
 
         function start() {
-            score = 0; atlr = 0; timeLeft = 60; active = true;
+            score = 0; atlr = 0; active = true;
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('score').innerText = '000';
             document.getElementById('atlr').innerText = '0';
-            createGrid();
-            tick();
+            createBubbles();
+            readyProjectile();
         }
 
-        function tick() {
+        function readyProjectile() {
+            projColor = colors[Math.floor(Math.random()*colors.length)];
+            projectile.className = projColor;
+            projectile.style.display = 'block';
+            projX = window.innerWidth / 2 - 15;
+            projY = window.innerHeight - 200;
+            updateProj();
+        }
+
+        function updateProj() {
+            projectile.style.left = projX + 'px';
+            projectile.style.top = projY + 'px';
+        }
+
+        window.addEventListener('mousemove', e => {
             if(!active) return;
-            timeLeft -= 0.1;
-            document.getElementById('timer-fill').style.width = (timeLeft / 60 * 100) + '%';
-            
-            if(timeLeft <= 0) {
-                active = false;
-                end();
-            } else {
-                setTimeout(tick, 100);
+            const angle = (e.clientX - window.innerWidth/2) / 20;
+            launcher.style.transform = `rotate(${angle}deg)`;
+        });
+
+        window.addEventListener('click', e => {
+            if(!active || projectile.dataset.firing === 'true') return;
+            const targetX = e.clientX;
+            const targetY = e.clientY;
+            fire(targetX, targetY);
+        });
+
+        function fire(tx, ty) {
+            projectile.dataset.firing = 'true';
+            const dx = tx - projX;
+            const dy = ty - projY;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const vx = (dx / dist) * 15;
+            const vy = (dy / dist) * 15;
+
+            function move() {
+                if(!active) return;
+                projX += vx;
+                projY += vy;
+                updateProj();
+
+                if(projY < 0 || projX < 0 || projX > window.innerWidth) {
+                    resetProjectile();
+                    return;
+                }
+
+                // Collision
+                const bubbles = document.querySelectorAll('.bubble:not(.bursting):not(.dropping)');
+                bubbles.forEach(b => {
+                    const rect = b.getBoundingClientRect();
+                    if(projX + 15 > rect.left && projX + 15 < rect.right && projY < rect.bottom) {
+                        if(b.classList.contains(projColor)) {
+                            burst(b);
+                            score += 50;
+                            atlr = Math.floor(score / 100);
+                            document.getElementById('score').innerText = score.toString().padStart(3, '0');
+                            document.getElementById('atlr').innerText = atlr;
+                        }
+                        resetProjectile();
+                        return;
+                    }
+                });
+
+                if(projectile.dataset.firing === 'true') requestAnimationFrame(move);
             }
+            move();
+        }
+
+        function burst(el) {
+            el.classList.add('bursting');
+            // Drop neighbors logic (simplified)
+            const row = parseInt(el.dataset.row);
+            const col = parseInt(el.dataset.col);
+            const others = document.querySelectorAll('.bubble:not(.bursting)');
+            others.forEach(o => {
+                if(Math.random() > 0.8) o.classList.add('dropping');
+            });
+            setTimeout(() => el.remove(), 500);
+        }
+
+        function resetProjectile() {
+            projectile.dataset.firing = 'false';
+            readyProjectile();
         }
 
         async function end() {
+            active = false;
             document.getElementById('overlay').style.display = 'flex';
-            document.getElementById('overlay').querySelector('h1').innerText = 'MISSION COMPLETE';
-            document.getElementById('overlay').querySelector('p').innerText = 'YOU EARNED ' + atlr + ' ATLR';
+            document.getElementById('overlay').querySelector('h1').innerText = 'CLEANUP COMPLETE';
             if(window.Atelia) {
-                const user = await Atelia.auth.getUser();
-                if(user.data.user) {
-                    await Atelia.arena.updatePrestige(user.data.user.id, atlr);
-                }
+                const u = await Atelia.auth.getUser();
+                if(u.data.user) await Atelia.arena.updatePrestige(u.data.user.id, atlr);
             }
         }
     </script>
