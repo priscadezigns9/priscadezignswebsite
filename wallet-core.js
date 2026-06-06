@@ -30,6 +30,21 @@ window.addEventListener('load', () => {
 /* Sovereign Wallet Core v5.5.0 [Absolute Integrity & Private Layer] */
 
 // Persistent State
+
+// Search-to-Earn Counter
+let searchCount = parseInt(localStorage.getItem('prn_search_count')) || 0;
+
+function recordSearch() {
+    searchCount++;
+    localStorage.setItem('prn_search_count', searchCount);
+    
+    if(searchCount >= 5) {
+        earnPRN(0.05, 'Neural Synthesis Batch');
+        searchCount = 0;
+        localStorage.setItem('prn_search_count', 0);
+    }
+}
+
 let WALLETS = JSON.parse(localStorage.getItem('prn_wallets')) || [
     { name: 'Mother Node', handle: '$prisca.prn', address: 'addr1q8...prisca', balance: 2540.00 },
     { name: 'Business Node', handle: '$priscion.prn', address: 'addr1q9...priscion', balance: 15000.00 }
@@ -40,8 +55,8 @@ let developerMode = localStorage.getItem('prn_dev_mode') === 'true';
 let privacyShield = localStorage.getItem('prn_privacy_shield') === 'true';
 
 const ASSETS_DATA = [
-    { id: 'prn', name: 'PRISCION ($PRN)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/prn_coin.png' },
-    { id: 'nrl', name: 'NEURAL ($NRL)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/nrl_coin.png' },
+    { id: 'prn', name: 'PRISCION ($PRN)', logo: '/assets/coins/prn_coin.png' },
+    { id: 'nrl', name: 'NEURAL ($NRL)', logo: '/assets/coins/nrl_coin.png' },
     { id: 'atlr', name: 'ATELIA ($ATLR)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/atlr_coin.png' },
     { id: 'musd', name: 'MUSTARD ($MUSD)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/musd_coin.png' },
     { id: 'jello', name: 'JELLO ($JELLO)', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/jello_coin.png' }
@@ -188,10 +203,42 @@ function renderVaultView() {
     });
 }
 
+
 function renderHubView() {
     const view = document.getElementById('wallet-main-view');
-    const brands = [
-        { name: "Dreaming Anime", url: "/dreaminganime/", desc: "Media & Cinema Node" },
+    view.innerHTML = '<div style="padding:40px; color:#444; font-size:0.65rem; text-align:center;">SYNCING HUB...</div>';
+    
+    fetch('/vault_manifest.json').then(r => r.json()).then(data => {
+        const nodes = data.filter(i => i.type === 'Empire/Node');
+        view.innerHTML = `
+            <div style="padding:20px;">
+                <h2 style="color:white; font-size:1.2rem; margin-bottom:20px; font-family:'Playfair Display';">Empire Hub</h2>
+                <div style="font-size:0.5rem; color:#444; margin-bottom:15px; text-transform:uppercase; letter-spacing:1px;">Sovereign Ledger Nodes</div>
+                ${nodes.map(n => `
+                    <div onclick="navigateToSovereignNode('${n.handle}')" style="background:#080808; padding:18px; border-radius:15px; margin-bottom:12px; border:1px solid #222; cursor:pointer; transition:0.3s;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="color:white; font-weight:800; font-size:0.75rem;">${n.name}</div>
+                                <div style="color:#7B35D4; font-size:0.55rem; margin-top:4px; font-family:'Space Mono';">${n.handle}</div>
+                            </div>
+                            <div style="font-size:0.45rem; color:#00FF88; background:rgba(0,255,136,0.05); padding:4px 8px; border-radius:4px; font-weight:900;">ONLINE</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    });
+}
+
+function navigateToSovereignNode(handle) {
+    const path = handle.replace('$', '').replace('.prn', '');
+    // Earn for cross-node navigation
+    if(typeof earnPRN === 'function') earnPRN(0.01, 'Node Handshake');
+    setTimeout(() => {
+        window.location.href = '/' + path + '/';
+    }, 300);
+}
+,
         { name: "Atelia Gaming", url: "/ateliagaming/", desc: "Gaming Lab Node" },
         { name: "Nurasen", url: "/nurasen/", desc: "Cybersecurity Node" },
         { name: "Calalloo", url: "/calalloo/", desc: "Heritage Node" },
@@ -286,3 +333,4 @@ style.textContent = `
     input:checked + .slider:before { transform: translateX(20px); }
 `;
 document.head.appendChild(style);
+
