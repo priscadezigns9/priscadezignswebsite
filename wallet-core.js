@@ -70,7 +70,7 @@ function renderAssetsView() {
             
             <div style="background:linear-gradient(135deg, #7B35D4 0%, #4c1d95 100%); padding:25px; border-radius:24px; color:white; margin-bottom:25px; box-shadow:0 10px 30px rgba(123,53,212,0.3);">
                 <div style="font-size:0.6rem; text-transform:uppercase; opacity:0.7; margin-bottom:8px; font-weight:700;">Net Worth</div>
-                <div style="font-size:2.2rem; font-weight:900; margin-bottom:20px;">$4,240.50</div>
+                <div style="font-size:2.2rem; font-weight:900; margin-bottom:20px;">--.-- $MUSD</div>
                 <div style="display:flex; gap:8px;">
                     <button class="btn-action" onclick="renderSendView()">SEND</button>
                     <button class="btn-action" onclick="renderReceiveView()">RECEIVE</button>
@@ -209,8 +209,8 @@ function renderStakingView() {
             
             <div style="background:linear-gradient(135deg, #00ff88 0%, #00a058 100%); padding:25px; border-radius:24px; color:white; margin-bottom:25px;">
                 <div style="font-size:0.6rem; text-transform:uppercase; opacity:0.8; font-weight:800;">APY Rewards</div>
-                <div style="font-size:2.5rem; font-weight:900;">12.5%</div>
-                <div style="font-size:0.7rem; margin-top:10px;">Current Staked: 5,000 $PRN</div>
+                <div style="font-size:2.5rem; font-weight:900;">--.-%</div>
+                <div style="font-size:0.7rem; margin-top:10px;">Current Staked: 0 $PRN</div>
             </div>
             
             <div style="background:#111; padding:25px; border-radius:24px; border:1px solid #222;">
