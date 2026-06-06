@@ -45,6 +45,10 @@
         .ep-card .t { font-weight: 900; font-size: 0.9rem; text-transform: uppercase; }
 
         footer { text-align: center; padding: 60px 0; border-top: 1px solid #111; font-family: 'Space Mono'; font-size: 0.7rem; opacity: 0.5; margin-top: 60px; }
+    
+        .theater-viewport { position: relative; }
+        .theater-viewport.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 20000; border: none; background: #000; }
+        .fs-btn { position: absolute; bottom: 20px; right: 20px; background: var(--accent); color: #fff; border: none; padding: 10px 15px; font-family: 'Space Mono'; font-size: 0.7rem; font-weight: 900; cursor: pointer; z-index: 101; }
     </style>
 </head>
 <body>
@@ -157,9 +161,32 @@
             `).join('');
         }
 
+        
         function play(u, n){
             const v = document.getElementById('theater');
-            v.innerHTML = `<video controls autoplay poster="../assets/p-logo.png"><source src="${u}" type="video/mp4"></video><div style="position:absolute;bottom:20px;left:20px;font-family:'Space Mono';font-size:.7rem;background:rgba(0,0,0,0.8);padding:10px;border:1px solid var(--accent);z-index:100;">NOW STREAMING: ${n}</div>`;
+            v.innerHTML = `
+                <video id="main-video" controls autoplay poster="../assets/p-logo.png" style="width:100%; height:100%;">
+                    <source src="${u}" type="video/mp4">
+                </video>
+                <button class="fs-btn" onclick="toggleFS()">FULLSCREEN</button>
+                <div id="stream-tag" style="position:absolute;bottom:20px;left:20px;font-family:'Space Mono';font-size:.7rem;background:rgba(0,0,0,0.8);padding:10px;border:1px solid var(--accent);z-index:100;">NOW STREAMING: ${n}</div>
+            `;
+            closeOverlay();
+            v.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleFS(){
+            const v = document.getElementById('theater');
+            v.classList.toggle('fullscreen');
+            const btn = v.querySelector('.fs-btn');
+            btn.innerText = v.classList.contains('fullscreen') ? 'EXIT FULLSCREEN' : 'FULLSCREEN';
+            if (v.classList.contains('fullscreen')) {
+                if (v.requestFullscreen) v.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+    " type="video/mp4"></video><div style="position:absolute;bottom:20px;left:20px;font-family:'Space Mono';font-size:.7rem;background:rgba(0,0,0,0.8);padding:10px;border:1px solid var(--accent);z-index:100;">NOW STREAMING: ${n}</div>`;
             closeOverlay();
             v.scrollIntoView({ behavior: 'smooth' });
             if(typeof recordSearch === 'function') recordSearch();
@@ -174,3 +201,4 @@
     </script>
 </body>
 </html>
+
