@@ -10,26 +10,18 @@
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
         header { padding: 15px 5%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #111; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 1000; }
         .logo-img { width: 32px; height: 32px; cursor: pointer; }
-        .search-wrap { flex: 1; position: relative; }
         .search-input { width: 100%; background: #0D0D0D; border: 1px solid #222; border-radius: 100px; padding: 12px 25px 12px 50px; color: white; font-size: 0.9rem; outline: none; transition: 0.3s; box-sizing: border-box; }
-        .search-input:focus { border-color: var(--accent); }
         .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #444; font-size: 0.8rem; }
         .stats-bar { background: #000; padding: 6px 20px; font-size: 0.5rem; font-family: 'Space Mono'; font-weight: 800; color: #444; border-bottom: 1px solid #111; display: flex; justify-content: space-between; }
         .active-sig { color: var(--green); }
         .results-container { padding: 30px 5%; flex: 1; max-width: 900px; margin: 0 auto; width: 95%; }
-        .neural-processing { text-align: center; padding: 100px 20px; display: none; }
-        .neural-processing.active { display: block; }
-        .p-step { font-family: 'Space Mono'; font-size: 0.6rem; letter-spacing: 2px; color: #444; margin: 10px 0; }
-        .p-step.active { color: var(--accent); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
         .result-card { background: var(--card); border: 1px solid #111; border-radius: 16px; padding: 25px; margin-bottom: 20px; transition: 0.3s; display: block; text-decoration: none; color: white; position: relative; overflow: hidden; }
         .result-card:hover { border-color: var(--accent); background: #0D0D0D; transform: translateY(-3px); }
         .res-type { font-family: 'Space Mono'; font-size: 0.5rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; display: flex; justify-content: space-between; }
         .res-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .res-url { font-size: 0.7rem; color: var(--green); margin-bottom: 10px; font-family: 'Space Mono'; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .res-handle { font-size: 0.7rem; color: var(--green); margin-bottom: 10px; font-family: 'Space Mono'; font-weight: 900; }
         .res-desc { font-size: 0.85rem; color: #888; line-height: 1.6; }
         .v-badge { padding: 4px 10px; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.2); color: var(--green); border-radius: 4px; font-size: 0.5rem; font-weight: 900; }
-        .w2-badge { padding: 4px 10px; background: rgba(255,255,255,0.05); border: 1px solid #222; color: #555; border-radius: 4px; font-size: 0.5rem; font-weight: 900; }
         .ai-summary { background: linear-gradient(135deg, #111 0%, #050505 100%); border: 1px solid #222; border-left: 4px solid var(--accent); padding: 25px; border-radius: 12px; margin-bottom: 40px; position: relative; }
         .ai-summary::before { content: 'AI SYNTHESIS'; position: absolute; top: -10px; left: 20px; background: var(--accent); color: white; padding: 2px 10px; font-size: 0.5rem; font-weight: 900; border-radius: 4px; font-family: 'Space Mono'; }
         .ai-text { font-size: 0.9rem; color: #aaa; line-height: 1.7; }
@@ -38,62 +30,53 @@
 </head>
 <body>
     <div class='stats-bar'>
-        <div><span class='active-sig'>●</span> NURASEN P2P MESH ACTIVE</div>
-        <div>BLOCK: #2026-GENESIS |  REWARDS: +0.01</div>
+        <div><span class='active-sig'>●</span> SOVEREIGN HANDLE RESOLVER ACTIVE</div>
+        <div>LEDGER: PRISCION-MAINNET | REWARDS: +0.01 PRN</div>
     </div>
     <header>
         <a href='/leggo.html'><img src='/assets/leggo-logo.png' class='logo-img' alt='LEGGO'></a>
-        <div class='search-wrap'>
+        <div style='flex:1; position:relative;'>
             <span class='search-icon'>⚡</span>
-            <input type='text' id='q' class='search-input' onkeyup='handleNewSearch(event)' placeholder='Execute Neural Command...'>
+            <input type='text' id='q' class='search-input' onkeyup='handleNewSearch(event)' placeholder='Resolve Handle...'>
         </div>
     </header>
-    <div class='results-container'>
-        <div id='neural-steps' class='neural-processing'>
-            <div id='step-1' class='p-step'>[1/3] DECRYPTING REQUEST...</div>
-            <div id='step-2' class='p-step'>[2/3] SCANNING BLOCKCHAIN...</div>
-            <div id='step-3' class='p-step'>[3/3] SYNTHESIZING WWW...</div>
-        </div>
-        <div id='results-view'>
-            <div class='empty-view'>AWAITING COMMAND...</div>
-        </div>
+    <div class='results-container' id='results-view'>
+        <div class='empty-view'>AWAITING NEURAL COMMAND...</div>
     </div>
     <script>
         const params = new URLSearchParams(window.location.search);
         const query = (params.get('q') || '').toLowerCase();
         const input = document.getElementById('q');
         const resultsView = document.getElementById('results-view');
-        const neuralSteps = document.getElementById('neural-steps');
-        if(query) { input.value = query; runNeuralSearch(query); }
-        async function runNeuralSearch(q) {
-            resultsView.innerHTML = ''; neuralSteps.classList.add('active');
-            const steps = ['step-1', 'step-2', 'step-3'];
-            for(let i=0; i<steps.length; i++) {
-                document.getElementById(steps[i]).classList.add('active');
-                await new Promise(r => setTimeout(r, 500));
-            }
-            neuralSteps.classList.remove('active');
+
+        if(query) {
+            input.value = query;
+            runHandleSearch(query);
+        }
+
+        async function runHandleSearch(q) {
             const brands = [
-                { name: 'Dreaming Anime', url: 'https://dreaminganime.com', desc: 'Sovereign Cinema and Manga Vault.', category: 'Empire Hub' },
-                { name: 'The Way Made Known', url: 'https://thewaymadeknown.org', desc: 'Biblical Apologetics and Mission backbone.', category: 'Mission Node' },
-                { name: 'Atelia Gaming', url: 'https://ateliagaming.com', desc: 'High-fidelity PC gaming and engineering.', category: 'Engineering' }
+                { name: 'Dreaming Anime', handle: '.prn', path: 'dreaminganime', desc: 'Sovereign Cinema and Manga Vault.', category: 'Empire Hub' },
+                { name: 'The Way Made Known', handle: '.prn', path: 'thewaymadeknown', desc: 'Biblical Apologetics and Gospel Mission.', category: 'Foundation Node' },
+                { name: 'Atelia Gaming', handle: '.prn', path: 'ateliagaming', desc: 'High-fidelity PC gaming and hardware engineering.', category: 'Engineering' },
+                { name: 'Riddiim', handle: '.prn', path: 'riddiim', desc: 'Digital music super-app and audio engineering.', category: 'Media Node' },
+                { name: 'D Panyard', handle: '.prn', path: 'dpanyard', desc: 'Caribbean cultural gateway and business platform.', category: 'Cultural Node' },
+                { name: 'Nurasen', handle: '.prn', path: 'nurasen', desc: 'Neural cybersecurity and digital defense.', category: 'Security Node' }
             ];
-            const internals = brands.filter(b => b.name.toLowerCase().includes(q));
-            const web = [
-                { title: 'Global Signal: ' + q, url: 'https://duckduckgo.com/?q=' + encodeURIComponent(q), desc: 'Real-time global signals synthesized from 10,000+ verified nodes.' }
-            ];
-            renderResults(internals, web, q);
+
+            const matches = brands.filter(b => b.name.toLowerCase().includes(q) || b.handle.toLowerCase().includes(q));
+            
+            if(matches.length > 0) {
+                let h = '<div class='ai-summary'><div class='ai-text'>Sovereign Handles detected. Resolving results to LEGGO Explorer nodes. All traffic funneled through the Priscion Ledger.</div></div>';
+                matches.forEach(m => {
+                    h += '<a href="/leggo.html?node=' + m.handle + '" class='result-card'><div class='res-type'><span>' + m.category + '</span><span class='v-badge'>LEDGER VERIFIED</span></div><div class='res-title'>' + m.name + '</div><div class='res-handle'>' + m.handle + '</div><div class='res-desc'>' + m.desc + '</div></a>';
+                });
+                resultsView.innerHTML = h;
+            } else {
+                resultsView.innerHTML = '<div class='empty-view'>NO SOVEREIGN HANDLES FOUND FOR "' + q + '"</div>';
+            }
         }
-        function renderResults(internals, web, q) {
-            let h = '<div class='ai-summary'><div class='ai-text'>I have indexed the Ledger and synthesized global signals for "' + q + '". Your privacy tunnel is active.</div></div>';
-            internals.forEach(b => {
-                h += '<a href="' + b.url + '" class='result-card'><div class='res-type'><span>' + b.category + '</span><span class='v-badge'>VERIFIED SOVEREIGN</span></div><div class='res-title'>' + b.name + '</div><div class='res-url'>' + b.url + '</div><div class='res-desc'>' + b.desc + '</div></a>';
-            });
-            web.forEach(w => {
-                h += '<a href="' + w.url + '" class='result-card' target='_blank'><div class='res-type'><span>Global Signal</span><span class='w2-badge'>WEB2 TUNNEL</span></div><div class='res-title'>' + w.title + '</div><div class='res-url'>' + w.url + '</div><div class='res-desc'>' + w.desc + '</div></a>';
-            });
-            resultsView.innerHTML = h;
-        }
+
         function handleNewSearch(e) { if(e.key === 'Enter') { window.location.href = 'search.html?q=' + encodeURIComponent(e.target.value); } }
     </script>
 </body>
