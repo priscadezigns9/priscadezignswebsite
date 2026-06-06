@@ -1,4 +1,4 @@
-/* Sovereign Wallet Core v5.0.0 [High-Fidelity Evolution] */
+/* Sovereign Wallet Core v5.1.0 [High-Fidelity Neural Overhaul] */
 
 const WALLETS = [
     { name: 'Mother Node', handle: '$prisca.prn', address: 'addr1q8...prisca' },
@@ -6,12 +6,14 @@ const WALLETS = [
 ];
 
 let currentWalletIndex = 0;
+let developerMode = false;
 
+// High-Fidelity Asset Data with Correct Coin Images
 const ASSETS_DATA = [
-    { id: 'prn', name: 'PRISCION ($PRN)', balance: '2,540.00', usd: '$2,540.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg' },
-    { id: 'nrl', name: 'NEURAL ($NRL)', balance: '15,000', usd: '$15,000', logo: 'https://drive.google.com/uc?export=view&id=1To_XBjrXDO6ZRoQ2YzTleweTg6sEHgOL' },
-    { id: 'atlr', name: 'ATELIA ($ATLR)', balance: '82,400', usd: '$2,472.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/atelia_logo.webp' },
-    { id: 'musd', name: 'MUSTARD ($MUSD)', balance: '867.85', usd: '$867.85', logo: 'https://drive.google.com/uc?export=view&id=1RJfigGY8p5kg0-4WV8_DExrDd4Hj2mtz' }
+    { id: 'prn', name: 'PRISCION ($PRN)', balance: '2,540.00', usd: '$2,540.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/prn_coin.png' },
+    { id: 'nrl', name: 'NEURAL ($NRL)', balance: '15,000', usd: '$15,000', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/nrl_coin.png' },
+    { id: 'atlr', name: 'ATELIA ($ATLR)', balance: '82,400', usd: '$2,472.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/atlr_coin.png' },
+    { id: 'musd', name: 'MUSTARD ($MUSD)', balance: '867.85', usd: '$867.85', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/musd_coin.png' }
 ];
 
 const EMPIRE_NODES = [
@@ -19,25 +21,15 @@ const EMPIRE_NODES = [
     { name: 'DREAMING', handle: '$dreaming.prn', url: '/dreaminganime/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/dreaming_logo.jpg', icon: '⛩️' },
     { name: 'RIDDIIM', handle: '$riddiim.prn', url: '/riddiim/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/riddiim_logo.png', icon: '🎵' },
     { name: 'CALALLOO', handle: '$calalloo.prn', url: '/calalloo/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/calalloo_logo.png', icon: '🍲' },
-    { name: 'NURASEN', handle: '$nurasen.prn', url: '/nurasen/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg', icon: '🛡️' },
-    { name: 'VERDANT', handle: '$verdant.prn', url: '/verdantco/', icon: '🌱' },
-    { name: 'GLOW', handle: '$glow.prn', url: '/glowprotocol/', icon: '🧴' },
-    { name: 'SOLE', handle: '$sole.prn', url: '/soleprestige/', icon: '👟' },
-    { name: 'ESSENCE', handle: '$essence.prn', url: '/essenceelite/', icon: '✨' },
-    { name: 'AUTODROME', handle: '$autodrome.prn', url: '/theautodrome/', icon: '🏎️' },
-    { name: 'PEAK FIT', handle: '$peakfit.prn', url: '/peakfit/', icon: '⚡' },
-    { name: 'ESCAPIST', handle: '$escapist.prn', url: '/theescapist/', icon: '🏝️' },
-    { name: 'TECH SCOUT', handle: '$techscout.prn', url: '/techscout/', icon: '🔭' },
-    { name: 'WATCHLIST', handle: '$watchlist.prn', url: '/thewatchlist/', icon: '⌚' },
-    { name: 'PRIME LAND', handle: '$primeland.prn', url: '/primelandnetwork/', icon: '🏢' },
-    { name: 'QUIET LUXURY', handle: '$quietluxury.prn', url: '/quietluxury/', icon: '🛋️' },
-    { name: 'COUTURE', handle: '$couture.prn', url: '/couturegallery/', icon: '👜' },
-    { name: 'PAW VAULT', handle: '$pawvault.prn', url: '/pawvault/', icon: '🐾' },
-    { name: 'PANTRIQ', handle: '$pantriq.prn', url: '/pantriq/', icon: '🍳' },
-    { name: 'SHELFLY', handle: '$shelfly.prn', url: '/shelfly/', icon: '📚' },
-    { name: 'DESKWELL', handle: '$deskwell.prn', url: '/deskwell/', icon: '🪑' },
-    { name: 'GEN PLAY', handle: '$genplay.prn', url: '/thegenplay/', icon: '🧩' },
-    { name: 'DUMPLING', handle: '$dumpling.prn', url: '/mybabydumpling/', icon: '👶' }
+    { name: 'NURASEN', handle: '$nurasen.prn', url: '/nurasen/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg', icon: '🛡️' }
+];
+
+const SAAS_NODES = [
+    { name: 'CUPYX', handle: '$cupyx.prn', url: '/cupyx/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/cupyx_logo.png', icon: '☕' },
+    { name: 'MOBLYNC', handle: '$moblync.prn', url: '/moblync/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/moblync_logo.png', icon: '📱' },
+    { name: 'KARJOV', handle: '$karjov.prn', url: '/karjov/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/karjov_logo.png', icon: '⚔️' },
+    { name: 'ROWCELL', handle: '$rowcell.prn', url: '/rowcell/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/rowcell_logo.png', icon: '🌹' },
+    { name: 'VELLOQ', handle: '$velloq.prn', url: '/velloq/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/velloq_logo.png', icon: '⚡' }
 ];
 
 function initializeWallet(containerId) {
@@ -48,62 +40,6 @@ function initializeWallet(containerId) {
     if(!hasPin) renderOnboarding(sidebar);
     else if(!isSess) renderAuth(sidebar);
     else renderWalletMain(sidebar);
-}
-
-function renderOnboarding(sidebar) {
-    const content = sidebar.querySelector('.sidebar-content');
-    content.innerHTML = `
-        <div style="text-align:center; padding:60px 25px;">
-            <div class="hologram-glow" style="width:100px; height:100px; margin:0 auto 30px; border-radius:50%; background:url('https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg') center/cover;"></div>
-            <h2 style="font-family:'Playfair Display'; margin-bottom:15px; color:white; font-size:1.8rem;">Sovereign Identity</h2>
-            <p style="color:#888; font-size:0.8rem; margin-bottom:40px;">Initialize your neural handshake on the Priscion Ledger.</p>
-            <button onclick="startWalletCreation()" class="btn btn-primary" style="width:100%; margin-bottom:15px; padding:18px;">CREATE IDENTITY</button>
-            <button onclick="startRestore()" class="btn btn-outline" style="width:100%; padding:18px;">RESTORE VAULT</button>
-        </div>
-    `;
-}
-
-function startWalletCreation() {
-    const seed = "nebula orbit galaxy pulse neural ledger sovereign mustard architect high fidelity empire";
-    const content = document.getElementById('sidebar').querySelector('.sidebar-content');
-    content.innerHTML = `
-        <div style="text-align:center; padding:30px 20px;">
-            <h3 style="margin-bottom:20px; color:white;">Neural Seed Phrase</h3>
-            <div style="background:#050505; padding:25px; border-radius:20px; border:1px solid #7B35D4; font-family:'Space Mono'; font-size:0.75rem; display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:30px; text-align:left;">
-                ${seed.split(' ').map((w, i) => `<span style="color:#aaa;"><b style="color:#7B35D4;">${i+1}.</b> ${w}</span>`).join('')}
-            </div>
-            <input type="password" id="new-pin" placeholder="Create 4-Digit PIN" maxlength="4" style="width:100%; padding:18px; background:#111; border:1px solid #222; border-radius:15px; color:white; text-align:center; margin-bottom:25px; font-size:1.5rem;">
-            <button onclick="finalizeCreation('${seed}')" class="btn btn-primary" style="width:100%; padding:18px;">FINALIZE IDENTITY</button>
-        </div>
-    `;
-}
-
-function finalizeCreation(seed) {
-    const pin = document.getElementById('new-pin').value;
-    if(pin.length < 4) { alert("PIN must be 4 digits."); return; }
-    localStorage.setItem('priscion_pin', pin);
-    localStorage.setItem('priscion_seed', seed);
-    sessionStorage.setItem('prn_sess', '1');
-    renderWalletMain(document.getElementById('sidebar'));
-}
-
-function renderAuth(sidebar) {
-    const content = sidebar.querySelector('.sidebar-content');
-    content.innerHTML = `
-        <div style="text-align:center; padding:80px 30px;">
-            <div class="hologram-glow" style="width:80px; height:80px; margin:0 auto 40px; border-radius:50%; background:url('https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg') center/cover; border:2px solid #7B35D4;"></div>
-            <h2 style="font-family:'Playfair Display'; margin-bottom:40px; color:white;">Unlock Vault</h2>
-            <input type="password" id="auth-pin" placeholder="••••" maxlength="4" style="width:100%; padding:20px; background:#111; border:1px solid #222; border-radius:15px; color:white; text-align:center; margin-bottom:40px; font-size:2rem; letter-spacing:10px;">
-            <button onclick="checkAuthPin()" class="btn btn-primary" style="width:100%; padding:18px;">UNLOCK</button>
-        </div>
-    `;
-}
-
-function checkAuthPin() {
-    if(document.getElementById('auth-pin').value === localStorage.getItem('priscion_pin')) {
-        sessionStorage.setItem('prn_sess', '1');
-        renderWalletMain(document.getElementById('sidebar'));
-    } else { alert("Handshake Failed. Incorrect PIN."); }
 }
 
 function renderWalletMain(sidebar) {
@@ -118,17 +54,17 @@ function renderAssetsView() {
     view.innerHTML = `
         <div style="padding:20px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:30px;">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <div onclick="openVaultForPFP()" style="width:55px; height:55px; border-radius:50%; border:2px solid #7B35D4; overflow:hidden; cursor:pointer; background:#000;">
+                <div style="display:flex; align-items:center; gap:15px; cursor:pointer;" onclick="renderMultiWalletView()">
+                    <div style="width:55px; height:55px; border-radius:50%; border:2px solid #7B35D4; overflow:hidden; background:#000;">
                         <img src="${pfp}" style="width:100%; height:100%; object-fit:cover;">
                     </div>
                     <div>
-                        <div style="font-weight:900; font-size:1.1rem; color:white; letter-spacing:0.5px;">${wallet.handle}</div>
-                        <div style="font-size:0.5rem; color:#7B35D4; text-transform:uppercase; font-weight:800;">${wallet.name} Active</div>
+                        <div id="wallet-handle-trigger" style="font-weight:900; font-size:1.1rem; color:white; letter-spacing:0.5px; border-bottom:1px dashed #444;">${wallet.handle}</div>
+                        <div style="font-size:0.5rem; color:#7B35D4; text-transform:uppercase; font-weight:800;">Node: ${wallet.name}</div>
                     </div>
                 </div>
-                <div onclick="renderMultiWalletView()" style="cursor:pointer; background:#111; padding:8px; border-radius:10px; border:1px solid #222;">
-                    🔄
+                <div onclick="window.open('/mint-live.html')" style="cursor:pointer; background:#111; padding:8px; border-radius:10px; border:1px solid #222;" title="Live Mint View (Pool.pm style)">
+                    📊
                 </div>
             </div>
             
@@ -149,7 +85,7 @@ function renderAssetsView() {
     document.getElementById('asset-list-container').innerHTML = ASSETS_DATA.map(a => `
         <div style="background:#111; border:1px solid rgba(255,255,255,0.03); border-radius:18px; padding:18px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <div style="display:flex; align-items:center; gap:12px;">
-                <img src="${a.logo}" style="width:32px; height:32px; border-radius:50%;">
+                <img src="${a.logo}" style="width:40px; height:40px; border-radius:50%;">
                 <div>
                     <div style="font-weight:800; font-size:0.75rem; color:white;">${a.name}</div>
                     <div style="font-size:0.55rem; color:#666;">${a.balance}</div>
@@ -202,7 +138,6 @@ function renderReceiveView() {
             
             <div style="background:#111; padding:30px; border-radius:24px; border:1px solid #222; text-align:center;">
                 <div style="background:white; padding:15px; border-radius:15px; width:180px; height:180px; margin:0 auto 25px;">
-                    <!-- QR Placeholder -->
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${wallet.address}" style="width:100%;">
                 </div>
                 
@@ -253,12 +188,11 @@ function renderSwapView() {
                         <select style="background:#111; border:none; color:white; font-weight:700;">
                             <option>NRL</option>
                             <option>ATLR</option>
-                            <option>SNEK</option>
                         </select>
                     </div>
                 </div>
                 
-                <button class="btn btn-primary" style="width:100%; padding:18px;" onclick="alert('Swap Executed on PRX (Priscion Exchange)')">SWAP ASSETS</button>
+                <button class="btn btn-primary" style="width:100%; padding:18px;" onclick="alert('Swap Executed on PRX.')">SWAP ASSETS</button>
             </div>
         </div>
     `;
@@ -280,8 +214,7 @@ function renderStakingView() {
             </div>
             
             <div style="background:#111; padding:25px; border-radius:24px; border:1px solid #222;">
-                <h3 style="color:white; font-size:0.9rem; margin-bottom:15px;">Participate in Governance</h3>
-                <p style="color:#666; font-size:0.65rem; margin-bottom:20px;">Lock your $PRN to secure the Mother Node and earn $NRL rewards.</p>
+                <h3 style="color:white; font-size:0.9rem; margin-bottom:15px;">Secure the Mother Node</h3>
                 <button class="btn btn-primary" style="width:100%; padding:15px;" onclick="alert('Staking Contract Anchored.')">STAKE $PRN</button>
             </div>
         </div>
@@ -314,6 +247,35 @@ function switchWallet(index) {
     renderAssetsView();
 }
 
+function renderSettingsView() {
+    const view = document.getElementById('wallet-main-view');
+    view.innerHTML = `
+        <div style="padding:20px;">
+            <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin-bottom:25px;">Sovereign Security</h2>
+            <div style="background:#111; border-radius:20px; overflow:hidden;">
+                <div class="settings-item">
+                    <span style="font-size:0.75rem; color:white;">Developer Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" ${developerMode ? 'checked' : ''} onchange="toggleDevMode()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="settings-item" onclick="alert('Hardware Bridge Initialized.')">
+                    <span style="font-size:0.75rem; color:white;">Connect Hardware Wallet</span>
+                </div>
+                <div class="settings-item" onclick="window.open('https://alexa.amazon.com')">
+                    <span style="font-size:0.75rem; color:white;">Link Alexa Neural Voice</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function toggleDevMode() {
+    developerMode = !developerMode;
+    alert(`Developer Mode: ${developerMode ? 'ENABLED' : 'DISABLED'}`);
+}
+
 async function renderVaultView() {
     const view = document.getElementById('wallet-main-view');
     view.innerHTML = `
@@ -322,8 +284,6 @@ async function renderVaultView() {
                 <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white;">Sovereign Vault</h2>
                 <button class="btn btn-primary" style="padding:8px 15px; font-size:0.5rem;" onclick="document.getElementById('vault-up-core').click()">+ ADD ASSET</button>
             </div>
-            <input type="file" id="vault-up-core" style="display:none;" onchange="alert('Asset Minted to Sovereign Ledger.')">
-            
             <div id="vault-items-grid-core" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div>
         </div>
     `;
@@ -332,24 +292,24 @@ async function renderVaultView() {
         const data = await resp.json();
         document.getElementById('vault-items-grid-core').innerHTML = data.map(item => `
             <div style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:15px; border-radius:20px; text-align:center; cursor:pointer;" onclick="window.open('${item.url}')">
-                <div style="font-size:1.8rem; margin-bottom:10px;">${item.type.includes('image') ? '🖼️' : (item.type.includes('pdf') ? '🪪' : '📄')}</div>
+                <div style="font-size:1.8rem; margin-bottom:10px;">${item.type.includes('image') ? '🖼️' : '📄'}</div>
                 <div style="font-size:0.55rem; font-weight:800; color:#fff;">${item.name}</div>
             </div>
         `).join('');
     } catch(e) {
-        document.getElementById('vault-items-grid-core').innerHTML = '<p style="color:#555; font-size:0.6rem; grid-column:span 2; text-align:center;">Vault Access Protocol Offline.</p>';
+        document.getElementById('vault-items-grid-core').innerHTML = '<p style="color:#555; font-size:0.6rem;">Vault Offline.</p>';
     }
 }
 
 function renderEmpireHub() {
     const view = document.getElementById('wallet-main-view');
     view.innerHTML = `
-        <div style="padding:20px; overflow-y:auto; height:100%;">
+        <div style="padding:20px;">
             <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin-bottom:20px;">Empire Hub</h2>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 ${EMPIRE_NODES.map(node => `
                     <a href="${node.url}" style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:20px; border-radius:22px; text-align:center; text-decoration:none; color:white; display:block;">
-                        ${node.logo ? `<img src="${node.logo}" style="width:45px; height:45px; border-radius:50%; border:2px solid #7B35D4; margin-bottom:12px;">` : `<div style="font-size:2rem; margin-bottom:12px;">${node.icon}</div>`}
+                        <img src="${node.logo}" style="width:45px; height:45px; border-radius:50%; border:2px solid #7B35D4; margin-bottom:12px;">
                         <div style="font-size:0.65rem; font-weight:900;">${node.name}</div>
                     </a>
                 `).join('')}
@@ -372,40 +332,17 @@ function switchWalletTabCore(tab) {
     if(tab === 'sync') renderSettingsView();
 }
 
-function renderSettingsView() {
-    const view = document.getElementById('wallet-main-view');
-    view.innerHTML = `
-        <div style="padding:20px;">
-            <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin-bottom:25px;">Sovereign Security</h2>
-            <div style="background:#111; border-radius:20px; overflow:hidden;">
-                <div class="settings-item" onclick="alert('Hardware Bridge Initialized.')">
-                    <span style="font-size:0.75rem; color:white;">Connect Ledger Hardware</span>
-                    <span style="color:#7B35D4; font-size:0.6rem;">OFFLINE</span>
-                </div>
-                <div class="settings-item" onclick="alert('Nurasen Shield Active')">
-                    <span style="font-size:0.75rem; color:white;">Neural Firewall</span>
-                    <span style="color:#00ff88; font-size:0.6rem;">ACTIVE</span>
-                </div>
-                <div class="settings-item" style="border-bottom:none;" onclick="alert('Identity Reset Initiated')">
-                    <span style="font-size:0.75rem; color:#ff4444;">Wipe All Wallets</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function openVaultForPFP() {
-    switchWalletTabCore('vault');
-}
-
-// Styles
+// Global Styles
 const style = document.createElement('style');
 style.textContent = `
     .btn-action { flex:1; background:rgba(255,255,255,0.1); border:none; color:white; padding:12px; border-radius:12px; font-size:0.5rem; font-weight:800; cursor:pointer; transition:0.2s; }
     .btn-action:hover { background:rgba(255,255,255,0.2); }
-    .settings-item { padding:20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; cursor:pointer; }
-    .settings-item:hover { background:rgba(255,255,255,0.02); }
-    .hologram-glow { box-shadow:0 0 20px rgba(123,53,212,0.5); animation:hologramPulse 3s infinite ease-in-out; }
-    @keyframes hologramPulse { 0% { transform:scale(1); opacity:0.8; } 50% { transform:scale(1.05); opacity:1; } 100% { transform:scale(1); opacity:0.8; } }
+    .settings-item { padding:20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #222; }
+    .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
+    .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #7B35D4; }
+    input:checked + .slider:before { transform: translateX(20px); }
 `;
 document.head.appendChild(style);
