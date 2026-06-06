@@ -1,4 +1,4 @@
-/* Sovereign Wallet Core v4.7.2 [High-Fidelity & Blockchain SaaS] */
+/* Sovereign Wallet Core v4.7.3 [High-Fidelity & Rowcell Fix] */
 
 const ASSETS_DATA = [
     { id: 'prn', name: 'PRISCION ($PRN)', balance: '2,540.00', usd: '$2,540.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg' },
@@ -8,11 +8,11 @@ const ASSETS_DATA = [
 ];
 
 const EMPIRE_NODES = [
-    { name: 'ATELIA', handle: '$atelia.prn', url: '/ateliagaming/', logo: 'https://drive.google.com/uc?export=view&id=11BZOAz1dm9ALneaf-gOA3aGx0pGKM5gd' },
-    { name: 'DREAMING', handle: '$dreaming.prn', url: '/dreaminganime/', logo: 'https://drive.google.com/uc?export=view&id=1LKlvVSg4UJB0T0Qb1fyVPs6COTmtDSko' },
-    { name: 'RIDDIIM', handle: '$riddiim.prn', url: '/riddiim/', logo: 'https://drive.google.com/uc?export=view&id=1gDFu34kqiGtiFqqgXR9bplqipa0QkJVT' },
-    { name: 'CALALLOO', handle: '$calalloo.prn', url: '/calalloo/', logo: 'https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB' },
-    { name: 'NURASEN', handle: '$nurasen.prn', url: '/nurasen/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg' },
+    { name: 'ATELIA', handle: '$atelia.prn', url: '/ateliagaming/', logo: 'https://drive.google.com/uc?export=view&id=11BZOAz1dm9ALneaf-gOA3aGx0pGKM5gd', icon: '🎮' },
+    { name: 'DREAMING', handle: '$dreaming.prn', url: '/dreaminganime/', logo: 'https://drive.google.com/uc?export=view&id=1LKlvVSg4UJB0T0Qb1fyVPs6COTmtDSko', icon: '⛩️' },
+    { name: 'RIDDIIM', handle: '$riddiim.prn', url: '/riddiim/', logo: 'https://drive.google.com/uc?export=view&id=1gDFu34kqiGtiFqqgXR9bplqipa0QkJVT', icon: '🎵' },
+    { name: 'CALALLOO', handle: '$calalloo.prn', url: '/calalloo/', logo: 'https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB', icon: '🍲' },
+    { name: 'NURASEN', handle: '$nurasen.prn', url: '/nurasen/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg', icon: '🛡️' },
     { name: 'ESSENCE', handle: '$essenceelite.prn', url: '/essenceelite/', icon: '✨' },
     { name: 'GEN PLAY', handle: '$thegenplay.prn', url: '/thegenplay/', icon: '🎮' },
     { name: 'AUTODROME', handle: '$theautodrome.prn', url: '/theautodrome/', icon: '🏎️' },
@@ -195,7 +195,8 @@ function renderEmpireHub() {
             <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin-bottom:20px;">Empire Ecosystem</h2>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 ${EMPIRE_NODES.map(node => `
-                    <a href="${node.url}" style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:20px; border-radius:22px; text-align:center; text-decoration:none; color:white; display:block;">
+                    <a href="${node.url}" style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:20px; border-radius:22px; text-align:center; text-decoration:none; color:white; display:block; position:relative;">
+                        <div style="font-size:1.2rem; position:absolute; top:10px; right:10px;">${node.icon}</div>
                         ${node.logo ? `<img src="${node.logo}" style="width:45px; height:45px; border-radius:50%; border:2px solid #7B35D4; margin-bottom:12px;">` : `<div style="font-size:2rem; margin-bottom:12px;">${node.icon}</div>`}
                         <div style="font-size:0.65rem; font-weight:900;">${node.name}</div>
                         <div style="font-size:0.45rem; color:#7B35D4; font-weight:800; margin-top:5px;">${node.handle}</div>
@@ -239,7 +240,7 @@ function renderSettingsView() {
             <div style="background:#111; border-radius:20px; overflow:hidden;">
                 <div class="settings-item" onclick="alert('Neural Sync Active')">
                     <span style="font-size:0.75rem; color:white;">Neural Engine</span>
-                    <span style="color:#7B35D4; font-size:0.6rem;">v4.7.2</span>
+                    <span style="color:#7B35D4; font-size:0.6rem;">v4.7.3</span>
                 </div>
                 <div class="settings-item" onclick="alert('Nurasen Shield Active')">
                     <span style="font-size:0.75rem; color:white;">Security Shield</span>
