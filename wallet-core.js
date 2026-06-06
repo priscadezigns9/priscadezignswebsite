@@ -61,6 +61,7 @@ function renderAssetsView() {
                     <button class="btn-action" onclick="renderSendView()">SEND</button>
                     <button class="btn-action" onclick="renderReceiveView()">RECEIVE</button>
                     <button class="btn-action" onclick="renderSwapView()">SWAP</button>
+                    <button class="btn-action" onclick="renderBuyView()">BUY</button>
                     <button class="btn-action" onclick="renderStakingView()">STAKE</button>
                 </div>
             </div>
@@ -147,6 +148,58 @@ function renderReceiveView() {
             </div>
         </div>
     `;
+}
+
+function renderBuyView() {
+    const view = document.getElementById('wallet-main-view');
+    view.innerHTML = `
+        <div style="padding:20px;">
+            <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
+                <button class="btn" onclick="renderAssetsView()" style="background:none; border:none; color:#7B35D4; font-size:1.5rem; cursor:pointer;">←</button>
+                <h2 style="font-family:'Playfair Display'; font-size:1.4rem; color:white; margin:0;">Buy Crypto</h2>
+            </div>
+            <div style="background:#111; padding:25px; border-radius:24px; border:1px solid #222;">
+                <label style="color:#666; font-size:0.5rem; text-transform:uppercase; font-weight:800; display:block; margin-bottom:10px;">Select Asset</label>
+                <select id="buy-asset" style="width:100%; background:black; border:1px solid #333; padding:15px; border-radius:12px; color:white; margin-bottom:20px;">
+                    ${ASSETS_DATA.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+                </select>
+                
+                <label style="color:#666; font-size:0.5rem; text-transform:uppercase; font-weight:800; display:block; margin-bottom:10px;">Amount (USD)</label>
+                <input type="number" id="buy-amount" placeholder="100.00" style="width:100%; background:black; border:1px solid #333; padding:15px; border-radius:12px; color:white; margin-bottom:20px; font-size:1.5rem;">
+                
+                <label style="color:#666; font-size:0.5rem; text-transform:uppercase; font-weight:800; display:block; margin-bottom:10px;">Payment Method</label>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:30px;">
+                    <div onclick="selectPayment('visa')" id="pay-visa" style="background:black; border:1px solid #7B35D4; padding:15px; border-radius:12px; text-align:center; cursor:pointer;">
+                        <div style="font-size:0.8rem; font-weight:900;">VISA / DEBIT</div>
+                    </div>
+                    <div onclick="selectPayment('apple')" id="pay-apple" style="background:black; border:1px solid #222; padding:15px; border-radius:12px; text-align:center; cursor:pointer; opacity:0.5;">
+                        <div style="font-size:0.8rem; font-weight:900;">APPLE PAY</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width:100%; padding:18px;" onclick="executeBuy()">INITIATE SOVEREIGN PURCHASE</button>
+                <p style="font-size:0.5rem; color:#444; text-align:center; margin-top:15px;">Secure Visa/Debit Bridge via Jello Privacy Layer</p>
+            </div>
+        </div>
+    `;
+}
+
+function selectPayment(method) {
+    document.getElementById('pay-visa').style.borderColor = method === 'visa' ? '#7B35D4' : '#222';
+    document.getElementById('pay-apple').style.borderColor = method === 'apple' ? '#7B35D4' : '#222';
+}
+
+function executeBuy() {
+    const amount = parseFloat(document.getElementById('buy-amount').value);
+    if(!amount || amount < 10) { alert("Minimum purchase is $10."); return; }
+    alert(`Redirecting to Secure Visa Bridge...\nAmount: $${amount}\nLayer: Jello Node`);
+    // Logic to simulate addition to balance after "success"
+    setTimeout(() => {
+        WALLETS[currentWalletIndex].balance += amount;
+        saveWallets();
+        renderAssetsView();
+        alert("Sovereign Purchase Successful. Assets Anchored to Ledger.");
+    }, 2000);
 }
 
 function renderSwapView() {
