@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Sovereign Singularity v4.3.8 [Neural Gateway] -->
+<!-- Sovereign Singularity v4.4.0 [Neural Gateway] -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +10,7 @@
     <!-- OG Tags -->
     <meta property="og:title" content="PRISCION | Neural AI & Sovereign Blockchain" />
     <meta property="og:description" content="Enter the Empire. High-fidelity AI products, Web3 settlement, and the Sovereign Ledger." />
-    <meta property="og:image" content="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_official.jpg" />
+    <meta property="og:image" content="https://drive.google.com/uc?export=view&id=1D4We-G4I_M3cjBKyPHbVTa9W5abinD8v" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://priscadezigns.org/" />
 
@@ -66,6 +66,7 @@
             width: 100%;
             top: 0;
             z-index: 1000;
+            background: rgba(10, 10, 10, 0.8);
         }
 
         .logo {
@@ -79,7 +80,7 @@
             letter-spacing: 2px;
         }
 
-        .logo img { height: 35px; border-radius: 50%; border: 1px solid var(--accent); }
+        .logo img { height: 40px; border-radius: 50%; border: 1px solid var(--accent); }
 
         nav { display: flex; gap: 30px; }
         nav a { 
@@ -255,6 +256,27 @@
         }
         .s-tab.active { color: var(--accent); border-top: 2px solid var(--accent); background: rgba(123, 53, 212, 0.05); }
 
+        /* Login Overlay */
+        #authOverlay {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+            background:rgba(0,0,0,0.95); z-index:9999; 
+            backdrop-filter: blur(30px); align-items:center; justify-content:center;
+        }
+        .auth-box {
+            background: var(--surface);
+            border: 1px solid var(--accent);
+            width: 90%; max-width: 400px;
+            padding: 40px;
+            border-radius: 32px;
+            text-align: center;
+            box-shadow: 0 0 50px var(--neural-glow);
+        }
+        .auth-box input {
+            width: 100%; padding: 15px; margin-bottom: 15px;
+            background: #000; border: 1px solid var(--border);
+            border-radius: 12px; color: white; font-family: 'Space Mono', monospace;
+            text-align: center; font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
@@ -272,19 +294,19 @@
             <a href="wallet/vault.html">Vault</a>
         </nav>
         <div style="display:flex; gap:12px;">
-            <button onclick="toggleSidebar()" class="btn btn-outline">Sovereign Wallet</button>
+            <button onclick="handleWalletClick()" class="btn btn-outline">Sovereign Wallet</button>
             <a href="leggo.html" class="btn btn-primary">Launch LEGGO</a>
         </div>
     </header>
 
     <main class="hero">
-        <div class="hero-badge">SOVEREIGN PROTOCOL v4.3.8</div>
+        <div class="hero-badge">SOVEREIGN PROTOCOL v4.4.0</div>
         <h1>Architecting <br><span style="color:var(--accent);">Autonomous</span> Identity.</h1>
         <p>Welcome to the High-Fidelity Gateway. We are bridging the gap between human intent and high-fidelity blockchain settlement.</p>
         
         <div style="display:flex; gap:20px;">
             <a href="leggo.html" class="btn btn-primary" style="padding: 18px 40px; font-size: 0.85rem;">Launch LEGGO Browser</a>
-            <button onclick="toggleSidebar()" class="btn btn-outline" style="padding: 18px 40px; font-size: 0.85rem;">Open Sovereign Wallet</button>
+            <button onclick="handleWalletClick()" class="btn btn-outline" style="padding: 18px 40px; font-size: 0.85rem;">Open Sovereign Wallet</button>
         </div>
     </main>
 
@@ -335,6 +357,19 @@
         </div>
     </div>
 
+    <!-- Auth Overlay -->
+    <div id="authOverlay">
+        <div class="auth-box">
+            <img src="https://drive.google.com/uc?export=view&id=1D4We-G4I_M3cjBKyPHbVTa9W5abinD8v" style="height:70px; border-radius:50%; border:2px solid var(--accent); margin-bottom:20px;">
+            <h2 id="authTitle" style="margin-bottom:10px;">Security Verification</h2>
+            <p id="authDesc" style="color:var(--muted); font-size:0.8rem; margin-bottom:25px;">Please enter your Sovereign PIN to unlock your vault.</p>
+            <input type="password" id="pinField" placeholder="PIN CODE">
+            <button onclick="processAuth()" class="btn btn-primary" style="width:100%;">Unlock Vault</button>
+            <p id="authSwitch" onclick="switchToSetup()" style="color:var(--accent); font-size:0.7rem; margin-top:20px; cursor:pointer;">New user? Set up your Sovereign PIN</p>
+            <button onclick="closeAuth()" style="background:none; border:none; color:var(--muted); font-size:0.75rem; margin-top:15px; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 PRISCION. ARCHITECTED BY THE ARCHITECT. ANCHORED TO THE LEDGER.</p>
     </footer>
@@ -353,13 +388,58 @@
     <script>
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
         
+        function handleWalletClick() {
+            const hasPin = localStorage.getItem('priscion_pin');
+            const session = sessionStorage.getItem('priscion_session');
+            
+            if (!hasPin) {
+                switchToSetup();
+                document.getElementById('authOverlay').style.display = 'flex';
+            } else if (!session) {
+                document.getElementById('authOverlay').style.display = 'flex';
+            } else {
+                toggleSidebar();
+            }
+        }
+
+        function closeAuth() { document.getElementById('authOverlay').style.display = 'none'; }
+
+        function switchToSetup() {
+            document.getElementById('authTitle').innerText = "Create Sovereign PIN";
+            document.getElementById('authDesc').innerText = "Secure your identity with a permanent PIN code.";
+            document.getElementById('authSwitch').style.display = 'none';
+            document.getElementById('pinField').dataset.mode = 'setup';
+        }
+
+        function processAuth() {
+            const pin = document.getElementById('pinField').value;
+            const mode = document.getElementById('pinField').dataset.mode;
+            
+            if (mode === 'setup') {
+                if (pin.length < 4) { alert("PIN must be at least 4 digits."); return; }
+                localStorage.setItem('priscion_pin', pin);
+                sessionStorage.setItem('priscion_session', 'active');
+                alert("Sovereign PIN established.");
+                closeAuth();
+                toggleSidebar();
+            } else {
+                const stored = localStorage.getItem('priscion_pin');
+                if (pin === stored) {
+                    sessionStorage.setItem('priscion_session', 'active');
+                    closeAuth();
+                    toggleSidebar();
+                } else {
+                    alert("Invalid Sovereign PIN.");
+                }
+            }
+        }
+
         function closeEbook() { 
             document.getElementById('ebookSidePopup').classList.remove('show'); 
             localStorage.setItem('ebook_dismissed', 'true');
         }
 
         window.onload = () => {
-            // E-book popup
             if(!localStorage.getItem('ebook_dismissed')) {
                 setTimeout(() => {
                     document.getElementById('ebookSidePopup').classList.add('show');
