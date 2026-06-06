@@ -546,49 +546,53 @@
     
     
     
+    
+    
     <script>
     async function connectVespr() {
         const status = document.getElementById('walletStatus');
-        status.innerHTML = '⚡ Initiating Real-Time Sync...';
+        status.innerHTML = '⚡ Initiating Neural Sync...';
         status.style.color = '#F3BA2F';
 
         try {
             if (typeof window.cardano !== 'undefined' && window.cardano.vespr) {
                 const vespr = window.cardano.vespr;
                 
-                // FORCE ENABLE: This triggers the Vespr UI to wake up
-                status.innerHTML = '⚡ Awaiting Vespr Approval...';
+                // Request Permission (CIP-30)
                 const api = await vespr.enable();
                 
                 if (api) {
-                    status.innerHTML = '⚡ Reading Sovereign Data...';
-                    
-                    // 1. Fetch Stake Address (Identity)
+                    // Fetch Stake Address for Proof of Identity
                     const rewardAddr = await api.getRewardAddresses();
                     const stakeAddr = rewardAddr[0]; 
                     
-                    // 2. Fetch Balance (The "Real" proof)
-                    // CIP-30 returns balance as a hex-encoded CBOR string
-                    const balanceHex = await api.getBalance();
-                    
-                    // Simplified alert to show the user REAL DATA from their wallet
-                    alert('PRISCION NODE SYNCED\n\nID: ' + stakeAddr.substring(0,20) + '...\n\nYour Vespr assets are now visible to the Priscion Sovereign Engine.');
-                    
-                    status.innerHTML = '● Vespr Linked (' + stakeAddr.substring(0,10) + ')';
+                    // Update Status Pill
+                    status.innerHTML = '● Vespr Linked: ' + stakeAddr.substring(0,10) + '...';
                     status.style.color = '#00FF88';
                     
+                    // UPDATE ASSETS UI
+                    const assetList = document.getElementById('wallet-assets');
+                    const stakeInfo = '<div style="background:rgba(123,53,212,0.1); border-radius:18px; padding:15px; margin-bottom:15px; border:1px solid #7B35D4;">' +
+                                      '<span style="font-size:0.7rem; color:#7B35D4; font-weight:800; text-transform:uppercase;">Connected Identity (Vespr)</span><br>' +
+                                      '<span style="font-family:monospace; font-size:0.75rem; color:#333; word-break:break-all;">' + stakeAddr + '</span>' +
+                                      '</div>';
+                    
+                    // Prepend the connection proof to the assets list
+                    if (!assetList.innerHTML.includes(stakeAddr.substring(0,10))) {
+                        assetList.innerHTML = stakeInfo + assetList.innerHTML;
+                    }
+                    
+                    alert('Sovereign Link Confirmed.\n\nYour Vespr Wallet is now the Primary Authority for this session.');
                     showWalletTab('assets');
                 }
             } else {
-                alert('Vespr Wallet not detected. Please ensure you are using the Vespr DApp browser or have the extension active.');
+                alert('Vespr Wallet not detected.');
                 status.innerHTML = '● Vespr Not Found';
-                status.style.color = '#FF4B2B';
             }
         } catch (err) {
-            console.error('Sovereign Bridge Error:', err);
-            alert('Vespr Connection Refused: ' + (err.info || err.message || 'Check App Settings'));
+            console.error(err);
+            alert('Vespr Sync Refused.');
             status.innerHTML = '● Sync Failed';
-            status.style.color = '#FF4B2B';
         }
     }
     </script>
