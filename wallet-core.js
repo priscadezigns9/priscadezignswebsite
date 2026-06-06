@@ -1,37 +1,44 @@
-/* Sovereign Wallet Core v4.7.4 [High-Fidelity & Rowcell Final] */
+/* Sovereign Wallet Core v4.7.5 [High-Fidelity & Full Empire Sync] */
 
 const ASSETS_DATA = [
     { id: 'prn', name: 'PRISCION ($PRN)', balance: '2,540.00', usd: '$2,540.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg' },
     { id: 'nrl', name: 'NEURAL ($NRL)', balance: '15,000', usd: '$15,000', logo: 'https://drive.google.com/uc?export=view&id=1To_XBjrXDO6ZRoQ2YzTleweTg6sEHgOL' },
-    { id: 'atlr', name: 'ATELIA ($ATLR)', balance: '82,400', usd: '$2,472.00', logo: 'https://drive.google.com/uc?export=view&id=11BZOAz1dm9ALneaf-gOA3aGx0pGKM5gd' },
+    { id: 'atlr', name: 'ATELIA ($ATLR)', balance: '82,400', usd: '$2,472.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/atelia_logo.webp' },
     { id: 'musd', name: 'MUSTARD ($MUSD)', balance: '867.85', usd: '$867.85', logo: 'https://drive.google.com/uc?export=view&id=1RJfigGY8p5kg0-4WV8_DExrDd4Hj2mtz' }
 ];
 
 const EMPIRE_NODES = [
-    { name: 'ATELIA', handle: '$atelia.prn', url: '/ateliagaming/', logo: 'https://drive.google.com/uc?export=view&id=11BZOAz1dm9ALneaf-gOA3aGx0pGKM5gd', icon: '🎮' },
-    { name: 'DREAMING', handle: '$dreaming.prn', url: '/dreaminganime/', logo: 'https://drive.google.com/uc?export=view&id=1LKlvVSg4UJB0T0Qb1fyVPs6COTmtDSko', icon: '⛩️' },
-    { name: 'RIDDIIM', handle: '$riddiim.prn', url: '/riddiim/', logo: 'https://drive.google.com/uc?export=view&id=1gDFu34kqiGtiFqqgXR9bplqipa0QkJVT', icon: '🎵' },
-    { name: 'CALALLOO', handle: '$calalloo.prn', url: '/calalloo/', logo: 'https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB', icon: '🍲' },
+    { name: 'ATELIA', handle: '$atelia.prn', url: '/ateliagaming/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/atelia_logo.webp', icon: '🎮' },
+    { name: 'DREAMING', handle: '$dreaming.prn', url: '/dreaminganime/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/dreaming_logo.jpg', icon: '⛩️' },
+    { name: 'RIDDIIM', handle: '$riddiim.prn', url: '/riddiim/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/riddiim_logo.png', icon: '🎵' },
+    { name: 'CALALLOO', handle: '$calalloo.prn', url: '/calalloo/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/calalloo_logo.png', icon: '🍲' },
     { name: 'NURASEN', handle: '$nurasen.prn', url: '/nurasen/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg', icon: '🛡️' },
-    { name: 'ESSENCE', handle: '$essenceelite.prn', url: '/essenceelite/', icon: '✨' },
-    { name: 'GEN PLAY', handle: '$thegenplay.prn', url: '/thegenplay/', icon: '🎮' },
-    { name: 'AUTODROME', handle: '$theautodrome.prn', url: '/theautodrome/', icon: '🏎️' },
-    { name: 'GLOW', handle: '$glowprotocol.prn', url: '/glowprotocol/', icon: '🧴' },
+    { name: 'VERDANT', handle: '$verdant.prn', url: '/verdantco/', icon: '🌱' },
+    { name: 'GLOW', handle: '$glow.prn', url: '/glowprotocol/', icon: '🧴' },
+    { name: 'SOLE', handle: '$sole.prn', url: '/soleprestige/', icon: '👟' },
+    { name: 'ESSENCE', handle: '$essence.prn', url: '/essenceelite/', icon: '✨' },
+    { name: 'AUTODROME', handle: '$autodrome.prn', url: '/theautodrome/', icon: '🏎️' },
     { name: 'PEAK FIT', handle: '$peakfit.prn', url: '/peakfit/', icon: '⚡' },
-    { name: 'SOLE', handle: '$soleprestige.prn', url: '/soleprestige/', icon: '👟' },
-    { name: 'ESCAPIST', handle: '$theescapist.prn', url: '/theescapist/', icon: '🏝️' },
+    { name: 'ESCAPIST', handle: '$escapist.prn', url: '/theescapist/', icon: '🏝️' },
     { name: 'TECH SCOUT', handle: '$techscout.prn', url: '/techscout/', icon: '🔭' },
-    { name: 'WATCHLIST', handle: '$thewatchlist.prn', url: '/thewatchlist/', icon: '⌚' },
-    { name: 'VERDANT', handle: '$verdantco.prn', url: '/verdantco/', icon: '🌱' },
-    { name: 'DESKWELL', handle: '$deskwell.prn', url: '/deskwell/', icon: '🪑' }
+    { name: 'WATCHLIST', handle: '$watchlist.prn', url: '/thewatchlist/', icon: '⌚' },
+    { name: 'PRIME LAND', handle: '$primeland.prn', url: '/primelandnetwork/', icon: '🏢' },
+    { name: 'QUIET LUXURY', handle: '$quietluxury.prn', url: '/quietluxury/', icon: '🛋️' },
+    { name: 'COUTURE', handle: '$couture.prn', url: '/couturegallery/', icon: '👜' },
+    { name: 'PAW VAULT', handle: '$pawvault.prn', url: '/pawvault/', icon: '🐾' },
+    { name: 'PANTRIQ', handle: '$pantriq.prn', url: '/pantriq/', icon: '🍳' },
+    { name: 'SHELFLY', handle: '$shelfly.prn', url: '/shelfly/', icon: '📚' },
+    { name: 'DESKWELL', handle: '$deskwell.prn', url: '/deskwell/', icon: '🪑' },
+    { name: 'GEN PLAY', handle: '$genplay.prn', url: '/thegenplay/', icon: '🧩' },
+    { name: 'DUMPLING', handle: '$dumpling.prn', url: '/mybabydumpling/', icon: '👶' }
 ];
 
 const SAAS_NODES = [
-    { name: 'CUPYX', handle: '$cupyx.prn', url: '/cupyx/', logo: 'https://drive.google.com/uc?export=view&id=1MFeoBty54LMd5tTK5Z6D32nMumc0LTD6' },
-    { name: 'MOBLYNC', handle: '$moblync.prn', url: '/moblync/', logo: 'https://drive.google.com/uc?export=view&id=1QV6Cwpt0ng-V0gawbumCEHtmZMhqs9wb' },
-    { name: 'KARJOV', handle: '$karjov.prn', url: '/karjov/', logo: 'https://drive.google.com/uc?export=view&id=1QYpTqBOMGTeaz7A-IFB5C2Ee_qn6840f' },
-    { name: 'ROWCELL', handle: '$rowcell.prn', url: '/rowcell/', logo: 'https://drive.google.com/uc?export=view&id=1uYllyU4Tmi5NAGoOzbFLBg7Owy-7vLJ0' },
-    { name: 'VELLOQ', handle: '$velloq.prn', url: '/velloq/', logo: 'https://drive.google.com/uc?export=view&id=1PjxvX2yBeVzMDguMbilJIrAtgtUvpjGG' }
+    { name: 'CUPYX', handle: '$cupyx.prn', url: '/cupyx/', logo: 'https://drive.google.com/uc?export=view&id=1MFeoBty54LMd5tTK5Z6D32nMumc0LTD6', icon: '☕' },
+    { name: 'MOBLYNC', handle: '$moblync.prn', url: '/moblync/', logo: 'https://drive.google.com/uc?export=view&id=1QV6Cwpt0ng-V0gawbumCEHtmZMhqs9wb', icon: '📱' },
+    { name: 'KARJOV', handle: '$karjov.prn', url: '/karjov/', logo: 'https://drive.google.com/uc?export=view&id=1QYpTqBOMGTeaz7A-IFB5C2Ee_qn6840f', icon: '⚔️' },
+    { name: 'ROWCELL', handle: '$rowcell.prn', url: '/rowcell/', logo: 'https://drive.google.com/uc?export=view&id=1uYllyU4Tmi5NAGoOzbFLBg7Owy-7vLJ0', icon: '🌹' },
+    { name: 'VELLOQ', handle: '$velloq.prn', url: '/velloq/', logo: 'https://drive.google.com/uc?export=view&id=1PjxvX2yBeVzMDguMbilJIrAtgtUvpjGG', icon: '⚡' }
 ];
 
 function initializeWallet(containerId) {
@@ -240,7 +247,7 @@ function renderSettingsView() {
             <div style="background:#111; border-radius:20px; overflow:hidden;">
                 <div class="settings-item" onclick="alert('Neural Sync Active')">
                     <span style="font-size:0.75rem; color:white;">Neural Engine</span>
-                    <span style="color:#7B35D4; font-size:0.6rem;">v4.7.4</span>
+                    <span style="color:#7B35D4; font-size:0.6rem;">v4.7.5</span>
                 </div>
                 <div class="settings-item" onclick="alert('Nurasen Shield Active')">
                     <span style="font-size:0.75rem; color:white;">Security Shield</span>
