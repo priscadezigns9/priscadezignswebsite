@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelia Pet | Vanguard Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--red); }
+        .logo-img { height: 40px; filter: drop-shadow(0 0 5px var(--red)); }
+
+        #pet-container {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: radial-gradient(circle, #1a1a1a 0%, #050505 100%);
+            position: relative;
+        }
+
+        #pet-stage { position: relative; width: 400px; height: 400px; display: flex; align-items: center; justify-content: center; }
+        #pet-img { height: 300px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: drop-shadow(0 0 20px rgba(255,107,0,0.3)); }
+        .bounce { animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        
+        .interaction-ui { display: flex; gap: 20px; margin-top: 40px; z-index: 10; }
+        .action-btn {
+            background: #111; border: 2px solid var(--red); color: white; padding: 15px 25px;
+            font-family: 'Russo One'; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .action-btn:hover:not(:disabled) { background: var(--red); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(211,47,47,0.4); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #444; }
+        .action-btn span { font-size: 0.7rem; color: var(--orange); }
+
+        .stats-panel {
+            position: absolute; top: 30px; right: 30px; background: rgba(0,0,0,0.8);
+            border: 1px solid var(--red); padding: 20px; width: 200px;
+        }
+        .stat-row { margin-bottom: 15px; }
+        .stat-label { font-family: 'Russo One'; font-size: 0.7rem; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-bar { height: 8px; background: #222; width: 100%; position: relative; border-radius: 4px; overflow: hidden; }
+        .stat-fill { height: 100%; background: var(--red); transition: 0.5s; }
+
+        #reward-popup {
+            position: absolute; top: 40%; font-family: 'Bangers'; font-size: 3rem; color: var(--orange);
+            pointer-events: none; opacity: 0; transition: 0.5s; z-index: 100;
+        }
+        .show-reward { animation: float-up 1s forwards; }
+        @keyframes float-up { 0% { opacity: 0; transform: translateY(0); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateY(-100px); } }
+
+        #char-select {
+            position: absolute; top: 30px; left: 30px; display: flex; gap: 10px;
+        }
+        .char-thumb {
+            width: 50px; height: 50px; border: 2px solid #333; cursor: pointer; padding: 5px;
+            background: #111; transition: 0.3s;
+        }
+        .char-thumb:hover, .char-thumb.active { border-color: var(--red); background: #222; }
+        .char-thumb img { width: 100%; height: 100%; object-fit: contain; }
+
+        #atlr-balance {
+            position: absolute; top: 100px; right: 30px; font-family: 'Bangers'; font-size: 2rem; color: var(--white);
+            display: flex; align-items: center; gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.2rem; color:var(--orange);">VANGUARD COMPANION</div>
+    </nav>
+
+    <div id="pet-container">
+        <div id="char-select">
+            <div class="char-thumb active" onclick="setChar('astra')"><img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp"></div>
+            <div class="char-thumb" onclick="setChar('mimi')"><img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp"></div>
+            <div class="char-thumb" onclick="setChar('nova')"><img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp"></div>
+            <div class="char-thumb" onclick="setChar('echo')"><img src="https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp"></div>
+        </div>
+
+        <div id="atlr-balance">
+            <img src="https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp" height="40">
+            <span id="bal-val">0</span>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-row">
+                <div class="stat-label">Hunger</div>
+                <div class="stat-bar"><div id="bar-hunger" class="stat-fill" style="width: 80%;"></div></div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">Happiness</div>
+                <div class="stat-bar"><div id="bar-happy" class="stat-fill" style="width: 50%;"></div></div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">Energy</div>
+                <div class="stat-bar"><div id="bar-energy" class="stat-fill" style="width: 100%;"></div></div>
+            </div>
+        </div>
+
+        <div id="reward-popup">+5 ATLR</div>
+
+        <div id="pet-stage">
+            <img id="pet-img" class="bounce" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp">
+        </div>
+
+        <div class="interaction-ui">
+            <button class="action-btn" onclick="interact('feed')" id="btn-feed">
+                FEED <span>+5 ATLR</span>
+            </button>
+            <button class="action-btn" onclick="interact('walk')" id="btn-walk">
+                WALK <span>+10 ATLR</span>
+            </button>
+            <button class="action-btn" onclick="interact('play')" id="btn-play">
+                PLAY <span>+7 ATLR</span>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        let stats = { hunger: 80, happy: 50, energy: 100 };
+        const assets = {
+            astra: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp',
+            mimi: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp',
+            nova: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp',
+            echo: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp'
+        };
+
+        function setChar(c) {
+            document.getElementById('pet-img').src = assets[c];
+            document.querySelectorAll('.char-thumb').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        async function interact(type) {
+            let reward = 0;
+            const pet = document.getElementById('pet-img');
+            
+            if(type === 'feed') {
+                stats.hunger = Math.min(100, stats.hunger + 20);
+                reward = 5;
+                pet.style.transform = 'scale(1.2)';
+            } else if(type === 'walk') {
+                stats.energy = Math.max(0, stats.energy - 30);
+                stats.happy = Math.min(100, stats.happy + 25);
+                reward = 10;
+                pet.style.transform = 'translateX(50px)';
+            } else if(type === 'play') {
+                stats.happy = Math.min(100, stats.happy + 15);
+                stats.energy = Math.max(0, stats.energy - 10);
+                reward = 7;
+                pet.style.transform = 'rotate(360deg)';
+            }
+
+            setTimeout(() => { pet.style.transform = ''; }, 500);
+            updateBars();
+            showReward(reward);
+            
+            if(window.Atelia) {
+                const user = await Atelia.auth.getUser();
+                if(user.data.user) {
+                    await Atelia.arena.updatePrestige(user.data.user.id, reward);
+                    refreshBalance();
+                }
+            }
+        }
+
+        function updateBars() {
+            document.getElementById('bar-hunger').style.width = stats.hunger + '%';
+            document.getElementById('bar-happy').style.width = stats.happy + '%';
+            document.getElementById('bar-energy').style.width = stats.energy + '%';
+        }
+
+        function showReward(val) {
+            const el = document.getElementById('reward-popup');
+            el.innerText = '+' + val + ' ATLR';
+            el.classList.add('show-reward');
+            setTimeout(() => el.classList.remove('show-reward'), 1000);
+        }
+
+        async function refreshBalance() {
+            const user = await Atelia.auth.getUser();
+            if(user.data.user) {
+                const p = await Atelia.arena.getProfile(user.data.user.id);
+                document.getElementById('bal-val').innerText = p.atlr_prestige || 0;
+            }
+        }
+
+        setInterval(() => {
+            stats.hunger = Math.max(0, stats.hunger - 1);
+            stats.happy = Math.max(0, stats.happy - 1);
+            updateBars();
+        }, 10000);
+
+        refreshBalance();
+    </script>
+</body>
+</html>
