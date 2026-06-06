@@ -1,7 +1,7 @@
 /* Sovereign Wallet Core v4.7.0 [High-Fidelity & Blockchain SaaS] */
 
 const ASSETS_DATA = [
-    { id: 'prn', name: 'PRISCION ($PRN)', balance: '2,540.00', usd: '$2,540.00', logo: 'https://drive.google.com/uc?export=view&id=1Q3xqSqxA5QciLWWAXEXzDSUTWNiJzeI4' },
+    { id: 'prn', name: 'PRISCION ($PRN)', balance: '2,540.00', usd: '$2,540.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg' },
     { id: 'nrl', name: 'NEURAL ($NRL)', balance: '15,000', usd: '$15,000', logo: 'https://drive.google.com/uc?export=view&id=1To_XBjrXDO6ZRoQ2YzTleweTg6sEHgOL' },
     { id: 'atlr', name: 'ATELIA ($ATLR)', balance: '82,400', usd: '$2,472.00', logo: 'https://drive.google.com/uc?export=view&id=11BZOAz1dm9ALneaf-gOA3aGx0pGKM5gd' },
     { id: 'musd', name: 'MUSTARD ($MUSD)', balance: '867.85', usd: '$867.85', logo: 'https://drive.google.com/uc?export=view&id=1RJfigGY8p5kg0-4WV8_DExrDd4Hj2mtz' }
@@ -48,7 +48,7 @@ function renderOnboarding(sidebar) {
     const content = sidebar.querySelector('.sidebar-content');
     content.innerHTML = `
         <div style="text-align:center; padding:60px 25px;">
-            <div class="hologram-glow" style="width:100px; height:100px; margin:0 auto 30px; border-radius:50%; background:url('https://drive.google.com/uc?export=view&id=1YMkt8FVv4RwG3zLmEw-DfycGg7G9S-7E') center/cover;"></div>
+            <div class="hologram-glow" style="width:100px; height:100px; margin:0 auto 30px; border-radius:50%; background:url('https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg') center/cover;"></div>
             <h2 style="font-family:'Playfair Display'; margin-bottom:15px; color:white; font-size:1.8rem;">Sovereign Identity</h2>
             <p style="color:#888; font-size:0.8rem; margin-bottom:40px;">Initialize your neural handshake on the Priscion Ledger.</p>
             <button onclick="startWalletCreation()" class="btn btn-primary" style="width:100%; margin-bottom:15px; padding:18px;">CREATE IDENTITY</button>
@@ -85,7 +85,7 @@ function renderAuth(sidebar) {
     const content = sidebar.querySelector('.sidebar-content');
     content.innerHTML = `
         <div style="text-align:center; padding:80px 30px;">
-            <div class="hologram-glow" style="width:80px; height:80px; margin:0 auto 40px; border-radius:50%; background:url('https://drive.google.com/uc?export=view&id=1YMkt8FVv4RwG3zLmEw-DfycGg7G9S-7E') center/cover; border:2px solid #7B35D4;"></div>
+            <div class="hologram-glow" style="width:80px; height:80px; margin:0 auto 40px; border-radius:50%; background:url('https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg') center/cover; border:2px solid #7B35D4;"></div>
             <h2 style="font-family:'Playfair Display'; margin-bottom:40px; color:white;">Unlock Vault</h2>
             <input type="password" id="auth-pin" placeholder="••••" maxlength="4" style="width:100%; padding:20px; background:#111; border:1px solid #222; border-radius:15px; color:white; text-align:center; margin-bottom:40px; font-size:2rem; letter-spacing:10px;">
             <button onclick="checkAuthPin()" class="btn btn-primary" style="width:100%; padding:18px;">UNLOCK</button>
@@ -106,7 +106,7 @@ function renderWalletMain(sidebar) {
 
 function renderAssetsView() {
     const view = document.getElementById('wallet-main-view');
-    const pfp = localStorage.getItem('user_pfp') || 'https://drive.google.com/uc?export=view&id=1YMkt8FVv4RwG3zLmEw-DfycGg7G9S-7E';
+    const pfp = localStorage.getItem('user_pfp') || 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg';
     view.innerHTML = `
         <div style="padding:20px;">
             <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
