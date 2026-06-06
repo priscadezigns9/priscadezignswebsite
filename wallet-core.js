@@ -162,23 +162,27 @@ function renderAssetsView() {
 }
 
 function renderVaultView() {
-    const view = document.getElementById('wallet-main-view');
     view.innerHTML = '<div style="padding:40px; color:#444; font-size:0.65rem; text-align:center;">VAULT SYNCHRONIZING...</div>';
     fetch('/vault_manifest.json').then(r => r.json()).then(data => {
         view.innerHTML = `
             <div style="padding:20px;">
                 <h2 style="color:white; font-size:1.2rem; margin-bottom:20px; font-family:'Playfair Display';">Sovereign Vault</h2>
-                ${data.map(i => `
-                    <div onclick="window.open('${i.url}')" style="background:#080808; padding:18px; border-radius:15px; margin-bottom:12px; border:1px solid #222; cursor:pointer; transition:0.3s;">
-                        <div style="display:flex; justify-content:space-between; align-items:start;">
-                            <div>
-                                <div style="color:white; font-weight:800; font-size:0.75rem;">${i.name}</div>
-                                <div style="color:#666; font-size:0.5rem; margin-top:4px;">${i.category} • ${i.type}</div>
+                ${data.map(i => {
+                    const isImg = i.type.toLowerCase().includes('image') || i.url.match(/\.(jpg|jpeg|png|webp|gif|svg)$/i);
+                    return `
+                    <div onclick="window.open('${i.url}')" style="background:#080808; padding:18px; border-radius:15px; margin-bottom:12px; border:1px solid #222; cursor:pointer; transition:0.3s; display:flex; gap:15px; align-items:center;">
+                        ${isImg ? `<img src="${i.url}" style="width:50px; height:50px; border-radius:10px; object-fit:contain; background:#000;">` : `<div style="width:50px; height:50px; background:#111; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#444; font-size:0.5rem;">FILE</div>`}
+                        <div style="flex:1;">
+                            <div style="display:flex; justify-content:space-between; align-items:start;">
+                                <div>
+                                    <div style="color:white; font-weight:800; font-size:0.75rem;">${i.name}</div>
+                                    <div style="color:#666; font-size:0.5rem; margin-top:4px;">${i.category} • ${i.type}</div>
+                                </div>
+                                <div style="color:#00FF88; font-size:0.45rem; font-weight:900; text-transform:uppercase; background:rgba(0,255,136,0.1); padding:4px 8px; border-radius:4px;">${i.ledger_status}</div>
                             </div>
-                            <div style="color:#00FF88; font-size:0.45rem; font-weight:900; text-transform:uppercase; background:rgba(0,255,136,0.1); padding:4px 8px; border-radius:4px;">${i.ledger_status}</div>
                         </div>
-                    </div>
-                `).join('')}
+                    </div>`;
+                }).join('')}
             </div>
         `;
     });
