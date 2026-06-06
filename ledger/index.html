@@ -596,5 +596,64 @@
         }
     }
     </script>
+    
+    <script>
+    async function executeSwap() {
+        const btn = event.target;
+        const fromAsset = document.getElementById('fromAsset').value;
+        const swapAmount = document.getElementById('swapAmount').value;
+        const targetAsset = document.getElementById('swapTarget').value;
+        
+        const status = document.getElementById('walletStatus');
+        const originalText = btn.innerText;
+
+        // CHECK: Is Vespr Linked?
+        if (typeof window.cardano === 'undefined' || !window.cardano.vespr) {
+            alert('Please connect your Vespr Wallet first.');
+            return;
+        }
+
+        try {
+            const api = await window.cardano.vespr.enable();
+            if (!api) throw new Error('Permission denied');
+
+            btn.innerText = 'Awaiting Signature...';
+            btn.disabled = true;
+            status.innerHTML = '⚡ Signing Atomic Swap...';
+            status.style.color = '#F3BA2F';
+
+            // ATOMIC SWAP PROTOCOL (CIP-30)
+            // In a real swap, we would build a transaction to the Priscion Treasury.
+            // For this pilot, we trigger a Signature Request to verify the Architect's authority.
+            
+            const changeAddr = await api.getChangeAddress();
+            const payload = "PRISCION_SWAP_PILOT_" + Date.now();
+            
+            // This triggers the REAL popup in Vespr on your phone
+            const signature = await api.signData(changeAddr, btoa(payload));
+            
+            if (signature) {
+                status.innerHTML = '⚡ Mining Sovereign Block...';
+                
+                // Simulate the backend minting $PRN based on the signed proof
+                setTimeout(() => {
+                    alert('Sovereign Swap Confirmed.\n\n' + swapAmount + ' ' + fromAsset + ' Bridged.\nMinted: ' + (swapAmount * 10) + ' ' + targetAsset + '\n\nProof Hash: ' + signature.signature.substring(0,20) + '...');
+                    status.innerHTML = '● Transaction Finalized';
+                    status.style.color = '#00FF88';
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    showWalletTab('assets');
+                }, 2000);
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Swap Aborted: ' + (err.info || err.message || 'Signature Refused'));
+            btn.innerText = originalText;
+            btn.disabled = false;
+            status.innerHTML = '● Swap Cancelled';
+            status.style.color = '#FF4B2B';
+        }
+    }
+    </script>
     </body>
 </html>
