@@ -213,30 +213,45 @@
         }
     </style>
 <style>
-    #walletModal {
-        display: none;
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 360px;
-        height: 600px;
-        background: #FFF;
-        z-index: 100000;
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        border: 1px solid rgba(123,53,212,0.1);
-        flex-direction: column;
-        overflow: hidden;
-        animation: sideSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+    
+#walletModal {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 380px;
+    height: calc(100vh - 40px);
+    background: #FFF;
+    z-index: 100000;
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    border: 2px solid #7B35D4;
+    flex-direction: column;
+    overflow: hidden;
+}
+
     @keyframes sideSlide {
         from { transform: translateX(100%) scale(0.9); opacity: 0; }
         to { transform: translateX(0) scale(1); opacity: 1; }
     }
     @media (max-width: 480px) {
-        #walletModal {
-            top: 0; right: 0; width: 100%; height: 100%; border-radius: 0;
-        }
+        
+#walletModal {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 380px;
+    height: calc(100vh - 40px);
+    background: #FFF;
+    z-index: 100000;
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    border: 2px solid #7B35D4;
+    flex-direction: column;
+    overflow: hidden;
+}
+
     }
 </style></head>
 <body>
@@ -538,9 +553,16 @@
     
     
 
+
 <script>
-    function openPriscionWallet() { document.getElementById("walletModal").style.display="flex"; document.body.style.overflow="hidden"; }
-    function closePriscionWallet() { document.getElementById("walletModal").style.display="none"; document.body.style.overflow="auto"; }
+    function openPriscionWallet() { 
+        const m = document.getElementById("walletModal");
+        if(m) { m.style.display="flex"; document.body.style.overflow="hidden"; }
+    }
+    function closePriscionWallet() { 
+        const m = document.getElementById("walletModal");
+        if(m) { m.style.display="none"; document.body.style.overflow="auto"; }
+    }
     function showWalletTab(t) { 
         ["assets","swap","connect"].forEach(v => { 
             const el=document.getElementById("view-"+v); const btn=document.getElementById("tab-"+v); 
@@ -560,41 +582,37 @@
             } else alert("Vespr browser required."); 
         } catch(e) { s.innerHTML="● Refused"; s.style.color="#FF4B2B"; } 
     }
-    async function initiateAssetRegistry() {
-        const s = document.getElementById("walletStatus"); s.innerHTML = "⚡ Handshaking..."; s.style.color = "#F3BA2F";
+    async function initiateGenesisSignature() {
+        const s = document.getElementById("walletStatus");
+        s.innerHTML = "⚡ Handshaking..."; s.style.color = "#F3BA2F";
         try {
             if(window.cardano && window.cardano.vespr) {
                 const api = await window.cardano.vespr.enable();
-                const stake = (await api.getRewardAddresses())[0];
-                const msg = "Sovereign Registry Request for  Identity";
-                
-                // Hex encoding is safer for signing strings
+                const addrs = await api.getRewardAddresses();
+                const stake = addrs[0];
+                const msg = "Genesis Request: Mint 1,000,000,000  Mother Tokens";
                 const hexMsg = Array.from(new TextEncoder().encode(msg)).map(b => b.toString(16).padStart(2, '0')).join('');
                 const sig = await api.signData(stake, hexMsg);
-                
-                alert("Sovereign Protocol: Identity Verified.\n\n Registry package transmitted.");
-                s.innerHTML = "●  Identity Published"; s.style.color = "#00FF88";
-            } else alert("Connect Vespr to Register.");
+                alert("Sovereign Protocol: Genesis Anchored.
+
+1 Billion  identity published.");
+                s.innerHTML = "●  Genesis Confirmed"; s.style.color = "#00FF88";
+                const alertBox = document.getElementById("genesis-alert");
+                if(alertBox) alertBox.style.display = "none";
+                updateAssetsUI("Priscion Native ()", "GENESIS-BLOCK-0");
+                showWalletTab("assets");
+            } else alert("Connect Vespr first.");
         } catch(err) {
-            alert("Registry Signature Error: " + (err.info || err.message || "User Canceled"));
-            s.innerHTML = "● Error"; s.style.color="#FF4B2B";
+            alert("Genesis Signature Refused.");
+            s.innerHTML = "● Refused"; s.style.color="#FF4B2B";
         }
     }
-    async function initiateGenesisSignature() {
-        const s = document.getElementById("walletStatus"); s.innerHTML = "⚡ Genesis Sig...";
-        setTimeout(() => { s.innerHTML = "● Genesis Confirmed"; s.style.color = "#00FF88"; updateAssetsUI("Priscion Native ()", "GENESIS-0"); showWalletTab("assets"); }, 1500);
-    }
-    
-    // --- AUTO-POPUP PROTOCOL ---
     window.addEventListener("load", () => {
         const urlParams = new URLSearchParams(window.location.search);
-        if(urlParams.get("action") === "wallet") {
-            setTimeout(openPriscionWallet, 500); // Smooth pop-up delay
-        }
-    });
-window.addEventListener("load", () => { 
+        if(urlParams.get("action") === "wallet") setTimeout(openPriscionWallet, 500);
         document.querySelectorAll("button").forEach(b => { if(b.innerText.toLowerCase().includes("wallet")) b.onclick = openPriscionWallet; }); 
     });
 </script>
+
 </body>
 </html>
