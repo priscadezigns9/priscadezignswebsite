@@ -1,129 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- LEGGO OS v3.3 [Sovereign Neural Explorer] -->
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEGGO | Sovereign Neural Explorer</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://drive.google.com/uc?export=view&id=1YMkt8FVv4RwG3zLmEw-DfycGg7G9S-7E">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <script src="wallet-core.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEGGO OS | Sovereign Neural Explorer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;700;900&family=Space+Mono&display=swap">
     <style>
-        :root {
-            --bg: #050505; --surface: #0f0f0f; --text: #FFFFFF; --muted: #888888; --accent: #7B35D4; --border: rgba(255, 255, 255, 0.1); --glow: rgba(123, 53, 212, 0.2); --safe-green: #00ff88;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
-        .browser-container { display: grid; grid-template-rows: auto 1fr; height: 100vh; width: 100vw; }
-        header { background: var(--surface); padding: 12px 3%; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--border); z-index: 1000; }
-        .browser-controls { display: flex; gap: 15px; color: var(--muted); font-size: 1rem; cursor: pointer; }
-        .address-bar { flex: 1; background: #000; border-radius: 40px; padding: 8px 20px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border); transition: 0.3s; }
-        .address-bar:focus-within { border-color: var(--accent); box-shadow: 0 0 15px var(--glow); }
-        .handle-indicator { color: var(--accent); font-weight: 800; font-size: 0.65rem; letter-spacing: 2px; }
-        .address-bar input { flex: 1; border: none; background: transparent; font-size: 0.9rem; font-weight: 600; outline: none; color: #fff; }
-        .wallet-trigger { display: flex; align-items: center; gap: 10px; background: rgba(123, 53, 212, 0.1); padding: 6px 15px; border-radius: 40px; border: 1px solid var(--accent); cursor: pointer; transition: 0.3s; }
-        .wallet-trigger img { width: 22px; height: 22px; border-radius: 50%; border: 1px solid white; }
-        main { position: relative; background: radial-gradient(circle at center, #111 0%, #000 100%); display: flex; flex-direction: column; align-items: center; overflow-y: auto; padding-top: 10vh; }
-        .hero-logo { width: 100px; margin-bottom: 25px; filter: drop-shadow(0 0 40px var(--glow)); }
-        .search-container { width: 90%; max-width: 650px; position: relative; z-index: 10; margin-bottom: 60px; }
-        #mainSearch { width: 100%; padding: 20px 35px; border-radius: 50px; border: 1px solid var(--border); background: rgba(15, 15, 15, 0.8); color: #fff; font-size: 1.1rem; outline: none; backdrop-filter: blur(10px); box-shadow: 0 15px 40px rgba(0,0,0,0.5); transition: 0.3s; }
-        .search-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: var(--accent); border: none; padding: 12px 25px; border-radius: 40px; color: white; font-weight: 800; cursor: pointer; font-size: 0.8rem; }
-        .app-hub { width: 90%; max-width: 1000px; padding-bottom: 150px; }
-        .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .hub-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 30px; text-align: center; transition: 0.3s; cursor: pointer; text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .hub-card img { width: 60px; height: 60px; border-radius: 50%; margin-bottom: 15px; border: 1px solid var(--border); object-fit: cover; }
-        .nurasen-shield { position: fixed; bottom: 100px; right: 30px; display: flex; align-items: center; gap: 10px; background: rgba(0, 255, 136, 0.1); border: 1px solid var(--safe-green); padding: 10px 20px; border-radius: 30px; z-index: 2000; cursor: pointer; transition: 0.3s; }
-        .node-dock { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(15, 15, 15, 0.8); border: 1px solid var(--border); padding: 10px 25px; border-radius: 50px; display: flex; gap: 20px; backdrop-filter: blur(20px); z-index: 1000; }
-        .dock-item { width: 44px; height: 44px; border-radius: 50%; cursor: pointer; transition: 0.3s; overflow: hidden; border: 1px solid var(--border); }
-        .dock-item img { width: 100%; height: 100%; object-fit: cover; }
-        .wallet-sidebar { position: fixed; top: 0; right: 0; width: 420px; height: 100%; background: var(--surface); border-left: 1px solid var(--border); transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); z-index: 2000; display: flex; flex-direction: column; box-shadow: -20px 0 60px rgba(0,0,0,0.8); }
-        .wallet-sidebar.active { transform: translateX(0); }
-        .sidebar-header { padding: 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-content { flex: 1; padding: 25px; overflow-y: auto; }
+        :root { --pr-purple: #7B35D4; --pr-black: #000; --pr-dark: #050505; }
+        body { background: var(--pr-black); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
+        .explorer-container { display: flex; height: 100vh; }
+        .sidebar-nav { width: 80px; background: var(--pr-dark); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+        .nav-icon { width: 40px; height: 40px; margin-bottom: 25px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        .nav-icon:hover { opacity: 1; }
+        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .search-bar-container { padding: 40px 10%; background: var(--pr-black); }
+        .search-bar { background: #111; border: 1px solid #222; border-radius: 50px; padding: 15px 30px; display: flex; align-items: center; }
+        .search-bar input { background: none; border: none; color: white; width: 100%; padding-left: 15px; font-size: 1.1rem; outline: none; }
+        .results-grid { flex: 1; overflow-y: auto; padding: 20px 10%; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
+        .node-tile { background: #050505; border: 1px solid rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .node-tile:hover { border-color: var(--pr-purple); transform: translateY(-5px); }
+        .node-icon { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--pr-purple); margin-bottom: 15px; }
+        .node-name { font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .node-handle { font-size: 0.5rem; color: var(--pr-purple); margin-top: 5px; }
     </style>
 </head>
 <body>
-
-    <div class="nurasen-shield" onclick="window.location.href='nurasen/index.html'">
-        <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg" style="width:20px; border-radius:50%;">
-        <span style="font-size:0.6rem; font-weight:900; color:var(--safe-green); letter-spacing:1px;">NURASEN PROTECTED</span>
-    </div>
-
-    <div class="browser-container">
-        <header>
-            <div class="browser-controls"><span onclick="history.back()">◀</span> <span onclick="location.reload()">↻</span></div>
-            <div class="address-bar">
-                <span class="handle-indicator">LEGGO://</span>
-                <input type="text" id="urlInput" placeholder="Enter .prn handle..." value="$priscion.prn">
-            </div>
-            <div class="wallet-trigger" onclick="toggleSidebar()">
-                <img src="https://drive.google.com/uc?export=view&id=1YMkt8FVv4RwG3zLmEw-DfycGg7G9S-7E">
-                <span style="font-weight:800; font-size:0.65rem; color:#fff;">$PRISCA.PRN</span>
-            </div>
-            <div style="cursor:pointer;" onclick="alert('Settings Hub: Neural v3.3')">⚙️</div>
-        </header>
-
-        <main>
-            <img src="https://drive.google.com/uc?export=view&id=1YMkt8FVv4RwG3zLmEw-DfycGg7G9S-7E" class="hero-logo">
-            <div style="color:var(--accent); font-size:0.65rem; letter-spacing:8px; text-transform:uppercase; font-weight:900; margin-bottom:30px;">Neural Explorer v3.3</div>
-            <div class="search-container">
-                <input type="text" id="mainSearch" placeholder="Search the Sovereign Ledger or the Web...">
-                <button class="search-btn" onclick="resolve()">EXPLORE</button>
-            </div>
-            <div class="app-hub">
-                <div class="hub-grid">
-                    <a href="ateliagaming/index.html" class="hub-card"><img src="https://drive.google.com/uc?export=view&id=1d0RGyRxGX4K-tK-KrWofcduDRB-SYrCE"><h3>Atelia</h3></a>
-                    <a href="dreaminganime/index.html" class="hub-card"><img src="https://drive.google.com/uc?export=view&id=1LKlvVSg4UJB0T0Qb1fyVPs6COTmtDSko"><h3>Dreaming</h3></a>
-                    <a href="calalloo/index.html" class="hub-card"><img src="https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB"><h3>Calalloo</h3></a>
-                    <a href="riddiim/index.html" class="hub-card"><img src="https://drive.google.com/uc?export=view&id=1EPmsqgYmNoom_B1ptQ4Hghu5HPDg4xmL"><h3>Riddiim</h3></a>
+    <div class="explorer-container">
+        <div class="sidebar-nav">
+            <img src="https://drive.google.com/uc?export=view&id=1YMkt8FVv4RwG3zLmEw-DfycGg7G9S-7E" style="width:30px; margin-bottom:40px;">
+            <div class="nav-icon">🌐</div>
+            <div class="nav-icon">🛡️</div>
+            <div class="nav-icon" onclick="toggleSidebar()">💳</div>
+        </div>
+        <div class="main-content">
+            <div class="search-bar-container">
+                <div class="search-bar">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Search Sovereign Nodes (e.g. $atelia.prn)..." onkeyup="filterNodes(this.value)">
                 </div>
             </div>
-        </main>
+            <div class="results-grid" id="node-grid"></div>
+        </div>
     </div>
 
-    <div class="node-dock">
-        <div class="dock-item" onclick="window.location.href='ateliagaming/index.html'"><img src="https://drive.google.com/uc?export=view&id=1d0RGyRxGX4K-tK-KrWofcduDRB-SYrCE"></div>
-        <div class="dock-item" onclick="window.location.href='dreaminganime/index.html'"><img src="https://drive.google.com/uc?export=view&id=1LKlvVSg4UJB0T0Qb1fyVPs6COTmtDSko"></div>
-        <div class="dock-item" onclick="window.location.href='calalloo/index.html'"><img src="https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB"></div>
-        <div class="dock-item" onclick="window.location.href='riddiim/index.html'"><img src="https://drive.google.com/uc?export=view&id=1EPmsqgYmNoom_B1ptQ4Hghu5HPDg4xmL"></div>
-    </div>
-
-    <div class="wallet-sidebar" id="sidebar">
+    <!-- Sovereign Wallet Sidebar -->
+    <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <h2 style="font-family:'Playfair Display'; font-size:1.2rem;">Neural Vault</h2>
-            <button onclick="toggleSidebar()" style="background:none; border:none; color:white; font-size:1.8rem; cursor:pointer;">&times;</button>
+            <h2 id="sidebar-title">PRISCION WALLET</h2>
+            <button onclick="toggleSidebar()" class="close-btn">&times;</button>
+        </div>
+        <div class="sidebar-tabs">
+            <button id="tab-assets" onclick="switchWalletTabCore('assets')">Assets</button>
+            <button id="tab-vault" onclick="switchWalletTabCore('vault')">Vault</button>
+            <button id="tab-shop" onclick="switchWalletTabCore('shop')">Hub</button>
+            <button id="tab-sync" onclick="switchWalletTabCore('sync')">Settings</button>
         </div>
         <div class="sidebar-content" id="wallet-main-view"></div>
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); border-top:1px solid var(--border);">
-            <button onclick="switchWalletTabCore('assets')" id="tab-assets" style="padding:15px; background:none; border:none; color:var(--accent); font-weight:900; font-size:0.6rem; border-top:2px solid var(--accent);">ASSETS</button>
-            <button onclick="switchWalletTabCore('vault')" id="tab-vault" style="padding:15px; background:none; border:none; color:var(--muted); font-weight:800; font-size:0.6rem;">VAULT</button>
-            <button onclick="switchWalletTabCore('shop')" id="tab-shop" style="padding:15px; background:none; border:none; color:var(--muted); font-weight:800; font-size:0.6rem;">HUB</button>
-            <button onclick="switchWalletTabCore('sync')" id="tab-sync" style="padding:15px; background:none; border:none; color:var(--muted); font-weight:800; font-size:0.6rem;">SYNC</button>
-        </div>
     </div>
-    <input type="file" id="pfp-upload-core" style="display:none;" onchange="handlePFPCore(event)">
 
+    <script src="wallet-core.js"></script>
     <script>
-        function toggleSidebar() { 
-            const s = document.getElementById('sidebar');
-            s.classList.toggle('active'); 
-            if(s.classList.contains('active')) initializeWallet('sidebar');
+        const nodes = [
+            { name: 'ATELIA GAMING', handle: '$atelia.prn', url: '/ateliagaming/', logo: 'https://drive.google.com/uc?export=view&id=11BZOAz1dm9ALneaf-gOA3aGx0pGKM5gd' },
+            { name: 'DREAMING ANIME', handle: '$dreaming.prn', url: '/dreaminganime/', logo: 'https://drive.google.com/uc?export=view&id=1LKlvVSg4UJB0T0Qb1fyVPs6COTmtDSko' },
+            { name: 'RIDDIIM STUDIO', handle: '$riddiim.prn', url: '/riddiim/', logo: 'https://drive.google.com/uc?export=view&id=1gDFu34kqiGtiFqqgXR9bplqipa0QkJVT' },
+            { name: 'CALALLOO HUB', handle: '$calalloo.prn', url: '/calalloo/', logo: 'https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB' },
+            { name: 'NURASEN SECURITY', handle: '$nurasen.prn', url: '/nurasen/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg' },
+            { name: 'VERDANT CO', handle: '$verdant.prn', url: '/verdantco/', icon: '🌱' },
+            { name: 'GLOW PROTOCOL', handle: '$glow.prn', url: '/glowprotocol/', icon: '🧴' },
+            { name: 'SOLE PRESTIGE', handle: '$sole.prn', url: '/soleprestige/', icon: '👟' }
+        ];
+
+        function renderGrid(list) {
+            const grid = document.getElementById('node-grid');
+            grid.innerHTML = list.map(n => `
+                <div class="node-tile" onclick="window.location.href='${n.url}'">
+                    ${n.logo ? \`<img src="${n.logo}" class="node-icon">\` : \`<div style="font-size:2.5rem; margin-bottom:15px;">\${n.icon}</div>\`}
+                    <div class="node-name">${n.name}</div>
+                    <div class="node-handle">${n.handle}</div>
+                </div>
+            `).join('');
         }
-        function resolve() {
-            const input = document.getElementById('mainSearch').value;
-            if(input.includes('.prn')) {
-                const handle = input.replace('$', '').replace('.prn', '');
-                const routes = {'ateliagaming':'ateliagaming/index.html', 'dreaminganime':'dreaminganime/index.html', 'calalloo':'calalloo/index.html', 'riddiim':'riddiim/index.html', 'nurasen':'nurasen/index.html'};
-                if(routes[handle]) { window.location.href = routes[handle]; return; }
-            }
-            window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(input);
+
+        function filterNodes(val) {
+            const filtered = nodes.filter(n => n.name.toLowerCase().includes(val.toLowerCase()) || n.handle.includes(val.toLowerCase()));
+            renderGrid(filtered);
         }
-        document.getElementById('mainSearch').addEventListener('keypress', (e) => { if(e.key === 'Enter') resolve(); });
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('active');
+            if(sb.classList.contains('active')) initializeWallet('sidebar');
+        }
+
+        renderGrid(nodes);
     </script>
 </body>
 </html>
