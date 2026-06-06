@@ -517,54 +517,43 @@
     }
     function updateAssetsUI(type, id) { 
         const list = document.getElementById("assets-list"); 
-        if(list) { 
-            list.innerHTML = '<div style="background:rgba(123,53,212,0.1); border-radius:18px; padding:15px; margin-bottom:10px; border:1px solid #7B35D4;"><span style="font-size:0.75rem; color:#7B35D4; font-weight:800; text-transform:uppercase;">CONNECTED: '+type+'</span><br><span style="font-family:monospace; font-size:0.8rem; color:#333; word-break:break-all;">'+id+'</span></div>' + list.innerHTML; 
-        } 
+        if(list) list.innerHTML = '<div style="background:rgba(123,53,212,0.1); border-radius:18px; padding:15px; margin-bottom:10px; border:1px solid #7B35D4;"><span style="font-size:0.75rem; color:#7B35D4; font-weight:800; text-transform:uppercase;">CONNECTED: '+type+'</span><br><span style="font-family:monospace; font-size:0.8rem; color:#333; word-break:break-all;">'+id+'</span></div>' + list.innerHTML; 
     }
     async function connectVespr() { 
-        const s = document.getElementById("walletStatus"); 
-        s.innerHTML = "⚡ Syncing Vespr..."; 
+        const s = document.getElementById("walletStatus"); s.innerHTML = "⚡ Syncing..."; 
         try { 
             if(window.cardano && window.cardano.vespr) { 
-                const api = await window.cardano.vespr.enable(); 
-                const addrs = await api.getRewardAddresses(); 
-                s.innerHTML = "● Vespr Linked"; s.style.color="#00FF88"; 
-                updateAssetsUI("Vespr", addrs[0]); showWalletTab("assets"); 
-            } else alert("Vespr not found."); 
+                const api = await window.cardano.vespr.enable(); const addrs = await api.getRewardAddresses(); 
+                s.innerHTML = "● Vespr Linked"; s.style.color="#00FF88"; updateAssetsUI("Vespr", addrs[0]); showWalletTab("assets"); 
+            } else alert("Vespr browser required."); 
         } catch(e) { s.innerHTML="● Refused"; s.style.color="#FF4B2B"; } 
     }
     async function initiateAssetRegistry() {
-        const s = document.getElementById("walletStatus");
-        s.innerHTML = "⚡ Handshaking with Vespr...";
-        s.style.color = "#F3BA2F";
+        const s = document.getElementById("walletStatus"); s.innerHTML = "⚡ Handshaking..."; s.style.color = "#F3BA2F";
         try {
             if(window.cardano && window.cardano.vespr) {
                 const api = await window.cardano.vespr.enable();
                 const stake = (await api.getRewardAddresses())[0];
-                const msg = "Sovereign Registry:  Mother Token Identity";
-                const sig = await api.signData(stake, btoa(msg));
-                alert("Sovereign Protocol: Identity Verified.\n\nSignature anchored.  Registry package transmitted.");
-                s.innerHTML = "●  Identity Published";
-                s.style.color = "#00FF88";
-            } else alert("Please connect Vespr to sign the Registry Identity.");
+                const msg = "Sovereign Registry Request for  Identity";
+                
+                // Hex encoding is safer for signing strings
+                const hexMsg = Array.from(new TextEncoder().encode(msg)).map(b => b.toString(16).padStart(2, '0')).join('');
+                const sig = await api.signData(stake, hexMsg);
+                
+                alert("Sovereign Protocol: Identity Verified.\n\n Registry package transmitted.");
+                s.innerHTML = "●  Identity Published"; s.style.color = "#00FF88";
+            } else alert("Connect Vespr to Register.");
         } catch(err) {
-            alert("Registry Signature Refused.");
-            s.innerHTML = "● Refused"; s.style.color="#FF4B2B";
+            alert("Registry Signature Error: " + (err.info || err.message || "User Canceled"));
+            s.innerHTML = "● Error"; s.style.color="#FF4B2B";
         }
     }
     async function initiateGenesisSignature() {
-        const s = document.getElementById("walletStatus");
-        s.innerHTML = "⚡ Genesis Signature Initiated...";
-        setTimeout(() => {
-            s.innerHTML = "● Genesis Confirmed"; s.style.color = "#00FF88";
-            updateAssetsUI("Priscion Native ()", "GENESIS-BLOCK-0");
-            showWalletTab("assets");
-        }, 1500);
+        const s = document.getElementById("walletStatus"); s.innerHTML = "⚡ Genesis Sig...";
+        setTimeout(() => { s.innerHTML = "● Genesis Confirmed"; s.style.color = "#00FF88"; updateAssetsUI("Priscion Native ()", "GENESIS-0"); showWalletTab("assets"); }, 1500);
     }
     window.addEventListener("load", () => { 
-        document.querySelectorAll("button").forEach(b => { 
-            if(b.innerText.toLowerCase().includes("wallet")) b.onclick = openPriscionWallet; 
-        }); 
+        document.querySelectorAll("button").forEach(b => { if(b.innerText.toLowerCase().includes("wallet")) b.onclick = openPriscionWallet; }); 
     });
 </script>
 </body>
