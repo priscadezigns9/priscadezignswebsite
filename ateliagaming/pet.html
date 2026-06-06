@@ -27,9 +27,7 @@
         }
 
         #pet-stage { position: relative; width: 400px; height: 400px; display: flex; align-items: center; justify-content: center; }
-        #pet-img { height: 300px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: drop-shadow(0 0 20px rgba(255,107,0,0.3)); }
-        .bounce { animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        #pet-img { height: 320px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: drop-shadow(0 0 20px rgba(255,107,0,0.3)); object-fit: contain; }
         
         .interaction-ui { display: flex; gap: 20px; margin-top: 40px; z-index: 10; }
         .action-btn {
@@ -110,7 +108,7 @@
         <div id="reward-popup">+5 ATLR</div>
 
         <div id="pet-stage">
-            <img id="pet-img" class="bounce" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp">
+            <img id="pet-img" src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp">
         </div>
 
         <div class="interaction-ui">
@@ -130,15 +128,37 @@
     <script src="/ateliagaming/js/atelia_supabase.js"></script>
     <script>
         let stats = { hunger: 80, happy: 50, energy: 100 };
-        const assets = {
-            astra: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp',
-            mimi: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp',
-            nova: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp',
-            echo: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp'
+        const charData = {
+            astra: {
+                idle: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp',
+                feed: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_pose_2.webp',
+                walk: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp',
+                play: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp'
+            },
+            mimi: {
+                idle: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_full_body_2d.webp',
+                feed: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_2d_hf_1.webp',
+                walk: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp',
+                play: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp'
+            },
+            nova: {
+                idle: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp',
+                feed: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_2d_hf.webp',
+                walk: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_running.webp',
+                play: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp'
+            },
+            echo: {
+                idle: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf.webp',
+                feed: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_2d_hf_1.webp',
+                walk: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp',
+                play: 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp'
+            }
         };
+        let char = 'astra';
 
         function setChar(c) {
-            document.getElementById('pet-img').src = assets[c];
+            char = c;
+            document.getElementById('pet-img').src = charData[c].idle;
             document.querySelectorAll('.char-thumb').forEach(t => t.classList.remove('active'));
             event.currentTarget.classList.add('active');
         }
@@ -147,23 +167,30 @@
             let reward = 0;
             const pet = document.getElementById('pet-img');
             
+            // Set action sprite
+            pet.src = charData[char][type];
+
             if(type === 'feed') {
                 stats.hunger = Math.min(100, stats.hunger + 20);
                 reward = 5;
-                pet.style.transform = 'scale(1.2)';
+                pet.style.transform = 'scale(1.1) translateY(-10px)';
             } else if(type === 'walk') {
                 stats.energy = Math.max(0, stats.energy - 30);
                 stats.happy = Math.min(100, stats.happy + 25);
                 reward = 10;
-                pet.style.transform = 'translateX(50px)';
+                pet.style.transform = 'translateX(60px)';
             } else if(type === 'play') {
                 stats.happy = Math.min(100, stats.happy + 15);
                 stats.energy = Math.max(0, stats.energy - 10);
                 reward = 7;
-                pet.style.transform = 'rotate(360deg)';
+                pet.style.transform = 'translateY(-50px) rotate(10deg)';
             }
 
-            setTimeout(() => { pet.style.transform = ''; }, 500);
+            setTimeout(() => { 
+                pet.style.transform = ''; 
+                pet.src = charData[char].idle;
+            }, 1000);
+
             updateBars();
             showReward(reward);
             
@@ -201,7 +228,7 @@
             stats.hunger = Math.max(0, stats.hunger - 1);
             stats.happy = Math.max(0, stats.happy - 1);
             updateBars();
-        }, 10000);
+        }, 15000);
 
         refreshBalance();
     </script>
