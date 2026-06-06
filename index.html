@@ -753,9 +753,25 @@
         </div>
     </div>
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <script>
+    // --- CORE UI ---
     function openPriscionWallet() {
-        console.log("Sovereign Protocol: Opening Priscion Wallet");
         const modal = document.getElementById('walletModal');
         if(modal) {
             modal.style.display = 'flex';
@@ -774,246 +790,73 @@
     function showWalletTab(tab) {
         const views = ['assets', 'swap', 'connect'];
         views.forEach(v => {
-            document.getElementById('view-' + v).style.display = (v === tab ? 'block' : 'none');
+            const el = document.getElementById('view-' + v);
             const btn = document.getElementById('tab-' + v);
+            if(el) el.style.display = (v === tab ? 'block' : 'none');
             if(btn) btn.style.color = (v === tab ? '#7B35D4' : '#AAA');
         });
     }
 
-    function connectHardware(name) {
-        const status = document.getElementById('walletStatus');
-        status.innerHTML = '⚡ Syncing ' + name + '...';
-        status.style.color = '#F3BA2F';
-        
-        setTimeout(() => {
-            alert('Priscion Wallet: Link Secure with ' + name + '. Assets Synced.');
-            status.innerHTML = '● ' + name + ' Linked';
-            status.style.color = '#00FF88';
-            showWalletTab('assets');
-        }, 2000);
-    }
-
-    function confirmSwap() {
-        alert('Neural Swap Protocol Initiated. Checking Ledger Liquidity...');
-        setTimeout(() => {
-            alert('Swap Success. Priscion Treasury Deposit Confirmed.');
-            showWalletTab('assets');
-        }, 1500);
-    }
-
-    // REBIND ALL WALLET BUTTONS ON LOAD
-    window.addEventListener('load', () => {
-        document.querySelectorAll('button').forEach(btn => {
-            if(btn.innerText.toLowerCase().includes('wallet')) {
-                btn.onclick = openPriscionWallet;
+    function updateAssetsUI(type, id) {
+        console.log("Updating Assets UI for:", type, id);
+        const assetList = document.getElementById('assets-list');
+        if (assetList) {
+            const info = `<div style="background:rgba(123,53,212,0.1); border-radius:20px; padding:20px; margin-bottom:12px; border:1px solid #7B35D4;">
+                <span style="font-size:0.75rem; color:#7B35D4; font-weight:800; text-transform:uppercase;">CONNECTED: ${type}</span><br>
+                <span style="font-family:monospace; font-size:0.8rem; color:#333; word-break:break-all;">${id}</span>
+            </div>`;
+            if (!assetList.innerHTML.includes(id.substring(0,10))) {
+                assetList.innerHTML = info + assetList.innerHTML;
             }
-        });
-    });
-    </script>
-    
-    
-    
-    
-    
-    
-    
-    <script>
+        }
+    }
+
+    // --- CARDANO (VESPR) ---
     async function connectVespr() {
         const status = document.getElementById('walletStatus');
-        status.innerHTML = '⚡ Initiating Neural Sync...';
+        status.innerHTML = '⚡ Syncing Vespr...';
         status.style.color = '#F3BA2F';
-
         try {
             if (typeof window.cardano !== 'undefined' && window.cardano.vespr) {
-                const vespr = window.cardano.vespr;
-                
-                // Request Permission (CIP-30)
-                const api = await vespr.enable();
-                
-                if (api) {
-                    // Fetch Stake Address for Proof of Identity
-                    const rewardAddr = await api.getRewardAddresses();
-                    const stakeAddr = rewardAddr[0]; 
-                    
-                    // Update Status Pill
-                    status.innerHTML = '● Vespr Linked: ' + stakeAddr.substring(0,10) + '...';
-                    status.style.color = '#00FF88';
-                    
-                    // UPDATE ASSETS UI
-                    const assetList = document.getElementById('wallet-assets');
-                    const stakeInfo = '<div style="background:rgba(123,53,212,0.1); border-radius:18px; padding:15px; margin-bottom:15px; border:1px solid #7B35D4;">' +
-                                      '<span style="font-size:0.7rem; color:#7B35D4; font-weight:800; text-transform:uppercase;">Connected Identity (Vespr)</span><br>' +
-                                      '<span style="font-family:monospace; font-size:0.75rem; color:#333; word-break:break-all;">' + stakeAddr + '</span>' +
-                                      '</div>';
-                    
-                    // Prepend the connection proof to the assets list
-                    if (!assetList.innerHTML.includes(stakeAddr.substring(0,10))) {
-                        assetList.innerHTML = stakeInfo + assetList.innerHTML;
-                    }
-                    
-                    alert('Sovereign Link Confirmed.\n\nYour Vespr Wallet is now the Primary Authority for this session.');
-                    showWalletTab('assets');
-                }
+                const api = await window.cardano.vespr.enable();
+                const rewardAddr = await api.getRewardAddresses();
+                const stakeAddr = rewardAddr[0]; 
+                status.innerHTML = '● Vespr Linked (' + stakeAddr.substring(0,8) + ')';
+                status.style.color = '#00FF88';
+                updateAssetsUI('Vespr (Mobile)', stakeAddr);
+                alert('Priscion Hub: Vespr sync successful.');
+                showWalletTab('assets');
             } else {
-                alert('Vespr Wallet not detected.');
-                status.innerHTML = '● Vespr Not Found';
+                alert('Vespr not detected.');
             }
         } catch (err) {
-            console.error(err);
-            alert('Vespr Sync Refused.');
-            status.innerHTML = '● Sync Failed';
-        }
-    }
-    </script>
-    
-    <script>
-    async function executeSwap() {
-        const btn = event.target;
-        const fromAsset = document.getElementById('fromAsset').value;
-        const swapAmount = document.getElementById('swapAmount').value;
-        const targetAsset = document.getElementById('swapTarget').value;
-        
-        const status = document.getElementById('walletStatus');
-        const originalText = btn.innerText;
-
-        // CHECK: Is Vespr Linked?
-        if (typeof window.cardano === 'undefined' || !window.cardano.vespr) {
-            alert('Please connect your Vespr Wallet first.');
-            return;
-        }
-
-        try {
-            const api = await window.cardano.vespr.enable();
-            if (!api) throw new Error('Permission denied');
-
-            btn.innerText = 'Awaiting Signature...';
-            btn.disabled = true;
-            status.innerHTML = '⚡ Signing Atomic Swap...';
-            status.style.color = '#F3BA2F';
-
-            // ATOMIC SWAP PROTOCOL (CIP-30)
-            // In a real swap, we would build a transaction to the Priscion Treasury.
-            // For this pilot, we trigger a Signature Request to verify the Architect's authority.
-            
-            const changeAddr = await api.getChangeAddress();
-            const payload = "PRISCION_SWAP_PILOT_" + Date.now();
-            
-            // This triggers the REAL popup in Vespr on your phone
-            const signature = await api.signData(changeAddr, btoa(payload));
-            
-            if (signature) {
-                status.innerHTML = '⚡ Mining Sovereign Block...';
-                
-                // Simulate the backend minting $PRN based on the signed proof
-                setTimeout(() => {
-                    alert('Sovereign Swap Confirmed.\n\n' + swapAmount + ' ' + fromAsset + ' Bridged.\nMinted: ' + (swapAmount * 10) + ' ' + targetAsset + '\n\nProof Hash: ' + signature.signature.substring(0,20) + '...');
-                    status.innerHTML = '● Transaction Finalized';
-                    status.style.color = '#00FF88';
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                    showWalletTab('assets');
-                }, 2000);
-            }
-        } catch (err) {
-            console.error(err);
-            alert('Swap Aborted: ' + (err.info || err.message || 'Signature Refused'));
-            btn.innerText = originalText;
-            btn.disabled = false;
-            status.innerHTML = '● Swap Cancelled';
+            status.innerHTML = '● Vespr Refused';
             status.style.color = '#FF4B2B';
         }
     }
-    </script>
-    
-    <script>
-    async function connectHardware(name) {
-        if (name !== 'Ledger Hardware') {
-            // Default mockup for other wallets
-            const status = document.getElementById('walletStatus');
-            status.innerHTML = '⚡ Syncing ' + name + '...';
-            status.style.color = '#F3BA2F';
-            setTimeout(() => {
-                alert('Priscion Wallet: Link Secure with ' + name + '. Assets Synced.');
-                status.innerHTML = '● ' + name + ' Linked';
-                status.style.color = '#00FF88';
-                showWalletTab('assets');
-            }, 2000);
-            return;
-        }
 
-        // REAL LEDGER WEBHID PROTOCOL
-        const status = document.getElementById('walletStatus');
-        status.innerHTML = '⚡ Searching for Ledger Device...';
-        status.style.color = '#F3BA2F';
-
-        try {
-            if (!navigator.hid) {
-                throw new Error('WebHID not supported in this browser. Please use Chrome, Brave, or Edge.');
-            }
-
-            // Request permission to access Ledger
-            // Ledger Vendor ID: 0x2c97
-            const devices = await navigator.hid.requestDevice({
-                filters: [{ vendorId: 0x2c97 }]
-            });
-
-            if (devices.length > 0) {
-                const ledger = devices[0];
-                status.innerHTML = '⚡ Opening ' + ledger.productName + '...';
-                
-                await ledger.open();
-                
-                alert('Priscion Hub: ' + ledger.productName + ' Detected.\n\nPlease open the Cardano or Ethereum app on your device to finalize the Sovereign Link.');
-                
-                status.innerHTML = '● Ledger Hardware Linked';
-                status.style.color = '#00FF88';
-                
-                // Add Ledger to Assets UI
-                const assetList = document.getElementById('wallet-assets');
-                const ledgerInfo = '<div style="background:rgba(123,53,212,0.1); border-radius:18px; padding:15px; margin-bottom:15px; border:1px solid #7B35D4;">' +
-                                  '<span style="font-size:0.7rem; color:#7B35D4; font-weight:800; text-transform:uppercase;">Hardware Guard (Ledger)</span><br>' +
-                                  '<span style="font-size:0.75rem; color:#333; font-weight:700;">' + ledger.productName + ' Active</span>' +
-                                  '</div>';
-                
-                if (!assetList.innerHTML.includes('Hardware Guard')) {
-                    assetList.innerHTML = ledgerInfo + assetList.innerHTML;
-                }
-
-                showWalletTab('assets');
-            } else {
-                status.innerHTML = '● No Device Selected';
-                status.style.color = '#FF4B2B';
-            }
-        } catch (err) {
-            console.error('Ledger Error:', err);
-            alert('Ledger Connection Failed: ' + err.message);
-            status.innerHTML = '● Link Failed';
-            status.style.color = '#FF4B2B';
-        }
-    }
-    </script>
-    
-    <script>
+    // --- EVM (METAMASK / BINANCE) ---
     async function connectMetaMask() {
         const status = document.getElementById('walletStatus');
         status.innerHTML = '⚡ Syncing MetaMask...';
         status.style.color = '#F3BA2F';
-
         if (typeof window.ethereum !== 'undefined') {
             try {
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 const account = accounts[0];
-                status.innerHTML = '● MetaMask Linked: ' + account.substring(0,8) + '...';
+                status.innerHTML = '● MetaMask Linked (' + account.substring(0,8) + ')';
                 status.style.color = '#00FF88';
                 updateAssetsUI('MetaMask (EVM)', account);
-                alert('Priscion Hub: MetaMask connected successfully.');
+                alert('Priscion Hub: MetaMask connected.');
                 showWalletTab('assets');
             } catch (err) {
+                console.error("MetaMask Error:", err);
                 status.innerHTML = '● MetaMask Refused';
                 status.style.color = '#FF4B2B';
+                alert('Connection Refused: ' + (err.message || 'Check extension status'));
             }
         } else {
-            alert('MetaMask not detected. Please install the extension.');
+            alert('MetaMask extension not found.');
         }
     }
 
@@ -1021,26 +864,61 @@
         const status = document.getElementById('walletStatus');
         status.innerHTML = '⚡ Syncing Binance...';
         status.style.color = '#F3BA2F';
-
-        // Binance Smart Chain usually uses MetaMask or Binance Wallet
-        if (typeof window.ethereum !== 'undefined' || typeof window.BinanceChain !== 'undefined') {
-            const provider = window.ethereum || window.BinanceChain;
+        const provider = window.ethereum || window.BinanceChain;
+        if (provider) {
             try {
                 const accounts = await provider.request({ method: 'eth_requestAccounts' });
                 const account = accounts[0];
-                status.innerHTML = '● Binance Linked: ' + account.substring(0,8) + '...';
+                status.innerHTML = '● Binance Linked (' + account.substring(0,8) + ')';
                 status.style.color = '#00FF88';
                 updateAssetsUI('Binance (BSC)', account);
-                alert('Priscion Hub: Binance Wallet connected successfully.');
+                alert('Priscion Hub: Binance linked.');
                 showWalletTab('assets');
             } catch (err) {
                 status.innerHTML = '● Binance Refused';
                 status.style.color = '#FF4B2B';
             }
         } else {
-            alert('Binance-compatible wallet not detected.');
+            alert('Binance-compatible wallet not found.');
         }
     }
+
+    // --- HARDWARE (LEDGER) ---
+    async function connectHardware(name) {
+        if (name !== 'Ledger') return;
+        const status = document.getElementById('walletStatus');
+        status.innerHTML = '⚡ Searching for Ledger...';
+        status.style.color = '#F3BA2F';
+        try {
+            const devices = await navigator.hid.requestDevice({ filters: [{ vendorId: 0x2c97 }] });
+            if (devices.length > 0) {
+                const ledger = devices[0];
+                await ledger.open();
+                status.innerHTML = '● Ledger Hardware Linked';
+                status.style.color = '#00FF88';
+                updateAssetsUI('Ledger Hardware', ledger.productName);
+                alert('Ledger ' + ledger.productName + ' detected. Open Cardano/Ethereum app.');
+                showWalletTab('assets');
+            }
+        } catch (err) {
+            status.innerHTML = '● Ledger Failed';
+            status.style.color = '#FF4B2B';
+        }
+    }
+
+    // --- SWAP ---
+    async function executeSwap() {
+        alert('Neural Swap Protocol v5.3: Signature required to confirm treasury settlement.');
+        // Simulation logic for now
+        showWalletTab('assets');
+    }
+
+    // Initialization
+    window.addEventListener('load', () => {
+        document.querySelectorAll('button').forEach(btn => {
+            if(btn.innerText.toLowerCase().includes('wallet')) btn.onclick = openPriscionWallet;
+        });
+    });
     </script>
     </body></html>
 
