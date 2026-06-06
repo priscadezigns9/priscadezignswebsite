@@ -360,7 +360,8 @@
       <div class="result-item" onclick='loadTrack(${JSON.stringify({
         title: i.title,
         artist: i.artist.name,
-        art: i.album.cover_big
+        art: i.album.cover_big,
+        deezerId: i.id
       }).replace(/'/g, "&apos;")})'>
         <img src="${i.album.cover_small}">
         <div class="res-info">
@@ -372,34 +373,39 @@
     results.style.display = 'block';
   };
 
-  window.loadTrack = async (t) => {
+  window.loadTrack = (t) => {
     currentTrack = t;
     results.style.display = 'none';
     emptyState.style.display = 'none';
     vaultList.style.display = 'none';
     playerUI.style.display = 'block';
-    
+
     document.getElementById('track-art').src = t.art;
     document.getElementById('track-name').textContent = t.title;
     document.getElementById('artist-name').textContent = t.artist;
     updateFavUI();
-    
+
     feedback.textContent = 'TUNING_FREQUENCY...';
 
-    // Excellence: Ad Injection for Free Users in RIDDIIM
-    const status = localStorage.getItem('empire_account_status') || 'free';
-    if(status !== 'premium') {
-      feedback.textContent = "SPONSORED_SIGNAL_SYNCING...";
-      await new Promise(r => setTimeout(r, 2000));
-    }
-    
-    const searchQuery = `${t.artist} ${t.title} audio`;
-    const ytId = await findYouTubeId(searchQuery);
-    if(ytId && isReady) {
-      player.loadVideoById(ytId);
+    if (t.deezerId) {
+      // Inject Deezer official widget — full track playback, sovereign signal
+      var existing = document.getElementById('deezer-widget-frame');
+      if (existing) existing.remove();
+      var frame = document.createElement('iframe');
+      frame.id = 'deezer-widget-frame';
+      frame.title = 'Deezer Widget';
+      frame.src = 'https://widget.deezer.com/widget/dark/track/' + t.deezerId + '?autoplay=1';
+      frame.width = '100%';
+      frame.height = '92';
+      frame.frameBorder = '0';
+      frame.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+      frame.style.cssText = 'border-radius:12px; margin-top:12px; display:block;';
+      // Insert widget below the player UI deck
+      var deck = document.querySelector('.deck-container');
+      if (deck) deck.appendChild(frame);
       feedback.textContent = 'STREAM_STABILIZED';
     } else {
-      feedback.textContent = 'SIGNAL_LOST_USING_PREVIEW';
+      feedback.textContent = 'SIGNAL_LOST';
     }
   };
 
