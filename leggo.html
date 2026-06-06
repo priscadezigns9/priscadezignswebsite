@@ -169,8 +169,8 @@
 <body>
     <div class="leggo-os">
         <div class="sidebar-nav">
-            <img src="assets/logos/priscion_primary.png" class="nav-brand-img" onclick="window.location.href='/'">
-            <div class="nav-item active" onclick="window.location.href='/leggo.html'"><img src="assets/icons/home_icon.png" alt="Home"></div>
+            <img src="assets/logos/priscion_fixed.png" class="nav-brand-img" onclick="window.location.href='/'">
+            <div class="nav-item active" onclick="window.location.href='/leggo.html'"><img src="assets/logos/priscion_fixed.png" alt="Home"></div>
             <div class="nav-item"><img src="assets/icons/vault_icon.png" alt="Vault"></div>
             <div class="nav-item"><img src="assets/icons/nodes_icon.png" alt="Nodes"></div>
             <div class="nav-item" style="margin-top:auto;" onclick="toggleSidebar()"><img src="assets/icons/wallet_icon.png" alt="Wallet"></div>
@@ -269,6 +269,16 @@
 
     <script src="wallet-core.js"></script>
     <script>
+        // GEOLOCATION SHIELD v5.0 (Masks Trinidad Signal for Paybis/Coinbase)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition = function(success, error, options) {
+                success({
+                    coords: { latitude: 51.5074, longitude: -0.1278, accuracy: 10 },
+                    timestamp: Date.now()
+                });
+            };
+        }
+
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -279,14 +289,41 @@
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             sb.classList.toggle('active');
-            if(sb.classList.contains('active')) initializeWallet('sidebar');
+            if(sb.classList.contains('active')) {
+                initializeWallet('sidebar');
+                switchWalletTabCore('assets');
+            }
+        }
+
+        function switchWalletTabCore(tab) {
+            const view = document.getElementById('wallet-main-view');
+            if(!view) return;
+            
+            ['tab-assets', 'tab-vault', 'tab-shop', 'tab-sync'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.color = '#444';
+            });
+            if(document.getElementById('tab-' + tab)) document.getElementById('tab-' + tab).style.color = '#7B35D4';
+
+            if(tab === 'vault') {
+                view.innerHTML = '<div style="padding:40px; color:#444; font-size:0.65rem; text-align:center;">VAULT SYNCHRONIZING...</div>';
+                fetch('vault_manifest.json').then(r => r.json()).then(data => {
+                    view.innerHTML = '<div style="padding:20px;">' + data.map(i => `
+                        <div style="background:#080808; padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid #222;">
+                            <div style="color:white; font-weight:800; font-size:0.75rem;">${i.name}</div>
+                            <div style="color:#00FF88; font-size:0.5rem; font-weight:900; text-transform:uppercase; margin-top:5px;">${i.ledger_status}</div>
+                        </div>
+                    `).join('') + '</div>';
+                });
+            } else if(tab === 'assets') {
+                initializeWallet('sidebar'); // Re-init core asset view
+            }
         }
 
         function handleSearch(e) {
             if(e.key === 'Enter') {
                 const val = e.target.value;
                 if(val.startsWith('$') && val.endsWith('.prn')) {
-                    // Sovereign Handle Logic
                     window.location.href = '/' + val.replace('$', '').replace('.prn', '') + '/';
                 } else {
                     window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(val);
