@@ -1,4 +1,4 @@
-/* Sovereign Wallet Core v4.7.0 [High-Fidelity & Blockchain SaaS] */
+/* Sovereign Wallet Core v4.7.2 [High-Fidelity & Blockchain SaaS] */
 
 const ASSETS_DATA = [
     { id: 'prn', name: 'PRISCION ($PRN)', balance: '2,540.00', usd: '$2,540.00', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg' },
@@ -8,30 +8,30 @@ const ASSETS_DATA = [
 ];
 
 const EMPIRE_NODES = [
-    { name: 'ATELIA', url: '/ateliagaming/', logo: 'https://drive.google.com/uc?export=view&id=11BZOAz1dm9ALneaf-gOA3aGx0pGKM5gd' },
-    { name: 'DREAMING', url: '/dreaminganime/', logo: 'https://drive.google.com/uc?export=view&id=1LKlvVSg4UJB0T0Qb1fyVPs6COTmtDSko' },
-    { name: 'RIDDIIM', url: '/riddiim/', logo: 'https://drive.google.com/uc?export=view&id=1gDFu34kqiGtiFqqgXR9bplqipa0QkJVT' },
-    { name: 'CALALLOO', url: '/calalloo/', logo: 'https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB' },
-    { name: 'NURASEN', url: '/nurasen/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg' },
-    { name: 'ESSENCE', url: '/essenceelite/', icon: '✨' },
-    { name: 'GEN PLAY', url: '/thegenplay/', icon: '🎮' },
-    { name: 'AUTODROME', url: '/theautodrome/', icon: '🏎️' },
-    { name: 'GLOW', url: '/glowprotocol/', icon: '🧴' },
-    { name: 'PEAK FIT', url: '/peakfit/', icon: '⚡' },
-    { name: 'SOLE', url: '/soleprestige/', icon: '👟' },
-    { name: 'ESCAPIST', url: '/theescapist/', icon: '🏝️' },
-    { name: 'TECH SCOUT', url: '/techscout/', icon: '🔭' },
-    { name: 'WATCHLIST', url: '/thewatchlist/', icon: '⌚' },
-    { name: 'VERDANT', url: '/verdantco/', icon: '🌱' },
-    { name: 'DESKWELL', url: '/deskwell/', icon: '🪑' }
+    { name: 'ATELIA', handle: '$atelia.prn', url: '/ateliagaming/', logo: 'https://drive.google.com/uc?export=view&id=11BZOAz1dm9ALneaf-gOA3aGx0pGKM5gd' },
+    { name: 'DREAMING', handle: '$dreaming.prn', url: '/dreaminganime/', logo: 'https://drive.google.com/uc?export=view&id=1LKlvVSg4UJB0T0Qb1fyVPs6COTmtDSko' },
+    { name: 'RIDDIIM', handle: '$riddiim.prn', url: '/riddiim/', logo: 'https://drive.google.com/uc?export=view&id=1gDFu34kqiGtiFqqgXR9bplqipa0QkJVT' },
+    { name: 'CALALLOO', handle: '$calalloo.prn', url: '/calalloo/', logo: 'https://drive.google.com/uc?export=view&id=1MOdc4fha-Guqo1X3Y8l9JdlBuMdDuuzB' },
+    { name: 'NURASEN', handle: '$nurasen.prn', url: '/nurasen/', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/nurasen_icon.jpg' },
+    { name: 'ESSENCE', handle: '$essenceelite.prn', url: '/essenceelite/', icon: '✨' },
+    { name: 'GEN PLAY', handle: '$thegenplay.prn', url: '/thegenplay/', icon: '🎮' },
+    { name: 'AUTODROME', handle: '$theautodrome.prn', url: '/theautodrome/', icon: '🏎️' },
+    { name: 'GLOW', handle: '$glowprotocol.prn', url: '/glowprotocol/', icon: '🧴' },
+    { name: 'PEAK FIT', handle: '$peakfit.prn', url: '/peakfit/', icon: '⚡' },
+    { name: 'SOLE', handle: '$soleprestige.prn', url: '/soleprestige/', icon: '👟' },
+    { name: 'ESCAPIST', handle: '$theescapist.prn', url: '/theescapist/', icon: '🏝️' },
+    { name: 'TECH SCOUT', handle: '$techscout.prn', url: '/techscout/', icon: '🔭' },
+    { name: 'WATCHLIST', handle: '$thewatchlist.prn', url: '/thewatchlist/', icon: '⌚' },
+    { name: 'VERDANT', handle: '$verdantco.prn', url: '/verdantco/', icon: '🌱' },
+    { name: 'DESKWELL', handle: '$deskwell.prn', url: '/deskwell/', icon: '🪑' }
 ];
 
 const SAAS_NODES = [
-    { name: 'CUPYX', url: 'https://cupyx.prn', icon: '☕' },
-    { name: 'MOBLYNC', url: 'https://moblync.prn', icon: '📱' },
-    { name: 'KARJOV', url: 'https://karjov.prn', icon: '⚔️' },
-    { name: 'ROSELL', url: 'https://rosell.prn', icon: '🌹' },
-    { name: 'VELLOQ', url: 'https://velloq.prn', icon: '⚡' }
+    { name: 'CUPYX', handle: '$cupyx.prn', url: '/cupyx/', icon: '☕' },
+    { name: 'MOBLYNC', handle: '$moblync.prn', url: '/moblync/', icon: '📱' },
+    { name: 'KARJOV', handle: '$karjov.prn', url: '/karjov/', icon: '⚔️' },
+    { name: 'ROWCELL', handle: '$rowcell.prn', url: '/rowcell/', icon: '🌹' },
+    { name: 'VELLOQ', handle: '$velloq.prn', url: '/velloq/', icon: '⚡' }
 ];
 
 function initializeWallet(containerId) {
@@ -198,7 +198,7 @@ function renderEmpireHub() {
                     <a href="${node.url}" style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:20px; border-radius:22px; text-align:center; text-decoration:none; color:white; display:block;">
                         ${node.logo ? `<img src="${node.logo}" style="width:45px; height:45px; border-radius:50%; border:2px solid #7B35D4; margin-bottom:12px;">` : `<div style="font-size:2rem; margin-bottom:12px;">${node.icon}</div>`}
                         <div style="font-size:0.65rem; font-weight:900;">${node.name}</div>
-                        <div style="font-size:0.45rem; color:#7B35D4; font-weight:800; margin-top:5px;">.PRN NODE</div>
+                        <div style="font-size:0.45rem; color:#7B35D4; font-weight:800; margin-top:5px;">${node.handle}</div>
                     </a>
                 `).join('')}
             </div>
@@ -206,10 +206,10 @@ function renderEmpireHub() {
             <h3 style="font-size:0.6rem; color:#888; text-transform:uppercase; margin:30px 0 15px; letter-spacing:2px; font-weight:900;">Blockchain SaaS</h3>
             <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;">
                 ${SAAS_NODES.map(s => `
-                    <div onclick="window.open('${s.url}')" style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:15px; border-radius:18px; text-align:center; cursor:pointer;">
+                    <div onclick="window.location.href='${s.url}'" style="background:#111; border:1px solid rgba(255,255,255,0.03); padding:15px; border-radius:18px; text-align:center; cursor:pointer;">
                         <div style="font-size:1.5rem; margin-bottom:8px;">${s.icon}</div>
                         <div style="font-size:0.55rem; font-weight:900; color:white;">${s.name}</div>
-                        <div style="font-size:0.4rem; color:#888; margin-top:3px;">Sovereign Protocol</div>
+                        <div style="font-size:0.4rem; color:#7B35D4; margin-top:3px; font-weight:800;">${s.handle}</div>
                     </div>
                 `).join('')}
             </div>
@@ -239,7 +239,7 @@ function renderSettingsView() {
             <div style="background:#111; border-radius:20px; overflow:hidden;">
                 <div class="settings-item" onclick="alert('Neural Sync Active')">
                     <span style="font-size:0.75rem; color:white;">Neural Engine</span>
-                    <span style="color:#7B35D4; font-size:0.6rem;">v4.7.0</span>
+                    <span style="color:#7B35D4; font-size:0.6rem;">v4.7.2</span>
                 </div>
                 <div class="settings-item" onclick="alert('Nurasen Shield Active')">
                     <span style="font-size:0.75rem; color:white;">Security Shield</span>
