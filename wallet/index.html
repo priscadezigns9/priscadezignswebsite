@@ -5,91 +5,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>PRISCION WALLET</title>
-    <link rel="manifest" href="/ledger/manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://priscadezigns.org/media/1780709319613.jpg">
     <style>
-        :root { --bg: #0B0E11; --card: #1E2329; --accent: #F0B90B; --p: #7B35D4; --g: #00FF88; --text: #EAECEF; --text-dim: #707A8A; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
-        .container { height: 100%; display: flex; flex-direction: column; }
-        .header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--bg); border-bottom: 1px solid #2B2F36; }
-        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.9rem; letter-spacing: 1px; }
-        .brand img { width: 26px; height: 26px; border-radius: 50%; }
-        .main { flex: 1; overflow-y: auto; padding: 20px; }
+        :root { --bg: #0B0E11; --card: #1E2329; --accent: #F0B90B; --p: #7B35D4; --text: #EAECEF; --text-dim: #707A8A; --g: #00FF88; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, system-ui; overflow: hidden; }
+        .app { height: 100%; display: flex; flex-direction: column; }
+        .hdr { padding: 25px 20px; border-bottom: 1px solid #2B2F36; display: flex; justify-content: space-between; align-items: center; }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1rem; }
+        .brand img { width: 30px; height: 30px; border-radius: 50%; }
+        .main { flex: 1; overflow-y: auto; padding: 25px; }
         .view { display: none; }
         .view.active { display: block; }
-        
-        /* Asset Row */
-        .asset-card { background: var(--card); border-radius: 24px; padding: 20px; border: 1px solid #2B3139; }
-        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #2B3139; }
-        .asset-img { width: 44px; height: 44px; border-radius: 12px; object-fit: cover; background: #FFF; }
-        .val-main { font-family: monospace; font-weight: 700; font-size: 1rem; text-align: right; }
-
-        /* NFT Gallery */
-        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .nft-card { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid #2B3139; }
-        .nft-img { width: 100%; aspect-ratio: 1; object-fit: cover; }
-        .nft-info { padding: 12px; text-align: left; }
-        .nft-title { font-weight: 800; font-size: 0.7rem; display: block; margin-bottom: 4px; color: var(--text); }
-        .nft-id { font-size: 0.6rem; color: var(--p); font-weight: 700; }
-
-        /* Browser Grid */
-        .browser-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .node-link { background: var(--card); border-radius: 20px; padding: 25px 15px; text-align: center; text-decoration: none; border: 1px solid #2B3139; display: flex; flex-direction: column; align-items: center; }
-        .node-img { width: 50px; height: 50px; border-radius: 12px; margin-bottom: 12px; object-fit: cover; }
-        .node-lbl { font-weight: 800; font-size: 0.7rem; color: var(--text); text-transform: uppercase; }
-
-        /* Bottom Nav */
-        .nav { height: 85px; background: var(--card); border-top: 1px solid #2B3139; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { text-align: center; color: var(--text-dim); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; cursor: pointer; flex: 1; padding: 10px; }
+        .card { background: var(--card); border-radius: 28px; padding: 25px; border: 1px solid #2B3139; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .asset-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #2B3139; }
+        .asset-img { width: 48px; height: 48px; border-radius: 14px; object-fit: cover; border: 1px solid #333; }
+        .val-main { font-family: monospace; font-weight: 700; font-size: 1.1rem; text-align: right; }
+        .val-sub { font-size: 0.75rem; color: var(--accent); margin-top: 5px; text-align: right; }
+        .nav { height: 90px; background: var(--card); border-top: 1px solid #2B3139; display: flex; justify-content: space-around; align-items: center; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { text-align: center; color: var(--text-dim); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; cursor: pointer; flex: 1; }
         .nav-item.active { color: var(--p); }
-        .nav-icon { font-size: 1.3rem; display: block; margin-bottom: 4px; }
+        .nft-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .nft-card { background: var(--card); border-radius: 24px; overflow: hidden; border: 1px solid #2B3139; }
+        .nft-img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+        .phrase-box { background: #FFFBE6; color: #856404; padding: 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; font-weight: 800; border: 2px dashed #FFE58F; display: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <div class="app">
+        <div class="hdr">
             <div class="brand"><img src="https://priscadezigns.org/media/1780709319613.jpg"> PRISCION</div>
-            <div style="font-size: 0.6rem; font-weight: 800; color: var(--g); background: rgba(0,255,136,0.1); padding: 4px 10px; border-radius: 20px;">VAULT SECURE</div>
+            <div style="color:var(--g); font-size:0.7rem; font-weight:900;">● NODE ACTIVE</div>
         </div>
         <div class="main">
-            <!-- VIEW: ASSETS -->
             <div id="assets" class="view active">
-                <div class="asset-card">
+                <div id="phraseBox" class="phrase-box">RECOVERY PHRASE SECURED</div>
+                <div class="card">
                     <div class="asset-row">
-                        <div style="display:flex; align-items:center; gap:12px;"><img src="https://priscadezigns.org/media/1780706020799.jpg" class="asset-img"><div><span style="font-weight:700;">PRN</span><span style="font-size:0.7rem; color:var(--text-dim); display:block;">Sovereign Native</span></div></div>
-                        <div class="val-main">1,000M</div>
+                        <div style="display:flex; align-items:center; gap:15px;"><img src="https://priscadezigns.org/media/1780706020799.jpg" class="asset-img"><div><strong>PRN</strong><br><small style="color:var(--text-dim);">Sovereign Native</small></div></div>
+                        <div><div class="val-main">1,000M</div><div class="val-sub">0.2M</div></div>
+                    </div>
+                    <div class="asset-row">
+                        <div style="display:flex; align-items:center; gap:15px;"><img src="https://priscadezigns.org/media/1780706348206.jpg" class="asset-img"><div><strong>MUSD</strong><br><small style="color:var(--text-dim);">Imperial Reserve</small></div></div>
+                        <div><div class="val-main">500K</div><div class="val-sub">00K</div></div>
+                    </div>
+                    <div class="asset-row" style="border-bottom:none;">
+                        <div style="display:flex; align-items:center; gap:15px;"><img src="https://priscadezigns.org/media/1780706433480.jpg" class="asset-img"><div><strong>NRL</strong><br><small style="color:var(--text-dim);">Neural Fuel</small></div></div>
+                        <div><div class="val-main">750K</div><div class="val-sub">Sovereign Core</div></div>
                     </div>
                 </div>
             </div>
-
-            <!-- VIEW: NFTs -->
-            <div id="nfts" class="view">
-                <h3 style="font-size:0.8rem; font-weight:900; margin-bottom:20px; color:var(--p); text-transform:uppercase;">Imperial Vault</h3>
+            <div id="vault" class="view">
                 <div class="nft-grid">
-                    <div class="nft-card"><img src="https://priscadezigns.org/media/1780709319613.jpg" class="nft-img"><div class="nft-info"><span class="nft-title">Mustard Tree Genesis</span><span class="nft-id">#0001</span></div></div>
-                    <div class="nft-card"><img src="https://priscadezigns.org/nurasen_center_shield_final.jpg" class="nft-img"><div class="nft-info"><span class="nft-title">Neural Shield Prime</span><span class="nft-id">#0042</span></div></div>
-                    <div class="nft-card"><img src="https://priscadezigns.org/media/1780706020799.jpg" class="nft-img"><div class="nft-info"><span class="nft-title">Sovereign Sovereign</span><span class="nft-id">#0882</span></div></div>
-                    <div class="nft-card"><div style="aspect-ratio:1; background:#0B0E11; display:flex; align-items:center; justify-content:center; color:#333; font-size:2rem;">+</div><div class="nft-info"><span class="nft-title">Mint New NFT</span><span class="nft-id">VAULT ACCESS</span></div></div>
+                    <div class="nft-card"><img src="https://priscadezigns.org/media/1780709319613.jpg" class="nft-img"><div style="padding:12px; font-size:0.7rem; font-weight:800; color:var(--p);">MUSTARD TREE #001</div></div>
+                    <div class="nft-card"><img src="https://priscadezigns.org/nurasen_center_shield_final.jpg" class="nft-img"><div style="padding:12px; font-size:0.7rem; font-weight:800; color:var(--p);">NURASEN PRIME #042</div></div>
                 </div>
             </div>
-
-            <!-- VIEW: BROWSER -->
             <div id="browser" class="view">
-                <div class="browser-grid">
-                    <a href="/" class="node-link"><img src="https://priscadezigns.org/media/1780709319613.jpg" class="node-img"><span class="node-lbl">Hub</span></a>
-                    <a href="/ateliagaming/" class="node-link"><img src="https://priscadezigns.org/media/1780709319613.jpg" class="node-img"><span class="node-lbl">Atelia</span></a>
-                    <a href="/sites/nurasen/" class="node-link"><img src="https://priscadezigns.org/nurasen_center_shield_final.jpg" class="node-img"><span class="node-lbl">Nurasen</span></a>
-                    <a href="/ledger/" class="node-link"><img src="https://priscadezigns.org/media/1780709319613.jpg" class="node-img"><span class="node-lbl">Ledger</span></a>
+                <div class="nft-grid">
+                    <a href="/" style="text-decoration:none;"><div class="nft-card"><img src="https://priscadezigns.org/media/1780709319613.jpg" class="nft-img"><div style="padding:12px; text-align:center; font-weight:900; color:var(--text);">HUB</div></div></a>
+                    <a href="/ledger/" style="text-decoration:none;"><div class="nft-card"><img src="https://priscadezigns.org/media/1780706020799.jpg" class="nft-img"><div style="padding:12px; text-align:center; font-weight:900; color:var(--text);">LEDGER</div></div></a>
                 </div>
             </div>
         </div>
-
         <div class="nav">
-            <div class="nav-item active" onclick="switchTab('assets', this)"><span class="nav-icon">💰</span>Assets</div>
-            <div class="nav-item" onclick="switchTab('nfts', this)"><span class="nav-icon">🖼️</span>NFTs</div>
-            <div class="nav-item" onclick="switchTab('browser', this)"><span class="nav-icon">🌐</span>Browser</div>
+            <div class="nav-item active" onclick="switchTab('assets', this)">Assets</div>
+            <div class="nav-item" onclick="switchTab('vault', this)">Vault</div>
+            <div class="nav-item" onclick="switchTab('browser', this)">Browser</div>
         </div>
     </div>
     <script>
