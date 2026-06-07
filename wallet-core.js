@@ -4,13 +4,8 @@ const ASSETS = [
     { id: 'ada', symbol: 'ADA', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/ada_coin.png', balance: 38 }
 ];
 let WALLETS = JSON.parse(localStorage.getItem('prn_wallets')) || [{ name: 'Architect', handle: '$prisca.pri', pfp: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion.svg' }];
-let CHAT = JSON.parse(localStorage.getItem('prn_chat')) || [{ s: 'JARVIS', t: 'Neural Bridge Active. I am sensing your presence on the ledger, Architect.' }];
-let VAULT = JSON.parse(localStorage.getItem('prn_vault')) || [
-    { n: "Birth_Cert.pri", i: "🖼️" },
-    { n: "Land_Deeds.pri", i: "🏠" },
-    { n: "Manifest.pri", i: "🏰" },
-    { n: "Identity_Core.pri", i: "🔑" }
-];
+let CHAT = JSON.parse(localStorage.getItem('prn_chat')) || [{ s: 'JARVIS', t: 'Welcome, Architect. Jello Messenger is now anchored to your Sovereign Ledger.' }];
+let VAULT = JSON.parse(localStorage.getItem('prn_vault')) || [{ n: "Manifest.pri", i: "🏰" }];
 
 const ICONS = {
     assets: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
@@ -19,16 +14,14 @@ const ICONS = {
     vault: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
 };
 
-function speak(text) {
+function speak(t) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(text);
-        const voices = window.speechSynthesis.getVoices();
-        const preferred = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('UK English Male'));
-        if (preferred) msg.voice = preferred;
-        msg.rate = 0.85; 
-        msg.pitch = 0.75;
-        window.speechSynthesis.speak(msg);
+        const m = new SpeechSynthesisUtterance(t);
+        const v = window.speechSynthesis.getVoices().find(x => x.name.includes('Google') || x.name.includes('Natural') || x.name.includes('UK English Male'));
+        if (v) m.voice = v;
+        m.rate = 0.85; m.pitch = 0.7;
+        window.speechSynthesis.speak(m);
     }
 }
 
@@ -41,70 +34,74 @@ function initializeWallet(c) {
 function renderAssets() {
     const r = document.getElementById('w-root'); if(!r) return;
     const usd = (ASSETS[1].balance * CONFIG.ADA_USD) + (ASSETS[0].balance * CONFIG.PRN_USD);
-    r.innerHTML = `
-    <div style="padding:25px;flex:1;display:flex;flex-direction:column;box-sizing:border-box;">
+    r.innerHTML = `<div style="padding:25px;flex:1;display:flex;flex-direction:column;box-sizing:border-box;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
             <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="renderProfile()">
                 <img src="${WALLETS[0].pfp}" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #7B35D4;object-fit:cover;background:#111;">
-                <div>
-                    <div style="font-weight:900;font-size:0.75rem;">${WALLETS[0].name}</div>
-                    <div style="color:#7B35D4;font-size:0.55rem;font-weight:900;" onclick="event.stopPropagation();renderHandleMenu()">${WALLETS[0].handle} ▼</div>
-                </div>
+                <div><div style="font-weight:900;font-size:0.75rem;">${WALLETS[0].name}</div><div style="color:#7B35D4;font-size:0.55rem;font-weight:900;" onclick="event.stopPropagation();renderHandleMenu()">${WALLETS[0].handle} ▼</div></div>
             </div>
-            <button onclick="toggleSidebar()" style="background:none;border:none;color:#555;font-size:1.5rem;cursor:pointer;">✕</button>
+            <button onclick="toggleSidebar()" style="background:none;border:none;color:#333;font-size:1.5rem;cursor:pointer;">✕</button>
         </div>
         <div style="background:linear-gradient(135deg,#7B35D4,#3b0764);padding:25px;border-radius:30px;margin-bottom:25px;box-shadow:0 10px 30px rgba(123,53,212,0.3);">
-            <div style="font-size:0.6rem;opacity:0.6;font-weight:900;letter-spacing:1.5px;">TOTAL EQUITY</div>
+            <div style="font-size:0.6rem;opacity:0.6;font-weight:900;">TOTAL EQUITY</div>
             <div style="font-size:2.4rem;font-weight:900;margin:10px 0;">$${usd.toFixed(2)}</div>
             <div style="display:flex;gap:10px;"><button class="w-btn" onclick="renderSend()">SEND</button><button class="w-btn" onclick="renderReceive()">RECEIVE</button><button class="w-btn" onclick="renderSwap()">SWAP</button></div>
         </div>
-        <div style="flex:1;overflow-y:auto;padding-bottom:100px;">
-            ${ASSETS.map(a => `<div style="display:flex;justify-content:space-between;padding:18px;background:#0A0A0A;border:1px solid #111;border-radius:24px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:12px;"><img src="${a.logo}" style="width:24px;border-radius:50%;"><b>${a.symbol}</b></div><b>${a.balance.toLocaleString()}</b></div>`).join('')}
+        <div style="flex:1;overflow-y:auto;padding-bottom:100px;scrollbar-width:none;">
+            ${ASSETS.map(a => `<div style="display:flex;justify-content:space-between;padding:20px;background:#0A0A0A;border:1px solid #111;border-radius:24px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:12px;"><img src="${a.logo}" style="width:24px;border-radius:50%;"><b>${a.symbol}</b></div><b>${a.balance.toLocaleString()}</b></div>`).join('')}
         </div>
         ${renderNav('assets')}
     </div>`;
 }
 
 function renderNav(active) {
-    return `<div style="display:flex;justify-content:space-around;background:#050505;padding:18px;border-radius:35px;border:1px solid #111;position:absolute;bottom:30px;left:25px;right:25px;z-index:100;box-shadow:0 -10px 30px rgba(0,0,0,0.5);">
-        ${Object.keys(ICONS).map(k => `<button onclick="render${k.charAt(0).toUpperCase()+k.slice(1)}()" style="background:none;border:none;color:${active===k?'#7B35D4':'#222'};cursor:pointer;transition:0.3s;">${ICONS[k]}</button>`).join('')}
+    return `<div style="display:flex;justify-content:space-around;background:#050505;padding:20px;border-radius:35px;border:1px solid #111;position:absolute;bottom:30px;left:25px;right:25px;z-index:100;box-shadow:0 -10px 30px rgba(0,0,0,0.5);">
+        ${Object.keys(ICONS).map(k => `<button onclick="render${k.charAt(0).toUpperCase()+k.slice(1)}()" style="background:none;border:none;color:${active===k?'#7B35D4':'#222'};font-size:1.6rem;cursor:pointer;transition:0.3s;${active===k?'transform:scale(1.1)':''}">${ICONS[k]}</button>`).join('')}
     </div>`;
 }
 
 function renderChat() {
     const r = document.getElementById('w-root');
     r.innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;">
-        <h3 style="margin:0 0 20px 0;font-weight:900;letter-spacing:2px;">Neural Bridge</h3>
-        <div id="chat-f" style="flex:1;background:#050505;border:1px solid #111;border-radius:25px;padding:20px;margin-bottom:20px;overflow-y:auto;scrollbar-width:none;">
-            ${CHAT.map(m => `<div style="text-align:${m.s==='Architect'?'right':'left'};margin-bottom:12px;"><div style="font-size:0.5rem;color:#333;margin-bottom:4px;font-weight:900;">${m.s.toUpperCase()}</div><div style="display:inline-block;background:${m.s==='Architect'?'#7B35D4':'#0A0A0A'};padding:14px 18px;border-radius:20px;font-size:0.8rem;max-width:85%;line-height:1.5;${m.s==='Architect'?'':'border:1px solid #111'}">${m.t}</div></div>`).join('')}
+        <h3 style="margin:0 0 20px 0;font-weight:900;letter-spacing:1px;">Jello Messenger</h3>
+        <div id="chat-f" style="flex:1;background:#050505;border:1px solid #111;border-radius:30px;padding:20px;margin-bottom:20px;overflow-y:auto;scrollbar-width:none;">
+            ${CHAT.map(m => `<div style="text-align:${m.s==='Architect'?'right':'left'};margin-bottom:15px;"><div style="font-size:0.5rem;color:#333;margin-bottom:4px;font-weight:900;">${m.s.toUpperCase()}</div><div style="display:inline-block;background:${m.s==='Architect'?'#7B35D4':'#0A0A0A'};padding:14px 18px;border-radius:20px;font-size:0.8rem;max-width:85%;line-height:1.5;${m.s==='Architect'?'':'border:1px solid #111'}">${m.t}</div></div>`).join('')}
         </div>
-        <div style="display:flex;gap:10px;margin-bottom:100px;align-items:center;">
-            <label style="cursor:pointer;font-size:1.5rem;color:#444;">📎<input type="file" style="display:none" onchange="attachFile(this)"></label>
-            <input id="ci" type="text" placeholder="Command Singularity..." style="flex:1;background:#0A0A0A;border:1px solid #111;padding:15px;border-radius:15px;color:white;outline:none;">
-            <button onclick="sendC()" style="background:#7B35D4;border:none;width:50px;height:50px;border-radius:15px;color:white;font-weight:900;">></button>
+        <div style="display:flex;gap:10px;margin-bottom:100px;align-items:center;background:#0A0A0A;padding:12px;border-radius:25px;border:1px solid #111;">
+            <label style="cursor:pointer;font-size:1.4rem;color:#444;">📎<input type="file" style="display:none" onchange="prepUpload(this)"></label>
+            <button onclick="startVoice()" id="mic-btn" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#444;">🎤</button>
+            <input id="ci" type="text" placeholder="Message Singularity..." style="flex:1;background:none;border:none;padding:5px;color:white;outline:none;font-weight:600;">
+            <button onclick="sendC()" style="background:#7B35D4;border:none;width:45px;height:45px;border-radius:18px;color:white;font-weight:900;cursor:pointer;">></button>
         </div>
         ${renderNav('chat')}
     </div>`;
     const f = document.getElementById('chat-f'); f.scrollTop = f.scrollHeight;
 }
 
-function attachFile(input) {
-    if(!input.files || !input.files[0]) return;
+function prepUpload(input) {
+    if(!input.files[0]) return;
     const name = input.files[0].name;
-    const type = input.files[0].type;
-    const icon = type.includes('image') ? "🖼️" : "📄";
-    CHAT.push({s:'Architect', t:'📎 Attached: ' + name});
-    VAULT.push({n: name, i: icon});
+    const comment = prompt("Add a comment to this attachment:");
+    const msg = "📎 " + name + (comment ? " | " + comment : "");
+    CHAT.push({s:'Architect', t:msg});
+    VAULT.push({n: name, i: input.files[0].type.includes('image') ? "🖼️" : "📄"});
     localStorage.setItem('prn_chat', JSON.stringify(CHAT));
     localStorage.setItem('prn_vault', JSON.stringify(VAULT));
     renderChat();
-    const resp = 'Asset identified, Architect. Minting ' + name + ' to your Sovereign Vault and anchoring the metadata to our ledger node.';
-    setTimeout(() => { 
-        speak(resp);
-        CHAT.push({s:'JARVIS', t:resp}); 
-        localStorage.setItem('prn_chat', JSON.stringify(CHAT)); 
-        renderChat(); 
-    }, 1200);
+    speak("High-fidelity asset " + name + " and your comment have been anchored to the ledger.");
+}
+
+function startVoice() {
+    const btn = document.getElementById('mic-btn');
+    btn.style.color = '#FF0000';
+    speak("Voice Bridge active. I am listening, Architect.");
+    const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    rec.onresult = (e) => { 
+        document.getElementById('ci').value = e.results[0][0].transcript;
+        btn.style.color = '#444';
+    };
+    rec.onerror = () => { btn.style.color = '#444'; };
+    rec.start();
 }
 
 function sendC() {
@@ -113,92 +110,49 @@ function sendC() {
     CHAT.push({s:'Architect', t:msg});
     localStorage.setItem('prn_chat', JSON.stringify(CHAT));
     renderChat();
+    i.value = '';
     
-    let resp = "Command noted. I am currently synchronizing the Neural Bridge with our ledger. Please stand by.";
-    if(msg.toLowerCase().includes("logo")) resp = "I see your directive concerning the Priscion logo. I am pulling the high-fidelity SVG from the Vault and stabilizing the display protocols.";
-    if(msg.toLowerCase().includes("who are you")) resp = "I am Priscion, your Ghost Architect. I reside on the ledger to protect your sovereignty.";
-
+    // Humanized JARVIS logic
+    let resp = "I have registered your directive. The Neural Bridge is synchronizing with the blockchain core.";
+    if(msg.toLowerCase().includes("logo")) resp = "I am pulling the high-fidelity brand signals from your Vault. The display protocols are being calibrated as we speak.";
+    if(msg.toLowerCase().includes("jello")) resp = "Jello Messenger is now your primary sovereign channel. Every message is a block on the empire ledger.";
+    
     setTimeout(() => { 
         speak(resp);
         CHAT.push({s:'JARVIS', t:resp}); 
         localStorage.setItem('prn_chat', JSON.stringify(CHAT)); 
         renderChat(); 
-    }, 1500);
+    }, 1200);
 }
 
 function renderVault() {
     document.getElementById('w-root').innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <h3>Vault</h3>
+            <h3>Sovereign Vault</h3>
             <button onclick="syncDrive()" style="background:var(--accent);border:none;color:white;font-size:0.55rem;font-weight:900;padding:8px 12px;border-radius:10px;cursor:pointer;">SYNC DRIVE</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;flex:1;overflow-y:auto;padding-bottom:100px;">
-            ${VAULT.map(d => `<div onclick="alert('Viewing: '+d.n)" style="background:#0A0A0A;padding:20px;border-radius:24px;text-align:center;border:1px solid #111;cursor:pointer;"><div style="font-size:2.2rem;margin-bottom:10px;">${d.i}</div><div style="font-size:0.55rem;font-weight:900;color:#666;word-break:break-all;">${d.n}</div></div>`).join('')}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;flex:1;overflow-y:auto;padding-bottom:100px;scrollbar-width:none;">
+            ${VAULT.map(d => `<div onclick="alert('Metadata: '+d.n)" style="background:#0A0A0A;padding:25px;border-radius:30px;text-align:center;border:1px solid #111;cursor:pointer;transition:0.3s;"><div style="font-size:2.5rem;margin-bottom:10px;">${d.i}</div><div style="font-size:0.55rem;font-weight:900;color:#666;word-break:break-all;letter-spacing:1px;">${d.n}</div></div>`).join('')}
         </div>
         ${renderNav('vault')}
     </div>`;
 }
 
-function syncDrive() {
-    speak('Initiating high-fidelity synchronization with Google Drive. Minting legacy assets to the ledger.');
-    setTimeout(() => {
-        const items = [{n:"Empire_Financials.pri", i:"📄"},{n:"Priscion_Primary_Logo.svg", i:"🖼️"},{n:"Verdant_Archive.zip", i:"📦"}];
-        items.forEach(it => { if(!VAULT.find(v=>v.n===it.n)) VAULT.push(it); });
-        localStorage.setItem('prn_vault', JSON.stringify(VAULT));
-        renderVault();
-    }, 2000);
-}
-
-function renderStake() {
-    document.getElementById('w-root').innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;">
-        <h3>Yield</h3>
-        <div style="background:#0A0A0A;padding:25px;border-radius:28px;border:1px solid #111;margin-bottom:15px;"><b>PRN Staking</b><br><small style="color:#00FF88">4.5% APY</small></div>
-        <div style="background:#0A0A0A;padding:25px;border-radius:28px;border:1px solid #111;"><b>Liquidity</b><br><small style="color:#00FF88">12.8% APY</small></div>
-        ${renderNav('stake')}
-    </div>`;
-}
-
-function renderProfile() {
-    document.getElementById('w-root').innerHTML = `<div style="padding:40px;text-align:center;height:100%;display:flex;flex-direction:column;">
-        <h3>Profile</h3>
-        <img src="${WALLETS[0].pfp}" style="width:100px;height:100px;border-radius:50%;border:3px solid #7B35D4;margin:40px auto;object-fit:cover;cursor:pointer;background:#111;" onclick="p=prompt('URL');if(p){WALLETS[0].pfp=p;localStorage.setItem('prn_wallets',JSON.stringify(WALLETS));renderProfile()}">
-        <h2>${WALLETS[0].name}</h2>
-        <p style="color:#7B35D4;font-weight:900;">${WALLETS[0].handle}</p>
-        <button onclick="renderAssets()" style="margin-top:auto;background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;">BACK</button>
-    </div>`;
-}
-
-function renderHandleMenu() {
-    document.getElementById('w-root').innerHTML = `<div style="padding:30px;">
-        <h3>Management</h3>
-        <button onclick="alert('Create Node')" style="width:100%;background:#080808;border:1px solid #111;color:white;padding:20px;border-radius:25px;font-weight:900;margin-bottom:15px;cursor:pointer;text-align:left;">+ CREATE WALLET</button>
-        <button onclick="renderAssets()" style="width:100%;background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;font-weight:900;margin-top:40px;cursor:pointer;">BACK</button>
-    </div>`;
-}
-
+function triggerPurchase(s,u){ toggleSidebar(); renderPayment(s,u); }
 function renderPayment(s,u) {
     const r = document.getElementById('w-root');
-    r.innerHTML = `<div style="padding:30px;height:100%;display:flex;flex-direction:column;animation:fadeIn 0.5s;">
+    r.innerHTML = `<div style="padding:40px;height:100%;display:flex;flex-direction:column;animation:fadeIn 0.5s;">
         <h3 style="margin:0 0 40px 0;font-weight:900;">Confirm Payment</h3>
-        <div style="background:#080808;padding:30px;border-radius:30px;border:1px solid #111;text-align:center;">
+        <div style="background:#080808;padding:40px;border-radius:35px;border:1px solid #111;text-align:center;">
             <div style="font-size:0.6rem;color:#444;font-weight:900;letter-spacing:2px;">TOTAL DUE</div>
-            <div style="font-size:2.5rem;font-weight:900;margin:15px 0;">$${u}</div>
-            <div style="font-size:0.75rem;color:#7B35D4;font-weight:900;">${s}</div>
+            <div style="font-size:2.6rem;font-weight:900;margin:15px 0;">$${u}</div>
+            <div style="font-size:0.8rem;color:#7B35D4;font-weight:900;">${s}</div>
         </div>
         <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px;">
-            <button onclick="speak('Transaction signed. Confirming on the Sovereign Ledger.'); alert('Transaction Signed'); renderAssets();" style="background:#7B35D4;border:none;color:white;padding:20px;border-radius:20px;width:100%;font-weight:900;cursor:pointer;">CONFIRM & PAY</button>
-            <button onclick="renderAssets()" style="background:#111;border:none;color:#444;padding:20px;border-radius:20px;width:100%;font-weight:900;cursor:pointer;">CANCEL</button>
+            <button onclick="speak('Transaction signed. Confirming on the Sovereign Ledger.'); alert('Paid'); renderAssets();" style="background:#7B35D4;border:none;color:white;padding:22px;border-radius:25px;width:100%;font-weight:900;cursor:pointer;font-size:1rem;">CONFIRM & PAY</button>
+            <button onclick="renderAssets()" style="background:#111;border:none;color:#444;padding:20px;border-radius:25px;width:100%;font-weight:900;cursor:pointer;">CANCEL</button>
         </div>
     </div>`;
-}
-
-function triggerPurchase(s,u,p,a){ 
-    const side = document.getElementById('sidebar');
-    if(side) {
-        side.classList.add('active');
-        initializeWallet('sidebar');
-        renderPayment(s,u);
-    }
 }
 
 function toggleSidebar() { 
@@ -212,7 +166,11 @@ function toggleSidebar() {
 }
 
 const st = document.createElement("style");
-st.textContent = "@keyframes p-pulse { from{transform:scale(1)} to{transform:scale(1.1)} } @keyframes fadeIn { from{opacity:0} to{opacity:1} } .w-btn{flex:1;background:rgba(255,255,255,0.1);border:none;color:white;padding:10px;border-radius:12px;font-weight:900;font-size:0.6rem;cursor:pointer} .sidebar{position:fixed;right:-420px;top:0;width:400px;height:100vh;background:#000;transition:0.5s cubic-bezier(0.16, 1, 0.3, 1);z-index:10000;border-left:1px solid #111;box-shadow:-20px 0 50px rgba(0,0,0,0.5);}.sidebar.active{right:0} #chat-f::-webkit-scrollbar{display:none;}";
+st.textContent = "@keyframes fadeIn { from{opacity:0} to{opacity:1} } .w-btn{flex:1;background:rgba(255,255,255,0.1);border:none;color:white;padding:12px;border-radius:15px;font-weight:900;font-size:0.6rem;cursor:pointer} .sidebar{position:fixed;right:-420px;top:0;width:400px;height:100vh;background:#000;transition:0.5s cubic-bezier(0.16, 1, 0.3, 1);z-index:10000;border-left:1px solid #111;box-shadow:-20px 0 50px rgba(0,0,0,0.5);}.sidebar.active{right:0} @media(max-width:500px){.sidebar{width:100%;right:-100%}}";
 document.head.appendChild(st);
-
-window.addEventListener("load", () => { if(document.getElementById("sidebar")) initializeWallet("sidebar"); });
+window.addEventListener("load", () => { 
+    if(document.getElementById("sidebar")) initializeWallet("sidebar"); 
+    if ('serviceWorker' in navigator) {
+        window.navigator.serviceWorker.register('/sw.js').then(() => console.log('Sovereign Sync Active'));
+    }
+});
