@@ -176,3 +176,21 @@ window.addEventListener("load", () => {
 });
 
 
+
+
+function renderStake() {
+    const c = document.getElementById('wallet-content');
+    if(!c) return;
+    c.innerHTML = `
+        <div style="padding:30px; animation:fadeIn 0.5s">
+            <h2 style="font-weight:900; letter-spacing:3px; font-size:1.5rem;">STAKING</h2>
+            <div style="background:#111; padding:25px; border-radius:20px; margin-top:20px;">
+                <div style="color:#555; font-size:0.6rem; font-weight:900; margin-bottom:10px;">ESTIMATED APY</div>
+                <div style="font-size:2rem; font-weight:900; color:var(--accent);">12.5%</div>
+                <p style="color:#666; font-size:0.7rem; margin-top:15px;">Stake your $PRN to secure the Sovereign Ledger and earn passive neural yield.</p>
+                <button class="w-btn" style="width:100%; margin-top:20px; background:var(--accent); border-radius:15px; padding:15px; border:none; color:#fff; font-weight:900; cursor:pointer;" onclick="alert('Stake Initiated: Transaction pending on Ledger...')">STAKE $PRN</button>
+            </div>
+        </div>
+    `;
+    if(typeof updateNav === 'function') updateNav('stake');
+}
