@@ -5,28 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NURASEN | Sovereign Neural dVPN</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Playfair+Display:wght@900&family=Space+Mono:wght@700&display=swap">
-    
+    <script src="../wallet-core.js"></script>
     <style>
         :root { --accent: #00FF88; --bg: #050505; --surface: #111; }
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
         header { padding: 30px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a1a1a; }
-        .logo { font-weight: 900; font-size: 1.2rem; letter-spacing: 3px; color: var(--accent); }
+        .logo { font-weight: 900; font-size: 1.2rem; letter-spacing: 3px; color: var(--accent; }
         .hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 20px; }
         .node-box { background: linear-gradient(180deg, #111 0%, #080808 100%); padding: 50px; border-radius: 40px; border: 1px solid #222; max-width: 500px; width: 100%; box-shadow: 0 30px 100px rgba(0,255,136,0.05); }
         .btn-wallet { width: 100%; padding: 22px; background: #7B35D4; color: white; border: none; border-radius: 18px; font-weight: 900; font-size: 0.9rem; text-transform: uppercase; cursor: pointer; margin-top: 30px; transition: 0.4s; box-shadow: 0 10px 40px rgba(123,53,212,0.2); }
         .btn-wallet:hover { transform: translateY(-5px); background: #8e44ad; }
         .status-badge { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 0.55rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; border: 1px solid #333; color: #444; }
-        .status-badge.active { color: var(--accent); border-color: var(--accent); }
-        
-        /* Sidebar Overlay */
-        .sidebar { position: fixed; top: 0; right: -420px; width: 420px; height: 100vh; background: rgba(5,5,5,0.98); backdrop-filter: blur(30px); border-left: 1px solid #222; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; text-align: left; }
-        .sidebar.active { right: 0; }
-        @media (max-width: 768px) { .sidebar { width: 100%; right: -100%; } }
+        .sidebar { position: fixed; top: 0; right: -500px; width: 420px; height: 100vh; background: rgba(5,5,5,0.98); backdrop-filter: blur(30px); border-left: 1px solid #222; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; text-align: left; }
+        .sidebar.active { right: 0; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">NURASEN</div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignwebsite/main/assets/logos/n{ซjวง_icon.jpg" style="width:40px; border-radius:10px;">
+            <div class="logo">NURASEN</div>
+        </div>
         <nav><a href="/" style="color: #666; text-decoration: none; font-size: 0.7rem; font-weight: 800;">HUB</a></nav>
     </header>
 
@@ -34,45 +33,19 @@
         <div class="node-box">
             <div id="connection-status" class="status-badge">Vault Disconnected</div>
             <h1 style="font-size: 2.5rem; margin: 0; font-weight: 900;">Neural dVPN</h1>
-            <p style="color: #666; font-size: 0.9rem; margin: 20px 0 40px;">To activate regional bypass, you must anchor this dashboard to your Sovereign Wallet.</p>
+            <p style="color: #666; font-size: 0.9rem; margin: 20px 0 40px;">To activate regional bypass, your Sovereign Wallet must be linked.</p>
             
-            <div style="background: black; padding: 20px; border-radius: 15px; border: 1px solid #222; text-align: left;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.7rem; font-weight: 800; color: #444;">PROTECTION LAYER</span>
-                    <span style="font-size: 0.7rem; font-weight: 900; color: white;">JELLO (ZKP)</span>
-                </div>
-            </div>
-
-            <button onclick="toggleSidebar()" class="btn-wallet">Link Sovereign Wallet</button>
-            <a href="nurasen-vpn.apk" style="margin-top: 30px; display: inline-block; color: #333; text-decoration: none; font-size: 0.6rem; font-weight: 800;">DOWNLOAD MOBILE NODE (.APK)</a>
+            <button onclick="toggleSidebar(); initializeWallet('sidebar');" class="btn-wallet">Link Sovereign Wallet</button>
         </div>
     </main>
 
-    
+    <div id="sidebar" class="sidebar"></div>
 
-<style>
-    .sidebar { position: fixed; right: -400px; top: 0; width: 400px; height: 100vh; background: rgba(5,5,5,0.98); backdrop-filter: blur(25px); border-left: 1px solid #222; transition: 0.5s cubic-bezier(0.8,0,0.2,1); z-index: 10000; overflow-y: auto; font-family: sans-serif; }
-    .sidebar.active { right: 0; }
-    .sidebar-header { padding: 30px; border-bottom: 1px solid #111; display: flex; justify-content: space-between; align-items: center; color: white; }
-    .close-btn { background: none; border: none; color: #555; font-size: 2rem; cursor: pointer; }
-    .sidebar-tabs { display: flex; border-bottom: 1px solid #111; }
-    .sidebar-tabs button { flex: 1; background: none; border: none; color: #444; padding: 15px; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
-    @media (max-width: 480px) { .sidebar { width: 100%; right: -100%; } }
-</style>
-<div id="sidebar" class="sidebar"></div>
-<script>
-    function toggleSidebar() {
-        const sb = document.getElementById('sidebar');
-        sb.classList.toggle('active');
-        if(sb.classList.contains('active')) {
-            if(typeof initializeWallet === 'function') initializeWallet('sidebar');
+    <script>
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('active');
         }
-    }
-</script>
+    </script>
 </body>
 </html>
-
-
-
-
-
