@@ -1,1 +1,171 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>LEGGO Hub</title><style>body{background:#000;color:#fff;font-family:sans-serif;margin:0;overflow:hidden}.os{display:flex;height:100vh}.nav{width:60px;border-right:1px solid #111;display:flex;flex-direction:column;align-items:center;padding:20px}.nav-btn{cursor:pointer;color:#444;margin-bottom:30px}.main{flex:1;display:flex;flex-direction:column}.top{height:60px;border-bottom:1px solid #111;display:flex;align-items:center;padding:0 20px}.dash{flex:1;padding:40px;overflow-y:auto}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:20px}.tile{background:#0A0A0A;padding:20px;border-radius:20px;text-align:center;cursor:pointer}.viewport{display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:#000;z-index:50}iframe{width:100%;height:100%;border:none}.sidebar{position:fixed;right:-420px;top:0;width:400px;height:100vh;background:#050505;border-left:1px solid #222;transition:0.5s;z-index:10000}.sidebar.active{right:0}</style></head><body><div class="os"><nav class="nav"><div class="nav-btn" onclick="closeNode()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-btn" onclick="toggleSidebar()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div></nav><div class="main"><header class="top"><img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/p-logo.png" style="width:30px"></header><div class="dash"><div class="viewport" id="viewport"><iframe id="frame"></iframe></div><div class="grid" id="grid"></div></div></div></div><div id="sidebar" class="sidebar"></div><script src="wallet-core.js"></script><script>const nodes=[{name:"Anime",handle:".pri",icon:"⛩️"},{name:"Nurasen",handle:".pri",icon:"🛡️"},{name:"Gaming",handle:".pri",icon:"🎮"}];function renderGrid(){document.getElementById('grid').innerHTML=nodes.map(n=>'<div class="tile" onclick="openNode('' + n.handle + '')"><div>' + n.icon + '</div><div>' + n.name + '</div></div>').join('')}function openNode(h){const p=h.replace('$','').replace('.pri','');document.getElementById('viewport').style.display='block';document.getElementById('frame').src='/'+p+'/'}function closeNode(){document.getElementById('viewport').style.display='none'}function toggleSidebar(){document.getElementById('sidebar').classList.toggle('active');if(document.getElementById('sidebar').classList.contains('active'))initializeWallet('sidebar')}window.onload=renderGrid;</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEGGO Hub | Priscion OS</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap">
+    <style>
+        :root { --accent: #7B35D4; --bg: #000; --surface: #0A0A0A; --border: #1a1a1a; }
+        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
+        .os { display: flex; height: 100vh; }
+        
+        /* Sidebar Nav */
+        .nav { width: 70px; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 25px 0; background: #050505; }
+        .nav-btn { cursor: pointer; color: #444; margin-bottom: 35px; transition: 0.3s; }
+        .nav-btn:hover { color: var(--accent); }
+        .nav-btn.active { color: var(--accent); }
+
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        
+        /* Top Bar */
+        .top { height: 70px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 30px; background: #030303; }
+        .p-logo { width: 28px; margin-right: 25px; }
+        .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 20px; color: #fff; width: 350px; font-size: 0.8rem; outline: none; transition: 0.3s; }
+        .search-bar:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(123, 53, 212, 0.1); }
+
+        /* Dashboard Grid */
+        .dash { flex: 1; padding: 50px; overflow-y: auto; background: radial-gradient(circle at top right, rgba(123, 53, 212, 0.05), transparent); }
+        .grid-header { margin-bottom: 40px; }
+        .grid-header h1 { font-size: 2.2rem; font-weight: 900; margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; }
+        .tile { background: var(--surface); border: 1px solid var(--border); padding: 25px 15px; border-radius: 24px; text-align: center; cursor: pointer; transition: 0.4s; }
+        .tile:hover { transform: translateY(-5px); border-color: var(--accent); background: #0F0F0F; }
+        .tile-icon { font-size: 2rem; margin-bottom: 12px; display: block; }
+        .tile-name { font-size: 0.6rem; font-weight: 900; color: #666; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* Node Viewport */
+        .viewport { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .node-bar { display: none; align-items: center; gap: 15px; background: var(--accent); color: #fff; padding: 6px 15px; border-radius: 50px; font-size: 0.7rem; font-weight: 900; margin-left: 20px; }
+
+        /* Sidebar Wallet */
+        .sidebar { position: fixed; right: -420px; top: 0; width: 400px; height: 100vh; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(30px); border-left: 1px solid var(--border); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1000; }
+        .sidebar.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+    <div class="os">
+        <!-- Sidebar Navigation -->
+        <nav class="nav">
+            <div class="nav-btn active" onclick="closeNode()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </div>
+            <div class="nav-btn" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+        </nav>
+
+        <!-- Main Interface -->
+        <div class="main">
+            <header class="top">
+                <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/p-logo.png" class="p-logo" alt="P">
+                <input type="text" class="search-bar" placeholder="Enter Sovereign Handle ($name.pri)..." onkeydown="handleSearch(event)">
+                <div id="node-bar" class="node-bar">
+                    <span id="active-handle"></span>
+                    <span onclick="closeNode()" style="cursor:pointer; opacity:0.7;">✕</span>
+                </div>
+            </header>
+
+            <div class="dash">
+                <div class="viewport" id="viewport">
+                    <iframe id="node-frame"></iframe>
+                </div>
+                
+                <div class="grid-header">
+                    <h1>Priscion OS</h1>
+                    <p style="color: #444; font-weight: 700; margin-top: 5px;">Architect Mode Active</p>
+                </div>
+
+                <div class="grid" id="node-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sovereign Wallet Sidebar -->
+    <div id="sidebar" class="sidebar"></div>
+
+    <script src="wallet-core.js"></script>
+    <script>
+        const nodes = [
+            { name: "Dreaming Anime", handle: "$dreaminganime.pri", icon: "⛩️" },
+            { name: "Nurasen", handle: "$nurasen.pri", icon: "🛡️" },
+            { name: "Atelia Gaming", handle: "$atelia.pri", icon: "🎮" },
+            { name: "The Way Made Known", handle: "$twmk.pri", icon: "📖" },
+            { name: "D'Panyard", handle: "$dpanyard.pri", icon: "🥁" },
+            { name: "Riddiim", handle: "$riddiim.pri", icon: "🎵" },
+            { name: "Glow Protocol", handle: "$glow.pri", icon: "✨" },
+            { name: "Peak Fit", handle: "$peakfit.pri", icon: "⚡" },
+            { name: "Sole Prestige", handle: "$sole.pri", icon: "👟" },
+            { name: "Essence Elite", handle: "$essence.pri", icon: "🧪" },
+            { name: "The Escapist", handle: "$escapist.pri", icon: "🌴" },
+            { name: "Tech Scout", handle: "$techscout.pri", icon: "📡" },
+            { name: "Quiet Luxury", handle: "$quietluxury.pri", icon: "🏡" },
+            { name: "Prime Land", handle: "$primeland.pri", icon: "🗺️" },
+            { name: "Autodrome", handle: "$autodrome.pri", icon: "🏎️" },
+            { name: "Paw Vault", handle: "$pawvault.pri", icon: "🐾" },
+            { name: "Pantriq", handle: "$pantriq.pri", icon: "🍳" },
+            { name: "Watch List", handle: "$watchlist.pri", icon: "⌚" },
+            { name: "Deskwell", handle: "$deskwell.pri", icon: "🖥️" },
+            { name: "The Gen Play", handle: "$genplay.pri", icon: "🧸" },
+            { name: "Verdant Co", handle: "$verdant.pri", icon: "🌿" }
+        ];
+
+        function renderGrid() {
+            const grid = document.getElementById('node-grid');
+            grid.innerHTML = nodes.map(n => `
+                <div class="tile" onclick="openNode('${n.handle}')">
+                    <span class="tile-icon">${n.icon}</span>
+                    <span class="tile-name">${n.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function openNode(handle) {
+            const path = handle.replace('$', '').replace('.pri', '');
+            const viewport = document.getElementById('viewport');
+            const frame = document.getElementById('node-frame');
+            const nodeBar = document.getElementById('node-bar');
+            const handleText = document.getElementById('active-handle');
+
+            viewport.style.display = 'block';
+            frame.src = '/' + path + '/';
+            handleText.innerText = handle;
+            nodeBar.style.display = 'flex';
+        }
+
+        function closeNode() {
+            document.getElementById('viewport').style.display = 'none';
+            document.getElementById('node-bar').style.display = 'none';
+            document.getElementById('node-frame').src = '';
+        }
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('active');
+            if (sb.classList.contains('active')) {
+                if (typeof initializeWallet === 'function') {
+                    initializeWallet('sidebar');
+                }
+            }
+        }
+
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const val = e.target.value.trim();
+                if (val.startsWith('$')) {
+                    openNode(val);
+                } else {
+                    // Search logic or node resolution
+                    console.log('Searching for:', val);
+                }
+            }
+        }
+
+        window.onload = () => {
+            renderGrid();
+        };
+    </script>
+</body>
+</html>
