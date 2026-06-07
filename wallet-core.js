@@ -3,7 +3,7 @@ const ASSETS = [
     { id: 'prn', symbol: 'PRN', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/neural_coin_hf.png', balance: 2540 },
     { id: 'ada', symbol: 'ADA', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/ada_coin.png', balance: 38 }
 ];
-let WALLETS = JSON.parse(localStorage.getItem('prn_wallets')) || [{ name: 'Architect', handle: '$prisca.pri', pfp: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion.svg' }];
+let WALLETS = JSON.parse(localStorage.getItem('prn_wallets')) || [{ name: 'Architect', handle: '$prisca.pri', pfp: 'assets/p-logo.png' }];
 let CHAT = JSON.parse(localStorage.getItem('prn_chat')) || [{ s: 'JARVIS', t: 'Welcome, Architect. Jello Messenger is now anchored to your Sovereign Ledger.' }];
 let VAULT = JSON.parse(localStorage.getItem('prn_vault')) || [{ n: "Manifest.pri", i: "🏰" }];
 
@@ -56,7 +56,7 @@ function renderAssets() {
 
 function renderNav(active) {
     return `<div style="display:flex;justify-content:space-around;background:#050505;padding:20px;border-radius:35px;border:1px solid #111;position:absolute;bottom:30px;left:25px;right:25px;z-index:100;box-shadow:0 -10px 30px rgba(0,0,0,0.5);">
-        ${Object.keys(ICONS).map(k => `<button onclick="render${k.charAt(0).toUpperCase()+k.slice(1)}()" style="background:none;border:none;color:${active===k?'#7B35D4':'#222'};font-size:1.6rem;cursor:pointer;transition:0.3s;${active===k?'transform:scale(1.1)':''}">${ICONS[k]}</button>`).join('')}
+        ${Object.keys(ICONS).map(k => `<button onclick="render${k.charAt(0).toUpperCase()+k.slice(1)}()" style="background:none;border:none;color:${active===k?'#7B35D4':'#444'};font-size:1.6rem;cursor:pointer;transition:0.3s;${active===k?'transform:scale(1.1)':''}">${ICONS[k]}</button>`).join('')}
     </div>`;
 }
 
