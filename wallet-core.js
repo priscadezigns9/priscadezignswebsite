@@ -27,7 +27,7 @@ function renderAssetsView() {
             <!-- LUXURY HEADER -->
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
                 <div style="width:45px; height:45px; background:linear-gradient(135deg, #7B35D4, #E0AAFF); border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 20px rgba(123,53,212,0.3);">
-                    <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/p-logo.png" style="width:25px;">
+                    <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/p-logo.png" style="width:25px;">
                 </div>
                 <div style="text-align:right;">
                     <div style="font-size:0.5rem; letter-spacing:2px; color:#555; font-weight:900;">SECURE NODE</div>
@@ -99,3 +99,7 @@ function navigateToSovereignNode(h) {
     window.location.href = '/'+p+'/';
 }
 
+
+
+function renderReceiveView() { const v = document.getElementById("wallet-main-view"); v.innerHTML = "<div class="view-container"><h3 class="view-title">Receive</h3><div style="text-align:center; margin-top:40px;"><div style="background:white; padding:20px; display:inline-block; border-radius:20px;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=addr1q8...prisca" style="width:150px;"></div><p style="color:#666; font-size:0.6rem; margin-top:20px;">addr1q8...prisca</p><button class="btn-primary" onclick="renderAssetsView()">BACK</button></div></div>"; }
+function renderSwapView() { const v = document.getElementById("wallet-main-view"); v.innerHTML = "<div class="view-container"><h3 class="view-title">Swap</h3><div style="text-align:center; padding-top:100px;"><p style="color:#666;">DEX Handshake Pending...</p><button class="btn-primary" onclick="renderAssetsView()">BACK</button></div></div>"; }
