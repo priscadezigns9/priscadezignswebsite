@@ -31,7 +31,7 @@ function renderAssetsView() {
                 </div>
                 <div style="text-align:right;">
                     <div style="font-size:0.5rem; letter-spacing:2px; color:#555; font-weight:900;">SECURE NODE</div>
-                    <div style="font-size:0.9rem; font-weight:900; color:white;">$prisca.prn</div>
+                    <div style="font-size:0.9rem; font-weight:900; color:white;">$prisca.pri</div>
                 </div>
             </div>
 
@@ -95,6 +95,7 @@ document.head.appendChild(style);
 window.addEventListener('load', () => { initializeWallet('sidebar'); });
 
 function navigateToSovereignNode(h) { 
-    const p = h.replace('$','').replace('.prn','');
+    const p = h.replace('$','').replace('.pri','');
     window.location.href = '/'+p+'/';
 }
+
