@@ -149,7 +149,7 @@ function renderPayment(s,u) {
             <div style="font-size:0.8rem;color:#7B35D4;font-weight:900;">${s}</div>
         </div>
         <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px;">
-            <button onclick="speak('Transaction signed. Confirming on the Sovereign Ledger.'); alert('Paid'); renderAssets();" style="background:#7B35D4;border:none;color:white;padding:22px;border-radius:25px;width:100%;font-weight:900;cursor:pointer;font-size:1rem;">CONFIRM & PAY</button>
+            <button onclick="speak('Transaction signed. Architect privilege detected: Fee waived.'); alert('Paid: Sovereign Access Granted'); renderAssets();" style="background:#7B35D4;border:none;color:white;padding:22px;border-radius:25px;width:100%;font-weight:900;cursor:pointer;font-size:1rem;">CONFIRM & PAY</button>
             <button onclick="renderAssets()" style="background:#111;border:none;color:#444;padding:20px;border-radius:25px;width:100%;font-weight:900;cursor:pointer;">CANCEL</button>
         </div>
     </div>`;
