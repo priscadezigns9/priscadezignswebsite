@@ -139,13 +139,59 @@ function renderVault() {
 }
 
 function triggerPurchase(s,u){ toggleSidebar(); renderPayment(s,u); }
-function renderPayment(s,u) {
-    const r = document.getElementById('w-root');
-    r.innerHTML = `<div style="padding:40px;height:100%;display:flex;flex-direction:column;animation:fadeIn 0.5s;">
-        <h3 style="margin:0 0 40px 0;font-weight:900;">Confirm Payment</h3>
-        <div style="background:#080808;padding:40px;border-radius:35px;border:1px solid #111;text-align:center;">
-            <div style="font-size:0.6rem;color:#444;font-weight:900;letter-spacing:2px;">TOTAL DUE</div>
-            <div style="font-size:2.6rem;font-weight:900;margin:15px 0;">$${u}</div>
+
+function renderPayment(serviceName, basePrice) {
+    const c = document.getElementById('wallet-content');
+    if(!c) return;
+    
+    // Logic: Web2 Price is standard, Web3 ($PRN) gets 10% discount
+    const web2Price = parseFloat(basePrice) || 299.00;
+    const prnPrice = (web2Price * 0.9).toFixed(2);
+    
+    c.innerHTML = `
+        <div style="padding:30px; animation:fadeIn 0.5s">
+            <h2 style="font-weight:900; letter-spacing:3px; font-size:1.5rem;">CHECKOUT</h2>
+            <div style="background:#111; padding:20px; border-radius:20px; margin-top:20px;">
+                <div style="font-size:0.7rem; font-weight:900; color:var(--accent);">${serviceName.toUpperCase()}</div>
+                <div style="display:flex; justify-content:space-between; margin-top:15px; border-bottom:1px solid #222; padding-bottom:15px;">
+                    <span style="color:#555; font-size:0.8rem;">Standard Price (Card/PayPal)</span>
+                    <span style="font-weight:900;">$${web2Price.toFixed(2)}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:15px;">
+                    <span style="color:var(--accent); font-size:0.8rem; font-weight:900;">Sovereign Price ($PRN)</span>
+                    <span style="font-weight:900; color:var(--accent);">-10% DISCOUNT</span>
+                </div>
+                <div style="font-size:1.5rem; font-weight:900; margin-top:5px; text-align:right;">${prnPrice} $PRN</div>
+            </div>
+
+            <div style="margin-top:30px;">
+                <div style="font-size:0.6rem; font-weight:900; color:#333; letter-spacing:2px; margin-bottom:15px;">SELECT PAYMENT METHOD</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <button class="w-btn" style="background:#0070BA; font-size:0.6rem;" onclick="alert('Redirecting to PayPal Checkout...')">PAYPAL</button>
+                    <button class="w-btn" style="background:#111; font-size:0.6rem; border:1px solid #333;" onclick="alert('Processing Card Payment...')">CREDIT CARD</button>
+                    <button class="w-btn" style="background:#111; font-size:0.6rem; border:1px solid #333;" onclick="alert('Initiating Bank Transfer...')">US BANK (ACH)</button>
+                    <button class="w-btn" style="background:var(--accent); font-size:0.6rem;" onclick="alert('Transaction Signed: Paying with $PRN')">SOVEREIGN ($PRN)</button>
+                </div>
+            </div>
+            
+            <div style="margin-top:40px; background:linear-gradient(to bottom, #080808, #000); padding:20px; border-radius:20px; border:1px solid var(--accent);">
+                <div style="font-size:0.6rem; font-weight:900; color:var(--accent);">TIER SELECTION</div>
+                <div style="margin-top:10px;">
+                    <label style="display:flex; align-items:center; gap:10px; margin-bottom:10px; cursor:pointer;">
+                        <input type="radio" name="tier" checked> 
+                        <span style="font-size:0.7rem; font-weight:900;">WEB2 BASIC (Website + App)</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                        <input type="radio" name="tier"> 
+                        <span style="font-size:0.7rem; font-weight:900; color:var(--accent);">WEB3 SOVEREIGN (+Handle & Ledger)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+    updateNav('none');
+}
+</div>
             <div style="font-size:0.8rem;color:#7B35D4;font-weight:900;">${s}</div>
         </div>
         <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px;">
