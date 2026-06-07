@@ -1,105 +1,43 @@
-/* 
-   PRISCION WALLET CORE v5.0-HUGE
-   [Architect Protocol: 2026 Luxury Aesthetic]
-*/
 
+/* PRISCION WALLET CORE v5.2.0-STABLE */
 const DET_CONFIG = { ADA_USDT: 0.44, PRN_ADA: 5.8 };
-
 const ASSETS = [
     { id: 'prn', name: 'PRISCION', symbol: 'PRN', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/prn_coin.png', balance: 2540.00 },
     { id: 'ada', name: 'CARDANO', symbol: 'ADA', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/ada_coin.png', balance: 38.00 },
-    { id: 'jlo', name: 'JELLO', symbol: 'JLO', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/jlo_coin.png', balance: 0.00 }
+    { id: 'jlo', name: 'JELLO', symbol: 'JLO', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/jlo_coin.png', balance: 0.00 },
+    { id: 'musd', name: 'MUSTARD', symbol: 'MUSD', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/musd_coin.png', balance: 0.00 }
 ];
-
-function initializeWallet(containerId) {
-    const container = document.getElementById(containerId);
-    if(!container) return;
-    container.innerHTML = '<div id="wallet-main-view"></div>';
+let WALLETS = JSON.parse(localStorage.getItem('prn_wallets')) || [
+    { name: 'Mother Node', handle: '.pri', pfp: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/p-logo.png' }
+];
+function initializeWallet(c) {
+    const d = document.getElementById(c);
+    if(!d) return;
+    d.innerHTML = '<div id="wallet-main-view" style="height:100%;background:#000;"></div>';
     renderAssetsView();
 }
-
 function renderAssetsView() {
-    const view = document.getElementById('wallet-main-view');
-    const totalUSD = ASSETS[1].balance * DET_CONFIG.ADA_USDT;
-    
-    view.innerHTML = `
-        <div class="view-container">
-            <!-- LUXURY HEADER -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                <div style="width:45px; height:45px; background:linear-gradient(135deg, #7B35D4, #E0AAFF); border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 20px rgba(123,53,212,0.3);">
-                    <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/p-logo.png" style="width:25px;">
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:0.5rem; letter-spacing:2px; color:#555; font-weight:900;">SECURE NODE</div>
-                    <div style="font-size:0.9rem; font-weight:900; color:white;">$prisca.pri</div>
-                </div>
-            </div>
-
-            <!-- PORTOFOLIO CARD -->
-            <div class="luxury-card">
-                <div style="font-size:0.6rem; opacity:0.6; letter-spacing:1px;">TOTAL ASSETS</div>
-                <div style="font-size:2.8rem; font-weight:900; margin:5px 0;">$${totalUSD.toFixed(2)}</div>
-                <div style="display:flex; gap:12px; margin-top:25px;">
-                    <button class="huge-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m-7-7 7 7-7 7"/></svg><span>SEND</span></button>
-                    <button class="huge-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5m-7 7 7-7 7 7"/></svg><span>RECEIVE</span></button>
-                </div>
-            </div>
-
-            <!-- ASSET LIST -->
-            <div style="flex:1; overflow-y:auto;">
-                <h4 style="font-size:0.55rem; color:#333; letter-spacing:3px; margin-bottom:20px; font-weight:900;">PORTFOLIO</h4>
-                ${ASSETS.map(a => `
-                    <div class="huge-asset-row">
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <div class="huge-icon-box"><img src="${a.logo}" style="width:22px;"></div>
-                            <div>
-                                <div style="font-weight:900; font-size:0.85rem; color:white;">${a.symbol}</div>
-                                <div style="font-size:0.55rem; color:#444; font-weight:700;">${a.name}</div>
-                            </div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-weight:900; font-size:0.9rem; color:white;">${a.balance.toLocaleString()}</div>
-                            <div style="font-size:0.55rem; color:#7B35D4;">LEDGER SYNCED</div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-
-            <!-- MODERN HUGEICON NAV -->
-            <div class="huge-nav">
-                <button class="huge-nav-btn active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></button>
-                <button class="huge-nav-btn" onclick="renderHubView()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></button>
-                <button class="huge-nav-btn" onclick="renderVaultView()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></button>
-                <button class="huge-nav-btn" onclick="renderNeuralTerminal()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></button>
-            </div>
-        </div>
-    `;
+    const v = document.getElementById('wallet-main-view');
+    const u = ASSETS[1].balance * DET_CONFIG.ADA_USDT;
+    v.innerHTML = '<div style="padding:30px;color:white;font-family:sans-serif;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;">' +
+            '<div style="width:45px;height:45px;background:linear-gradient(135deg,#7B35D4,#E0AAFF);border-radius:14px;display:flex;align-items:center;justify-content:center;"><img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/p-logo.png" style="width:25px;"></div>' +
+            '<div style="text-align:right;"><div style="font-size:0.9rem;font-weight:900;">' + WALLETS[0].handle + '</div></div>' +
+        '</div>' +
+        '<div style="background:#111;padding:30px;border-radius:30px;margin-bottom:30px;">' +
+            '<div style="font-size:0.6rem;opacity:0.5;">TOTAL ASSETS</div>' +
+            '<div style="font-size:2.5rem;font-weight:900;">$' + u.toFixed(2) + '</div>' +
+            '<div style="display:flex;gap:10px;margin-top:20px;">' +
+                '<button onclick="renderReceiveView()" style="flex:1;padding:12px;border-radius:12px;border:none;font-weight:900;cursor:pointer;">SEND</button>' +
+                '<button onclick="renderReceiveView()" style="flex:1;padding:12px;border-radius:12px;border:none;font-weight:900;cursor:pointer;">RECEIVE</button>' +
+            '</div>' +
+        '</div>' +
+        ASSETS.map(a => '<div style="display:flex;justify-content:space-between;padding:15px;background:#0A0A0A;border-radius:15px;margin-bottom:10px;"><div>' + a.symbol + '</div><div>' + a.balance + '</div></div>').join('') +
+    '</div>';
 }
-
-// INJECT STYLES
-const style = document.createElement('style');
-style.textContent = `
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-    #wallet-main-view { font-family: 'Inter', sans-serif; background:#000; height:100%; color:white; }
-    .view-container { padding:30px; display:flex; flex-direction:column; height:100%; box-sizing:border-box; }
-    .luxury-card { background: linear-gradient(135deg, #111, #050505); border: 1px solid #1a1a1a; padding:35px; border-radius:35px; margin-bottom:40px; }
-    .huge-btn { flex:1; background: #fff; color:#000; border:none; padding:12px; border-radius:18px; font-weight:900; font-size:0.65rem; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; }
-    .huge-asset-row { display:flex; justify-content:space-between; align-items:center; padding:20px; background:#080808; border:1px solid #111; border-radius:24px; margin-bottom:15px; }
-    .huge-icon-box { width:45px; height:45px; background:#111; border-radius:16px; display:flex; align-items:center; justify-content:center; border:1px solid #1a1a1a; }
-    .huge-nav { display:flex; justify-content:space-around; background:#0F0F0F; padding:18px; border-radius:28px; border:1px solid #1a1a1a; margin-top:auto; }
-    .huge-nav-btn { background:none; border:none; color:#444; cursor:pointer; transition:0.3s; }
-    .huge-nav-btn.active { color:#fff; filter: drop-shadow(0 0 8px rgba(255,255,255,0.4)); }
-`;
-document.head.appendChild(style);
-
-window.addEventListener('load', () => { initializeWallet('sidebar'); });
-
-function navigateToSovereignNode(h) { 
-    const p = h.replace('$','').replace('.pri','');
-    window.location.href = '/'+p+'/';
+function renderReceiveView() {
+    const v = document.getElementById('wallet-main-view');
+    v.innerHTML = '<div style="padding:30px;color:white;text-align:center;"><h3>Receive</h3><div style="background:white;padding:20px;display:inline-block;border-radius:20px;margin:20px 0;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=addr1q8...prisca" style="width:150px;"></div><p style="font-size:0.6rem;color:#666;">addr1q8...prisca</p><button onclick="renderAssetsView()" style="margin-top:20px;padding:12px 30px;background:#7B35D4;color:white;border:none;border-radius:12px;cursor:pointer;">BACK</button></div>';
 }
-
-
-
-function renderReceiveView() { const v = document.getElementById("wallet-main-view"); v.innerHTML = "<div class="view-container"><h3 class="view-title">Receive</h3><div style="text-align:center; margin-top:40px;"><div style="background:white; padding:20px; display:inline-block; border-radius:20px;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=addr1q8...prisca" style="width:150px;"></div><p style="color:#666; font-size:0.6rem; margin-top:20px;">addr1q8...prisca</p><button class="btn-primary" onclick="renderAssetsView()">BACK</button></div></div>"; }
-function renderSwapView() { const v = document.getElementById("wallet-main-view"); v.innerHTML = "<div class="view-container"><h3 class="view-title">Swap</h3><div style="text-align:center; padding-top:100px;"><p style="color:#666;">DEX Handshake Pending...</p><button class="btn-primary" onclick="renderAssetsView()">BACK</button></div></div>"; }
+function navigateToSovereignNode(h) { window.location.href = "/" + h.replace("$","").replace(".pri","") + "/"; }
+window.addEventListener("load", () => { if(document.getElementById("sidebar")) initializeWallet("sidebar"); });
