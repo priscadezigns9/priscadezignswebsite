@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>HUB | Priscion OS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap">
     <style>
         :root { --accent: #7B35D4; --bg: #000; --surface: #080808; --border: #111; }
@@ -15,18 +14,20 @@
         .nav-btn:hover { color: var(--accent); }
         .main { flex: 1; display: flex; flex-direction: column; position: relative; }
         .top { height: 75px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 25px; background: #000; }
-        .p-logo { height: 28px; cursor: pointer; }
-        .lego-logo { font-weight: 900; letter-spacing: 4px; font-size: 0.8rem; color: #FFF; background: var(--accent); padding: 6px 14px; border-radius: 10px; margin: 0 15px; }
-        .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; color: #fff; flex: 1; max-width: 400px; font-size: 0.8rem; outline: none; }
+        .p-logo { height: 28px; cursor: pointer; filter: drop-shadow(0 0 5px var(--accent)); }
+        .lego-logo { font-weight: 900; letter-spacing: 4px; font-size: 0.8rem; color: #FFF; background: var(--accent); padding: 6px 14px; border-radius: 10px; margin: 0 15px; text-transform: uppercase; }
+        .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; color: #fff; flex: 1; max-width: 400px; font-size: 0.8rem; outline: none; transition: 0.3s; }
+        .search-bar:focus { border-color: var(--accent); width: 100%; }
         .dash { flex: 1; padding: 40px; overflow-y: auto; background: radial-gradient(circle at top right, rgba(123, 53, 212, 0.03), transparent); scrollbar-width: none; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; }
         .tile { background: var(--surface); border: 1px solid var(--border); padding: 25px 10px; border-radius: 28px; text-align: center; cursor: pointer; transition: 0.4s; }
-        .tile:hover { border-color: var(--accent); transform: translateY(-5px); }
-        .tile svg { color: var(--accent); margin-bottom: 12px; stroke-width: 2.5; width: 24px; height: 24px; }
-        .tile-name { font-size: 0.55rem; font-weight: 900; color: #444; letter-spacing: 1.5px; text-transform: uppercase; }
-        .viewport { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; }
-        .vp-header { height: 65px; border-bottom: 1px solid #111; display: flex; align-items: center; padding: 0 25px; justify-content: space-between; background: #050505; }
-        iframe { width: 100%; height: calc(100% - 65px); border: none; }
+        .tile:hover { border-color: var(--accent); transform: translateY(-5px); background: #0A0A0A; }
+        .tile svg { color: var(--accent); margin-bottom: 15px; }
+        .tile-name { font-weight: 900; font-size: 0.65rem; letter-spacing: 2px; color: #444; text-transform: uppercase; }
+        .tile:hover .tile-name { color: #fff; }
+        .viewport { position: fixed; top: 0; left: 70px; right: 0; bottom: 0; background: #000; z-index: 500; display: none; flex-direction: column; }
+        .vp-header { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; background: #000; }
+        #if { flex: 1; border: none; width: 100%; height: 100%; }
         .sidebar { position: fixed; right: -420px; top: 0; width: 400px; height: 100vh; background: #000; z-index: 1000; border-left: 1px solid var(--border); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: -20px 0 50px rgba(0,0,0,0.5); }
         .sidebar.active { right: 0; }
         @media(max-width: 600px) {
@@ -37,30 +38,32 @@
             .dash { padding: 20px; }
             .grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
             .sidebar { width: 100%; right: -100%; }
+            .viewport { left: 0; }
         }
     </style>
 </head>
 <body>
     <div class="os">
         <nav class="nav">
-            <div class="nav-btn" onclick="window.location.href='/'"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+            <div class="nav-btn" onclick="location.href='index.html'"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+            <div class="nav-btn" onclick="renderGrid()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
             <div class="nav-btn" onclick="toggleSidebar()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
         </nav>
         <div class="main">
             <header class="top">
-                <img src="assets/p-logo.png" class="p-logo" onclick="window.location.href='/'">
+                <img src="p-logo.png" class="p-logo" onclick="window.location.href='index.html'">
                 <span class="lego-logo">LEGGO</span>
-                <input type="text" class="search-bar" placeholder="Enter Handle...">
+                <input type="text" class="search-bar" placeholder="Enter Handle (e.g. $atelia.pri)...">
             </header>
             <div class="dash">
                 <div class="viewport" id="vp">
                     <div class="vp-header">
-                        <span id="vp-name" style="font-weight:900; letter-spacing:2px; font-size:0.7rem; color:var(--accent);">NODE</span>
-                        <button onclick="closeNode()" style="background:none; border:none; color:#444; font-size:1.5rem; cursor:pointer;">✕</button>
+                        <span id="vp-name" style="font-weight:900; letter-spacing:3px; font-size:0.7rem; color:var(--accent);">NODE</span>
+                        <button onclick="closeNode()" style="background:none; border:none; color:#444; font-size:1.5rem; cursor:pointer; font-weight:900;">✕</button>
                     </div>
                     <iframe id="if"></iframe>
                 </div>
-                <h1 style="font-weight:900; font-size:2rem; margin-bottom:30px;">Priscion Hub</h1>
+                <h1 style="font-weight:900; font-size:2rem; margin-bottom:30px; letter-spacing:2px;">Priscion Hub</h1>
                 <div class="grid" id="grid"></div>
             </div>
         </div>
@@ -78,28 +81,9 @@
             { n: "Riddiim", h: "$riddiim.pri", i: '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>' },
             { n: "Glow", h: "$glow.pri", i: '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>' },
             { n: "Peak", h: "$peakfit.pri", i: '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>' },
-            { n: "Tech", h: "$techscout.pri", i: '<circle cx="12" cy="12" r="2"></circle><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>' },
-            { n: "Estate", h: "$primeland.pri", i: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>' },
-            { n: "Luxury", h: "$quietluxury.pri", i: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>' },
             { n: "Autodrome", h: "$autodrome.pri", i: '<circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle><path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"></path>' },
-            { n: "Couture", h: "$couturegallery.pri", i: '<rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M16 7V5a4 4 0 0 0-8 0v2"></path>' },
-            { n: "Pantriq", h: "$pantriq.pri", i: '<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>' },
-            { n: "Paw", h: "$pawvault.pri", i: '<path d="M11 20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v15Z"></path><path d="M11 5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v15a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V5Z"></path>' },
-            { n: "Essence", h: "$essenceelite.pri", i: '<path d="M4.5 3h15"></path><path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"></path>' },
-            { n: "Escapist", h: "$theescapist.pri", i: '<path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2"></path>' },
-            { n: "Watch", h: "$thewatchlist.pri", i: '<circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline>' },
-            { n: "Verdant", h: "$verdantco.pri", i: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2"></path>' },
-            { n: "Seamrite", h: "$seamrite.pri", i: '<circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20"></path>' }
+            { n: "Couture", h: "$couturegallery.pri", i: '<rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M16 7V5a4 4 0 0 0-8 0v2"></path>' }
         ];
-
-        function renderGrid() {
-            document.getElementById('grid').innerHTML = nodes.map(n => `
-                <div class="tile" onclick="openNode('${n.h}', '${n.n}')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">${n.i}</svg>
-                    <div class="tile-name">${n.n}</div>
-                </div>
-            `).join('');
-        }
 
         const nodeMap = {
             'dreaminganime': 'dreaminganime',
@@ -110,34 +94,38 @@
             'riddiim': 'riddiim',
             'glow': 'glowprotocol',
             'peakfit': 'peakfit',
-            'techscout': 'thetechscouthq',
-            'primeland': 'primelandnetwork',
-            'quietluxury': 'quietluxury',
             'autodrome': 'theautodrome',
-            'couturegallery': 'couturegallery',
-            'pantriq': 'pantriq',
-            'pawvault': 'pawvault',
-            'essenceelite': 'essenceelite',
-            'theescapist': 'theescapist',
-            'thewatchlist': 'thewatchlist',
-            'verdantco': 'verdantco',
-            'seamrite': 'seamritedesigns'
+            'couturegallery': 'couturegallery'
         };
 
-        function openNode(h, name) { if(h === "messenger") { toggleSidebar(); renderChat(); return; } const key = h.replace("$","").replace(".pri",""); const p = nodeMap[key] || key; document.getElementById("vp-name").innerText = name.toUpperCase(); document.getElementById("vp").style.display="block"; document.getElementById("if").src="/"+p+"/"; }
-            const key = h.replace('$','').replace('.pri','');
-            const p = nodeMap[key] || key;
-            document.getElementById('vp-name').innerText = name.toUpperCase();
-            document.getElementById('vp').style.display='block';
-            document.getElementById('if').src='/'+p+'/';
-        }
-            const p = h.replace('$','').replace('.pri','');
-            document.getElementById('vp-name').innerText = name.toUpperCase();
-            document.getElementById('vp').style.display='block';
-            document.getElementById('if').src='/'+p+'/';
+        function renderGrid() {
+            const g = document.getElementById('grid');
+            if(!g) return;
+            g.innerHTML = nodes.map(n => `
+                <div class="tile" onclick="openNode('${n.h}', '${n.n}')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${n.i}</svg>
+                    <div class="tile-name">${n.n}</div>
+                </div>
+            `).join('');
         }
 
-        function closeNode() { document.getElementById('vp').style.display='none'; document.getElementById('if').src=''; }
+        function openNode(h, name) {
+            if(h === 'messenger') { 
+                toggleSidebar(); 
+                if(typeof renderChat === 'function') renderChat(); 
+                return; 
+            }
+            const key = h.replace('$','').replace('.pri','');
+            const p = nodeMap[key] || key;
+            document.getElementById('vp-name').innerText = name.toUpperCase() + ' NODE';
+            document.getElementById('vp').style.display='flex';
+            document.getElementById('if').src= p + '/index.html';
+        }
+
+        function closeNode() { 
+            document.getElementById('vp').style.display='none'; 
+            document.getElementById('if').src=''; 
+        }
 
         function toggleSidebar() {
             const s = document.getElementById('sidebar');
@@ -147,10 +135,8 @@
                 if(typeof initializeWallet === 'function') initializeWallet('sidebar');
             }
         }
+
         window.onload = renderGrid;
     </script>
 </body>
 </html>
-
-
-
