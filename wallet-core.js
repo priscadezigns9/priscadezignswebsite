@@ -2,36 +2,29 @@ const CONFIG = { ADA_USD: 0.44, PRN_USD: 0.198, PRN_ADA: 2.22 };
 const ASSETS = [
     { id: 'prn', symbol: 'PRN', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/prn_coin.png', balance: 2540 },
     { id: 'ada', symbol: 'ADA', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/coins/ada_coin.png', balance: 38 },
-    { id: 'nrl', symbol: 'NRL', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/neural_coin_hf.png', balance: 1 }
+    { id: 'nrl', symbol: 'NRL', logo: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/p-logo.png', balance: 1 }
 ];
 let WALLETS = JSON.parse(localStorage.getItem('prn_wallets')) || [{ name: 'Architect', handle: '$prisca.pri', pfp: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/p-logo.png' }];
 let CHAT = JSON.parse(localStorage.getItem('prn_chat')) || [{ s: 'JARVIS', t: 'Neural Bridge Active. Singularity established.' }];
 
-function initializeWallet(containerId) {
-    const root = document.getElementById(containerId);
-    if (!root) return;
-    root.innerHTML = '<div id="w-root" style="height:100%;width:100%;background:#000;color:white;font-family:Inter,sans-serif;overflow:hidden;position:relative;display:flex;flex-direction:column;"></div>';
-    if (!sessionStorage.getItem('prn_initialized')) {
-        renderSplash();
-    } else {
-        renderAssets();
-    }
-}
+const ICONS = {
+    assets: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+    stake: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    chat: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-14 8.38 8.38 0 0 1 3.8.9L21 3z"/></svg>',
+    vault: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
+};
 
-function renderSplash() {
-    const r = document.getElementById('w-root');
-    r.innerHTML = '<div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#000;"><img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/p-logo.png" style="width:60px;animation:p-pulse 2s infinite alternate;"><div style="margin-top:20px;letter-spacing:5px;font-weight:900;color:#7B35D4;font-size:0.7rem;">PRISCION</div></div>';
-    setTimeout(() => {
-        sessionStorage.setItem('prn_initialized', 'true');
-        renderAssets();
-    }, 1500);
+function initializeWallet(c) {
+    const root = document.getElementById(c); if (!root) return;
+    root.innerHTML = '<div id="w-root" style="height:100%;width:100%;background:#000;color:white;font-family:sans-serif;overflow:hidden;position:relative;display:flex;flex-direction:column;"></div>';
+    renderAssets();
 }
 
 function renderAssets() {
     const r = document.getElementById('w-root'); if(!r) return;
     const usd = (ASSETS[1].balance * CONFIG.ADA_USD) + (ASSETS[0].balance * CONFIG.PRN_USD);
     r.innerHTML = `
-    <div style="padding:25px;flex:1;display:flex;flex-direction:column;box-sizing:border-box;animation:fadeIn 0.5s;">
+    <div style="padding:25px;flex:1;display:flex;flex-direction:column;box-sizing:border-box;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
             <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="renderProfile()">
                 <img src="${WALLETS[0].pfp}" style="width:38px;height:38px;border-radius:50%;border:1.5px solid #7B35D4;object-fit:cover;">
@@ -40,54 +33,50 @@ function renderAssets() {
                     <div style="color:#7B35D4;font-size:0.55rem;font-weight:900;" onclick="event.stopPropagation();renderHandleMenu()">${WALLETS[0].handle} ▼</div>
                 </div>
             </div>
-            <button onclick="toggleSidebar()" style="background:none;border:none;color:#333;font-size:1.5rem;cursor:pointer;transition:0.3s;">✕</button>
+            <button onclick="toggleSidebar()" style="background:none;border:none;color:#555;font-size:1.5rem;cursor:pointer;">✕</button>
         </div>
-        <div style="background:linear-gradient(135deg,#7B35D4,#3b0764);padding:25px;border-radius:35px;margin-bottom:25px;box-shadow:0 15px 35px rgba(0,0,0,0.4);">
-            <div style="font-size:0.6rem;opacity:0.6;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;">Portfolio Balance</div>
-            <div style="font-size:2.4rem;font-weight:900;margin:12px 0;">$${usd.toLocaleString(undefined,{minimumFractionDigits:2})}</div>
-            <div style="display:flex;gap:10px;margin-top:10px;">
-                <button class="w-btn" onclick="renderSend()">SEND</button>
-                <button class="w-btn" onclick="renderReceive()">RECEIVE</button>
-                <button class="w-btn" onclick="renderSwap()">SWAP</button>
-            </div>
+        <div style="background:linear-gradient(135deg,#7B35D4,#3b0764);padding:25px;border-radius:30px;margin-bottom:25px;">
+            <div style="font-size:0.6rem;opacity:0.6;font-weight:900;letter-spacing:1px;">EQUITY</div>
+            <div style="font-size:2.2rem;font-weight:900;margin:10px 0;">$${usd.toFixed(2)}</div>
+            <div style="display:flex;gap:10px;"><button class="w-btn" onclick="renderSend()">SEND</button><button class="w-btn" onclick="renderReceive()">RECEIVE</button><button class="w-btn" onclick="renderSwap()">SWAP</button></div>
         </div>
         <div style="flex:1;overflow-y:auto;padding-bottom:100px;">
-            ${ASSETS.map(a => `
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:20px;background:#080808;border:1px solid #111;border-radius:28px;margin-bottom:12px;transition:0.3s;">
-                    <div style="display:flex;align-items:center;gap:15px;">
-                        <div style="width:32px;height:32px;background:#111;border-radius:50%;display:flex;justify-content:center;align-items:center;"><img src="${a.logo}" style="width:20px;"></div>
-                        <b style="font-size:0.9rem;">${a.symbol}</b>
-                    </div>
-                    <div style="text-align:right;"><b style="font-size:0.9rem;">${a.balance.toLocaleString()}</b><div style="font-size:0.5rem;color:#444;">$${(a.balance * (a.id==='ada'?CONFIG.ADA_USD:CONFIG.PRN_USD)).toFixed(2)}</div></div>
-                </div>
-            `).join('')}
+            ${ASSETS.map(a => `<div style="display:flex;justify-content:space-between;padding:18px;background:#0A0A0A;border:1px solid #111;border-radius:24px;margin-bottom:10px;"><div style="display:flex;align-items:center;gap:12px;"><img src="${a.logo}" style="width:24px;border-radius:50%;"><b>${a.symbol}</b></div><b>${a.balance.toLocaleString()}</b></div>`).join('')}
         </div>
         ${renderNav('assets')}
     </div>`;
 }
 
 function renderNav(active) {
-    const icons = { assets: '💰', stake: '🥩', chat: '💬', vault: '🔒' };
-    return `<div style="display:flex;justify-content:space-around;background:#050505;padding:18px;border-radius:35px;border:1px solid #111;position:absolute;bottom:30px;left:25px;right:25px;z-index:100;box-shadow:0 -10px 30px rgba(0,0,0,0.5);">
-        ${Object.keys(icons).map(k => `<button onclick="render${k.charAt(0).toUpperCase()+k.slice(1)}()" style="background:none;border:none;color:${active===k?'#7B35D4':'#222'};font-size:1.6rem;cursor:pointer;transition:0.4s;${active===k?'transform:scale(1.1)':''}">${icons[k]}</button>`).join('')}
+    return `<div style="display:flex;justify-content:space-around;background:#080808;padding:20px;border-radius:35px;border:1px solid #111;position:absolute;bottom:30px;left:25px;right:25px;z-index:100;">
+        ${Object.keys(ICONS).map(k => `<button onclick="render${k.charAt(0).toUpperCase()+k.slice(1)}()" style="background:none;border:none;color:${active===k?'#7B35D4':'#222'};cursor:pointer;transition:0.3s;">${ICONS[k]}</button>`).join('')}
     </div>`;
 }
 
 function renderChat() {
     const r = document.getElementById('w-root');
-    r.innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;animation:fadeIn 0.4s;">
-        <h3 style="margin:0 0 20px 0;font-weight:900;letter-spacing:2px;font-size:1.1rem;">Neural Bridge</h3>
-        <div id="chat-f" style="flex:1;background:#030303;border:1px solid #111;border-radius:30px;padding:20px;margin-bottom:20px;overflow-y:auto;scrollbar-width:none;">
-            ${CHAT.map(m => `<div style="text-align:${m.s==='Architect'?'right':'left'};margin-bottom:15px;"><div style="font-size:0.5rem;color:#333;margin-bottom:4px;font-weight:900;">${m.s.toUpperCase()}</div><div style="display:inline-block;background:${m.s==='Architect'?'#7B35D4':'#0A0A0A'};padding:14px 18px;border-radius:20px;font-size:0.8rem;max-width:85%;line-height:1.5;${m.s==='Architect'?'':'border:1px solid #111'}">${m.t}</div></div>`).join('')}
+    r.innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;">
+        <h3>Neural Bridge</h3>
+        <div id="chat-f" style="flex:1;background:#050505;border:1px solid #111;border-radius:25px;padding:20px;margin-bottom:20px;overflow-y:auto;">
+            ${CHAT.map(m => `<div style="text-align:${m.s==='Architect'?'right':'left'};margin-bottom:12px;"><div style="display:inline-block;background:${m.s==='Architect'?'#7B35D4':'#111'};padding:12px;border-radius:15px;font-size:0.8rem;max-width:85%;">${m.t}</div></div>`).join('')}
         </div>
-        <div style="display:flex;gap:10px;margin-bottom:100px;align-items:center;background:#080808;padding:10px;border-radius:25px;border:1px solid #111;">
-            <label style="cursor:pointer;width:40px;height:40px;display:flex;justify-content:center;align-items:center;color:#444;font-size:1.2rem;">📎<input type="file" style="display:none" onchange="alert('Asset verified. Anchoring to ledger...')"></label>
-            <input id="ci" type="text" placeholder="Command..." style="flex:1;background:none;border:none;padding:10px;color:white;outline:none;font-weight:600;font-size:0.8rem;">
-            <button onclick="sendC()" style="background:#7B35D4;border:none;width:40px;height:40px;border-radius:18px;color:white;font-weight:900;cursor:pointer;">></button>
+        <div style="display:flex;gap:10px;margin-bottom:100px;align-items:center;">
+            <label style="cursor:pointer;font-size:1.5rem;color:#444;">📎<input type="file" style="display:none" onchange="attachFile(this)"></label>
+            <input id="ci" type="text" placeholder="Command..." style="flex:1;background:#0A0A0A;border:1px solid #111;padding:15px;border-radius:15px;color:white;outline:none;">
+            <button onclick="sendC()" style="background:#7B35D4;border:none;width:50px;height:50px;border-radius:15px;color:white;">></button>
         </div>
         ${renderNav('chat')}
     </div>`;
     const f = document.getElementById('chat-f'); f.scrollTop = f.scrollHeight;
+}
+
+function attachFile(input) {
+    if(!input.files || !input.files[0]) return;
+    const name = input.files[0].name;
+    CHAT.push({s:'Architect', t:'📎 Attached: ' + name});
+    localStorage.setItem('prn_chat', JSON.stringify(CHAT));
+    renderChat();
+    setTimeout(() => { CHAT.push({s:'JARVIS', t:'Asset identified: ' + name + '. Anchoring high-fidelity metadata to ledger node.'}); localStorage.setItem('prn_chat', JSON.stringify(CHAT)); renderChat(); }, 1200);
 }
 
 function sendC() {
@@ -95,133 +84,66 @@ function sendC() {
     CHAT.push({s:'Architect', t:i.value});
     localStorage.setItem('prn_chat', JSON.stringify(CHAT));
     renderChat();
-    setTimeout(() => {
-        CHAT.push({s:'JARVIS', t:'Command registered. Syncing with external APIs (Gmail, WPP, Slack)...'});
-        localStorage.setItem('prn_chat', JSON.stringify(CHAT));
-        renderChat();
-    }, 1200);
+    setTimeout(() => { CHAT.push({s:'JARVIS', t:'Command registered. Syncing Singularity.'}); localStorage.setItem('prn_chat', JSON.stringify(CHAT)); renderChat(); }, 1000);
 }
 
 function renderStake() {
-    document.getElementById('w-root').innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;animation:fadeIn 0.4s;">
-        <h3 style="margin:0 0 20px 0;font-weight:900;">Yield Engine</h3>
-        <div style="background:#080808;padding:25px;border-radius:30px;border:1px solid #111;margin-bottom:15px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;"><div><b style="font-size:1rem;">PRN Staking</b><br><small style="color:#666">Fixed Rewards</small></div><b style="color:#00FF88;font-size:1.4rem;">4.5%</b></div>
-            <button onclick="alert('Stake Initialized')" style="width:100%;background:#7B35D4;border:none;color:white;padding:15px;border-radius:15px;margin-top:20px;font-weight:900;cursor:pointer;">DEPOSIT PRN</button>
-        </div>
-        <div style="background:#080808;padding:25px;border-radius:30px;border:1px solid #111;">
-            <div style="display:flex;justify-content:space-between;align-items:center;"><div><b style="font-size:1rem;">PRN/ADA LP</b><br><small style="color:#666">Trading Fees</small></div><b style="color:#00FF88;font-size:1.4rem;">12.8%</b></div>
-            <button onclick="alert('Liquidity Initialized')" style="width:100%;background:#111;border:none;color:white;padding:15px;border-radius:15px;margin-top:20px;font-weight:900;cursor:pointer;border:1px solid #222;">ADD LIQUIDITY</button>
-        </div>
+    document.getElementById('w-root').innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;">
+        <h3>Yield Engine</h3>
+        <div style="background:#0A0A0A;padding:25px;border-radius:28px;border:1px solid #111;margin-bottom:15px;"><b>PRN Staking</b><br><small style="color:#00FF88">4.5% APY</small><button onclick="alert('Staking Active')" style="width:100%;background:#7B35D4;border:none;color:white;padding:12px;border-radius:12px;margin-top:15px;font-weight:900;">DEPOSIT</button></div>
+        <div style="background:#0A0A0A;padding:25px;border-radius:28px;border:1px solid #111;"><b>Liquidity</b><br><small style="color:#00FF88">12.8% APY</small><button onclick="alert('Liquidity Added')" style="width:100%;background:#111;border:none;color:white;padding:12px;border-radius:12px;margin-top:15px;font-weight:900;">ADD LP</button></div>
         ${renderNav('stake')}
     </div>`;
 }
 
 function renderVault() {
-    const docs = [{n:"Birth_Cert.pri",i:"🖼️"}, {n:"Land_Deeds.pri",i:"🏠"}, {n:"Manifest.pri",i:"🏰"}, {n:"Architect_Keys.pri",i:"🔑"}, {n:"Heritage_Archive.pri",i:"🗂️"}];
-    document.getElementById('w-root').innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;animation:fadeIn 0.4s;">
-        <h3 style="margin:0 0 20px 0;font-weight:900;">Sovereign Vault</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;flex:1;overflow-y:auto;padding-bottom:100px;scrollbar-width:none;">
-            ${docs.map(d => `<div onclick="alert('Verifying: '+d.n)" style="background:#080808;padding:25px;border-radius:30px;text-align:center;border:1px solid #111;cursor:pointer;transition:0.3s;"><div style="font-size:2.5rem;margin-bottom:10px;">${d.i}</div><div style="font-size:0.6rem;font-weight:900;color:#666;letter-spacing:1px;">${d.n}</div></div>`).join('')}
+    const docs = [{n:"Birth_Cert.pri",i:"🖼️"}, {n:"Land_Deeds.pri",i:"🏠"}, {n:"Manifest.pri",i:"🏰"}, {n:"PrimeLand.pri",i:"🗺️"}, {n:"Heritage.pri",i:"🗂️"}];
+    document.getElementById('w-root').innerHTML = `<div style="padding:25px;height:100%;display:flex;flex-direction:column;box-sizing:border-box;">
+        <h3>Sovereign Vault</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;flex:1;overflow-y:auto;padding-bottom:100px;">
+            ${docs.map(d => `<div onclick="alert('Viewing: '+d.n)" style="background:#0A0A0A;padding:20px;border-radius:24px;text-align:center;border:1px solid #111;cursor:pointer;"><div style="font-size:2.2rem;margin-bottom:10px;">${d.i}</div><div style="font-size:0.6rem;font-weight:900;color:#666;">${d.n}</div></div>`).join('')}
         </div>
         ${renderNav('vault')}
     </div>`;
 }
 
 function renderProfile() {
-    document.getElementById('w-root').innerHTML = `<div style="padding:40px;text-align:center;height:100%;display:flex;flex-direction:column;animation:fadeIn 0.4s;">
-        <h3 style="margin:0;font-weight:900;letter-spacing:2px;">Sovereign Profile</h3>
-        <img src="${WALLETS[0].pfp}" style="width:110px;height:110px;border-radius:50%;border:4px solid #7B35D4;margin:40px auto;object-fit:cover;cursor:pointer;" onclick="p=prompt('New PFP URL');if(p){WALLETS[0].pfp=p;localStorage.setItem('prn_wallets',JSON.stringify(WALLETS));renderProfile()}">
-        <h2 onclick="n=prompt('Change Name');if(n){WALLETS[0].name=n;localStorage.setItem('prn_wallets',JSON.stringify(WALLETS));renderProfile()}" style="cursor:pointer;margin:0;font-size:1.8rem;font-weight:900;">${WALLETS[0].name}</h2>
-        <p style="color:#7B35D4;font-weight:900;letter-spacing:2px;margin-top:10px;">${WALLETS[0].handle}</p>
-        <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px;">
-            <button onclick="alert('Recovery Phase: [REDACTED]')" style="background:#111;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;cursor:pointer;border:1px solid #222;">SECURITY PHRASE</button>
-            <button onclick="renderAssets()" style="background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;cursor:pointer;">BACK</button>
-        </div>
+    document.getElementById('w-root').innerHTML = `<div style="padding:40px;text-align:center;height:100%;display:flex;flex-direction:column;">
+        <h3>Profile</h3>
+        <img src="${WALLETS[0].pfp}" style="width:100px;height:100px;border-radius:50%;border:3px solid #7B35D4;margin:30px auto;object-fit:cover;cursor:pointer;" onclick="p=prompt('URL');if(p){WALLETS[0].pfp=p;localStorage.setItem('prn_wallets',JSON.stringify(WALLETS));renderProfile()}">
+        <h2 onclick="n=prompt('Name');if(n){WALLETS[0].name=n;localStorage.setItem('prn_wallets',JSON.stringify(WALLETS));renderProfile()}">${WALLETS[0].name}</h2>
+        <p style="color:#7B35D4;font-weight:900;">${WALLETS[0].handle}</p>
+        <button onclick="renderAssets()" style="margin-top:auto;background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;">BACK</button>
     </div>`;
 }
 
 function renderHandleMenu() {
-    document.getElementById('w-root').innerHTML = `<div style="padding:30px;height:100%;display:flex;flex-direction:column;animation:fadeIn 0.4s;">
-        <h3 style="margin:0 0 40px 0;font-weight:900;">Management</h3>
-        <div style="flex:1;display:flex;flex-direction:column;gap:15px;">
-            <button onclick="alert('Initializing Node Registration')" style="width:100%;background:#080808;border:1px solid #111;color:white;padding:20px;border-radius:25px;font-weight:900;cursor:pointer;text-align:left;">+ CREATE NEW WALLET</button>
-            <button onclick="alert('Enter 24-word Seed')" style="width:100%;background:#080808;border:1px solid #111;color:white;padding:20px;border-radius:25px;font-weight:900;cursor:pointer;text-align:left;">🔑 RESTORE WALLET</button>
-            <button onclick="alert('Connect Ledger/Vespr')" style="width:100%;background:#080808;border:1px solid #111;color:white;padding:20px;border-radius:25px;font-weight:900;cursor:pointer;text-align:left;">🛡️ ADD HARDWARE LEDGER</button>
-        </div>
-        <button onclick="renderAssets()" style="background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;cursor:pointer;">BACK</button>
+    document.getElementById('w-root').innerHTML = `<div style="padding:30px;">
+        <h3>Node Management</h3>
+        <button onclick="alert('Create Node')" style="width:100%;background:#111;border:none;color:white;padding:18px;border-radius:20px;font-weight:900;margin-bottom:15px;">+ CREATE WALLET</button>
+        <button onclick="alert('Restore')" style="width:100%;background:#111;border:none;color:white;padding:18px;border-radius:20px;font-weight:900;margin-bottom:15px;">🔑 RESTORE WALLET</button>
+        <button onclick="renderAssets()" style="width:100%;background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;margin-top:40px;">BACK</button>
     </div>`;
 }
 
 function renderReceive() {
-    const addr = 'addr1q8...prisca';
-    document.getElementById('w-root').innerHTML = `<div style="padding:40px;text-align:center;height:100%;display:flex;flex-direction:column;animation:fadeIn 0.4s;">
-        <h3 style="margin:0 0 30px 0;font-weight:900;">Receive Assets</h3>
-        <div style="background:#fff;padding:20px;display:inline-block;border-radius:30px;margin-bottom:30px;box-shadow:0 0 50px rgba(255,255,255,0.1);"><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${addr}"></div>
-        <div style="background:#080808;padding:20px;border:1px solid #111;border-radius:20px;font-size:0.65rem;word-break:break-all;color:#7B35D4;font-weight:900;">${addr}</div>
-        <button onclick="renderAssets()" style="margin-top:auto;background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;cursor:pointer;">BACK</button>
-    </div>`;
+    document.getElementById('w-root').innerHTML = `<div style="padding:40px;text-align:center;"><h3>Receive</h3><div style="background:#fff;padding:20px;display:inline-block;border-radius:25px;margin-bottom:20px;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=addr1q8...prisca"></div><button onclick="renderAssets()" style="background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;">BACK</button></div>`;
 }
 
 function renderSend() {
-    document.getElementById('w-root').innerHTML = `<div style="padding:30px;height:100%;display:flex;flex-direction:column;animation:fadeIn 0.4s;">
-        <h3 style="margin:0 0 30px 0;font-weight:900;">Send Assets</h3>
-        <div style="flex:1;">
-            <input type="text" placeholder="Handle ($name.pri)" style="width:100%;background:#080808;border:1px solid #111;padding:20px;border-radius:20px;color:white;margin-bottom:15px;outline:none;font-weight:900;">
-            <input type="number" placeholder="Amount" style="width:100%;background:#080808;border:1px solid #111;padding:20px;border-radius:20px;color:white;outline:none;font-weight:900;">
-        </div>
-        <button onclick="alert('Signing Transaction...');renderAssets()" style="background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;cursor:pointer;">CONTINUE</button>
-    </div>`;
+    document.getElementById('w-root').innerHTML = `<div style="padding:30px;"><h3>Send Assets</h3><input type="text" placeholder="Handle" style="width:100%;background:#0A0A0A;border:1px solid #111;padding:18px;border-radius:20px;color:white;margin:20px 0;outline:none;"><button onclick="alert('Signing...');renderAssets()" style="background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;">SEND</button></div>`;
 }
 
 function renderSwap() {
-    document.getElementById('w-root').innerHTML = `<div style="padding:30px;height:100%;display:flex;flex-direction:column;animation:fadeIn 0.4s;">
-        <h3 style="margin:0 0 30px 0;font-weight:900;">Sovereign Swap</h3>
-        <div style="flex:1;">
-            <div style="background:#080808;padding:25px;border-radius:25px;border:1px solid #111;margin-bottom:10px;">
-                <small style="color:#444;font-weight:900;">SELL</small>
-                <div style="display:flex;justify-content:space-between;margin-top:10px;"><b>ADA</b><input type="number" value="100" style="background:none;border:none;color:white;text-align:right;width:80px;font-weight:900;outline:none;"></div>
-            </div>
-            <div style="text-align:center;padding:10px;font-size:1.8rem;color:#7B35D4;">↓</div>
-            <div style="background:#080808;padding:25px;border-radius:25px;border:1px solid #111;">
-                <small style="color:#444;font-weight:900;">BUY</small>
-                <div style="display:flex;justify-content:space-between;margin-top:10px;"><b>PRN</b><b style="color:#7B35D4;">222.00</b></div>
-            </div>
-        </div>
-        <button onclick="alert('Swap Executed');renderAssets()" style="background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;cursor:pointer;">EXECUTE SWAP</button>
-    </div>`;
+    document.getElementById('w-root').innerHTML = `<div style="padding:30px;"><h3>Swap</h3><div style="background:#0A0A0A;padding:20px;border-radius:20px;border:1px solid #111;margin-top:20px;"><b>ADA</b></div><div style="text-align:center;padding:10px;">↓</div><div style="background:#0A0A0A;padding:20px;border-radius:20px;border:1px solid #111;"><b>PRN</b></div><button onclick="alert('Swap Executed');renderAssets()" style="background:#7B35D4;border:none;color:white;padding:18px;border-radius:20px;width:100%;font-weight:900;margin-top:30px;">EXECUTE SWAP</button></div>`;
 }
 
-function triggerPurchase(s, u, p, a) {
-    toggleSidebar();
-    initializeWallet('sidebar');
-    setTimeout(() => {
-        CHAT.push({s:'Architect', t:'I want to purchase the '+s+'.'});
-        CHAT.push({s:'JARVIS', t:'Processing checkout for '+s+' ($'+u+'). Please confirm the transaction in your wallet.'});
-        localStorage.setItem('prn_chat', JSON.stringify(CHAT));
-        renderChat();
-    }, 800);
-}
+function triggerPurchase(s,u,p,a){ toggleSidebar(); initializeWallet('sidebar'); setTimeout(()=>{CHAT.push({s:'Architect', t:'Initiating purchase for '+s}); CHAT.push({s:'JARVIS', t:'Checkout for '+s+' ($'+u+') initialized. Confirm in wallet.'}); localStorage.setItem('prn_chat', JSON.stringify(CHAT)); renderChat();}, 800); }
 
-function toggleSidebar() { 
-    const s = document.getElementById("sidebar"); 
-    if(!s) return; 
-    s.classList.toggle("active"); 
-    if(s.classList.contains("active")) initializeWallet("sidebar"); 
-}
+function toggleSidebar() { const s = document.getElementById("sidebar"); if(!s) return; s.classList.toggle("active"); if(s.classList.contains("active")) initializeWallet("sidebar"); }
 
 const st = document.createElement("style");
-st.textContent = `
-    @keyframes p-pulse { from{transform:scale(1)} to{transform:scale(1.1)} }
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-    .w-btn { flex:1; background:rgba(255,255,255,0.1); border:none; color:white; padding:12px; border-radius:15px; font-weight:900; font-size:0.6rem; cursor:pointer; transition:0.3s; }
-    .w-btn:hover { background:rgba(255,255,255,0.2); transform:translateY(-2px); }
-    .sidebar { position:fixed; right:-420px; top:0; width:400px; height:100vh; background:#000; transition:0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index:10000; border-left:1px solid #111; box-shadow:-10px 0 50px rgba(0,0,0,0.5); }
-    .sidebar.active { right:0; }
-    #chat-f::-webkit-scrollbar { display: none; }
-`;
+st.textContent = "@keyframes p-pulse { from{transform:scale(1)} to{transform:scale(1.1)} } .w-btn{flex:1;background:rgba(255,255,255,0.1);border:none;color:white;padding:10px;border-radius:12px;font-weight:900;font-size:0.6rem;cursor:pointer} .sidebar{position:fixed;right:-420px;top:0;width:400px;height:100vh;background:#000;transition:0.5s;z-index:10000;border-left:1px solid #111;box-shadow:-20px 0 50px rgba(0,0,0,0.5)}.sidebar.active{right:0}";
 document.head.appendChild(st);
 
-window.addEventListener("load", () => { 
-    if(document.getElementById("sidebar")) initializeWallet("sidebar"); 
-});
+window.addEventListener("load", () => { if(document.getElementById("sidebar")) initializeWallet("sidebar"); });
