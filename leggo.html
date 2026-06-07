@@ -3,60 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>HUB | Priscion OS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap">
     <style>
-        :root { --accent: #7B35D4; --bg: #000; --surface: #050505; --border: #111; }
+        :root { --accent: #7B35D4; --bg: #000; --surface: #080808; --border: #111; }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
         .os { display: flex; height: 100vh; }
         .nav { width: 70px; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 30px 0; background: #030303; }
-        .nav-btn { cursor: pointer; color: #333; margin-bottom: 35px; transition: 0.3s; font-size: 1.5rem; display: flex; justify-content: center; align-items: center; }
-        .nav-btn:hover, .nav-btn.active { color: var(--accent); }
+        .nav-btn { cursor: pointer; color: #333; margin-bottom: 35px; font-size: 1.5rem; transition: 0.3s; }
+        .nav-btn:hover { color: var(--accent); }
         .main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .top { height: 75px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 30px; background: #000; }
+        .top { height: 75px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 25px; background: #000; }
         .p-logo { height: 28px; cursor: pointer; }
-        .search-wrap { margin-left: 20px; display: flex; align-items: center; gap: 15px; }
-        .lego-logo { font-weight: 900; letter-spacing: 4px; font-size: 0.8rem; color: #FFF; background: var(--accent); padding: 5px 12px; border-radius: 8px; }
-        .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; color: #fff; width: 350px; font-size: 0.8rem; outline: none; }
-        .dash { flex: 1; padding: 50px; overflow-y: auto; background: radial-gradient(circle at top right, rgba(123, 53, 212, 0.02), transparent); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 25px; }
-        .tile { background: var(--surface); border: 1px solid var(--border); padding: 30px 10px; border-radius: 28px; text-align: center; cursor: pointer; transition: 0.4s; }
-        .tile:hover { border-color: var(--accent); transform: translateY(-5px); background: #080808; }
-        .tile svg { color: var(--accent); margin-bottom: 15px; stroke-width: 2.5; }
+        .lego-logo { font-weight: 900; letter-spacing: 4px; font-size: 0.8rem; color: #FFF; background: var(--accent); padding: 6px 14px; border-radius: 10px; margin: 0 15px; }
+        .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; color: #fff; flex: 1; max-width: 400px; font-size: 0.8rem; outline: none; }
+        .dash { flex: 1; padding: 40px; overflow-y: auto; background: radial-gradient(circle at top right, rgba(123, 53, 212, 0.03), transparent); scrollbar-width: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 20px; }
+        .tile { background: var(--surface); border: 1px solid var(--border); padding: 25px 10px; border-radius: 28px; text-align: center; cursor: pointer; transition: 0.4s; }
+        .tile:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .tile svg { color: var(--accent); margin-bottom: 12px; stroke-width: 2.5; width: 24px; height: 24px; }
         .tile-name { font-size: 0.55rem; font-weight: 900; color: #444; letter-spacing: 1.5px; text-transform: uppercase; }
         .viewport { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 500; }
-        .vp-header { height: 60px; border-bottom: 1px solid #111; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; background: #050505; }
-        iframe { width: 100%; height: calc(100% - 60px); border: none; }
-        .sidebar { position: fixed; right: -420px; top: 0; width: 400px; height: 100vh; background: #000; z-index: 1000; border-left: 1px solid var(--border); transition: 0.5s; }
+        .vp-header { height: 65px; border-bottom: 1px solid #111; display: flex; align-items: center; padding: 0 25px; justify-content: space-between; background: #050505; }
+        iframe { width: 100%; height: calc(100% - 65px); border: none; }
+        .sidebar { position: fixed; right: -420px; top: 0; width: 400px; height: 100vh; background: #000; z-index: 1000; border-left: 1px solid var(--border); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: -20px 0 50px rgba(0,0,0,0.5); }
         .sidebar.active { right: 0; }
+        @media(max-width: 600px) {
+            .nav { width: 60px; padding: 20px 0; }
+            .top { padding: 0 15px; }
+            .lego-logo { display: none; }
+            .search-bar { font-size: 0.75rem; }
+            .dash { padding: 20px; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .sidebar { width: 100%; right: -100%; }
+        }
     </style>
 </head>
 <body>
     <div class="os">
         <nav class="nav">
-            <div class="nav-btn" onclick="window.location.href='/'">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            </div>
-            <div class="nav-btn" onclick="toggleSidebar()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
+            <div class="nav-btn" onclick="window.location.href='/'">🏠</div>
+            <div class="nav-btn" onclick="toggleSidebar()">👤</div>
         </nav>
         <div class="main">
             <header class="top">
-                <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/p-logo.png" class="p-logo" onclick="window.location.href='/'">
-                <div class="search-wrap">
-                    <span class="lego-logo">LEGGO</span>
-                    <input type="text" class="search-bar" placeholder="Enter Sovereign Handle ($name.pri)...">
-                </div>
+                <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion.svg" class="p-logo" onclick="window.location.href='/'">
+                <span class="lego-logo">LEGGO</span>
+                <input type="text" class="search-bar" placeholder="Enter Handle...">
             </header>
             <div class="dash">
                 <div class="viewport" id="vp">
                     <div class="vp-header">
                         <span id="vp-name" style="font-weight:900; letter-spacing:2px; font-size:0.7rem; color:var(--accent);">NODE</span>
-                        <button onclick="closeNode()" style="background:none; border:none; color:#555; font-size:1.2rem; cursor:pointer;">✕</button>
+                        <button onclick="closeNode()" style="background:none; border:none; color:#444; font-size:1.5rem; cursor:pointer;">✕</button>
                     </div>
                     <iframe id="if"></iframe>
                 </div>
-                <h1 style="font-weight:900; font-size:2.2rem; margin-bottom:40px; letter-spacing:-1px;">Priscion Hub</h1>
+                <h1 style="font-weight:900; font-size:2rem; margin-bottom:30px;">Priscion Hub</h1>
                 <div class="grid" id="grid"></div>
             </div>
         </div>
@@ -65,6 +69,7 @@
     <script src="wallet-core.js"></script>
     <script>
         const nodes = [
+            { n: "Jello", h: "messenger", i: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-14 8.38 8.38 0 0 1 3.8.9L21 3z"></path>' },
             { n: "Anime", h: "$dreaminganime.pri", i: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>' },
             { n: "Nurasen", h: "$nurasen.pri", i: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>' },
             { n: "Atelia", h: "$atelia.pri", i: '<rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h.01M10 12h.01M15 11l2 2m0-2l-2 2"></path>' },
@@ -84,8 +89,7 @@
             { n: "Escapist", h: "$theescapist.pri", i: '<path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2"></path>' },
             { n: "Watch", h: "$thewatchlist.pri", i: '<circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline>' },
             { n: "Verdant", h: "$verdantco.pri", i: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2"></path>' },
-            { n: "Seamrite", h: "$seamrite.pri", i: '<circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20"></path>' },
-            { n: "Dumpling", h: "$mybabydumpling.pri", i: '<path d="M9 12h.01"></path><path d="M15 12h.01"></path><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 5 6.3"></path>' }
+            { n: "Seamrite", h: "$seamrite.pri", i: '<circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20"></path>' }
         ];
 
         function renderGrid() {
@@ -98,6 +102,7 @@
         }
 
         function openNode(h, name) {
+            if(h === 'messenger') { toggleSidebar(); renderChat(); return; }
             const p = h.replace('$','').replace('.pri','');
             document.getElementById('vp-name').innerText = name.toUpperCase();
             document.getElementById('vp').style.display='block';
