@@ -174,3 +174,4 @@ window.addEventListener("load", () => {
         window.navigator.serviceWorker.register('/sw.js').then(() => console.log('Sovereign Sync Active'));
     }
 });
+
