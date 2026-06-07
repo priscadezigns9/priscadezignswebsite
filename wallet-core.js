@@ -69,7 +69,7 @@ function renderChat() {
         </div>
         <div style="display:flex;gap:10px;margin-bottom:100px;align-items:center;background:#0A0A0A;padding:12px;border-radius:25px;border:1px solid #111;">
             <label style="cursor:pointer;font-size:1.4rem;color:#444;">📎<input type="file" style="display:none" onchange="prepUpload(this)"></label>
-            <button onclick="startVoice()" id="mic-btn" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#444;">🎤</button>
+            <button onclick="startVoice()" id="mic-btn" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#444;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></button>
             <input id="ci" type="text" placeholder="Message Singularity..." style="flex:1;background:none;border:none;padding:5px;color:white;outline:none;font-weight:600;">
             <button onclick="sendC()" style="background:#7B35D4;border:none;width:45px;height:45px;border-radius:18px;color:white;font-weight:900;cursor:pointer;">></button>
         </div>
