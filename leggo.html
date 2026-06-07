@@ -2,62 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HUB | Priscion OS</title>
+    <title>OS | Priscion Hub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap">
     <style>
         :root { --accent: #7B35D4; --bg: #000; --surface: #080808; --border: #111; }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
         .os { display: flex; height: 100vh; }
-        .nav { width: 70px; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 30px 0; background: #030303; }
+        .nav { width: 75px; border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 30px 0; background: #030303; }
         .nav-btn { cursor: pointer; color: #333; margin-bottom: 35px; font-size: 1.5rem; transition: 0.3s; }
-        .nav-btn:hover { color: var(--accent); }
+        .nav-btn:hover, .nav-btn.active { color: var(--accent); }
         .main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .top { height: 75px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 25px; background: #000; }
-        .p-logo { height: 32px; cursor: pointer; }
-        .lego-logo-img { height: 24px; margin-left: 20px; }
-        .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; color: #fff; flex: 1; max-width: 400px; font-size: 0.8rem; outline: none; margin-left: 20px; }
-        .dash { flex: 1; padding: 40px; overflow-y: auto; background: radial-gradient(circle at top right, rgba(123, 53, 212, 0.05), transparent); scrollbar-width: none; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
-        .tile { background: var(--surface); border: 1px solid var(--border); padding: 20px 10px; border-radius: 24px; text-align: center; cursor: pointer; transition: 0.4s; }
+        .top { height: 80px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 25px; background: #000; }
+        .p-logo { height: 35px; cursor: pointer; }
+        .lego-logo-img { height: 22px; margin-left: 15px; }
+        .address-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 25px; color: var(--accent); flex: 1; max-width: 450px; font-size: 0.8rem; outline: none; margin-left: 20px; font-weight: 900; letter-spacing: 2px; }
+        .dash { flex: 1; padding: 40px; overflow-y: auto; background: radial-gradient(circle at top right, rgba(123, 53, 212, 0.03), transparent); scrollbar-width: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+        .tile { background: var(--surface); border: 1px solid var(--border); padding: 25px 10px; border-radius: 28px; text-align: center; cursor: pointer; transition: 0.4s; }
         .tile:hover { border-color: var(--accent); transform: translateY(-5px); background: #0A0A0A; }
-        .tile svg { color: var(--accent); margin-bottom: 12px; }
+        .tile svg { color: var(--accent); margin-bottom: 15px; width: 22px; height: 22px; }
         .tile-name { font-weight: 900; font-size: 0.55rem; letter-spacing: 1px; color: #444; text-transform: uppercase; }
-        .tile:hover { color: #fff; }
         .tile:hover .tile-name { color: #fff; }
-        .viewport { position: fixed; top: 0; left: 70px; right: 0; bottom: 0; background: #000; z-index: 500; display: none; flex-direction: column; }
-        .vp-header { height: 60px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; background: #000; }
+        .viewport { position: fixed; top: 0; left: 75px; right: 0; bottom: 0; background: #000; z-index: 500; display: none; flex-direction: column; }
+        .vp-header { height: 70px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 30px; background: #000; }
         #if { flex: 1; border: none; width: 100%; height: 100%; }
-        .sidebar { position: fixed; right: -420px; top: 0; width: 400px; height: 100vh; background: #000; z-index: 1000; border-left: 1px solid var(--border); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .sidebar { position: fixed; right: -420px; top: 0; width: 400px; height: 100vh; background: #000; z-index: 2000; border-left: 1px solid var(--border); transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
         .sidebar.active { right: 0; }
+        @media(max-width: 600px) {
+            .nav { width: 65px; }
+            .top { padding: 0 15px; }
+            .address-bar { display: none; }
+            .lego-logo-img { display: none; }
+            .dash { padding: 20px; }
+            .grid { grid-template-columns: repeat(3, 1fr); }
+            .sidebar { width: 100%; right: -100%; }
+            .viewport { left: 0; }
+        }
     </style>
 </head>
 <body>
     <div class="os">
         <nav class="nav">
-            <div class="nav-btn" onclick="location.href='index.html'"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
-            <div class="nav-btn" onclick="renderGrid()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-            <div class="nav-btn" onclick="toggleSidebar()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
+            <div class="nav-btn" onclick="location.href='index.html'"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>
+            <div class="nav-btn active" onclick="renderGrid()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+            <div class="nav-btn" onclick="toggleSidebar()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
         </nav>
         <div class="main">
             <header class="top">
                 <img src="assets/p-logo.png" class="p-logo" onclick="location.href='index.html'">
                 <img src="assets/leggo-logo.png" class="lego-logo-img">
-                <input type="text" class="search-bar" placeholder="Enter Handle (e.g. $atelia.pri)...">
+                <input type="text" id="handle-bar" class="address-bar" value="PRISCION.PRI" readonly>
             </header>
             <div class="dash">
                 <div class="viewport" id="vp">
                     <div class="vp-header">
-                        <span id="vp-name" style="font-weight:900; letter-spacing:3px; font-size:0.7rem; color:var(--accent);">NODE</span>
-                        <div style="display:flex; gap:20px;">
-                            <button id="donate-btn" style="display:none; background:var(--accent); border:none; color:#fff; font-weight:900; font-size:0.6rem; padding:8px 15px; border-radius:10px; cursor:pointer;" onclick="triggerDonate()">DONATE</button>
-                            <button onclick="closeNode()" style="background:none; border:none; color:#444; font-size:1.2rem; cursor:pointer;">✕</button>
+                        <span id="vp-name" style="font-weight:900; letter-spacing:4px; font-size:0.7rem; color:var(--accent);">NODE ACTIVE</span>
+                        <div style="display:flex; gap:20px; align-items:center;">
+                            <button id="donate-btn" style="display:none; background:var(--accent); border:none; color:#fff; font-weight:900; font-size:0.6rem; padding:10px 20px; border-radius:10px; cursor:pointer;" onclick="triggerDonate()">DONATE</button>
+                            <button onclick="closeNode()" style="background:none; border:none; color:#444; font-size:1.5rem; cursor:pointer;">✕</button>
                         </div>
                     </div>
                     <iframe id="if"></iframe>
                 </div>
-                <h1 style="font-weight:900; font-size:1.8rem; margin-bottom:30px; letter-spacing:2px;">Priscion Hub</h1>
-                <div class="grid" id="grid"></div>
+                <div id="hub-view">
+                    <h1 style="font-weight:900; font-size:2rem; margin-bottom:35px; letter-spacing:2px;">Sovereign Hub</h1>
+                    <div class="grid" id="grid"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -65,32 +76,28 @@
     <script src="wallet-core.js"></script>
     <script>
         const nodes = [
-            { n: 'Gen Play', h: '$genplay.pri', i: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>' },
-            { n: 'Deskwell', h: '$deskwell.pri', i: '<rect x="3" y="9" width="18" height="12" rx="2"></rect><path d="M1 9h22M12 9v12"></path>' },
-            { n: 'Dumpling', h: '$dumpling.pri', i: '<circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"></path>' }
-,
             { n: 'Jello', h: 'messenger', i: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-14 8.38 8.38 0 0 1 3.8.9L21 3z"></path>' },
-            { n: 'Anime', h: '$dreaminganime.pri', i: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>' },
+            { n: 'Anime', h: '$dreaminganime.pri', i: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>' },
             { n: 'Nurasen', h: '$nurasen.pri', i: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>' },
-            { n: 'Atelia', h: '$atelia.pri', i: '<rect x="2" y="6" width="20" height="12" rx="2"></rect><path d="M6 12h.01M10 12h.01M15 11l2 2m0-2l-2 2"></path>' },
-            { n: 'TWMK', h: '$twmk.pri', i: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>' },
-            { n: 'Autodrome', h: '$autodrome.pri', i: '<circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle><path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"></path>' },
-            { n: 'Riddiim', h: '$riddiim.pri', i: '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>' },
+            { n: 'Market', h: 'market', i: '<path d="M3 3v18h18"></path><path d="m18 7-7.1 7-3.7-3.8L3 14"></path>' },
+            { n: 'Atelia', h: '$atelia.pri', i: '<rect x="2" y="6" width="20" height="12" rx="2"></rect>' },
+            { n: 'Passwords', h: 'passwords', i: '<path d="M15 6V5a3 3 0 0 0-6 0v1"></path><rect x="5" y="6" width="14" height="14" rx="2"></rect><circle cx="12" cy="13" r="1.5"></circle>' },
+            { n: 'TWMK', h: '$twmk.pri', i: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path>' },
             { n: 'dpanyard', h: '$dpanyard.pri', i: '<circle cx="12" cy="12" r="9"></circle><path d="M7 12h10M12 7v10"></path>' },
+            { n: 'Riddiim', h: '$riddiim.pri', i: '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>' },
             { n: 'Glow', h: '$glow.pri', i: '<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2"></path>' },
             { n: 'Peak', h: '$peakfit.pri', i: '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>' },
+            { n: 'Calalloo', h: '$calalloo.pri', i: '<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>' },
+            { n: 'Gen Play', h: '$genplay.pri', i: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>' },
+            { n: 'Deskwell', h: '$deskwell.pri', i: '<rect x="3" y="9" width="18" height="12" rx="2"></rect><path d="M1 9h22M12 9v12"></path>' },
+            { n: 'Dumpling', h: '$dumpling.pri', i: '<circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path>' },
+            { n: 'Autodrome', h: '$autodrome.pri', i: '<circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle><path d="M5 17h-2v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"></path>' },
             { n: 'Couture', h: '$couture.pri', i: '<rect x="3" y="7" width="18" height="13" rx="2"></rect><path d="M16 7V5a4 4 0 0 0-8 0v2"></path>' },
             { n: 'Escapist', h: '$escapist.pri', i: '<path d="M3 21h18M19 21v-4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v4M9 21V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v12"></path>' },
             { n: 'Pantriq', h: '$pantriq.pri', i: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18M9 4v16"></path>' },
-            { n: 'Paw', h: '$paw.pri', i: '<circle cx="12" cy="12" r="9"></circle><path d="M9 12l2 2 4-4"></path>' },
-            { n: 'Essence', h: '$essence.pri', i: '<path d="M12 2v20M2 12h20"></path>' },
-            { n: 'Scout', h: '$techscout.pri', i: '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>' },
-            { n: 'Prime', h: '$primeland.pri', i: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>' },
-            { n: 'Watch', h: '$watchlist.pri', i: '<circle cx="12" cy="12" r="7"></circle><polyline points="12 9 12 12 13.5 13.5"></polyline>' },
             { n: 'Verdant', h: '$verdant.pri', i: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2"></path>' }
         ];
 
-        
         const nodeMap = {
             'dreaminganime': 'dreaminganime',
             'nurasen': 'nurasen',
@@ -101,37 +108,38 @@
             'dpanyard': 'dpanyard',
             'glow': 'glowprotocol',
             'peakfit': 'peakfit',
+            'calalloo': 'calalloo',
+            'genplay': 'thegenplay',
+            'deskwell': 'deskwell',
+            'dumpling': 'mybabydumpling',
             'couture': 'couturegallery',
             'escapist': 'theescapist',
             'pantriq': 'pantriq',
-            'paw': 'pawvault',
-            'essence': 'essenceelite',
-            'techscout': 'thetechscouthq',
-            'primeland': 'primelandnetwork',
-            'watchlist': 'thewatchlist',
-            'verdant': 'verdantco',
-            'genplay': 'thegenplay',
-            'deskwell': 'deskwell',
-            'dumpling': 'mybabydumpling'
+            'verdant': 'verdantco'
         };
 
-
         function renderGrid() {
+            closeNode();
             const g = document.getElementById('grid');
             if(!g) return;
             g.innerHTML = nodes.map(n => `
                 <div class="tile" onclick="openNode('${n.h}', '${n.n}')">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${n.i}</svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${n.i}</svg>
                     <div class="tile-name">${n.n}</div>
                 </div>
             `).join('');
+            document.getElementById('handle-bar').value = "PRISCION.PRI";
         }
 
         function openNode(h, name) {
             if(h === 'messenger') { toggleSidebar(); if(typeof renderChat === 'function') renderChat(); return; }
+            if(h === 'passwords') { alert('Sovereign Password Manager: Loading Secured Vault...'); return; }
+            if(h === 'market') { alert('Marketplace Node: Fetching Real-Time Asset Prices...'); return; }
+            
             const key = h.replace('$','').replace('.pri','');
             const p = nodeMap[key] || key;
             document.getElementById('vp-name').innerText = name.toUpperCase() + ' NODE';
+            document.getElementById('handle-bar').value = h.toUpperCase();
             document.getElementById('vp').style.display = 'flex';
             document.getElementById('if').src = '../' + p + '/index.html';
             document.getElementById('donate-btn').style.display = (key === 'twmk') ? 'block' : 'none';
@@ -149,7 +157,7 @@
             if(!s) return;
             s.classList.toggle('active');
             if(s.classList.contains('active')) {
-                if(typeof initializeWallet === 'function') initializeWallet('sidebar');
+                if(typeof renderWallet === 'function') renderWallet();
             }
         }
 
