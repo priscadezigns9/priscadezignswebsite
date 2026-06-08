@@ -49,13 +49,22 @@
 
         .loading-pulse { animation: pulse 1.5s infinite; color: var(--accent); font-weight: 900; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-    </style>
+    
+    .heartbeat-container { 
+        background: #000; color: #FFF; padding: 10px 20px; border-radius: 100px; 
+        display: flex; align-items: center; gap: 15px; font-size: 0.7rem; font-weight: 800; 
+        text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(0,255,255,0.3);
+        margin-right: 15px;
+    }
+    .pulse-dot { width: 8px; height: 8px; background: #00FFFF; border-radius: 50%; animation: pulse-anim 1.5s infinite; }
+    @keyframes pulse-anim { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
+</style>
 </head>
 <body>
     <nav>
         <div class="logo"><img src="../logos/NURASEN_DEFINITIVE_2026.png" alt="Nurasen"></div>
         <div class="nav-btns">
-            <a href="/nurasen/" class="btn-home">Home</a>
+            <div class="heartbeat-container"><div class="pulse-dot"></div><div id="sync-heartbeat">Sentinel Pulse: Synchronizing...</div></div><a href="/nurasen/" class="btn-home">Home</a>
             <div id="tier-badge" class="tier-badge">SENTINEL SYNCING...</div>
         </div>
     </nav>
@@ -170,6 +179,25 @@
                 row.cells[3].textContent = 'Just Now';
             }, 2000);
         }
-    </script>
+    
+    function updateHeartbeat() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPremium = urlParams.get("premium") === "true";
+        const heartbeat = document.getElementById("sync-heartbeat");
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        
+        if (isPremium) {
+            heartbeat.innerHTML = "Sentinel Pulse: ACTIVE (" + timeStr + ") | 15m Scan";
+            document.querySelector(".pulse-dot").style.background = "#00FFFF";
+        } else {
+            heartbeat.innerHTML = "Sentinel Pulse: STABLE (" + timeStr + ") | 12h Scan";
+            document.querySelector(".pulse-dot").style.background = "#888";
+        }
+    }
+    setInterval(updateHeartbeat, 60000);
+    document.addEventListener("DOMContentLoaded", updateHeartbeat);
+</script>
 </body>
 </html>
+
