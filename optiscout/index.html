@@ -49,7 +49,6 @@
         .hero h1 { font-size: 4.5rem; font-weight: 900; margin-bottom: 25px; color: #000; letter-spacing: -3px; line-height: 1; }
         .hero p { font-size: 1.3rem; color: var(--muted); max-width: 800px; margin: 0 auto 50px; font-weight: 400; }
         
-        /* Redesigned Tier Comparison */
         .premium-comparison { padding: 100px 6% 160px; background: #FFFFFF; text-align: center; }
         .premium-comparison h2 { font-size: 3rem; font-weight: 900; margin-bottom: 80px; color: #000; letter-spacing: -1.5px; }
         .tier-grid { display: flex; justify-content: center; gap: 40px; max-width: 1100px; margin: 0 auto; flex-wrap: wrap; }
@@ -141,35 +140,6 @@
         .btn-black { background: #000; color: #FFF; }
         .btn-black:hover { background: var(--accent); transform: scale(1.02); }
 
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            backdrop-filter: blur(10px);
-        }
-        .modal-overlay.open { display: flex; }
-        .modal {
-            background: white;
-            padding: 50px;
-            border-radius: 32px;
-            max-width: 550px;
-            width: 90%;
-            position: relative;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.5);
-        }
-        .modal-close { position: absolute; top: 25px; right: 25px; cursor: pointer; font-size: 1.8rem; color: #AAA; }
-        .modal-tabs { display: flex; border-bottom: 1px solid #EEE; margin-bottom: 30px; }
-        .modal-tab { padding: 12px 25px; cursor: pointer; font-size: 1rem; font-weight: 700; color: #888; background: none; border: none; outline: none; border-bottom: 3px solid transparent; }
-        .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-        .pay-detail { display: none; }
-        .pay-detail.open { display: block; }
-        .btn-primary { background: var(--accent); color: white; padding: 15px; border-radius: 12px; font-weight: 700; text-decoration: none; display: block; width: 100%; text-align: center; margin-top: 20px; }
-        
         footer { padding: 80px 6%; text-align: center; border-top: 1px solid var(--border); font-size: 0.8rem; color: #AAA; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
@@ -203,9 +173,9 @@
 
             <!-- Premium Tier -->
             <div class='tier-card premium-tier'>
-                <div class='tier-badge'>Recommended</div>
+                <div class='tier-badge'>TEST MODE</div>
                 <h3>OptiScout Premium</h3>
-                <div class='tier-price'>$3.99<span> / mo</span></div>
+                <div class='tier-price'>FREE<span> (TEST)</span></div>
                 <ul class='tier-list'>
                     <li><strong>15-Min Scans:</strong> Instant captures</li>
                     <li><strong>Instant Alerts:</strong> SMS & Email</li>
@@ -213,76 +183,11 @@
                     <li><strong>Infinite Registry:</strong> Unlimited tracking</li>
                     <li><strong>Empire Growth:</strong> Fuels Web3</li>
                 </ul>
-                <button class='btn-opti btn-orange' onclick="openPayModal('OptiScout Premium', '$3.99')">Unlock Premium</button>
+                <a href='dashboard.html?premium=true' class='btn-opti btn-orange'>Unlock Premium (Free for Test)</a>
             </div>
         </div>
     </section>
 
-    <!-- Payment Modal -->
-    <div class="modal-overlay" id="payModal">
-        <div class="modal">
-            <span class="modal-close" onclick="closePayModal()">&times;</span>
-            <div class="modal-tabs">
-                <button class="modal-tab active" onclick="togglePay('bank', this)">Bank</button>
-                <button class="modal-tab" onclick="togglePay('eth', this)">Crypto</button>
-                <button class="modal-tab" onclick="togglePay('intl', this)">PayPal</button>
-            </div>
-            <h3 id="modal-plan-name" style="margin-bottom: 20px;">OptiScout Premium</h3>
-            
-            <div id="pay-bank" class="pay-detail open">
-                <p><strong>Bank:</strong> Citibank, N.A.<br><strong>Routing:</strong> 031100209<br><strong>Account:</strong> 70580060002427728</p>
-                <p style="margin-top:15px; font-size:0.8rem; color:#888;">Ref: <span id="auto-ref-bank" style="color:var(--accent); font-weight:700;">[REF]</span></p>
-            </div>
-
-            <div id="pay-eth" class="pay-detail">
-                <p><strong>ERC-20 Wallet:</strong><br><span id="eth-addr" style="font-size:0.85rem; word-break:break-all;">0xcef857e82c306b3d0f2db080e7794f4bb376049e</span></p>
-                <button class="btn-primary" onclick="copyAddr('eth-addr', event)">Copy Address</button>
-            </div>
-
-            <div id="pay-intl" class="pay-detail">
-                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=QXE9PL58QPU9L&item_name=OptiScout+Premium&currency_code=USD&amount=3.99" class="btn-primary">Proceed to PayPal</a>
-            </div>
-        </div>
-    </div>
-
     <footer>© 2026 OPTISCOUT · AN ORCINOS APEX INTELLIGENCE PRODUCT</footer>
-
-    <script>
-        function openPayModal(plan, price) {
-            document.getElementById('modal-plan-name').textContent = plan + ' — ' + price;
-            const m = document.getElementById('payModal');
-            m.classList.add('open');
-            document.body.style.overflow = 'hidden';
-            const ref = 'PD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-            document.getElementById('auto-ref-bank').textContent = ref;
-        }
-
-        function closePayModal() {
-            document.getElementById('payModal').classList.remove('open');
-            document.body.style.overflow = '';
-        }
-
-        function togglePay(tab, btn) {
-            document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('open'));
-            document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('pay-' + tab).classList.add('open');
-            btn.classList.add('active');
-        }
-
-        function copyAddr(id, ev) {
-            const el = document.getElementById(id);
-            navigator.clipboard.writeText(el.textContent).then(() => {
-                const b = ev.target;
-                const o = b.textContent;
-                b.textContent = 'Copied!';
-                setTimeout(() => b.textContent = o, 2000);
-            });
-        }
-
-        window.onclick = function(e) {
-            const m = document.getElementById('payModal');
-            if (e.target == m) closePayModal();
-        }
-    </script>
 </body>
 </html>
