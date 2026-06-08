@@ -21,7 +21,9 @@ Full catalog of Orcinos software products.
 - **PayPal**
 - **Crypto (ERC-20)**: `0xcef857e82c306b3d0f2db080e7794f4bb376049e`
 - **Payoneer**
-- **NO Stripe**
+- **NO <!-- <!-- Stripe removed. Empire uses PayPal + Crypto + Payoneer only --> removed. Empire uses PayPal + Crypto + Payoneer only -->**
 
 ## Deployment
 All apps are linked from the [Orcinos Hub Page](index.html).
+
+
