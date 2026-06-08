@@ -1,51 +1,48 @@
-// Dricil Shared App Logic (Supabase + Auth)
+/**
+ * Dricil App Logic
+ * Autonomous AI Digital Agency Core
+ */
 
-const CONFIG = {
-    SUPABASE_URL: '{{credential:supabase-project-url}}',
-    SUPABASE_ANON_KEY: '{{credential:supabase-anon-key}}'
-};
-
-// Initialize Supabase Client (Assuming supabase.js is loaded via CDN)
-let supabase;
-if (typeof supabase !== 'undefined') {
-    // This would be initialized if the script is loaded
-}
+const SUPABASE_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
 
 const dricilApp = {
-    async init() {
+    init() {
+        console.log("Dricil Agency Activated.");
+        this.checkSession();
+    },
+
+    getSupabase() {
         if (typeof createClient !== 'undefined') {
-            supabase = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+            return createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+        return null;
+    },
+
+    async checkSession() {
+        const sb = this.getSupabase();
+        if (!sb) return;
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) {
+            document.body.classList.add('logged-in');
         }
     },
 
-    async signUp(email, password) {
-        const { user, error } = await supabase.auth.signUp({ email, password });
-        return { user, error };
-    },
-
-    async signIn(email, password) {
-        const { user, error } = await supabase.auth.signIn({ email, password });
-        return { user, error };
-    },
-
-    async getClientProfile(userId) {
-        const { data, error } = await supabase
+    // Agency Services
+    async getClients() {
+        const sb = this.getSupabase();
+        if (!sb) return [];
+        const { data, error } = await sb
             .from('clients')
             .select('*')
-            .eq('user_id', userId)
-            .single();
-        return { data, error };
-    },
-
-    async saveOnboarding(onboardingData) {
-        const { data, error } = await supabase
-            .from('clients')
-            .insert([onboardingData]);
-        return { data, error };
+            .order('name');
+        return data || [];
     },
 
     async getContentQueue(clientId) {
-        const { data, error } = await supabase
+        const sb = this.getSupabase();
+        if (!sb) return [];
+        const { data, error } = await sb
             .from('content_queue')
             .select('*')
             .eq('client_id', clientId)
@@ -54,7 +51,9 @@ const dricilApp = {
     },
 
     async getReports(clientId) {
-        const { data, error } = await supabase
+        const sb = this.getSupabase();
+        if (!sb) return [];
+        const { data, error } = await sb
             .from('reports')
             .select('*')
             .eq('client_id', clientId)
@@ -63,7 +62,9 @@ const dricilApp = {
     },
 
     async updateAutoPublish(clientId, status) {
-        const { data, error } = await supabase
+        const sb = this.getSupabase();
+        if (!sb) return;
+        const { data, error } = await sb
             .from('clients')
             .update({ auto_publish: status })
             .eq('id', clientId);
