@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanguard Duel | Atelia Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--red); }
+        .logo-img { height: 35px; filter: drop-shadow(0 0 5px var(--red)); }
+
+        #stage {
+            flex: 1; background: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1600&q=80');
+            background-size: cover; position: relative; overflow: hidden;
+            display: flex; align-items: flex-end; justify-content: space-around;
+            padding-bottom: 50px;
+        }
+
+        .fighter {
+            width: 200px; height: 300px; position: relative; transition: transform 0.1s;
+            display: flex; align-items: flex-end; justify-content: center;
+        }
+        .fighter img { height: 100%; width: auto; object-fit: contain; }
+        
+        #player { filter: drop-shadow(0 0 20px rgba(0,255,255,0.5)); }
+        #enemy { filter: drop-shadow(0 0 20px rgba(211,47,47,0.5)); transform: scaleX(-1); }
+
+        .hp-bar-container {
+            position: absolute; top: 40px; width: 400px; height: 30px;
+            background: rgba(0,0,0,0.7); border: 2px solid var(--white);
+        }
+        .hp-fill { height: 100%; background: var(--red); transition: 0.3s; width: 100%; }
+        #player-hp-ui { left: 50px; }
+        #enemy-hp-ui { right: 50px; }
+
+        .label {
+            position: absolute; top: -30px; font-family: 'Russo One'; font-size: 0.8rem;
+            color: var(--orange); letter-spacing: 2px;
+        }
+
+        #controls-overlay {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 20px; z-index: 100;
+        }
+        .control-btn {
+            padding: 15px 30px; background: rgba(0,0,0,0.8); border: 2px solid var(--red);
+            color: white; font-family: 'Russo One'; cursor: pointer; transition: 0.2s;
+        }
+        .control-btn:hover { background: var(--red); transform: translateY(-5px); }
+
+        #fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 50; }
+        .hit-spark {
+            position: absolute; width: 100px; height: 100px; background: radial-gradient(circle, white, transparent);
+            animation: hit 0.3s forwards;
+        }
+        @keyframes hit { 0% { transform: scale(0); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+
+        #overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="arena.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.1rem; color:var(--red);">VANGUARD DUEL</div>
+    </nav>
+
+    <div id="stage">
+        <div id="fx-layer"></div>
+
+        <div class="hp-bar-container" id="player-hp-ui">
+            <div class="label">VANGUARD PILOT</div>
+            <div class="hp-fill" id="p-hp" style="width: 100%;"></div>
+        </div>
+
+        <div class="hp-bar-container" id="enemy-hp-ui">
+            <div class="label" style="right:0;">DATA CORRUPTION</div>
+            <div class="hp-fill" id="e-hp" style="width: 100%;"></div>
+        </div>
+
+        <div class="fighter" id="player">
+            <img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_full_body_hf.webp">
+        </div>
+
+        <div class="fighter" id="enemy">
+            <img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_v4.webp">
+        </div>
+
+        <div id="controls-overlay">
+            <button class="control-btn" onclick="attack('light')">LIGHT ATTACK</button>
+            <button class="control-btn" onclick="attack('heavy')" style="border-color:var(--orange);">HEAVY BURST</button>
+            <button class="control-btn" onclick="attack('special')" style="background:var(--red);">SPECIAL PROTOCOL</button>
+        </div>
+
+        <div id="overlay">
+            <h1 style="font-family:'Bangers'; font-size:5rem; margin:0; letter-spacing:5px;">VANGUARD DUEL</h1>
+            <p style="font-family:'Russo One'; color:var(--orange); margin-bottom:40px;">SOVEREIGN COMBAT INITIALIZED</p>
+            <button class="control-btn" style="padding:15px 60px; font-size:1.5rem;" onclick="start()">INITIATE BATTLE</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        let pHP = 100, eHP = 100, active = false;
+
+        function start() {
+            document.getElementById('overlay').style.display = 'none';
+            active = true;
+            pHP = 100; eHP = 100;
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('p-hp').style.width = pHP + '%';
+            document.getElementById('e-hp').style.width = eHP + '%';
+            if (eHP <= 0) end(true);
+            if (pHP <= 0) end(false);
+        }
+
+        function attack(type) {
+            if (!active) return;
+            const p = document.getElementById('player');
+            const e = document.getElementById('enemy');
+            
+            let damage = 0;
+            if (type === 'light') {
+                damage = 10;
+                p.style.transform = 'translateX(50px)';
+            } else if (type === 'heavy') {
+                damage = 25;
+                p.style.transform = 'scale(1.2) translateX(30px)';
+            } else {
+                damage = 45;
+                p.style.transform = 'scale(1.5) translateY(-50px)';
+            }
+
+            setTimeout(() => { p.style.transform = ''; }, 200);
+
+            // Hit FX
+            const spark = document.createElement('div');
+            spark.className = 'hit-spark';
+            spark.style.left = '60%';
+            spark.style.top = '50%';
+            document.getElementById('fx-layer').appendChild(spark);
+            setTimeout(() => spark.remove(), 300);
+
+            eHP -= damage;
+            updateUI();
+            
+            if (active) setTimeout(enemyCounter, 800);
+        }
+
+        function enemyCounter() {
+            if (!active) return;
+            const e = document.getElementById('enemy');
+            e.style.transform = 'scaleX(-1) translateX(50px)';
+            setTimeout(() => { e.style.transform = 'scaleX(-1)'; }, 200);
+
+            pHP -= 15;
+            updateUI();
+        }
+
+        async function end(win) {
+            active = false;
+            const modal = document.getElementById('overlay');
+            modal.style.display = 'flex';
+            modal.querySelector('h1').innerText = win ? 'VICTORY' : 'DEFEATED';
+            modal.querySelector('p').innerText = win ? 'PROTOCOL SECURED. +50 ATLR' : 'LINK SEVERED. RETRYING...';
+            
+            if (win && window.Atelia) {
+                const u = await Atelia.auth.getUser();
+                if (u.data.user) Atelia.arena.updatePrestige(u.data.user.id, 50);
+            }
+        }
+    </script>
+</body>
+</html>
