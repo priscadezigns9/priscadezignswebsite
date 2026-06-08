@@ -5,7 +5,7 @@ D'Panyard is a comprehensive business directory for Trinidad and Tobago, designe
 ## Tech Stack
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
 - **Database/Auth:** Supabase
-- **Payments:** Stripe (Integration Ready)
+- **Payments:** <!-- <!-- Stripe removed. Empire uses PayPal + Crypto + Payoneer only --> removed. Empire uses PayPal + Crypto + Payoneer only --> (Integration Ready)
 
 ## Setup Instructions
 
@@ -38,3 +38,5 @@ This project is built to be hosted on **GitHub Pages** or any static hosting ser
 
 ## Local Development
 Simply open `landing/index.html` in your browser. No local server is required as it uses the Supabase CDN and client-side logic.
+
+
