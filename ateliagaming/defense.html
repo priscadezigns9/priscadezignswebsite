@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Defense | Atelia Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--red); }
+        .logo-img { height: 35px; filter: drop-shadow(0 0 5px var(--red)); }
+
+        #game-layout { flex: 1; display: flex; position: relative; }
+        
+        /* Map / Grid */
+        #defense-map {
+            flex: 1; background: radial-gradient(circle, #1a1a1a 0%, #050505 100%);
+            position: relative; overflow: hidden; cursor: crosshair;
+        }
+        .grid-cell {
+            position: absolute; width: 60px; height: 60px;
+            border: 1px solid rgba(255,255,255,0.03); box-sizing: border-box;
+        }
+        .grid-cell:hover { background: rgba(211,47,47,0.1); border-color: var(--red); }
+
+        /* Sidebar / Shop */
+        #shop-panel {
+            width: 300px; background: #0a0a0a; border-left: 2px solid var(--red);
+            padding: 20px; display: flex; flex-direction: column; gap: 20px;
+        }
+        .shop-header { font-family: 'Russo One'; color: var(--orange); font-size: 1.2rem; letter-spacing: 2px; }
+        .unit-card {
+            background: #111; border: 1px solid #333; padding: 15px; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; gap: 15px;
+        }
+        .unit-card:hover { border-color: var(--red); background: #1a1a1a; }
+        .unit-card.active { border-color: var(--white); background: #222; box-shadow: 0 0 15px var(--red); }
+        .unit-card img { height: 50px; width: 50px; object-fit: contain; }
+        .unit-info h4 { margin: 0; font-family: 'Russo One'; font-size: 0.8rem; }
+        .unit-info p { margin: 5px 0 0; font-size: 0.7rem; color: #888; }
+        .unit-cost { font-family: 'Bangers'; color: var(--orange); font-size: 1.1rem; }
+
+        /* Game Elements */
+        .tower {
+            position: absolute; width: 60px; height: 60px; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s;
+        }
+        .tower img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255,107,0,0.5)); }
+        
+        .enemy {
+            position: absolute; width: 40px; height: 40px; background: #D32F2F;
+            border-radius: 50%; z-index: 5; box-shadow: 0 0 15px var(--red);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Russo One'; font-size: 0.6rem; color: white;
+        }
+        
+        .core {
+            position: absolute; bottom: 40px; right: 40px; width: 100px; height: 100px;
+            background: radial-gradient(circle, var(--orange), transparent);
+            border: 4px solid var(--white); border-radius: 50%; z-index: 20;
+            display: flex; align-items: center; justify-content: center;
+            animation: corePulse 2s infinite;
+        }
+        @keyframes corePulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--orange); } 50% { transform: scale(1.1); box-shadow: 0 0 50px var(--orange); } }
+
+        #ui-overlay {
+            position: absolute; top: 20px; left: 20px; display: flex; gap: 30px;
+            background: rgba(0,0,0,0.8); padding: 10px 25px; border-radius: 8px; border: 1px solid var(--red);
+        }
+        .stat { font-family: 'Bangers'; font-size: 1.8rem; }
+        .stat span { color: var(--orange); }
+
+        #start-modal {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .btn {
+            padding: 15px 45px; background: var(--red); color: white; border: 3px solid white;
+            font-family: 'Russo One'; font-size: 1.5rem; cursor: pointer; transition: 0.3s;
+        }
+        .btn:hover { background: var(--orange); transform: scale(1.05); }
+
+        .laser {
+            position: absolute; height: 2px; background: #00ffff; box-shadow: 0 0 5px #00ffff;
+            transform-origin: left center; z-index: 15; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="arena.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.1rem; color:var(--red);">NEURAL DEFENSE PRO</div>
+    </nav>
+
+    <div id="game-layout">
+        <div id="ui-overlay">
+            <div class="stat">CORE: <span id="core-hp">100</span></div>
+            <div class="stat">DATA: <span id="data-creds">250</span></div>
+            <div class="stat">WAVE: <span id="wave-num">1</span></div>
+            <div class="stat">ATLR: <span id="atlr-earned">0</span></div>
+        </div>
+
+        <div id="defense-map">
+            <div class="core" id="main-core"><span style="font-family:'Russo One'; font-size:0.7rem;">CORE</span></div>
+            <!-- Grid will be generated here -->
+        </div>
+
+        <div id="shop-panel">
+            <div class="shop-header">VANGUARD UNITS</div>
+            
+            <div class="unit-card" onclick="selectUnit('astra', 100)" id="u-astra">
+                <img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp">
+                <div class="unit-info">
+                    <h4>ASTRA (RAPID)</h4>
+                    <p>High firing rate laser.</p>
+                    <div class="unit-cost">100 DATA</div>
+                </div>
+            </div>
+
+            <div class="unit-card" onclick="selectUnit('mimi', 200)" id="u-mimi">
+                <img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp">
+                <div class="unit-info">
+                    <h4>MIMI (HEAVY)</h4>
+                    <p>Heavy data burst.</p>
+                    <div class="unit-cost text-orange">200 DATA</div>
+                </div>
+            </div>
+
+            <div class="unit-card" onclick="selectUnit('nova', 350)" id="u-nova">
+                <img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp">
+                <div class="unit-info">
+                    <h4>NOVA (PULSE)</h4>
+                    <p>Area of effect shockwave.</p>
+                    <div class="unit-cost">350 DATA</div>
+                </div>
+            </div>
+
+            <div style="flex:1"></div>
+            <button class="btn" style="font-size:1rem; padding:10px;" onclick="nextWave()">INITIATE NEXT WAVE</button>
+        </div>
+
+        <div id="start-modal">
+            <h1 style="font-family:'Bangers'; font-size:5rem; margin:0; letter-spacing:5px;">NEURAL DEFENSE</h1>
+            <p style="font-family:'Russo One'; color:var(--orange); margin-bottom:40px;">PROTECT THE SOVEREIGN CORE</p>
+            <button class="btn" onclick="startGame()">ENTER PROTOCOL</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        let dataCreds = 250, coreHP = 100, wave = 1, atlr = 0, active = false;
+        let selectedUnit = null, selectedCost = 0;
+        let towers = [], enemies = [], path = [];
+
+        const map = document.getElementById('defense-map');
+        const unitAssets = {
+            astra: 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp',
+            mimi: 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp',
+            nova: 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp'
+        };
+
+        function startGame() {
+            document.getElementById('start-modal').style.display = 'none';
+            active = true;
+            generateGrid();
+            gameLoop();
+        }
+
+        function generateGrid() {
+            const cols = Math.floor(map.clientWidth / 60);
+            const rows = Math.floor(map.clientHeight / 60);
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.style.left = (c * 60) + 'px';
+                    cell.style.top = (r * 60) + 'px';
+                    cell.onclick = () => placeTower(c * 60, r * 60);
+                    map.appendChild(cell);
+                }
+            }
+        }
+
+        function selectUnit(u, cost) {
+            selectedUnit = u;
+            selectedCost = cost;
+            document.querySelectorAll('.unit-card').forEach(c => c.classList.remove('active'));
+            document.getElementById('u-'+u).classList.add('active');
+        }
+
+        function placeTower(x, y) {
+            if (!selectedUnit || dataCreds < selectedCost) return;
+            dataCreds -= selectedCost;
+            document.getElementById('data-creds').innerText = dataCreds;
+
+            const t = document.createElement('div');
+            t.className = 'tower';
+            t.style.left = x + 'px';
+            t.style.top = y + 'px';
+            t.innerHTML = `<img src="${unitAssets[selectedUnit]}">`;
+            map.appendChild(t);
+
+            towers.push({ x: x + 30, y: y + 30, type: selectedUnit, lastShot: 0 });
+        }
+
+        function spawnEnemy() {
+            const e = document.createElement('div');
+            e.className = 'enemy';
+            e.style.left = '-40px';
+            e.style.top = (Math.random() * (map.clientHeight - 100) + 50) + 'px';
+            e.innerText = 'VIRUS';
+            map.appendChild(e);
+            enemies.push({ el: e, x: -40, y: parseFloat(e.style.top), hp: 50 + (wave * 10) });
+        }
+
+        function nextWave() {
+            if (!active) return;
+            wave++;
+            document.getElementById('wave-num').innerText = wave;
+            for (let i = 0; i < 5 + wave; i++) {
+                setTimeout(spawnEnemy, i * 1000);
+            }
+        }
+
+        function gameLoop() {
+            if (!active) return;
+
+            // Enemy Movement
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const e = enemies[i];
+                const coreX = map.clientWidth - 100;
+                const coreY = map.clientHeight - 100;
+                
+                const dx = coreX - e.x;
+                const dy = coreY - e.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (dist < 60) {
+                    coreHP -= 10;
+                    document.getElementById('core-hp').innerText = coreHP;
+                    e.el.remove();
+                    enemies.splice(i, 1);
+                    if (coreHP <= 0) gameOver();
+                    continue;
+                }
+
+                e.x += (1 + wave * 0.1) * (dx / dist);
+                e.y += (1 + wave * 0.1) * (dy / dist);
+                e.el.style.left = e.x + 'px';
+                e.el.style.top = e.y + 'px';
+            }
+
+            // Tower Attacks
+            const now = Date.now();
+            towers.forEach(t => {
+                let range = t.type === 'astra' ? 300 : 200;
+                let cooldown = t.type === 'astra' ? 500 : 1000;
+                
+                if (now - t.lastShot > cooldown) {
+                    const target = enemies.find(e => {
+                        const dist = Math.sqrt(Math.pow(t.x - e.x, 2) + Math.pow(t.y - e.y, 2));
+                        return dist < range;
+                    });
+
+                    if (target) {
+                        t.lastShot = now;
+                        fireLaser(t.x, t.y, target.x + 20, target.y + 20);
+                        target.hp -= t.type === 'mimi' ? 50 : 20;
+                        if (target.hp <= 0) {
+                            atlr += 1;
+                            dataCreds += 20;
+                            document.getElementById('atlr-earned').innerText = atlr;
+                            document.getElementById('data-creds').innerText = dataCreds;
+                            target.el.remove();
+                            enemies = enemies.filter(item => item !== target);
+                        }
+                    }
+                }
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function fireLaser(x1, y1, x2, y2) {
+            const l = document.createElement('div');
+            l.className = 'laser';
+            const dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            l.style.width = dist + 'px';
+            l.style.left = x1 + 'px';
+            l.style.top = y1 + 'px';
+            l.style.transform = `rotate(${angle}rad)`;
+            map.appendChild(l);
+            setTimeout(() => l.remove(), 100);
+        }
+
+        function gameOver() {
+            active = false;
+            alert("CORE COMPROMISED. ATLR SECURED: " + atlr);
+            if (window.Atelia) Atelia.arena.updatePrestige(null, atlr);
+            location.reload();
+        }
+    </script>
+</body>
+</html>
