@@ -40,7 +40,7 @@ Last Updated: 2026-06-08
 **Domain:** orcinos.com (NEEDS PURCHASING)
 **Role:** SaaS products, Chrome extensions, platforms, AI tools
 **Logo:** Orca icon, blue-to-purple gradient (#00BFFF to #1E3FD8 to #6B27FF)
-**Payment:** PayPal + Crypto (ERC-20: 0xcef857e82c306b3d0f2db080e7794f4bb376049e) + Payoneer. NO Stripe.
+**Payment:** PayPal + Crypto (ERC-20: 0xcef857e82c306b3d0f2db080e7794f4bb376049e) + Payoneer. NO <!-- <!-- Stripe removed. Empire uses PayPal + Crypto + Payoneer only --> removed. Empire uses PayPal + Crypto + Payoneer only -->.
 
 ### Chrome Extensions
 | Product | Price | Status |
@@ -85,11 +85,12 @@ Last Updated: 2026-06-08
 
 ---
 
-## FOURTH COMPANY — AI DIGITAL AGENCY
-**Name:** TBD — domain candidates: brandwave.com / kestriva.com
+## FOURTH COMPANY — DRICIL (AI Digital Agency)
+**Name:** Dricil
+**Domain:** dricil.com (NEEDS PURCHASING)
 **Role:** Done-for-you AI-powered digital agency. Fully autonomous.
 **AI Engine:** OpenAI GPT-4o
-**Payment:** PayPal + Crypto + Payoneer. NO Stripe.
+**Payment:** PayPal + Crypto + Payoneer. NO <!-- <!-- Stripe removed. Empire uses PayPal + Crypto + Payoneer only --> removed. Empire uses PayPal + Crypto + Payoneer only -->.
 
 ### Services (For Clients)
 - Social media content (AI-generated + scheduled)
@@ -148,8 +149,10 @@ Last Updated: 2026-06-08
 - PayPal — primary processor
 - Crypto ERC-20 — 0xcef857e82c306b3d0f2db080e7794f4bb376049e
 - Payoneer — international transfers
-- NO STRIPE. EVER.
+- NO <!-- <!-- Stripe removed. Empire uses PayPal + Crypto + Payoneer only --> removed. Empire uses PayPal + Crypto + Payoneer only -->. EVER.
 
 ## AMAZON AFFILIATE
 - Tag: priscadezigns-20
 - Storefront: priscadezigns
+
+
