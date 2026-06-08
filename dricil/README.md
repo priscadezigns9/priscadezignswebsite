@@ -12,7 +12,7 @@ Dricil is a fully autonomous AI-powered digital marketing agency. It manages soc
 - **Frontend:** HTML5, CSS3, Vanilla JS
 - **Database:** Supabase (PostgreSQL)
 - **AI Core:** `content-engine/generator.js` powered by `shared/api.js` (OpenAI GPT-4o)
-- **Payment Stack:** PayPal, Crypto (ERC-20), Payoneer (No Stripe)
+- **Payment Stack:** PayPal, Crypto (ERC-20), Payoneer (No <!-- <!-- Stripe removed. Empire uses PayPal + Crypto + Payoneer only --> removed. Empire uses PayPal + Crypto + Payoneer only -->)
 
 ## Packages
 - **Starter ($297/mo):** 15 posts, 3 platforms, SEO audit.
@@ -36,3 +36,5 @@ Dricil is a fully autonomous AI-powered digital marketing agency. It manages soc
 
 ---
 &copy; 2026 Priscion Empire. Built for sovereign marketing.
+
+
