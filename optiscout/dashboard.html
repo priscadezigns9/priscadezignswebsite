@@ -38,12 +38,15 @@
         th { text-align: left; padding: 20px; background: #FAFAFA; border-bottom: 1px solid var(--border); font-size: 0.75rem; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
         td { padding: 20px; border-bottom: 1px solid var(--border); font-size: 0.95rem; font-weight: 500; }
         .empty-state { padding: 60px; text-align: center; color: var(--muted); }
+        
+        .loading-pulse { animation: pulse 1.5s infinite; color: var(--accent); font-weight: 700; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
     <nav>
         <div class="logo"><img src="../logos/OPTISCOUT_DEFINITIVE_2026.png" alt="OptiScout"></div>
-        <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border: 2px solid var(--accent); padding: 6px 15px; border-radius: 100px;">Active Intelligence Node</div>
+        <div id="tier-badge" style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #FFF; background: #000; padding: 6px 15px; border-radius: 100px;">Loading Node...</div>
     </nav>
 
     <div class="container">
@@ -51,9 +54,9 @@
             <h2>How to Use OptiScout</h2>
             <ol>
                 <li><strong>Source your target:</strong> Visit any Amazon product page.</li>
-                <li><strong>Copy the URL:</strong> Copy the web address from your browser.</li>
-                <li><strong>Initialize the Scout:</strong> Paste the URL into the search bar below and click "Initialize Scout."</li>
-                <li><strong>Monitor Volatility:</strong> OptiScout will begin tracking price movements and alert you when a deal is identified.</li>
+                <li><strong>Copy the URL:</strong> Copy the full product URL from your address bar.</li>
+                <li><strong>Initialize the Scout:</strong> Paste the URL below and click "Initialize Scout."</li>
+                <li><strong>Neural Sync:</strong> Your node will connect to the Amazon shard and start tracking volatility.</li>
             </ol>
         </div>
 
@@ -61,24 +64,24 @@
             <div class="card">
                 <h4>Active Monitors</h4>
                 <div class="val" id="monitor-count">0</div>
-                <div class="desc">Total products currently tracked by your node.</div>
+                <div class="desc">Products currently being tracked.</div>
             </div>
             <div class="card">
                 <h4>Daily Signals</h4>
-                <div class="val">42,901</div>
-                <div class="desc">Neural market scans processed across global Amazon shards.</div>
+                <div class="val" id="signal-val">42,901</div>
+                <div class="desc">Total global market scans processed today.</div>
             </div>
             <div class="card">
-                <h4>Scout Savings</h4>
-                <div class="val">$0.00</div>
-                <div class="desc">Calculated savings identified by deal-hunting protocols.</div>
+                <h4>Scout Alpha</h4>
+                <div class="val" id="alpha-val">$0.00</div>
+                <div class="desc">Potential savings identified by your node.</div>
             </div>
         </div>
 
         <div class="search-area">
             <h3 style="margin-bottom: 20px; font-weight: 800;">Initialize Neural Scout</h3>
             <div class="search-flex">
-                <input type="text" id="asset-url" placeholder="Paste Amazon Product URL here...">
+                <input type="text" id="asset-url" placeholder="Paste Amazon Product URL here (e.g. https://www.amazon.com/dp/...)">
                 <button onclick="addAsset()">Initialize Scout</button>
             </div>
         </div>
@@ -87,15 +90,15 @@
             <table id="asset-table">
                 <thead>
                     <tr>
-                        <th>Asset Name / URL</th>
-                        <th>Status</th>
-                        <th>Signal</th>
+                        <th>Asset Target</th>
+                        <th>Neural Status</th>
+                        <th>Signal Strength</th>
                         <th>Last Sync</th>
                     </tr>
                 </thead>
                 <tbody id="asset-body">
                     <tr id="no-assets">
-                        <td colspan="4" class="empty-state">No active scouts. Paste a URL above to begin monitoring.</td>
+                        <td colspan="4" class="empty-state">No active scouts. Enter a URL above to activate your first node.</td>
                     </tr>
                 </tbody>
             </table>
@@ -103,11 +106,27 @@
     </div>
 
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPremium = urlParams.get('premium') === 'true';
+        const tierBadge = document.getElementById('tier-badge');
+        
+        if (isPremium) {
+            tierBadge.textContent = 'Premium Intelligence Active';
+            tierBadge.style.background = 'var(--accent)';
+        } else {
+            tierBadge.textContent = 'Freemium Service (Standard)';
+            tierBadge.style.background = '#000';
+        }
+
         let count = 0;
         function addAsset() {
             const urlInput = document.getElementById('asset-url');
             const url = urlInput.value.trim();
-            if (!url) { alert('Please enter a valid Amazon URL.'); return; }
+            
+            if (!url || (!url.includes('amazon.') && !url.includes('amzn.'))) { 
+                alert('Invalid URL. Please paste a direct Amazon product link.'); 
+                return; 
+            }
             
             const tbody = document.getElementById('asset-body');
             const noAssets = document.getElementById('no-assets');
@@ -117,19 +136,25 @@
             document.getElementById('monitor-count').textContent = count;
 
             const row = document.createElement('tr');
-            const shortUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
+            const displayUrl = url.length > 60 ? url.substring(0, 57) + '...' : url;
+            
             row.innerHTML = `
-                <td>${shortUrl}</td>
-                <td><span style="color: #00AD69; font-weight: 700;">INITIALIZING...</span></td>
-                <td>Scouting Volatility</td>
-                <td>Just Now</td>
+                <td><a href="${url}" target="_blank" style="color: #000; text-decoration:none; font-weight:600;">${displayUrl}</a></td>
+                <td><span class="loading-pulse">SYNCING...</span></td>
+                <td>Searching...</td>
+                <td>Initializing</td>
             `;
             tbody.prepend(row);
             urlInput.value = '';
-            
-            alert('Scout Protocol Initialized. Your node is now tracking this asset.');
+
+            // Simulated "Working" behavior
+            setTimeout(() => {
+                row.cells[1].innerHTML = '<span style="color: #00AD69; font-weight: 700;">ACTIVE</span>';
+                row.cells[2].textContent = isPremium ? 'HIGH (15m Scan)' : 'STANDARD (12h Scan)';
+                row.cells[3].textContent = 'Just Now';
+                document.getElementById('alpha-val').textContent = '$' + (Math.random() * 50).toFixed(2);
+            }, 2000);
         }
     </script>
 </body>
 </html>
-
