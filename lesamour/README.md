@@ -17,7 +17,7 @@ Les Amour is a premium, marriage-first intimacy and relationship platform design
 - **Frontend:** HTML5, CSS3 (Design System), JavaScript (ES6+).
 - **Backend/Database:** Supabase (PostgreSQL, Auth, Real-time).
 - **AI Engine:** OpenAI GPT-4o API.
-- **Payments:** PayPal, Crypto (ERC-20), Payoneer (No Stripe).
+- **Payments:** PayPal, Crypto (ERC-20), Payoneer (No <!-- <!-- Stripe removed. Empire uses PayPal + Crypto + Payoneer only --> removed. Empire uses PayPal + Crypto + Payoneer only -->).
 
 ## Design Identity
 
@@ -44,3 +44,5 @@ Les Amour is a premium, marriage-first intimacy and relationship platform design
 
 ---
 *An Orcinos product under the Prisca Dezigns empire.*
+
+
