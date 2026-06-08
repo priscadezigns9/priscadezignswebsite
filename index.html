@@ -492,7 +492,7 @@
 
         <!-- PayPal Detail -->
         <div id="pay-intl" class="pay-detail">
-          <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=priscadezigns9@gmail.com&item_name=Service+Payment&currency_code=USD" class="btn btn-primary" style="display:block; text-align:center; margin-bottom:15px; width: 100%;">Proceed to PayPal</a>
+          <a id="paypal-btn" href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=priscadezigns9@gmail.com&item_name=Service+Payment&currency_code=USD&amount=0" class="btn btn-primary" style="display:block; text-align:center; margin-bottom:15px; width: 100%;" target="_blank" rel="noopener">Proceed to PayPal</a>
           <p style="font-size:0.75rem;color:#666;">Please include the reference ID in the payment note.</p>
           <p style="font-size:0.75rem;color:#999;margin-top:10px;">Ref: <span id="auto-ref-intl" style="font-weight:700; color:var(--accent);">[REF]</span></p>
         </div>
@@ -539,6 +539,14 @@ function openPayModal(plan, type) {
   if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
   var ref = plan.replace(/[^A-Z0-9]/gi,'').toUpperCase().slice(0,6) + '-' + Date.now().toString(36).toUpperCase().slice(-4);
   ['bank','eth','intl'].forEach(function(k){ var el2=document.getElementById('auto-ref-'+k); if(el2) el2.textContent=ref; });
+  // Pre-fill PayPal with amount and item name
+  var ppBtn = document.getElementById('paypal-btn');
+  if (ppBtn) {
+    var rawAmt = type.replace(/[^0-9.]/g,'');
+    var itemName = encodeURIComponent(plan);
+    var base = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=priscadezigns9%40gmail.com&currency_code=USD';
+    ppBtn.href = base + '&item_name=' + itemName + (rawAmt ? '&amount=' + rawAmt : '');
+  }
   if (type==='PayPal') togglePay('intl');
   else if (type==='Web3'||type==='Crypto') togglePay('eth');
   else togglePay('bank');
