@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Your Business | D'Panyard</title>
+    <link rel="stylesheet" href="../shared/dpanyard.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase.js"></script>
+    <style>
+        .step { display: none; }
+        .step.active { display: block; }
+        .progress { display: flex; gap: 1rem; margin-bottom: 2rem; }
+        .progress-step { flex: 1; height: 8px; background: var(--gray-200); border-radius: 4px; }
+        .progress-step.active { background: var(--warm-amber); }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../landing/index.html" class="logo">D'PANYARD</a>
+        <nav>
+            <a href="../browse/directory.html">Browse</a>
+            <a href="register.html" class="btn btn-primary">List Your Business</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--gray-200);">
+            <h2>List Your Business</h2>
+            <p style="margin-bottom: 2rem; color: #666;">Join Trinidad's fastest growing directory.</p>
+            
+            <div class="progress">
+                <div class="progress-step active" id="p1"></div>
+                <div class="progress-step" id="p2"></div>
+                <div class="progress-step" id="p3"></div>
+            </div>
+
+            <form id="register-form">
+                <!-- Step 1 -->
+                <div class="step active" id="step1">
+                    <h3>Basic Info</h3>
+                    <div class="form-group">
+                        <label>Business Name*</label>
+                        <input type="text" id="biz-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category*</label>
+                        <select id="biz-category" required>
+                            <option value="">Select Category</option>
+                            <!-- Injected -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>District*</label>
+                        <select id="biz-district" required>
+                            <option value="">Select District</option>
+                            <option value="Port of Spain">Port of Spain</option>
+                            <option value="San Fernando">San Fernando</option>
+                            <option value="Chaguanas">Chaguanas</option>
+                            <option value="Arima">Arima</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp Number* (e.g. 8681234567)</label>
+                        <input type="text" id="biz-whatsapp" required>
+                    </div>
+                    <button type="button" class="btn btn-navy" onclick="nextStep(2)">Next Step</button>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step" id="step2">
+                    <h3>Details & Contact</h3>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="biz-desc" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="biz-address">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" id="biz-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="biz-email">
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="button" class="btn btn-navy" style="opacity: 0.6;" onclick="nextStep(1)">Back</button>
+                        <button type="button" class="btn btn-navy" onclick="nextStep(3)">Review & Submit</button>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step" id="step3">
+                    <h3>Review Listing</h3>
+                    <div id="review-content" style="background: var(--gray-100); padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem;"></div>
+                    
+                    <div style="background: #fff8e1; padding: 1rem; border-radius: 4px; margin-bottom: 1.5rem; border: 1px solid #ffe082;">
+                        <h4>Upgrade to Premium?</h4>
+                        <p>Get a verified badge and appear at the top of searches for just $25/mo.</p>
+                        <a href="#" class="btn btn-primary" style="margin-top: 0.5rem;">Upgrade with Stripe</a>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="button" class="btn btn-navy" style="opacity: 0.6;" onclick="nextStep(2)">Edit</button>
+                        <button type="submit" class="btn btn-navy">Submit Listing</button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="success-msg" style="display: none; text-align: center;">
+                <h2 style="color: var(--success);">Success!</h2>
+                <p>Your listing has been submitted and is pending verification. Welcome to the Yard!</p>
+                <a href="../browse/directory.html" class="btn btn-navy" style="margin-top: 1rem;">Go to Directory</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const categories = ["Mechanic", "Plumber", "Electrician", "Catering", "Bakery", "Seamstress", "Cleaning Services", "Florist", "IT Services", "Taxi"];
+        
+        function nextStep(s) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step${s}`).classList.add('active');
+            
+            document.querySelectorAll('.progress-step').forEach((el, i) => {
+                if (i < s) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+
+            if (s === 3) {
+                const name = document.getElementById('biz-name').value;
+                const cat = document.getElementById('biz-category').value;
+                const dist = document.getElementById('biz-district').value;
+                document.getElementById('review-content').innerHTML = `
+                    <strong>Name:</strong> ${name}<br>
+                    <strong>Category:</strong> ${cat}<br>
+                    <strong>District:</strong> ${dist}
+                `;
+            }
+        }
+
+        document.getElementById('register-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('biz-name').value,
+                category: document.getElementById('biz-category').value,
+                district: document.getElementById('biz-district').value,
+                whatsapp: document.getElementById('biz-whatsapp').value,
+                description: document.getElementById('biz-desc').value,
+                address: document.getElementById('biz-address').value,
+                phone: document.getElementById('biz-phone').value,
+                email: document.getElementById('biz-email').value
+            };
+
+            try {
+                await window.dpapi.registerBusiness(data);
+                document.getElementById('register-form').style.display = 'none';
+                document.querySelector('h2').style.display = 'none';
+                document.querySelector('.progress').style.display = 'none';
+                document.getElementById('success-msg').style.display = 'block';
+            } catch (err) {
+                alert("Error submitting listing. Please check your connection.");
+            }
+        };
+
+        function init() {
+            const catSelect = document.getElementById('biz-category');
+            categories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                catSelect.appendChild(opt);
+            });
+        }
+        init();
+    </script>
+</body>
+</html>
