@@ -497,7 +497,7 @@
 
         <!-- PayPal Detail -->
         <div id="pay-intl" class="pay-detail">
-          <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=QXE9PL58QPU9L&item_name=Service+Payment&currency_code=USD" class="btn btn-primary" style="display:block; text-align:center; margin-bottom:15px; width: 100%;">Proceed to PayPal</a>
+          <a id="paypal-dynamic-link" href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=priscadezigns9@gmail.com&item_name=Service+Payment&currency_code=USD" class="btn btn-primary" style="display:block; text-align:center; margin-bottom:15px; width: 100%;">Proceed to PayPal</a>
           <p style="font-size:0.75rem;color:#666;">Please include the reference ID in the payment note.</p>
           <p style="font-size:0.75rem;color:#999;margin-top:10px;">Ref: <span id="auto-ref-intl" style="font-weight:700; color:var(--accent);">[REF]</span></p>
         </div>
@@ -537,6 +537,16 @@ function openPayModal(plan, price) {
   if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
   var ref = 'PD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
   ['bank','eth','intl'].forEach(function(k){ var el2=document.getElementById('auto-ref-'+k); if(el2) el2.textContent=ref; });
+
+  // Sovereign: Update PayPal link dynamically for A La Carte
+  var paypalLink = document.getElementById('paypal-dynamic-link');
+  if (paypalLink && price) {
+      var cleanPrice = price.replace(/[$,]/g, '');
+      if (!isNaN(cleanPrice) && cleanPrice > 0) {
+          var encodedPlan = encodeURIComponent(plan + ' [REF: ' + ref + ']');
+          paypalLink.href = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=priscadezigns9@gmail.com&item_name=' + encodedPlan + '&amount=' + cleanPrice + '&currency_code=USD';
+      }
+  }
 }
 
 function closePayModal() {
