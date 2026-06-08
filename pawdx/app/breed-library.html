@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breed Library | PawDx</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="../shared/app.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="../landing/index.html" class="logo">Paw<span>Dx</span></a>
+                <ul class="nav-links">
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="symptom-checker.html">Checker</a></li>
+                    <li><a href="breed-library.html">Breeds</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mt-20">
+        <h1>Breed Health Library</h1>
+        <p class="mb-20">Discover common health predispositions for over 200 pet breeds.</p>
+
+        <div class="card">
+            <div class="form-group">
+                <input type="text" id="breed-search" placeholder="Search breeds (e.g. Golden Retriever, Siamese, etc.)" oninput="doSearch()">
+            </div>
+        </div>
+
+        <div id="breed-results" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;" class="mt-20">
+            <!-- Results will be injected here -->
+        </div>
+    </main>
+
+    <script>
+        let allBreeds = [];
+
+        async function loadBreeds() {
+            try {
+                const response = await fetch('../data/breeds.json');
+                allBreeds = await response.json();
+                renderBreeds(allBreeds);
+            } catch (e) {
+                console.error("Failed to load breeds:", e);
+            }
+        }
+
+        function renderBreeds(list) {
+            const container = document.getElementById('breed-results');
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                container.innerHTML = '<div class="text-center" style="grid-column: 1/-1;">No breeds found.</div>';
+                return;
+            }
+
+            list.forEach(breed => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3 style="color: var(--coral);">${breed.name}</h3>
+                        <span style="font-size: 10px; background: var(--teal); color: white; padding: 2px 8px; border-radius: 10px;">${breed.species}</span>
+                    </div>
+                    <p style="margin-top: 10px; font-weight: 600;">Common Health Predispositions:</p>
+                    <ul style="padding-left: 20px; font-size: 14px; margin-top: 5px;">
+                        ${breed.health_issues.map(issue => `<li>${issue}</li>`).join('')}
+                    </ul>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function doSearch() {
+            const query = document.getElementById('breed-search').value.toLowerCase();
+            const filtered = allBreeds.filter(b => 
+                b.name.toLowerCase().includes(query) || 
+                b.species.toLowerCase().includes(query) ||
+                b.health_issues.some(i => i.toLowerCase().includes(query))
+            );
+            renderBreeds(filtered);
+        }
+
+        window.onload = loadBreeds;
+    </script>
+</body>
+</html>
