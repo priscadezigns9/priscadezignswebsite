@@ -1,6 +1,6 @@
 // Supabase & OpenAI Keys (Placeholders - User must provide real keys in production)
-const SUPABASE_URL = 'https://your-project-url.supabase.co';
-const SUPABASE_ANON_KEY = 'your-anon-key';
+const SUPABASE_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
 const OPENAI_API_KEY = 'your-openai-key';
 
 // Check if crisis keywords are present
@@ -77,7 +77,7 @@ async function sendMessageToHartaly(message, history = []) {
 
 // Mood Tracker Logic
 async function logMood(score, note) {
-    if (!currentUser) return;
+    if (!supabaseClient) return;
     const { data, error } = await supabaseClient.from('mood_logs').insert([
         { user_id: currentUser.id, score, note }
     ]);
