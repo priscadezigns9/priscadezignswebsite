@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker | PawDx</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../shared/app.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="../landing/index.html" class="logo">Paw<span>Dx</span></a>
+                <ul class="nav-links">
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="symptom-checker.html">Checker</a></li>
+                    <li><a href="breed-library.html">Breeds</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mt-20" style="max-width: 800px;">
+        <h1>AI Symptom Checker</h1>
+        <p class="mb-20">Enter your pet's details and symptoms for an instant health analysis.</p>
+
+        <div class="card">
+            <form id="checker-form">
+                <div class="form-group">
+                    <label>Select Pet</label>
+                    <select id="checker-pet-id" required>
+                        <option value="">-- Choose a pet profile --</option>
+                        <option value="new">New / Guest Pet</option>
+                    </select>
+                </div>
+
+                <div id="guest-pet-fields" class="hidden">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div class="form-group">
+                            <label>Species</label>
+                            <select id="guest-species">
+                                <option value="Dog">Dog</option>
+                                <option value="Cat">Cat</option>
+                                <option value="Bird">Bird</option>
+                                <option value="Rabbit">Rabbit</option>
+                                <option value="Fish">Fish</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="text" id="guest-age" placeholder="e.g. 5 years">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Breed</label>
+                        <input type="text" id="guest-breed" placeholder="e.g. Beagle">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="guest-weight" step="0.1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Symptoms & Behavior</label>
+                    <textarea id="symptoms-input" rows="5" placeholder="Describe symptoms: coughing, lethargy, loss of appetite, vomiting, etc." required></textarea>
+                </div>
+
+                <button type="submit" id="analyze-btn" class="btn btn-primary" style="width: 100%; font-size: 18px;">Analyze with AI</button>
+            </form>
+        </div>
+
+        <!-- Analysis Results -->
+        <div id="analysis-loading" class="hidden text-center mt-20">
+            <p>🔄 Our AI is analyzing symptoms. Please wait...</p>
+        </div>
+
+        <div id="results-area" class="hidden mt-20">
+            <div class="card" id="urgency-card">
+                <h2 id="urgency-label">Analysis Result</h2>
+                <div class="urgency-meter"><div id="urgency-fill" class="urgency-fill"></div></div>
+                <p id="urgency-text" style="font-weight: 800; text-transform: uppercase; margin-bottom: 10px;"></p>
+                <hr class="mb-20">
+                
+                <div class="mb-20">
+                    <h3 style="color: var(--teal);">Likely Conditions</h3>
+                    <ul id="likely-conditions-list"></ul>
+                </div>
+
+                <div class="mb-20">
+                    <h3 style="color: var(--teal);">AI Analysis Summary</h3>
+                    <p id="analysis-summary"></p>
+                </div>
+
+                <div class="mb-20">
+                    <h3 style="color: var(--coral);">Vet Advice</h3>
+                    <p id="vet-advice"></p>
+                </div>
+
+                <div class="mb-20">
+                    <h3 style="color: var(--teal);">Suggested Home Remedies</h3>
+                    <ul id="home-remedies-list"></ul>
+                </div>
+
+                <div class="mt-20 text-center" style="background: var(--cream); padding: 15px; border-radius: 8px;">
+                    <p style="font-size: 14px; font-style: italic;">Disclaimer: This AI analysis is for informational purposes only and is not a substitute for professional veterinary medical advice, diagnosis, or treatment.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-20" id="vet-finder">
+            <h3>📍 Find a Vet Near You</h3>
+            <p>Need immediate help? Find the closest veterinary clinics.</p>
+            <div style="background: #eee; height: 300px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 15px 0;">
+                <p>Google Maps Integration Placeholder</p>
+            </div>
+            <button class="btn btn-outline" onclick="window.open('https://www.google.com/maps/search/veterinary+clinics+near+me')">Open in Google Maps</button>
+        </div>
+    </main>
+
+    <script>
+        const petSelect = document.getElementById('checker-pet-id');
+        const guestFields = document.getElementById('guest-pet-fields');
+
+        petSelect.onchange = () => {
+            if (petSelect.value === 'new') {
+                guestFields.classList.remove('hidden');
+            } else {
+                guestFields.classList.add('hidden');
+            }
+        };
+
+        async function initPets() {
+            if (!PawDx.config.supabaseUrl) return;
+            const pets = await PawDx.getPets();
+            pets.forEach(pet => {
+                const opt = document.createElement('option');
+                opt.value = pet.id;
+                opt.textContent = pet.name;
+                opt.dataset.pet = JSON.stringify(pet);
+                petSelect.appendChild(opt);
+            });
+
+            // Handle ID in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('id')) {
+                petSelect.value = urlParams.get('id');
+            }
+        }
+
+        document.getElementById('checker-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('analyze-btn');
+            const loading = document.getElementById('analysis-loading');
+            const results = document.getElementById('results-area');
+
+            btn.disabled = true;
+            loading.classList.remove('hidden');
+            results.classList.add('hidden');
+
+            try {
+                let petData;
+                if (petSelect.value === 'new' || !petSelect.value) {
+                    petData = {
+                        type: document.getElementById('guest-species').value,
+                        age: document.getElementById('guest-age').value,
+                        breed: document.getElementById('guest-breed').value,
+                        weight: document.getElementById('guest-weight').value
+                    };
+                } else {
+                    const selectedPet = JSON.parse(petSelect.selectedOptions[0].dataset.pet);
+                    petData = {
+                        type: selectedPet.species,
+                        age: selectedPet.dob ? Math.floor((new Date() - new Date(selectedPet.dob)) / (1000 * 60 * 60 * 24 * 365)) + ' years' : 'Unknown',
+                        breed: selectedPet.breed,
+                        weight: selectedPet.weight
+                    };
+                }
+
+                const symptoms = document.getElementById('symptoms-input').value;
+                const aiResult = await PawDx.checkSymptoms(petData, symptoms);
+
+                // Populate Results
+                document.getElementById('analysis-summary').textContent = aiResult.analysis_summary;
+                document.getElementById('vet-advice').textContent = aiResult.vet_advice;
+                
+                const conditionsList = document.getElementById('likely-conditions-list');
+                conditionsList.innerHTML = aiResult.likely_conditions.map(c => `<li>${c}</li>`).join('');
+
+                const remediesList = document.getElementById('home-remedies-list');
+                remediesList.innerHTML = aiResult.home_remedies.map(r => `<li>${r}</li>`).join('');
+
+                const fill = document.getElementById('urgency-fill');
+                const label = document.getElementById('urgency-text');
+                
+                label.textContent = aiResult.urgency_level + " Urgency";
+                fill.className = 'urgency-fill';
+                
+                if (aiResult.urgency_level.toLowerCase() === 'green') {
+                    fill.classList.add('urgency-low');
+                    fill.style.width = '33%';
+                    label.style.color = 'var(--success)';
+                } else if (aiResult.urgency_level.toLowerCase() === 'yellow') {
+                    fill.classList.add('urgency-medium');
+                    fill.style.width = '66%';
+                    label.style.color = 'var(--warning)';
+                } else {
+                    fill.classList.add('urgency-high');
+                    fill.style.width = '100%';
+                    label.style.color = 'var(--danger)';
+                }
+
+                results.classList.remove('hidden');
+                results.scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                loading.classList.add('hidden');
+            }
+        };
+
+        window.onload = () => {
+            PawDx.init();
+            initPets();
+        };
+    </script>
+</body>
+</html>
