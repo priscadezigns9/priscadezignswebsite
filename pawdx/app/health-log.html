@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Log | PawDx</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../shared/app.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="../landing/index.html" class="logo">Paw<span>Dx</span></a>
+                <ul class="nav-links">
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="symptom-checker.html">Checker</a></li>
+                    <li><a href="breed-library.html">Breeds</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mt-20">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>Health Log</h1>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-outline" onclick="PawDx.exportHealthLog()">Export PDF</button>
+                <button class="btn btn-primary" onclick="showAddLogModal()">+ New Entry</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label>Select Pet</label>
+                <select id="log-pet-id" onchange="loadLogs()"></select>
+            </div>
+        </div>
+
+        <div id="logs-container" class="mt-20">
+            <!-- Logs injected here -->
+        </div>
+    </main>
+
+    <!-- Add Log Modal -->
+    <div id="log-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div class="card" style="width: 100%; max-width: 500px;">
+            <h3>New Health Log Entry</h3>
+            <form id="add-log-form" class="mt-10">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="log-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="log-weight" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Notes / Observations</label>
+                    <textarea id="log-notes" rows="4" placeholder="How is your pet feeling today?" required></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">Save Entry</button>
+                    <button type="button" class="btn btn-outline" onclick="hideAddLogModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        async function init() {
+            PawDx.init();
+            if (!PawDx.supabase) return;
+            
+            const pets = await PawDx.getPets();
+            const select = document.getElementById('log-pet-id');
+            pets.forEach(pet => {
+                const opt = document.createElement('option');
+                opt.value = pet.id;
+                opt.textContent = pet.name;
+                select.appendChild(opt);
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('id')) {
+                select.value = urlParams.get('id');
+            }
+            
+            loadLogs();
+        }
+
+        async function loadLogs() {
+            const petId = document.getElementById('log-pet-id').value;
+            if (!petId) return;
+
+            const { data, error } = await PawDx.supabase.from('health_logs').select('*').eq('pet_id', petId).order('date', { ascending: false });
+            
+            const container = document.getElementById('logs-container');
+            container.innerHTML = '';
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="card text-center">No health logs found for this pet.</div>';
+                return;
+            }
+
+            data.forEach(log => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.marginBottom = '15px';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--cream); padding-bottom: 10px; margin-bottom: 10px;">
+                        <span style="font-weight: 800;">${new Date(log.date).toLocaleDateString()}</span>
+                        ${log.weight ? `<span style="color: var(--teal); font-weight: 600;">${log.weight} kg</span>` : ''}
+                    </div>
+                    <p style="white-space: pre-wrap;">${log.notes}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function showAddLogModal() { 
+            document.getElementById('log-modal').classList.remove('hidden');
+            document.getElementById('log-date').valueAsDate = new Date();
+        }
+        function hideAddLogModal() { document.getElementById('log-modal').classList.add('hidden'); }
+
+        document.getElementById('add-log-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const petId = document.getElementById('log-pet-id').value;
+            const log = {
+                pet_id: petId,
+                date: document.getElementById('log-date').value,
+                weight: parseFloat(document.getElementById('log-weight').value) || null,
+                notes: document.getElementById('log-notes').value
+            };
+            await PawDx.supabase.from('health_logs').insert([log]);
+            hideAddLogModal();
+            loadLogs();
+        };
+
+        window.onload = init;
+    </script>
+</body>
+</html>
