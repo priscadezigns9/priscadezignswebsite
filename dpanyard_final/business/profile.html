@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Profile | D'Panyard</title>
+    <link rel="stylesheet" href="../shared/dpanyard.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase.js"></script>
+    <style>
+        .profile-header { background: white; padding: 3rem 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--gray-200); }
+        .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../landing/index.html" class="logo">D'PANYARD</a>
+        <nav>
+            <a href="../browse/directory.html">Browse</a>
+            <a href="register.html" class="btn btn-primary">List Your Business</a>
+        </nav>
+    </header>
+
+    <main class="container" id="profile-container">
+        <div id="loading">Loading Profile...</div>
+        
+        <div id="profile-content" style="display: none;">
+            <div class="profile-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <span id="biz-category" class="badge badge-category"></span>
+                        <span id="biz-verified" class="badge badge-verified" style="display: none;">Verified</span>
+                        <h1 id="biz-name" style="margin-top: 0.5rem; font-size: 2.5rem;"></h1>
+                        <p id="biz-district" style="color: #666; font-size: 1.1rem;"></p>
+                        <div id="biz-rating" class="stars"></div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <a id="whatsapp-link" href="#" target="_blank" class="btn btn-whatsapp" style="padding: 1rem 2rem; font-size: 1.1rem;">Message on WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <section>
+                    <div style="background: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--gray-200); margin-bottom: 2rem;">
+                        <h3>About the Business</h3>
+                        <p id="biz-description" style="white-space: pre-line; margin-top: 1rem;"></p>
+                    </div>
+
+                    <div style="background: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--gray-200);">
+                        <h3>Customer Reviews</h3>
+                        <div id="reviews-list" style="margin-top: 1rem;">
+                            <!-- Reviews injected -->
+                        </div>
+                        <hr style="margin: 2rem 0; border-top: 1px solid var(--gray-200);">
+                        <h4>Leave a Review</h4>
+                        <form id="review-form" style="margin-top: 1rem;">
+                            <div class="form-group">
+                                <label>Your Name</label>
+                                <input type="text" id="rev-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Rating</label>
+                                <select id="rev-rating" required>
+                                    <option value="5">5 Stars - Excellent</option>
+                                    <option value="4">4 Stars - Good</option>
+                                    <option value="3">3 Stars - Okay</option>
+                                    <option value="2">2 Stars - Poor</option>
+                                    <option value="1">1 Star - Terrible</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Comment</label>
+                                <textarea id="rev-comment" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-navy">Post Review</button>
+                        </form>
+                    </div>
+                </section>
+
+                <aside>
+                    <div style="background: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--gray-200); margin-bottom: 2rem;">
+                        <h3>Contact Info</h3>
+                        <p style="margin-top: 1rem;"><strong>Phone:</strong> <span id="biz-phone"></span></p>
+                        <p><strong>Email:</strong> <span id="biz-email"></span></p>
+                        <p><strong>Address:</strong> <span id="biz-address"></span></p>
+                    </div>
+
+                    <div style="background: white; padding: 2rem; border-radius: 12px; border: 1px solid var(--gray-200);">
+                        <h3>Send an Inquiry</h3>
+                        <form id="inquiry-form" style="margin-top: 1rem;">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" id="inq-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Your Phone/WhatsApp</label>
+                                <input type="text" id="inq-contact" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea id="inq-msg" rows="4" placeholder="I'm interested in..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-navy" style="width: 100%;">Send Inquiry</button>
+                        </form>
+                        <div id="inq-success" style="display: none; color: var(--success); margin-top: 1rem; text-align: center;">Inquiry sent!</div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const bizId = params.get('id');
+
+        async function loadProfile() {
+            if (!bizId) {
+                document.getElementById('loading').innerHTML = '<h2>No business ID provided.</h2>';
+                return;
+            }
+
+            try {
+                const biz = await window.dpapi.getBusinessById(bizId);
+                if (!biz) {
+                    document.getElementById('loading').innerHTML = '<h2>Business not found.</h2>';
+                    return;
+                }
+
+                document.getElementById('biz-name').textContent = biz.name;
+                document.getElementById('biz-category').textContent = biz.category;
+                document.getElementById('biz-district').textContent = biz.district;
+                document.getElementById('biz-description').textContent = biz.description || 'No description provided.';
+                document.getElementById('biz-phone').textContent = biz.phone || 'N/A';
+                document.getElementById('biz-email').textContent = biz.email || 'N/A';
+                document.getElementById('biz-address').textContent = biz.address || 'N/A';
+                document.getElementById('biz-rating').textContent = '★'.repeat(Math.round(biz.rating || 0)) + ` (${biz.rating || 0})`;
+                document.getElementById('whatsapp-link').href = `https://wa.me/${biz.whatsapp}`;
+
+                if (biz.is_verified) document.getElementById('biz-verified').style.display = 'inline-block';
+
+                // Reviews
+                const revList = document.getElementById('reviews-list');
+                if (biz.reviews && biz.reviews.length > 0) {
+                    revList.innerHTML = biz.reviews.map(r => `
+                        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--gray-100); padding-bottom: 1rem;">
+                            <strong>${r.reviewer_name}</strong> <span style="color: var(--warm-amber);">${'★'.repeat(r.rating)}</span>
+                            <p style="margin-top: 0.5rem;">${r.comment}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    revList.innerHTML = '<p>No reviews yet. Be the first to leave one!</p>';
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('profile-content').style.display = 'block';
+
+            } catch (err) {
+                document.getElementById('loading').innerHTML = '<h2>Error loading profile.</h2>';
+            }
+        }
+
+        document.getElementById('review-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const data = {
+                business_id: bizId,
+                reviewer_name: document.getElementById('rev-name').value,
+                rating: parseInt(document.getElementById('rev-rating').value),
+                comment: document.getElementById('rev-comment').value
+            };
+            await window.dpapi.submitReview(data);
+            alert("Review submitted!");
+            location.reload();
+        };
+
+        document.getElementById('inquiry-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const data = {
+                business_id: bizId,
+                client_name: document.getElementById('inq-name').value,
+                client_phone: document.getElementById('inq-contact').value,
+                message: document.getElementById('inq-msg').value
+            };
+            await window.dpapi.submitInquiry(data);
+            document.getElementById('inquiry-form').style.display = 'none';
+            document.getElementById('inq-success').style.display = 'block';
+        };
+
+        loadProfile();
+    </script>
+</body>
+</html>
