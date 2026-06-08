@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guided Journal | Hartaly</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="../landing/index.html" class="logo">Hartaly</a>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html">🏠 Dashboard</a>
+            <a href="chat.html">💬 Hartaly Chat</a>
+            <a href="mood.html">📈 Mood Tracker</a>
+            <a href="journal.html" class="active">✍️ Guided Journal</a>
+            <a href="cbt.html">📚 CBT Toolkit</a>
+            <a href="breathing.html">🫁 Breathing Room</a>
+        </nav>
+        <a href="crisis.html" class="btn btn-danger" style="margin-top: auto; padding: 10px;">I need help now</a>
+    </div>
+
+    <main class="main-content">
+        <header style="margin-bottom: 40px;">
+            <h1>Guided Journal</h1>
+            <p style="color: #666;">Deepen your self-awareness with AI-guided reflections.</p>
+        </header>
+
+        <div class="card" id="prompt-card">
+            <h3 id="journal-prompt">Generating your personal prompt...</h3>
+            <textarea id="journal-response" placeholder="Write freely. No one is watching." style="width: 100%; height: 300px; margin-top: 20px; padding: 15px; border-radius: 15px; border: 1px solid var(--soft-gray); font-family: inherit; font-size: 16px;"></textarea>
+            <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn btn-primary" onclick="saveEntry()">Save & Reflect</button>
+                <button class="btn btn-secondary" onclick="newPrompt()">New Prompt</button>
+            </div>
+        </div>
+
+        <div id="reflection-area" class="card" style="margin-top: 25px; display: none; background-color: var(--warm-sand);">
+            <h3>Hartaly's Reflection</h3>
+            <p id="reflection-text" style="font-style: italic;"></p>
+        </div>
+    </main>
+
+    <script src="../shared/app.js"></script>
+    <script>
+        async function newPrompt() {
+            document.getElementById('journal-prompt').innerText = "Thinking...";
+            const prompt = await generateJournalPrompt();
+            document.getElementById('journal-prompt').innerText = prompt;
+        }
+
+        async function saveEntry() {
+            const prompt = document.getElementById('journal-prompt').innerText;
+            const responseText = document.getElementById('journal-response').value;
+            
+            if(!responseText) return alert("Write a little something first.");
+
+            document.getElementById('reflection-area').style.display = 'block';
+            document.getElementById('reflection-text').innerText = "Reflecting on your words...";
+
+            // Simple client-side reflection for demo (real version would call OpenAI)
+            const promptRequest = `User wrote a journal entry about: "${responseText.substring(0, 500)}". Give a 2-sentence empathetic, warm reflection.`;
+            
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-4o",
+                        messages: [{ role: "user", content: promptRequest }],
+                        max_tokens: 150
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('reflection-text').innerText = data.choices[0].message.content;
+            } catch (e) {
+                document.getElementById('reflection-text').innerText = "Your reflection is a step toward healing. Keep going.";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', newPrompt);
+    </script>
+</body>
+</html>
