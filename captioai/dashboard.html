@@ -33,6 +33,15 @@
         .nav-btns { display: flex; align-items: center; gap: 15px; }
         .btn-home { font-size: 0.75rem; font-weight: 800; color: #000; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; padding: 8px 16px; border: 1.5px solid #000; border-radius: 8px; transition: 0.2s; }
         .btn-home:hover { background: #000; color: #FFF; }
+
+    .heartbeat-container { 
+        background: #000; color: #FFF; padding: 10px 20px; border-radius: 100px; 
+        display: flex; align-items: center; gap: 15px; font-size: 0.7rem; font-weight: 800; 
+        text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(227,30,36,0.3);
+        margin-right: 15px;
+    }
+    .pulse-dot { width: 8px; height: 8px; background: #E31E24; border-radius: 50%; animation: pulse-anim 1.5s infinite; }
+    @keyframes pulse-anim { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.8); opacity: 0.5; } }
 </style>
 </head>
 <body>
@@ -40,7 +49,7 @@
         <div class="logo"><img src="../logos/CAPTIO_AI_DEFINITIVE_2026.png" alt="Captio AI"></div>
         
         <div class="nav-btns">
-            <a href="/captioai/" class="btn-home">Home</a>
+            <div class="heartbeat-container"><div class="pulse-dot"></div><div id="sync-heartbeat">Neural Pulse: Synchronizing...</div></div><a href="/captioai/" class="btn-home">Home</a>
             <div id="tier-badge" class="tier-badge">Neural Node Active</div>
         </div>
 
@@ -96,8 +105,27 @@
                 setTimeout(() => btn.textContent = orig, 2000);
             });
         }
-    </script>
+    
+    function updateHeartbeat() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isPremium = urlParams.get("premium") === "true";
+        const heartbeat = document.getElementById("sync-heartbeat");
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        
+        if (isPremium) {
+            heartbeat.innerHTML = "Neural Pulse: ACTIVE (" + timeStr + ") | 15m Sync";
+            document.querySelector(".pulse-dot").style.background = "#E31E24";
+        } else {
+            heartbeat.innerHTML = "Neural Pulse: STABLE (" + timeStr + ") | 12h Sync";
+            document.querySelector(".pulse-dot").style.background = "#888";
+        }
+    }
+    setInterval(updateHeartbeat, 60000);
+    document.addEventListener("DOMContentLoaded", updateHeartbeat);
+</script>
 </body>
 </html>
+
 
 
