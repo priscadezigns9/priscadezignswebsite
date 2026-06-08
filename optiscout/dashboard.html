@@ -36,6 +36,12 @@
         .card .desc { font-size: 0.85rem; color: #666; margin-top: 8px; font-weight: 500; }
 
         .search-area { background: #F9F9F9; padding: 45px; border-radius: 24px; border: 1px solid var(--border); margin-bottom: 40px; text-align: center; }
+        .scout-input {
+            width: 100%; max-width: 600px; padding: 22px; border-radius: 15px;
+            border: 1px solid var(--border); background: #FFF; font-size: 1rem;
+            margin-bottom: 20px; outline: none; transition: 0.3s; text-align: center;
+        }
+        .scout-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(255,149,0,0.1); }
         .btn-scan { padding: 20px 60px; background: #000; color: #FFF; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px; font-size: 1.1rem; }
         .btn-scan:hover { background: var(--accent); transform: scale(1.02); }
 
@@ -87,7 +93,9 @@
         </div>
 
         <div class="search-area">
-            <h3 style="font-size: 1.8rem; font-weight: 900; color: #000; margin-bottom: 30px;">Initialize Asset Monitor</h3>
+            <h3 style="font-size: 1.8rem; font-weight: 900; color: #000; margin-bottom: 25px;">Initialize Asset Monitor</h3>
+            <input type="text" id="scout-url" class="scout-input" placeholder="Paste Amazon Product URL or ASIN here...">
+            <br>
             <button class="btn-scan" onclick="initializeScout()">Initialize Neural Scout</button>
         </div>
 
@@ -153,7 +161,23 @@
         setInterval(updateHeartbeat, 60000);
         document.addEventListener('DOMContentLoaded', updateHeartbeat);
 
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialUrl = urlParams.get('url');
+            if (initialUrl) {
+                document.getElementById('scout-url').value = initialUrl;
+                initializeScout();
+            }
+        };
+
         function initializeScout() {
+            const scoutInput = document.getElementById('scout-url');
+            const url = scoutInput.value.trim();
+            if (!url) {
+                alert('Please provide an Amazon URL or Product identifier.');
+                return;
+            }
+
             const tbody = document.getElementById('monitor-body');
             const noAssets = document.getElementById('no-assets');
             if (noAssets) noAssets.remove();
@@ -162,14 +186,16 @@
             const isPremium = urlParams.get('premium') === 'true';
 
             const row = document.createElement('tr');
+            const displayUrl = url.length > 50 ? url.substring(0, 47) + '...' : url;
             row.innerHTML = `
-                <td><div style="color: #000; font-weight: 700;">Amazon Product Shard</div></td>
+                <td><div style="color: #000; font-weight: 700;">${displayUrl}</div></td>
                 <td><span class="loading-pulse">INITIALIZING...</span></td>
                 <td>Searching...</td>
                 <td>--</td>
                 <td>--</td>
             `;
             tbody.prepend(row);
+            scoutInput.value = '';
 
             setTimeout(function() {
                 row.cells[1].innerHTML = 'ACTIVE';
@@ -185,3 +211,4 @@
     </script>
 </body>
 </html>
+
