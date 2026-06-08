@@ -1,7 +1,7 @@
 /* Les Amour App Logic */
 
-const SUPABASE_URL = ''; // User to provide
-const SUPABASE_KEY = ''; // User to provide
+const SUPABASE_URL = 'https://sktpjacowqaedddtrhuz.supabase.co'; // User to provide
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs'; // User to provide
 const OPENAI_API_KEY = ''; // User to provide
 
 // Initialize Supabase (requires script tag in HTML)
@@ -48,7 +48,7 @@ const LesAmour = {
             return reply;
         } catch (error) {
             console.error('Coach Error:', error);
-            return "I'm sorry, I'm having a little trouble connecting right now. Please try again in a moment, dear friend.";
+            return "I'm sorry, I'm having a little trouble connecting zight now. Please try again in a moment, dear friend.";
         }
     },
 
