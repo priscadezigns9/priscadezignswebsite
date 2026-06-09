@@ -12,34 +12,46 @@
                 </div>
                 
                 <div class="pm-body">
-                    <!-- PayPal Container -->
-                    <div id="pm-paypal-button-container"></div>
-                    <button class="pm-method-btn pm-btn-paypal" id="pm-trigger-paypal">
-                        <svg class="pm-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L7.9 15H5L7 3H15.5C18.5 3 20.5 5 20.5 8C20.5 9.5 20 11 19 12.2C18 13.5 16.5 14.5 14.5 14.5H12.5L11.5 21H7Z"/></svg>
-                        Pay with PayPal
-                    </button>
+                    <!-- Step 1: Email Capture -->
+                    <div id="pm-step-email" class="pm-step active">
+                        <p class="pm-step-text">Enter your email to receive your access and receipt.</p>
+                        <input type="email" id="pm-client-email" class="pm-input" placeholder="your@email.com" required>
+                        <button class="pm-method-btn pm-btn-continue" id="pm-btn-to-payment">
+                            Continue to Payment
+                        </button>
+                    </div>
 
-                    <!-- Payoneer Link -->
-                    <a href="#" target="_blank" class="pm-method-btn pm-btn-payoneer" id="pm-link-payoneer">
-                        <svg class="pm-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 7H13V13H11V7ZM11 15H13V17H11V15Z"/></svg>
-                        Pay with Payoneer
-                    </a>
+                    <!-- Step 2: Payment Methods -->
+                    <div id="pm-step-payment" class="pm-step">
+                        <!-- PayPal Container -->
+                        <div id="pm-paypal-button-container"></div>
+                        <button class="pm-method-btn pm-btn-paypal" id="pm-trigger-paypal">
+                            <svg class="pm-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 21L7.9 15H5L7 3H15.5C18.5 3 20.5 5 20.5 8C20.5 9.5 20 11 19 12.2C18 13.5 16.5 14.5 14.5 14.5H12.5L11.5 21H7Z"/></svg>
+                            Pay with PayPal
+                        </button>
 
-                    <!-- Crypto Section -->
-                    <button class="pm-method-btn pm-btn-crypto" id="pm-trigger-crypto">
-                        <svg class="pm-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-11v2h2v-2h-2zm0-4v2h2V7h-2zm0 8v2h2v-2h-2z"/></svg>
-                        Pay with Crypto
-                    </button>
-                    
-                    <div class="pm-crypto-section" id="pm-crypto-details">
-                        <div class="pm-qr-wrapper" id="pm-qrcode"></div>
-                        <div class="pm-address-wrapper">
-                            <span class="pm-address-text" id="pm-wallet-address">0x...</span>
-                            <button class="pm-copy-btn" id="pm-copy-address">Copy</button>
-                        </div>
-                        <div class="pm-crypto-info">
-                            <div class="pm-crypto-network">Network: ERC-20 (Ethereum)</div>
-                            <div class="pm-crypto-warning">Warning: Send only ERC-20 compatible tokens to this address.</div>
+                        <!-- Payoneer Link -->
+                        <a href="#" target="_blank" class="pm-method-btn pm-btn-payoneer" id="pm-link-payoneer">
+                            <svg class="pm-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 7H13V13H11V7ZM11 15H13V17H11V15Z"/></svg>
+                            Pay with Payoneer
+                        </a>
+
+                        <!-- Crypto Section -->
+                        <button class="pm-method-btn pm-btn-crypto" id="pm-trigger-crypto">
+                            <svg class="pm-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-11v2h2v-2h-2zm0-4v2h2V7h-2zm0 8v2h2v-2h-2z"/></svg>
+                            Pay with Crypto
+                        </button>
+                        
+                        <div class="pm-crypto-section" id="pm-crypto-details">
+                            <div class="pm-qr-wrapper" id="pm-qrcode"></div>
+                            <div class="pm-address-wrapper">
+                                <span class="pm-address-text" id="pm-wallet-address">0x...</span>
+                                <button class="pm-copy-btn" id="pm-copy-address">Copy</button>
+                            </div>
+                            <div class="pm-crypto-info">
+                                <div class="pm-crypto-network">Network: ERC-20 (Ethereum)</div>
+                                <div class="pm-crypto-warning">Warning: Send only ERC-20 compatible tokens to this address.</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -72,12 +84,55 @@
         cryptoSection.classList.remove('active');
         paypalContainer.classList.remove('active');
         paypalTrigger.style.display = 'flex';
+        emailStep.classList.add('active');
+        paymentStep.classList.remove('active');
+        emailInput.value = '';
+        continueBtn.innerText = 'Continue to Payment';
+        continueBtn.disabled = false;
         // Clear QR code to prevent duplication next time
         document.getElementById('pm-qrcode').innerHTML = '';
     }
 
     closeBtn.onclick = closePaymentModal;
     overlay.onclick = (e) => { if(e.target === overlay) closePaymentModal(); };
+
+    const emailStep = document.getElementById('pm-step-email');
+    const paymentStep = document.getElementById('pm-step-payment');
+    const emailInput = document.getElementById('pm-client-email');
+    const continueBtn = document.getElementById('pm-btn-to-payment');
+
+    continueBtn.onclick = async () => {
+        const email = emailInput.value;
+        if (!email || !email.includes('@')) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+
+        continueBtn.innerText = 'Verifying...';
+        continueBtn.disabled = true;
+
+        try {
+            // Save to Supabase (Capture first)
+            if (window.supabase) {
+                const sb = window.supabase.createClient(
+                    'https://sktpjacowqaeddtrhuz.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs'
+                );
+                
+                await sb.from('leads').insert([{
+                    email: email,
+                    product: currentConfig.productName,
+                    price: currentConfig.price,
+                    status: 'pending'
+                }]);
+            }
+        } catch (e) {
+            console.error('Lead capture failed, but continuing to payment...', e);
+        }
+
+        emailStep.classList.remove('active');
+        paymentStep.classList.add('active');
+    };
 
     // Toggle Crypto Section
     cryptoBtn.onclick = () => {
