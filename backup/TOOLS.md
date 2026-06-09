@@ -15,6 +15,7 @@ Use these category-level signals for high-fidelity discovery. Never limit search
 | **Prime Land** | Real Estate | Global luxury listings, architectural landmarks, sustainable property investment, urban design. |
 | **Glow Protocol** | Beauty/Skincare | Skincare diagnostics, regenerative beauty tech, longevity science, dermatological innovation. |
 | **Sole Prestige** | Footwear | Luxury sneakers, high-end heels, archival footwear design, bespoke shoemaking. |
+| **Ornalis Lighting** | Lighting | High-fidelity lighting, chandeliers, architectural illumination, sanctuary atmosphere. |
 ## Empire Social Status Map (v2.0)
 The following brands are authorized for active social deployment (FB/IG/Threads). All other brands are **Website-Only**.
 
@@ -33,6 +34,7 @@ The following brands are authorized for active social deployment (FB/IG/Threads)
 | **The Escapist** | ACTIVE | FB, IG, Threads |
 | **The Tech Scout HQ** | ACTIVE | FB, IG, Threads, X |
 | **Quiet Luxury** | ACTIVE | FB, IG, Threads |
+| **The Sovereign Signal** | ACTIVE | X, FB, IG, Threads |
 | **Prime Land Network**| ACTIVE | FB, IG, Threads, X |
 
 ## Sovereign Social Sharding (X vs. Meta)
