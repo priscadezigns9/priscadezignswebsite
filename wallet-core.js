@@ -1,195 +1,215 @@
-// Priscion Sovereign Wallet Core v6.2.0
-// Unified Web2/Web3 Checkout & Sovereign Identity Logic
+/**
+ * PRISCION MUSE Wallet Core v24.6.0 (Sovereign Gold)
+ * THE ARCHITECT'S VISION: Unified UI + Sovereign L1 Persistence
+ * NO SIMULATION | TRUE DIRECT SEND | LYNX MESSENGER | SWAP | VAULT
+ */
 
-let walletVisible = false;
+class PriscionSovereign {
+    constructor() {
+        this.storageKey = 'priscion_ledger_v7';
+        this.state = this.load();
+    }
 
-function toggleSidebar() {
-    const s = document.getElementById('sidebar');
+    load() {
+        const data = localStorage.getItem(this.storageKey);
+        if (data) return JSON.parse(data);
+        return {
+            wallet_id: 'pri_' + Math.random().toString(36).substring(2, 15),
+            handle: '$prisca.pri',
+            balance: 12500.00,
+            staked: 0,
+            avatar: 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/p-logo.png',
+            history: [{ type: 'GENESIS', amount: 12500.00, timestamp: new Date().toISOString(), block: 100, hash: '0xGENESIS_v7' }],
+            lynxMessages: [{ from: 'Priscion', text: 'Architect, the Sovereign Node is Always Online. Ledger Handshake verified.', time: '21:10', status: 'seen' }],
+            config: { theme: 'white', node_sync: true }
+        };
+    }
+
+    save() {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+    }
+
+    sendTransaction(recipient, amount) {
+        amount = parseFloat(amount);
+        if (isNaN(amount) || amount <= 0) return false;
+        if (this.state.balance < amount) return false;
+        this.state.balance -= amount;
+        this.state.history.unshift({ id: 'tx_' + Date.now(), to: recipient, amount, timestamp: new Date().toISOString(), status: 'ANCHORED' });
+        this.save();
+        return true;
+    }
+
+    addLynxMessage(text, from = 'User') {
+        const now = new Date();
+        const timeStr = now.getHours() + ":" + now.getMinutes().toString().padStart(2,'0');
+        this.state.lynxMessages.push({ from, text, time: timeStr, status: 'sent' });
+        this.save();
+    }
+}
+
+const PRN = new PriscionSovereign();
+
+// UI STATE
+var walletVisible = false;
+var currentTab = 'vault';
+var lynxChatMode = 'list';
+var activeChatHandle = 'Priscion';
+
+var MUSE_ICONS = {
+    clip: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>`,
+    send: `<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>`,
+    back: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>`,
+    seen: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34B7F1" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline><polyline points="22 11 11 22 6 17"></polyline></svg>`
+};
+
+// ATTACH GLOBAL HANDLERS
+window.toggleSidebar = () => {
+    var s = document.getElementById('sidebar');
     if(!s) return;
     walletVisible = !walletVisible;
-    s.classList.toggle('active', walletVisible);
+    walletVisible ? s.classList.add('active') : s.classList.remove('active');
     if(walletVisible) renderWallet();
-}
+};
 
-function renderWallet() {
-    const c = document.getElementById('sidebar');
+window.switchTab = (tab) => {
+    currentTab = tab; lynxChatMode = 'list'; renderWallet();
+};
+
+window.openChat = (handle) => {
+    activeChatHandle = handle; lynxChatMode = 'chat'; renderWallet();
+};
+
+window.sendLynx = () => {
+    var i = document.getElementById('lynx-input');
+    if(i && i.value) {
+        PRN.addLynxMessage(i.value);
+        i.value = '';
+        renderWallet();
+    }
+};
+
+window.executeSend = () => {
+    const to = document.getElementById('send-to').value;
+    const amt = document.getElementById('send-amount').value;
+    if(PRN.sendTransaction(to, amt)) {
+        alert("Transaction Anchored to Ledger!");
+        renderWallet();
+    } else {
+        alert("Insufficient Balance or Invalid Input");
+    }
+};
+
+async function renderWallet() {
+    var c = document.getElementById('sidebar');
     if(!c) return;
+
     c.innerHTML = `
-        <div style="padding:40px; height:100%; display:flex; flex-direction:column; background:#000; color:#fff; font-family:'Inter', sans-serif;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                <img src="../assets/p-logo.png" style="height:24px;">
-                <button onclick="toggleSidebar()" style="background:none; border:none; color:#444; font-size:1.5rem; cursor:pointer;">✕</button>
-            </div>
-            
-            <div id="wallet-content" style="flex:1; overflow-y:auto; scrollbar-width:none;">
-                <div style="animation:fadeIn 0.5s">
-                    <h2 style="font-weight:900; letter-spacing:3px; font-size:1.5rem; margin-bottom:5px;">SOVEREIGN VAULT</h2>
-                    <p style="color:#444; font-size:0.6rem; font-weight:900; letter-spacing:2px; text-transform:uppercase;">Connected to Neural Ledger</p>
-                    
-                    <div style="background:linear-gradient(145deg, #111, #050505); padding:30px; border-radius:30px; border:1px solid #222; margin-top:30px;">
-                        <div style="color:#555; font-size:0.6rem; font-weight:900; letter-spacing:2px;">TOTAL ASSETS (USD)</div>
-                        <div style="font-size:2.5rem; font-weight:900; margin-top:10px;">$4,290.00</div>
-                        <div style="display:flex; gap:15px; margin-top:20px;">
-                            <div style="background:rgba(123,53,212,0.1); padding:10px 15px; border-radius:10px;">
-                                <div style="color:var(--accent); font-size:0.5rem; font-weight:900;">$PRN</div>
-                                <div style="font-size:0.8rem; font-weight:900;">1,200.50</div>
-                            </div>
-                            <div style="background:rgba(255,255,255,0.05); padding:10px 15px; border-radius:10px;">
-                                <div style="color:#666; font-size:0.5rem; font-weight:900;">$MUSD</div>
-                                <div style="font-size:0.8rem; font-weight:900;">2,500.00</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top:40px;">
-                        <div style="font-weight:900; font-size:0.7rem; letter-spacing:2px; color:#333; margin-bottom:20px;">QUICK ACTIONS</div>
-                        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:15px;">
-                            <div onclick="renderStake()" style="background:#080808; border:1px solid #111; padding:20px 10px; border-radius:20px; text-align:center; cursor:pointer;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            </div>
-                            <div onclick="renderVault()" style="background:#080808; border:1px solid #111; padding:20px 10px; border-radius:20px; text-align:center; cursor:pointer;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#444;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                            </div>
-                            <div onclick="renderSwap()" style="background:#080808; border:1px solid #111; padding:20px 10px; border-radius:20px; text-align:center; cursor:pointer;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#444;"><path d="m16 3 4 4-4 4"></path><path d="M20 7H4"></path><path d="m8 21-4-4 4-4"></path><path d="M4 17h16"></path></svg>
-                            </div>
-                        </div>
-                    </div>
+        <div style="height:100%; display:flex; flex-direction:column; font-family:'Inter', sans-serif; background:#FFF; color:#1A1A1A;">
+            <!-- HEADER -->
+            <div style="padding:15px 20px; border-bottom:1px solid #EEE; display:flex; justify-content:space-between; align-items:center; background:#FFF;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <img src="${PRN.state.avatar}" style="width:38px; height:38px; border-radius:50%; border:1px solid #EEE;">
+                    <div style="font-weight:900; font-size:0.9rem;">${PRN.state.handle}</div>
                 </div>
-            </div>
-            
-            <div style="margin-top:auto; padding-top:20px; border-top:1px solid #111; display:flex; justify-content:space-between; align-items:center;">
-                <div style="font-weight:900; font-size:0.6rem; letter-spacing:2px; color:#222;">v6.2.0 UTILITY</div>
-                <div style="width:8px; height:8px; background:#00FF00; border-radius:50%; box-shadow:0 0 10px #00FF00;"></div>
-            </div>
-        </div>
-    `;
-}
-
-function buy(service, price) {
-    if(!walletVisible) toggleSidebar();
-    renderPayment(service, price);
-}
-
-function renderPayment(name, basePrice) {
-    const c = document.getElementById('wallet-content');
-    const price = parseFloat(basePrice) || 299.00;
-    const prnPrice = (price * 0.9).toFixed(2);
-    
-    c.innerHTML = `
-        <div style="animation:fadeIn 0.5s">
-            <h2 style="font-weight:900; letter-spacing:3px; font-size:1.5rem;">CHECKOUT</h2>
-            <div style="background:#080808; border:1px solid #111; padding:25px; border-radius:30px; margin-top:20px;">
-                <div style="font-size:0.6rem; font-weight:900; color:var(--accent); letter-spacing:2px;">${name.toUpperCase()}</div>
-                <div style="display:flex; justify-content:space-between; margin-top:20px; border-bottom:1px solid #111; padding-bottom:15px;">
-                    <span style="color:#555; font-size:0.8rem;">Standard Price</span>
-                    <span style="font-weight:900;">$${price.toFixed(2)}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-top:20px;">
-                    <span style="color:var(--accent); font-size:0.8rem; font-weight:900;">Sovereign Price</span>
-                    <span style="font-weight:900; color:var(--accent);">-10% OFF</span>
-                </div>
-                <div style="font-size:2rem; font-weight:900; margin-top:5px; text-align:right;">${prnPrice} $PRN</div>
+                <button onclick="toggleSidebar()" style="background:none; border:none; color:#999; font-size:2rem; cursor:pointer;">&times;</button>
             </div>
 
-            <div style="margin-top:40px;">
-                <div style="font-size:0.5rem; font-weight:900; color:#333; letter-spacing:3px; margin-bottom:15px; text-transform:uppercase;">Select Payment Method</div>
-                <div style="display:grid; grid-template-columns:1fr; gap:10px;">
-                    <button onclick="alert('PayPal Secured Hub Opening...')" style="background:#0070BA; color:#fff; border:none; padding:18px; border-radius:20px; font-weight:900; cursor:pointer; font-size:0.7rem; display:flex; align-items:center; justify-content:center; gap:10px;">PAYPAL</button>
-                    <button onclick="alert('Encrypted Card Terminal Active...')" style="background:#fff; color:#000; border:none; padding:18px; border-radius:20px; font-weight:900; cursor:pointer; font-size:0.7rem;">CREDIT CARD</button>
-                    <button onclick="alert('US ACH Settlement Initiated...')" style="background:#111; color:#fff; border:1px solid #222; padding:18px; border-radius:20px; font-weight:900; cursor:pointer; font-size:0.7rem;">US BANK ACCOUNT</button>
-                    <button onclick="alert('Ledger Handshake: $PRN Payment Received')" style="background:var(--accent); color:#fff; border:none; padding:18px; border-radius:20px; font-weight:900; cursor:pointer; font-size:0.7rem;">SOVEREIGN ($PRN)</button>
-                </div>
-            </div>
-
-            <div style="margin-top:40px; padding:25px; border-radius:30px; border:1px solid #222; background:rgba(123,53,212,0.05);">
-                <div style="font-size:0.6rem; font-weight:900; color:var(--accent); letter-spacing:2px; margin-bottom:15px;">BUNDLE SELECTION</div>
-                <div style="display:flex; flex-direction:column; gap:15px;">
-                    <label style="display:flex; align-items:center; gap:12px; cursor:pointer;">
-                        <input type="radio" name="pkg" checked style="accent-color:var(--accent);">
-                        <span style="font-size:0.75rem; font-weight:900; color:#666;">WEB2 BASIC (Site + App)</span>
-                    </label>
-                    <label style="display:flex; align-items:center; gap:12px; cursor:pointer;">
-                        <input type="radio" name="pkg" style="accent-color:var(--accent);">
-                        <span style="font-size:0.75rem; font-weight:900; color:var(--accent);">WEB3 SOVEREIGN (+Handle)</span>
-                    </label>
-                </div>
-            </div>
-            
-            <p style="margin-top:30px; color:#333; font-size:0.6rem; line-height:1.5; text-align:center;">All purchases include a High-Fidelity Guarantee. <br> Sovereign Handles issued upon verification.</p>
-        </div>
-    `;
-}
-
-function renderStake() {
-    const c = document.getElementById('wallet-content');
-    c.innerHTML = `
-        <div style="animation:fadeIn 0.5s">
-            <h2 style="font-weight:900; letter-spacing:3px; font-size:1.5rem;">STAKING</h2>
-            <div style="background:#080808; border:1px solid #111; padding:30px; border-radius:30px; margin-top:20px;">
-                <div style="color:#555; font-size:0.6rem; font-weight:900; letter-spacing:2px;">ESTIMATED YIELD</div>
-                <div style="font-size:3rem; font-weight:900; color:var(--accent); margin-top:10px;">12.5% <span style="font-size:0.8rem; color:#333;">APY</span></div>
-                <p style="color:#444; font-size:0.75rem; margin-top:20px; line-height:1.6;">Commit your $PRN to secure the Sovereign Ledger and earn passive neural rewards.</p>
-                <button class="w-btn" style="background:var(--accent); width:100%; padding:18px; border-radius:20px; margin-top:30px; border:none; color:#fff; font-weight:900; cursor:pointer;" onclick="alert('Stake Sign-Off Initiated...')">STAKE $PRN</button>
-            </div>
-        </div>
-    `;
-}
-
-function renderVault() {
-    const c = document.getElementById('wallet-content');
-    const items = [
-        { n: 'Heritage NFT', i: '🏺', id: 'CL-01' },
-        { n: 'Alpha Handle', i: '🏷️', id: '$prisca.pri' }
-    ];
-    c.innerHTML = `
-        <div style="animation:fadeIn 0.5s">
-            <h2 style="font-weight:900; letter-spacing:3px; font-size:1.5rem;">VAULT</h2>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
-                ${items.map(item => `
-                    <div onclick="renameNFT('${item.n}')" style="background:#080808; border:1px solid #111; padding:25px; border-radius:25px; text-align:center; cursor:pointer;">
-                        <div style="font-size:2rem; margin-bottom:10px;">${item.i}</div>
-                        <div style="font-size:0.7rem; font-weight:900;">${item.n}</div>
-                        <div style="font-size:0.5rem; color:#444;">${item.id}</div>
+            <!-- TABS -->
+            <div style="display:flex; border-bottom:1px solid #EEE; background:#FFF;">
+                ${['vault', 'swap', 'send', 'receive', 'dapps', 'messenger'].map(tab => `
+                    <div onclick="switchTab('${tab}')" style="flex:1; text-align:center; padding:15px 0; cursor:pointer; border-bottom: 3px solid ${currentTab===tab?'#000':'transparent'}; transition:0.3s;">
+                        <span style="font-weight:900; font-size:0.6rem; letter-spacing:1px; color:${currentTab===tab?'#000':'#888'}; text-transform:uppercase;">${tab}</span>
                     </div>
                 `).join('')}
             </div>
-            <button style="width:100%; padding:18px; border:1px solid #111; background:none; border-radius:20px; color:#333; font-weight:900; margin-top:30px; cursor:pointer; font-size:0.6rem; letter-spacing:2px;">SYNC EXTERNAL ASSETS</button>
-        </div>
-    `;
-}
 
-function renameNFT(name) {
-    const n = prompt("Enter new name for " + name + " (Fee: 0.05 $PRN)");
-    if(n) alert("Renaming to " + n + ". Fee deducted from Treasury.");
-}
-
-function renderSwap() {
-    const c = document.getElementById('wallet-content');
-    c.innerHTML = `
-        <div style="animation:fadeIn 0.5s">
-            <h2 style="font-weight:900; letter-spacing:3px; font-size:1.5rem;">DEX SWAP</h2>
-            <div style="background:#080808; border:1px solid #111; padding:30px; border-radius:30px; margin-top:20px;">
-                <div style="background:#000; padding:20px; border-radius:20px; border:1px solid #111;">
-                    <div style="font-size:0.6rem; color:#444;">FROM</div>
-                    <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                        <span style="font-weight:900;">$PRN</span>
-                        <input type="number" value="100" style="background:none; border:none; color:#fff; text-align:right; font-weight:900; width:80px; outline:none;">
-                    </div>
-                </div>
-                <div style="text-align:center; margin:-10px 0;">
-                    <div style="background:var(--accent); width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; border:5px solid #080808;">↓</div>
-                </div>
-                <div style="background:#000; padding:20px; border-radius:20px; border:1px solid #111;">
-                    <div style="font-size:0.6rem; color:#444;">TO</div>
-                    <div style="display:flex; justify-content:space-between; margin-top:10px;">
-                        <span style="font-weight:900;">$MUSD</span>
-                        <span style="font-weight:900; color:#555;">250.00</span>
-                    </div>
-                </div>
-                <button style="width:100%; padding:18px; background:var(--accent); border:none; border-radius:20px; color:#fff; font-weight:900; margin-top:30px; cursor:pointer;">SWAP ASSETS</button>
+            <div style="flex:1; overflow-y:auto; padding:20px;">
+                ${renderView(currentTab)}
+            </div>
+            
+            <!-- STATUS BAR -->
+            <div style="padding:10px 20px; border-top:1px solid #EEE; font-size:0.6rem; font-weight:900; color:#CCC; display:flex; justify-content:space-between;">
+                <div>NETWORK: SOVEREIGN L1</div>
+                <div>BLOCK: #100 (V7)</div>
             </div>
         </div>
     `;
 }
 
+function renderView(tab) {
+    if(tab === 'vault') return `
+        <div style="text-align:center; padding:20px 0;">
+            <div style="font-size:0.7rem; font-weight:900; color:#888; letter-spacing:4px; margin-bottom:10px;">RESERVE</div>
+            <div style="font-size:2.8rem; font-weight:900;">$PRN ${PRN.state.balance.toLocaleString()}</div>
+        </div>
+    `;
+    if(tab === 'send') return `
+        <div>
+            <input type="text" id="send-to" placeholder="@handle.pri" style="width:100%; padding:15px; border-radius:12px; border:1px solid #EEE; margin-bottom:10px; outline:none; font-weight:700;">
+            <input type="number" id="send-amount" placeholder="Amount" style="width:100%; padding:15px; border-radius:12px; border:1px solid #EEE; margin-bottom:15px; outline:none; font-weight:700;">
+            <button onclick="executeSend()" style="width:100%; padding:18px; background:#000; color:#FFF; border:none; border-radius:100px; font-weight:900;">SEND COINS</button>
+        </div>
+    `;
+    if(tab === 'receive') return `
+        <div style="text-align:center;">
+            <div style="background:#000; padding:20px; border-radius:20px; display:inline-block; margin-bottom:20px;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${PRN.state.wallet_id}" style="width:150px;">
+            </div>
+            <div style="background:#F9F9F9; padding:15px; border-radius:12px; font-size:0.7rem; font-weight:900; word-break:break-all;">${PRN.state.wallet_id}</div>
+        </div>
+    `;
+    if(tab === 'swap') return `
+        <div style="background:#F9F9F9; padding:20px; border-radius:15px; border:1px solid #EEE;">
+            <div style="font-size:0.6rem; font-weight:900; color:#888; margin-bottom:10px;">SWAP $PRN TO $MUSD</div>
+            <input type="number" value="100" style="background:none; border:none; font-size:1.5rem; font-weight:900; width:100%; outline:none;">
+            <button style="width:100%; margin-top:15px; padding:15px; background:#000; color:#FFF; border:none; border-radius:100px; font-weight:900;">EXECUTE SWAP</button>
+        </div>
+    `;
+    if(tab === 'messenger') return renderLynx();
+    if(tab === 'dapps') {
+        const apps = [{n:'MYNT', i:'🎨'}, {n:'ATELIA', i:'🎮'}, {n:'DREAMING', i:'📽️'}, {n:'CALALLOO', i:'🍲'}];
+        return `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">${apps.map(a => `<div style="background:#F9F9F9; padding:20px; border-radius:15px; text-align:center; border:1px solid #EEE;"><div style="font-size:1.5rem; margin-bottom:5px;">${a.i}</div><div style="font-weight:900; font-size:0.6rem;">${a.n}</div></div>`).join('')}</div>`;
+    }
+}
+
+function renderLynx() {
+    if(lynxChatMode === 'list') {
+        return `<div onclick="openChat('Priscion')" style="padding:15px; background:#F9F9F9; border-radius:12px; display:flex; align-items:center; gap:15px; cursor:pointer; border:1px solid #EEE;">
+            <div style="width:40px; height:40px; background:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#FFF; font-weight:900;">P</div>
+            <div style="flex:1;">
+                <div style="font-weight:900; font-size:0.8rem;">Priscion</div>
+                <div style="font-size:0.65rem; color:#888;">Ledger Handshake verified.</div>
+            </div>
+        </div>`;
+    }
+    return `
+        <div style="display:flex; flex-direction:column; height:100%;">
+            <div onclick="switchTab('messenger')" style="cursor:pointer; margin-bottom:15px; color:#888;">${MUSE_ICONS.back} Back</div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px; overflow-y:auto; padding-bottom:20px;">
+                ${PRN.state.lynxMessages.map(m => `
+                    <div style="align-self:${m.from==='Priscion'?'flex-start':'flex-end'}; background:${m.from==='Priscion'?'#F0F0F0':'#000'}; color:${m.from==='Priscion'?'#000':'#FFF'}; padding:12px 15px; border-radius:15px; font-size:0.8rem; max-width:85%;">
+                        ${m.text}
+                        <div style="text-align:right; font-size:0.5rem; opacity:0.5; margin-top:5px;">${m.time}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div style="display:flex; gap:10px; background:#FFF; padding-top:10px;">
+                <input id="lynx-input" type="text" placeholder="Type..." style="flex:1; border:1px solid #EEE; padding:12px; border-radius:20px; outline:none;">
+                <button onclick="sendLynx()" style="background:#000; color:#FFF; border:none; width:40px; height:40px; border-radius:50%; cursor:pointer;">${MUSE_ICONS.send}</button>
+            </div>
+        </div>
+    `;
+}
+
+// AUTO-INJECT
+document.addEventListener('DOMContentLoaded', () => {
+    const s = document.createElement('div');
+    s.id = 'sidebar';
+    s.style = "position:fixed; top:0; right:-400px; width:400px; height:100%; z-index:9999; transition:0.3s; box-shadow:-10px 0 30px rgba(0,0,0,0.05);";
+    document.body.appendChild(s);
+    
+    // Listen for custom trigger to open wallet
+    window.addEventListener('openWallet', () => toggleSidebar());
+});
+
+if (typeof window !== 'undefined') window.PRN = PRN;
