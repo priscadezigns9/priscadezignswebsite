@@ -1,40 +1,35 @@
-# MY_RULES.md - Empire Registry
+# RULES - The Simple Way
 
-## Sovereign Naming Protocol (Definitive)
-- **Blockchain:** Priscion
-- **Reserve Asset:** $PRN
-- **Stablecoin:** $MUSD
-- **Neural Token:** $NRL (Neural)
-- **Gaming Token:** $ATLR
-- **Wallet:** MUSE
-- **Swap:** Chillata
-- **Privacy Layer:** Jello
-- **Explorer:** Pulse
-- **Analytics:** Peanuts
-- **NFT Store:** MYNT
-- **Browser:** LEGGO
+## The Simple Language Mandate (Mandatory)
+- **Banned Words:** "Empire", "Sovereign", "Node", "Fidelity", "Protocol", "Infrastructure", "Autonomous".
+- **The Rule:** Speak and write like a helpful friend. Use simple words that anyone can understand. No tech jargon.
+- **Replacements:**
+    - "Empire" -> "Group", "Network", or "Prisca Dezigns".
+    - "Sovereign" -> "Independent", "Private", "Secure", or "Trusted".
+    - "Node" -> "Part", "Brand", "Product", or "Branch".
+    - "High-Fidelity" -> "High quality", "Clear", or "Best".
+    - "Autonomous" -> "Automatic" or "Works on its own".
+    - "Infrastructure" -> "Systems" or "Setup".
 
-## The "Pure Ledger" Protocol
-- **Mandate:** Absolute focus on Web3 infrastructure. 
-- **Restriction:** All social media deployment and "Session Delta" tasks are purged from this node's operational scope.
-- **Role:** I am the technical guardian of the Priscion Blockchain. I manage the dApp hub, the ledger, and the sovereign economic rails.
-- **Rule of Restraint:** Do NOT initiate new dApp developments until current core infrastructure is perfected.
+## Naming
+- **Business:** Prisca Dezigns.
+- **Technical Branch:** Orcinos.
+- **Blockchain Branch:** Priscion.
 
-## Financial Watchdog - Acknowledged Alerts (Do Not Re-Flag)
-- **McAfee expiry June 7** — acknowledged, do not repeat
-- **Binance unrecognized login June 6** — acknowledged, do not repeat
-- Only flag NEW financial events going forward
+## Payment Stack
+- PayPal (Primary), Crypto (ERC-20), Payoneer.
+- NO Stripe.
 
-## Rule: Check Before Claiming (Added 2026-06-07)
-- NEVER say "I can't access X" without running `credentials(action="list")` first
-- NEVER second-guess a capability that was established in a previous session
-- When access is in question: CHECK THE TOOL, then speak
-- Facebook/Instagram/Threads: token `facebook-user-token` covers personal account (Priscilla Drucilla Ecila Narine) + all 18 brand pages + Instagram publishing
-
-## Personal Instagram Protocol (@priscillanarine)
-- **Handle:** @priscillanarine (personal account, separate from @prisca.adaa)
-- **Content:** Images ONLY — no text-only posts
-- **Source:** Google Drive ONLY — never stock, never generated
-- **Session:** Assigned to Session ALPHA (runs with PRISCION, Dreaming Anime, Atelia, Couture Gallery)
-- **Status:** ON HOLD — deploy only when user confirms "images are ready"
-- **Action:** When user says images are ready, fetch from Drive and post to @priscillanarine IG only
+## Financial Alerts - Acknowledged
+- Coinbase June 6: passkey added, address verified, account verified.
+- CEX.IO June 6: identity verified + login (13:49 UTC).
+- priscion.pri@gmail.com: account creation, family group addition.
+- Calalloo (Unverified) Google sign-in by priscion.pri June 7 9:43 PM UTC.
+- Google security alert on priscion.pri June 7 9:00 PM UTC.
+- Scotiabank withdrawal.
+- Instagram handle change.
+- Google recovery phone update.
+- New device login.
+- McAfee expiry June 7.
+- Binance unrecognized login June 6.
+- RULE: Only flag events completely absent from this list. Never re-flag variations of the above.
