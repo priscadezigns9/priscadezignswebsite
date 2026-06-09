@@ -2,13 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MUSE WALLET | Priscion Empire</title>
-    <style>body{background:#000;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;}</style>
+    <title>MUSE | Secure Login</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap">
+    <style>
+        body { margin: 0; background: #fff; color: #000; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .login-box { text-align: center; width: 350px; }
+        .logo-anim { width: 100px; animation: pulse 2s infinite; cursor: pointer; margin-bottom: 40px; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+        input { width: 100%; padding: 20px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 20px; font-size: 1rem; outline: none; text-align: center; }
+        .btn { width: 100%; padding: 20px; border-radius: 100px; border: none; background: #000; color: #fff; font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #333; }
+    </style>
 </head>
 <body>
-    <div style="text-align:center;">
-        <div style="font-size:3rem; font-weight:900; margin-bottom:20px;">MUSE.</div>
-        <p style="color:#555; letter-spacing:2px; font-weight:900;">AWAITING SOVEREIGN HANDSHAKE</p>
+    <div id="splash" class="login-box">
+        <img src="assets/muse_icon.png" class="logo-anim" onclick="showLogin()">
+        <p style="font-weight:900; letter-spacing:1px; color:#999;">TAP TO UNLOCK</p>
     </div>
+
+    <div id="login" class="login-box" style="display:none;">
+        <img src="assets/muse_icon.png" style="width:60px; margin-bottom:30px;">
+        <h2 style="font-weight:900;">Enter Password</h2>
+        <p style="color:#999; margin-bottom:30px;">Secure Access to your Sovereign Wallet</p>
+        <input type="password" id="pass" placeholder="••••••••">
+        <button class="btn" onclick="verify()">UNLOCK WALLET</button>
+        <p id="err" style="color:red; font-size:0.8rem; margin-top:20px; display:none;">Incorrect Password</p>
+    </div>
+
+    <script src="wallet-core.js"></script>
+    <script>
+        function showLogin() {
+            document.getElementById('splash').style.display = 'none';
+            document.getElementById('login').style.display = 'block';
+        }
+        async function verify() {
+            const p = document.getElementById('pass').value;
+            // The hardened wallet core now fetches from Supabase
+            if (PRN.checkPassword(p)) {
+                const urlParams = new URLSearchParams(window.location.search);
+                if(urlParams.get('action') === 'pay') {
+                    if (confirm('Confirm Transaction: $PRN 1,500.00 for Sovereign Onboarding?')) {
+                        const success = await PRN.sendCoins('PRISCION_SERVICES', 1500);
+                        if (success) {
+                            alert('Transaction Anchored to Ledger!');
+                            location.href = 'index.html';
+                        } else {
+                            alert('Ledger Sync Failed: Insufficient Balance or Network Error.');
+                        }
+                    }
+                } else {
+                    location.href = 'wallet-app.html';
+                }
+            } else {
+                document.getElementById('err').style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
