@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velloq Onboarding | Build Your Empire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #050508; --card: #0F172A; --primary: #0EA5E9; --accent: #00B4A6; --text: #F8FAFC; --dim: #94A3B8; --border: rgba(255,255,255,0.08); }
+        body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden; }
+        
+        .wizard-container { width: 90%; max-width: 600px; padding: 40px; position: relative; }
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.5s ease; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h2 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -1px; }
+        p { color: var(--dim); margin-bottom: 30px; font-size: 1rem; }
+        
+        .input-group { margin-bottom: 24px; }
+        label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); }
+        input, textarea, select { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: #fff; font-family: inherit; font-size: 1rem; box-sizing: border-box; }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+        
+        .btn-group { display: flex; gap: 15px; margin-top: 40px; }
+        .btn { padding: 16px 32px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-size: 1rem; }
+        .btn-next { background: var(--primary); color: #fff; flex: 2; }
+        .btn-prev { background: transparent; border: 1px solid var(--border); color: var(--dim); flex: 1; }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        
+        .progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: var(--primary); transition: width 0.3s ease; z-index: 1000; }
+        
+        .upload-area { border: 2px dashed var(--border); border-radius: 16px; padding: 40px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .upload-area:hover { border-color: var(--primary); background: rgba(14, 165, 233, 0.05); }
+        
+        #loading { display: none; text-align: center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+    
+    <div class="wizard-container">
+        <!-- Step 1: Basic Identity -->
+        <div class="step active" id="step1">
+            <h2>The Foundation</h2>
+            <p>Tell us the name of your empire.</p>
+            <div class="input-group">
+                <label>Business Name</label>
+                <input type="text" id="bizName" placeholder="e.g. Ornalis Lighting">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-next" onclick="nextStep(2)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 2: The Mission -->
+        <div class="step" id="step2">
+            <h2>The Vision</h2>
+            <p>What do you do and who is it for?</p>
+            <div class="input-group">
+                <label>What does your business do?</label>
+                <textarea id="bizDo" rows="3" placeholder="e.g. We design luxury high-fidelity lighting for modern homes."></textarea>
+            </div>
+            <div class="input-group">
+                <label>Who is your target customer?</label>
+                <input type="text" id="bizCustomer" placeholder="e.g. Interior designers and homeowners seeking luxury.">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="nextStep(1)">Back</button>
+                <button class="btn btn-next" onclick="nextStep(3)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Brand DNA -->
+        <div class="step" id="step3">
+            <h2>Brand DNA</h2>
+            <p>Define the character of your presence.</p>
+            <div class="input-group">
+                <label>3 Core Values</label>
+                <input type="text" id="bizValues" placeholder="e.g. Excellence, Innovation, Integrity">
+            </div>
+            <div class="input-group">
+                <label>Design Vibe</label>
+                <select id="bizVibe">
+                    <option value="Clean & Minimalist">Clean & Minimalist</option>
+                    <option value="Bold & Tech-Focused">Bold & Tech-Focused</option>
+                    <option value="Luxury & Elegant">Luxury & Elegant</option>
+                    <option value="Warm & Approachable">Warm & Approachable</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="nextStep(2)">Back</button>
+                <button class="btn btn-next" onclick="nextStep(4)">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Assets -->
+        <div class="step" id="step4">
+            <h2>Visual Assets</h2>
+            <p>Upload your logo or product imagery.</p>
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div style="font-size: 2rem; margin-bottom: 10px;">📁</div>
+                <div id="fileStatus">Click to upload files (Images, Logo)</div>
+                <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFiles(this.files)">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-prev" onclick="nextStep(3)">Back</button>
+                <button class="btn btn-next" onclick="submitWizard()">Generate Website</button>
+            </div>
+        </div>
+
+        <!-- Step 5: Loading / Success -->
+        <div id="loading">
+            <div class="spinner"></div>
+            <h2>Architecting Your Empire</h2>
+            <p>The Velloq AI is currently synthesizing your Brand DNA and generating high-fidelity copywriting...</p>
+        </div>
+        
+        <div id="success" style="display: none; text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 20px;">🚀</div>
+            <h2>Architecture Complete</h2>
+            <p>Your autonomous website has been generated. Our team is performing the final neural optimization.</p>
+            <button class="btn btn-next" onclick="window.location.href='/velloq/'">Return to Velloq</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        function nextStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            currentStep = step;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const prog = (currentStep / totalSteps) * 100;
+            document.getElementById('progress').style.width = prog + '%';
+        }
+
+        function handleFiles(files) {
+            document.getElementById('fileStatus').textContent = files.length + " files selected.";
+        }
+
+        async function submitWizard() {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('loading').style.display = 'block';
+            
+            const data = {
+                name: document.getElementById('bizName').value,
+                mission: document.getElementById('bizDo').value,
+                customer: document.getElementById('bizCustomer').value,
+                values: document.getElementById('bizValues').value,
+                vibe: document.getElementById('bizVibe').value,
+                category: 'Velloq Onboarding'
+            };
+
+            try {
+                // Send data to Supabase Leads table as a detailed entry
+                const response = await fetch('https://sktpjacowqaedddtrhuz.supabase.co/rest/v1/leads', {
+                    method: 'POST',
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: data.name,
+                        details: `Mission: ${data.mission} | Customer: ${data.customer} | Values: ${data.values} | Vibe: ${data.vibe}`,
+                        category: data.category,
+                        package: 'Autonomous Site Build'
+                    })
+                });
+
+                // Simulate AI Generation time
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('progress').style.width = '100%';
+                }, 3000);
+            } catch (err) {
+                alert('Connection error. Please try again.');
+                nextStep(4);
+            }
+        }
+    </script>
+</body>
+</html>
