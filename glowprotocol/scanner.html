@@ -55,11 +55,26 @@
 <button class="btn-scan" onclick="performMolecularScan()">GENERATE DIAGNOSTIC ✨</button>
 <div id="results" class="results-area"><div class="score-card"><div id="scoreCircle" class="score-circle">--</div><div class="score-info"><h3 id="scoreTitle">Analyzing Architecture...</h3><p id="scoreDesc">We are sequencing the raw data against the Gold Standard index.</p></div></div>
 <div class="analysis-grid"><div class="analysis-card"><h4>Biological Heroes</h4><div id="heroList"></div></div><div class="analysis-card"><h4>Potential Disruptors</h4><div id="disruptorList"></div></div></div></div></div></div>
-<footer><p>© 2026 PRISCION EMPIRE | NEURAL DIAGNOSTICS v1.0</p></footer>
+<footer><p>© 2026 PRISCION | NEURAL DIAGNOSTICS v1.0</p></footer>
 <script>
 const HERO_DB = ["niacinamide", "glycerin", "hyaluronic acid", "retinol", "peptides", "ceramides", "panthenol", "squalane", "centella asiatica", "vitamin c", "ascorbic acid", "tocopherol", "ferulic acid", "green tea", "allantoin"];
 const DISRUPTOR_DB = ["alcohol denat", "fragrance", "parfum", "paraben", "sulfate", "sls", "essential oil", "lemon oil", "lavender oil", "menthol", "eucalyptus", "oxybenzone", "formaldehyde"];
-function performMolecularScan() {
+
+async function getCosDNADiagnostic(ingredients) {
+  const url = 'https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/cosdna-scanner';
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ingredients })
+    });
+    return response.ok ? await response.json() : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function performMolecularScan() {
   const input = document.getElementById('ingredientsInput').value.toLowerCase();
   if (!input.trim()) return alert("Please enter ingredients first.");
   const results = document.getElementById('results');
@@ -68,25 +83,61 @@ function performMolecularScan() {
   const scoreCircle = document.getElementById('scoreCircle');
   const scoreTitle = document.getElementById('scoreTitle');
   const scoreDesc = document.getElementById('scoreDesc');
+  
   results.style.display = 'block';
-  heroList.innerHTML = '';
-  disruptorList.innerHTML = '';
+  heroList.innerHTML = 'Analyzing molecular structure...';
+  disruptorList.innerHTML = 'Checking signal integrity...';
+  
   let heroesFound = [];
   let disruptorsFound = [];
+  
+  // Local Scan
   HERO_DB.forEach(h => { if (input.includes(h)) heroesFound.push(h); });
   DISRUPTOR_DB.forEach(d => { if (input.includes(d)) disruptorsFound.push(d); });
+
+  // External CosDNA Scan
+  const externalData = await getCosDNADiagnostic(input);
+  if (externalData) {
+    if (externalData.heroes) {
+      externalData.heroes.forEach(h => {
+        if (!heroesFound.includes(h.toLowerCase())) heroesFound.push(h.toLowerCase());
+      });
+    }
+    if (externalData.disruptors) {
+      externalData.disruptors.forEach(d => {
+        if (!disruptorsFound.includes(d.toLowerCase())) disruptorsFound.push(d.toLowerCase());
+      });
+    }
+  }
+
+  heroList.innerHTML = '';
+  disruptorList.innerHTML = '';
+  
   heroesFound.forEach(h => { heroList.innerHTML += '<span class="ingredient-tag tag-good">' + h + '</span>'; });
   disruptorsFound.forEach(d => { disruptorList.innerHTML += '<span class="ingredient-tag tag-bad">' + d + '</span>'; });
+  
   if (heroesFound.length === 0) heroList.innerHTML = "No significant biological heroes detected.";
   if (disruptorsFound.length === 0) disruptorList.innerHTML = "No common inflammatory disruptors detected. High fidelity.";
+  
   let baseScore = 70;
   baseScore += (heroesFound.length * 5);
   baseScore -= (disruptorsFound.length * 10);
   const finalScore = Math.min(Math.max(baseScore, 0), 100);
   scoreCircle.innerText = finalScore;
-  if (finalScore >= 90) { scoreTitle.innerText = "Gold Standard Architecture"; scoreDesc.innerText = "This formula is highly optimized for biological regeneration."; }
-  else if (finalScore >= 70) { scoreTitle.innerText = "High-Fidelity Formula"; scoreDesc.innerText = "A solid protocol with effective active signals."; }
-  else { scoreTitle.innerText = "Low-Quality Signal Detected"; scoreDesc.innerText = "This formula contains architectural flaws that may disrupt the skin barrier."; }
+  
+  if (finalScore >= 90) { 
+    scoreTitle.innerText = "Gold Standard Architecture"; 
+    scoreDesc.innerText = "This formula is highly optimized for biological regeneration."; 
+  }
+  else if (finalScore >= 70) { 
+    scoreTitle.innerText = "High-Fidelity Formula"; 
+    scoreDesc.innerText = "A solid protocol with effective active signals."; 
+  }
+  else { 
+    scoreTitle.innerText = "Low-Quality Signal Detected"; 
+    scoreDesc.innerText = "This formula contains architectural flaws that may disrupt the skin barrier."; 
+  }
+  
   results.scrollIntoView({ behavior: 'smooth' });
 }
 </script>
