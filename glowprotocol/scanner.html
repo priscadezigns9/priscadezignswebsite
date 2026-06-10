@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Molecular Scanner | Glow Protocol</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blush: #FFF0F5;
+      --cream: #FFF8FC;
+      --pink: #FF4D8D;
+      --pink-dark: #e03578;
+      --text: #2d1b2e;
+      --text-light: #7a5e7e;
+      --white: #ffffff;
+      --shadow: 0 10px 30px rgba(255, 77, 141, 0.1);
+    }
+    body { font-family: 'Inter', sans-serif; background-color: var(--cream); color: var(--text); line-height: 1.6; }
+    header { background: #fff; padding: 1rem 6%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--blush); }
+    .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-img { height: 45px; width: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--pink); }
+    .logo-text { font-size: 1.6rem; font-weight: 700; color: var(--pink); font-family: 'Playfair Display', serif; }
+    .container { max-width: 1000px; margin: 80px auto; padding: 0 20px; }
+    .scanner-box { background: #fff; border-radius: 30px; padding: 60px; border: 1px solid var(--blush); box-shadow: var(--shadow); text-align: center; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 3rem; margin-bottom: 20px; color: var(--text); }
+    p.subtitle { color: var(--text-light); margin-bottom: 40px; font-size: 1.1rem; }
+    .input-wrapper { margin-bottom: 40px; text-align: left; }
+    label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; color: var(--pink); letter-spacing: 1px; }
+    textarea { width: 100%; height: 200px; padding: 25px; border-radius: 20px; border: 1px solid var(--blush); background: var(--cream); font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--text); resize: none; outline: none; transition: 0.3s; }
+    textarea:focus { border-color: var(--pink); box-shadow: 0 0 10px rgba(255, 77, 141, 0.1); }
+    .btn-scan { background: var(--pink); color: #fff; padding: 18px 60px; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 77, 141, 0.3); }
+    .btn-scan:hover { background: var(--pink-dark); transform: translateY(-2px); }
+    .results-area { display: none; margin-top: 60px; text-align: left; }
+    .score-card { display: flex; align-items: center; gap: 30px; background: var(--blush); padding: 40px; border-radius: 24px; margin-bottom: 40px; }
+    .score-circle { width: 120px; height: 120px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: var(--pink); border: 5px solid var(--pink); }
+    .score-info h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px; }
+    .score-info p { color: var(--text-light); font-size: 0.95rem; }
+    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+    .analysis-card { background: #fff; border: 1px solid var(--blush); padding: 30px; border-radius: 20px; }
+    .analysis-card h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); margin-bottom: 15px; }
+    .ingredient-tag { display: inline-block; padding: 6px 14px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; margin: 0 8px 8px 0; }
+    .tag-good { background: #e8f5e9; color: #2e7d32; }
+    .tag-bad { background: #ffebee; color: #c62828; }
+    footer { margin-top: 100px; text-align: center; color: var(--text-light); font-size: 0.8rem; padding-bottom: 40px; }
+  </style>
+</head>
+<body>
+<header><a href="/glowprotocol/" class="logo-container"><img src="https://lh3.googleusercontent.com/d/1oVHaG2yMmf3WvlnJXvZqtE4aGvxNuoK6" alt="Logo" class="logo-img"><span class="logo-text">Glow Protocol</span></a></header>
+<div class="container"><div class="scanner-box"><h1>Molecular Scanner</h1><p class="subtitle">Paste your product ingredients to reveal their biological DNA and safety profile.</p>
+<div class="input-wrapper"><label>INGREDIENT LIST (INCI)</label><textarea id="ingredientsInput" placeholder="Aqua, Glycerin, Niacinamide, Phenoxyethanol..."></textarea></div>
+<button class="btn-scan" onclick="performMolecularScan()">GENERATE DIAGNOSTIC ✨</button>
+<div id="results" class="results-area"><div class="score-card"><div id="scoreCircle" class="score-circle">--</div><div class="score-info"><h3 id="scoreTitle">Analyzing Architecture...</h3><p id="scoreDesc">We are sequencing the raw data against the Gold Standard index.</p></div></div>
+<div class="analysis-grid"><div class="analysis-card"><h4>Biological Heroes</h4><div id="heroList"></div></div><div class="analysis-card"><h4>Potential Disruptors</h4><div id="disruptorList"></div></div></div></div></div></div>
+<footer><p>© 2026 PRISCION EMPIRE | NEURAL DIAGNOSTICS v1.0</p></footer>
+<script>
+const HERO_DB = ["niacinamide", "glycerin", "hyaluronic acid", "retinol", "peptides", "ceramides", "panthenol", "squalane", "centella asiatica", "vitamin c", "ascorbic acid", "tocopherol", "ferulic acid", "green tea", "allantoin"];
+const DISRUPTOR_DB = ["alcohol denat", "fragrance", "parfum", "paraben", "sulfate", "sls", "essential oil", "lemon oil", "lavender oil", "menthol", "eucalyptus", "oxybenzone", "formaldehyde"];
+function performMolecularScan() {
+  const input = document.getElementById('ingredientsInput').value.toLowerCase();
+  if (!input.trim()) return alert("Please enter ingredients first.");
+  const results = document.getElementById('results');
+  const heroList = document.getElementById('heroList');
+  const disruptorList = document.getElementById('disruptorList');
+  const scoreCircle = document.getElementById('scoreCircle');
+  const scoreTitle = document.getElementById('scoreTitle');
+  const scoreDesc = document.getElementById('scoreDesc');
+  results.style.display = 'block';
+  heroList.innerHTML = '';
+  disruptorList.innerHTML = '';
+  let heroesFound = [];
+  let disruptorsFound = [];
+  HERO_DB.forEach(h => { if (input.includes(h)) heroesFound.push(h); });
+  DISRUPTOR_DB.forEach(d => { if (input.includes(d)) disruptorsFound.push(d); });
+  heroesFound.forEach(h => { heroList.innerHTML += '<span class="ingredient-tag tag-good">' + h + '</span>'; });
+  disruptorsFound.forEach(d => { disruptorList.innerHTML += '<span class="ingredient-tag tag-bad">' + d + '</span>'; });
+  if (heroesFound.length === 0) heroList.innerHTML = "No significant biological heroes detected.";
+  if (disruptorsFound.length === 0) disruptorList.innerHTML = "No common inflammatory disruptors detected. High fidelity.";
+  let baseScore = 70;
+  baseScore += (heroesFound.length * 5);
+  baseScore -= (disruptorsFound.length * 10);
+  const finalScore = Math.min(Math.max(baseScore, 0), 100);
+  scoreCircle.innerText = finalScore;
+  if (finalScore >= 90) { scoreTitle.innerText = "Gold Standard Architecture"; scoreDesc.innerText = "This formula is highly optimized for biological regeneration."; }
+  else if (finalScore >= 70) { scoreTitle.innerText = "High-Fidelity Formula"; scoreDesc.innerText = "A solid protocol with effective active signals."; }
+  else { scoreTitle.innerText = "Low-Quality Signal Detected"; scoreDesc.innerText = "This formula contains architectural flaws that may disrupt the skin barrier."; }
+  results.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
