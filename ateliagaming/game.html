@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atelia Gaming Hub | Neural Play</title>
+    <title>Atelia Gaming Hub | Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,157 +11,195 @@
             --orange: #FF6B00;
             --white: #FFFFFF;
             --black: #050505;
+            --cyber: #00ffff;
+            --glass: rgba(255, 255, 255, 0.03);
         }
         body, html {
             margin: 0; padding: 0; font-family: 'Inter', sans-serif;
             background-color: var(--black); color: var(--white);
+            min-height: 100vh; overflow-x: hidden;
         }
+
+        /* 3D Background */
+        .bg-fixed {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 10% 10%, #1a0a0a 0%, #050505 100%);
+        }
+        .grid-3d {
+            position: fixed; inset: 0; z-index: -1;
+            background-image: linear-gradient(rgba(211,47,47,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(211,47,47,0.03) 1px, transparent 1px);
+            background-size: 80px 80px; transform: perspective(1000px) rotateX(60deg) translateY(-200px);
+            opacity: 0.5;
+        }
+
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 5%; background: #000; border-bottom: 2px solid var(--red);
+            padding: 15px 5%; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--red);
+            backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 1000;
         }
-        .logo-img { height: 40px; filter: drop-shadow(0 0 5px var(--red)); }
-        
-        .hub-container { padding: 80px 10%; text-align: center; }
-        .hub-header h2 { font-family: 'Bangers'; font-size: 5rem; margin: 0; letter-spacing: 4px; }
-        .hub-header p { font-family: 'Russo One'; color: var(--orange); letter-spacing: 3px; margin-bottom: 60px; }
+        .logo-img { height: 40px; filter: drop-shadow(0 0 10px var(--red)); }
+
+        .layout-main { display: flex; padding: 40px 5%; gap: 40px; }
+
+        /* Sidebar Stats */
+        .sidebar { width: 300px; display: flex; flex-direction: column; gap: 25px; }
+        .stat-panel {
+            background: var(--glass); border: 1px solid rgba(255,255,255,0.1);
+            padding: 25px; border-radius: 12px; position: relative; overflow: hidden;
+        }
+        .stat-panel::before { content: ''; position: absolute; top:0; left:0; width:3px; height:100%; background: var(--cyber); }
+        .stat-label { font-family: 'Russo One'; font-size: 0.7rem; color: #888; letter-spacing: 2px; text-transform: uppercase; }
+        .stat-value { font-family: 'Bangers'; font-size: 2.2rem; color: var(--white); margin: 5px 0; }
+        .stat-sub { font-size: 0.65rem; color: var(--cyber); font-family: 'Russo One'; }
+
+        /* Hub Content */
+        .hub-content { flex: 1; }
+        .hub-header { margin-bottom: 50px; }
+        .hub-header h2 { font-family: 'Bangers'; font-size: 6rem; margin: 0; letter-spacing: 5px; line-height: 1; }
+        .hub-header p { font-family: 'Russo One'; color: var(--orange); letter-spacing: 4px; font-size: 1.1rem; }
 
         .game-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px; margin-top: 40px;
+            gap: 25px;
         }
         .game-card {
-            background: #111; border: 1px solid #222; text-decoration: none; color: white;
-            transition: 0.4s; overflow: hidden; display: block; position: relative;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            text-decoration: none; color: white; transition: 0.4s; overflow: hidden;
+            display: block; position: relative; border-radius: 8px;
+            transform-style: preserve-3d;
         }
-        .game-card:hover { transform: translateY(-10px); border-color: var(--red); box-shadow: 0 15px 30px rgba(211,47,47,0.2); }
-        .game-img { width: 100%; height: 200px; object-fit: cover; opacity: 0.7; transition: 0.4s; }
+        .game-card:hover { 
+            transform: translateY(-10px) rotateX(2deg) rotateY(2deg); 
+            border-color: var(--red); background: rgba(255,255,255,0.05);
+            box-shadow: 0 20px 40px rgba(211,47,47,0.2);
+        }
+        .game-img { width: 100%; height: 200px; object-fit: cover; opacity: 0.6; transition: 0.4s; }
         .game-card:hover .game-img { opacity: 1; transform: scale(1.05); }
         
-        .game-info { padding: 25px; text-align: left; }
-        .game-info h3 { font-family: 'Russo One'; font-size: 1.2rem; margin: 10px 0; }
-        .game-info p { color: #888; font-size: 0.9rem; line-height: 1.5; height: 60px; overflow: hidden; }
+        .game-info { padding: 25px; position: relative; z-index: 10; }
+        .game-info h3 { font-family: 'Russo One'; font-size: 1.2rem; margin: 10px 0; letter-spacing: 1px; }
+        .game-info p { color: #888; font-size: 0.85rem; line-height: 1.6; height: 55px; overflow: hidden; }
         
         .p2e-badge {
             background: var(--red); color: white; padding: 4px 10px; font-family: 'Russo One';
-            font-size: 0.7rem; border-radius: 2px; display: inline-block;
+            font-size: 0.65rem; border-radius: 2px; display: inline-block; letter-spacing: 1px;
+        }
+
+        .os-tag { position: absolute; top: 15px; right: 15px; font-family: 'Russo One'; font-size: 0.6rem; color: rgba(255,255,255,0.1); }
+
+        @media (max-width: 1100px) {
+            .layout-main { flex-direction: column-reverse; }
+            .sidebar { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+            .hub-header h2 { font-size: 4rem; }
         }
     </style>
 </head>
 <body>
 
+    <div class="bg-fixed"></div>
+    <div class="grid-3d"></div>
+
     <nav>
         <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
-        <a href="index.html" style="color:white; font-family:'Russo One'; text-decoration:none; font-size:0.8rem;">RETURN TO HQ</a>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <a href="dashboard.html" style="color:var(--cyber); font-family:'Russo One'; text-decoration:none; font-size:0.7rem; border:1px solid var(--cyber); padding:5px 15px; border-radius:3px;">LIVE SIGNALS</a>
+            <a href="index.html" style="color:white; font-family:'Russo One'; text-decoration:none; font-size:0.7rem; opacity:0.6;">HQ PORTAL</a>
+        </div>
     </nav>
 
-    <div class="hub-container">
-        <div class="hub-header">
-            <h2>GAMING HUB</h2>
-            <p>VANGUARD NEURAL PROTOCOLS</p>
+    <div class="layout-main">
+        
+        <div class="hub-content">
+            <div class="hub-header">
+                <h2>NEURAL HUB</h2>
+                <p>SELECT PROTOCOL · INITIALIZE P2E</p>
+            </div>
+
+            <div class="game-grid">
+                <a href="arena.html" class="game-card" style="grid-column: span 2; border-color: var(--red);">
+                    <div class="os-tag">SYS: ELITE</div>
+                    <img src="https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=1200&q=80" class="game-img" style="height:300px;">
+                    <div class="game-info">
+                        <span class="p2e-badge" style="background:var(--orange);">FLAGSHIP PROTOCOL</span>
+                        <h3 style="font-size:2rem;">ATELIA ARENA PRO</h3>
+                        <p>Access the high-intensity neural battleground. Feature-complete autonomous games designed for maximum ATLR yield and sovereign prestige.</p>
+                    </div>
+                </a>
+
+                <a href="wings.html" class="game-card">
+                    <div class="os-tag">SYS: VANGUARD</div>
+                    <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&q=80" class="game-img">
+                    <div class="game-info">
+                        <span class="p2e-badge">EARN ATLR</span>
+                        <h3>ASTRA WINGS PRO</h3>
+                        <p>Navigate the data fields and gain altitude. Collect prestige tokens while dodging neural interference.</p>
+                    </div>
+                </a>
+
+                <a href="pet.html" class="game-card">
+                    <div class="os-tag">SYS: COMPANION</div>
+                    <img src="https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=800&q=80" class="game-img">
+                    <div class="game-info">
+                        <span class="p2e-badge">EARN ATLR</span>
+                        <h3>VANGUARD COMPANION</h3>
+                        <p>Train and nurture your Vanguard unit. High-fidelity interactions yield ATLR rewards and prestige growth.</p>
+                    </div>
+                </a>
+
+                <a href="snake.html" class="game-card">
+                    <div class="os-tag">SYS: GRID</div>
+                    <img src="https://images.unsplash.com/photo-1628277613967-6abca504d0ac?w=800&q=80" class="game-img">
+                    <div class="game-info">
+                        <span class="p2e-badge">EARN ATLR</span>
+                        <h3>NEURAL SNAKE 3D</h3>
+                        <p>Pilot your Vanguard thread through the 3D grid. Consume ATLR nodes and grow your sovereign prestige.</p>
+                    </div>
+                </a>
+
+                <a href="lab.html" class="game-card">
+                    <div class="os-tag">SYS: GENETIC</div>
+                    <img src="https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=800&q=80" class="game-img">
+                    <div class="game-info">
+                        <span class="p2e-badge">DISCOVER</span>
+                        <h3>SOVEREIGN LAB</h3>
+                        <p>Breed unique Vanguard creatures in the high-fidelity incubator and unlock rare genetic mutations.</p>
+                    </div>
+                </a>
+            </div>
         </div>
 
-        <div class="game-grid">
-            <a href="arena.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?w=800&q=80" class="game-img" alt="Atelia Arena">
-                <div class="game-info">
-                    <span class="p2e-badge">ELITE CHALLENGE</span>
-                    <h3>ATELIA ARENA (PRO)</h3>
-                    <p>Enter the elite arena protocols. Face high-intensity challenges and secure maximum ATLR prestige.</p>
+        <div class="sidebar">
+            <div class="stat-panel">
+                <div class="stat-label">Network Pulse</div>
+                <div class="stat-value" id="live-block">13529973</div>
+                <div class="stat-sub">CARDANO MAINNET · STABLE</div>
+            </div>
+            <div class="stat-panel" style="border-color:var(--red);">
+                <div class="stat-label">Stored Prestige</div>
+                <div class="stat-value" id="user-atlr">0 ATLR</div>
+                <div class="stat-sub">VANGUARD WALLET CONNECTED</div>
+            </div>
+            <div class="stat-panel">
+                <div class="stat-label">Mission Briefing</div>
+                <div style="font-size:0.75rem; line-height:1.4; color:#ccc; margin-top:10px;" id="briefing-text">
+                    INFILTRATE THE SOVEREIGN NETWORK AND EXTRACT VITAL DATA NODES. THE LEDGER AWAITS YOUR COMMAND.
                 </div>
-            </a>
-
-            <a href="wings.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&q=80" class="game-img" alt="Astra Wings">
-                <div class="game-info">
-                    <span class="p2e-badge">EARN ATLR</span>
-                    <h3>ASTRA WINGS PRO</h3>
-                    <p>Navigate the data fields and gain altitude. Collect prestige tokens while dodging neural interference.</p>
-                </div>
-            </a>
-
-            <a href="pet.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=800&q=80" class="game-img" alt="Vanguard Companion">
-                <div class="game-info">
-                    <span class="p2e-badge">EARN ATLR</span>
-                    <h3>VANGUARD COMPANION</h3>
-                    <p>Train and nurture your Vanguard unit. High-fidelity interactions yield ATLR rewards and prestige growth.</p>
-                </div>
-            </a>
-
-            <a href="bubbles.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&q=80" class="game-img" alt="Neural Blast">
-                <div class="game-info">
-                    <span class="p2e-badge">EARN ATLR</span>
-                    <h3>NEURAL BLAST</h3>
-                    <p>Strategic bubble cleanup protocol. Clear the network layers using Nova's high-fidelity launcher.</p>
-                </div>
-            </a>
-
-            <a href="snake.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1628277613967-6abca504d0ac?w=800&q=80" class="game-img" alt="Neural Snake">
-                <div class="game-info">
-                    <span class="p2e-badge">EARN ATLR</span>
-                    <h3>NEURAL SNAKE 3D</h3>
-                    <p>Pilot your Vanguard thread through the 3D grid. Consume ATLR nodes and grow your sovereign prestige.</p>
-                </div>
-            </a>
-
-            <a href="strike.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80" class="game-img" alt="Atelia Strike">
-                <div class="game-info">
-                    <span class="p2e-badge">EARN ATLR</span>
-                    <h3>ATELIA STRIKE</h3>
-                    <p>Top-down orbital defense. Protect the network from data corruption and secure high-fidelity ATLR rewards.</p>
-                </div>
-            </a>
-
-            <a href="circuit.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1542362567-b05500269734?w=800&q=80" class="game-img" alt="Autodrome Circuit">
-                <div class="game-info">
-                    <span class="p2e-badge">EARN ATLR</span>
-                    <h3>AUTODROME CIRCUIT</h3>
-                    <p>Precision driving at its peak. Navigate the high-fidelity tracks and build your prestige.</p>
-                </div>
-            </a>
-
-            <a href="lab.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=800&q=80" class="game-img" alt="Vanguard Lab">
-                <div class="game-info">
-                    <span class="p2e-badge">DISCOVER GENETICS</span>
-                    <h3>VANGUARD LAB</h3>
-                    <p>Breed unique Vanguard creatures in the high-fidelity incubator and unlock rare genetic mutations.</p>
-                </div>
-            </a>
-
-            <a href="forge.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1614728263952-84ea256f9679?w=800&q=80" class="game-img" alt="Sovereign Forge">
-                <div class="game-info">
-                    <span class="p2e-badge">FORGE EVOLUTION</span>
-                    <h3>SOVEREIGN FORGE PRO</h3>
-                    <p>Step beyond the Vanguard. Architect unknown high-fidelity entities through autonomous evolution protocols.</p>
-                </div>
-            </a>
-
-            <a href="scout.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80" class="game-img" alt="Scout Interceptor">
-                <div class="game-info">
-                    <span class="p2e-badge">TECH DEFENSE</span>
-                    <h3>SCOUT INTERCEPTOR</h3>
-                    <p>Join the Tech Scout HQ defense unit. Pilot high-fidelity drones to intercept anomalies and protect the ledger.</p>
-                </div>
-            </a>
-
-            <a href="dashboard.html" class="game-card">
-                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80" class="game-img" alt="Titan Intelligence">
-                <div class="game-info">
-                    <span class="p2e-badge">LIVE SIGNAL</span>
-                    <h3>TITAN INTELLIGENCE</h3>
-                    <p>Access the high-fidelity sovereign signal. Real-time Cardano data and AI-generated mission briefings for the Empire.</p>
-                </div>
-            </a>
+                <div class="stat-sub" style="margin-top:15px;">AI INTEL: LLAMA-3.3</div>
+            </div>
         </div>
+
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script src="/ateliagaming/js/vanguard_hud.js"></script>
+    <script>
+        Atelia.auth.onAuthStateChange(async (e, session) => {
+            if (session?.user) {
+                const p = await Atelia.arena.getProfile(session.user.id);
+                document.getElementById('user-atlr').innerText = (p.atlr_prestige || 0) + ' ATLR';
+            }
+        });
+    </script>
 </body>
 </html>
