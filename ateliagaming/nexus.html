@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neural Nexus | Atelia Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+            --cyber: #00ffff;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; touch-action: none;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--cyber); }
+        .logo-img { height: 35px; filter: drop-shadow(0 0 5px var(--cyber)); }
+
+        #game-container { flex: 1; position: relative; }
+        
+        #overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
+        .btn { padding: 15px 45px; background: var(--cyber); color: black; border: 3px solid white; font-family: 'Russo One'; font-size: 1.5rem; cursor: pointer; transition: 0.3s; margin-top: 25px; }
+        .btn:hover { background: var(--white); transform: scale(1.05); }
+
+        #htp-btn { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--cyber); color: black; border: 2px solid white; border-radius: 50%; font-family: 'Russo One'; cursor: pointer; z-index: 5000; font-size: 1.4rem; }
+        #htp-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .htp-content { max-width: 500px; font-family: 'Inter', sans-serif; }
+        .htp-title { font-family: 'Bangers'; font-size: 3.5rem; color: var(--cyber); margin-bottom: 20px; }
+        .htp-section { margin-bottom: 15px; }
+        .htp-label { font-family: 'Russo One'; color: var(--white); font-size: 1rem; margin-bottom: 5px; }
+        .htp-text { color: #ccc; font-size: 0.9rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.1rem; color:var(--cyber);">NEURAL NEXUS PRO</div>
+    </nav>
+
+    <div id="game-container">
+        <div id="overlay">
+            <h1 style="font-family:'Bangers'; font-size:4rem; margin:0; color:var(--cyber);">NEURAL NEXUS</h1>
+            <p style="font-family:'Russo One'; color:white; font-size:0.8rem; max-width:400px; margin:10px auto;">As a cyber-operative, infiltrate the sovereign network and extract vital data nodes navigating a labyrinthine digital realm.</p>
+            <button class="btn" onclick="start()">INITIATE HARVEST</button>
+        </div>
+    </div>
+
+    <button id="htp-btn" onclick="toggleHTP()">?</button>
+    <div id="htp-modal" onclick="toggleHTP()">
+        <div class="htp-content">
+            <h2 class="htp-title">HOW TO PLAY</h2>
+            <div class="htp-section">
+                <div class="htp-label">OBJECTIVE</div>
+                <div class="htp-text">Infiltrate the network and harvest raw data nodes while dodging systemic corruption.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">CONTROLS</div>
+                <div class="htp-text">DRAG your finger (mobile) or use your MOUSE (desktop) to steer the Data Siphon ship.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">REWARDS</div>
+                <div class="htp-text">Earn +10 ATLR for every 20 data nodes harvested.</div>
+            </div>
+            <button class="btn" style="font-size: 1rem; padding: 10px 30px;">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        let gameInstance = null;
+
+        function toggleHTP() {
+            const m = document.getElementById('htp-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function start() {
+            document.getElementById('overlay').style.display = 'none';
+            if (gameInstance) return;
+
+            const config = {
+                type: Phaser.AUTO,
+                width: window.innerWidth,
+                height: window.innerHeight - 70,
+                parent: 'game-container',
+                backgroundColor: '#050505',
+                physics: { default: 'arcade', arcade: { gravity: { y: 0 } } },
+                scene: { preload: preload, create: create, update: update }
+            };
+            gameInstance = new Phaser.Game(config);
+        }
+
+        function preload() {
+            this.load.image('player', 'https://priscadezigns.org/logos/cupyx_logo_small.png');
+            this.load.image('node', 'https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp');
+            this.load.image('enemy', 'https://priscadezigns.org/logos/pd_mark_sq.png');
+        }
+
+        let player, nodes, enemies, score = 0, scoreText, active = true;
+
+        function create() {
+            active = true; score = 0;
+            player = this.physics.add.sprite(window.innerWidth/2, window.innerHeight-150, 'player').setScale(0.5);
+            player.setCollideWorldBounds(true);
+
+            nodes = this.physics.add.group();
+            enemies = this.physics.add.group();
+
+            this.time.addEvent({ delay: 1000, callback: spawnNode, callbackScope: this, loop: true });
+            this.time.addEvent({ delay: 2000, callback: spawnEnemy, callbackScope: this, loop: true });
+
+            this.physics.add.overlap(player, nodes, collectNode, null, this);
+            this.physics.add.collider(player, enemies, hitEnemy, null, this);
+
+            scoreText = this.add.text(20, 20, 'NODES: 0', { font: '24px "Russo One"', fill: '#00ffff' });
+
+            this.input.on('pointermove', pointer => { if(active) player.x = pointer.x; player.y = pointer.y; });
+        }
+
+        function update() {
+            if(!active) return;
+            nodes.children.iterate(n => { if(n && n.y > window.innerHeight) n.destroy(); });
+            enemies.children.iterate(e => { if(e && e.y > window.innerHeight) e.destroy(); });
+        }
+
+        function spawnNode() {
+            if(!active) return;
+            let n = nodes.create(Phaser.Math.Between(50, window.innerWidth-50), -50, 'node');
+            n.setVelocityY(200); n.setScale(0.4);
+        }
+
+        function spawnEnemy() {
+            if(!active) return;
+            let e = enemies.create(Phaser.Math.Between(50, window.innerWidth-50), -50, 'enemy');
+            e.setVelocityY(Phaser.Math.Between(250, 400)); e.setScale(0.7);
+        }
+
+        function collectNode(p, n) {
+            n.destroy(); score++; scoreText.setText('NODES: ' + score);
+        }
+
+        function hitEnemy(p, e) {
+            active = false; this.physics.pause();
+            let finalAtlr = Math.floor(score / 2);
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('overlay').querySelector('h1').innerText = 'LINK SEVERED';
+            document.getElementById('overlay').querySelector('p').innerText = 'DATA HARVESTED: ' + score + ' | ATLR: ' + finalAtlr;
+            if(window.Atelia) {
+                Atelia.auth.getUser().then(u => { if(u.data.user) Atelia.arena.updatePrestige(u.data.user.id, finalAtlr); });
+            }
+            setTimeout(() => { gameInstance.destroy(true); gameInstance = null; }, 500);
+        }
+    </script>
+</body>
+</html>
