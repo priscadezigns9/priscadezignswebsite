@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excellence Enquiry | Prisca Dezigns</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #FDF8F2; --text: #1A1A1A; --accent: #7B35D4; --border: rgba(123, 53, 212, 0.1); }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; margin: 0; padding: 60px 6%; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { max-width: 500px; width: 100%; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 10px; letter-spacing: -1px; }
+        p { color: #666; margin-bottom: 30px; font-size: 1.1rem; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: var(--accent); }
+        input, textarea { width: 100%; padding: 15px; border: 1px solid var(--border); background: #fff; border-radius: 12px; font-size: 1rem; font-family: inherit; outline: none; }
+        input:focus, textarea:focus { border-color: var(--accent); }
+        .btn { background: var(--accent); color: #fff; padding: 18px; border: none; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; font-size: 1rem; transition: opacity 0.2s; margin-top: 10px; }
+        .btn:hover { opacity: 0.9; }
+        .back { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: var(--text); font-size: 0.85rem; font-weight: 600; opacity: 0.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 40px;">
+            <img src="/logos/PRISCA_DEZIGNS_DEFINITIVE_2026.png" alt="Prisca Dezigns" style="height: 60px;">
+        </header>
+        <h1>Excellence Enquiry</h1>
+        <p>Complete the details below to initiate your high-fidelity service request.</p>
+        
+        <form id="enquiryForm">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="name" required placeholder="Your Name">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="email" required placeholder="Your Email">
+            </div>
+            <div class="form-group">
+                <label>Service Requested</label>
+                <input type="text" id="service" readonly style="background: #f9f9f9;">
+            </div>
+            <div class="form-group">
+                <label>Project Details</label>
+                <textarea id="details" rows="4" placeholder="Tell us about your requirements..."></textarea>
+            </div>
+            <button type="submit" class="btn">Send Enquiry</button>
+        </form>
+        <a href="/" class="back">Return to Home</a>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const service = params.get('service') || 'General Excellence Enquiry';
+        document.getElementById('service').value = service;
+
+        document.getElementById('enquiryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.textContent = 'Processing...';
+            btn.disabled = true;
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const details = document.getElementById('details').value;
+            const svc = document.getElementById('service').value;
+
+            try {
+                await fetch('https://sktpjacowqaedddtrhuz.supabase.co/rest/v1/leads', {
+                    method: 'POST',
+                    headers: {
+                        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs',
+                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs',
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ 
+                        email: email, 
+                        details: `Name: ${name} | Service: ${svc} | Message: ${details}`,
+                        source: 'Service Enquiry'
+                    })
+                });
+
+                const waText = `Hi Prisca Dezigns, I am ${name} and I am interested in ${svc}. Email: ${email}. Message: ${details}`;
+                window.location.href = `https://wa.me/447576505652?text=${encodeURIComponent(waText)}`;
+                
+            } catch (err) {
+                window.location.href = 'https://wa.me/447576505652';
+            }
+        });
+    </script>
+</body>
+</html>
