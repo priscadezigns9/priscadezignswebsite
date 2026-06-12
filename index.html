@@ -295,6 +295,7 @@
         }
     </style>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -520,15 +521,34 @@
     <div class="modal-overlay" id="payModal">
       <div class="modal">
         <span class="modal-close" onclick="closePayModal()">✕</span>
-        <div class="modal-tabs">
-          <button class="modal-tab active" onclick="togglePay('bank', this)">Bank</button>
-          <button class="modal-tab" onclick="togglePay('eth', this)">Crypto</button>
-          <button class="modal-tab" onclick="togglePay('intl', this)">PayPal</button>
-        </div>
-        <h3 id="modal-plan-name" style="font-size: 1.1rem; margin-bottom: 20px; color: #111;">Service Payment</h3>
         
-        <!-- Bank Detail -->
-        <div id="pay-bank" class="pay-detail open">
+        <!-- Lead Capture View -->
+        <div id="lead-capture-view" style="padding: 20px 0;">
+            <h3 style="font-family:'Playfair Display',serif; font-size: 1.8rem; margin-bottom: 10px;">Reserve Your Node</h3>
+            <p style="color: #666; margin-bottom: 25px; font-size: 0.9rem;">Enter your details to secure your spot and view payment options.</p>
+            
+            <form id="leadForm">
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="leadName" placeholder="Full Name" required style="width: 100%; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: inherit;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <input type="email" id="leadEmail" placeholder="Email Address" required style="width: 100%; padding: 15px; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: inherit;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 1rem;">SECURE PLAN</button>
+            </form>
+        </div>
+
+        <!-- Payment View (Hidden initially) -->
+        <div id="payment-view" style="display: none;">
+            <div class="modal-tabs">
+              <button class="modal-tab active" onclick="togglePay('bank', this)">Bank</button>
+              <button class="modal-tab" onclick="togglePay('eth', this)">Crypto</button>
+              <button class="modal-tab" onclick="togglePay('intl', this)">PayPal</button>
+            </div>
+            <h3 id="modal-plan-name" style="font-size: 1.1rem; margin-bottom: 20px; color: #111;">Service Payment</h3>
+            
+            <!-- Bank Detail -->
+            <div id="pay-bank" class="pay-detail open">
           <div style="background:#f0f7ff; padding:15px; border-radius:12px; border:1px solid #d0e4ff; margin-bottom: 15px;">
             <p style="font-size:0.75rem; font-weight:700; color:#0056b3; margin-bottom:8px; text-transform: uppercase;">Citibank (US Payoneer)</p>
             <div style="font-family:monospace; font-size:0.8rem; color:#333; line-height: 1.6;">
@@ -558,6 +578,7 @@
           <p style="font-size:0.75rem;color:#666;">Please include the reference ID in the payment note.</p>
           <p style="font-size:0.75rem;color:#999;margin-top:10px;">Ref: <span id="auto-ref-intl" style="font-weight:700; color:var(--accent);">[REF]</span></p>
         </div>
+      </div> <!-- End payment-view -->
       </div>
     </div>
 
@@ -587,15 +608,28 @@
 </div>
 
 <script>
+const SUPABASE_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentPlan = '';
+
 function openPayModal(plan, price) {
+  currentPlan = plan + (price ? ' — ' + price : '');
+  
+  // Reset Views
+  document.getElementById('lead-capture-view').style.display = 'block';
+  document.getElementById('payment-view').style.display = 'none';
+  
   var el = document.getElementById('modal-plan-name');
-  if (el) el.textContent = plan + (price ? ' — ' + price : '');
+  if (el) el.textContent = currentPlan;
+  
   var modal = document.getElementById('payModal');
   if (modal) { modal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  
   var ref = 'PD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
   ['bank','eth','intl'].forEach(function(k){ var el2=document.getElementById('auto-ref-'+k); if(el2) el2.textContent=ref; });
 
-  // Private: Update PayPal link dynamically for A La Carte
   var paypalLink = document.getElementById('paypal-dynamic-link');
   if (paypalLink && price) {
       var cleanPrice = price.replace(/[$,]/g, '');
@@ -605,6 +639,33 @@ function openPayModal(plan, price) {
       }
   }
 }
+
+document.getElementById('leadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const name = document.getElementById('leadName').value;
+    const email = document.getElementById('leadEmail').value;
+    
+    btn.textContent = 'SECURE YOUR POSITION...';
+    btn.disabled = true;
+
+    try {
+        await sb.from('leads').insert([{ 
+            email: email, 
+            type: 'package_inquiry', 
+            domain: currentPlan,
+            name: name // Assuming name column exists or is handled by metadata later
+        }]);
+    } catch (err) {
+        console.error('Lead sync failed', err);
+    }
+
+    // Always show payment view regardless of sync success to avoid blocking user
+    document.getElementById('lead-capture-view').style.display = 'none';
+    document.getElementById('payment-view').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'SECURE PLAN';
+});
 
 function closePayModal() {
   var modal = document.getElementById('payModal');
@@ -648,3 +709,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </body></html>
+
