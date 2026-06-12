@@ -4,142 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Shop | ORNALIS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #0A0A0A; --text: #F5F5F5; --muted: #999999; --gold: #D4AF37; --border: rgba(255,255,255,0.05); --btn-text: #000000; --header-bg: #050505; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
-        header { padding: 25px 6%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: var(--header-bg); position: sticky; top: 0; z-index: 100; }
-        .logo img { height: 50px; width: auto; object-fit: contain; mix-blend-mode: multiply; }
+        header { padding: 25px 6%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: var(--header-bg); }
+        .logo img { height: 50px; width: auto; object-fit: contain; }
         nav ul { display: flex; list-style: none; gap: 30px; }
         nav a { text-decoration: none; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text); transition: 0.3s; }
         nav a:hover { color: var(--gold); }
-        .hero { padding: 80px 6% 20px; text-align: center; max-width: 900px; margin: 0 auto; }
-        .hero h1 { font-family: 'Playfair Display', serif; font-size: 3.2rem; margin-bottom: 25px; line-height: 1.2; }
-        .hero p { color: var(--muted); font-size: 1.15rem; margin-bottom: 40px; }
-        .btn { display: inline-block; background: var(--gold); color: var(--btn-text); padding: 14px 40px; text-decoration: none; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; border-radius: 2px; transition: 0.3s; }
-        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; padding: 60px 6%; }
-        .card { border: 1px solid var(--border); padding: 30px; transition: 0.4s; background: var(--header-bg); display: flex; flex-direction: column; height: 100%; }
-        .card:hover { border-color: var(--gold); transform: translateY(-5px); }
-        .p-img { aspect-ratio: 1/1; margin-bottom: 25px; overflow: hidden; }
-        .p-img img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
-        .p-info { flex-grow: 1; display: flex; flex-direction: column; }
-        .p-info h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 15px; min-height: 3em; }
-        .p-info .price { color: var(--gold); font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 25px; }
-        .p-info .btn { margin-top: auto; }
-
-        footer { padding: 80px 6%; text-align: center; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); letter-spacing: 2px; background: var(--header-bg); }
-        footer img { height: 50px; margin-bottom: 20px; mix-blend-mode: multiply; }
+        .hero { padding: 80px 6% 40px; text-align: center; max-width: 900px; margin: 0 auto; }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 2.8rem; margin-bottom: 15px; }
+        .hero p { color: var(--muted); font-size: 1.1rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px; padding: 40px 6%; }
+        .card { border: 1px solid var(--border); padding: 25px; transition: 0.4s; background: var(--header-bg); display: flex; flex-direction: column; }
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+        .p-img { aspect-ratio: 1/1; margin-bottom: 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000; }
+        .p-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .p-info h3 { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 12px; min-height: 2.4em; color: var(--text); }
+        .p-info .price { color: var(--gold); font-weight: 700; font-size: 1.2rem; display: block; margin-bottom: 20px; }
+        .btn { display: inline-block; background: var(--gold); color: var(--btn-text); padding: 12px 20px; text-decoration: none; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; border-radius: 2px; transition: 0.3s; width: 100%; text-align: center; }
+        .btn:hover { opacity: 0.9; }
+        footer { padding: 60px 6%; text-align: center; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); letter-spacing: 2px; background: var(--header-bg); }
+        footer img { height: 40px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
     <header>
         <div class="logo"><a href="index.html"><img src="../logos/ORNALIS_LOGO.png" alt="ornalis"></a></div>
-        <nav><ul><li><a href="index.html">Home</a></li><li><a href="shop.html" style="color: var(--gold);">Shop</a></li><li><a href="blog.html">Blog</a></li></ul></nav>
+        <nav><ul><li><a href="index.html">Home</a></li><li><a href="shop.html" style="color: var(--gold);">Shop</a></li></ul></nav>
     </header>
     <section class="hero">
-        <h1>The Shop</h1>
-        <p>A curated collection of architectural lighting designed to transform your space into a sanctuary of high-fidelity atmosphere.</p>
+        <h1>Atmospheric Excellence</h1>
+        <p>Architectural lighting designed for the high-fidelity sanctuary. Neural Sync Enabled.</p>
     </section>
     <div class="grid" id="g"></div>
     <script>
-        const data = [
-  {
-    "name": "CLAIRDAI 15.7\" Modern Crystal Chandelier",
-    "price": "$299.99",
-    "image": "https://m.media-amazon.com/images/I/71ec4-9HivL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0D6R72GNW?tag=priscadezigns-20"
-  },
-  {
-    "name": "Saint Mossi Modern K9 Crystal Raindrop",
-    "price": "$189.99",
-    "image": "https://m.media-amazon.com/images/I/71-Ine-8PbL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B01AA8Q0R8?tag=priscadezigns-20"
-  },
-  {
-    "name": "Siljoy Large 26-Light High Ceiling Chandelier",
-    "price": "$854.13",
-    "image": "https://m.media-amazon.com/images/I/61ZE1zmmnKL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0DFFXSGJ7?tag=priscadezigns-20"
-  },
-  {
-    "name": "Rectangle Gold Crystal Raindrop Chandelier",
-    "price": "$539.99",
-    "image": "https://m.media-amazon.com/images/I/71QN-0hek+L._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B09QC11MRG?tag=priscadezigns-20"
-  },
-  {
-    "name": "Luxury 7-Tier K9 Crystal Chandelier (40in)",
-    "price": "$999.99",
-    "image": "https://m.media-amazon.com/images/I/71GbGlwH45L._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0B714BY7Y?tag=priscadezigns-20"
-  },
-  {
-    "name": "Modern Round 20-Light 2-Tier Crystal Chandelier",
-    "price": "$768.99",
-    "image": "https://m.media-amazon.com/images/I/71R7ag2jHWL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0F26N3JGD?tag=priscadezigns-20"
-  },
-  {
-    "name": "Gold Tree Branches Luxury Raindrop Pendant",
-    "price": "$699.98",
-    "image": "https://m.media-amazon.com/images/I/61xSMlgNR4L._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0CSK64KBX?tag=priscadezigns-20"
-  },
-  {
-    "name": "72\" Rectangular Golden Tree Branch Chandelier",
-    "price": "$798.00",
-    "image": "https://m.media-amazon.com/images/I/81MF4M58AdL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0G3H26X8Q?tag=priscadezigns-20"
-  },
-  {
-    "name": "Modern Oval Gold Crystal Chandelier",
-    "price": "$389.00",
-    "image": "https://m.media-amazon.com/images/I/71A11VTkU1L._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0FLX6X8TG?tag=priscadezigns-20"
-  },
-  {
-    "name": "Possini Euro Design Organic Sculpture Lamp",
-    "price": "$139.99",
-    "image": "https://m.media-amazon.com/images/I/81vKdNKz2KL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0B9JKYLGH?tag=priscadezigns-20"
-  },
-  {
-    "name": "JONATHAN Y White Alabaster Rectangular Lamp",
-    "price": "$112.99",
-    "image": "https://m.media-amazon.com/images/I/81xWeiPJyyL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B07B649D9C?tag=priscadezigns-20"
-  },
-  {
-    "name": "Clear Crystal Geometric Glam Table Lamp",
-    "price": "$127.99",
-    "image": "https://m.media-amazon.com/images/I/81LLt-lIUpL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B077MG1JKT?tag=priscadezigns-20"
-  },
-  {
-    "name": "Modern Ceramic Translucent Bedside Lamp",
-    "price": "$89.99",
-    "image": "https://m.media-amazon.com/images/I/71iWiJrKGwL._AC_SL1500_.jpg",
-    "link": "https://www.amazon.com/dp/B0FX8BJFQZ?tag=priscadezigns-20"
-  }
-];
-        const g = document.getElementById('g');
-        data.forEach(p => {
-            const proxiedImg = `https://images.weserv.nl/?url=${encodeURIComponent(p.image)}&w=500&h=500&fit=contain&default=https://via.placeholder.com/500x500?text=Ornalis+Excellence`;
-            g.innerHTML += `
-                <div class='card'>
-                    <div class='p-img'><img src='${proxiedImg}' loading="lazy"></div>
-                    <div class='p-info'>
-                        <h3>${p.name}</h3>
-                        <span class='price'>${p.price}</span>
-                        <a href='${p.link}' target='_blank' class='btn' style='width:100%;text-align:center'>Buy on Amazon</a>
-                    </div>
-                </div>
-            `;
-        });
+        const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        async function load() {
+            try {
+                const { data, error } = await sb.from('ornalis_products').select('*');
+                if (error) throw error;
+                const g = document.getElementById('g');
+                data.forEach(p => {
+                    g.innerHTML += `
+                        <div class='card'>
+                            <div class='p-img'><img src='${p.image}' loading="lazy"></div>
+                            <div class='p-info'>
+                                <h3>${p.name}</h3>
+                                <span class='price'>${p.price}</span>
+                                <a href='${p.link}' target='_blank' class='btn'>Buy on Amazon</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) { console.error(err); }
+        }
+        load();
     </script>
     <footer>
         <img src='../logos/ORNALIS_LOGO.png'><br>
