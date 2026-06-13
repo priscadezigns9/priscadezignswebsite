@@ -44,6 +44,8 @@
         td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
         
         .shroud { font-family: var(--font-mono); font-size: 0.75rem; color: #4ade80; background: #000; padding: 15px; border-radius: 8px; border: 1px solid #166534; }
+        .pill { padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
+        .pill-active { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
     </style>
 </head>
 <body>
@@ -57,7 +59,7 @@
             <div class="nav-section">
                 <span class="nav-label">Core Agency</span>
                 <a href="#leads" class="nav-item active">Lead Registry</a>
-                <a href="#services" class="nav-item">Service Tracking</a>
+                <a href="#newsletter" class="nav-item">Newsletter Signups</a>
             </div>
             <div class="nav-section">
                 <span class="nav-label">Affiliate Brands</span>
@@ -67,58 +69,59 @@
 
         <main>
             <div class="hud">
-                <div class="metric"><div class="m-label">Total Leads</div><div class="m-value" id="h-leads">0</div></div>
-                <div class="metric"><div class="m-label">Total Traffic</div><div class="m-value" id="h-traffic">0</div></div>
-                <div class="metric"><div class="m-label">Conversion</div><div class="m-value">4.2%</div></div>
-                <div class="metric"><div class="m-label">Empire Status</div><div class="m-value" style="color:#4ade80">STABLE</div></div>
+                <div class="metric"><div class="m-label">Total Inquiries</div><div class="m-value" id="h-leads">0</div></div>
+                <div class="metric"><div class="m-label">Empire Traffic</div><div class="m-value" id="h-traffic">0</div></div>
+                <div class="metric"><div class="m-label">Total Signups</div><div class="m-value" id="h-signups">0</div></div>
+                <div class="metric"><div class="m-label">Conversion Rate</div><div class="m-value" id="h-conv">0%</div></div>
             </div>
 
-            <section id="leads" class="table-container">
-                <div class="t-header">Real-Time Lead Registry</div>
+            <section id="newsletter" class="table-container">
+                <div class="t-header">Global Newsletter Registry</div>
                 <table>
                     <thead>
                         <tr>
                             <th>Time</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Service/Interest</th>
-                            <th>Status</th>
+                            <th>Email Address</th>
+                            <th>Source Brand</th>
+                            <th>Email Status</th>
                         </tr>
                     </thead>
-                    <tbody id="lead-body">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </section>
-
-            <section id="services" class="table-container">
-                <div class="t-header">Prisca Designs Service Analytics</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Feature / Service</th>
-                            <th>Price Point</th>
-                            <th>Real-Time Inquiries</th>
-                        </tr>
-                    </thead>
-                    <tbody id="service-body">
+                    <tbody id="signup-body">
                         <!-- Populated by JS -->
                     </tbody>
                 </table>
             </section>
 
             <section id="affiliates" class="table-container">
-                <div class="t-header">23-Brand Empire Matrix</div>
+                <div class="t-header">Affiliate Empire Matrix (Real-Time Traffic)</div>
                 <table>
                     <thead>
                         <tr>
                             <th>Brand Node</th>
                             <th>Niche Category</th>
-                            <th>Geotag Target</th>
-                            <th>Live Hits</th>
+                            <th>Site Visits</th>
+                            <th>Shop Clicks</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="affiliate-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="leads" class="table-container">
+                <div class="t-header">Agency Service Inquiries</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Lead Name</th>
+                            <th>Email</th>
+                            <th>Interest</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lead-body">
                         <!-- Populated by JS -->
                     </tbody>
                 </table>
@@ -137,107 +140,97 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const services = [
-            "High-End Logo Kit", "Cinematic Reveal", "Smart Social Reels", 
-            "Brand Check-up", "Content Template", "3D Video Intro", 
-            "Free Brand Scan", "Branding Ecosystem", "Growth Ecosystem", 
-            "Custom AI Solutions", "Peak Fit eBook"
-        ];
-
         const affiliates = [
-            { name: "PRISCION (Head)", niche: "Parent Agency", geo: "Global/TT" },
-            { name: "Dreaming Anime", niche: "Media/Content", geo: "Global" },
-            { name: "Atelia Gaming", niche: "Gaming/Hardware", geo: "Global" },
-            { name: "Couture Gallery", niche: "Luxury Fashion", geo: "Global" },
-            { name: "The Way Made Known", niche: "Mission/Gospel", geo: "Global" },
-            { name: "The Autodrome", niche: "Automotive", geo: "Global" },
-            { name: "Peak Fit", niche: "Biohacking", geo: "Global" },
-            { name: "Glow Protocol", niche: "Skincare Tech", geo: "Global" },
-            { name: "Sole Prestige", niche: "Footwear", geo: "Global" },
-            { name: "Essence Elite", niche: "Fragrance", geo: "Global" },
-            { name: "The Escapist", niche: "Luxury Travel", geo: "Global" },
-            { name: "The Tech Scout HQ", niche: "Tech News", geo: "Global" },
-            { name: "Quiet Luxury", niche: "Home Decor", geo: "Global" },
-            { name: "The Sovereign Signal", niche: "Intelligence", geo: "Global" },
-            { name: "Prime Land Network", niche: "Real Estate", geo: "Global" },
-            { name: "Axoria Frames", niche: "Eyewear", geo: "Global" },
-            { name: "Les Amour", niche: "AI Relationships", geo: "Global" },
-            { name: "Ornalis Lighting", niche: "High-End Lighting", geo: "Global" },
-            { name: "My Baby Dumpling", niche: "Maternity", geo: "Global" },
-            { name: "Shelfly", niche: "Organization", geo: "Global" },
-            { name: "Deskwell", niche: "Office Design", geo: "Global" },
-            { name: "The Gen Play", niche: "Collectibles", geo: "Global" },
-            { name: "Paw Vault", niche: "Pet Care", geo: "Global" },
-            { name: "Calalloo", niche: "Caribbean Heritage", geo: "Trinidad & Tobago" }
+            { name: "Dreaming Anime", niche: "Media/Content" },
+            { name: "Atelia Gaming", niche: "Gaming/Hardware" },
+            { name: "Couture Gallery", niche: "Luxury Fashion" },
+            { name: "The Autodrome", niche: "Automotive" },
+            { name: "Peak Fit", niche: "Biohacking" },
+            { name: "Glow Protocol", niche: "Skincare Tech" },
+            { name: "Sole Prestige", niche: "Footwear" },
+            { name: "Essence Elite", niche: "Fragrance" },
+            { name: "The Escapist", niche: "Luxury Travel" },
+            { name: "The Tech Scout HQ", niche: "Tech News" },
+            { name: "Quiet Luxury", niche: "Home Decor" },
+            { name: "Prime Land Network", niche: "Real Estate" },
+            { name: "Axoria Frames", niche: "Eyewear" },
+            { name: "Les Amour", niche: "AI Relationships" },
+            { name: "Ornalis Lighting", niche: "High-End Lighting" },
+            { name: "My Baby Dumpling", niche: "Maternity" },
+            { name: "Shelfly", niche: "Organization" },
+            { name: "Deskwell", niche: "Office Design" },
+            { name: "The Gen Play", niche: "Collectibles" },
+            { name: "Paw Vault", niche: "Pet Care" }
         ];
 
         function populateUI() {
-            document.getElementById('session-id').textContent = 'ALICE_V_SYNC';
-            
-            document.getElementById('service-body').innerHTML = services.map(s => `
-                <tr>
-                    <td style="color:var(--accent); font-weight:700;">${s}</td>
-                    <td>-</td>
-                    <td id="inq-${s.replace(/\\s+/g, '')}" style="font-weight:900;">0</td>
-                </tr>
-            `).join('');
-
+            document.getElementById('session-id').textContent = 'EXCELLENCE_V2_SYNC';
             document.getElementById('affiliate-body').innerHTML = affiliates.map(a => `
                 <tr>
                     <td style="color:#FFF; font-weight:700;">${a.name}</td>
                     <td style="color:var(--gray);">${a.niche}</td>
-                    <td>${a.geo}</td>
                     <td id="hits-${a.name.replace(/[^a-zA-Z0-9]/g, '')}" style="color:#4ade80; font-weight:900;">0</td>
+                    <td id="shop-${a.name.replace(/[^a-zA-Z0-9]/g, '')}" style="color:var(--accent); font-weight:900;">0</td>
+                    <td><span class="pill pill-active">Live</span></td>
                 </tr>
             `).join('');
         }
 
-        async function fetchLeads() {
-            const { data } = await sb.from('leads').select('*').order('created_at', { ascending: false }).limit(30);
-            if (data) {
-                document.getElementById('h-leads').textContent = data.length;
-                document.getElementById('lead-body').innerHTML = data.map(l => `
+        async function fetchData() {
+            // Fetch Leads
+            const { data: leads } = await sb.from('leads').select('*').order('created_at', { ascending: false });
+            if (leads) {
+                document.getElementById('h-leads').textContent = leads.length;
+                document.getElementById('lead-body').innerHTML = leads.map(l => `
                     <tr>
                         <td style="font-size:0.7rem; color:var(--gray);">${new Date(l.created_at).toLocaleTimeString()}</td>
                         <td style="font-weight:700; color:var(--accent);">${l.name || 'Anonymous'}</td>
                         <td>${l.email}</td>
                         <td style="font-size:0.8rem;">${l.plan_interest || l.domain || 'General'}</td>
-                        <td style="color:#4ade80; font-weight:700;">VERIFIED</td>
                     </tr>
                 `).join('');
-                
-                // Update service inquiry counts
-                const inqs = {};
-                data.forEach(l => {
-                    const key = (l.plan_interest || l.domain || '').split(' — ')[0];
-                    if (key) inqs[key] = (inqs[key] || 0) + 1;
-                });
-                services.forEach(s => {
-                    const el = document.getElementById(`inq-${s.replace(/\\s+/g, '')}`);
-                    if (el) el.textContent = inqs[s] || 0;
-                });
             }
-        }
 
-        async function fetchTraffic() {
-            const { data } = await sb.from('traffic').select('*');
-            if (data) {
-                let total = 0;
-                data.forEach(row => {
+            // Fetch Newsletters
+            const { data: signups } = await sb.from('newsletter_signups').select('*').order('created_at', { ascending: false });
+            if (signups) {
+                document.getElementById('h-signups').textContent = signups.length;
+                document.getElementById('signup-body').innerHTML = signups.map(s => `
+                    <tr>
+                        <td style="font-size:0.7rem; color:var(--gray);">${new Date(s.created_at).toLocaleTimeString()}</td>
+                        <td style="font-weight:700; color:var(--white);">${s.email}</td>
+                        <td style="color:var(--accent); font-weight:700;">${s.brand}</td>
+                        <td style="color:#4ade80; font-size:0.7rem;">WELCOME_SENT</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Fetch Traffic
+            const { data: traffic } = await sb.from('traffic').select('*');
+            if (traffic) {
+                let totalHits = 0;
+                let totalShop = 0;
+                traffic.forEach(row => {
                     const brandId = row.brand.replace(/[^a-zA-Z0-9]/g, '');
-                    const el = document.getElementById(`hits-${brandId}`);
-                    if (el) el.textContent = row.clicks;
-                    total += row.clicks;
+                    const hitsEl = document.getElementById(`hits-${brandId}`);
+                    const shopEl = document.getElementById(`shop-${brandId}`);
+                    if (hitsEl) hitsEl.textContent = row.clicks || 0;
+                    if (shopEl) shopEl.textContent = row.shop_clicks || 0;
+                    totalHits += (row.clicks || 0);
+                    totalShop += (row.shop_clicks || 0);
                 });
-                document.getElementById('h-traffic').textContent = total.toLocaleString();
+                document.getElementById('h-traffic').textContent = totalHits.toLocaleString();
+                
+                // Calculate Conversion (Signups + Leads / Traffic)
+                const conv = totalHits > 0 ? (((signups?.length || 0) + (leads?.length || 0)) / totalHits * 100).toFixed(1) : 0;
+                document.getElementById('h-conv').textContent = conv + '%';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             populateUI();
-            fetchLeads();
-            fetchTraffic();
-            setInterval(() => { fetchLeads(); fetchTraffic(); }, 5000);
+            fetchData();
+            setInterval(fetchData, 5000);
         });
     </script>
 </body>
