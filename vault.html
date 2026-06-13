@@ -164,20 +164,24 @@
         ];
 
         function populateUI() {
-            document.getElementById('session-id').textContent = 'EXCELLENCE_V2_SYNC';
-            document.getElementById('affiliate-body').innerHTML = affiliates.map(a => `
+            document.getElementById('session-id').textContent = 'EXCELLENCE_FINAL_SYNC';
+            document.getElementById('affiliate-body').innerHTML = affiliates.map(a => {
+                let name = a.name;
+                if (name === 'Atelia Gaming') name = 'Atelia';
+                if (name === 'Axoria Frames') name = 'Avoria';
+                const id = name.replace(/[^a-zA-Z0-9]/g, '');
+                return `
                 <tr>
                     <td style="color:#FFF; font-weight:700;">${a.name}</td>
                     <td style="color:var(--gray);">${a.niche}</td>
-                    <td id="hits-${a.name.replace(/[^a-zA-Z0-9]/g, '')}" style="color:#4ade80; font-weight:900;">0</td>
-                    <td id="shop-${a.name.replace(/[^a-zA-Z0-9]/g, '')}" style="color:var(--accent); font-weight:900;">0</td>
+                    <td id="hits-${id}" style="color:#4ade80; font-weight:900;">0</td>
+                    <td id="shop-${id}" style="color:var(--accent); font-weight:900;">0</td>
                     <td><span class="pill pill-active">Live</span></td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         async function fetchData() {
-            // Fetch Leads
             const { data: leads } = await sb.from('leads').select('*').order('created_at', { ascending: false });
             if (leads) {
                 document.getElementById('h-leads').textContent = leads.length;
@@ -191,7 +195,6 @@
                 `).join('');
             }
 
-            // Fetch Newsletters
             const { data: signups } = await sb.from('newsletter_signups').select('*').order('created_at', { ascending: false });
             if (signups) {
                 document.getElementById('h-signups').textContent = signups.length;
@@ -205,23 +208,21 @@
                 `).join('');
             }
 
-            // Fetch Traffic
             const { data: traffic } = await sb.from('traffic').select('*');
             if (traffic) {
                 let totalHits = 0;
-                let totalShop = 0;
                 traffic.forEach(row => {
-                    const brandId = row.brand.replace(/[^a-zA-Z0-9]/g, '');
+                    let name = row.brand;
+                    if (name === 'Atelia Gaming') name = 'Atelia';
+                    if (name === 'Axoria') name = 'Avoria';
+                    const brandId = name.replace(/[^a-zA-Z0-9]/g, '');
                     const hitsEl = document.getElementById(`hits-${brandId}`);
                     const shopEl = document.getElementById(`shop-${brandId}`);
                     if (hitsEl) hitsEl.textContent = row.clicks || 0;
                     if (shopEl) shopEl.textContent = row.shop_clicks || 0;
                     totalHits += (row.clicks || 0);
-                    totalShop += (row.shop_clicks || 0);
                 });
                 document.getElementById('h-traffic').textContent = totalHits.toLocaleString();
-                
-                // Calculate Conversion (Signups + Leads / Traffic)
                 const conv = totalHits > 0 ? (((signups?.length || 0) + (leads?.length || 0)) / totalHits * 100).toFixed(1) : 0;
                 document.getElementById('h-conv').textContent = conv + '%';
             }
