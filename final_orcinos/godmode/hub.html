@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="keywords" content="admin dashboard, system control, neural interface, empire management">
+    <meta name="description" content="High-fidelity system control and empire management. The ultimate interface for autonomous operations.">
+    <meta name="geo.region" content="US">
+    <meta name="geo.placename" content="Global">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORCINOS | God Mode Hub</title>
+    <!-- v1.5 - UNIFIED INFINITE SCROLL COMMAND HUB -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --light-blue: #E0F2FE; --accent-blue: #0ea5e9; --navy: #0f172a; --white: #FFFFFF;
+            --gray: #64748b; --border: #e2e8f0; --amber: #FF9500;
+            --font-header: 'Playfair Display', serif; --font-body: 'Inter', sans-serif; --font-mono: 'Fira Code', monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000814; color: var(--navy); font-family: var(--font-body); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        header { background: var(--navy); color: white; padding: 15px 4%; display: flex; justify-content: space-between; align-items: center; z-index: 1100; border-bottom: 2px solid var(--amber); }
+        .logo-box h1 { font-family: var(--font-header); font-size: 1.2rem; letter-spacing: 2px; cursor: pointer; text-transform: uppercase; font-weight: 900; color: var(--amber); }
+        .toggle-btn { background: transparent; color: var(--amber); border: 1px solid var(--amber); padding: 5px 15px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; cursor: pointer; margin-left: 10px; }
+        .toggle-btn:hover { background: var(--amber); color: var(--navy); }
+
+        .hub-layout { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Sidebar Navigation */
+        .sidebar-matrix { width: 340px; background: #000814; border-right: 1px solid rgba(255,149,0,0.2); display: flex; flex-direction: column; padding: 20px; overflow-y: auto; transition: 0.3s; z-index: 1000; }
+        .sidebar-matrix.hidden { width: 0; padding: 0; overflow: hidden; border-right: none; }
+        .sidebar-matrix h2 { font-size: 0.75rem; color: var(--amber); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,149,0,0.2); padding-bottom: 10px; font-weight: 900; }
+        
+        .nav-item { padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,149,0,0.1); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; color: #94A3B8; text-decoration: none; display: block; font-size: 0.85rem; font-weight: 700; }
+        .nav-item:hover { border-color: var(--amber); color: #FFF; transform: translateX(5px); }
+        .nav-item.active { border-left: 4px solid var(--amber); background: rgba(255,149,0,0.1); color: #FFF; }
+
+        /* Infinite Stage */
+        .main-stage { flex: 1; overflow-y: auto; scroll-behavior: smooth; display: flex; flex-direction: column; }
+        
+        .shard-section { width: 100%; min-height: 100vh; position: relative; display: flex; flex-direction: column; border-bottom: 5px solid var(--amber); background: #FFF; }
+        .shard-label { position: absolute; top: 30px; left: 30px; background: var(--amber); color: var(--navy); padding: 8px 20px; font-weight: 900; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; z-index: 100; box-shadow: 10px 10px 0 rgba(0,0,0,0.1); }
+        .shard-viewport { width: 100%; height: 85vh; border: none; }
+        
+        .intelligence-shroud { background: var(--navy); color: #FFF; padding: 60px 10%; border-top: 2px solid var(--amber); min-height: 400px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .intel-box { border-left: 2px solid var(--amber); padding-left: 30px; }
+        .intel-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; color: var(--gray); font-weight: 900; margin-bottom: 15px; }
+        .intel-data { font-family: var(--font-mono); font-size: 0.9rem; color: #94A3B8; }
+
+        .global-hud { position: sticky; top: 0; background: var(--navy); padding: 15px 4%; display: flex; gap: 30px; z-index: 1050; border-bottom: 1px solid rgba(255,149,0,0.1); }
+        .metric { border-left: 2px solid var(--amber); padding-left: 15px; }
+        .metric-label { font-size: 0.6rem; color: var(--gray); text-transform: uppercase; font-weight: 700; }
+        .metric-val { font-size: 1rem; font-weight: 900; color: white; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-box"><h1 onclick="window.location.href='../index.html'">ORCINOS_HUB</h1></div>
+        <div>
+            <button class="toggle-btn" onclick="toggleSidebar()">Toggle Matrix</button>
+            <button class="toggle-btn" onclick="scrollToTop()">Top</button>
+        </div>
+        <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--amber); font-weight:700;">UNIFIED_STAGE: v1.5</div>
+    </header>
+
+    <div class="hub-layout">
+        <aside class="sidebar-matrix" id="sidebar">
+            <h2>Product Matrix</h2>
+            <div id="matrix-list">
+                <a href="#nurasen" class="nav-item active">Nurasen</a>
+                <a href="#sovsygnal" class="nav-item">SOV SYGNL</a>
+                <a href="#syle" class="nav-item">Syle</a>
+                <a href="#vyne" class="nav-item">Vyne</a>
+                <a href="#slumber" class="nav-item">Slumber</a>
+                <a href="#prayerblock" class="nav-item">PrayerBlock</a>
+                <a href="#calalloo" class="nav-item">Calalloo</a>
+                <a href="#dricil" class="nav-item">Dricil</a>
+                <a href="#pawdx" class="nav-item">PawDX</a>
+            </div>
+        </aside>
+
+        <main class="main-stage" id="stage">
+            <div class="global-hud">
+                <div class="metric"><div class="metric-label">Aggregated Traffic</div><div class="metric-val" id="g-traffic">142,891</div></div>
+                <div class="metric"><div class="metric-label">Active Shards</div><div class="metric-val">14</div></div>
+                <div class="metric"><div class="metric-label">Neural Sync</div><div class="metric-val" style="color:#22C55E">STABLE</div></div>
+            </div>
+
+            <!-- Shard: Nurasen -->
+            <section id="nurasen" class="shard-section">
+                <div class="shard-label">Shard 01: Nurasen</div>
+                <iframe class="shard-viewport" src="../nurasen/dashboard.html?godmode=true"></iframe>
+                <div class="intelligence-shroud">
+                    <div class="intel-box">
+                        <div class="intel-title">Threat Intelligence</div>
+                        <div class="intel-data">
+                            > SCANNING_SHARD_01...<br>
+                            > FIREWALL_STATUS: ACTIVE<br>
+                            > ANOMALY_DETECTION: 0 DETECTED
+                        </div>
+                    </div>
+                    <div class="intel-box">
+                        <div class="intel-title">Device Handshake</div>
+                        <div class="intel-data">
+                            > CLIENT_UUID: 6868eff5-241b-4f00...<br>
+                            > PROTOCOL: SOVEREIGN_ENCRYPTED<br>
+                            > LOCATION: SAN_FERNANDO, TT
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shard: SOV SYGNL -->
+            <section id="sovsygnal" class="shard-section">
+                <div class="shard-label">Shard 02: SOV SYGNL</div>
+                <iframe class="shard-viewport" src="../sovsygnal/index.html?godmode=true"></iframe>
+                <div class="intelligence-shroud">
+                    <div class="intel-box">
+                        <div class="intel-title">Global Frequency</div>
+                        <div class="intel-data">
+                            > FREQ: 104.2 MHZ<br>
+                            > SIGNAL_STRENGTH: 98%<br>
+                            > MARKET_SENTIMENT: BULLISH
+                        </div>
+                    </div>
+                    <div class="intel-box">
+                        <div class="intel-title">Content Pulse</div>
+                        <div class="intel-data">
+                            > LATEST_HEADLINE: Strategic Mediation...<br>
+                            > SOURCE: NEUTRAL_CORRIDOR<br>
+                            > CATEGORY: GEOPOLITICS
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shard: Syle -->
+            <section id="syle" class="shard-section">
+                <div class="shard-label">Shard 03: Syle</div>
+                <iframe class="shard-viewport" src="../syle/index.html?godmode=true"></iframe>
+                <div class="intelligence-shroud">
+                    <div class="intel-box">
+                        <div class="intel-title">Curation Engine</div>
+                        <div class="intel-data">
+                            > MODE: NEURAL_SELECTION<br>
+                            > CATEGORIES: COUTURE, SANCTUARY, WELLNESS<br>
+                            > STATUS: SYNCED
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shard: Vyne -->
+            <section id="vyne" class="shard-section">
+                <div class="shard-label">Shard 04: Vyne</div>
+                <iframe class="shard-viewport" src="../vyne/index.html?godmode=true"></iframe>
+                <div class="intelligence-shroud">
+                    <div class="intel-box">
+                        <div class="intel-title">Financial Ledger</div>
+                        <div class="intel-data">
+                            > VAULT_BALANCE: $142,891.00<br>
+                            > PAYOUT_AUTOMATION: ENABLED<br>
+                            > SETTLEMENT_LAYER: CARDANO_L1
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Shard: Slumber -->
+             <section id="slumber" class="shard-section">
+                <div class="shard-label">Shard 05: Slumber</div>
+                <iframe class="shard-viewport" src="../slumber/index.html?godmode=true"></iframe>
+                <div class="intelligence-shroud">
+                    <div class="intel-box">
+                        <div class="intel-title">Neural Rest Logs</div>
+                        <div class="intel-data">
+                            > AVG_SLEEP_SCORE: 88/100<br>
+                            > DEEP_REM_THRESHOLD: OPTIMAL<br>
+                            > STATUS: MONITORING
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Shard: PrayerBlock -->
+             <section id="prayerblock" class="shard-section">
+                <div class="shard-label">Shard 06: PrayerBlock</div>
+                <iframe class="shard-viewport" src="../prayerblock/index.html?godmode=true"></iframe>
+                <div class="intelligence-shroud">
+                    <div class="intel-box">
+                        <div class="intel-title">Sanctuary Signals</div>
+                        <div class="intel-data">
+                            > ARCHIVE_SYNC: 100%<br>
+                            > EVIDENCE_LAYER: ACTIVE<br>
+                            > MISSION: PROCLAIM_GOSPEL
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Shard: Calalloo -->
+             <section id="calalloo" class="shard-section">
+                <div class="shard-label">Shard 07: Calalloo</div>
+                <iframe class="shard-viewport" src="../calalloo/index.html?godmode=true"></iframe>
+                <div class="intelligence-shroud">
+                    <div class="intel-box">
+                        <div class="intel-title">Heritage Data</div>
+                        <div class="intel-data">
+                            > CULINARY_DNA: MAPPED<br>
+                            > HISTORICAL_RECORDS: SYNCED<br>
+                            > STATUS: LIVE
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('hidden'); }
+        function scrollToTop() { document.getElementById('stage').scrollTo(0, 0); }
+        
+        // Navigation highlighting
+        const stage = document.getElementById('stage');
+        const sections = document.querySelectorAll('.shard-section');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        stage.addEventListener('scroll', () => {
+            let current = "";
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                if (stage.scrollTop >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href').includes(current)) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        setInterval(() => {
+            const traffic = document.getElementById('g-traffic');
+            traffic.textContent = (parseInt(traffic.textContent.replace(',','')) + Math.floor(Math.random() * 5)).toLocaleString();
+        }, 3000);
+    </script>
+    <!-- Real-Time Click Tracking -->
+    <script>
+        (function() {
+            const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+            const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
+            const BRAND = 'godmode';
+            
+            async function track() {
+                try {
+                    await fetch(`${SB_URL}/rest/v1/rpc/increment_traffic`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SB_KEY,
+                            'Authorization': `Bearer ${SB_KEY}`
+                        },
+                        body: JSON.stringify({ brand_name: BRAND, metric: 'clicks' })
+                    });
+                } catch (e) {}
+            }
+            if (document.readyState === 'complete') { track(); }
+            else { window.addEventListener('load', track); }
+        })();
+    </script>
+</body>
+</html>
