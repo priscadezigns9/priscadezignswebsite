@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priscion Intelligence Hub | Vault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        .architect-card {
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        .architect-card:hover {
+            border-color: #000;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+    <!-- Header -->
+    <nav class="border-b border-gray-100 py-6 px-10 flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+            <img src="/logos/PRISCA_ICON_LOGO.png" alt="Logo" class="h-8">
+            <span class="text-sm font-bold tracking-widest uppercase text-gray-400">Priscion Intelligence Hub</span>
+        </div>
+        <div id="sync-indicator" class="flex items-center text-xs font-medium text-green-500 uppercase tracking-widest">
+            <span class="h-2 w-2 bg-green-500 rounded-full mr-2"></span>
+            Live Telemetry
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-10 py-16">
+        <header class="mb-16">
+            <h1 class="text-6xl font-black mb-4 tracking-tighter">Intelligence Hub</h1>
+            <p class="text-xl text-gray-500 max-w-2xl font-light">Real-time oversight of the Priscion Network ecosystem. Data-driven leads and user profiles.</p>
+        </header>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-16">
+            <div class="architect-card p-10 bg-gray-50/30 rounded-sm">
+                <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Total Profiles</p>
+                <h3 class="text-5xl font-bold" id="profiles-count">...</h3>
+            </div>
+            <div class="architect-card p-10 bg-gray-50/30 rounded-sm">
+                <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Active Leads</p>
+                <h3 class="text-5xl font-bold" id="leads-count">...</h3>
+            </div>
+            <div class="architect-card p-10 bg-gray-50/30 rounded-sm">
+                <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">System Nodes</p>
+                <h3 class="text-5xl font-bold">Active</h3>
+            </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="mb-16">
+            <div class="flex justify-between items-end mb-8">
+                <h2 class="text-3xl font-bold">Live Lead Stream</h2>
+                <div class="text-xs text-gray-400 uppercase tracking-widest" id="last-update">Updating...</div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-xs uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                            <th class="py-6 font-bold">Name / Entity</th>
+                            <th class="py-6 font-bold">Email Address</th>
+                            <th class="py-6 font-bold">Brand Source</th>
+                            <th class="py-6 font-bold">Capture Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leads-table-body" class="divide-y divide-gray-50">
+                        <!-- Leads will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-gray-100 py-10 px-10">
+        <div class="flex justify-between items-center text-xs text-gray-400 uppercase tracking-widest font-bold">
+            <div>© 2026 Priscion Group</div>
+            <div>Architect Mandate v4.0</div>
+        </div>
+    </footer>
+
+    <script>
+        const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+
+        async function refreshData() {
+            try {
+                // Total Profiles Count
+                const { count: profilesCount, error: pError } = await supabaseClient
+                    .from('profiles')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (!pError) {
+                    document.getElementById('profiles-count').innerText = profilesCount.toLocaleString();
+                }
+
+                // Leads Data
+                const { data: leads, error: lError, count: leadsTotal } = await supabaseClient
+                    .from('leads')
+                    .select('*', { count: 'exact' })
+                    .order('created_at', { ascending: false });
+
+                if (!lError) {
+                    document.getElementById('leads-count').innerText = leadsTotal.toLocaleString();
+                    const tbody = document.getElementById('leads-table-body');
+                    
+                    if (leads && leads.length > 0) {
+                        tbody.innerHTML = leads.map(lead => `
+                            <tr class="group hover:bg-gray-50 transition-all">
+                                <td class="py-6 font-semibold text-gray-900">${lead.name || lead.first_name || 'Anonymous'}</td>
+                                <td class="py-6 text-gray-500 font-light">${lead.email}</td>
+                                <td class="py-6">
+                                    <span class="px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-600 border border-gray-200">
+                                        ${lead.source || lead.brand || 'Direct'}
+                                    </span>
+                                </td>
+                                <td class="py-6 text-gray-400 text-sm font-light">${new Date(lead.created_at).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="4" class="py-20 text-center text-gray-300 uppercase tracking-widest text-xs font-bold">No telemetry detected</td></tr>';
+                    }
+                }
+
+                document.getElementById('last-update').innerText = 'Last Sync: ' + new Date().toLocaleTimeString();
+            } catch (error) {
+                console.error("Supabase Error:", error);
+            }
+        }
+
+        refreshData();
+        setInterval(refreshData, 30000); // Sync every 30s
+    </script>
+</body>
+</html>
