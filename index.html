@@ -45,6 +45,15 @@
             pointer-events: auto;
         }
 
+        .logo-container {
+            display: flex; align-items: center; gap: 15px;
+        }
+
+        .logo-img {
+            width: 40px; height: 40px;
+            object-fit: contain;
+        }
+
         .logo { 
             font-family: var(--font-heading); 
             font-size: 2.2rem; font-weight: 900; letter-spacing: -1.5px;
@@ -72,11 +81,12 @@
 
         h1 {
             font-family: var(--font-heading);
-            font-size: clamp(4rem, 10vw, 8rem);
+            font-size: clamp(3rem, 7vw, 6rem);
             line-height: 0.85;
             color: var(--purple);
-            letter-spacing: -5px;
+            letter-spacing: -3px;
             font-weight: 900;
+            text-transform: uppercase;
         }
 
         .view-cta {
@@ -124,21 +134,21 @@
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 10px;
             z-index: 11;
         }
 
         .dot {
-            width: 6px; height: 6px;
+            width: 4px; height: 4px;
             border-radius: 50%;
             background: var(--lilac);
-            opacity: 0.3;
+            opacity: 0.2;
         }
 
         .dot.active {
             opacity: 1;
             background: var(--purple);
-            transform: scale(2);
+            transform: scale(2.5);
         }
     </style>
 </head>
@@ -146,19 +156,22 @@
 
     <div id="ui-layer">
         <header>
-            <div class="logo">prisca dezigns.</div>
+            <div class="logo-container">
+                <img src="https://raw.githubusercontent.com/priscadezigns9/priscion/main/assets/priscion_logo.png" alt="Prisca Dezigns" class="logo-img">
+                <div class="logo">prisca dezigns.</div>
+            </div>
             <div class="nav-trigger">INDEX</div>
         </header>
 
         <main>
-            <div class="brand-label" id="current-sector">DESIGN & STRATEGY</div>
-            <h1 id="current-brand">PRISCION HUB</h1>
+            <div class="brand-label" id="current-sector">SYSTEM ENTRY</div>
+            <h1 id="current-brand">BRAND SCAN</h1>
             <a href="#" id="brand-url" class="view-cta">ENTER DOMAIN</a>
         </main>
 
         <footer>
             <div class="footer-info">
-                Solving the puzzle of the digital empire.
+                Architecting Private Digital Networks for the Sovereign Individual.
             </div>
             <div id="interaction-guide" style="font-size: 0.6rem; letter-spacing: 3px; color: var(--lilac); font-weight: 900;">
                 SCROLL TO ROTATE SLICES
@@ -166,12 +179,7 @@
         </footer>
     </div>
 
-    <div id="scroll-indicator">
-        <div class="dot active"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-    </div>
+    <div id="scroll-indicator" id="dots-container"></div>
 
     <div id="canvas-container"></div>
 
@@ -184,13 +192,11 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // Lighting
         scene.add(new THREE.AmbientLight(0xffffff, 0.7));
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
         dirLight.position.set(5, 5, 5);
         scene.add(dirLight);
 
-        // The Rubik's Globe (Geodesic Wireframe)
         const geometry = new THREE.IcosahedronGeometry(2.5, 3);
         const material = new THREE.MeshPhongMaterial({ 
             color: 0xC8A2C8, 
@@ -201,22 +207,34 @@
         const globe = new THREE.Mesh(geometry, material);
         scene.add(globe);
 
-        // Rotating Rings (Rubik's Slices)
-        const ringGeo = new THREE.TorusGeometry(2.6, 0.01, 16, 100);
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x301934, transparent: true, opacity: 0.2 });
-        const ringX = new THREE.Mesh(ringGeo, ringMat);
-        const ringY = new THREE.Mesh(ringGeo, ringMat);
-        ringY.rotation.x = Math.PI / 2;
-        scene.add(ringX, ringY);
-
         camera.position.z = 6;
 
         const brands = [
             { name: "BRAND SCAN", sector: "SYSTEM ENTRY", url: "#" },
             { name: "PRISCION HUB", sector: "CORE NETWORK", url: "https://priscion.com" },
-            { name: "COUTURE GALLERY", sector: "LUXURY RETAIL", url: "https://priscadezigns.org/couturegallery/" },
+            { name: "DESKWELL", sector: "OFFICE SOLUTIONS", url: "https://priscadezigns.org/deskwell/" },
+            { name: "PANTRIQ", sector: "SMART KITCHEN", url: "https://priscadezigns.org/pantriq/" },
+            { name: "SHELFLY", sector: "SMART STORAGE", url: "https://priscadezigns.org/shelfly/" },
+            { name: "ESSENCE ELITE", sector: "FRAGRANCE", url: "https://priscadezigns.org/essenceelite/" },
+            { name: "GLOW PROTOCOL", sector: "SKINCARE", url: "https://priscadezigns.org/glowprotocol/" },
+            { name: "PRIME LAND NETWORK", sector: "REAL ESTATE", url: "https://priscadezigns.org/primelandnetwork/" },
+            { name: "THE WATCH LIST", sector: "HOROLOGY", url: "https://priscadezigns.org/thewatchlist/" },
+            { name: "SOLE PRESTIGE", sector: "FOOTWEAR", url: "https://priscadezigns.org/soleprestige/" },
             { name: "ATELIA GAMING", sector: "MEDIA & TECH", url: "https://priscadezigns.org/ateliagaming/" },
-            { name: "CALALLOO", sector: "CULTURAL HERITAGE", url: "https://priscadezigns.org/calalloo/" },
+            { name: "DREAMING ANIME", sector: "ANIME MEDIA", url: "https://dreaminganime.com" },
+            { name: "PEAK FIT", sector: "BIOHACKING", url: "https://priscadezigns.org/peakfit/" },
+            { name: "VERDANT CO", sector: "SUSTAINABILITY", url: "https://priscadezigns.org/verdantco/" },
+            { name: "MY BABY DUMPLING", sector: "MATERNITY", url: "https://priscadezigns.org/mybabydumpling/" },
+            { name: "RIDDIIM", sector: "MUSIC STUDIO", url: "https://priscadezigns.org/riddiim/" },
+            { name: "THE AUTODROME", sector: "AUTOMOTIVE", url: "https://priscadezigns.org/theautodrome/" },
+            { name: "THE ESCAPIST", sector: "TRAVEL", url: "https://priscadezigns.org/theescapist/" },
+            { name: "THE TECH SCOUT HQ", sector: "INNOVATION", url: "https://priscadezigns.org/thetechscouthq/" },
+            { name: "QUIET LUXURY", sector: "HOME DECOR", url: "https://priscadezigns.org/quietluxury/" },
+            { name: "COUTURE GALLERY", sector: "LUXURY RETAIL", url: "https://priscadezigns.org/couturegallery/" },
+            { name: "PAW VAULT", sector: "PET CARE", url: "https://priscadezigns.org/pawvault/" },
+            { name: "LES AMOUR", sector: "RELATIONSHIPS", url: "https://priscadezigns.org/lesamour/" },
+            { name: "ORNALIS LIGHTING", sector: "ARCHITECTURAL", url: "https://priscadezigns.org/ornalis/" },
+            { name: "AXORIA FRAMES", sector: "EYEWEAR", url: "https://priscadezigns.org/axoria/" },
             { name: "CUPYX", sector: "PRODUCT", url: "#" },
             { name: "VELLOQ", sector: "PRODUCT", url: "#" },
             { name: "KARJOV", sector: "PRODUCT", url: "#" },
@@ -230,6 +248,14 @@
             { name: "THREADS", sector: "SOCIAL", url: "https://www.threads.net/@priscillanarine" }
         ];
 
+        // Generate Dots
+        const dotsContainer = document.getElementById('scroll-indicator');
+        brands.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'dot' + (i === 0 ? ' active' : '');
+            dotsContainer.appendChild(dot);
+        });
+
         let currentIndex = 0;
         let isAnimating = false;
 
@@ -240,32 +266,29 @@
             const direction = e.deltaY > 0 ? 1 : -1;
             currentIndex = (currentIndex + direction + brands.length) % brands.length;
 
-            // Rotate Globe like a Rubik's Slice
             gsap.to(globe.rotation, { 
-                y: globe.rotation.y + (Math.PI / 2 * direction), 
-                x: globe.rotation.x + (Math.PI / 8 * direction),
-                duration: 1.2, 
-                ease: "expo.inOut",
+                y: globe.rotation.y + (Math.PI / 4 * direction), 
+                x: globe.rotation.x + (Math.PI / 10 * direction),
+                duration: 1.0, 
+                ease: "power2.inOut",
                 onComplete: () => { isAnimating = false; }
             });
 
-            // Update UI with GSAP for high-fidelity feel
-            gsap.to("main", { opacity: 0, x: -20, duration: 0.3, onComplete: () => {
+            gsap.to("main", { opacity: 0, x: -10, duration: 0.2, onComplete: () => {
                 document.getElementById('current-brand').innerText = brands[currentIndex].name;
                 document.getElementById('current-sector').innerText = brands[currentIndex].sector;
                 document.getElementById('brand-url').href = brands[currentIndex].url;
                 
-                // Update dots
                 const dots = document.querySelectorAll('.dot');
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
 
-                gsap.to("main", { opacity: 1, x: 0, duration: 0.5 });
+                gsap.to("main", { opacity: 1, x: 0, duration: 0.4 });
             }});
-        });
+        }, { passive: true });
 
         function animate() {
             requestAnimationFrame(animate);
-            globe.rotation.y += 0.002;
+            globe.rotation.y += 0.001;
             renderer.render(scene, camera);
         }
         animate();
