@@ -2,298 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Procyon Intelligence | Blog Archive</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <title>The Proclamation | The Way Made Known</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap">
     <style>
-        :root {
-            --ivory: #FDFCF0;
-            --purple: #301934;
-            --lilac: #DCD0FF;
-            --text: #2D3436;
-            --font-heading: 'Playfair Display', serif;
-            --font-body: 'Inter', sans-serif;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;900&family=Playfair+Display:wght@900&display=swap');
-
+        :root { --bg: #F8FBFF; --text: #2C3E50; --baby-blue: #89CFF0; --deep-blue: #4682B4; --border: rgba(137, 207, 240, 0.2); }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { 
-            font-family: var(--font-body); 
-            background: var(--ivory); 
-            color: var(--text); 
-            overflow: hidden;
-            height: 100vh;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; overflow-x: hidden; }
+        .nav { padding: 25px 6%; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid var(--border); position: relative; z-index: 10; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--deep-blue); text-decoration: none; }
+        .container { max-width: 900px; margin: 0 auto; padding: 80px 6%; position: relative; z-index: 5; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 40px; text-align: center; color: var(--deep-blue); }
+        .blog-grid { display: grid; gap: 30px; }
+        .blog-card { background: #fff; padding: 40px; border-radius: 15px; border: 1px solid var(--border); text-decoration: none; color: inherit; transition: 0.3s; }
+        .blog-card:hover { transform: translateY(-5px); border-color: var(--baby-blue); }
+        .blog-card h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 10px; color: var(--text); }
+        .blog-card p { color: #666; font-size: 1rem; }
+        .blog-meta { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--baby-blue); margin-bottom: 5px; }
 
-        #bg-logo-overlay {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80vw;
-            height: 80vw;
-            background: url("logo_icon.jpg") no-repeat center;
-            background-size: contain;
-            opacity: 0.03;
-            z-index: -1;
-            pointer-events: none;
-        }
+        /* Animation Global */
+        .tree-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 1; opacity: 0.5; }
+        .mustard-tree-svg { width: 100%; height: 100%; position: absolute; bottom: -20px; left: -50px; transform-origin: bottom left; }
+        .tree-path { stroke: var(--baby-blue); stroke-width: 1.5; fill: none; stroke-dasharray: 2500; stroke-dashoffset: 2500; animation: growTree 7s ease-out forwards; }
+        @keyframes growTree { to { stroke-dashoffset: 0; } }
 
-        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        
-        #ui-layer {
-            position: relative;
-            z-index: 10;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px 60px;
-            pointer-events: none;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: auto;
-        }
-
-        .logo-container {
-            display: flex; align-items: center; gap: 15px;
-        }
-
-        .logo-img {
-            width: 50px; height: 50px;
-            object-fit: contain;
-            border-radius: 50%;
-        }
-
-        .logo { 
-            font-family: var(--font-heading); 
-            font-size: 2.2rem; font-weight: 900; letter-spacing: -1.5px;
-            color: var(--purple);
-            text-transform: lowercase;
-            text-decoration: none;
-        }
-
-        main {
-            text-align: left;
-            pointer-events: auto;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .brand-visual-container {
-            display: flex;
-            align-items: flex-start;
-            gap: 40px;
-        }
-
-        .brand-text-content {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .brand-label {
-            font-weight: 900;
-            font-size: 0.8rem;
-            letter-spacing: 4px;
-            color: var(--purple);
-            opacity: 0.6;
-        }
-
-        h1 {
-            font-family: var(--font-heading);
-            font-size: 5.5rem;
-            line-height: 0.9;
-            color: var(--purple);
-            margin-bottom: 10px;
-        }
-
-        .brand-description {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            max-width: 500px;
-            color: var(--text);
-            opacity: 0.8;
-            margin-bottom: 20px;
-        }
-
-        .view-cta {
-            background: var(--purple);
-            color: var(--ivory);
-            border: none;
-            padding: 18px 45px;
-            font-weight: 900;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            cursor: pointer;
-            width: fit-content;
-            transition: all 0.3s;
-        }
-
-        .view-cta:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(48, 25, 52, 0.2);
-        }
-
-        footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            pointer-events: auto;
-        }
-
-        .footer-info {
-            font-size: 0.75rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            opacity: 0.4;
-            max-width: 300px;
-            line-height: 1.8;
-        }
-
-        #scroll-indicator {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--purple);
-            opacity: 0.2;
-            transition: 0.3s;
-        }
-
-        .dot.active { opacity: 1; transform: scale(1.5); }
+        footer { padding: 60px 6%; text-align: center; border-top: 1px solid var(--border); font-size: 0.8rem; color: #888; position: relative; z-index: 10; background: #fff; }
     </style>
 </head>
 <body>
-    <div id="bg-logo-overlay"></div>
-    <div id="canvas-container"></div>
-
-    <div id="ui-layer">
-        <header>
-            <div class="logo-container">
-                <img src="assets/priscion_logo.png" alt="Prisca Dezigns" class="logo-img">
-                <a href="index.html" class="logo">prisca dezigns.</a>
-            </div>
-            <div style="font-weight: 900; font-size: 0.7rem; letter-spacing: 3px; color: var(--purple);">BLOG INTELLIGENCE</div>
-        </header>
-
-        <main>
-            <div class="brand-visual-container">
-                <div class="brand-text-content">
-                    <div class="brand-label" id="current-sector">INTELLIGENCE FEED</div>
-                    <h1 id="current-brand">BLOG ARCHIVE</h1>
-                    <div class="brand-description" id="current-desc">Explore the latest technical insights and brand evolution updates.</div>
-                    <button id="main-cta" class="view-cta">READ ARTICLE</button>
-                </div>
-            </div>
-        </main>
-
-        <footer>
-            <div class="footer-info">
-                Sovereign Knowledge Distribution System.<br>
-                SCROLL TO NAVIGATE ARTICLES
-            </div>
-            <div id="scroll-indicator"></div>
-        </footer>
+    <div class="tree-container">
+        <svg class="mustard-tree-svg" viewBox="0 0 500 500" preserveAspectRatio="xMinYMax meet">
+            <path class="tree-path" d="M20,480 C40,400 80,350 120,300 C160,250 200,200 250,150 M120,300 C180,280 250,290 300,240 M120,330 C80,280 50,220 70,150 M250,150 C300,120 350,150 400,100 M250,150 C220,100 180,50 150,80" />
+            <circle cx="20" cy="480" r="6" fill="var(--baby-blue)" /> <!-- The Seed -->
+        </svg>
     </div>
-
-    <script>
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-        const globeGroup = new THREE.Group();
-        const geometry = new THREE.SphereGeometry(2, 64, 64);
-        const material = new THREE.MeshPhongMaterial({
-            color: 0x301934,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.15
-        });
-        const globe = new THREE.Mesh(geometry, material);
-        globeGroup.add(globe);
-
-        const light = new THREE.PointLight(0xDCD0FF, 1, 100);
-        light.position.set(5, 5, 5);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-        scene.add(globeGroup);
-        camera.position.z = 5;
-
-        const blogs = [
-            { name: "EDEN NOW", sector: "REVELATIONS", desc: "Understanding our restoration through the Second Adam and the mandate to dominate.", url: "/thewaymadeknown/blog/walking-in-eden-now/" },
-            { name: "SCALES FALL", sector: "TESTIMONY", desc: "The journey from university questions to a life-changing encounter with Christ.", url: "/thewaymadeknown/blog/testimony/" },
-            { name: "TITAN SIGNALS", sector: "MARKET INTEL", desc: "Global market intelligence and technical analysis for the sovereign trader.", url: "titan-signals-blog.html" },
-            { name: "VERDANT CO", sector: "SUSTAINABILITY", desc: "Regenerative agriculture and circular economy reports.", url: "verdant-co-blog.html" },
-            { name: "SOLE PRESTIGE", sector: "LUXURY RETAIL", desc: "Archival footwear design and the future of premium streetwear.", url: "sole-prestige-blog.html" }
-        ];
-
-        const dotsContainer = document.getElementById('scroll-indicator');
-        blogs.forEach((_, i) => {
-            const dot = document.createElement('div');
-            dot.className = 'dot' + (i === 0 ? ' active' : '');
-            dotsContainer.appendChild(dot);
-        });
-
-        let currentIndex = 0;
-        let lastScrollTime = 0;
-        const scrollCooldown = 600;
-
-        function updateUI(index) {
-            const blog = blogs[index];
-            gsap.to(".brand-text-content", { opacity: 0, y: 20, duration: 0.3, onComplete: () => {
-                document.getElementById('current-brand').innerText = blog.name;
-                document.getElementById('current-sector').innerText = blog.sector;
-                document.getElementById('current-desc').innerText = blog.desc;
-                document.getElementById('main-cta').onclick = () => window.open(blog.url, '_blank');
-                
-                const dots = document.querySelectorAll('.dot');
-                dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-                gsap.to(".brand-text-content", { opacity: 1, y: 0, duration: 0.6 });
-            }});
-        }
-
-        function handleNavigation(direction) {
-            const now = Date.now();
-            if (now - lastScrollTime < scrollCooldown) return;
-            lastScrollTime = now;
-            currentIndex = (currentIndex + direction + blogs.length) % blogs.length;
-            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2 * direction), duration: 1.2, ease: "power3.out" });
-            updateUI(currentIndex);
-        }
-
-        window.addEventListener('wheel', (e) => {
-            if (Math.abs(e.deltaY) < 10) return;
-            handleNavigation(e.deltaY > 0 ? 1 : -1);
-        }, { passive: true });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            globe.rotation.y += 0.001;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        updateUI(0);
-    </script>
+    <nav class="nav"><a href="/thewaymadeknown/" class="logo">The Way Made Known</a></nav>
+    <div class="container">
+        <h1>The Proclamation</h1>
+        <div class="blog-grid">
+            <a href="/thewaymadeknown/blog/walking-in-eden-now/" class="blog-card">
+                <div class="blog-meta">Revelations</div>
+                <h2>Walking in Eden Now</h2>
+                <p>Understanding our restoration through the Second Adam and the mandate to dominate the earth here and now.</p>
+            </a>
+            <a href="/thewaymadeknown/blog/testimony/" class="blog-card">
+                <div class="blog-meta">Testimony</div>
+                <h2>When Scales Fall from the Eyes</h2>
+                <p>The journey from university questions to a life-changing encounter with Christ in 2015.</p>
+            </a>
+            <a href="/thewaymadeknown/blog/analytical-thinking/" class="blog-card">
+                <div class="blog-meta">Visions & Dreams</div>
+                <h2>Analytical Thinking in a World of Emotion</h2>
+                <p>Why faith is a reasoned pursuit of Truth, not a blind leap into the dark.</p>
+            </a>
+            <a href="/thewaymadeknown/blog/mustard-seed-to-tree/" class="blog-card">
+                <div class="blog-meta">Visions & Dreams</div>
+                <h2>From a Mustard Seed to a Mustard Tree</h2>
+                <p>Taking the cap off your faith and moving from a seed to a limitless foundation.</p>
+            </a>
+        </div>
+    </div>
+    <footer>© 2026 The Way Made Known</footer>
 </body>
 </html>
+
