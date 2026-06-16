@@ -259,7 +259,7 @@
             transform: translate(-50%, -50%);
             width: 80vw;
             height: 80vw;
-            background: url("logo_icon.jpg") no-repeat center;
+            background: url("assets/background_logo.jpg") no-repeat center;
             background-size: contain;
             opacity: 0.03;
             z-index: -1;
@@ -306,8 +306,14 @@
     <div id="modal-overlay">
         <div id="modal-content">
             <span class="close-modal" id="close-modal">&times;</span>
-            <h2 style="font-family: var(--font-heading); color: var(--purple); margin-bottom: 10px;">Secure Your Slot</h2>
-            <p style="font-size: 0.9rem; margin-bottom: 30px; color: #666;">Submit your details to activate your Intelligence Node.</p>
+            
+            
+            <h2 id="modal-title" style="font-family: var(--font-heading); color: var(--purple); margin-bottom: 10px;">Secure Your Slot</h2>
+            <div id="pkg-checklist" style="margin-bottom: 25px; padding: 15px; background: rgba(48, 25, 52, 0.05); border-radius: 8px; display: none; text-align: left;">
+                <h4 style="font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--purple); margin-bottom: 10px; border-bottom: 1px solid rgba(48, 25, 52, 0.1); padding-bottom: 5px;">Includes:</h4>
+                <ul id="checklist-items" style="list-style: none; font-size: 0.8rem; color: #555; display: grid; gap: 8px;"></ul>
+            </div>
+            <form id="lead-form">
             <form id="lead-form">
                 <div class="form-field">
                     <label>Full Name</label>
@@ -364,13 +370,13 @@
         const brands = [
             { name: "BRAND SCAN", sector: "SYSTEM ENTRY", logo: "", desc: "Real-time diagnostic analysis of digital identity and brand footprint.", url: "scan/", type: "external" },
             
-            { name: "STARTER PKG", sector: "PACKAGES", logo: "", price: "$297/mo", desc: "Core digital foundation. Branding, single landing page, and basic SEO mapping.", type: "lead" },
-            { name: "GROWTH PKG", sector: "PACKAGES", logo: "", price: "$597/mo", desc: "Scaling network. Multi-page architecture, CRM integration, and AI analytics.", type: "lead" },
-            { name: "TRUSTED PKG", sector: "PACKAGES", logo: "", price: "$1,200/mo", desc: "The Sovereign Standard. Full automation, Web3 integration, and deep data vaulting.", type: "lead" },
+            { name: "STARTER PKG", sector: "PACKAGES", logo: "", price: "$297", desc: "Core digital foundation. Branding, single landing page, and basic SEO mapping.", type: "lead", checklist: ['Core Branding', 'Single Landing Page', 'SEO Mapping', 'Domain Connection'] },
+            { name: "GROWTH PKG", sector: "PACKAGES", logo: "", price: "$597", desc: "Scaling network. Multi-page architecture, CRM integration, and AI analytics.", type: "lead", checklist: ['Multi-page Architecture', 'CRM Integration', 'AI Analytics Dashboard', 'Social Media Setup'] },
+            { name: "TRUSTED PKG", sector: "PACKAGES", logo: "", price: "$1,200", desc: "The Sovereign Standard. Full automation, Premium Architecture, and deep data vaulting.", type: "lead", checklist: ['Full Business Automation', 'Premium Brand Identity', 'High-Fidelity Data Vaulting', '24/7 Technical Support'] },
             
-            { name: "AI COPYWRITING", sector: "A LA CARTE", logo: "", price: "$150", desc: "Neural-optimized messaging for high-fidelity audience engagement.", type: "lead" },
-            { name: "LOGO DESIGN", sector: "A LA CARTE", logo: "", price: "$250", desc: "Minimalist, symbolic identity engineering for luxury and tech niches.", type: "lead" },
-            { name: "SEO ARCHITECTURE", sector: "A LA CARTE", logo: "", price: "$450", desc: "Technical structural alignment for maximum visibility across the global signal.", type: "lead" },
+            { name: "AI COPYWRITING", sector: "A LA CARTE", logo: "", price: "$150", desc: "Neural-optimized messaging for high-fidelity audience engagement.", type: "lead", checklist: ['Neural-Optimized Messaging', 'High-Fidelity Engagement', 'Targeted Ad Copy'] },
+            { name: "LOGO DESIGN", sector: "A LA CARTE", logo: "", price: "$250", desc: "Minimalist, symbolic identity engineering for luxury and tech niches.", type: "lead", checklist: ['Minimalist Symbolic Identity', 'High-Res Master Assets', 'Niche-Specific Engineering'] },
+            { name: "SEO ARCHITECTURE", sector: "A LA CARTE", logo: "", price: "$450", desc: "Technical structural alignment for maximum visibility across the global signal.", type: "lead", checklist: ['Technical Structural Alignment', 'Global Signal Optimization', 'Meta Data Calibration'] },
             
             { name: "ROWCELL", sector: "PRODUCT", logo: "", desc: "Advanced cellular logistics and data management node.", url: "rowcell/", type: "external" },
             { name: "KARJOV", sector: "PRODUCT", logo: "", desc: "High-performance operational engine for private networks.", url: "karjov/", type: "external" },
@@ -403,7 +409,7 @@
             { name: "PEAK FIT", sector: "BRAND", logo: "", desc: "Biohacking recovery science and elite fitness performance.", url: "peakfit/", type: "external" },
 
             { name: "SEAMRITE DESIGNS", sector: "CLIENT", logo: "", desc: "Modern artistic sewing and ancestral Caribbean authenticity.", url: "seamritedesigns-/", type: "external" },
-            { name: "PRISICON", sector: "CORE NETWORK", logo: "", desc: "The high-fidelity migration hub for the Web3 transition.", url: "https://priscion.com", type: "external" },
+            { name: "PROCYON", sector: "CORE NETWORK", logo: "", desc: "The high-fidelity migration hub for the Digital Evolution.", url: "https://priscion.com", type: "external" },
             { name: "EVOLVE", sector: "PARTNER", logo: "", desc: "Caribbean-wide corporate mobility and fleet sales logistics.", url: "partners/#evolve", type: "external" },
             
             { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "blog.html", type: "external" },
@@ -453,8 +459,30 @@
 
         // MODAL LOGIC
         const modal = document.body;
+        
         function openModal(pkgName) {
+            const pkg = brands.find(b => b.name === pkgName);
             document.getElementById('target-package').value = pkgName;
+            document.getElementById('modal-title').innerText = "Activate " + pkgName;
+            
+            const list = document.getElementById('checklist-items');
+            const checklistContainer = document.getElementById('pkg-checklist');
+            list.innerHTML = "";
+            
+            if (pkg && pkg.checklist) {
+                pkg.checklist.forEach(item => {
+                    const li = document.createElement('li');
+                    li.style.display = "flex";
+                    li.style.alignItems = "center";
+                    li.style.gap = "10px";
+                    li.innerHTML = '<span style="color: var(--purple); font-weight: 900;">✓</span> ' + item;
+                    list.appendChild(li);
+                });
+                checklistContainer.style.display = "block";
+            } else {
+                checklistContainer.style.display = "none";
+            }
+            
             modal.classList.add('modal-active');
         }
 
