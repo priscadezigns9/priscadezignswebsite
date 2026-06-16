@@ -175,29 +175,64 @@
             z-index: 1;
         }
 
+        
         #scroll-indicator {
             position: fixed;
-            right: 50px;
+            right: 40px;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            z-index: 11;
+            gap: 15px;
+            z-index: 100;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .dot-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            opacity: 0.3;
+            group: dot;
+        }
+
+        .dot-wrapper:hover, .dot-wrapper.active {
+            opacity: 1;
+        }
+
+        .dot-label {
+            font-size: 0.55rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--lilac);
+            transition: 0.3s;
+            transform: translateX(10px);
+            opacity: 0;
+            white-space: nowrap;
+        }
+
+        .dot-wrapper:hover .dot-label, .dot-wrapper.active .dot-label {
+            opacity: 1;
+            transform: translateX(0);
         }
 
         .dot {
-            width: 4px; height: 4px;
+            width: 8px; height: 8px;
             border-radius: 50%;
             background: var(--lilac);
-            opacity: 0.2;
+            transition: 0.3s;
         }
 
-        .dot.active {
-            opacity: 1;
+        .dot-wrapper.active .dot {
             background: var(--purple);
-            transform: scale(2.5);
+            box-shadow: 0 0 15px var(--purple);
+            transform: scale(1.3);
         }
+
 
         /* MODAL STYLES */
         #modal-overlay {
@@ -420,12 +455,53 @@
             { name: "THREADS", sector: "SOCIAL", logo: "", desc: "Real-time discussion on the affiliate engine.", url: "https://threads.net/@priscillanarine", type: "external" }
         ];
 
+        
+        function rotateSlices(dir) {
+            if (isAnimating) return;
+            isAnimating = true;
+            const direction = dir === 'next' ? 1 : -1;
+            currentIndex = (currentIndex + direction + brands.length) % brands.length;
+            gsap.to(globe.rotation, { 
+                y: globe.rotation.y + (Math.PI / 2.5 * direction), 
+                duration: 1.5, 
+                ease: "expo.out",
+                onComplete: () => { isAnimating = false; }
+            });
+            updateUI(currentIndex);
+        }
+
+        function jumpTo(index) {
+            if (isAnimating || index === currentIndex) return;
+            const diff = index - currentIndex;
+            isAnimating = true;
+            currentIndex = index;
+            gsap.to(globe.rotation, { 
+                y: globe.rotation.y + (Math.PI / 2.5 * diff), 
+                duration: 1.5, 
+                ease: "expo.out",
+                onComplete: () => { isAnimating = false; }
+            });
+            updateUI(currentIndex);
+        }
+
         const dotsContainer = document.getElementById('scroll-indicator');
-        brands.forEach((_, i) => {
+        brands.forEach((brand, i) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'dot-wrapper' + (i === 0 ? ' active' : '');
+            wrapper.onclick = () => jumpTo(i);
+            
+            const label = document.createElement('span');
+            label.className = 'dot-label';
+            label.innerText = brand.name;
+            
             const dot = document.createElement('div');
-            dot.className = 'dot' + (i === 0 ? ' active' : '');
-            dotsContainer.appendChild(dot);
+            dot.className = 'dot';
+            
+            wrapper.appendChild(label);
+            wrapper.appendChild(dot);
+            dotsContainer.appendChild(wrapper);
         });
+
 
         let currentIndex = 0;
         let isAnimating = false;
@@ -451,7 +527,7 @@
                 const logoImg = document.getElementById('dynamic-logo');
                 logoImg.style.display = brand.logo ? "block" : "none"; logoImg.src = brand.logo;
                 
-                const dots = document.querySelectorAll('.dot');
+                const dots = document.querySelectorAll('.dot-wrapper');
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
 
                 gsap.to(".brand-visual-container", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" });
@@ -552,22 +628,12 @@
             }
         }, {passive: true});
 
+        
         window.addEventListener('wheel', (e) => {
             if (isAnimating || modal.classList.contains('modal-active')) return;
-            isAnimating = true;
-
-            const direction = e.deltaY > 0 ? 1 : -1;
-            currentIndex = (currentIndex + direction + brands.length) % brands.length;
-
-            gsap.to(globe.rotation, { 
-                y: globe.rotation.y + (Math.PI / 2.5 * direction), 
-                duration: 1.5, 
-                ease: "expo.out",
-                onComplete: () => { isAnimating = false; }
-            });
-
-            updateUI(currentIndex);
+            rotateSlices(e.deltaY > 0 ? 'next' : 'prev');
         }, { passive: true });
+
 
         function animate() {
             requestAnimationFrame(animate);
