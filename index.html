@@ -252,9 +252,23 @@
 
         #form-msg { text-align: center; font-weight: 900; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; margin-top: 15px; }
 
+        #bg-logo-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vw;
+            height: 80vw;
+            background: url("logo_icon.jpg") no-repeat center;
+            background-size: contain;
+            opacity: 0.03;
+            z-index: -1;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
+    <div id="bg-logo-overlay"></div>
 
     <div id="ui-layer">
         <header>
@@ -389,7 +403,7 @@
             { name: "PEAK FIT", sector: "BRAND", logo: "", desc: "Biohacking recovery science and elite fitness performance.", url: "peakfit/", type: "external" },
 
             { name: "SEAMRITE DESIGNS", sector: "CLIENT", logo: "", desc: "Modern artistic sewing and ancestral Caribbean authenticity.", url: "seamritedesigns-/", type: "external" },
-            { name: "PROCYON", sector: "CORE NETWORK", logo: "", desc: "The high-fidelity migration hub for the Web3 transition.", url: "https://priscion.com", type: "external" },
+            { name: "PRISICON", sector: "CORE NETWORK", logo: "", desc: "The high-fidelity migration hub for the Web3 transition.", url: "https://priscion.com", type: "external" },
             { name: "EVOLVE", sector: "PARTNER", logo: "", desc: "Caribbean-wide corporate mobility and fleet sales logistics.", url: "partners/#evolve", type: "external" },
             
             { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "blog.html", type: "external" },
@@ -407,6 +421,7 @@
         });
 
         let currentIndex = 0;
+        let isAnimating = false;
 
         function updateUI(index) {
             const brand = brands[index];
@@ -481,40 +496,21 @@
             }
         };
 
-        let lastScrollTime = 0;
-        const scrollCooldown = 600; 
+        window.addEventListener('wheel', (e) => {
+            if (isAnimating || modal.classList.contains('modal-active')) return;
+            isAnimating = true;
 
-        function handleNavigation(direction) {
-            const now = Date.now();
-            if (now - lastScrollTime < scrollCooldown || modal.classList.contains('modal-active')) return;
-            
-            lastScrollTime = now;
+            const direction = e.deltaY > 0 ? 1 : -1;
             currentIndex = (currentIndex + direction + brands.length) % brands.length;
 
             gsap.to(globe.rotation, { 
                 y: globe.rotation.y + (Math.PI / 2.5 * direction), 
-                duration: 1.2, 
-                ease: "power3.out"
+                duration: 1.5, 
+                ease: "expo.out",
+                onComplete: () => { isAnimating = false; }
             });
 
             updateUI(currentIndex);
-        }
-
-        window.addEventListener('wheel', (e) => {
-            if (Math.abs(e.deltaY) < 10) return;
-            handleNavigation(e.deltaY > 0 ? 1 : -1);
-        }, { passive: true });
-
-        let touchStartY = 0;
-        window.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
-        }, { passive: true });
-
-        window.addEventListener('touchend', (e) => {
-            const deltaY = touchStartY - e.changedTouches[0].clientY;
-            if (Math.abs(deltaY) > 50) {
-                handleNavigation(deltaY > 0 ? 1 : -1);
-            }
         }, { passive: true });
 
         function animate() {
