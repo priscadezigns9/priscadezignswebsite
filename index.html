@@ -28,7 +28,6 @@
             height: 100vh;
         }
 
-        /* UI Overlays */
         #ui-layer {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -61,15 +60,32 @@
             text-transform: lowercase;
         }
 
-        .nav-trigger {
-            font-weight: 900; font-size: 0.7rem; letter-spacing: 3px;
-            color: var(--purple); cursor: pointer;
-        }
-
         main {
             text-align: left;
             pointer-events: auto;
             max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .brand-visual-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .dynamic-brand-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(48, 25, 52, 0.1));
+            transition: all 0.5s ease;
+        }
+
+        .brand-text-content {
+            display: flex;
+            flex-direction: column;
         }
 
         .brand-label {
@@ -81,8 +97,8 @@
 
         h1 {
             font-family: var(--font-heading);
-            font-size: clamp(3rem, 7vw, 6rem);
-            line-height: 0.85;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            line-height: 0.9;
             color: var(--purple);
             letter-spacing: -3px;
             font-weight: 900;
@@ -90,16 +106,17 @@
         }
 
         .view-cta {
-            margin-top: 30px;
+            margin-top: 10px;
             display: inline-block;
-            padding: 15px 40px;
+            padding: 12px 35px;
             border: 1px solid var(--purple);
             color: var(--purple);
             text-decoration: none;
             font-weight: 900;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 2px;
             transition: all 0.3s ease;
+            width: fit-content;
         }
 
         .view-cta:hover {
@@ -115,12 +132,11 @@
         .footer-info { 
             font-family: var(--font-heading);
             font-style: italic;
-            font-size: 1.2rem; 
+            font-size: 1.1rem; 
             color: var(--lilac);
             max-width: 400px;
         }
 
-        /* 3D Container */
         #canvas-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -134,7 +150,7 @@
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             z-index: 11;
         }
 
@@ -160,13 +176,18 @@
                 <img src="https://raw.githubusercontent.com/priscadezigns9/priscion/main/assets/priscion_logo.png" alt="Prisca Dezigns" class="logo-img">
                 <div class="logo">prisca dezigns.</div>
             </div>
-            <div class="nav-trigger">INDEX</div>
+            <div style="font-weight: 900; font-size: 0.7rem; letter-spacing: 3px; color: var(--purple);">EMPIRE V.2.0</div>
         </header>
 
         <main>
-            <div class="brand-label" id="current-sector">SYSTEM ENTRY</div>
-            <h1 id="current-brand">BRAND SCAN</h1>
-            <a href="#" id="brand-url" class="view-cta">ENTER DOMAIN</a>
+            <div class="brand-visual-container">
+                <img id="dynamic-logo" src="https://raw.githubusercontent.com/priscadezigns9/priscion/main/assets/priscion_logo.png" alt="Brand Logo" class="dynamic-brand-logo">
+                <div class="brand-text-content">
+                    <div class="brand-label" id="current-sector">SYSTEM ENTRY</div>
+                    <h1 id="current-brand">BRAND SCAN</h1>
+                    <a href="#" id="brand-url" class="view-cta">ENTER DOMAIN</a>
+                </div>
+            </div>
         </main>
 
         <footer>
@@ -174,12 +195,12 @@
                 Architecting Private Digital Networks for the Sovereign Individual.
             </div>
             <div id="interaction-guide" style="font-size: 0.6rem; letter-spacing: 3px; color: var(--lilac); font-weight: 900;">
-                SCROLL TO ROTATE SLICES
+                SCROLL TO NAVIGATE SLICES
             </div>
         </footer>
     </div>
 
-    <div id="scroll-indicator" id="dots-container"></div>
+    <div id="scroll-indicator"></div>
 
     <div id="canvas-container"></div>
 
@@ -193,62 +214,50 @@
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
         scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(5, 5, 5);
-        scene.add(dirLight);
-
-        const geometry = new THREE.IcosahedronGeometry(2.5, 3);
-        const material = new THREE.MeshPhongMaterial({ 
+        const globeGeo = new THREE.IcosahedronGeometry(2.5, 3);
+        const globeMat = new THREE.MeshPhongMaterial({ 
             color: 0xC8A2C8, 
             wireframe: true,
             transparent: true,
-            opacity: 0.4
+            opacity: 0.3
         });
-        const globe = new THREE.Mesh(geometry, material);
+        const globe = new THREE.Mesh(globeGeo, globeMat);
         scene.add(globe);
 
         camera.position.z = 6;
 
+        const baseAssets = "https://raw.githubusercontent.com/priscadezigns9/priscion/main/assets/";
         const brands = [
-            { name: "BRAND SCAN", sector: "SYSTEM ENTRY", url: "#" },
-            { name: "PRISCION HUB", sector: "CORE NETWORK", url: "https://priscion.com" },
-            { name: "DESKWELL", sector: "OFFICE SOLUTIONS", url: "https://priscadezigns.org/deskwell/" },
-            { name: "PANTRIQ", sector: "SMART KITCHEN", url: "https://priscadezigns.org/pantriq/" },
-            { name: "SHELFLY", sector: "SMART STORAGE", url: "https://priscadezigns.org/shelfly/" },
-            { name: "ESSENCE ELITE", sector: "FRAGRANCE", url: "https://priscadezigns.org/essenceelite/" },
-            { name: "GLOW PROTOCOL", sector: "SKINCARE", url: "https://priscadezigns.org/glowprotocol/" },
-            { name: "PRIME LAND NETWORK", sector: "REAL ESTATE", url: "https://priscadezigns.org/primelandnetwork/" },
-            { name: "THE WATCH LIST", sector: "HOROLOGY", url: "https://priscadezigns.org/thewatchlist/" },
-            { name: "SOLE PRESTIGE", sector: "FOOTWEAR", url: "https://priscadezigns.org/soleprestige/" },
-            { name: "ATELIA GAMING", sector: "MEDIA & TECH", url: "https://priscadezigns.org/ateliagaming/" },
-            { name: "DREAMING ANIME", sector: "ANIME MEDIA", url: "https://dreaminganime.com" },
-            { name: "PEAK FIT", sector: "BIOHACKING", url: "https://priscadezigns.org/peakfit/" },
-            { name: "VERDANT CO", sector: "SUSTAINABILITY", url: "https://priscadezigns.org/verdantco/" },
-            { name: "MY BABY DUMPLING", sector: "MATERNITY", url: "https://priscadezigns.org/mybabydumpling/" },
-            { name: "RIDDIIM", sector: "MUSIC STUDIO", url: "https://priscadezigns.org/riddiim/" },
-            { name: "THE AUTODROME", sector: "AUTOMOTIVE", url: "https://priscadezigns.org/theautodrome/" },
-            { name: "THE ESCAPIST", sector: "TRAVEL", url: "https://priscadezigns.org/theescapist/" },
-            { name: "THE TECH SCOUT HQ", sector: "INNOVATION", url: "https://priscadezigns.org/thetechscouthq/" },
-            { name: "QUIET LUXURY", sector: "HOME DECOR", url: "https://priscadezigns.org/quietluxury/" },
-            { name: "COUTURE GALLERY", sector: "LUXURY RETAIL", url: "https://priscadezigns.org/couturegallery/" },
-            { name: "PAW VAULT", sector: "PET CARE", url: "https://priscadezigns.org/pawvault/" },
-            { name: "LES AMOUR", sector: "RELATIONSHIPS", url: "https://priscadezigns.org/lesamour/" },
-            { name: "ORNALIS LIGHTING", sector: "ARCHITECTURAL", url: "https://priscadezigns.org/ornalis/" },
-            { name: "AXORIA FRAMES", sector: "EYEWEAR", url: "https://priscadezigns.org/axoria/" },
-            { name: "CUPYX", sector: "PRODUCT", url: "#" },
-            { name: "VELLOQ", sector: "PRODUCT", url: "#" },
-            { name: "KARJOV", sector: "PRODUCT", url: "#" },
-            { name: "ROWCELL", sector: "PRODUCT", url: "#" },
-            { name: "SEAMRITE DESIGNS", sector: "CLIENTS", url: "https://priscadezigns.org/seamritedesigns-/" },
-            { name: "EVOLVE MOBILITY", sector: "PARTNERS", url: "https://priscadezigns.org/theautodrome/" },
-            { name: "EMPIRE BLOG", sector: "INTELLIGENCE", url: "#" },
-            { name: "A LA CARTE", sector: "SERVICES", url: "#" },
-            { name: "FACEBOOK", sector: "SOCIAL", url: "https://facebook.com/priscilla.narine" },
-            { name: "INSTAGRAM", sector: "SOCIAL", url: "https://www.instagram.com/priscillanarine/" },
-            { name: "THREADS", sector: "SOCIAL", url: "https://www.threads.net/@priscillanarine" }
+            { name: "BRAND SCAN", sector: "SYSTEM ENTRY", logo: baseAssets + "priscion_logo.png", url: "#" },
+            { name: "PRISCION HUB", sector: "CORE NETWORK", logo: baseAssets + "priscion_logo.png", url: "https://priscion.com" },
+            { name: "MUZE WALLET", sector: "FINANCIAL", logo: baseAssets + "muze_logo.png", url: "#" },
+            { name: "DESKWELL", sector: "OFFICE SOLUTIONS", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/deskwell/" },
+            { name: "PANTRIQ", sector: "SMART KITCHEN", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/pantriq/" },
+            { name: "SHELFLY", sector: "SMART STORAGE", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/shelfly/" },
+            { name: "ESSENCE ELITE", sector: "FRAGRANCE", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/essenceelite/" },
+            { name: "GLOW PROTOCOL", sector: "SKINCARE", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/glowprotocol/" },
+            { name: "PRIME LAND NETWORK", sector: "REAL ESTATE", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/primelandnetwork/" },
+            { name: "THE WATCH LIST", sector: "HOROLOGY", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/thewatchlist/" },
+            { name: "SOLE PRESTIGE", sector: "FOOTWEAR", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/soleprestige/" },
+            { name: "ATELIA GAMING", sector: "MEDIA & TECH", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/ateliagaming/" },
+            { name: "DREAMING ANIME", sector: "ANIME MEDIA", logo: baseAssets + "priscion_logo.png", url: "https://dreaminganime.com" },
+            { name: "PEAK FIT", sector: "BIOHACKING", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/peakfit/" },
+            { name: "VERDANT CO", sector: "SUSTAINABILITY", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/verdantco/" },
+            { name: "RIDDIIM", sector: "MUSIC STUDIO", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/riddiim/" },
+            { name: "THE AUTODROME", sector: "AUTOMOTIVE", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/theautodrome/" },
+            { name: "THE ESCAPIST", sector: "TRAVEL", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/theescapist/" },
+            { name: "THE TECH SCOUT HQ", sector: "INNOVATION", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/thetechscouthq/" },
+            { name: "QUIET LUXURY", sector: "HOME DECOR", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/quietluxury/" },
+            { name: "COUTURE GALLERY", sector: "LUXURY RETAIL", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/couturegallery/" },
+            { name: "PAW VAULT", sector: "PET CARE", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/pawvault/" },
+            { name: "LES AMOUR", sector: "RELATIONSHIPS", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/lesamour/" },
+            { name: "ORNALIS LIGHTING", sector: "ARCHITECTURAL", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/ornalis/" },
+            { name: "AXORIA FRAMES", sector: "EYEWEAR", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/axoria/" },
+            { name: "SEAMRITE DESIGNS", sector: "CLIENTS", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/seamritedesigns-/" },
+            { name: "EVOLVE MOBILITY", sector: "PARTNERS", logo: baseAssets + "priscion_logo.png", url: "https://priscadezigns.org/theautodrome/" },
+            { name: "FACEBOOK", sector: "SOCIAL", logo: baseAssets + "priscion_logo.png", url: "https://facebook.com/priscilla.narine" }
         ];
 
-        // Generate Dots
         const dotsContainer = document.getElementById('scroll-indicator');
         brands.forEach((_, i) => {
             const dot = document.createElement('div');
@@ -267,28 +276,28 @@
             currentIndex = (currentIndex + direction + brands.length) % brands.length;
 
             gsap.to(globe.rotation, { 
-                y: globe.rotation.y + (Math.PI / 4 * direction), 
-                x: globe.rotation.x + (Math.PI / 10 * direction),
-                duration: 1.0, 
-                ease: "power2.inOut",
+                y: globe.rotation.y + (Math.PI / 3 * direction), 
+                duration: 1.2, 
+                ease: "expo.out",
                 onComplete: () => { isAnimating = false; }
             });
 
-            gsap.to("main", { opacity: 0, x: -10, duration: 0.2, onComplete: () => {
+            gsap.to(".brand-visual-container", { opacity: 0, y: 20, duration: 0.3, onComplete: () => {
                 document.getElementById('current-brand').innerText = brands[currentIndex].name;
                 document.getElementById('current-sector').innerText = brands[currentIndex].sector;
                 document.getElementById('brand-url').href = brands[currentIndex].url;
+                document.getElementById('dynamic-logo').src = brands[currentIndex].logo;
                 
                 const dots = document.querySelectorAll('.dot');
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
 
-                gsap.to("main", { opacity: 1, x: 0, duration: 0.4 });
+                gsap.to(".brand-visual-container", { opacity: 1, y: 0, duration: 0.5 });
             }});
         }, { passive: true });
 
         function animate() {
             requestAnimationFrame(animate);
-            globe.rotation.y += 0.001;
+            globe.rotation.y += 0.002;
             renderer.render(scene, camera);
         }
         animate();
