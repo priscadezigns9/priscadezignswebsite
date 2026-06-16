@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prisca Dezigns | The Rubik's Globe</title>
-    <link rel="icon" type="image/png" href="https://drive.google.com/uc?export=download&id=1oDDpOkbUL-KjZgXistmsy8iLuRiyZ5s4">
+    <!-- GDrive Direct Link Proxy -->
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1oDDpOkbUL-KjZgXistmsy8iLuRiyZ5s4">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --ivory: #FFFFF0;
@@ -17,6 +19,7 @@
             --text: #1a1a1a;
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Inter', sans-serif;
+            --accent: #14B8A6;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,8 +52,9 @@
         }
 
         .logo-img {
-            width: 40px; height: 40px;
+            width: 50px; height: 50px;
             object-fit: contain;
+            border-radius: 50%;
         }
 
         .logo { 
@@ -116,6 +120,15 @@
             font-style: italic;
         }
 
+        .price-tag {
+            font-family: var(--font-body);
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--purple);
+            margin-bottom: 20px;
+            display: block;
+        }
+
         .view-cta {
             display: inline-block;
             padding: 14px 40px;
@@ -128,6 +141,8 @@
             transition: all 0.3s ease;
             width: fit-content;
             text-transform: uppercase;
+            cursor: pointer;
+            background: transparent;
         }
 
         .view-cta:hover {
@@ -179,6 +194,60 @@
             background: var(--purple);
             transform: scale(2.5);
         }
+
+        /* MODAL STYLES */
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(48, 25, 52, 0.95);
+            z-index: 100;
+            display: none;
+            align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        #modal-content {
+            background: var(--ivory);
+            padding: 60px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .modal-active #modal-overlay { display: flex; opacity: 1; }
+        .modal-active #modal-content { transform: translateY(0); }
+
+        .close-modal {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 2rem; color: var(--purple);
+            cursor: pointer; font-weight: 300;
+        }
+
+        #lead-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-field { display: flex; flex-direction: column; gap: 8px; }
+        .form-field label { font-weight: 900; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--lilac); }
+        .form-field input, .form-field select {
+            padding: 15px; border: 1px solid rgba(48, 25, 52, 0.1);
+            background: #fff; font-family: var(--font-body);
+            font-size: 1rem; border-radius: 8px;
+        }
+
+        #submit-btn {
+            background: var(--purple); color: #fff;
+            padding: 18px; border: none; border-radius: 100px;
+            font-weight: 900; font-size: 0.8rem; letter-spacing: 3px;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+        }
+
+        #submit-btn:disabled { background: var(--lilac); cursor: not-allowed; }
+
+        #form-msg { text-align: center; font-weight: 900; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; margin-top: 15px; }
+
     </style>
 </head>
 <body>
@@ -186,10 +255,10 @@
     <div id="ui-layer">
         <header>
             <div class="logo-container">
-                <img src="https://drive.google.com/uc?export=download&id=1oDDpOkbUL-KjZgXistmsy8iLuRiyZ5s4" alt="Prisca Dezigns" class="logo-img">
+                <img src="https://lh3.googleusercontent.com/d/1oDDpOkbUL-KjZgXistmsy8iLuRiyZ5s4" alt="Prisca Dezigns" class="logo-img">
                 <div class="logo">prisca dezigns.</div>
             </div>
-            <div style="font-weight: 900; font-size: 0.7rem; letter-spacing: 3px; color: var(--purple);">EMPIRE V.2.2</div>
+            <div style="font-weight: 900; font-size: 0.7rem; letter-spacing: 3px; color: var(--purple);">EMPIRE V.2.3</div>
         </header>
 
         <main>
@@ -199,7 +268,8 @@
                     <div class="brand-label" id="current-sector">SYSTEM ENTRY</div>
                     <h1 id="current-brand">BRAND SCAN</h1>
                     <div class="brand-description" id="current-desc"></div>
-                    <a href="scan/" id="brand-url" target="_blank" class="view-cta">ENTER DOMAIN</a>
+                    <div class="price-tag" id="current-price"></div>
+                    <button id="main-cta" class="view-cta">ENTER DOMAIN</button>
                 </div>
             </div>
         </main>
@@ -214,11 +284,39 @@
         </footer>
     </div>
 
-    <div id="scroll-indicator"></div>
+    <div id="modal-overlay">
+        <div id="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <h2 style="font-family: var(--font-heading); color: var(--purple); margin-bottom: 10px;">Secure Your Slot</h2>
+            <p style="font-size: 0.9rem; margin-bottom: 30px; color: #666;">Submit your details to activate your Intelligence Node.</p>
+            <form id="lead-form">
+                <div class="form-field">
+                    <label>Full Name</label>
+                    <input type="text" id="user-name" placeholder="E.g. Satoshi Nakamoto" required>
+                </div>
+                <div class="form-field">
+                    <label>Contact Signal (Email)</label>
+                    <input type="email" id="user-email" placeholder="email@nexus.com" required>
+                </div>
+                <div class="form-field">
+                    <label>Selected Target</label>
+                    <input type="text" id="target-package" readonly>
+                </div>
+                <button type="submit" id="submit-btn">INITIATE CONNECTION</button>
+            </form>
+            <div id="form-msg"></div>
+        </div>
+    </div>
 
+    <div id="scroll-indicator"></div>
     <div id="canvas-container"></div>
 
     <script>
+        // SUPABASE INIT
+        const SB_URL = "https://sktpjacowqaedddtrhuz.supabase.co";
+        const SB_KEY = "{{credential:supabase-anon-key}}";
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -244,70 +342,56 @@
 
         camera.position.z = 6.5;
 
-        const base = "https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/";
-        
         const brands = [
-            // 1. BRAND SCAN
-            { name: "BRAND SCAN", sector: "SYSTEM ENTRY", logo: "", desc: "Real-time diagnostic analysis of digital identity and brand footprint.", url: "scan/" },
+            { name: "BRAND SCAN", sector: "SYSTEM ENTRY", logo: "", desc: "Real-time diagnostic analysis of digital identity and brand footprint.", url: "scan/", type: "external" },
             
-            // 2. PACKAGES
-            { name: "STARTER PKG", sector: "PACKAGES", logo: "", desc: "Core digital foundation. Branding, single landing page, and basic SEO mapping.", url: "packages/#starter" },
-            { name: "GROWTH PKG", sector: "PACKAGES", logo: "", desc: "Scaling network. Multi-page architecture, CRM integration, and 3 months of AI analytics.", url: "packages/#growth" },
-            { name: "TRUSTED PKG", sector: "PACKAGES", logo: "", desc: "The Sovereign Standard. Full automation, Web3 integration, and deep data vaulting.", url: "packages/#trusted" },
+            { name: "STARTER PKG", sector: "PACKAGES", logo: "", price: "$297/mo", desc: "Core digital foundation. Branding, single landing page, and basic SEO mapping.", type: "lead" },
+            { name: "GROWTH PKG", sector: "PACKAGES", logo: "", price: "$597/mo", desc: "Scaling network. Multi-page architecture, CRM integration, and AI analytics.", type: "lead" },
+            { name: "TRUSTED PKG", sector: "PACKAGES", logo: "", price: "$1,200/mo", desc: "The Sovereign Standard. Full automation, Web3 integration, and deep data vaulting.", type: "lead" },
             
-            // 3. A LA CARTE
-            { name: "AI COPYWRITING", sector: "A LA CARTE", logo: "", desc: "Neural-optimized messaging for high-fidelity audience engagement.", url: "services/#copy" },
-            { name: "LOGO DESIGN", sector: "A LA CARTE", logo: "", desc: "Minimalist, symbolic identity engineering for luxury and tech niches.", url: "services/#logo" },
-            { name: "SEO ARCHITECTURE", sector: "A LA CARTE", logo: "", desc: "Technical structural alignment for maximum visibility across the global signal.", url: "services/#seo" },
+            { name: "AI COPYWRITING", sector: "A LA CARTE", logo: "", price: "$150", desc: "Neural-optimized messaging for high-fidelity audience engagement.", type: "lead" },
+            { name: "LOGO DESIGN", sector: "A LA CARTE", logo: "", price: "$250", desc: "Minimalist, symbolic identity engineering for luxury and tech niches.", type: "lead" },
+            { name: "SEO ARCHITECTURE", sector: "A LA CARTE", logo: "", price: "$450", desc: "Technical structural alignment for maximum visibility across the global signal.", type: "lead" },
             
-            // 4. INDIVIDUAL PRODUCTS
-            { name: "ROWCELL", sector: "PRODUCT", logo: "", desc: "Advanced cellular logistics and data management node.", url: "rowcell/" },
-            { name: "KARJOV", sector: "PRODUCT", logo: "", desc: "High-performance operational engine for private networks.", url: "karjov/" },
-            { name: "VELLOQ", sector: "PRODUCT", logo: "", desc: "Next-gen communication and encryption protocol.", url: "velloq/" },
-            { name: "MOBLYNC", sector: "PRODUCT", logo: "", desc: "Mobile-first synchronization for multi-device brand ecosystems.", url: "moblync/" },
-            { name: "CUPYX", sector: "PRODUCT", logo: "", desc: "Digital resource containerization and distribution utility.", url: "cupyx/" },
+            { name: "ROWCELL", sector: "PRODUCT", logo: "", desc: "Advanced cellular logistics and data management node.", url: "rowcell/", type: "external" },
+            { name: "KARJOV", sector: "PRODUCT", logo: "", desc: "High-performance operational engine for private networks.", url: "karjov/", type: "external" },
+            { name: "VELLOQ", sector: "PRODUCT", logo: "", desc: "Next-gen communication and encryption protocol.", url: "velloq/", type: "external" },
+            { name: "MOBLYNC", sector: "PRODUCT", logo: "", desc: "Mobile-first synchronization for multi-device brand ecosystems.", url: "moblync/", type: "external" },
+            { name: "CUPYX", sector: "PRODUCT", logo: "", desc: "Digital resource containerization and distribution utility.", url: "cupyx/", type: "external" },
             
-            // 5. THE BRANDS
-            { name: "ESSENCE ELITE", sector: "BRAND", logo: "", desc: "Artisanal olfactory science and scent-layering mastery.", url: "essenceelite/" },
-            { name: "THE AUTODROME", sector: "BRAND", logo: "", desc: "Engineering-grade supercar culture and automotive performance.", url: "theautodrome/" },
-            { name: "DESKWELL", sector: "BRAND", logo: "", desc: "High-fidelity ergonomic environments for peak productivity.", url: "deskwell/" },
-            { name: "THE GEN PLAY", sector: "BRAND", logo: "", desc: "Generational toys and high-fidelity collectible engineering.", url: "thegenplay/" },
-            { name: "LES AMOUR", sector: "BRAND", logo: "", desc: "AI-powered emotional intelligence and relationship coaching.", url: "lesamour/" },
-            { name: "ORNALIS LIGHTING", sector: "BRAND", logo: "", desc: "Architectural illumination and sanctuary atmosphere engineering.", url: "ornalis/" },
-            { name: "AVORIA FRAMES", sector: "BRAND", logo: "", desc: "Sovereign eyewear and architectural vision design.", url: "axoria/" },
-            { name: "SHELFLY", sector: "BRAND", logo: "", desc: "Intelligent storage logistics for modern living spaces.", url: "shelfly/" },
-            { name: "PANTRIQ", sector: "BRAND", logo: "", desc: "Automated culinary logistics and smart kitchen tech.", url: "pantriq/" },
-            { name: "VERDANT CO", sector: "BRAND", logo: "", desc: "Regenerative sustainability and circular economy infrastructure.", url: "verdantco/" },
-            { name: "QUIET LUXURY", sector: "BRAND", logo: "", desc: "Minimalist luxury and sanctuary-focused home decor.", url: "quietluxury/" },
-            { name: "COUTURE GALLERY", sector: "BRAND", logo: "", desc: "Archival fashion craftsmanship and luxury accessories.", url: "couturegallery/" },
-            { name: "PAW VAULT", sector: "BRAND", logo: "", desc: "High-fidelity pet care and smart nutrition technology.", url: "pawvault/" },
-            { name: "THE WATCH LIST", sector: "BRAND", logo: "", desc: "Elite horological engineering and archival timepiece intelligence.", url: "thewatchlist/" },
-            { name: "THE ESCAPIST", sector: "BRAND", logo: "", desc: "Sanctuary travel experiences and luxury destination intelligence.", url: "theescapist/" },
-            { name: "GLOW PROTOCOL", sector: "BRAND", logo: "", desc: "Regenerative beauty tech and longevity skin diagnostics.", url: "glowprotocol/" },
-            { name: "SOLE PRESTIGE", sector: "BRAND", logo: "", desc: "Bespoke footwear design and elite streetwear culture.", url: "soleprestige/" },
-            { name: "PRIME LAND NETWORK", sector: "BRAND", logo: "", desc: "Global property investment and luxury real estate logistics.", url: "primelandnetwork/" },
-            { name: "ATELIA GAMING", sector: "BRAND", logo: "", desc: "High-fidelity gaming media and tech hardware engineering.", url: "ateliagaming/" },
-            { name: "THE WAY MADE KNOWN", sector: "MISSION", logo: "", desc: "Analytical faith evidence and historical gospel proclamation.", url: "https://thewaymadeknown.com" },
-            { name: "DREAMING ANIME", sector: "BRAND", logo: "", desc: "High-fidelity animation media and studio production news.", url: "https://dreaminganime.com" },
-            { name: "THE TECH SCOUT HQ", sector: "BRAND", logo: "", desc: "Innovation news and emerging neural technology signals.", url: "thetechscouthq/" },
-            { name: "PEAK FIT", sector: "BRAND", logo: "", desc: "Biohacking recovery science and elite fitness performance.", url: "peakfit/" },
+            { name: "ESSENCE ELITE", sector: "BRAND", logo: "", desc: "Artisanal olfactory science and scent-layering mastery.", url: "essenceelite/", type: "external" },
+            { name: "THE AUTODROME", sector: "BRAND", logo: "", desc: "Engineering-grade supercar culture and automotive performance.", url: "theautodrome/", type: "external" },
+            { name: "DESKWELL", sector: "BRAND", logo: "", desc: "High-fidelity ergonomic environments for peak productivity.", url: "deskwell/", type: "external" },
+            { name: "THE GEN PLAY", sector: "BRAND", logo: "", desc: "Generational toys and high-fidelity collectible engineering.", url: "thegenplay/", type: "external" },
+            { name: "LES AMOUR", sector: "BRAND", logo: "", desc: "AI-powered emotional intelligence and relationship coaching.", url: "lesamour/", type: "external" },
+            { name: "ORNALIS LIGHTING", sector: "BRAND", logo: "", desc: "Architectural illumination and sanctuary atmosphere engineering.", url: "ornalis/", type: "external" },
+            { name: "AVORIA FRAMES", sector: "BRAND", logo: "", desc: "Sovereign eyewear and architectural vision design.", url: "axoria/", type: "external" },
+            { name: "SHELFLY", sector: "BRAND", logo: "", desc: "Intelligent storage logistics for modern living spaces.", url: "shelfly/", type: "external" },
+            { name: "PANTRIQ", sector: "BRAND", logo: "", desc: "Automated culinary logistics and smart kitchen tech.", url: "pantriq/", type: "external" },
+            { name: "VERDANT CO", sector: "BRAND", logo: "", desc: "Regenerative sustainability and circular economy infrastructure.", url: "verdantco/", type: "external" },
+            { name: "QUIET LUXURY", sector: "BRAND", logo: "", desc: "Minimalist luxury and sanctuary-focused home decor.", url: "quietluxury/", type: "external" },
+            { name: "COUTURE GALLERY", sector: "BRAND", logo: "", desc: "Archival fashion craftsmanship and luxury accessories.", url: "couturegallery/", type: "external" },
+            { name: "PAW VAULT", sector: "BRAND", logo: "", desc: "High-fidelity pet care and smart nutrition technology.", url: "pawvault/", type: "external" },
+            { name: "THE WATCH LIST", sector: "BRAND", logo: "", desc: "Elite horological engineering and archival timepiece intelligence.", url: "thewatchlist/", type: "external" },
+            { name: "THE ESCAPIST", sector: "BRAND", logo: "", desc: "Sanctuary travel experiences and luxury destination intelligence.", url: "theescapist/", type: "external" },
+            { name: "GLOW PROTOCOL", sector: "BRAND", logo: "", desc: "Regenerative beauty tech and longevity skin diagnostics.", url: "glowprotocol/", type: "external" },
+            { name: "SOLE PRESTIGE", sector: "BRAND", logo: "", desc: "Bespoke footwear design and elite streetwear culture.", url: "soleprestige/", type: "external" },
+            { name: "PRIME LAND NETWORK", sector: "BRAND", logo: "", desc: "Global property investment and luxury real estate logistics.", url: "primelandnetwork/", type: "external" },
+            { name: "ATELIA GAMING", sector: "BRAND", logo: "", desc: "High-fidelity gaming media and tech hardware engineering.", url: "ateliagaming/", type: "external" },
+            { name: "THE WAY MADE KNOWN", sector: "MISSION", logo: "", desc: "Analytical faith evidence and historical gospel proclamation.", url: "https://thewaymadeknown.com", type: "external" },
+            { name: "DREAMING ANIME", sector: "BRAND", logo: "", desc: "High-fidelity animation media and studio production news.", url: "https://dreaminganime.com", type: "external" },
+            { name: "THE TECH SCOUT HQ", sector: "BRAND", logo: "", desc: "Innovation news and emerging neural technology signals.", url: "thetechscouthq/", type: "external" },
+            { name: "PEAK FIT", sector: "BRAND", logo: "", desc: "Biohacking recovery science and elite fitness performance.", url: "peakfit/", type: "external" },
 
-            // 6. CLIENTS
-            { name: "SEAMRITE DESIGNS", sector: "CLIENT", logo: "", desc: "Modern artistic sewing and ancestral Caribbean authenticity.", url: "seamritedesigns-/" },
+            { name: "SEAMRITE DESIGNS", sector: "CLIENT", logo: "", desc: "Modern artistic sewing and ancestral Caribbean authenticity.", url: "seamritedesigns-/", type: "external" },
+            { name: "PRISICON", sector: "CORE NETWORK", logo: "", desc: "The high-fidelity migration hub for the Web3 transition.", url: "https://priscion.com", type: "external" },
+            { name: "EVOLVE", sector: "PARTNER", logo: "", desc: "Caribbean-wide corporate mobility and fleet sales logistics.", url: "partners/#evolve", type: "external" },
+            
+            { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "pd_blog_migration.html", type: "external" },
 
-            // 7. PRISCION
-            { name: "PRISICON", sector: "CORE NETWORK", logo: "", desc: "The high-fidelity migration hub for the Web3 transition.", url: "https://priscion.com" },
-
-            // 8. PARTNERS
-            { name: "EVOLVE", sector: "PARTNER", logo: "", desc: "Caribbean-wide corporate mobility and fleet sales logistics.", url: "partners/#evolve" },
-
-            // 9. BLOG
-            { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "blog/" },
-
-            // 10. SOCIALS
-            { name: "FACEBOOK", sector: "SOCIAL", logo: "", desc: "Connect with our community on the Meta landscape.", url: "https://facebook.com/priscilla.narine" },
-            { name: "INSTAGRAM", sector: "SOCIAL", logo: "", desc: "Visual storytelling and luxury brand signals.", url: "https://instagram.com/priscillanarine" },
-            { name: "THREADS", sector: "SOCIAL", logo: "", desc: "Real-time discussion on the affiliate engine.", url: "https://threads.net/@priscillanarine" }
+            { name: "FACEBOOK", sector: "SOCIAL", logo: "", desc: "Connect with our community on the Meta landscape.", url: "https://facebook.com/priscilla.narine", type: "external" },
+            { name: "INSTAGRAM", sector: "SOCIAL", logo: "", desc: "Visual storytelling and luxury brand signals.", url: "https://instagram.com/priscillanarine", type: "external" },
+            { name: "THREADS", sector: "SOCIAL", logo: "", desc: "Real-time discussion on the affiliate engine.", url: "https://threads.net/@priscillanarine", type: "external" }
         ];
 
         const dotsContainer = document.getElementById('scroll-indicator');
@@ -327,20 +411,19 @@
                 document.getElementById('current-brand').innerText = brand.name;
                 document.getElementById('current-sector').innerText = brand.sector;
                 document.getElementById('current-desc').innerText = brand.desc;
-                document.getElementById('brand-url').href = brand.url;
+                document.getElementById('current-price').innerText = brand.price || "";
                 
-                const logoImg = document.getElementById('dynamic-logo');
-                if (brand.logo === "") {
-                    logoImg.style.visibility = "hidden";
-                    logoImg.style.display = "none";
+                const cta = document.getElementById('main-cta');
+                if (brand.type === "lead") {
+                    cta.innerText = "GET STARTED";
+                    cta.onclick = () => openModal(brand.name);
                 } else {
-                    logoImg.style.display = "block";
-                    logoImg.style.visibility = "visible";
-                    logoImg.src = brand.logo;
-                    logoImg.onerror = function() {
-                        this.style.display = "none";
-                    };
+                    cta.innerText = "ENTER DOMAIN";
+                    cta.onclick = () => window.open(brand.url, '_blank');
                 }
+
+                const logoImg = document.getElementById('dynamic-logo');
+                logoImg.style.display = "none";
                 
                 const dots = document.querySelectorAll('.dot');
                 dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
@@ -349,8 +432,53 @@
             }});
         }
 
+        // MODAL LOGIC
+        const modal = document.body;
+        function openModal(pkgName) {
+            document.getElementById('target-package').value = pkgName;
+            modal.classList.add('modal-active');
+        }
+
+        document.getElementById('close-modal').onclick = () => modal.classList.remove('modal-active');
+        document.getElementById('modal-overlay').onclick = (e) => {
+            if (e.target.id === 'modal-overlay') modal.classList.remove('modal-active');
+        };
+
+        const leadForm = document.getElementById('lead-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const formMsg = document.getElementById('form-msg');
+
+        leadForm.onsubmit = async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.innerText = "SYNCHRONIZING...";
+            
+            const data = {
+                name: document.getElementById('user-name').value,
+                email: document.getElementById('user-email').value,
+                package: document.getElementById('target-package').value,
+                brand: "Priscion",
+                created_at: new Date().toISOString()
+            };
+
+            const { error } = await supabaseClient.from('client_leads').insert([data]);
+
+            if (error) {
+                formMsg.style.color = "#EF4444";
+                formMsg.innerText = "ERROR: UPLINK FAILED. TRY AGAIN.";
+                submitBtn.disabled = false;
+                submitBtn.innerText = "RETRY INITIATION";
+            } else {
+                formMsg.style.color = "var(--accent)";
+                formMsg.innerText = "NODE ACTIVATED. WE WILL CONTACT YOU SHORTLY.";
+                submitBtn.innerText = "CONNECTION SECURED";
+                leadForm.reset();
+                setTimeout(() => modal.classList.remove('modal-active'), 2000);
+            }
+        };
+
         window.addEventListener('wheel', (e) => {
-            if (isAnimating) return;
+            if (isAnimating || modal.classList.contains('modal-active')) return;
             isAnimating = true;
 
             const direction = e.deltaY > 0 ? 1 : -1;
@@ -379,7 +507,6 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Initialize first state
         updateUI(0);
     </script>
 </body>
