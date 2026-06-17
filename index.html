@@ -650,7 +650,7 @@
             isAnimating = true;
             const direction = dir === 'next' ? 1 : -1;
             currentIndex = (currentIndex + direction + brands.length) % brands.length;
-            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * direction), duration: 1.5, ease: "expo.out", onComplete: () => { isAnimating = false; } });
+            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * direction), duration: 0.8, ease: "power2.out", onComplete: () => { isAnimating = false; } });
             updateUI(currentIndex);
         }
 
@@ -658,7 +658,7 @@
             if (isAnimating || index === currentIndex) return;
             const diff = index - currentIndex;
             isAnimating = true; currentIndex = index;
-            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * diff), duration: 1.5, ease: "expo.out", onComplete: () => { isAnimating = false; } });
+            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * diff), duration: 0.8, ease: "power2.out", onComplete: () => { isAnimating = false; } });
             updateUI(currentIndex);
         }
 
@@ -761,7 +761,39 @@
             if (Math.abs(dx) > 50) { if (dx > 0) rotateSlices('prev'); else rotateSlices('next'); startX = e.clientX; }
         });
         window.addEventListener('mouseup', () => { isDragging = false; });
-        window.addEventListener('wheel', (e) => { if (isAnimating || modal.classList.contains('modal-active')) return; rotateSlices(e.deltaY > 0 ? 'next' : 'prev'); }, { passive: true });
+
+        // High-fidelity touch sensitivity update
+        let touchStartY = 0;
+        window.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
+            
+            const touchY = e.touches[0].clientY;
+            const dy = touchStartY - touchY;
+            const TOUCH_THRESHOLD = 30; // Sensitive light flick
+
+            if (Math.abs(dy) >= TOUCH_THRESHOLD) {
+                rotateSlices(dy > 0 ? 'next' : 'prev');
+                touchStartY = touchY; // Reset starting point for fluid swiping
+            }
+        }, { passive: true });
+
+        let wheelAccumulator = 0;
+        const WHEEL_THRESHOLD = 50; // Reduced from default behavior for higher sensitivity
+
+        window.addEventListener('wheel', (e) => { 
+            if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
+            
+            wheelAccumulator += e.deltaY;
+            
+            if (Math.abs(wheelAccumulator) >= WHEEL_THRESHOLD) {
+                rotateSlices(wheelAccumulator > 0 ? 'next' : 'prev');
+                wheelAccumulator = 0;
+            }
+        }, { passive: true });
 
         function animate() { requestAnimationFrame(animate); globe.rotation.y += 0.0015; renderer.render(scene, camera); }
         animate();
@@ -770,4 +802,3 @@
     </script>
 </body>
 </html>
-
