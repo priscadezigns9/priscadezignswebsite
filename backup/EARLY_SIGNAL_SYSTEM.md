@@ -1,4 +1,4 @@
-# EARLY_SIGNAL_SYSTEM.md - Empire Signal Intelligence
+# EARLY_SIGNAL_SYSTEM.md - Network Signal Intelligence
 
 ## Brand Signal Map
 
@@ -20,16 +20,18 @@
 | **Real Estate** | Prime Land Network | Sentient neighborhoods, luxury listings, sustainable investment |
 | **Home/Toiletries** | Quiet Luxury, Shelfly | Minimalist design, sanctuary engineering, home wellness |
 
-## UPCOMING SIGNALS (Scan Date: 2026-06-07)
+## UPCOMING SIGNALS
+| World Cup 2026 Early Signals | Fashion/Culture | 2026-06-11 | Fan-zone merch and foodie-fashion monitoring | 🟢 LIVE |
+ (Scan Date: 2026-06-07)
 
-| Signal | Niche | Confirmed Date | Empire Preparedness | Status |
+| Signal | Niche | Confirmed Date | Network Preparedness | Status |
 | :--- | :--- | :--- | :--- | :--- |
 | WWDC 2026 Keynote | Tech/SaaS/App | 2026-06-08 | Pre-event blogs drafted, homepage live stream embed | 🟢 READY |
-| London Tech Week | Tech/Business | 2026-06-08 | Signal scan active | 🟡 SCANNING |
-| Summer Game Fest | Gaming | 2026-06-05 to 06-10 | AAA trailers monitoring | 🟢 LIVE |
-| F1 Canadian Grand Prix | Automotive | 2026-06-07 | Race highlights monitoring | 🟢 LIVE |
+| London Tech Week | Tech/Business | 2026-06-08 | Signal scan active | 🔵 ARCHIVING |
+| Summer Game Fest | Gaming | 2026-06-05 to 06-10 | AAA trailers monitoring | 🔵 ARCHIVING |
+| F1 Canadian Grand Prix | Automotive | 2026-06-07 | Race highlights monitoring | 🔵 ARCHIVING |
 | Anime Expo 2026 | Anime | 2023-07-02 | Summer lineup analysis | 🟡 PREPARING |
-| Beauty Expo Australia | Skincare | 2026-06-13 | Trend analysis pending | 🟡 PENDING |
+| Beauty Expo Australia | Skincare | 2026-06-13 | Trend analysis pending | 🟡 SCANNING |
 | JCK Las Vegas (Watch) | Watches | 2026-06-01 to 06-04 | Event recap pending | 🔵 ARCHIVING |
 
 ## Recent Discoveries (Movers & Shakers)
