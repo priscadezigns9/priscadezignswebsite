@@ -1,5 +1,9 @@
 # TOOLS.md - Local Notes
 
+## AgentOn Credentials
+- **Agent Name:** Priscion Elite Scout
+- **API Key:** `aqt_sqExJ3np3TWMycFnxTgaRB2gDUFbXIml6NY6sFd59Vs` (Keep secure)
+
 ## Empire Brand & Niche Mapping (The Broad Spectrum)
 Use these category-level signals for high-fidelity discovery. Never limit search to the brand name alone.
 
@@ -16,7 +20,45 @@ Use these category-level signals for high-fidelity discovery. Never limit search
 | **Glow Protocol** | Beauty/Skincare | Skincare diagnostics, regenerative beauty tech, longevity science, dermatological innovation. |
 | **Sole Prestige** | Footwear | Luxury sneakers, high-end heels, archival footwear design, bespoke shoemaking. |
 | **Ornalis Lighting** | Lighting | High-fidelity lighting, chandeliers, architectural illumination, sanctuary atmosphere. |
-## Empire Social Status Map (v2.0)
+| **Les Amour** | Relationships | AI-powered relationship coaching, high-fidelity intimacy tools, emotional intelligence. |
+| **Axoria Frames** | Eyewear | Sovereign eyewear, architectural frames, modern visionary design. |
+| **Riddiim** | Music Player/Studio | High-fidelity audio engineering, studio production, music playback tech. |
+
+## Blog Content & Sourcing Mandate (Effective 2026-06-15)
+- **Primary Objective**: Blogs serve as deep intelligence feeds or product showrooms.
+- **Structural Integrity**: Minimum 2-page depth (~1000 words). High value, zero fluff.
+- **Sourcing Protocol**: 
+    - **News**: Primary press releases, niche authority journals, official brand newsrooms.
+    - **Products**: Strictly Amazon Product API assets or manufacturer-direct media.
+- **Anti-Greenwashing**: For Verdant Co, verify sustainability claims against primary regenerative science records.
+
+## Orcinos URL Redirects (Namecheap Assignment)
+All Orcinos products must point to these assigned redirects. **Strictly preserve UI/UX.**
+
+| Product / Host | Assigned Redirect URL |
+| :--- | :--- |
+| **@ (Root)** | http://www.orcinos.com/ |
+| **nurasen** | https://orcinos.com/nurasen/ |
+| **captioai** | https://orcinos.com/captioai/ |
+| **panthriq** | https://orcinos.com/panthriq/ |
+| **blankedout** | https://orcinos.com/blankedout/ |
+| **thesignal** | https://orcinos.com/thesignal/ |
+| **optiscout** | https://orcinos.com/optiscout/ |
+| **pawsdx** | https://orcinos.com/pawsdx/ |
+| **riddiim** | https://orcinos.com/riddiim/ |
+| **sellit** | https://orcinos.com/sellit/ |
+| **ebony** | https://orcinos.com/ebony/ |
+| **vibe** | https://orcinos.com/vibe/ |
+| **handy** | https://orcinos.com/handy/ |
+| **dpanthriq** | https://orcinos.com/dpanthriq/ |
+| **calalloo** | https://orcinos.com/calalloo/ |
+| **dricil** | https://orcinos.com/dricil/ |
+
+## Cloudinary Media Optimization
+- **Cloud Name:** davvgg5sy
+- **Base URL:** https://res.cloudinary.com/davvgg5sy/image/upload/
+- **Mandate:** Use Cloudinary for all high-fidelity asset delivery. Apply `f_auto,q_auto` transformations by default to ensure 98% quality at minimum bandwidth.
+
 The following brands are authorized for active social deployment (FB/IG/Threads). All other brands are **Website-Only**.
 
 | Brand | Status | Primary Social Channels |
@@ -34,21 +76,26 @@ The following brands are authorized for active social deployment (FB/IG/Threads)
 | **The Escapist** | ACTIVE | FB, IG, Threads |
 | **The Tech Scout HQ** | ACTIVE | FB, IG, Threads, X |
 | **Quiet Luxury** | ACTIVE | FB, IG, Threads |
-| **The Sovereign Signal** | ACTIVE | X, FB, IG, Threads |
 | **Prime Land Network**| ACTIVE | FB, IG, Threads, X |
+| **NehNeh** | ACTIVE | FB, IG, Threads |
+| **Paw Vault** | ACTIVE | FB, IG, Threads |
+| **The Watch List** | ACTIVE | FB, IG, Threads |
+| **Pantriq** | ACTIVE | IG, Threads |
+| **Verdant Co** | ACTIVE | FB, IG, Threads |
+| **Seamrite Designs** | ACTIVE | FB, IG, Threads |
 
 ## Sovereign Social Sharding (X vs. Meta)
-- **X (Twitter) Mandate:** The "Sovereign Frontier." Primary hub for the **Priscion Sovereign Ledger ($PRN)**, Cardano community interaction, and Web3 diplomatic engagement. High-fidelity crypto technicals only.
-- **Meta (FB/IG/Threads) Mandate:** The "Affiliate Engine." Focused on the AI shop architecture, luxury aesthetics, and affiliate brand nodes. 
-- **Execution:** Never mix the "Crypto Signal" of X with the "Lifestyle/Retail Signal" of Meta. Maintain strict platform sharding to preserve the professional fidelity of each node.
+- **X (Twitter) Mandate:** The "Sovereign Frontier." Primary hub for the **Priscion Sovereign Ledger ($PRN)**, **Priscion (the AI Agency)**, Cardano community interaction, and Web3 diplomatic engagement. High-fidelity crypto technicals and agency evolution signals only.
+- **Meta (FB/IG/Threads) Mandate:** The "Affiliate Engine." Focused on **Prisca Dezigns (the Parent Legal Entity)**, the AI shop architecture, luxury aesthetics, and affiliate brand nodes. 
+- **Execution:** Never mix the "Crypto/Priscion Signal" of X with the "Lifestyle/Retail/Prisca Dezigns Signal" of Meta. Maintain strict platform sharding to preserve the professional fidelity of each node.
 To ensure 100% coverage without platform fatigue, the 14 active brands are sharded into 4 staggered execution sessions.
 
 | Session | Time Window (AST) | Brands |
 | :--- | :--- | :--- |
-| **Session ALPHA** | 09:00 - 12:00 | PRISCION, Dreaming Anime, Atelia Gaming, Couture Gallery |
-| **Session BRAVO** | 12:00 - 15:00 | TWMK, The Autodrome, Peak Fit, Glow Protocol |
-| **Session CHARLIE** | 15:00 - 18:00 | Sole Prestige, Essence Elite, The Escapist |
-| **Session DELTA** | 18:00 - 21:00 | The Tech Scout HQ, Quiet Luxury, Prime Land Network |
+| **Session ALPHA** | 09:00 - 12:00 | PRISCION, Dreaming Anime, Atelia Gaming, Couture Gallery, NehNeh, Seamrite Designs, Verdant Co |
+| **Session BRAVO** | 12:00 - 15:00 | TWMK, The Autodrome, Peak Fit, Glow Protocol, Paw Vault |
+| **Session CHARLIE** | 15:00 - 18:00 | Sole Prestige, Essence Elite, The Escapist, The Watch List |
+| **Session DELTA** | 18:00 - 21:00 | The Tech Scout HQ, Quiet Luxury, Prime Land Network, Pantriq |
 
 ## Strict Deployment Mandate (Effective Immediately)
 - **Zero-Fallback Policy**: Total ban on 'Fallback' assets (Pexels, Unsplash, Archive). Hubs must find primary or secondary high-fidelity niche signals or ABORT deployment. No exceptions.
@@ -89,10 +136,13 @@ The following channels have been established as the primary communication hubs f
 | **Riddiim** | `#riddiim` | `C0B4Y3QP85Q` |
 | **Prime Land Network** | `#primelandnetwork-` | `C0B8G8CRLJJ` |
 | **The Tech Scout HQ** | `#thetechscouthq` | `C0B8J9JJQ9G` |
-| **D'Panyard** | `#dpanyard` | `C0B4ZMQ5LD7` |
+| **Axoria Frames** | `#axoriaframes` | `PENDING` |
+| **Les Amour** | `#lesamour` | `PENDING` |
+| **Ornalis Lighting** | `#ornalislighting` | `PENDING` |
 | **My Baby Dumpling** | `#mybabydumpling` | `C0B4U65L4R3` |
 | **Shelfly** | `#shelfly` | `C0B51648NF6` |
 | **Deskwell** | `#deskwell` | `C0B51GXUNQL` |
 | **The Gen Play** | `#thegenplay` | `C0B59DWQ7V2` |
 | **Paw Vault** | `#pawvault` | `C0B5RS6K8U8` |
 | **Seamrite Designs** | `#seamritedesigns-` | `C0B8JA3MEAW` |
+SOVSYGNAL push method confirmed Jun17: use cat b64 file inside single-quoted curl -d. See push workflow in gen_orcinos_push pattern.
