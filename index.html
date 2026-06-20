@@ -1,3 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prisca Dezigns | The Rubik's Globe</title>
+    <!-- GDrive Direct Link Proxy -->
+    <link rel="icon" type="image/png" href="https://share.zapia.com/si99hoojrdxzaoos5dmo1x">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @keyframes globePulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px var(--purple); } 50% { transform: scale(1.1); box-shadow: 0 0 25px var(--purple); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px var(--purple); } 50% { transform: scale(1.1); box-shadow: 0 0 25px var(--purple); } }
+        :root {
+            --ivory: #FFFFF0;
+            --lilac: #C8A2C8;
+            --purple: #301934;
+            --text: #1a1a1a;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --accent: #14B8A6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        #page-wrapper {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        body { 
+            font-family: var(--font-body); 
+            background: var(--ivory); 
+            color: var(--text); 
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        section {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        #ui-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px;
+        }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            pointer-events: auto;
+        }
+
+        .logo-container {
+            display: flex; align-items: center; gap: 15px;
+        }
+
+        .logo-img {
+            width: 140px; height: 140px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .logo { 
+            font-family: var(--font-heading); 
+            font-size: 2.2rem; font-weight: 900; letter-spacing: -1.5px;
+            color: var(--purple);
+            text-transform: lowercase;
+        }
+
+        main {
+            text-align: left;
+            pointer-events: auto;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .brand-visual-container {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+        }
+
+        .dynamic-brand-logo {
+            width: 280px;
+            height: 280px;
+            object-fit: contain;
+            filter: drop-shadow(0 15px 35px rgba(48, 25, 52, 0.2));
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 20px;
+        }
+
+        .brand-text-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-label {
+            font-weight: 900; font-size: 0.75rem;
+            letter-spacing: 6px; text-transform: uppercase;
+            color: var(--lilac);
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            line-height: 0.9;
+            color: var(--purple);
+            letter-spacing: -3px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .brand-description {
+            font-size: 1rem;
+            color: var(--text);
+            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .price-tag {
+            font-family: var(--font-body);
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--purple);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .view-cta {
+            display: inline-block;
+            padding: 14px 40px;
+            border: 1px solid var(--purple);
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 0.75rem;
+            letter-spacing: 2.5px;
+            transition: all 0.3s ease;
+            width: fit-content;
+            text-transform: uppercase;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .view-cta:hover {
+            background: var(--purple);
+            color: var(--ivory);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(48, 25, 52, 0.2);
+        }
+
+        footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .footer-info { 
+            font-family: var(--font-heading);
+            font-style: italic;
+            font-size: 1.1rem; 
+            color: var(--lilac);
+            max-width: 400px;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        #scroll-indicator {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .dot-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            opacity: 0.3;
+        }
+
+        .dot-wrapper:hover, .dot-wrapper.active {
+            opacity: 1;
+        }
+
+        .dot-label {
+            font-size: 0.55rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--lilac);
+            transition: 0.3s;
+            transform: translateX(10px);
+            opacity: 0;
+            white-space: nowrap;
+        }
+
+        .dot-wrapper:hover .dot-label, .dot-wrapper.active .dot-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--lilac);
+            transition: 0.3s;
+        }
+
+        .dot-wrapper.active .dot {
+            background: var(--purple);
+            box-shadow: 0 0 15px var(--purple);
+            transform: scale(1.3);
+        }
+
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(48, 25, 52, 0.95);
+            z-index: 200;
+            display: none;
+            align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        #modal-content {
+            background: var(--ivory);
+            padding: 60px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .modal-active #modal-overlay { display: flex; opacity: 1; }
+        .modal-active #modal-content { transform: translateY(0); }
+
+        .close-modal {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 2rem; color: var(--purple);
+            cursor: pointer; font-weight: 300;
+        }
+
+        #lead-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-field { display: flex; flex-direction: column; gap: 8px; }
+        .form-field label { font-weight: 900; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; color: var(--lilac); }
+        .form-field input, .form-field select {
+            padding: 15px; border: 1px solid rgba(48, 25, 52, 0.1);
+            background: #fff; font-family: var(--font-body);
+            font-size: 1rem; border-radius: 8px;
+        }
+
+        #submit-btn {
+            background: var(--purple); color: #fff;
+            padding: 18px; border: none; border-radius: 100px;
+            font-weight: 900; font-size: 0.8rem; letter-spacing: 3px;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+        }
+
+        #bg-logo-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vw;
+            height: 80vw;
+            background: url("assets/background_logo.jpg") no-repeat center;
+            background-size: contain;
+            opacity: 0.03;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        #package-section {
+            background: var(--ivory);
+            display: none;
+            flex-direction: column;
+            align-items: center;
             justify-content: flex-start;
             padding: 80px 50px;
             z-index: 50;
@@ -150,9 +461,6 @@
                 </main>
 
                 <footer>
-                    <div style="position: fixed; bottom: 60px; left: 80px; z-index: 9999; pointer-events: auto;">
-                      <a href="privacy.html" style="padding: 15px; font-size: 0.7rem; background: rgba(255,255,255,0.01); color: var(--lilac); text-decoration: none; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; opacity: 0.5;">Privacy</a>
-                    </div>
                     <div class="footer-info">Architecting Private Digital Networks for the Sovereign Individual.</div>
                     <div id="interaction-guide" style="font-size: 0.6rem; letter-spacing: 3px; color: var(--lilac); font-weight: 900; margin-bottom: 25px;">SCROLL TO NAVIGATE SLICES</div>
                 </footer>
@@ -340,8 +648,7 @@
             { name: "THE TECH SCOUT HQ", sector: "BRAND", logo: "", desc: "Innovation news and emerging neural technology signals.", url: "thetechscouthq/", type: "external" },
             { name: "PEAK FIT", sector: "BRAND", logo: "", desc: "Biohacking recovery science and elite fitness performance.", url: "peakfit/", type: "external" },
             { name: "EVOLVE", sector: "PARTNER", logo: "", desc: "Caribbean-wide corporate mobility and fleet sales logistics.", url: "/evolve/", type: "external" },
-            { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "https://priscadezigns.org/prisca-dezigns/blog/", type: "external" },
-            { name: "PRIVACY POLICY", sector: "LEGAL", logo: "", desc: "Our commitment to digital infrastructure privacy and sovereign data engineering.", url: "privacy.html", type: "external" }
+            { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "blog.html", type: "external" }
         ];
 
         let currentIndex = 0;
@@ -525,3 +832,4 @@
     </script>
 </body>
 </html>
+
