@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
-        :root { --black: #050505; --white: #FFFFFF; --silver: #E0E0E0; --forest: #1B3022; --accent: #2D5A27; --gold: #D4AF37; }
+        :root { --black: #050505; --white: #FFFFFF; --silver: #E0E0E0; --forest: #1B3022; --accent: #2D5A27; }
         body { margin: 0; background: var(--black); color: var(--white); font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
         nav { 
@@ -24,24 +24,40 @@
         }
         .back-link:hover { background: var(--white); color: var(--black); }
 
+        /* The Bugatti C-Curve Hero Architecture */
         .hero { 
-            height: 100vh; display: flex; flex-direction: column; justify-content: center; 
-            align-items: flex-start; padding: 0 8vw; 
-            background: radial-gradient(circle at 70% 30%, #1B3022 0%, #050505 100%); 
-            position: relative; overflow: hidden;
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: var(--black); position: relative; overflow: hidden;
         }
 
-        .hero-content { z-index: 1; position: relative; width: 100%; }
-        .hero-tagline { font-size: 1.5rem; letter-spacing: 10px; text-transform: uppercase; color: var(--silver); margin-bottom: 20px; font-weight: 300; }
-        .hero-text h1 { font-size: 14vw; font-weight: 900; margin: 0; line-height: 0.8; text-transform: uppercase; letter-spacing: -10px; }
-        .hero-sub { font-size: 2rem; font-weight: 100; margin-top: 30px; letter-spacing: 4px; color: var(--silver); }
-        
-        .savings-banner {
-            margin-top: 40px; padding: 20px 40px; background: rgba(45, 90, 39, 0.2);
-            border-left: 4px solid var(--accent); max-width: 600px;
+        .curve-bg {
+            position: absolute; top: 50%; right: -10vw; transform: translateY(-50%);
+            width: 80vw; height: 120vh;
+            border: 40px solid var(--accent);
+            border-radius: 50% 0 0 50%;
+            opacity: 0.2; pointer-events: none;
+            z-index: 0;
         }
-        .savings-banner h3 { margin: 0; font-size: 1.2rem; color: var(--white); text-transform: uppercase; letter-spacing: 2px; }
-        .savings-banner p { margin: 10px 0 0 0; font-size: 0.9rem; color: var(--silver); }
+
+        .hero-content { 
+            z-index: 1; position: relative; width: 84vw; display: grid; 
+            grid-template-columns: 1fr 1fr; align-items: center; gap: 50px;
+        }
+        
+        .hero-left { max-width: 800px; }
+        .hero-tagline { font-size: 1.5rem; letter-spacing: 12px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; font-weight: 700; }
+        .hero-text h1 { font-size: 12vw; font-weight: 900; margin: 0; line-height: 0.8; text-transform: uppercase; letter-spacing: -12px; }
+        .hero-sub { font-size: 2rem; font-weight: 100; margin-top: 30px; letter-spacing: 4px; color: var(--silver); }
+
+        .hero-right { position: relative; height: 100%; display: flex; justify-content: center; }
+        .hero-img { width: 120%; transform: translateX(10%); filter: drop-shadow(0 30px 100px rgba(0,0,0,0.5)); }
+
+        .savings-banner {
+            margin-top: 50px; padding: 25px; background: rgba(45, 90, 39, 0.1);
+            border-left: 5px solid var(--accent); max-width: 500px; backdrop-filter: blur(10px);
+        }
+        .savings-banner h3 { margin: 0; font-size: 1.1rem; color: var(--white); text-transform: uppercase; letter-spacing: 2px; }
+        .savings-banner p { margin: 10px 0 0 0; font-size: 0.85rem; color: var(--silver); line-height: 1.6; }
 
         .feature-grid { padding: 150px 8vw; background: var(--white); color: var(--black); }
         .vehicle-strip { display: flex; flex-direction: column; gap: 200px; }
@@ -49,8 +65,8 @@
         .vehicle-entry:nth-child(even) { direction: rtl; }
         .vehicle-entry:nth-child(even) .v-text { direction: ltr; }
         
-        .v-img-wrap { position: relative; overflow: hidden; }
-        .v-img-wrap img { width: 100%; height: 75vh; object-fit: cover; transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .v-img-wrap { position: relative; overflow: hidden; background: #000; border-radius: 4px; }
+        .v-img-wrap img { width: 100%; height: 75vh; object-fit: cover; transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0.9; }
         
         .v-text h2 { font-size: 6vw; font-weight: 900; margin: 0 0 30px 0; text-transform: uppercase; letter-spacing: -4px; line-height: 0.9; }
         .v-text p { font-size: 1.4rem; line-height: 1.5; color: #333; font-weight: 300; margin-bottom: 40px; }
@@ -60,9 +76,7 @@
         .spec-item span { display: block; font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 1px; }
         .spec-item strong { font-size: 1.2rem; font-weight: 700; color: var(--black); }
 
-        .trini-savings-box {
-            margin-top: 30px; padding: 25px; background: #f9f9f9; border: 1px solid #eee;
-        }
+        .trini-savings-box { margin-top: 30px; padding: 25px; background: #f9f9f9; border: 1px solid #eee; }
         .trini-savings-box h4 { margin: 0 0 15px 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
         .trini-savings-box ul { margin: 0; padding: 0; list-style: none; }
         .trini-savings-box li { margin-bottom: 10px; font-size: 0.9rem; color: #555; position: relative; padding-left: 20px; }
@@ -78,9 +92,9 @@
 
         footer { padding: 100px 8vw; text-align: center; background: var(--black); border-top: 1px solid #111; color: #444; font-size: 0.7rem; letter-spacing: 2px; }
         
-        @media (max-width: 1024px) {
-            .vehicle-entry { grid-template-columns: 1fr; gap: 40px; }
-            .v-text h2 { font-size: 4rem; }
+        @media (max-width: 1400px) {
+            .hero-content { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+            .hero-right { display: none; }
         }
     </style>
 </head>
@@ -88,16 +102,21 @@
     <nav><div class="logo">VERDANT CO</div><a href="/verdantco/" class="back-link">Back to Verdant</a></nav>
     
     <section class="hero">
+        <div class="curve-bg"></div>
         <div class="hero-content">
-            <div class="hero-tagline">Regenerative High-Performance</div>
-            <h1>LEAP<br>INTO<br>PURE</h1>
-            <div class="hero-sub">Zero Extraction. Maximum Savings.</div>
-            <div class="savings-banner">
-                <h3>Trinidad & Tobago EV Advantage</h3>
-                <p>Tax-Free imports, zero fuel costs, and low maintenance. Save up to 5,000 TTD annually compared to internal combustion engines.</p>
+            <div class="hero-left">
+                <div class="hero-tagline">Pure Performance</div>
+                <h1>LEAP<br>INTO<br>PURE</h1>
+                <div class="hero-sub">Zero Extraction. Maximum Savings.</div>
+                <div class="savings-banner">
+                    <h3>The Trinidad Advantage</h3>
+                    <p>Unlock 100% Tax-Free imports and save over 5,000 TTD yearly in fuel and maintenance. Pure logic meets pure luxury.</p>
+                </div>
+            </div>
+            <div class="hero-right">
+                <img src="https://priscadezigns.org/theautodrome/ev-mobility/assets/hyptec.webp" class="hero-img" alt="Sovereign EV">
             </div>
         </div>
-        <div class="scroll-indicator"><div class="scroll-line"></div></div>
     </section>
 
     <section class="feature-grid"><div class="vehicle-strip">
@@ -106,7 +125,7 @@
             <div class="v-img-wrap"><img src="https://priscadezigns.org/theautodrome/ev-mobility/assets/hyptec.webp" alt="HYPTEC HT"></div>
             <div class="v-text">
                 <h2>HYPTEC HT</h2>
-                <p>Luxury meets sustainable logic. Every detail is optimized for aerodynamic efficiency and long-term durability in tropical climates.</p>
+                <p>Luxury meets sustainable logic. Engineered for aerodynamic efficiency and long-term durability in tropical climates.</p>
                 <div class="specs-table">
                     <div class="spec-item"><span>Range</span><strong>600 KM</strong></div>
                     <div class="spec-item"><span>Efficiency</span><strong>13.1 kWh/100km</strong></div>
@@ -116,10 +135,10 @@
                 <div class="trini-savings-box">
                     <h4>Why it makes sense in T&T</h4>
                     <ul>
-                        <li>Import Duty & Motor Vehicle Tax EXEMPT.</li>
-                        <li>/bin/bash Gas Bills — Charge at home with 240V.</li>
-                        <li>8-Year High-Fidelity Battery Warranty.</li>
-                        <li>Minimal moving parts = lower service costs.</li>
+                        <li>Duty & Motor Vehicle Tax EXEMPT.</li>
+                        <li>/bin/bash Gas Bills — High-Fidelity Energy Management.</li>
+                        <li>8-Year Battery Warranty.</li>
+                        <li>Minimal moving parts = lower maintenance.</li>
                     </ul>
                 </div>
                 <a href="https://wa.me/18683424101?text=I%20am%20interested%20in%20the%20HYPTEC%20HT%20from%20Verdant%20Co" class="cta-whatsapp">Inquire via WhatsApp</a>
@@ -142,33 +161,10 @@
                     <ul>
                         <li>Slash monthly transport costs by 70%.</li>
                         <li>Regenerative braking saves on brake pads.</li>
-                        <li>High resale value through Web3 verification.</li>
+                        <li>High resale value via Web3 verification.</li>
                     </ul>
                 </div>
                 <a href="https://wa.me/18683424101?text=I%20am%20interested%20in%20the%20SEALION%207%20from%20Verdant%20Co" class="cta-whatsapp">Inquire via WhatsApp</a>
-            </div>
-        </div>
-        <!-- AION Y PLUS -->
-        <div class="vehicle-entry">
-            <div class="v-img-wrap"><img src="https://priscadezigns.org/theautodrome/ev-mobility/assets/aion.webp" alt="AION Y PLUS"></div>
-            <div class="v-text">
-                <h2>AION Y PLUS</h2>
-                <p>Urban mobility for the conscious navigator. Perfect for Trinidadians seeking a balance of luxury and practicality.</p>
-                <div class="specs-table">
-                    <div class="spec-item"><span>Range</span><strong>400 KM</strong></div>
-                    <div class="spec-item"><span>Wheelbase</span><strong>2750 MM</strong></div>
-                    <div class="spec-item"><span>Charge Time</span><strong>30m (80%)</strong></div>
-                    <div class="spec-item"><span>Materials</span><strong>Vegan Interior</strong></div>
-                </div>
-                <div class="trini-savings-box">
-                    <h4>Practical Sustainability</h4>
-                    <ul>
-                        <li>Zero Carbon Footprint in every drive.</li>
-                        <li>Full smart-home integration charging.</li>
-                        <li>Tax-exempt for local business owners.</li>
-                    </ul>
-                </div>
-                <a href="https://wa.me/18683424101?text=I%20am%20interested%20in%20the%20AION%20Y%20PLUS%20from%20Verdant%20Co" class="cta-whatsapp">Inquire via WhatsApp</a>
             </div>
         </div>
     </div></section>
@@ -177,8 +173,10 @@
 
     <script>
         gsap.registerPlugin(ScrollTrigger);
-        gsap.from(".hero-content h1", { y: 200, opacity: 0, duration: 1.5, ease: "power4.out", stagger: 0.2 });
-        gsap.to(".scroll-line", { y: "100%", duration: 2, repeat: -1, ease: "power1.inOut" });
+        gsap.from(".hero-left", { x: -100, opacity: 0, duration: 1.5, ease: "power4.out" });
+        gsap.from(".hero-right img", { x: 200, opacity: 0, duration: 1.5, ease: "power4.out", delay: 0.2 });
+        gsap.from(".curve-bg", { scale: 1.5, opacity: 0, duration: 2, ease: "power2.out" });
+        
         gsap.utils.toArray(".vehicle-entry").forEach(entry => {
             gsap.from(entry.querySelector("img"), { scrollTrigger: { trigger: entry, start: "top 80%", scrub: true }, scale: 1.2, duration: 2 });
             gsap.from(entry.querySelector(".v-text"), { scrollTrigger: { trigger: entry, start: "top 70%" }, y: 100, opacity: 0, duration: 1.2, ease: "power3.out" });
