@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Scan | Neural Brand Diagnostic by Prisca Dezigns</title>
+    <link rel="icon" type="image/png" href="https://share.zapia.com/si99hoojrdxzaoos5dmo1x">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --ivory: #FFFFF0;
+            --lilac: #C8A2C8;
+            --purple: #301934;
+            --text: #1a1a1a;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--ivory); color: var(--text); font-family: var(--font-body); overflow: hidden; height: 100vh; width: 100vw; }
+
+        #globe-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.4; }
+        
+        .main-ui { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; text-align: center; }
+        
+        h1 { font-family: var(--font-heading); font-size: clamp(2.5rem, 8vw, 5rem); color: var(--purple); margin-bottom: 10px; letter-spacing: -2px; }
+        .subtitle { color: var(--lilac); font-weight: 900; letter-spacing: 4px; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 40px; }
+
+        .scan-box { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); padding: 40px; border-radius: 4px; border: 1px solid var(--lilac); max-width: 500px; width: 100%; box-shadow: 0 10px 30px rgba(48, 25, 52, 0.1); }
+        
+        input { width: 100%; padding: 15px; border: 1px solid var(--lilac); background: transparent; color: var(--purple); font-family: var(--font-body); margin-bottom: 20px; outline: none; text-align: center; font-size: 1.1rem; }
+        input::placeholder { color: var(--lilac); opacity: 0.6; }
+
+        .scan-btn { background: var(--purple); color: var(--ivory); border: none; padding: 18px 40px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; width: 100%; }
+        .scan-btn:hover { letter-spacing: 4px; opacity: 0.9; }
+
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--ivory); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #status { font-family: var(--font-heading); font-size: 1.5rem; color: var(--purple); margin-top: 20px; }
+        
+        .loader { width: 50px; height: 50px; border: 3px solid var(--lilac); border-top: 3px solid var(--purple); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #results { display: none; max-width: 600px; width: 100%; }
+        .result-card { background: white; padding: 30px; border: 1px solid var(--lilac); text-align: left; margin-top: 20px; }
+        .result-card h2 { font-family: var(--font-heading); color: var(--purple); margin-bottom: 15px; }
+        .score { font-size: 3rem; font-weight: 900; color: var(--purple); margin-bottom: 10px; }
+
+        .back-btn { margin-top: 20px; display: inline-block; color: var(--purple); text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div id="globe-container"></div>
+
+    <div id="overlay">
+        <div class="loader"></div>
+        <div id="status">INITIATING NEURAL SCAN...</div>
+    </div>
+
+    <div class="main-ui" id="main-ui">
+        <h1>Alpha Scan</h1>
+        <p class="subtitle">Neural Brand Diagnostic</p>
+
+        <div class="scan-box">
+            <input type="text" id="domain" placeholder="ENTER BRAND DOMAIN (e.g. brand.com)">
+            <input type="email" id="user-email" placeholder="YOUR ARCHITECT EMAIL">
+            <button class="scan-btn" onclick="startScan()">Initiate Scan</button>
+            <a href="../" class="back-btn">Return to Hub</a>
+        </div>
+    </div>
+
+    <div class="main-ui" id="results">
+        <h1>Diagnostic Report</h1>
+        <div class="result-card">
+            <div class="score">84/100</div>
+            <h2>Identity Fragmentation Detected</h2>
+            <p style="margin-bottom: 20px; line-height: 1.6;">Your brand signal is strong but lacks high-fidelity consistency across touchpoints. We've detected 3 primary optimization nodes.</p>
+            <button class="scan-btn" onclick="window.location.href='../#package-section'">View Evolution Packages</button>
+        </div>
+        <a href="javascript:location.reload()" class="back-btn">Run New Scan</a>
+    </div>
+
+    <script>
+        const supabaseClient = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
+
+        // Three.js Globe Logic
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('globe-container').appendChild(renderer.domElement);
+
+        const globeGeo = new THREE.SphereGeometry(3, 64, 64);
+        const globeMat = new THREE.MeshPhongMaterial({ color: 0xC8A2C8, wireframe: true, transparent: true, opacity: 0.3 });
+        const globe = new THREE.Mesh(globeGeo, globeMat);
+        scene.add(globe);
+
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x404040));
+        camera.position.z = 6;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            globe.rotation.y += 0.002;
+            globe.rotation.x += 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        async function startScan() {
+            const domain = document.getElementById('domain').value;
+            const email = document.getElementById('user-email').value;
+            if (!domain || !email) return alert("Please provide both domain and email.");
+
+            document.getElementById('overlay').style.display = 'flex';
+            const status = document.getElementById('status');
+            
+            const msgs = [
+                "FETCHING DOMAIN METADATA...",
+                "ANALYZING TYPOGRAPHY CONSISTENCY...",
+                "EVALUATING BRAND SIGNAL CLARITY...",
+                "CHECKING MOBILE NEURAL ADAPTATION...",
+                "FINALIZING DIAGNOSTIC REPORT..."
+            ];
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                status.innerText = msgs[i];
+                i++;
+                if(i >= msgs.length) {
+                    clearInterval(interval);
+                    completeScan(domain, email);
+                }
+            }, 1000);
+        }
+
+        async function completeScan(domain, email) {
+            // Log to Supabase
+            await supabaseClient.from('client_leads').insert([{
+                name: "Scan User",
+                email: email,
+                package: "ALPHA SCAN",
+                brand: "Prisca Dezigns",
+                message: `Domain: ${domain}`,
+                created_at: new Date().toISOString()
+            }]);
+
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'none';
+            document.getElementById('results').style.display = 'flex';
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
