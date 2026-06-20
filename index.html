@@ -1,37 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prisca Dezigns | The Rubik's Globe</title>
+    <!-- GDrive Direct Link Proxy -->
+    <link rel="icon" type="image/png" href="https://share.zapia.com/si99hoojrdxzaoos5dmo1x">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @keyframes globePulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px var(--purple); } 50% { transform: scale(1.1); box-shadow: 0 0 25px var(--purple); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 15px var(--purple); } 50% { transform: scale(1.1); box-shadow: 0 0 25px var(--purple); } }
+        :root {
+            --ivory: #FFFFF0;
+            --lilac: #C8A2C8;
+            --purple: #301934;
+            --text: #1a1a1a;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --accent: #14B8A6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        #page-wrapper {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        body { 
+            font-family: var(--font-body); 
+            background: var(--ivory); 
+            color: var(--text); 
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        section {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+        }
+
+        #ui-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px;
+        }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            pointer-events: auto;
+        }
+
+        .logo-container {
+            display: flex; align-items: center; gap: 15px;
+        }
+
+        .logo-img {
+            width: 140px; height: 140px;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(48, 25, 52, 0.2));
+            mix-blend-mode: multiply;
+        }
+
+        .logo { 
+            font-family: var(--font-heading); 
+            font-size: 2.2rem; font-weight: 900; letter-spacing: -1.5px;
+            color: var(--purple);
+            text-transform: lowercase;
+        }
+
+        main {
+            text-align: left;
+            pointer-events: auto;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .brand-visual-container {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+        }
+
+        .dynamic-brand-logo {
+            width: 280px;
+            height: 280px;
+            object-fit: contain;
+            filter: drop-shadow(0 15px 35px rgba(48, 25, 52, 0.2));
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-bottom: 20px;
+        }
+
+        .brand-text-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-label {
+            font-weight: 900; font-size: 0.75rem;
+            letter-spacing: 6px; text-transform: uppercase;
+            color: var(--lilac);
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            line-height: 0.9;
+            color: var(--purple);
+            letter-spacing: -3px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .brand-description {
+            font-size: 1rem;
+            color: var(--text);
+            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .price-tag {
+            font-family: var(--font-body);
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--purple);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .view-cta {
+            display: inline-block;
+            padding: 14px 40px;
+            border: 1px solid var(--purple);
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 0.75rem;
+            letter-spacing: 2.5px;
+            transition: all 0.3s ease;
+            width: fit-content;
+            text-transform: uppercase;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .view-cta:hover {
+            background: var(--purple);
+            color: var(--ivory);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(48, 25, 52, 0.2);
+        }
+
+        footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .footer-info { 
+            font-family: var(--font-heading);
+            font-style: italic;
+            font-size: 1.1rem; 
+            color: var(--lilac);
+            max-width: 400px;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        #scroll-indicator {
+            position: fixed;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .dot-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            opacity: 0.3;
+        }
+
+        .dot-wrapper:hover, .dot-wrapper.active {
+            opacity: 1;
+        }
+
+        .dot-label {
+            font-size: 0.55rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--lilac);
+            transition: 0.3s;
+            transform: translateX(10px);
+            opacity: 0;
+            white-space: nowrap;
+        }
+
+        .dot-wrapper:hover .dot-label, .dot-wrapper.active .dot-label {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--lilac);
+            transition: 0.3s;
+        }
+
+        .dot-wrapper.active .dot {
+            background: var(--purple);
+            box-shadow: 0 0 15px var(--purple);
+            transform: scale(1.3);
+        }
+
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(48, 25, 52, 0.95);
+            z-index: 200;
+            display: none;
+            align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        #modal-content {
+            background: var(--ivory);
+            padding: 60px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .modal-active #modal-overlay { display: flex; opacity: 1; }
+        .modal-active #modal-content { transform: translateY(0); }
+
+        .close-modal {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 2rem; color: var(--purple);
+            cursor: pointer; font-weight: 300;
+        }
+
+        #lead-form { display: flex; flex-direction: column; gap: 20px; }
+        .form-field { display: flex; flex-direction: column; gap: 8px; }
+        .form-field label { font-weight: 900; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--lilac); }
+        .form-field input, .form-field select {
+            padding: 15px; border: 1px solid rgba(48, 25, 52, 0.1);
+            background: #fff; font-family: var(--font-body);
+            font-size: 1rem; border-radius: 8px;
+        }
+
+        #submit-btn {
+            background: var(--purple); color: #fff;
+            padding: 18px; border: none; border-radius: 100px;
+            font-weight: 900; font-size: 0.8rem; letter-spacing: 3px;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s;
+        }
+
+        #bg-logo-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vw;
+            height: 80vw;
+            background: url("assets/background_logo.jpg") no-repeat center;
+            background-size: contain;
+            opacity: 0.03;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        #package-section {
+            background: var(--ivory);
+            display: none;
+            flex-direction: column;
+            align-items: center;
             justify-content: flex-start;
             padding: 80px 50px;
             z-index: 50;
             min-height: 100vh;
-            position: relative;
-        }
-
-        .back-to-home {
-            position: fixed;
-            top: 40px;
-            right: 40px;
-            padding: 12px 30px;
-            background: var(--purple);
-            color: var(--ivory);
-            font-weight: 900;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-radius: 100px;
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: none;
-            border: none;
-        }
-
-        .package-active .back-to-home {
-            display: block;
-        }
-
-        .back-to-home:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(48, 25, 52, 0.2);
         }
 
         #package-section h2 {
@@ -118,25 +400,15 @@
 </head>
 <body>
     <div id="page-wrapper">
-        <div class="back-to-home" onclick="hidePackages()">← RETURN TO GLOBE</div>
         <section id="globe-section">
             <div id="bg-logo-overlay"></div>
             <div id="ui-layer">
                 <header>
                     <div class="logo-container">
-                        <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="Prisca Dezigns" class="logo-img">
+                        <img src="https://share.zapia.com/pymd7sa9f66vcqn2xl5lwq" alt="Prisca Dezigns" class="logo-img">
+                        <div class="logo">prisca dezigns.</div>
                     </div>
-                    <nav style="display: flex; gap: 30px; pointer-events: auto;">
-                        
-                        <a href="/evolve/" style="text-decoration: none; color: #14B8A6; font-weight: 900; font-size: 0.95rem; letter-spacing: 2.5px; text-transform: uppercase;">EV Mobility</a>
-                    </nav>
-                    
-                    <div id="neural-search-container" style="position: relative; margin-right: 40px; pointer-events: auto;">
-                        <input type="text" id="neural-search" placeholder="⚲ SEARCH..." 
-                               style="background: rgba(255,255,240,0.2); border: 1.5px solid var(--border); color: var(--purple); padding: 12px 24px; border-radius: 4px; font-size: 0.8rem; letter-spacing: 2px; font-weight: 900; width: 200px; outline: none; transition: 0.3s; font-family: var(--font-body);">
-                        <div id="search-results" style="position: absolute; top: 110%; left: 0; width: 100%; background: #fff; border: 1px solid var(--border); border-radius: 4px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.1);"></div>
-                    </div>
-<div style="font-weight: 900; font-size: 0.7rem; letter-spacing: 3px; color: var(--purple); margin-right: 60px;">EMPIRE V.2.3 [PRISCA_DEZIGNS_2123]</div>
+                    <div style="font-weight: 900; font-size: 0.7rem; letter-spacing: 3px; color: var(--purple); margin-right: 60px;">EMPIRE V.2.3 [PRISCA_DEZIGNS_2123]</div>
                 </header>
 
                 <main>
@@ -150,9 +422,6 @@
                 </main>
 
                 <footer>
-                    <div style="position: fixed; bottom: 40px; right: 60px; z-index: 9999; pointer-events: auto;">
-                      <a href="privacy.html" style="padding: 15px; font-size: 0.7rem; background: rgba(255,255,255,0.01); color: var(--lilac); text-decoration: none; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; opacity: 0.5;">Privacy</a>
-                    </div>
                     <div class="footer-info">Architecting Private Digital Networks for the Sovereign Individual.</div>
                     <div id="interaction-guide" style="font-size: 0.6rem; letter-spacing: 3px; color: var(--lilac); font-weight: 900; margin-bottom: 25px;">SCROLL TO NAVIGATE SLICES</div>
                 </footer>
@@ -339,40 +608,20 @@
             { name: "DREAMING ANIME", sector: "BRAND", logo: "", desc: "High-fidelity animation media and studio production news.", url: "https://dreaminganime.com", type: "external" },
             { name: "THE TECH SCOUT HQ", sector: "BRAND", logo: "", desc: "Innovation news and emerging neural technology signals.", url: "thetechscouthq/", type: "external" },
             { name: "PEAK FIT", sector: "BRAND", logo: "", desc: "Biohacking recovery science and elite fitness performance.", url: "peakfit/", type: "external" },
-            { name: "EVOLVE", sector: "PARTNER", logo: "", desc: "Caribbean-wide corporate mobility and fleet sales logistics.", url: "/evolve/", type: "external" },
-            { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "https://priscadezigns.org/prisca-dezigns/blog/", type: "external" }
+            { name: "PROCYON", sector: "CORE NETWORK", logo: "", desc: "The high-fidelity migration hub for the Digital Evolution.", url: "https://priscion.com", type: "external" },
+            { name: "EVOLVE", sector: "PARTNER", logo: "", desc: "Caribbean-wide corporate mobility and fleet sales logistics.", url: "partners/#evolve", type: "external" },
+            { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "blog.html", type: "external" }
         ];
 
         let currentIndex = 0;
-        let isAnimating = false; 
-        const searchInput = document.getElementById('neural-search');
-        const searchResults = document.getElementById('search-results');
-        searchInput.oninput = (e) => {
-            const query = e.target.value.toLowerCase();
-            if (query.length < 1) { searchResults.style.display = 'none'; return; }
-            const matches = brands.filter(b => b.name.toLowerCase().includes(query) || b.sector.toLowerCase().includes(query));
-            if (matches.length > 0) {
-                searchResults.innerHTML = matches.map(m => {
-                    const idx = brands.indexOf(m);
-                    return `<div onclick="jumpTo(${idx}); document.getElementById('neural-search').value=''; document.getElementById('search-results').style.display='none';" 
-                                 style="padding: 15px 20px; font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; color: #1a1a1a; cursor: pointer; border-bottom: 1px solid #f0f0f0; text-transform: uppercase;">
-                                 ${m.name}
-                            </div>`;
-                }).join('');
-                searchResults.style.display = 'flex';
-            } else { searchResults.style.display = 'none'; }
-        };
-        window.addEventListener('click', (e) => {
-            if (!document.getElementById('neural-search-container').contains(e.target)) { searchResults.style.display = 'none'; }
-        });
-
+        let isAnimating = false;
 
         function rotateSlices(dir) {
             if (isAnimating) return;
             isAnimating = true;
             const direction = dir === 'next' ? 1 : -1;
             currentIndex = (currentIndex + direction + brands.length) % brands.length;
-            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * direction), duration: 0.8, ease: "power2.out", onComplete: () => { isAnimating = false; } });
+            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * direction), duration: 1.5, ease: "expo.out", onComplete: () => { isAnimating = false; } });
             updateUI(currentIndex);
         }
 
@@ -380,7 +629,7 @@
             if (isAnimating || index === currentIndex) return;
             const diff = index - currentIndex;
             isAnimating = true; currentIndex = index;
-            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * diff), duration: 0.8, ease: "power2.out", onComplete: () => { isAnimating = false; } });
+            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * diff), duration: 1.5, ease: "expo.out", onComplete: () => { isAnimating = false; } });
             updateUI(currentIndex);
         }
 
@@ -442,11 +691,6 @@
             modal.classList.add('modal-active');
         }
 
-        function hidePackages() {
-            document.body.classList.remove('package-active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
         document.getElementById('close-modal').onclick = () => modal.classList.remove('modal-active');
         document.getElementById('modal-overlay').onclick = (e) => { if (e.target.id === 'modal-overlay') modal.classList.remove('modal-active'); };
 
@@ -483,39 +727,7 @@
             if (Math.abs(dx) > 50) { if (dx > 0) rotateSlices('prev'); else rotateSlices('next'); startX = e.clientX; }
         });
         window.addEventListener('mouseup', () => { isDragging = false; });
-
-        // High-fidelity touch sensitivity update
-        let touchStartY = 0;
-        window.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
-        }, { passive: true });
-
-        window.addEventListener('touchmove', (e) => {
-            if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
-            
-            const touchY = e.touches[0].clientY;
-            const dy = touchStartY - touchY;
-            const TOUCH_THRESHOLD = 20; // Sensitive light flick
-
-            if (Math.abs(dy) >= TOUCH_THRESHOLD) {
-                rotateSlices(dy > 0 ? 'next' : 'prev');
-                touchStartY = touchY; // Reset starting point for fluid swiping
-            }
-        }, { passive: true });
-
-        let wheelAccumulator = 0;
-        const WHEEL_THRESHOLD = 25; // Reduced from default behavior for higher sensitivity
-
-        window.addEventListener('wheel', (e) => { 
-            if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
-            
-            wheelAccumulator += e.deltaY;
-            
-            if (Math.abs(wheelAccumulator) >= WHEEL_THRESHOLD) {
-                rotateSlices(wheelAccumulator > 0 ? 'next' : 'prev');
-                wheelAccumulator = 0;
-            }
-        }, { passive: true });
+        window.addEventListener('wheel', (e) => { if (isAnimating || modal.classList.contains('modal-active')) return; rotateSlices(e.deltaY > 0 ? 'next' : 'prev'); }, { passive: true });
 
         function animate() { requestAnimationFrame(animate); globe.rotation.y += 0.0015; renderer.render(scene, camera); }
         animate();
@@ -524,3 +736,4 @@
     </script>
 </body>
 </html>
+
