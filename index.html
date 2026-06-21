@@ -199,6 +199,55 @@
             pointer-events: auto;
         }
 
+        @media (max-width: 768px) {
+            #scroll-indicator { display: none !important; }
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 400;
+            pointer-events: auto;
+        }
+        .hamburger div {
+            width: 25px;
+            height: 2px;
+            background: var(--purple);
+            transition: 0.3s;
+        }
+        .hamburger.active div:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.active div:nth-child(2) { opacity: 0; }
+        .hamburger.active div:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        #mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--ivory);
+            z-index: 350;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 80px 20px;
+        }
+        .mobile-menu-item {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            color: var(--purple);
+            margin: 10px 0;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
         .dot-wrapper {
             display: flex;
             align-items: center;
@@ -489,6 +538,11 @@
                     <div class="logo-container">
                         <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="Prisca Dezigns" class="logo-img">
                     </div>
+                    <div class="hamburger" id="hamburger">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
                     <nav style="display: flex; gap: 30px; pointer-events: auto;">
                         
                     </nav>
@@ -518,6 +572,7 @@
             </div>
             <div id="canvas-container"></div>
             <div id="scroll-indicator"></div>
+            <div id="mobile-menu"></div>
         </section>
 
         <section id="package-section">
@@ -893,6 +948,34 @@
         function animate() { requestAnimationFrame(animate); globe.rotation.y += 0.0015; renderer.render(scene, camera); }
         animate();
         window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        // Mobile Menu Logic
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        brands.forEach((brand, index) => {
+            const item = document.createElement('div');
+            item.className = 'mobile-menu-item';
+            item.textContent = brand.name;
+            item.onclick = () => {
+                if (brand.type === 'scroll') {
+                    document.body.classList.add('package-active');
+                    gsap.to('#page-wrapper', { scrollTo: '#package-section', duration: 1.5, ease: 'power4.inOut' });
+                } else {
+                    jumpTo(index);
+                }
+                toggleMenu();
+            };
+            mobileMenu.appendChild(item);
+        });
+
+        function toggleMenu() {
+            const isActive = hamburger.classList.toggle('active');
+            mobileMenu.style.display = isActive ? 'flex' : 'none';
+            document.body.style.overflow = isActive ? 'hidden' : 'auto';
+        }
+
+        hamburger.addEventListener('click', toggleMenu);
+
         updateUI(0);
     </script>
     <a href="https://priscadezigns.org/privacy.html" style="position: fixed; bottom: 30px; left: 30px; z-index: 1000; color: #14B8A6; font-size: 0.65rem; font-weight: 900; letter-spacing: 3px; text-decoration: none; text-transform: uppercase; font-family: var(--font-body);">Privacy</a>
