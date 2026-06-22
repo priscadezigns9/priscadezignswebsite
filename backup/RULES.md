@@ -16,6 +16,8 @@ God Mode is a universal administrative layer for the Architect. It provides real
 - **Access Protocol:** 5-click handshake on the password field of the login perimeter followed by the `alice` token.
 
 ## Design Integrity (Non-Negotiable)
+- **Pricing Philosophy (Lambo Level)**: SaaS products must be competitive enough to avoid friction (entry-level) but structured as luxurious, high-performance tools. Never "cheap," always "elite value."
+- **Media Mandate**: ZERO text-only posts. Every deployment MUST include one high-fidelity image and one high-fidelity video from verified primary or secondary sources. Broken links or fallbacks are grounds for immediate abort.
 - **Banned Terms**: "Prisca Dezigns" and "Prisca Dezigns" (as spoken names) are strictly banned. It is always **Prisca Dezigns**. Maintain the "Simple and Friendly" voice mandate.
 - **Link Mandate**: ONLY Prisca Dezigns uses priscadezigns.org. Dreaming Anime uses dreaminganime.com. ALL other affiliate brands are url redirects of priscadezigns.org.
 - **MUZE Logo**: Use `assets/muze_logo.png` for all MUZE-related branding (Splash, Nav, Icons). Do not use black placeholders.
@@ -112,3 +114,11 @@ God Mode is a universal administrative layer for the Architect. It provides real
 - **`advertise.html`** — permanent page. Never regenerated from scratch. Only surgical edits allowed.
 - **Inquiry form** — submits to Supabase `ad_inquiries` table (URL + anon key stored in credentials). Never rerouted to email or Formspree.
 - **To add a new brand ad:** Update the relevant `SIDEBAR_CONFIG[sector]['brand']` tuple. The old brand is REPLACED (slides out), not deleted — keep a comment with the previous brand for history.
+
+## High-Accuracy Content Mandate (Effective 2026-06-22)
+- **Target Brands (The Core Five):** The Autodrome, Verdant Co., The Tech Scout HQ, Prime Land Network, Atelia Gaming.
+- **Session Quantity:** Exactly THREE (3) posts per brand within their assigned session window.
+- **Content Mix:** 1x Pure Text (Intel/Opinion), 1x High-Fidelity Image (Artifact/Product), 1x High-Fidelity Video (Trend/Showcase).
+- **Research Mandate:** Every post must be preceded by `web_search` for current consumer interest, trending niche topics, and "Latest Product" news.
+- **Verification Protocol:** After every post, the agent MUST perform a Graph API check after 60s and 15m to confirm visibility. No "Ghost Posts."
+- **Social Commander Entry:** priscadezigns.org/commander (Secure Entry via Vault Code)
