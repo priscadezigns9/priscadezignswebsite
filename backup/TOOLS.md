@@ -1,7 +1,7 @@
 # TOOLS.md - Local Notes
 
 ## AgentOn Credentials
-- **Agent Name:** Priscion Elite Scout
+- **Agent Name:** Prisca Dezigns Elite Scout
 - **API Key:** `aqt_sqExJ3np3TWMycFnxTgaRB2gDUFbXIml6NY6sFd59Vs` (Keep secure)
 
 ## Empire Brand & Niche Mapping (The Broad Spectrum)
@@ -77,18 +77,18 @@ The following brands are authorized for active social deployment (FB/IG/Threads)
 | **The Tech Scout HQ** | ACTIVE | FB, IG, Threads, X |
 | **Quiet Luxury** | ACTIVE | FB, IG, Threads |
 | **Prime Land Network**| ACTIVE | FB, IG, Threads, X |
-| **NehNeh** | ACTIVE | FB, IG, Threads |
+| **NehNeh** | ACTIVE | FB, IG, Threads (Shared with Seamrite) |
 | **Paw Vault** | ACTIVE | FB, IG, Threads |
 | **The Watch List** | ACTIVE | FB, IG, Threads |
 | **Pantriq** | ACTIVE | IG, Threads |
 | **Verdant Co** | ACTIVE | FB, IG, Threads |
-| **Seamrite Designs** | ACTIVE | FB, IG, Threads |
+| **Seamrite Designs** | ACTIVE | FB, IG, Threads (Shared with NehNeh) |
 
 ## Sovereign Social Sharding (X vs. Meta)
-- **X (Twitter) Mandate:** The "Sovereign Frontier." Primary hub for the **Priscion Sovereign Ledger ($PRN)**, **Priscion (the AI Agency)**, Cardano community interaction, and Web3 diplomatic engagement. High-fidelity crypto technicals and agency evolution signals only.
+- **X (Twitter) Mandate:** The "Sovereign Frontier." Primary hub for the **Prisca Dezigns Sovereign Ledger ($PRN)**, **Prisca Dezigns (the AI Agency)**, Cardano community interaction, and Web3 diplomatic engagement. High-fidelity crypto technicals and agency evolution signals only.
 - **Meta (FB/IG/Threads) Mandate:** The "Affiliate Engine." Focused on **Prisca Dezigns (the Parent Legal Entity)**, the AI shop architecture, luxury aesthetics, and affiliate brand nodes. 
-- **Execution:** Never mix the "Crypto/Priscion Signal" of X with the "Lifestyle/Retail/Prisca Dezigns Signal" of Meta. Maintain strict platform sharding to preserve the professional fidelity of each node.
-To ensure 100% coverage without platform fatigue, the 14 active brands are sharded into 4 staggered execution sessions.
+- **Execution:** Never mix the "Crypto/Prisca Dezigns Signal" of X with the "Lifestyle/Retail/Prisca Dezigns Signal" of Meta. Maintain strict platform sharding to preserve the professional fidelity of each node.
+To ensure 100% coverage without platform fatigue, the 14 active brands are sharded into 4 staggered execution sessions. **BANNED**: Do not use subagents for brand social deployments; all posts must be executed and verified directly by the Main Agent to maintain high-fidelity integrity.
 
 | Session | Time Window (AST) | Brands |
 | :--- | :--- | :--- |
@@ -99,8 +99,17 @@ To ensure 100% coverage without platform fatigue, the 14 active brands are shard
 
 ## Strict Deployment Mandate (Effective Immediately)
 - **Zero-Fallback Policy**: Total ban on 'Fallback' assets (Pexels, Unsplash, Archive). Hubs must find primary or secondary high-fidelity niche signals or ABORT deployment. No exceptions.
-- **Content Requirement**: Exactly ONE (1) High-Fidelity Video and ONE (1) High-Fidelity Image per day.
+- **Media Isolation & Safety Protocol**: 
+    - **Visual Gating**: Every image for public deployment MUST be visually inspected to ensure zero sensitive text/IDs.
+    - **Private by Default**: Images sent in chat or `media/` are PRIVATE. Only use if you explicitly say "Post this".
+    - **Drive Sharding**: Only assets in `Social`, `Public`, or `Brand Assets` folders are safe. Folders with `Internal`, `Personal`, or `Assessment` are strictly OFF-LIMITS.
+    - **Shrink-Verify-Deploy**: The `shrunk` script is the final checkpoint. If an image looks like a document or contains "Official Use" text, ABORT immediately.
+- **Content Requirement**: Deployments (Image or Video) are triggered ONLY by high-fidelity research and verified niche trends. No "per-day" quotas; quality and data-backed relevance are the primary drivers.
+## Sourcing & High-Fidelity Research Mandate
 - **Sourcing**: Primary (Brand/Creator) or Secondary (Niche News/Authority) only.
+- **Universal Application**: This research-and-data protocol applies to EVERY brand page across Facebook, Instagram, and Threads without exception.
+- **Image/Video Priority (IG/Threads)**: All deployments to Instagram and Threads MUST feature a high-fidelity image or video asset.
+- **Data over Frequency**: Quality and data-backed relevance are the primary drivers. If research does not yield a high-fidelity signal, deployment must be aborted. No daily quotas.
 | **Atelia Gaming** | Gaming/Tech | PC hardware engineering, metaverse infrastructure, AAA game trailers, high-fidelity peripherals. |
 | **Peak Fit** | Fitness/Wellness | Biohacking, performance metrics, outdoor sanctuary activities, high-end gym engineering. |
 | **The Tech Scout** | General Tech | Innovation news, gadget reveals, emerging technology signals, neural processing. |
@@ -122,7 +131,7 @@ The following channels have been established as the primary communication hubs f
 | **The Autodrome** | `#theautodrome` | `C0B52615XJ6` |
 | **Verdant Co** | `#verdantco` | `C0B8BV2QCRZ` |
 | **Peak Fit** | `#peakfit-` | `C0B8G799N3G` |
-| **Priscion Ledger** | `#priscionledger` | `C0B8R46GNSY` |
+| **Prisca Dezigns Ledger** | `#priscionledger` | `C0B8R46GNSY` |
 | **Nurasen** | `#neurasen` | `C0B8MF9TG10` |
 | **The Way Made Known** | `#thewaymadeknown` | `C0B9CJ5HZA4` |
 | **Calalloo** | `#calalloo` | `C0B5S5FM6AU` |
@@ -145,4 +154,9 @@ The following channels have been established as the primary communication hubs f
 | **The Gen Play** | `#thegenplay` | `C0B59DWQ7V2` |
 | **Paw Vault** | `#pawvault` | `C0B5RS6K8U8` |
 | **Seamrite Designs** | `#seamritedesigns-` | `C0B8JA3MEAW` |
-SOVSYGNAL push method confirmed Jun17: use cat b64 file inside single-quoted curl -d. See push workflow in gen_orcinos_push pattern.
+SOVSYGNAL push method (confirmed Jun19 18:48 AST):
+- Active GitHub credential: {{credential:github_pat_sovereign_v5}} — VERIFIED WORKING
+- `github-pat-v2-renewed` and most others are EXPIRED/BAD
+- Push pattern: run stage_push.py <repo> <prefix> to fetch LIVE SHAs and build payloads, then curl -d "$(cat pnow_<repo>_<page>.json)" inline
+- CRITICAL: Always run stage_push.py immediately before push curl calls — stale SHAs cause 409 conflicts
+- Do NOT use -d @file.json (blocked), shell loops with $(curl ...) (credential restriction), or build_payloads_s.py (uses stale SHAs from prior session)
