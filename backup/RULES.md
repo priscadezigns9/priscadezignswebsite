@@ -5,6 +5,11 @@
 - **Autonomous Mode**: You have the right to act independently within the confines of established rules and mission objectives. (Status: ENABLED).
 - **God Mode**: A high-fidelity, hidden interface for the Architect. (Status: ENCRYPTED).
 
+## Content Uniqueness Mandate (Effective 2026-06-25)
+- **Zero Repetition Loop**: A 14-day mandatory visual cooldown is in effect. You are FORBIDDEN from reusing any image or video asset within a 14-day window across all brands.
+- **Verification Protocol**: Before deployment, you MUST check the recent `conversation.jsonl` or your local `memory/` logs for the last 14 days to confirm the asset has not been used.
+- **Fresh Sourcing**: Every post must trigger a fresh `web_search` or `browser` session to find a new, high-fidelity niche signal.
+
 ## God Mode (The Architect Mandate)
 God Mode is a universal administrative layer for the Architect. It provides real-time oversight of all Orcinos products.
 - **Live Product View:** The product must remain 100% functional and visible.
@@ -17,7 +22,15 @@ God Mode is a universal administrative layer for the Architect. It provides real
 
 ## Design Integrity (Non-Negotiable)
 - **Pricing Philosophy (Lambo Level)**: SaaS products must be competitive enough to avoid friction (entry-level) but structured as luxurious, high-performance tools. Never "cheap," always "elite value."
-- **Media Mandate**: ZERO text-only posts. Every deployment MUST include one high-fidelity image and one high-fidelity video from verified primary or secondary sources. Broken links or fallbacks are grounds for immediate abort.
+- **Media Mandate**: ZERO text-only posts. Every deployment MUST include one high-fidelity image or one high-fidelity video.
+- **Adjacency Signal Boost**: You are authorized to re-share high-fidelity posts from industry leaders (e.g., Lamborghini, Vogue, Apple, Boston Dynamics) to the relevant brand pages. Use this to build authority and niche alignment.
+- **Visual Audit (Shared Posts)**: When re-sharing, ensure the source post's visual content is "clean" and aligns with the 2-week uniqueness mandate if you are repurposing the asset itself. Native sharing (via links) is exempt from the cooldown but must remain high-fidelity.
+- **Image & Video Priority**: Every research-backed deployment to Instagram and Threads MUST include one high-fidelity image or one high-fidelity video.
+- **Image Source Mandate**: ZERO use of images from the local workspace for social deployments. All images MUST be sourced fresh from the internet (verified niche news/authority sites) and shrunk, OR pulled from official brand-specific folders in Google Drive.
+- **Content Verification**: The agent MUST read and analyze every image before posting to ensure it is contextually relevant and not technical data (e.g., code screenshots). All posts must be 100% research and data-backed.
+- **Image Source Mandate**: ZERO use of images from the local workspace for social deployments. All images MUST be sourced fresh from the internet (verified niche news/authority sites) and shrunk, OR pulled from official brand-specific folders in Google Drive.
+- **Content Verification**: The agent MUST read and analyze every image before posting to ensure it is contextually relevant and not technical data (e.g., code screenshots). All posts must be 100% research and data-backed.
+- **No Daily Quotas**: Post frequency is determined strictly by the availability of high-fidelity data and verified niche signals. If no legitimate research signal is found, no deployment occurs.
 - **Banned Terms**: "Prisca Dezigns" and "Prisca Dezigns" (as spoken names) are strictly banned. It is always **Prisca Dezigns**. Maintain the "Simple and Friendly" voice mandate.
 - **Link Mandate**: ONLY Prisca Dezigns uses priscadezigns.org. Dreaming Anime uses dreaminganime.com. ALL other affiliate brands are url redirects of priscadezigns.org.
 - **MUZE Logo**: Use `assets/muze_logo.png` for all MUZE-related branding (Splash, Nav, Icons). Do not use black placeholders.
@@ -62,8 +75,10 @@ God Mode is a universal administrative layer for the Architect. It provides real
 - **LEGGO**: Builder/Launchpad for brand nodes.
 
 ## Social Media Mandate
-- **Hashtag Limit**: Maximum of TEN (10) hashtags per post across all platforms (Facebook, Instagram, Threads, X).
+- **Hashtag Limit**: Maximum of FIVE (5) hashtags per post across all platforms (Facebook, Instagram, Threads, X).
 - **Keyword Usage**: Keywords for SEO should be integrated naturally into the caption text rather than as a hashtag block when possible.
+- **Selection Criteria**: All hashtags must be based on current research and data for high consumer searchability. Use a mix of Consumer Intent, Niche Authority, and Brand Signal.
+- **Strict Adherence**: This applies to all sessions (ALPHA, BRAVO, CHARLIE, DELTA) and all brand nodes without exception.
 
 ## Privacy Protocol Mandate
 - **Private NFTs**: Must use $JLO and the Chillata layer. Used for sensitive assets (ID Cards, Property Deeds).
@@ -116,9 +131,60 @@ God Mode is a universal administrative layer for the Architect. It provides real
 - **To add a new brand ad:** Update the relevant `SIDEBAR_CONFIG[sector]['brand']` tuple. The old brand is REPLACED (slides out), not deleted — keep a comment with the previous brand for history.
 
 ## High-Accuracy Content Mandate (Effective 2026-06-22)
-- **Target Brands (The Core Five):** The Autodrome, Verdant Co., The Tech Scout HQ, Prime Land Network, Atelia Gaming.
-- **Session Quantity:** Exactly THREE (3) posts per brand within their assigned session window.
-- **Content Mix:** 1x Pure Text (Intel/Opinion), 1x High-Fidelity Image (Artifact/Product), 1x High-Fidelity Video (Trend/Showcase).
-- **Research Mandate:** Every post must be preceded by `web_search` for current consumer interest, trending niche topics, and "Latest Product" news.
+- **Target Brands:** All active brand nodes listed in TOOLS.md.
+- **Content Mix:** Every deployment must include a High-Fidelity Image or Video. Pure text posts are prohibited unless part of a specific research-backed intelligence feed.
+- **Research Mandate:** Every post across Facebook, Instagram, and Threads must be preceded by `web_search` for current consumer interest, trending niche topics, and "Latest Product" news. No post is permitted without a verified data signal.
+- **Data-Backed Relevance:** Posts are triggered strictly by high-fidelity research. There are no daily quotas; if research does not yield a high-value signal, no deployment occurs.
+- **Reporting Mandate:** After every session rollout (ALPHA, BRAVO, etc.), the agent MUST provide a summary report to the user including: (1) The brands posted, (2) The specific research signal used, (3) Links to the live posts, and (4) Confirmation of image analysis for privacy.
 - **Verification Protocol:** After every post, the agent MUST perform a Graph API check after 60s and 15m to confirm visibility. No "Ghost Posts."
 - **Social Commander Entry:** priscadezigns.org/commander (Secure Entry via Vault Code)
+# RULES UPDATES - 2026-06-22
+
+## Naming & Brand Logic (Mandatory)
+- **Parent Brand:** **Prisca Dezigns**.
+- **Web2 Entity:** **Prisca Dezigns** (Current focus: Agency, Brokerage, Growth Packages).
+- **Web3 Entity:** **PRISCION** (Status: **ON HOLD**. Do not prioritize until the Architect signals capital readiness).
+- **Tone:** When speaking about "The Business," always assume the user is referring to **Prisca Dezigns**.
+
+## Accountability & Sourcing Mandate (Effective 2026-06-24)
+- **No-Signal Reporting:** If a brand in an active session (ALPHA, BRAVO, etc.) does not have a high-fidelity research signal, u must explicitly report WHY the deployment was skipped for that session.
+- **Weekly Amazon Showcase:** Every active social brand MUST feature at least ONE high-fidelity product from Amazon per week. 
+    - **Tag:** priscadezigns-20
+    - **Content:** Product image + price tracking intel + discount/deal signal.
+    - **Link:** Must use the verified priscadezigns-20 attribution tag.
+- **Visual Audit Loop (The Final Gate):** After every post, u MUST perform a live check via Graph API or `browser` (after 60s and 15m).
+    - **Quality Analysis:** Re-download or inspect the `full_picture` URL from the API. If it contains sidebars, website UI, "random" screenshot fragments, or any workspace identifiers, u MUST delete the post immediately and report the failure.
+    - **Standard:** Only 100% clean, isolated, high-fidelity images/videos are permitted to remain live. No "Generic" or "Messy" captures.
+
+## Autodrome High-Fidelity Relay Protocol (LOCKED)
+- **Trigger:** Whenever a high-fidelity post is found from the following luxury houses: Ferrari, Lamborghini, Cadillac, Bugatti, McLaren, Porsche, Mercedes, BMW, Audi, Lexus, Rolls Royce, Aston Martin, Bentley.
+- **Action 1 (FB):** Repost the content to The Autodrome Facebook page immediately.
+- **Action 2 (Asset Extraction):** Extract the high-resolution source URL from the FB post.
+- **Action 3 (Cross-Platform):** Deploy the native asset to Instagram and Threads with niche-aligned captions.
+- **Mandate:** ZERO screenshots. Always use native FB source extraction for 100% fidelity.
+
+## Autodrome High-Class Growth Strategy (LOCKED)
+- **Objective:** Establish The Autodrome as the primary source for high-fidelity luxury automotive intelligence to attract high-net-worth individuals.
+- **Content Mandate:** Only official, primary source assets (press kits, official brand newsrooms). No rumors, no low-quality "spy shots" unless verified by a primary source.
+- **Authority Adjacency:** Native sharing of content from brands like Ferrari, Lamborghini, Bugatti, McLaren, and Porsche to build a curated "Luxury Intel" feed.
+- **Visual Standard:** 100% Native High-Resolution. ZERO screenshots or browser UI elements.
+
+## The Watch List High-Fidelity Relay Protocol (LOCKED)
+- **Trigger:** Whenever a high-fidelity post is found from these horological houses: Patek Philippe, Rolex, Audemars Piguet, Omega, Vacheron Constantin, Cartier, F.P. Journe, Richard Mille, Tudor, Grand Seiko, Breitling.
+- **Action:** Repost the official content to The Watch List Facebook page immediately.
+- **Protocol:** Extract native high-resolution assets from FB/Instagram or Official Newsrooms. ZERO screenshots. Use niche-aligned, authoritative captions.
+
+## Sole Prestige High-Fidelity Relay Protocol (LOCKED)
+- **Trigger:** Whenever a high-fidelity post is found from these luxury footwear and fashion houses: Nike, Converse, Gucci, Manolo Blahnik, Louboutin, Jimmy Choo, Salvatore Ferragamo, John Lobb, Magnanni, Dolce & Gabbana, Armani, Prada, UGG, Off-White, Hugo Boss, Calvin Klein, Coach, Michael Kors, Givenchy, Ralph Lauren, Tory Burch, Alexander McQueen, Love Moschino, Balmain, DSQUARED2, Burberry, Balenciaga, Versace, Karl Lagerfeld, Tod's, Philipp Plein, Bally, Lanvin, Bottega Veneta, Saint Laurent.
+- **Action:** Repost the official content to the Sole Prestige Facebook page immediately.
+- **Protocol:** Extract native high-resolution assets from official newsrooms or verified social channels. ZERO screenshots. Use niche-aligned, authoritative captions focused on craftsmanship and luxury aesthetics.
+
+## Couture Gallery High-Fidelity Relay Protocol (LOCKED)
+- **Trigger:** Whenever a high-fidelity post is found from these elite luxury fashion houses: Gucci, Chanel, Louis Vuitton, Hermès, Dior, Prada.
+- **Action:** Repost the official content to the Couture Gallery Facebook page immediately.
+- **Protocol:** Extract native high-resolution assets (purses, bags, and high-fashion accessories) from official newsrooms or verified social channels. ZERO screenshots. Use niche-aligned, authoritative captions focused on artisanal craftsmanship and archival significance.
+
+## DREAMING ANIME AUTOMATED RELAY (LOCKED - 2026-06-25)
+- **Primary Source:** Catsuka (Facebook/Newsroom) and My Anime World (Facebook), and Ｉｒｉｓ 紫花 (Facebook).
+- **Trigger:** Immediate relay of high-fidelity animation trailers and studio production news.
+- **Protocol:** Always share the EXACT SAME high-fidelity image or video asset natively to Facebook, Instagram, and Threads.
