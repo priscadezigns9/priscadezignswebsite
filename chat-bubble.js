@@ -82,19 +82,22 @@
         
         const low = val.toLowerCase();
 
-        if (val === 'Back') {
-            state = history.pop() || 'ROOT';
-            if (state === 'ROOT') b.style.display = 'none';
-            m.innerHTML = ''; // Clear for fresh context or keep history? Let's refresh view.
-            if (state === 'ROOT') {
-                addMsg("Greetings. I am Sierra. Select a path to evolve your infrastructure:");
-                showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
-            } else if (state === 'WEBSITE_PATH') {
+                if (val === 'Back') {
+            state = 'ROOT';
+            addMsg('Returning to main menu. How else can I assist your evolution?', false);
+            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
+            return;
+        } else if (state === 'WEBSITE_PATH') {
                 addMsg("Select your Website Architectural tier:");
                 showOptions(['Starter', 'Growth', 'Trusted', 'E-Commerce', 'Custom Site']);
             
         } else if (state === 'BRANDING_PATH') {
-            if (val === 'Back') { handleInput('Back'); return; }
+                    if (val === 'Back') {
+            state = 'ROOT';
+            addMsg('Returning to main menu. How else can I assist your evolution?', false);
+            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
+            return;
+        }
             user_data.package = 'Branding: ' + val;
             state = 'FORM_NAME';
             setTimeout(() => addMsg("Genesis initiated. What is your <strong>Full Name</strong>?"), 400);
@@ -153,7 +156,12 @@
             }
         
         } else if (state === 'BRANDING_PATH') {
-            if (val === 'Back') { handleInput('Back'); return; }
+                    if (val === 'Back') {
+            state = 'ROOT';
+            addMsg('Returning to main menu. How else can I assist your evolution?', false);
+            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
+            return;
+        }
             user_data.package = 'Branding: ' + val;
             state = 'FORM_NAME';
             setTimeout(() => addMsg("Genesis initiated. What is your <strong>Full Name</strong>?"), 400);
