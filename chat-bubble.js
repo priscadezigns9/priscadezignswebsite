@@ -39,7 +39,7 @@
         'E-Growth': { setup: '97', pulse: '17/mo', desc: 'Conversion-Optimized Sales Engine' },
         'E-Trusted': { setup: ',500', pulse: '97/mo', desc: 'Enterprise On-Chain Commerce' },
         'AI Consultancy': { setup: '0,000 Consultation', pulse: 'Ecosystem Managed', desc: 'Enterprise-grade Neural Departments & Official Sierra AI Deployments' },
-        'Branding': { setup: '97', pulse: 'N/A', desc: 'Neural Identity & Logo Architecture' },
+        'Branding': { setup: '00', pulse: 'N/A', desc: 'Neural Identity & Logo Architecture' },
         'Brand Scan': { setup: '97', pulse: 'N/A', desc: 'Deep-Audit & Market Intelligence' }
     };
 
