@@ -1,133 +1,134 @@
+
 (function() {
     const container = document.createElement('div');
     container.id = 'prisca-chat-widget';
-    container.style.cssText = 'position: fixed; bottom: 160px; right: 40px; z-index: 10000; font-family: "Inter", -apple-system, sans-serif;';
+    container.style.cssText = "position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: 'Inter', sans-serif;";
     
     container.innerHTML = `
-        <button id='chat-toggle' style='background: #301934; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; box-shadow: 0 10px 25px rgba(48,25,52,0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;'>
-            <svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/></svg>
+        <button id="chat-toggle" style="background: #301934; border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; box-shadow: 0 8px 32px rgba(48,25,52,0.3); display: flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </button>
-        <div id='chat-window' style='display: none; position: absolute; bottom: 80px; right: 0; width: 380px; height: 600px; background: rgba(255, 255, 240, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 24px; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.3); overflow: hidden; border: 1px solid rgba(48,25,52,0.1);'>
-            <div style='background: #301934; color: white; padding: 24px; font-weight: 700; display: flex; justify-content: space-between; align-items: center;'>
-                <div style='display: flex; align-items: center; gap: 12px;'>
-                    <div style='width: 8px; height: 8px; background: #00FF00; border-radius: 50%; box-shadow: 0 0 10px #00FF00;'></div>
-                    <span style='font-size: 0.9rem; opacity: 0.9;'>SIERRA | NEURAL SCOUT</span>
+        <div id="chat-window" style="display: none; position: absolute; bottom: 85px; right: 0; width: 400px; height: 620px; background: #FFFFF0; border-radius: 20px; flex-direction: column; box-shadow: 0 12px 48px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid rgba(48,25,52,0.1); transition: all 0.3s ease;">
+            <div style="background: #301934; color: white; padding: 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 10px; height: 10px; background: #00FF00; border-radius: 50%; box-shadow: 0 0 8px #00FF00;"></div>
+                    <span>SIERRA | Neural Scout</span>
                 </div>
-                <div style='display: flex; gap: 15px; align-items: center;'>
-                    <button id='chat-back' style='background:none; border:none; color:white; cursor:pointer; font-size:12px; font-weight:600; opacity: 0.7; text-transform: uppercase; display: none;'>Back</button>
-                    <button id='close-chat' style='background:none; border:none; color:white; cursor:pointer; font-size:24px; opacity: 0.7;'>&times;</button>
-                </div>
+                <button id="close-chat" style="background:none; border:none; color:white; cursor:pointer; font-size:24px; opacity: 0.8;">&times;</button>
             </div>
-            <div id='chat-messages' style='flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;'></div>
-            <div id='chat-options' style='padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 10px;'></div>
-            <div style='padding: 20px 24px; border-top: 1px solid rgba(48,25,52,0.05); display: flex; gap: 12px;'>
-                <input type='text' id='user-input' placeholder='Type custom request...' style='flex: 1; padding: 12px 16px; border: 1px solid rgba(48,25,52,0.1); border-radius: 14px;'>
-                <button id='send-btn' style='background: #301934; color: white; border: none; padding: 0 18px; border-radius: 14px;'>Send</button>
+            <div id="chat-messages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #ffffff;"></div>
+            <div id="chat-options" style="padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 8px; background: #ffffff; border-top: 1px solid #f0f0f0;"></div>
+            <div style="padding: 20px; border-top: 1px solid #eee; display: flex; gap: 10px; background: #ffffff;">
+                <input type="text" id="user-input" placeholder="Type only for custom requests..." style="flex: 1; padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 12px; outline: none; font-size: 0.95rem;">
+                <button id="send-btn" style="background: #301934; color: white; border: none; padding: 0 20px; border-radius: 12px; cursor: pointer; font-weight: 600;">Send</button>
             </div>
-        </div>`;
+        </div>
+    `;
     
     document.body.appendChild(container);
-    const t = document.getElementById('chat-toggle'), w = document.getElementById('chat-window'), c = document.getElementById('close-chat'), b = document.getElementById('chat-back'), i = document.getElementById('user-input'), s = document.getElementById('send-btn'), m = document.getElementById('chat-messages'), opt = document.getElementById('chat-options');
-    let state = 'ROOT', user_data = {};
+
+    const t = document.getElementById('chat-toggle'), w = document.getElementById('chat-window'), c = document.getElementById('close-chat'), i = document.getElementById('user-input'), s = document.getElementById('send-btn'), m = document.getElementById('chat-messages'), opt = document.getElementById('chat-options');
+    
+    let state = 'ROOT';
+    let user_data = {};
 
     const PKG_CONFIG = {
-        'Starter': { setup: '97', pulse: '7/mo' }, 'Growth': { setup: '97', pulse: '7/mo' }, 'Trusted': { setup: ',200', pulse: '7/mo' },
-        'E-Starter': { setup: '97', pulse: '7/mo' }, 'E-Growth': { setup: ',497', pulse: '7/mo' }, 'E-Trusted': { setup: ',500', pulse: '7/mo' },
-        'AI Consultancy': { setup: ',000', pulse: ',500/mo' }
+        'Starter': { setup: '97', pulse: '7/mo', desc: 'Basic Brand Identity & Presence' },
+        'Growth': { setup: '97', pulse: '7/mo', desc: 'Active Scaling & Marketing Logic' },
+        'Trusted': { setup: ',200', pulse: '7/mo', desc: 'High-Fidelity Authority & Infrastructure' },
+        'E-Starter': { setup: '97', pulse: '7/mo', desc: 'Core E-Commerce Framework' },
+        'E-Growth': { setup: '97', pulse: '7/mo', desc: 'Conversion-Optimized Sales Engine' },
+        'E-Trusted': { setup: ',500', pulse: '97/mo', desc: 'Enterprise On-Chain Commerce' },
+        'AI Consultancy': { setup: '0,000 Consultation', pulse: 'Ecosystem Managed', desc: 'Enterprise-grade Neural Departments & Official Sierra AI Deployments' }
     };
 
     function addMsg(txt, u) {
-        const d = document.createElement('div'); d.innerHTML = txt;
-        d.style.cssText = 'padding:14px 18px; border-radius:' + (u ? '18px 18px 2px 18px' : '18px 18px 18px 2px') + '; font-size:0.9rem; max-width:82%; align-self:' + (u ? 'flex-end' : 'flex-start') + '; background:' + (u ? '#301934' : '#ffffff') + '; color:' + (u ? 'white' : '#333') + '; box-shadow: 0 4px 15px rgba(0,0,0,0.05);';
+        const d = document.createElement('div');
+        d.innerHTML = txt;
+        d.style.cssText = `padding:12px 16px; border-radius:15px; font-size:0.95rem; line-height:1.5; max-width:85%; align-self:${u?'flex-end':'flex-start'}; background:${u?'#301934':'#f1f1f1'}; color:${u?'white':'#333'}; box-shadow: 0 2px 4px rgba(0,0,0,0.05);`;
         m.appendChild(d); m.scrollTop = m.scrollHeight;
     }
 
     function showOptions(options) {
         opt.innerHTML = '';
         options.forEach(o => {
-            const btn = document.createElement('button'); btn.innerText = o;
-            btn.style.cssText = 'padding: 10px 20px; border: 1.5px solid #301934; border-radius: 14px; background: transparent; color: #301934; cursor: pointer; font-size: 0.85rem; font-weight: 700;';
-            btn.onclick = () => handleInput(o); opt.appendChild(btn);
+            const b = document.createElement('button');
+            b.innerText = o;
+            b.style.cssText = "padding: 10px 18px; border: 1.5px solid #301934; border-radius: 12px; background: white; color: #301934; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: all 0.2s;";
+            b.onmouseover = () => { b.style.background = '#301934'; b.style.color = 'white'; };
+            b.onmouseout = () => { b.style.background = 'white'; b.style.color = '#301934'; };
+            b.onclick = () => handleInput(o);
+            opt.appendChild(b);
         });
     }
 
     function handleInput(val) {
-        opt.innerHTML = '';
-        if (val === 'Back') {
-            state = 'ROOT'; b.style.display = 'none';
-            addMsg('Returning to main menu.', false);
-            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
-            return;
-        }
-        addMsg(val, true); b.style.display = 'block';
+        if (state !== 'FORM_NAME' && state !== 'FORM_EMAIL') addMsg(val, true);
         const low = val.toLowerCase();
-
+        
         if (state === 'ROOT') {
-            if (low.includes('branding') || low === '3') {
-                state = 'BRANDING_PATH';
-                addMsg('Branding is the genesis of your identity. Select your starting point:', false);
-                showOptions(['Brand Identity (New)', 'Brand Refresh (Existing)', 'Back']);
-            } else if (low.includes('web') || low === '1') {
+            if (low.includes('website') || low === '1') {
                 state = 'WEBSITE_PATH';
-                addMsg('Select your Website Architectural tier:', false);
-                showOptions(['Starter', 'Growth', 'Trusted', 'E-Commerce', 'Custom Site', 'Back']);
+                setTimeout(() => {
+                    addMsg("Select your Website Architectural tier:");
+                    showOptions(['Starter', 'Growth', 'Trusted', 'E-Commerce', 'Custom Site']);
+                }, 400);
             } else if (low.includes('ai') || low === '2') {
                 state = 'AI_PATH';
-                addMsg('AI Consultancy provides a full-scale neural ecosystem (,000). Shall we proceed?', false);
-                showOptions(['Yes, Initiate AI Intake', 'Back']);
-            } else if (low.includes('scan') || low === '4') {
-                state = 'BRAND_SCAN';
-                addMsg('Initiating Brand Scan. What is the URL or handle?', false);
+                setTimeout(() => {
+                    addMsg("AI Consultancy (k) requires a strategic intake. Shall we proceed?");
+                    showOptions(['Yes, Initiate AI Intake', 'Back to Main']);
+                }, 400);
             }
-        } else if (state === 'BRANDING_PATH') {
-            user_data.package = 'Branding: ' + val; state = 'FORM_NAME';
-            addMsg('Genesis initiated. What is your <strong>Full Name</strong>?', false);
         } else if (state === 'WEBSITE_PATH') {
             if (val === 'E-Commerce') {
-                addMsg('Select your E-Commerce tier:', false);
-                showOptions(['E-Starter', 'E-Growth', 'E-Trusted', 'Back']);
+                setTimeout(() => {
+                    addMsg("Select your E-Commerce architectural tier:");
+                    showOptions(['E-Starter', 'E-Growth', 'E-Trusted']);
+                }, 400);
             } else if (val === 'Custom Site') {
-                state = 'CUSTOM_FEATURES';
-                addMsg('Custom builds are modular. Select features:', false);
-                showOptions(['AI Chatbot', 'Blog', 'Social Sync', 'TikTok', 'Payment Modal', 'Membership', 'Calendar', 'Copywriting', 'Visual Assets', 'Done Selecting']);
-            } else {
-                user_data.package = val; state = 'FORM_NAME';
-                const pkg = PKG_CONFIG[val];
-                addMsg('Tier: <strong>' + val + '</strong><br>Setup: <strong>' + pkg.setup + '</strong><br>What is your <strong>Full Name</strong>?', false);
-            }
-        } else if (state === 'CUSTOM_FEATURES') {
-            if (val === 'Done Selecting') {
                 state = 'FORM_NAME';
-                addMsg('Architecture captured. What is your <strong>Full Name</strong>?', false);
+                setTimeout(() => addMsg("For custom builds, I need to collect your brand details. What is your <strong>Full Name</strong>?"), 400);
             } else {
-                user_data.features = (user_data.features || '') + val + ', ';
-                addMsg(val + ' added.', false);
-                showOptions(['AI Chatbot', 'Blog', 'Social Sync', 'TikTok', 'Payment Modal', 'Membership', 'Calendar', 'Copywriting', 'Visual Assets', 'Done Selecting']);
+                user_data.package = val;
+                state = 'FORM_NAME';
+                const pkg = PKG_CONFIG[val];
+                setTimeout(() => {
+                    addMsg(`Selected: <strong>${val}</strong><br>Setup: <strong>${pkg.setup}</strong><br>Pulse: <strong>${pkg.pulse}</strong><br><br>Ready to secure this build. What is your <strong>Full Name</strong>?`);
+                    opt.innerHTML = '';
+                }, 400);
             }
         } else if (state === 'AI_PATH') {
-            user_data.package = 'AI Consultancy'; state = 'FORM_NAME';
-            addMsg('Initiating AI Intake. What is your <strong>Full Name</strong>?', false);
-        } else if (state === 'BRAND_SCAN') {
-            user_data.target = val; state = 'FORM_NAME';
-            addMsg('Target identified. What is your <strong>Full Name</strong>?', false);
+            if (val.includes('Initiate')) {
+                user_data.package = 'AI Consultancy';
+                state = 'FORM_NAME';
+                setTimeout(() => addMsg("Initiating AI Intake. What is your <strong>Full Name</strong>?"), 400);
+            } else {
+                state = 'ROOT';
+                handleInput('Back');
+            }
         } else if (state === 'FORM_NAME') {
-            user_data.name = val; state = 'FORM_EMAIL';
-            addMsg('Thank you. What is your <strong>Best Email</strong>?', false);
+            user_data.name = val;
+            state = 'FORM_EMAIL';
+            addMsg("Thank you. What is your <strong>Best Email</strong> for the formal proposal?", false);
         } else if (state === 'FORM_EMAIL') {
-            user_data.email = val; state = 'COMPLETE';
-            addMsg('The Architect has been notified. Priscilla will reach out within 24 hours. 🙏', false);
+            user_data.email = val;
+            state = 'COMPLETE';
+            addMsg("Data synchronized. I am delivering your brief to the Architect now.", false);
+            setTimeout(() => addMsg("Intake Complete. Priscilla will reach out within 24 hours. Látom. 🙏", false), 800);
+            opt.innerHTML = '';
+            // Future: fetch() to Supabase leads table here
         }
     }
 
     t.onclick = () => {
         w.style.display = w.style.display === 'none' ? 'flex' : 'none';
         if (m.innerHTML === '') {
-            addMsg('Greetings. I am Sierra. Select a path:', false);
-            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
+            addMsg("Greetings. I am Sierra. Select a path to evolve your infrastructure:");
+            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy']);
         }
     };
-    c.onclick = () => { w.style.display = 'none'; };
-    b.onclick = () => handleInput('Back');
+    c.onclick = () => w.style.display = 'none';
     s.onclick = () => { const val = i.value.trim(); if (val) handleInput(val); i.value = ''; };
     i.onkeypress = (e) => { if (e.key === 'Enter') s.click(); };
 })();
