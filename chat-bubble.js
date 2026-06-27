@@ -154,7 +154,7 @@
             user_data.email = val;
             state = 'COMPLETE';
             addMsg("Data synchronized. Delivering brief to the Architect now.");
-            setTimeout(() => addMsg("Intake Complete. Priscilla will reach out within 24 hours. Látom. 🙏", false), 800);
+            setTimeout(() => addMsg("Intake Complete. Priscilla will reach out within 24 hours. 🙏", false), 800);
             opt.innerHTML = '';
             b.style.display = 'none';
         }
