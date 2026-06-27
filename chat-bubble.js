@@ -2,13 +2,13 @@
 (function() {
     const container = document.createElement('div');
     container.id = 'prisca-chat-widget';
-    container.style.cssText = "position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: 'Inter', sans-serif;";
+    container.style.cssText = "position: fixed; bottom: 90px; right: 20px; z-index: 9999; font-family: 'Inter', sans-serif;";
     
     container.innerHTML = `
         <button id="chat-toggle" style="background: #301934; border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; box-shadow: 0 8px 32px rgba(48,25,52,0.3); display: flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </button>
-        <div id="chat-window" style="display: none; position: absolute; bottom: 85px; right: 0; width: 400px; height: 620px; background: #FFFFF0; border-radius: 20px; flex-direction: column; box-shadow: 0 12px 48px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid rgba(48,25,52,0.1); transition: all 0.3s ease;">
+        <div id="chat-window" style="display: none; position: absolute; bottom: 155px; right: 0; width: 400px; height: 620px; background: #FFFFF0; border-radius: 20px; flex-direction: column; box-shadow: 0 12px 48px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid rgba(48,25,52,0.1); transition: all 0.3s ease;">
             <div style="background: #301934; color: white; padding: 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <div style="width: 10px; height: 10px; background: #00FF00; border-radius: 50%; box-shadow: 0 0 8px #00FF00;"></div>
