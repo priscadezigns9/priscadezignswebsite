@@ -126,7 +126,7 @@
                     addMsg("Select your E-Commerce architectural tier:");
                     showOptions(['E-Starter', 'E-Growth', 'E-Trusted']);
                 }, 400);
-            } else if (val === 'Custom Site') {
+            } else if (val === 'Custom Site') { user_data.package = 'Custom Site Build';
                 state = 'FORM_NAME';
                 setTimeout(() => addMsg("What is your <strong>Full Name</strong>?"), 400);
             } else {
@@ -154,7 +154,7 @@
             user_data.email = val;
             state = 'COMPLETE';
             addMsg("Data synchronized. Delivering brief to the Architect now.");
-            setTimeout(() => addMsg("Intake Complete. Priscilla will reach out within 24 hours. 🙏", false), 800);
+            setTimeout(() => addMsg("Intake Complete. The Architect has been notified. Priscilla will reach out within 24 hours. 🙏", false), 800);
             opt.innerHTML = '';
             b.style.display = 'none';
         }
