@@ -1,7 +1,7 @@
 (function() {
     const container = document.createElement('div');
     container.id = 'prisca-chat-widget';
-    container.style.cssText = 'position: fixed; bottom: 120px; right: 30px; z-index: 10000; font-family: "Inter", -apple-system, sans-serif;';
+    container.style.cssText = 'position: fixed; bottom: 160px; right: 40px; z-index: 10000; font-family: "Inter", -apple-system, sans-serif;';
     
     container.innerHTML = `
         <button id='chat-toggle' style='background: #301934; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; box-shadow: 0 10px 25px rgba(48,25,52,0.4); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;'>
