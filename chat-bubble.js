@@ -39,7 +39,7 @@
           m = document.getElementById('chat-messages'), 
           opt = document.getElementById('chat-options');
     
-    let state = 'ROOT';
+    let state = 'ROOT'; opt.innerHTML = '';
     let history = []; // Track state history for back button
     let user_data = {};
 
@@ -73,7 +73,7 @@
         });
     }
 
-    function handleInput(val) {
+    function handleInput(val) { opt.innerHTML = "";
         if (val !== 'Back' && state !== 'FORM_NAME' && state !== 'FORM_EMAIL') {
             addMsg(val, true);
             history.push(state);
@@ -83,7 +83,7 @@
         const low = val.toLowerCase();
 
                 if (val === 'Back') {
-            state = 'ROOT';
+            state = 'ROOT'; opt.innerHTML = '';
             addMsg('Returning to main menu. How else can I assist your evolution?', false);
             showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
             return;
@@ -93,7 +93,7 @@
             
         } else if (state === 'BRANDING_PATH') {
                     if (val === 'Back') {
-            state = 'ROOT';
+            state = 'ROOT'; opt.innerHTML = '';
             addMsg('Returning to main menu. How else can I assist your evolution?', false);
             showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
             return;
@@ -148,7 +148,7 @@
             } else {
                 user_data.package = val;
                 state = 'FORM_NAME';
-                const pkg = PKG_CONFIG[val];
+                const pkg = PKG_CONFIG[val]; opt.innerHTML = '';
                 setTimeout(() => {
                     addMsg(`Tier: <strong>${val}</strong><br>Setup: <strong>${pkg.setup}</strong><br>Ready to secure this build. What is your <strong>Full Name</strong>?`);
                     opt.innerHTML = '';
@@ -157,7 +157,7 @@
         
         } else if (state === 'BRANDING_PATH') {
                     if (val === 'Back') {
-            state = 'ROOT';
+            state = 'ROOT'; opt.innerHTML = '';
             addMsg('Returning to main menu. How else can I assist your evolution?', false);
             showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
             return;
