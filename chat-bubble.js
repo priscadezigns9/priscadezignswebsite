@@ -38,7 +38,9 @@
         'E-Starter': { setup: '97', pulse: '7/mo', desc: 'Core E-Commerce Framework' },
         'E-Growth': { setup: '97', pulse: '17/mo', desc: 'Conversion-Optimized Sales Engine' },
         'E-Trusted': { setup: ',500', pulse: '97/mo', desc: 'Enterprise On-Chain Commerce' },
-        'AI Consultancy': { setup: '0,000 Consultation', pulse: 'Ecosystem Managed', desc: 'Enterprise-grade Neural Departments & Official Sierra AI Deployments' }
+        'AI Consultancy': { setup: '0,000 Consultation', pulse: 'Ecosystem Managed', desc: 'Enterprise-grade Neural Departments & Official Sierra AI Deployments' },
+        'Branding': { setup: '97', pulse: 'N/A', desc: 'Neural Identity & Logo Architecture' },
+        'Brand Scan': { setup: '97', pulse: 'N/A', desc: 'Deep-Audit & Market Intelligence' }
     };
 
     function addMsg(txt, u) {
@@ -78,6 +80,14 @@
                     addMsg("Our <strong>AI Consultancy</strong> (0k fee) specializes in high-fidelity automation and Enterprise <strong>Sierra AI</strong> deployments (~0k total). Shall we proceed with a strategic intake?");
                     showOptions(['Yes, Initiate AI Intake', 'Back to Main']);
                 }, 400);
+            } else if (low.includes("branding") || low === "3") {
+                user_data.package = 'Branding';
+                state = 'FORM_NAME';
+                setTimeout(() => addMsg("Selected: <strong>Branding Package</strong> (97). What is your <strong>Full Name</strong>?"), 400);
+            } else if (low.includes("scan") || low === "4") {
+                user_data.package = 'Brand Scan';
+                state = 'FORM_NAME';
+                setTimeout(() => addMsg("Selected: <strong>Brand Scan</strong> (97). What is your <strong>Full Name</strong>?"), 400);
             }
         } else if (state === "WEBSITE_PATH") {
             if (val === "E-Commerce") {
@@ -123,7 +133,7 @@
         w.style.display = w.style.display === 'none' ? 'flex' : 'none';
         if (m.innerHTML === '') {
             addMsg("Greetings. I am Sierra. Select a path to evolve your infrastructure:");
-            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy']);
+            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
         }
     };
     c.onclick = () => w.style.display = 'none';
