@@ -141,9 +141,7 @@
                     addMsg("Select your E-Commerce architectural tier:");
                     showOptions(['E-Starter', 'E-Growth', 'E-Trusted']);
                 }, 400);
-            } else if (val === 'Custom Site') { state = 'CUSTOM_FEATURES'; setTimeout(() => { addMsg('Custom builds are architected module-by-module. Select the specific features required for your infrastructure:'); showOptions(['AI Chatbot', 'Blog', 'Social (FB/IG/Threads)', 'TikTok', 'Payment Modal', 'Membership', 'Calendar/Booking', 'Copywriting', 'Visual Assets', 'Done Selecting']); user_data.package = 'Custom Site Build';
-                state = 'FORM_NAME';
-                setTimeout(() => addMsg("What is your <strong>Full Name</strong>?"), 400);
+            } else if (val === 'Custom Site') { state = 'CUSTOM_FEATURES'; user_data.package = 'Custom Site Build'; setTimeout(() => { addMsg('Custom builds are architected module-by-module. Select the features required:'); showOptions(['AI Chatbot', 'Blog', 'Social Sync', 'TikTok', 'Payment Modal', 'Membership', 'Calendar/Booking', 'Copywriting', 'Visual Assets', 'Done Selecting']); }, 400);
             } else {
                 user_data.package = val;
                 state = 'FORM_NAME';
