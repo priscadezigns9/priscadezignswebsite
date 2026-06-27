@@ -88,11 +88,26 @@
             m.innerHTML = ''; // Clear for fresh context or keep history? Let's refresh view.
             if (state === 'ROOT') {
                 addMsg("Greetings. I am Sierra. Select a path to evolve your infrastructure:");
-                showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🔍 Brand Scan']);
+                showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
             } else if (state === 'WEBSITE_PATH') {
                 addMsg("Select your Website Architectural tier:");
                 showOptions(['Starter', 'Growth', 'Trusted', 'E-Commerce', 'Custom Site']);
-            } else if (state === 'AI_PATH') {
+            
+        } else if (state === 'BRANDING_PATH') {
+            if (val === 'Back') { handleInput('Back'); return; }
+            user_data.package = 'Branding: ' + val;
+            state = 'FORM_NAME';
+            setTimeout(() => addMsg("Genesis initiated. What is your <strong>Full Name</strong>?"), 400);
+        } else if (state === 'CUSTOM_FEATURES') {
+            if (val === 'Done Selecting') {
+                state = 'FORM_NAME';
+                addMsg("Architecting custom quote for: " + (user_data.features || 'Standard Custom'), false);
+                setTimeout(() => addMsg("What is your <strong>Full Name</strong>?"), 400);
+            } else {
+                user_data.features = (user_data.features || '') + val + ', ';
+                addMsg(val + " added to architecture.", false);
+            }
+} else if (state === 'AI_PATH') {
                 addMsg("AI Consultancy provides a full-scale neural ecosystem designed to eliminate operational friction ($8k). Shall we proceed?");
                 showOptions(['Yes, Initiate AI Intake', 'Back to Main']);
             }
@@ -100,7 +115,7 @@
         }
         
         if (state === 'ROOT') {
-            if (low.includes('scan') || low === '3') { 
+            if (low.includes('scan') || low === '4') { 
                 state = 'BRAND_SCAN'; 
                 setTimeout(() => { addMsg('Initiating high-fidelity Brand Scan. What is the URL or social handle to audit?'); opt.innerHTML = ''; }, 400); 
             } else if (low.includes('website') || low === '1') {
@@ -126,7 +141,7 @@
                     addMsg("Select your E-Commerce architectural tier:");
                     showOptions(['E-Starter', 'E-Growth', 'E-Trusted']);
                 }, 400);
-            } else if (val === 'Custom Site') { user_data.package = 'Custom Site Build';
+            } else if (val === 'Custom Site') { state = 'CUSTOM_FEATURES'; setTimeout(() => { addMsg('Custom builds are feature-dependent. Select additional modules required:'); showOptions(['AI Chatbot', 'On-Chain Payments', 'Member Portal', 'Advanced SEO', 'Done Selecting']); }, 400); user_data.package = 'Custom Site Build';
                 state = 'FORM_NAME';
                 setTimeout(() => addMsg("What is your <strong>Full Name</strong>?"), 400);
             } else {
@@ -138,7 +153,22 @@
                     opt.innerHTML = '';
                 }, 400);
             }
-        } else if (state === 'AI_PATH') {
+        
+        } else if (state === 'BRANDING_PATH') {
+            if (val === 'Back') { handleInput('Back'); return; }
+            user_data.package = 'Branding: ' + val;
+            state = 'FORM_NAME';
+            setTimeout(() => addMsg("Genesis initiated. What is your <strong>Full Name</strong>?"), 400);
+        } else if (state === 'CUSTOM_FEATURES') {
+            if (val === 'Done Selecting') {
+                state = 'FORM_NAME';
+                addMsg("Architecting custom quote for: " + (user_data.features || 'Standard Custom'), false);
+                setTimeout(() => addMsg("What is your <strong>Full Name</strong>?"), 400);
+            } else {
+                user_data.features = (user_data.features || '') + val + ', ';
+                addMsg(val + " added to architecture.", false);
+            }
+} else if (state === 'AI_PATH') {
             if (val.includes('Initiate')) {
                 user_data.package = 'AI Consultancy';
                 state = 'FORM_NAME';
@@ -165,7 +195,7 @@
         t.style.transform = w.style.display === 'none' ? 'scale(1)' : 'scale(0.9) rotate(90deg)';
         if (m.innerHTML === '') {
             addMsg("Greetings. I am Sierra. Select a path to evolve your infrastructure:");
-            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🔍 Brand Scan']);
+            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
         }
     };
     c.onclick = () => { w.style.display = 'none'; t.style.transform = 'scale(1)'; };
