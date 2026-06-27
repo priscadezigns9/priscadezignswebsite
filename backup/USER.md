@@ -82,8 +82,6 @@ who's in their life.
 ## Network Domain Strategy (Priority Roadmap)
 | Brand | Target Domain | Priority | Strategy | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| **ORCINOS Hub** | orcinos.com | **HIGH** | Home / About / Products Navigation | ✅ Overhauled |
-| **ELITESYGNAL** | orcinos.com/elitesygnal/ | **DONE** | Global Intel Hub | ✅ 30m Autonomy Active |
 | **Dreaming Anime** | dreaminganime.com | DONE | Gold Standard | ✅ Secured |
 | **Prisca Dezigns** | procyon.com | **DONE** | The Migration Hub | ✅ Secured |
 | **Atelia Gaming** | ateliagaming.com | **IMMEDIATE** | Core Foundation | 🛒 Next Paycheck |
@@ -133,7 +131,6 @@ who's in their life.
 
 ## The Prisca Dezigns Vision (Refined June 12, 2026)
 - **The Great Migration:** Merging Web2 businesses into Web3. Not just payments, but the entire business—inventory, brand, and identity—lives on the blockchain.
-- **Deep Wallet Integration:** Moving away from "address-to-address" manual payments. The MUZE Wallet is integrated directly into each business/product (e.g., Prisca Dezigns, Orcinos) so payments happen natively on-chain within the UI.
 - **On-Chain Inventory:** Storing a business's entire inventory on the blockchain for transparent e-commerce.
 - **Web3 Affiliate Marketing:** A whole new niche merging e-commerce with blockchain attribution (Share-to-Own).
 
@@ -211,7 +208,6 @@ who's in their life.
 ## Network Structure (Three Pillars)
 - **Prisca Dezigns** — Parent legal entity. Web design, web development, client work.
 - **Prisca Dezigns** — The Migration Hub. Moving Web2 brands (Calalloo, Atelia Gaming, Couture Gallery, etc.) to the Web3 Ledger.
-- **Orcinos** — Software/AI branch. SaaS products, Chrome extensions, platforms, AI tools. Managed via a dedicated "Orcinos" chat thread for focused software development.
 
 ## The Affiliate Instant Commission Logic
 - **Migration Referrals:** When a person refers a Web2 business to the Prisca Dezigns Migration Hub, they earn an instant commission on the migration service fee.
@@ -229,7 +225,6 @@ who's in their life.
 ## Prisca Dezigns Product Mandate
 - Automatic: I research market gaps via data → build working products → user approves → launch → advertise → revenue
 - **Prisca Dezigns Product Roles:**
-    - **Karjov:** Brand Automation (Facebook & Instagram).
     - **Moblync:** Mobile App development & sync.
     - **Velloq:** Web Development & encryption.
     - **Rowcell:** Data Management & cellular logistics.
