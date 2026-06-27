@@ -1,4 +1,3 @@
-
 (function() {
     const container = document.createElement('div');
     container.id = 'prisca-chat-widget';
@@ -33,13 +32,13 @@
     let user_data = {};
 
     const PKG_CONFIG = {
-        'Starter': { setup: '97', pulse: '7/mo', desc: 'Basic Brand Identity & Presence' },
-        'Growth': { setup: '97', pulse: '7/mo', desc: 'Active Scaling & Marketing Logic' },
-        'Trusted': { setup: ',200', pulse: '7/mo', desc: 'High-Fidelity Authority & Infrastructure' },
-        'E-Starter': { setup: '97', pulse: '7/mo', desc: 'Core E-Commerce Framework' },
-        'E-Growth': { setup: '97', pulse: '7/mo', desc: 'Conversion-Optimized Sales Engine' },
-        'E-Trusted': { setup: ',500', pulse: '97/mo', desc: 'Enterprise On-Chain Commerce' },
-        'AI Consultancy': { setup: ',000', pulse: ',500/mo', desc: 'Neural Council & Automation Ecosystem' }
+        'Starter': { setup: '$297', pulse: '$97/mo', desc: 'Basic Brand Identity & Presence' },
+        'Growth': { setup: '$597', pulse: '$97/mo', desc: 'Active Scaling & Marketing Logic' },
+        'Trusted': { setup: '$1,200', pulse: '$97/mo', desc: 'High-Fidelity Authority & Infrastructure' },
+        'E-Starter': { setup: '$497', pulse: '$97/mo', desc: 'Core E-Commerce Framework' },
+        'E-Growth': { setup: '$997', pulse: '$97/mo', desc: 'Conversion-Optimized Sales Engine' },
+        'E-Trusted': { setup: '$2,500', pulse: '$97/mo', desc: 'Enterprise On-Chain Commerce' },
+        'AI Consultancy': { setup: '$8,000', pulse: '$1,500/mo', desc: 'Custom Business Intelligence & Automation' }
     };
 
     function addMsg(txt, u) {
@@ -67,7 +66,10 @@
         const low = val.toLowerCase();
         
         if (state === 'ROOT') {
-            if (low.includes('scan') || low === '3' || low.includes('brand')) { state = 'BRAND_SCAN'; setTimeout(() => { addMsg('Initiating high-fidelity Brand Scan. What is the URL or social handle you wish to audit?'); opt.innerHTML = ''; }, 400); } else if (low.includes('website') || low === '1') {
+            if (low.includes('scan') || low === '3' || low.includes('brand')) { 
+                state = 'BRAND_SCAN'; 
+                setTimeout(() => { addMsg('Initiating high-fidelity Brand Scan. What is the URL or social handle you wish to audit?'); opt.innerHTML = ''; }, 400); 
+            } else if (low.includes('website') || low === '1') {
                 state = 'WEBSITE_PATH';
                 setTimeout(() => {
                     addMsg("Select your Website Architectural tier:");
@@ -76,11 +78,15 @@
             } else if (low.includes('ai') || low === '2') {
                 state = 'AI_PATH';
                 setTimeout(() => {
-                    addMsg("AI Consultancy (k) requires a strategic intake. Shall we proceed?");
+                    addMsg("AI Consultancy provides a full-scale neural ecosystem designed to eliminate operational friction ($8k). Shall we proceed?");
                     showOptions(['Yes, Initiate AI Intake', 'Back to Main']);
                 }, 400);
             }
-        } else if (state === 'BRAND_SCAN') { user_data.target = val; state = 'FORM_NAME'; setTimeout(() => { addMsg('Target identified. Analyzing digital footprint... <br><br>I need to deliver the diagnostic report to the Architect. What is your <strong>Full Name</strong>?'); }, 800); } else if (state === 'WEBSITE_PATH') {
+        } else if (state === 'BRAND_SCAN') { 
+            user_data.target = val; 
+            state = 'FORM_NAME'; 
+            setTimeout(() => { addMsg('Target identified. Analyzing digital footprint... <br><br>I need to deliver the diagnostic report to the Architect. What is your <strong>Full Name</strong>?'); }, 800); 
+        } else if (state === 'WEBSITE_PATH') {
             if (val === 'E-Commerce') {
                 setTimeout(() => {
                     addMsg("Select your E-Commerce architectural tier:");
@@ -117,7 +123,6 @@
             addMsg("Data synchronized. I am delivering your brief to the Architect now.", false);
             setTimeout(() => addMsg("Intake Complete. Priscilla will reach out within 24 hours. Látom. 🙏", false), 800);
             opt.innerHTML = '';
-            // Future: fetch() to Supabase leads table here
         }
     }
 
