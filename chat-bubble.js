@@ -67,7 +67,7 @@
         const low = val.toLowerCase();
         
         if (state === 'ROOT') {
-            if (low.includes('website') || low === '1') {
+            if (low.includes('scan') || low === '3' || low.includes('brand')) { state = 'BRAND_SCAN'; setTimeout(() => { addMsg('Initiating high-fidelity Brand Scan. What is the URL or social handle you wish to audit?'); opt.innerHTML = ''; }, 400); } else if (low.includes('website') || low === '1') {
                 state = 'WEBSITE_PATH';
                 setTimeout(() => {
                     addMsg("Select your Website Architectural tier:");
@@ -80,7 +80,7 @@
                     showOptions(['Yes, Initiate AI Intake', 'Back to Main']);
                 }, 400);
             }
-        } else if (state === 'WEBSITE_PATH') {
+        } else if (state === 'BRAND_SCAN') { user_data.target = val; state = 'FORM_NAME'; setTimeout(() => { addMsg('Target identified. Analyzing digital footprint... <br><br>I need to deliver the diagnostic report to the Architect. What is your <strong>Full Name</strong>?'); }, 800); } else if (state === 'WEBSITE_PATH') {
             if (val === 'E-Commerce') {
                 setTimeout(() => {
                     addMsg("Select your E-Commerce architectural tier:");
@@ -125,7 +125,7 @@
         w.style.display = w.style.display === 'none' ? 'flex' : 'none';
         if (m.innerHTML === '') {
             addMsg("Greetings. I am Sierra. Select a path to evolve your infrastructure:");
-            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy']);
+            showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🔍 Brand Scan']);
         }
     };
     c.onclick = () => w.style.display = 'none';
