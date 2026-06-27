@@ -40,7 +40,7 @@
         'E-Trusted': { setup: ',500', pulse: '97/mo', desc: 'Enterprise On-Chain Commerce' },
         'AI Consultancy': { setup: '0,000 Consultation', pulse: 'Ecosystem Managed', desc: 'Enterprise-grade Neural Departments & Official Sierra AI Deployments' },
         'Branding': { setup: '00', pulse: 'N/A', desc: 'Neural Identity & Logo Architecture' },
-        'Brand Scan': { setup: '97', pulse: 'N/A', desc: 'Deep-Audit & Market Intelligence' }
+        'Brand Scan': { setup: '7', pulse: 'N/A', desc: 'Deep-Audit & Market Intelligence' }
     };
 
     function addMsg(txt, u) {
