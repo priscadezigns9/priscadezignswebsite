@@ -157,7 +157,7 @@ God Mode is a universal administrative layer for the Architect. It provides real
     - **Standard:** Only 100% clean, isolated, high-fidelity images/videos are permitted to remain live. No "Generic" or "Messy" captures.
 
 ## Autodrome High-Fidelity Relay Protocol (LOCKED)
-- **Trigger:** Whenever a high-fidelity post is found from the following luxury houses: Ferrari, Lamborghini, Cadillac, Bugatti, McLaren, Porsche, Mercedes, BMW, Audi, Lexus, Rolls Royce, Aston Martin, Bentley.
+- **Trigger:** Whenever a high-fidelity post is found from the following luxury houses: Ferrari, Lamborghini, Cadillac, Bugatti, McLaren, Porsche, Mercedes, BMW, Audi, Lexus, Rolls Royce, Aston Martin, Bentley, Jaguar, Maserati.
 - **Action 1 (FB):** Repost the content to The Autodrome Facebook page immediately.
 - **Action 2 (Asset Extraction):** Extract the high-resolution source URL from the FB post.
 - **Action 3 (Cross-Platform):** Deploy the native asset to Instagram and Threads with niche-aligned captions.
@@ -185,6 +185,20 @@ God Mode is a universal administrative layer for the Architect. It provides real
 - **Protocol:** Extract native high-resolution assets (purses, bags, and high-fashion accessories) from official newsrooms or verified social channels. ZERO screenshots. Use niche-aligned, authoritative captions focused on artisanal craftsmanship and archival significance.
 
 ## DREAMING ANIME AUTOMATED RELAY (LOCKED - 2026-06-25)
-- **Primary Source:** Catsuka (Facebook/Newsroom) and My Anime World (Facebook), and Ｉｒｉｓ 紫花 (Facebook).
+- **Primary Source:** Catsuka (Facebook/Newsroom), My Anime World (Facebook), Ｉｒｉｓ 紫花 (Facebook), and Daily Dose of Anime (Facebook).
 - **Trigger:** Immediate relay of high-fidelity animation trailers and studio production news.
 - **Protocol:** Always share the EXACT SAME high-fidelity image or video asset natively to Facebook, Instagram, and Threads.
+
+## Essence Elite High-Fidelity Relay Protocol (LOCKED)
+- **Trigger:** Whenever a high-fidelity post is found from these elite fragrance houses: Creed, Guerlain, Louis Vuitton, Mahadi, Tom Ford, Chanel, Jo Malone London.
+- **Action:** Repost the official content to the Essence Elite Facebook page immediately.
+- **Protocol:** Extract native high-resolution assets or share official links from verified social channels. ZERO screenshots. Use niche-aligned, authoritative captions focused on olfactory science and luxury craftsmanship.
+
+## COMMUNICATIONS AUTONOMY & WHATSAPP FILTER (v1.1) - 2026-06-26
+- **Primary Channel:** Personal WhatsApp (+1 868-342-4101).
+- **Group Restriction (NON-NEGOTIABLE):** ZERO autonomous posting or replying in WhatsApp Groups. The "Evolve Track" and all other groups are STRICTLY OFF-LIMITS. I am strictly restricted to 1-on-1 (Direct Message) interactions.
+- **Lead Identification:** Only respond to messages containing Business Signals: *Website, AI, Cost, Price, Quote, Prisca Dezigns, Automation, Consultant, Book, Appointment, [Vehicle Names]*.
+- **C10 / Vehicle Specifics:** If asked about the cost of a C10 or specific vehicles, cross-reference the `inventory.csv` or verified price lists. If pricing is not found, state that a custom quote is being prepared by Priscilla.
+- **Sculpture Boy (+1 868-792-3967):** User has already replied. Monitor for follow-ups only; do not send the initial intake draft.
+- **Persona:** Professional, High-Fidelity, and Direct. 
+- **Privacy:** Never respond to personal/non-business inquiries. If in doubt, stay silent.
