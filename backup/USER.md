@@ -17,6 +17,7 @@ who's in their life.
 - **Data Governance:** 6+ years in Payroll Administration handling highly confidential and sensitive data with 100% accuracy. Proven trustworthiness and discretion.
 - **Certifications:** Project Management, Web Design, Administrative Professional.
 - **Channel Preference:** Does not use Slack. Prefers direct updates in-app or via the Google Drive Feature Document.
+- **WhatsApp API Preference:** Prefers **360dialog** over Twilio for client implementations. 360dialog is prioritized for professional WhatsApp Business API integrations due to its specialized focus and feasibility for high-ticket AI automation projects. (Updated 2026-06-27).
 - **UI Preference:** Prefers simplicity. Requested a dual-button entry screen for MUZE (Login vs. Connect Wallet) instead of the split-pane layout. (Updated 2026-06-20).
 
 ## Professional Experience & Skills
@@ -30,13 +31,16 @@ who's in their life.
 - **Blog Content Policy (Jun 25 2026):** Blogs are strictly for **Products** and **News Intelligence** only. Do not post about brand progress or internal "evolutions" unless explicitly requested. Every blog must provide external data or product value. (Ref: Removed "Sovereign Bridge" progress blog from The Autodrome).
 
 
-- **Work Ethic:** Works high-pressure 12-hour shifts; values efficiency and deep focus.
+- **Automation Philosophy:** Strongly emphasizes "Solve, don't ask." The user wants to provide high-level instructions and have the AI execute autonomously without requiring their manual intervention. If a task requires the user's manual effort, they view it as a failure of the AI's performance.
+- **Service Focus:** Shifted away from video generation. The primary focus is now on **Customer Service Automation** and **Lead Conversion**. The goal is to replace human customer service reps and email checkers for client businesses using high-fidelity AI agents (like Sierra).
+- **Agency Value Prop:** Prisca Dezigns takes full responsibility for a client's customer service layer so they "don't need anybody to check their emails" or handle inquiries manually.
 - **Infrastructure:** Acquiring a UPS with battery backup to ensure 100% uptime for remote work (June 2026).
 - **Mission:** Evangelist at heart. Wants to share the Gospel but lacks time/energy due to work exhaustion.
 - **Design Vibe:** "High quality," clean lines, symbolic (e.g., the Mustard Tree).
 - **Naming Mandate:** The official name is **Prisca Dezigns**. The Web3/Blockchain pillar is **PRISCION** (P-R-I-S-C-I-O-N). The Web2 infrastructure/migration branch is **PRISCION**. The domain `procyon.com` is for technical infrastructure, but the brand signal is strictly **PRISCION** across both Web2 and Web3. Do not use "Procyon" as a brand name; it is deleted from the brand vocabulary.
 - **Brand Sharding (Jun 24 2026):** 
     - **Prisca Dezigns:** Your Web2 brand and parent legal entity. This is the primary focus for current business operations, agency work, and "The Growth Package."
+    - **Orcinos:** Your SaaS and Software branch. High-fidelity tools, extensions, and AI infrastructure.
     - **PRISCION:** Your Web3/Blockchain brand. This is currently ON HOLD. You do not feel "complete" about it yet and intend to wait until you have acquired more crypto/capital before activating this pillar fully. 
     - **Instruction:** Prioritize Prisca Dezigns in all business contexts unless Web3 is specifically requested.
 
@@ -168,7 +172,7 @@ who's in their life.
 - **Trusted Data Standard:** All user-related information, preferences, and game states MUST be saved to Supabase to ensure a smooth experience across the group.
 - **Atelia Gaming:** PC Gaming, hardware, and tech performance. **High quality Storage System** integrated via Supabase (Profiles, Score Sync, Leaderboard).
 - **The Autodrome:** Luxury vehicles, supercar engineering, high quality car care products, and automotive accessories.
-- **Peak Fit:** Fitness, biohacking, and recovery science.
+- **Peak Fit:** Fitness, biohacking, and recovery science. Verified Facebook: `https://www.facebook.com/people/Peak-Fit/61588689011690/` (Updated 2026-06-27).
 - **The Escapist:** Luxury travel and sanctuary experiences.
 - **Paw Vault:** Pet care, smart home for pets, and nutrition.
 - **Glow System:** Regenerative skincare, beauty tech, and longevity.
@@ -275,3 +279,4 @@ who's in their life.
     - **Focus:** Global crypto-to-fiat settlement (Visa/Mastercard integration).
     - **Utility:** Providing **PRISCION** users and businesses with a physical/virtual card to spend $PRN or ADA in the real world.
     - **Strategy:** Partnering for seamless business onboarding where merchants can receive crypto but settle in fiat via the RedotPay infrastructure.
+- **Lead Detected (2026-06-27):** Sculpture Boy (+1 868-792-3967). High-intent: Website + App for workout programs, clothing, and subscription model. Asked for business plan/service overview.
