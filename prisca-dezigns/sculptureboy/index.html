@@ -4,82 +4,166 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sculpture Boy | Elite Fitness & Performance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1a1a1a;
             --accent: #f39c12; /* Gold/Strength */
             --text: #ffffff;
             --bg-dark: #0f0f0f;
+            --chat-bg: #f9f9f9;
         }
-        body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-dark); color: var(--text); line-height: 1.6; }
-        .hero { height: 80vh; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        .hero h1 { font-size: 3.5rem; text-transform: uppercase; letter-spacing: 5px; margin: 0; color: var(--accent); }
-        .hero p { font-size: 1.5rem; max-width: 700px; margin: 20px 0; }
-        .btn { background: var(--accent); color: var(--primary); padding: 15px 40px; text-decoration: none; font-weight: 800; text-transform: uppercase; border-radius: 5px; transition: 0.3s; }
-        .btn:hover { transform: scale(1.05); }
-        .features { padding: 80px 20px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .feature-card { background: #222; padding: 40px; border-radius: 15px; border-bottom: 4px solid var(--accent); }
+        body { font-family: 'Montserrat', sans-serif; margin: 0; background-color: var(--bg-dark); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+        .hero { height: 85vh; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .hero h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); text-transform: uppercase; letter-spacing: 5px; margin: 0; color: var(--accent); }
+        .hero p { font-size: 1.2rem; max-width: 700px; margin: 20px 0; color: #ccc; }
+        .btn { background: var(--accent); color: var(--primary); padding: 15px 40px; text-decoration: none; font-weight: 800; text-transform: uppercase; border-radius: 5px; transition: 0.3s; cursor: pointer; border: none; }
+        .btn:hover { background: #fff; transform: scale(1.05); }
+
+        .features { padding: 100px 20px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .feature-card { background: #161616; padding: 40px; border-radius: 15px; border-bottom: 4px solid var(--accent); transition: 0.3s; }
+        .feature-card:hover { transform: translateY(-10px); background: #1a1a1a; }
         .feature-card h3 { color: var(--accent); margin-top: 0; font-size: 1.5rem; }
-        .app-preview { background: #1a1a1a; padding: 60px 20px; text-align: center; }
-        .phone-mock { width: 300px; height: 600px; border: 8px solid #333; border-radius: 40px; margin: 0 auto; background: #000; overflow: hidden; position: relative; }
-        .chat-widget { position: fixed; bottom: 30px; right: 30px; width: 350px; background: #fff; color: #333; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
-        .chat-header { background: var(--accent); color: var(--primary); padding: 20px; font-weight: 800; display: flex; align-items: center; justify-content: space-between; }
-        .chat-body { height: 350px; padding: 20px; overflow-y: auto; background: #f9f9f9; }
-        .msg { margin-bottom: 15px; padding: 12px; border-radius: 10px; font-size: 0.9rem; }
-        .msg.bot { background: #e8f4fd; align-self: flex-start; border-left: 4px solid var(--accent); }
-        .footer { padding: 40px; text-align: center; background: #000; font-size: 0.8rem; color: #555; }
+
+        .booking-section { padding: 80px 20px; background: #111; text-align: center; }
+        .booking-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 900px; margin: 40px auto; }
+        .plan-card { background: #1a1a1a; padding: 30px; border-radius: 10px; border: 1px solid #333; }
+        .plan-price { font-size: 2rem; font-weight: 800; color: var(--accent); margin: 15px 0; }
+
+        /* Chat Widget Styles */
+        #chat-toggle { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.4); z-index: 1000; transition: 0.3s; }
+        #chat-toggle:hover { transform: scale(1.1); background: #fff; }
+        #chat-toggle svg { width: 30px; height: 30px; fill: var(--primary); }
+
+        .chat-widget { position: fixed; bottom: 110px; right: 30px; width: 380px; height: 500px; background: #fff; color: #333; border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); overflow: hidden; display: none; flex-direction: column; z-index: 1000; }
+        .chat-widget.active { display: flex; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .chat-header { background: var(--primary); color: #fff; padding: 25px; font-weight: 800; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--accent); }
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; background: var(--chat-bg); display: flex; flex-direction: column; gap: 12px; }
+        .msg { padding: 12px 16px; border-radius: 15px; font-size: 0.95rem; max-width: 85%; line-height: 1.4; }
+        .msg.bot { background: #eee; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.user { background: var(--accent); color: var(--primary); align-self: flex-end; border-bottom-right-radius: 2px; font-weight: 700; }
+        
+        .chat-input { padding: 20px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .chat-input input { flex: 1; border: none; outline: none; font-size: 1rem; }
+        .chat-input button { background: var(--accent); border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: 800; }
+
+        .footer { padding: 60px 20px; text-align: center; background: #000; border-top: 1px solid #222; }
+        .footer p { color: #666; font-size: 0.9rem; }
     </style>
 </head>
 <body>
     <div class="hero">
         <h1>Sculpture Boy</h1>
-        <p>Forge Your Legacy. Advanced Workout Programs & Premium Performance Apparel.</p>
-        <a href="#" class="btn">View Programs</a>
+        <p>Premium Performance Architecture for the Modern Athlete. Experience High-Fidelity Fitness Training.</p>
+        <button class="btn" onclick="toggleChat()">Start Transformation</button>
     </div>
 
     <div class="features">
         <div class="feature-card">
-            <h3>Neural Coaching</h3>
-            <p>Our AI Coach (Sierra) manages your subscriptions, nutrition logs, and workout adjustments 24/7. No more waiting for a reply.</p>
+            <h3>Custom Workout Logic</h3>
+            <p>Our programs are not static. We use high-fidelity tracking to adjust your load and volume in real-time, ensuring zero stagnation.</p>
         </div>
         <div class="feature-card">
-            <h3>Apparel Vault</h3>
-            <p>Exclusive access to the Sculpture Boy clothing line. Seamless ordering integrated directly into your training portal.</p>
+            <h3>Apparel Drop v1.0</h3>
+            <p>Performance-engineered clothing for those who prioritize craftsmanship. Seamless ordering via your member portal.</p>
         </div>
         <div class="feature-card">
-            <h3>Sovereign Fitness Hub</h3>
-            <p>A private infrastructure for your community. You own your data, your content, and your empire.</p>
+            <h3>Sovereign Data</h3>
+            <p>At Sculpture Boy, you own your metrics. Your progress is stored on your private node, secured by Prisca Dezigns infrastructure.</p>
         </div>
     </div>
 
-    <div class="app-preview">
-        <h2>Your Digital Empire</h2>
-        <div class="phone-mock">
-            <div style="padding: 20px; text-align: left;">
-                <h4 style="color: var(--accent);">Workout of the Day</h4>
-                <div style="background: #222; height: 100px; border-radius: 10px; margin: 10px 0;"></div>
-                <h4 style="color: var(--accent);">Your Stats</h4>
-                <div style="background: #222; height: 200px; border-radius: 10px; margin: 10px 0;"></div>
+    <div class="booking-section">
+        <h2>Member Enrollment</h2>
+        <div class="booking-grid">
+            <div class="plan-card">
+                <h3>Base Strength</h3>
+                <div class="plan-price">$350 TTD/mo</div>
+                <p>Standard access to mobile workout portal and apparel drops.</p>
+                <button class="btn" onclick="bookingAlert('Base Strength')">Enroll Now</button>
+            </div>
+            <div class="plan-card" style="border-color: var(--accent);">
+                <h3>Elite Protocol</h3>
+                <div class="plan-price">$650 TTD/mo</div>
+                <p>Full 1-on-1 AI coaching with Sierra integration and custom nutrition logic.</p>
+                <button class="btn" onclick="bookingAlert('Elite Protocol')">Enroll Now</button>
             </div>
         </div>
     </div>
 
-    <div class="chat-widget">
+    <div id="chat-toggle" onclick="toggleChat()">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </div>
+
+    <div class="chat-widget" id="sierra-chat">
         <div class="chat-header">
-            <span>Sculpture Boy Assistant</span>
-            <span style="font-size: 0.7rem;">Powered by Sierra</span>
+            <div>
+                <div style="font-size: 1.1rem;">SIERRA</div>
+                <div style="font-size: 0.7rem; font-weight: 400; opacity: 0.8;">Sculpture Boy Specialist</div>
+            </div>
+            <div onclick="toggleChat()" style="cursor: pointer; font-size: 1.5rem;">&times;</div>
         </div>
-        <div class="chat-body">
-            <div class="msg bot">Welcome to Sculpture Boy. I'm Sierra. Are you looking to join a workout program or check out the new apparel drop?</div>
-            <div class="msg bot" style="font-style: italic; font-size: 0.8rem; color: #777;">*Analyzing your fitness goals...*</div>
+        <div class="chat-body" id="chat-flow">
+            <div class="msg bot">Welcome to the Sculpture Boy ecosystem. I am Sierra, your performance architect.</div>
+            <div class="msg bot">Are you looking to view our <b>Workout Programs</b> or shop the latest <b>Apparel Drop</b>?</div>
         </div>
-        <div style="padding: 15px; border-top: 1px solid #eee;">
-            <input type="text" placeholder="Type to start your transformation..." style="width: 100%; border: none; outline: none;">
+        <div class="chat-input">
+            <input type="text" id="user-msg" placeholder="Tell Sierra your goal..." onkeypress="if(event.key === 'Enter') sendMsg()">
+            <button onclick="sendMsg()">SEND</button>
         </div>
     </div>
 
     <div class="footer">
-        &copy; 2026 Sculpture Boy &middot; Built & Managed by Prisca Dezigns
+        <p>&copy; 2026 Sculpture Boy &middot; Managed by Prisca Dezigns</p>
+        <p style="font-size: 0.7rem; margin-top: 10px; opacity: 0.5;">Secure Node Status: ACTIVE | Neural Handshake: VERIFIED</p>
     </div>
+
+    <script>
+        function toggleChat() {
+            const chat = document.getElementById('sierra-chat');
+            chat.classList.toggle('active');
+        }
+
+        function sendMsg() {
+            const input = document.getElementById('user-msg');
+            const flow = document.getElementById('chat-flow');
+            if (input.value.trim() === '') return;
+
+            // Add User Message
+            const uMsg = document.createElement('div');
+            uMsg.className = 'msg user';
+            uMsg.innerText = input.value;
+            flow.appendChild(uMsg);
+
+            const query = input.value.toLowerCase();
+            input.value = '';
+            flow.scrollTop = flow.scrollHeight;
+
+            // Simple Logic for Demo
+            setTimeout(() => {
+                const bMsg = document.createElement('div');
+                bMsg.className = 'msg bot';
+                
+                if (query.includes('workout') || query.includes('program')) {
+                    bMsg.innerHTML = "Our <b>Elite Protocol</b> is the most popular. It includes a custom logic map based on your current TDEE. Should I fetch the enrollment link?";
+                } else if (query.includes('apparel') || query.includes('clothing')) {
+                    bMsg.innerHTML = "The Summer '26 drop is now live. Exclusive for members. Would you like to view the catalog?";
+                } else if (query.includes('price') || query.includes('cost')) {
+                    bMsg.innerHTML = "Our memberships start at $350 TTD per month for Base access. The high-fidelity Elite Protocol is $650 TTD.";
+                } else {
+                    bMsg.innerHTML = "I'm analyzing that. In the meantime, you can explore our enrollment options directly on the page.";
+                }
+                
+                flow.appendChild(bMsg);
+                flow.scrollTop = flow.scrollHeight;
+            }, 800);
+        }
+
+        function bookingAlert(plan) {
+            alert("Backend Logic Triggered: Initiating enrollment for " + plan + ". Redirecting to secure checkout portal...");
+        }
+    </script>
 </body>
 </html>
