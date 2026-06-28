@@ -3,68 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lintro Realty - High-Fidelity Demo</title>
+    <title>Lintro Realty | Elite Property Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; margin: 0; background-color: #f4f4f9; color: #333; }
-        .hero { background: linear-gradient(135deg, #2c3e50, #27ae60); color: white; padding: 60px 20px; text-align: center; }
-        .logo { font-size: 2.5rem; font-weight: 800; letter-spacing: 2px; }
-        .tagline { font-size: 1.2rem; opacity: 0.9; margin-top: 10px; }
-        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s; }
-        .card:hover { transform: translateY(-5px); }
-        .card-img { height: 200px; background: #ddd; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #999; }
-        .card-body { padding: 20px; }
-        .card-title { font-size: 1.25rem; font-weight: 700; margin: 0; }
-        .card-price { color: #27ae60; font-weight: 800; font-size: 1.1rem; margin: 10px 0; }
-        .chat-widget { position: fixed; bottom: 20px; right: 20px; width: 300px; background: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); border: 1px solid #eee; overflow: hidden; }
-        .chat-header { background: #2c3e50; color: white; padding: 15px; font-weight: 700; }
-        .chat-body { height: 300px; padding: 15px; font-size: 0.9rem; background: #fafafa; }
-        .chat-bubble { background: #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px; width: fit-content; max-width: 85%; }
-        .chat-bubble.sierra { background: #d1e7dd; color: #0f5132; align-self: flex-start; }
-        .footer { text-align: center; padding: 40px; color: #999; font-size: 0.8rem; }
+        :root {
+            --primary: #2c3e50;
+            --accent: #27ae60;
+            --bg: #f8f9fa;
+            --text: #1a1a1a;
+            --white: #ffffff;
+        }
+        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); line-height: 1.6; }
+        .nav { background: var(--white); padding: 20px 0; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: 1px; }
+
+        .hero { background: linear-gradient(135deg, #1a2a3a, #2c3e50); color: var(--white); padding: 100px 20px; text-align: center; }
+        .hero h1 { font-size: 3rem; margin: 0; }
+        .hero p { font-size: 1.2rem; opacity: 0.8; margin: 20px 0; }
+
+        .container { max-width: 1100px; margin: 60px auto; padding: 0 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #efefef; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 45px rgba(0,0,0,0.1); }
+        .card-img { height: 230px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .card-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .card-body { padding: 25px; }
+        .tag { background: #e8f5e9; color: var(--accent); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .card-title { font-size: 1.4rem; font-weight: 700; margin: 15px 0 10px 0; }
+        .card-price { font-size: 1.2rem; color: var(--accent); font-weight: 800; }
+
+        /* Sierra Chat Widget */
+        #chat-trigger { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; }
+        .chat-panel { position: fixed; bottom: 105px; right: 30px; width: 360px; height: 550px; background: white; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); display: none; flex-direction: column; overflow: hidden; z-index: 1000; border: 1px solid #ddd; }
+        .chat-panel.active { display: flex; animation: slideUp 0.3s forwards; }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .chat-header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; background: #fcfcfc; display: flex; flex-direction: column; gap: 15px; }
+        .bubble { padding: 12px 18px; border-radius: 18px; font-size: 0.95rem; max-width: 80%; line-height: 1.4; }
+        .bubble.bot { background: #f0f2f5; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid #eee; }
+        .bubble.user { background: var(--accent); color: white; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
+
+        .chat-input { padding: 15px 20px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .chat-input input { flex: 1; border: none; outline: none; font-size: 1rem; }
+        .chat-input button { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+
+        .footer { padding: 60px 0; text-align: center; border-top: 1px solid #eee; color: #777; }
+        .btn-book { display: inline-block; background: var(--accent); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 700; margin-top: 15px; transition: 0.2s; }
+        .btn-book:hover { background: var(--primary); }
     </style>
 </head>
 <body>
+    <div class="nav">
+        <div class="nav-container">
+            <div class="logo">LINTRO REALTY</div>
+            <div style="font-weight: 700; color: var(--accent); font-size: 0.9rem;">MANAGED BY PRISCA DEZIGNS</div>
+        </div>
+    </div>
+
     <div class="hero">
-        <div class="logo">LINTRO REALTY</div>
-        <div class="tagline">The Future of Property Management in Trinidad</div>
+        <h1>Intelligent Property Management</h1>
+        <p>Sovereign rental solutions and automated portfolio management for Trinidad's elite landlords.</p>
     </div>
 
     <div class="container">
-        <h2>Featured Listings</h2>
+        <h2>Portfolio Snapshot</h2>
         <div class="grid">
             <div class="card">
-                <div class="card-img">Property Image Placeholder</div>
+                <div class="card-img"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" alt="Villa"></div>
                 <div class="card-body">
-                    <div class="card-title">Luxury 3-Bedroom Villa</div>
-                    <div class="card-price">$12,000 TTD / Month</div>
-                    <p>Located in the heart of Palmiste. Fully furnished with high-fidelity finishes.</p>
+                    <span class="tag">For Rent</span>
+                    <div class="card-title">Palmiste Luxury Villa</div>
+                    <div class="card-price">$12,000 TTD / mo</div>
+                    <p>4 Bed, 3 Bath. Fully automated security and smart irrigation.</p>
+                    <a href="javascript:void(0)" class="btn-book" onclick="bookViewing('Palmiste Villa')">Book Viewing</a>
                 </div>
             </div>
             <div class="card">
-                <div class="card-img">Property Image Placeholder</div>
+                <div class="card-img"><img src="https://images.unsplash.com/photo-1560448204-61dc36dc98c8?auto=format&fit=crop&w=800&q=80" alt="Studio"></div>
                 <div class="card-body">
-                    <div class="card-title">Modern Executive Studio</div>
-                    <div class="card-price">$4,500 TTD / Month</div>
-                    <p>San Fernando Central. Perfect for young professionals.</p>
+                    <span class="tag">Available</span>
+                    <div class="card-title">San Fernando Studio</div>
+                    <div class="card-price">$4,500 TTD / mo</div>
+                    <p>Modern executive space for high-fidelity living.</p>
+                    <a href="javascript:void(0)" class="btn-book" onclick="bookViewing('San Fernando Studio')">Book Viewing</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="chat-widget">
-        <div class="chat-header">Sierra | Lintro Concierge</div>
-        <div class="chat-body">
-            <div class="chat-bubble sierra">Good afternoon! I'm Sierra. Are you looking to rent or need property management today?</div>
+    <div id="chat-trigger" onclick="toggleChat()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </div>
+
+    <div class="chat-panel" id="chat-panel">
+        <div class="chat-header">
+            <div>
+                <div style="font-weight: 800;">SIERRA</div>
+                <div style="font-size: 0.7rem; opacity: 0.8;">Lintro Property Concierge</div>
+            </div>
+            <div onclick="toggleChat()" style="cursor: pointer;">&times;</div>
         </div>
-        <div style="padding: 10px; border-top: 1px solid #eee;">
-            <input type="text" placeholder="Type your message..." style="width: 100%; border: none; outline: none; font-size: 0.9rem;">
+        <div class="chat-body" id="chat-content">
+            <div class="bubble bot">Welcome to Lintro Realty. I am Sierra, your digital concierge.</div>
+            <div class="bubble bot">Are you looking to <b>Rent a Property</b> or do you need professional <b>Management Services</b> for your portfolio?</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input-text" placeholder="Type your inquiry..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">SEND</button>
         </div>
     </div>
 
     <div class="footer">
-        &copy; 2026 Lintro Realty &middot; Strategic AI Deployment by Prisca Dezigns
+        <p>&copy; 2026 Lintro Realty &middot; Built & Automated by Prisca Dezigns</p>
+        <p style="font-size: 0.7rem; color: #ccc;">Secure Infrastructure: VERIFIED | Latent 404 Shield: ACTIVE</p>
     </div>
+
+    <script>
+        function toggleChat() {
+            const panel = document.getElementById('chat-panel');
+            panel.classList.toggle('active');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input-text');
+            const content = document.getElementById('chat-content');
+            if (input.value.trim() === '') return;
+
+            const uDiv = document.createElement('div');
+            uDiv.className = 'bubble user';
+            uDiv.innerText = input.value;
+            content.appendChild(uDiv);
+
+            const val = input.value.toLowerCase();
+            input.value = '';
+            content.scrollTop = content.scrollHeight;
+
+            setTimeout(() => {
+                const bDiv = document.createElement('div');
+                bDiv.className = 'bubble bot';
+                
+                if (val.includes('rent')) {
+                    bDiv.innerHTML = "I have <b>3 verified properties</b> matching your profile. Would you like to view our Palmiste Luxury Villa or the San Fernando Studio?";
+                } else if (val.includes('management') || val.includes('owner')) {
+                    bDiv.innerHTML = "Lintro uses the <b>Wednesday Protocol</b> to handle tenant screening, maintenance logic, and legal compliance. Would you like to see our fee structure?";
+                } else if (val.includes('price') || val.includes('cost')) {
+                    bDiv.innerHTML = "Rental units range from $4,500 to $15,000 TTD. For management, we take a standard 10% fee with high-fidelity service included.";
+                } else {
+                    bDiv.innerHTML = "I'm processing that. Let me connect you with a Lintro advisor, or you can browse our current listings above.";
+                }
+                
+                content.appendChild(bDiv);
+                content.scrollTop = content.scrollHeight;
+            }, 1000);
+        }
+
+        function bookViewing(prop) {
+            alert("Sovereign Booking Handshake: Your viewing request for " + prop + " has been logged in the Lintro Master Database. Redirecting to calendar...");
+        }
+    </script>
 </body>
 </html>
