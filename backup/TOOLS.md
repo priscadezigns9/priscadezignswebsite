@@ -32,27 +32,9 @@ Use these category-level signals for high-fidelity discovery. Never limit search
     - **Products**: Strictly Amazon Product API assets or manufacturer-direct media.
 - **Anti-Greenwashing**: For Verdant Co, verify sustainability claims against primary regenerative science records.
 
-## Orcinos URL Redirects (Namecheap Assignment)
-All Orcinos products must point to these assigned redirects. **Strictly preserve UI/UX.**
 
 | Product / Host | Assigned Redirect URL |
 | :--- | :--- |
-| **@ (Root)** | http://www.orcinos.com/ |
-| **nurasen** | https://orcinos.com/nurasen/ |
-| **captioai** | https://orcinos.com/captioai/ |
-| **panthriq** | https://orcinos.com/panthriq/ |
-| **blankedout** | https://orcinos.com/blankedout/ |
-| **thesignal** | https://orcinos.com/thesignal/ |
-| **optiscout** | https://orcinos.com/optiscout/ |
-| **pawsdx** | https://orcinos.com/pawsdx/ |
-| **riddiim** | https://orcinos.com/riddiim/ |
-| **sellit** | https://orcinos.com/sellit/ |
-| **ebony** | https://orcinos.com/ebony/ |
-| **vibe** | https://orcinos.com/vibe/ |
-| **handy** | https://orcinos.com/handy/ |
-| **dpanthriq** | https://orcinos.com/dpanthriq/ |
-| **calalloo** | https://orcinos.com/calalloo/ |
-| **dricil** | https://orcinos.com/dricil/ |
 
 ## Cloudinary Media Optimization
 - **Cloud Name:** davvgg5sy
@@ -61,9 +43,8 @@ All Orcinos products must point to these assigned redirects. **Strictly preserve
 
 The following brands are authorized for active social deployment (FB/IG/Threads). All other brands are **Website-Only**.
 
-| Brand | Status | Primary Social Channels |
-| :--- | :--- | :--- |
 | **PRISCION (Head)** | ACTIVE | FB, IG, Threads, WhatsApp |
+| **Orcinos** | ACTIVE | FB, IG, Threads (SaaS/Software) |
 | **Dreaming Anime** | ACTIVE | FB, IG, Threads, X |
 | **Atelia Gaming** | ACTIVE | FB, IG, Threads, X |
 | **Couture Gallery** | ACTIVE | FB, IG, Threads |
