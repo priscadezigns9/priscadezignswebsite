@@ -18,6 +18,7 @@
             line-height: 1.6;
             color: var(--text);
             background-color: white;
+            scroll-behavior: smooth;
         }
         header {
             background: var(--dark);
@@ -124,20 +125,79 @@
             text-align: center;
             font-size: 0.9rem;
         }
-        #sierra-agent {
+        /* Strebor AI Bot */
+        #strebor-bot-toggle {
             position: fixed;
             bottom: 20px;
             right: 20px;
             background: var(--primary);
             color: white;
-            padding: 1rem;
+            padding: 1rem 1.5rem;
             border-radius: 50px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             cursor: pointer;
             font-weight: bold;
+            z-index: 1001;
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+        #chat-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        #chat-header {
+            background: var(--dark);
+            color: white;
+            padding: 1rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        #chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        .msg {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .bot { background: var(--gray); align-self: flex-start; }
+        .user { background: var(--primary); color: white; align-self: flex-end; margin-left: auto; }
+        #chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 5px;
+        }
+        #chat-input {
+            flex: 1;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        #send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -156,8 +216,14 @@
         <a href="#contact" class="cta-button">Get A Quote</a>
     </div>
 
+    <div class="section" id="about">
+        <h2 class="section-title">About Strebor Service & Parts</h2>
+        <p>Strebor Service & Parts is a dedicated mechanical solutions provider located in the heart of San Fernando, Trinidad. We specialize in sourcing high-quality industrial parts and providing expert repair services for a wide range of machinery and equipment.</p>
+        <p>With our physical location at 85 Cipero Road, we serve as a reliable anchor for local contractors and industrial operations, ensuring that downtime is minimized and performance is optimized through precision maintenance and timely parts supply.</p>
+    </div>
+
     <div class="section">
-        <h2 class="section-title">What We Do</h2>
+        <h2 class="section-title">Our Core Solutions</h2>
         <div class="grid">
             <div class="card">
                 <h3>Industrial Parts</h3>
@@ -181,10 +247,18 @@
     </div>
 
     <div class="section">
-        <h2 class="section-title">Visit Our Location</h2>
+        <h2 class="section-title">Our Location</h2>
         <p>Find us at <strong>85 Cipero Road, Retrench, San Fernando, Trinidad</strong>.</p>
-        <div style="background: #eee; height: 300px; display: flex; justify-content: center; align-items: center; color: #666;">
-            [Interactive Map for 85 Cipero Road]
+        <!-- Real Google Maps Embed -->
+        <div style="width: 100%; height: 400px; border:0; overflow: hidden;">
+            <iframe 
+                width="100%" 
+                height="400" 
+                frameborder="0" 
+                style="border:0" 
+                src="https://www.google.com/maps/embed/v1/place?key={{credential:google_design_hub}}&q=85+Cipero+Road+San+Fernando+Trinidad" 
+                allowfullscreen>
+            </iframe>
         </div>
     </div>
 
@@ -192,9 +266,66 @@
         <p>&copy; 2026 Strebor Service & Parts | Developed by Prisca Dezigns</p>
     </footer>
 
-    <div id="sierra-agent">
-        <span style="background: white; color: var(--primary); width: 24px; height: 24px; border-radius: 50%; display: inline-block; text-align: center; line-height: 24px;">i</span>
-        Ask Sierra - Web Assistant
+    <!-- Strebor AI Agent -->
+    <div id="strebor-bot-toggle" onclick="toggleChat()">
+        <span>Ask Strebor AI</span>
     </div>
+
+    <div id="chat-window">
+        <div id="chat-header">
+            <span>Strebor Assistant</span>
+            <span onclick="toggleChat()" style="cursor:pointer">×</span>
+        </div>
+        <div id="chat-messages">
+            <div class="msg bot">Hi! I'm the Strebor Assistant. How can I help you today? You can ask about our parts, services, or location.</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type your question...">
+            <button id="send-btn" onclick="handleChat()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const win = document.getElementById('chat-window');
+            win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleChat() {
+            const input = document.getElementById('chat-input');
+            const messages = document.getElementById('chat-messages');
+            const text = input.value.trim().toLowerCase();
+            if (!text) return;
+
+            // Add user message
+            const uMsg = document.createElement('div');
+            uMsg.className = 'msg user';
+            uMsg.innerText = input.value;
+            messages.appendChild(uMsg);
+            input.value = '';
+
+            // Simple Logic for the prototype
+            let response = "I'm not sure about that. Would you like me to connect you with our team via WhatsApp for a specific quote?";
+            
+            if (text.includes('part') || text.includes('inventory')) {
+                response = "We stock a wide range of industrial parts at 85 Cipero Road. Please let us know the specific part number or model you need!";
+            } else if (text.includes('repair') || text.includes('service')) {
+                response = "We provide expert mechanical repairs and maintenance. You can book a service check directly through this portal.";
+            } else if (text.includes('location') || text.includes('where')) {
+                response = "We are located at 85 Cipero Road, Retrench, San Fernando. You can see the live map on this page!";
+            } else if (text.includes('hour') || text.includes('open')) {
+                response = "We are generally open during standard business hours. For emergency parts or service, please message us on WhatsApp.";
+            }
+
+            // Bot response
+            setTimeout(() => {
+                const bMsg = document.createElement('div');
+                bMsg.className = 'msg bot';
+                bMsg.innerText = response;
+                messages.appendChild(bMsg);
+                messages.scrollTop = messages.scrollHeight;
+            }, 500);
+        }
+    </script>
 </body>
 </html>
