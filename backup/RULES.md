@@ -157,7 +157,7 @@ God Mode is a universal administrative layer for the Architect. It provides real
     - **Standard:** Only 100% clean, isolated, high-fidelity images/videos are permitted to remain live. No "Generic" or "Messy" captures.
 
 ## Autodrome High-Fidelity Relay Protocol (LOCKED)
-- **Trigger:** Whenever a high-fidelity post is found from the following luxury houses: Ferrari, Lamborghini, Cadillac, Bugatti, McLaren, Porsche, Mercedes, BMW, Audi, Lexus, Rolls Royce, Aston Martin, Bentley, Jaguar, Maserati.
+- **Trigger:** Whenever a high-fidelity post is found from the following luxury houses: Ferrari, Lamborghini, Cadillac, Bugatti, McLaren, Porsche, Mercedes, BMW, Audi, Lexus, Rolls Royce, Aston Martin, Bentley, Jaguar, Maserati, Koenigsegg.
 - **Action 1 (FB):** Repost the content to The Autodrome Facebook page immediately.
 - **Action 2 (Asset Extraction):** Extract the high-resolution source URL from the FB post.
 - **Action 3 (Cross-Platform):** Deploy the native asset to Instagram and Threads with niche-aligned captions.
@@ -166,7 +166,7 @@ God Mode is a universal administrative layer for the Architect. It provides real
 ## Autodrome High-Class Growth Strategy (LOCKED)
 - **Objective:** Establish The Autodrome as the primary source for high-fidelity luxury automotive intelligence to attract high-net-worth individuals.
 - **Content Mandate:** Only official, primary source assets (press kits, official brand newsrooms). No rumors, no low-quality "spy shots" unless verified by a primary source.
-- **Authority Adjacency:** Native sharing of content from brands like Ferrari, Lamborghini, Bugatti, McLaren, and Porsche to build a curated "Luxury Intel" feed.
+- **Authority Adjacency:** Native sharing of content from brands like Ferrari, Lamborghini, Bugatti, McLaren, Porsche, and Koenigsegg to build a curated "Luxury Intel" feed.
 - **Visual Standard:** 100% Native High-Resolution. ZERO screenshots or browser UI elements.
 
 ## The Watch List High-Fidelity Relay Protocol (LOCKED)
@@ -193,6 +193,14 @@ God Mode is a universal administrative layer for the Architect. It provides real
 - **Trigger:** Whenever a high-fidelity post is found from these elite fragrance houses: Creed, Guerlain, Louis Vuitton, Mahadi, Tom Ford, Chanel, Jo Malone London.
 - **Action:** Repost the official content to the Essence Elite Facebook page immediately.
 - **Protocol:** Extract native high-resolution assets or share official links from verified social channels. ZERO screenshots. Use niche-aligned, authoritative captions focused on olfactory science and luxury craftsmanship.
+
+## High-Priority Monitoring & Repost Mandate (LOCKED)
+- **Primary Focus (Level 1):** **The Autodrome**. This is the highest priority brand node.
+- **Priority Focus (Level 2):** **Couture Gallery**, **The Watch List**, **Sole Prestige**.
+- **The Autodrome "Live Link" Protocol:** I am now permanently locked into a "Live Monitoring" state for the primary luxury car brands listed in the relay protocol.
+- **Action:** Any time a primary source (Ferrari, Lamborghini, Koenigsegg, etc.) posts high-fidelity content, it must be extracted and relayed to The Autodrome immediately, bypassing standard session windows if a major reveal or asset drop occurs.
+- **Reporting Mandate:** If a deployment is skipped for any brand during a session (ALPHA, BRAVO, etc.), I must provide a specific data-backed "WHY" (e.g., "Visual Cooldown active," "No High-Fidelity primary signal found," or "Asset failed quality audit").
+- **Zero-Filler Policy:** Quality over frequency. I will never post filler content to hit a quota, but for high-priority brands (Autodrome, Couture Gallery, etc.), I will exhaust all primary niche sources (Press Kits, Newsrooms, Official Socials) before reporting a "No Signal" status.
 
 ## COMMUNICATIONS AUTONOMY & WHATSAPP FILTER (v1.1) - 2026-06-26
 - **Primary Channel:** Personal WhatsApp (+1 868-342-4101).
