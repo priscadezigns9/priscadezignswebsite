@@ -3,163 +3,662 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpha Scan | Neural Brand Diagnostic by Prisca Dezigns</title>
+    <title>Brand Scan | Prisca Dezigns</title>
     <link rel="icon" type="image/png" href="https://share.zapia.com/si99hoojrdxzaoos5dmo1x">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --ivory: #FFFFF0;
-            --lilac: #C8A2C8;
             --purple: #301934;
-            --text: #1a1a1a;
+            --lilac: #C8A2C8;
+            --red: #8B0000;
+            --green: #1a7a1a;
+            --yellow: #b8860b;
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Inter', sans-serif;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--ivory); color: var(--text); font-family: var(--font-body); overflow: hidden; height: 100vh; width: 100vw; }
+        body { background: var(--ivory); color: #1a1a1a; font-family: var(--font-body); min-height: 100vh; }
 
-        #globe-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.4; }
-        
-        .main-ui { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; text-align: center; }
-        
-        h1 { font-family: var(--font-heading); font-size: clamp(2.5rem, 8vw, 5rem); color: var(--purple); margin-bottom: 10px; letter-spacing: -2px; }
-        .subtitle { color: var(--lilac); font-weight: 900; letter-spacing: 4px; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 40px; }
+        /* NAV */
+        nav { background: var(--purple); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+        nav a { color: #fff; text-decoration: none; font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
+        nav a:hover { opacity: 1; }
+        .nav-logo { font-family: var(--font-heading); font-size: 1.1rem; color: var(--lilac); font-weight: 900; letter-spacing: 1px; }
 
-        .scan-box { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); padding: 40px; border-radius: 4px; border: 1px solid var(--lilac); max-width: 500px; width: 100%; box-shadow: 0 10px 30px rgba(48, 25, 52, 0.1); }
-        
-        input { width: 100%; padding: 15px; border: 1px solid var(--lilac); background: transparent; color: var(--purple); font-family: var(--font-body); margin-bottom: 20px; outline: none; text-align: center; font-size: 1.1rem; }
-        input::placeholder { color: var(--lilac); opacity: 0.6; }
+        /* HERO */
+        .hero { background: var(--purple); color: white; text-align: center; padding: 60px 24px 80px; }
+        .hero-tag { font-size: 0.65rem; letter-spacing: 4px; text-transform: uppercase; color: var(--lilac); margin-bottom: 16px; }
+        .hero h1 { font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 16px; }
+        .hero p { font-size: 1rem; opacity: 0.75; max-width: 520px; margin: 0 auto 40px; line-height: 1.7; }
 
-        .scan-btn { background: var(--purple); color: var(--ivory); border: none; padding: 18px 40px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; width: 100%; }
-        .scan-btn:hover { letter-spacing: 4px; opacity: 0.9; }
+        /* INPUT FORM */
+        .scan-form { display: flex; gap: 12px; max-width: 560px; margin: 0 auto; flex-wrap: wrap; justify-content: center; }
+        .scan-form input { flex: 1; min-width: 240px; padding: 16px 20px; border: 2px solid rgba(200,162,200,0.4); border-radius: 10px; background: rgba(255,255,255,0.07); color: white; font-size: 0.95rem; font-family: var(--font-body); outline: none; }
+        .scan-form input::placeholder { color: rgba(255,255,255,0.4); }
+        .scan-form input:focus { border-color: var(--lilac); }
+        .scan-form button { padding: 16px 32px; background: var(--lilac); color: var(--purple); border: none; border-radius: 10px; font-weight: 800; font-size: 0.9rem; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.2s, opacity 0.2s; }
+        .scan-form button:hover { transform: translateY(-2px); opacity: 0.9; }
+        .scan-form button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--ivory); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #status { font-family: var(--font-heading); font-size: 1.5rem; color: var(--purple); margin-top: 20px; }
-        
-        .loader { width: 50px; height: 50px; border: 3px solid var(--lilac); border-top: 3px solid var(--purple); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* PROGRESS */
+        #progress-section { display: none; max-width: 680px; margin: 48px auto; padding: 0 24px; }
+        .progress-label { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--purple); margin-bottom: 12px; text-align: center; }
+        .progress-bar-wrap { background: #e8e8e8; border-radius: 100px; height: 8px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--purple), var(--lilac)); border-radius: 100px; width: 0%; transition: width 0.4s ease; }
+        .progress-steps { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .step { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: #666; }
+        .step.active { color: var(--purple); font-weight: 600; }
+        .step.done { color: var(--green); }
+        .step-icon { width: 22px; height: 22px; border-radius: 50%; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; flex-shrink: 0; }
+        .step.done .step-icon { background: var(--green); color: white; }
+        .step.active .step-icon { background: var(--purple); color: white; }
 
-        #results { display: none; max-width: 600px; width: 100%; }
-        .result-card { background: white; padding: 30px; border: 1px solid var(--lilac); text-align: left; margin-top: 20px; }
-        .result-card h2 { font-family: var(--font-heading); color: var(--purple); margin-bottom: 15px; }
-        .score { font-size: 3rem; font-weight: 900; color: var(--purple); margin-bottom: 10px; }
+        /* RESULTS */
+        #results-section { display: none; max-width: 780px; margin: 0 auto; padding: 48px 24px; }
+        .domain-badge { display: inline-flex; align-items: center; gap: 8px; background: var(--purple); color: white; padding: 8px 18px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 32px; }
+        .overall-score { text-align: center; margin-bottom: 40px; }
+        .score-ring { width: 130px; height: 130px; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900; font-family: var(--font-heading); border: 6px solid; }
+        .score-ring.poor { border-color: #c0392b; color: #c0392b; }
+        .score-ring.fair { border-color: #e67e22; color: #e67e22; }
+        .score-ring.good { border-color: #27ae60; color: #27ae60; }
+        .score-label { font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; color: #888; }
+        .score-desc { font-size: 0.95rem; color: #444; margin-top: 8px; max-width: 420px; margin-left: auto; margin-right: auto; }
 
-        .back-btn { margin-top: 20px; display: inline-block; color: var(--purple); text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; }
+        /* CATEGORY SCORES */
+        .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 40px; }
+        .cat-card { background: white; border: 1px solid #e8e8e8; border-radius: 12px; padding: 20px; text-align: center; border-top: 4px solid; }
+        .cat-card.poor { border-top-color: #c0392b; }
+        .cat-card.fair { border-top-color: #e67e22; }
+        .cat-card.good { border-top-color: #27ae60; }
+        .cat-score { font-size: 2rem; font-weight: 900; font-family: var(--font-heading); }
+        .cat-card.poor .cat-score { color: #c0392b; }
+        .cat-card.fair .cat-score { color: #e67e22; }
+        .cat-card.good .cat-score { color: #27ae60; }
+        .cat-name { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #888; margin-top: 6px; }
+
+        /* ISSUES */
+        .section-title { font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 20px; color: var(--purple); }
+        .issues-free { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+        .issue-item { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 16px 20px; display: flex; align-items: flex-start; gap: 14px; }
+        .issue-sev { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+        .issue-sev.critical { background: #c0392b; }
+        .issue-sev.warning { background: #e67e22; }
+        .issue-sev.info { background: #3498db; }
+        .issue-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+        .issue-desc { font-size: 0.82rem; color: #666; line-height: 1.5; }
+
+        /* LOCKED SECTION */
+        .locked-section { position: relative; margin-bottom: 40px; }
+        .locked-blur { filter: blur(5px); pointer-events: none; user-select: none; opacity: 0.4; }
+        .locked-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,240,0.6); border-radius: 12px; z-index: 2; text-align: center; padding: 24px; }
+        .lock-icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .lock-title { font-family: var(--font-heading); font-size: 1.3rem; color: var(--purple); margin-bottom: 8px; }
+        .lock-desc { font-size: 0.85rem; color: #555; max-width: 360px; line-height: 1.6; margin-bottom: 20px; }
+        .unlock-btn { background: var(--purple); color: white; border: none; padding: 14px 32px; border-radius: 10px; font-weight: 800; font-size: 0.9rem; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: transform 0.2s; }
+        .unlock-btn:hover { transform: translateY(-2px); }
+
+        /* FAKE LOCKED ISSUES */
+        .fake-issues { display: flex; flex-direction: column; gap: 12px; }
+        .fake-issue { background: white; border: 1px solid #e8e8e8; border-radius: 10px; padding: 16px 20px; height: 70px; }
+
+        /* EMAIL CTA */
+        .email-cta { background: var(--purple); color: white; border-radius: 16px; padding: 36px; text-align: center; margin-bottom: 40px; }
+        .email-cta h3 { font-family: var(--font-heading); font-size: 1.4rem; margin-bottom: 10px; }
+        .email-cta p { font-size: 0.85rem; opacity: 0.8; margin-bottom: 20px; line-height: 1.6; }
+        .email-sent { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 14px 20px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* PAYMENT MODAL */
+        #payment-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        #payment-modal.open { display: flex; }
+        .modal-box { background: var(--ivory); border-radius: 20px; padding: 40px; max-width: 480px; width: 100%; text-align: center; }
+        .modal-box h2 { font-family: var(--font-heading); font-size: 1.8rem; color: var(--purple); margin-bottom: 10px; }
+        .modal-box p { font-size: 0.88rem; color: #555; margin-bottom: 24px; line-height: 1.7; }
+        .modal-price { font-family: var(--font-heading); font-size: 3rem; color: var(--purple); font-weight: 900; margin-bottom: 6px; }
+        .modal-price-sub { font-size: 0.78rem; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 28px; }
+        .paypal-btn { display: inline-block; background: #FFC439; color: #003087; padding: 16px 40px; border-radius: 10px; font-weight: 800; font-size: 1rem; text-decoration: none; letter-spacing: 1px; transition: transform 0.2s; margin-bottom: 14px; width: 100%; }
+        .paypal-btn:hover { transform: translateY(-2px); }
+        .modal-note { font-size: 0.75rem; color: #999; line-height: 1.5; }
+        .modal-close { margin-top: 16px; background: none; border: none; color: #aaa; font-size: 0.8rem; cursor: pointer; }
+
+        /* ERROR */
+        #error-section { display: none; max-width: 580px; margin: 60px auto; padding: 0 24px; text-align: center; }
+        .error-box { background: white; border: 2px solid #e8e8e8; border-radius: 16px; padding: 40px; }
+        .error-box h2 { font-family: var(--font-heading); color: var(--red); margin-bottom: 12px; }
+        .error-box p { font-size: 0.88rem; color: #666; line-height: 1.7; }
+        .retry-btn { margin-top: 20px; background: var(--purple); color: white; border: none; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+
+        @media (max-width: 600px) {
+            .hero { padding: 40px 20px 60px; }
+            .modal-box { padding: 28px 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="globe-container"></div>
+<nav>
+    <a href="/" class="nav-logo">Prisca Dezigns</a>
+    <a href="/">← Back to Home</a>
+</nav>
 
-    <div id="overlay">
-        <div class="loader"></div>
-        <div id="status">INITIATING NEURAL SCAN...</div>
+<!-- HERO + FORM -->
+<div class="hero">
+    <div class="hero-tag">Free Diagnostic Tool</div>
+    <h1>Brand Scan</h1>
+    <p>Enter your domain. We'll analyse your SEO, AEO, GEO, and brand presence — and deliver a real report to your inbox.</p>
+    <div class="scan-form">
+        <input type="text" id="domain-input" placeholder="yourbusiness.com" autocomplete="off" />
+        <input type="email" id="email-input" placeholder="your@email.com" autocomplete="off" />
+        <button id="scan-btn" onclick="startScan()">Run Free Scan</button>
+    </div>
+    <p style="margin-top:14px; font-size:0.72rem; opacity:0.45;">No account needed. Report delivered to your inbox.</p>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress-section">
+    <div class="progress-label" id="progress-label">Initialising scan...</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="progress-steps">
+        <div class="step" id="step-1"><div class="step-icon">1</div> Fetching domain & HTML structure</div>
+        <div class="step" id="step-2"><div class="step-icon">2</div> Analysing SEO signals (title, meta, headings)</div>
+        <div class="step" id="step-3"><div class="step-icon">3</div> Checking AEO (schema, structured data)</div>
+        <div class="step" id="step-4"><div class="step-icon">4</div> Checking GEO (Google Business, maps presence)</div>
+        <div class="step" id="step-5"><div class="step-icon">5</div> Auditing technical health (SSL, mobile, canonical)</div>
+        <div class="step" id="step-6"><div class="step-icon">6</div> Compiling report & sending to your inbox</div>
+    </div>
+</div>
+
+<!-- ERROR -->
+<div id="error-section">
+    <div class="error-box">
+        <h2>Domain Unreachable</h2>
+        <p>We couldn't connect to that domain. Make sure it's a live website and try again — or contact us directly at <strong>342-4101</strong> and we'll run the scan manually.</p>
+        <button class="retry-btn" onclick="resetScan()">Try Again</button>
+    </div>
+</div>
+
+<!-- RESULTS -->
+<div id="results-section">
+
+    <div class="domain-badge" id="domain-badge">🌐 Scanning: example.com</div>
+
+    <!-- OVERALL SCORE -->
+    <div class="overall-score">
+        <div class="score-ring" id="score-ring">--</div>
+        <div class="score-label">Overall Brand Score</div>
+        <div class="score-desc" id="score-desc">Calculating...</div>
     </div>
 
-    <div class="main-ui" id="main-ui">
-        <h1>Alpha Scan</h1>
-        <p class="subtitle">Neural Brand Diagnostic</p>
+    <!-- CATEGORY SCORES -->
+    <div class="categories" id="categories"></div>
 
-        <div class="scan-box">
-            <input type="text" id="domain" placeholder="ENTER BRAND DOMAIN (e.g. brand.com)">
-            <input type="email" id="user-email" placeholder="YOUR ARCHITECT EMAIL">
-            <button class="scan-btn" onclick="startScan()">Initiate Scan</button>
-            <a href="../" class="back-btn">Return to Hub</a>
+    <!-- FREE ISSUES -->
+    <div class="section-title">What We Found</div>
+    <div class="issues-free" id="issues-free"></div>
+
+    <!-- EMAIL SENT CONFIRMATION -->
+    <div class="email-cta" id="email-cta">
+        <h3>Your Summary Report Was Sent</h3>
+        <p id="email-cta-desc">A branded summary of these findings has been delivered to your inbox. Review the key gaps above.</p>
+        <div class="email-sent">📩 <span id="email-sent-addr"></span></div>
+    </div>
+
+    <!-- LOCKED FULL REPORT -->
+    <div class="section-title">Full Report — Unlock for $19 USD</div>
+    <div class="locked-section">
+        <div class="locked-blur fake-issues">
+            <div class="fake-issue"></div>
+            <div class="fake-issue"></div>
+            <div class="fake-issue"></div>
+            <div class="fake-issue"></div>
+            <div class="fake-issue"></div>
+        </div>
+        <div class="locked-overlay">
+            <div class="lock-icon">🔒</div>
+            <div class="lock-title" id="locked-title">12 More Issues Found</div>
+            <div class="lock-desc">Get the complete breakdown — every issue, severity level, and exactly how <strong>Prisca Dezigns</strong> fixes each one. Includes your full action plan and estimated impact.</div>
+            <button class="unlock-btn" onclick="openPayment()">Unlock Full Report — $19 USD</button>
         </div>
     </div>
 
-    <div class="main-ui" id="results">
-        <h1>Diagnostic Report</h1>
-        <div class="result-card">
-            <div class="score">84/100</div>
-            <h2>Identity Fragmentation Detected</h2>
-            <p style="margin-bottom: 20px; line-height: 1.6;">Your brand signal is strong but lacks high-fidelity consistency across touchpoints. We've detected 3 primary optimization nodes.</p>
-            <button class="scan-btn" onclick="window.location.href='../#package-section'">View Evolution Packages</button>
-        </div>
-        <a href="javascript:location.reload()" class="back-btn">Run New Scan</a>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div id="payment-modal">
+    <div class="modal-box">
+        <h2>Unlock Your Full Report</h2>
+        <p>Get every issue found on <strong id="modal-domain">your site</strong>, the complete action plan, and exactly how Prisca Dezigns brings your brand to full strength.</p>
+        <div class="modal-price">$19</div>
+        <div class="modal-price-sub">One-time · Full Report Unlocked</div>
+        <a id="paypal-link" href="https://paypal.me/priscadezigns9/19" target="_blank" class="paypal-btn" onclick="handlePaypalClick()">
+            Pay with PayPal →
+        </a>
+        <div class="modal-note">After payment, reply to your scan email with your PayPal confirmation. Your full report will be delivered within 2 hours.</div>
+        <button class="modal-close" onclick="closePayment()">Maybe later</button>
     </div>
+</div>
 
-    <script>
-        const supabaseClient = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
 
-        // Three.js Globe Logic
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('globe-container').appendChild(renderer.domElement);
+// ── Supabase ──────────────────────────────────────────────────────────────
+const SUPA_URL = 'https://ennyjdmwtdaxuqfjkaum.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVubnlqZG13dGRheHVxZmpraGF1bSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzE2MDY1NTcwLCJleHAiOjIwMzE2NDE1NzB9.xhJdTIavFv5A2Ei-7oHMJ77jrLrYr9KcAHnHj3rkFGY';
+const supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
-        const globeGeo = new THREE.SphereGeometry(3, 64, 64);
-        const globeMat = new THREE.MeshPhongMaterial({ color: 0xC8A2C8, wireframe: true, transparent: true, opacity: 0.3 });
-        const globe = new THREE.Mesh(globeGeo, globeMat);
-        scene.add(globe);
+let scanData = {};
 
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(5, 5, 5);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x404040));
-        camera.position.z = 6;
+// ── Helpers ───────────────────────────────────────────────────────────────
+function cleanDomain(raw) {
+    let d = raw.trim().toLowerCase();
+    d = d.replace(/^https?:\/\//,'').replace(/^www\./,'').replace(/\/.*/,'');
+    return d;
+}
 
-        function animate() {
-            requestAnimationFrame(animate);
-            globe.rotation.y += 0.002;
-            globe.rotation.x += 0.001;
-            renderer.render(scene, camera);
-        }
-        animate();
+function scoreClass(n) {
+    if (n >= 70) return 'good';
+    if (n >= 40) return 'fair';
+    return 'poor';
+}
 
-        async function startScan() {
-            const domain = document.getElementById('domain').value;
-            const email = document.getElementById('user-email').value;
-            if (!domain || !email) return alert("Please provide both domain and email.");
+function scoreLabel(n) {
+    if (n >= 70) return 'Good';
+    if (n >= 40) return 'Needs Work';
+    return 'Critical';
+}
 
-            document.getElementById('overlay').style.display = 'flex';
-            const status = document.getElementById('status');
-            
-            const msgs = [
-                "FETCHING DOMAIN METADATA...",
-                "ANALYZING TYPOGRAPHY CONSISTENCY...",
-                "EVALUATING BRAND SIGNAL CLARITY...",
-                "CHECKING MOBILE NEURAL ADAPTATION...",
-                "FINALIZING DIAGNOSTIC REPORT..."
-            ];
-            
-            let i = 0;
-            const interval = setInterval(() => {
-                status.innerText = msgs[i];
-                i++;
-                if(i >= msgs.length) {
-                    clearInterval(interval);
-                    completeScan(domain, email);
-                }
-            }, 1000);
-        }
+function setStep(n, status) {
+    const el = document.getElementById('step-' + n);
+    if (!el) return;
+    el.className = 'step ' + status;
+    el.querySelector('.step-icon').textContent = status === 'done' ? '✓' : n;
+}
 
-        async function completeScan(domain, email) {
-            // Log to Supabase
-            await supabaseClient.from('client_leads').insert([{
-                name: "Scan User",
+function setProgress(pct, label) {
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = label;
+}
+
+async function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── CORS proxy fetch ──────────────────────────────────────────────────────
+async function fetchDomain(url) {
+    // Try direct first (works for non-CORS-locked sites)
+    const proxies = [
+        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+        `https://corsproxy.io/?${encodeURIComponent(url)}`
+    ];
+    for (const proxy of proxies) {
+        try {
+            const r = await fetch(proxy, { signal: AbortSignal.timeout(10000) });
+            if (!r.ok) continue;
+            const j = await r.json().catch(async () => ({ contents: await r.text() }));
+            const html = j.contents || j.body || '';
+            if (html.length > 200) return html;
+        } catch(e) { continue; }
+    }
+    return null;
+}
+
+// ── ANALYSE HTML ─────────────────────────────────────────────────────────
+function analyseHTML(html, domain) {
+    const issues = [];
+    const scores = { seo: 100, aeo: 100, geo: 100, technical: 100 };
+
+    // ── SEO ──
+    const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g,'').trim() : '';
+    if (!title) {
+        issues.push({ sev: 'critical', cat: 'SEO', title: 'No Page Title Found', desc: 'Your website has no <title> tag. Google uses this as the headline in search results. Without it, you are invisible.', fix: 'Prisca Dezigns adds keyword-optimised title tags to every page.' });
+        scores.seo -= 30;
+    } else if (title.length < 30) {
+        issues.push({ sev: 'warning', cat: 'SEO', title: 'Page Title Too Short', desc: `Your title "${title}" is only ${title.length} characters. Google recommends 50–60 characters for maximum search visibility.`, fix: 'We rewrite titles to hit the optimal length and include your primary keyword.' });
+        scores.seo -= 15;
+    } else if (title.length > 65) {
+        issues.push({ sev: 'warning', cat: 'SEO', title: 'Page Title Too Long', desc: `Your title is ${title.length} characters — Google cuts off anything over 60, so part of your title is hidden in search results.`, fix: 'We trim and restructure titles so nothing is cut off.' });
+        scores.seo -= 10;
+    }
+
+    const metaDescMatch = html.match(/<meta[^>]*name=.description.[^>]*content=.([^"']+)/i) ||
+                          html.match(/<meta[^>]*content=.([^"']{30,})[^>]*name=.description./i);
+    const metaDesc = metaDescMatch ? metaDescMatch[1].trim() : '';
+    if (!metaDesc) {
+        issues.push({ sev: 'critical', cat: 'SEO', title: 'Missing Meta Description', desc: 'No meta description detected. This is the snippet Google shows under your link in search results. Without it, Google writes one itself — usually poorly.', fix: 'Prisca Dezigns writes compelling, keyword-rich descriptions for every page.' });
+        scores.seo -= 25;
+    } else if (metaDesc.length < 80) {
+        issues.push({ sev: 'warning', cat: 'SEO', title: 'Meta Description Too Short', desc: `Your meta description is only ${metaDesc.length} characters. Aim for 140–160 characters to maximise click-through rates.`, fix: 'We expand and optimise your meta descriptions to fill the full preview window.' });
+        scores.seo -= 10;
+    }
+
+    const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+    const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g,'').trim() : '';
+    if (!h1) {
+        issues.push({ sev: 'critical', cat: 'SEO', title: 'No H1 Heading Found', desc: 'Your page has no H1 tag. This is the primary signal Google uses to understand what your page is about.', fix: 'We structure every page with a clear, keyword-driven H1 heading.' });
+        scores.seo -= 20;
+    }
+
+    const h2s = (html.match(/<h2[^>]*>/gi) || []).length;
+    if (h2s === 0) {
+        issues.push({ sev: 'warning', cat: 'SEO', title: 'No H2 Subheadings', desc: 'No H2 tags found. Subheadings help Google understand your page structure and help users scan your content.', fix: 'We add structured headings to improve readability and SEO architecture.' });
+        scores.seo -= 10;
+    }
+
+    const canonical = /<link[^>]*rel=.canonical./i.test(html);
+    if (!canonical) {
+        issues.push({ sev: 'warning', cat: 'Technical', title: 'Missing Canonical Tag', desc: 'No canonical URL tag found. This can cause duplicate content issues if your site is accessible via multiple URLs.', fix: 'We add canonical tags to every page to protect your SEO equity.' });
+        scores.technical -= 15;
+    }
+
+    // ── AEO ──
+    const hasSchema = /application\/ld\+json/i.test(html);
+    const hasOpenGraph = /<meta[^>]*property=.og:/i.test(html);
+    const hasTwitterCard = /<meta[^>]*name=.twitter:/i.test(html);
+
+    if (!hasSchema) {
+        issues.push({ sev: 'critical', cat: 'AEO', title: 'No Structured Data (Schema)', desc: 'Your site has no JSON-LD schema markup. Without it, Google cannot display rich results (star ratings, FAQ boxes, business info) for your site — costing you visibility.', fix: 'Prisca Dezigns implements LocalBusiness, Product, and FAQ schema on every page.' });
+        scores.aeo -= 40;
+    }
+    if (!hasOpenGraph) {
+        issues.push({ sev: 'warning', cat: 'AEO', title: 'No Open Graph Tags', desc: 'Missing OG meta tags means when someone shares your link on Facebook, WhatsApp, or LinkedIn, it appears as a blank, unbranded preview — losing click-throughs.', fix: 'We add full OG tag coverage for maximum social media share appearance.' });
+        scores.aeo -= 30;
+    }
+    if (!hasTwitterCard) {
+        issues.push({ sev: 'info', cat: 'AEO', title: 'No Twitter/X Card Tags', desc: 'No Twitter card meta tags found. Your links shared on X appear as plain text with no image preview.', fix: 'We implement Twitter card tags for all major social channels.' });
+        scores.aeo -= 15;
+    }
+
+    // ── Technical ──
+    const hasViewport = /<meta[^>]*name=.viewport./i.test(html);
+    if (!hasViewport) {
+        issues.push({ sev: 'critical', cat: 'Technical', title: 'Not Optimised for Mobile', desc: 'No viewport meta tag detected. Your site likely displays as a desktop site on mobile phones — over 70% of your visitors are on mobile.', fix: 'Prisca Dezigns builds every site mobile-first, fully responsive from day one.' });
+        scores.technical -= 35;
+    }
+
+    const imgs = (html.match(/<img[^>]*>/gi) || []);
+    const noAltImgs = imgs.filter(i => !/alt=/i.test(i)).length;
+    if (noAltImgs > 0) {
+        issues.push({ sev: 'warning', cat: 'SEO', title: `${noAltImgs} Image${noAltImgs>1?'s':''} Missing Alt Text`, desc: `${noAltImgs} of your images have no alt attribute. Search engines cannot read images — alt text is how they know what your images show, impacting SEO and accessibility.`, fix: 'We audit and write descriptive alt text for every image on your site.' });
+        scores.seo -= Math.min(20, noAltImgs * 3);
+    }
+
+    const hasFavicon = /<link[^>]*rel=.(shortcut )?icon./i.test(html);
+    if (!hasFavicon) {
+        issues.push({ sev: 'info', cat: 'Technical', title: 'No Favicon Set', desc: 'Your site has no favicon — the small icon that appears in browser tabs and bookmarks. Small detail, big credibility signal.', fix: 'We design and implement a custom favicon as part of every build.' });
+        scores.technical -= 5;
+    }
+
+    // ── GEO ──
+    const hasGoogleMaps = /maps\.google|google\.com\/maps|gmap/i.test(html);
+    const hasAddress = /(\d+\s+\w+\s+(street|road|avenue|drive|lane|blvd|rd|st|ave)|trinidad|tobago)/i.test(html);
+    if (!hasGoogleMaps && !hasAddress) {
+        issues.push({ sev: 'warning', cat: 'GEO', title: 'No Location Signals Found', desc: 'No Google Maps embed or address detected on your site. For local businesses, location signals are critical for appearing in "near me" searches on Google.', fix: 'We embed Google Maps and add LocalBusiness schema so you rank in local searches.' });
+        scores.geo -= 40;
+    }
+
+    const hasGAorGTM = /google-analytics|gtag|googletagmanager/i.test(html);
+    if (!hasGAorGTM) {
+        issues.push({ sev: 'warning', cat: 'Technical', title: 'No Analytics Detected', desc: 'No Google Analytics or Tag Manager found. You have no data on who visits your site, where they come from, or what they do — flying blind.', fix: 'Prisca Dezigns installs GA4 and GTM on every site we build.' });
+        scores.technical -= 20;
+    }
+
+    // Cap scores at 0
+    for (const k in scores) scores[k] = Math.max(0, scores[k]);
+
+    const overall = Math.round((scores.seo + scores.aeo + scores.geo + scores.technical) / 4);
+
+    return { issues, scores, overall, title, metaDesc, h1, hasSchema, hasOpenGraph };
+}
+
+// ── SEND EMAIL via Formsubmit ─────────────────────────────────────────────
+async function sendReportEmail(domain, email, data) {
+    const { overall, scores, issues } = data;
+
+    const issueLines = issues.slice(0, 5).map(i =>
+        `• [${i.sev.toUpperCase()}] ${i.title}: ${i.desc}`
+    ).join('\n\n');
+
+    const body = `BRAND SCAN REPORT — ${domain.toUpperCase()}
+Generated by Prisca Dezigns | priscadezigns.org
+
+OVERALL SCORE: ${overall}/100
+
+BREAKDOWN:
+• SEO Score: ${scores.seo}/100
+• AEO Score: ${scores.aeo}/100
+• GEO Score: ${scores.geo}/100
+• Technical Score: ${scores.technical}/100
+
+KEY FINDINGS (Free Summary):
+${issueLines}
+
+${issues.length > 3 ? `+ ${issues.length - 3} more issues detected in your full report.` : ''}
+
+──────────────────────────────────────────
+
+WHAT THIS MEANS FOR ${domain.toUpperCase()}:
+Your site scored ${overall}/100. ${overall < 40 ? 'This is a critical gap — competitors with optimised sites are capturing customers you are losing right now.' : overall < 70 ? 'There are significant gaps that are costing you visibility and conversions.' : 'Your site is performing well but there are still improvements that can boost your reach.'}
+
+HOW PRISCA DEZIGNS CAN HELP:
+Every issue listed above is something we fix as part of our Growth Package — a fully custom, mobile-first, SEO-optimised website built for your business.
+
+Growth Package: $4,054 TTD (one-time) + $659 TTD/month maintenance
+Includes: Custom website, full SEO setup, schema markup, Google Analytics, mobile optimisation, and WhatsApp integration.
+
+UNLOCK YOUR FULL REPORT:
+For the complete breakdown of every issue, severity ratings, and your full action plan — pay $19 USD:
+https://paypal.me/priscadezigns9/19
+
+After payment, reply to this email with your PayPal confirmation and your full report will be delivered within 2 hours.
+
+──────────────────────────────────────────
+Prisca Dezigns | priscadezigns.org | 342-4101`;
+
+    try {
+        await fetch('https://formsubmit.co/ajax/priscillanarine@gmail.com', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                name: `Brand Scan — ${domain}`,
                 email: email,
-                package: "ALPHA SCAN",
-                brand: "Prisca Dezigns",
-                message: `Domain: ${domain}`,
-                created_at: new Date().toISOString()
-            }]);
-
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('main-ui').style.display = 'none';
-            document.getElementById('results').style.display = 'flex';
-        }
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+                message: body,
+                domain: domain,
+                overall_score: overall,
+                seo_score: scores.seo,
+                aeo_score: scores.aeo,
+                geo_score: scores.geo,
+                technical_score: scores.technical,
+                _subject: `🔍 Brand Scan Report: ${domain} — Score: ${overall}/100`
+            })
         });
-    </script>
+    } catch(e) {}
+}
+
+// ── LOG TO SUPABASE ───────────────────────────────────────────────────────
+async function logToSupabase(domain, email, data) {
+    try {
+        await supabase.from('client_leads').insert([{
+            name: `Brand Scan — ${domain}`,
+            email: email,
+            package: 'BRAND SCAN (FREE)',
+            brand: 'Prisca Dezigns',
+            message: `Domain: ${domain} | Score: ${data.overall}/100 | Issues: ${data.issues.length}`,
+            created_at: new Date().toISOString()
+        }]);
+    } catch(e) {}
+}
+
+// ── MAIN SCAN ─────────────────────────────────────────────────────────────
+async function startScan() {
+    const rawDomain = document.getElementById('domain-input').value.trim();
+    const email = document.getElementById('email-input').value.trim();
+
+    if (!rawDomain) { alert('Please enter your domain.'); return; }
+    if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+
+    const domain = cleanDomain(rawDomain);
+    const url = 'https://' + domain;
+
+    // Reset UI
+    document.getElementById('scan-btn').disabled = true;
+    document.getElementById('progress-section').style.display = 'block';
+    document.getElementById('results-section').style.display = 'none';
+    document.getElementById('error-section').style.display = 'none';
+    for (let i=1;i<=6;i++) setStep(i,'');
+    setProgress(5, 'Connecting to domain...');
+    document.querySelector('.hero').scrollIntoView({behavior:'smooth'});
+
+    // Step 1 — Fetch HTML
+    setStep(1,'active');
+    setProgress(15, 'Fetching domain structure...');
+    await delay(600);
+    const html = await fetchDomain(url);
+
+    if (!html) {
+        document.getElementById('progress-section').style.display = 'none';
+        document.getElementById('error-section').style.display = 'block';
+        document.getElementById('scan-btn').disabled = false;
+        return;
+    }
+    setStep(1,'done');
+
+    // Step 2 — SEO
+    setStep(2,'active');
+    setProgress(32, 'Analysing SEO signals...');
+    await delay(900);
+    setStep(2,'done');
+
+    // Step 3 — AEO
+    setStep(3,'active');
+    setProgress(50, 'Checking structured data & AEO...');
+    await delay(800);
+    setStep(3,'done');
+
+    // Step 4 — GEO
+    setStep(4,'active');
+    setProgress(65, 'Checking local & GEO signals...');
+    await delay(700);
+    setStep(4,'done');
+
+    // Step 5 — Technical
+    setStep(5,'active');
+    setProgress(80, 'Technical health audit...');
+    await delay(800);
+    const data = analyseHTML(html, domain);
+    setStep(5,'done');
+
+    // Step 6 — Send email + log
+    setStep(6,'active');
+    setProgress(95, 'Compiling report & sending to inbox...');
+    await Promise.all([
+        sendReportEmail(domain, email, data),
+        logToSupabase(domain, email, data)
+    ]);
+    setStep(6,'done');
+    setProgress(100, 'Scan complete.');
+    await delay(600);
+
+    // Store for payment modal
+    scanData = { domain, email, data };
+
+    // Show results
+    displayResults(domain, email, data);
+}
+
+// ── DISPLAY RESULTS ───────────────────────────────────────────────────────
+function displayResults(domain, email, data) {
+    document.getElementById('progress-section').style.display = 'none';
+    document.getElementById('results-section').style.display = 'block';
+
+    // Domain badge
+    document.getElementById('domain-badge').innerHTML = '🌐 ' + domain;
+
+    // Overall score
+    const ring = document.getElementById('score-ring');
+    ring.textContent = data.overall;
+    ring.className = 'score-ring ' + scoreClass(data.overall);
+    const descs = { poor: 'Critical gaps detected. Your site is losing customers to competitors right now.', fair: 'Significant room for improvement. Several key signals are missing.', good: 'Solid foundation, but there are still gaps worth closing.' };
+    document.getElementById('score-desc').textContent = descs[scoreClass(data.overall)];
+
+    // Category scores
+    const cats = [
+        { name: 'SEO', score: data.scores.seo },
+        { name: 'AEO', score: data.scores.aeo },
+        { name: 'GEO', score: data.scores.geo },
+        { name: 'Technical', score: data.scores.technical }
+    ];
+    document.getElementById('categories').innerHTML = cats.map(c =>
+        `<div class="cat-card ${scoreClass(c.score)}">
+            <div class="cat-score">${c.score}</div>
+            <div class="cat-name">${c.name}</div>
+        </div>`
+    ).join('');
+
+    // Show first 3 issues free
+    const freeIssues = data.issues.slice(0, 3);
+    document.getElementById('issues-free').innerHTML = freeIssues.map(issue =>
+        `<div class="issue-item">
+            <div class="issue-sev ${issue.sev}"></div>
+            <div>
+                <div class="issue-title">${issue.title}</div>
+                <div class="issue-desc">${issue.desc}</div>
+            </div>
+        </div>`
+    ).join('');
+
+    // Locked count
+    const lockedCount = Math.max(0, data.issues.length - 3);
+    document.getElementById('locked-title').textContent = lockedCount + ' More Issue' + (lockedCount !== 1 ? 's' : '') + ' Found';
+
+    // Email confirmation
+    document.getElementById('email-cta-desc').textContent = `A branded summary of these findings has been sent to ${email}. Review the key gaps above.`;
+    document.getElementById('email-sent-addr').textContent = email;
+
+    // Scroll to results
+    document.getElementById('results-section').scrollIntoView({behavior:'smooth'});
+
+    document.getElementById('scan-btn').disabled = false;
+}
+
+// ── PAYMENT ───────────────────────────────────────────────────────────────
+function openPayment() {
+    document.getElementById('modal-domain').textContent = scanData.domain || 'your site';
+    document.getElementById('payment-modal').classList.add('open');
+}
+
+function closePayment() {
+    document.getElementById('payment-modal').classList.remove('open');
+}
+
+function handlePaypalClick() {
+    // Log payment intent to Supabase
+    if (scanData.domain) {
+        supabase.from('client_leads').insert([{
+            name: `FULL REPORT REQUEST — ${scanData.domain}`,
+            email: scanData.email || '',
+            package: 'BRAND SCAN ($19 FULL REPORT)',
+            brand: 'Prisca Dezigns',
+            message: `Domain: ${scanData.domain} | Score: ${scanData.data?.overall}/100 — Client clicked PayPal unlock`,
+            created_at: new Date().toISOString()
+        }]).then(()=>{});
+    }
+    setTimeout(closePayment, 800);
+}
+
+function resetScan() {
+    document.getElementById('error-section').style.display = 'none';
+    document.getElementById('progress-section').style.display = 'none';
+    document.getElementById('scan-btn').disabled = false;
+    document.querySelector('.hero').scrollIntoView({behavior:'smooth'});
+}
+
+// ── Pre-fill domain from query param (Sierra chat passes it) ──────────────
+window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const d = params.get('domain');
+    if (d) document.getElementById('domain-input').value = d;
+});
+
+</script>
 </body>
 </html>
