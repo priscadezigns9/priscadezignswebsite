@@ -144,19 +144,17 @@
             state = 'COMPLETE';
             addMsg("Data synchronized. Delivering your brief to the Architect now...", false);
 
-            // ── Silent backend POST ─────────────────────────────
-            var WEBHOOK = 'https://script.google.com/macros/s/AKfycbxvwv6Wjfba9pNQr_tJvkID-cXnv8sv27igAokZb5ged0qHJ1fbd_7Of6IDsopurVZwRQ/exec';
-            var payload = JSON.stringify({
-                name:    user_data.name    || '',
-                email:   user_data.email   || '',
-                package: user_data.package || '',
-                source:  window.location.hostname || 'priscadezigns.org'
-            });
-            fetch(WEBHOOK, {
+            // ── Silent backend POST via Formsubmit ──────────────
+            fetch('https://formsubmit.co/ajax/priscillanarine@gmail.com', {
                 method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: payload
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    name:    user_data.name    || '',
+                    email:   user_data.email   || '',
+                    package: user_data.package || '',
+                    source:  window.location.hostname || 'priscadezigns.org',
+                    _subject: '🔥 New Lead: ' + (user_data.name || 'Unknown') + ' — ' + (user_data.package || 'General')
+                })
             }).catch(function() {});
             // ────────────────────────────────────────────────────
 
