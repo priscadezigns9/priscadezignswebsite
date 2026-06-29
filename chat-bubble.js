@@ -93,11 +93,17 @@
             } else if (low.includes('branding') || low === '3') {
                 user_data.package = 'Branding';
                 state = 'FORM_NAME';
-                setTimeout(() => { addMsg("Selected: <strong>Branding</strong> ($500). What is your <strong>Full Name</strong>?"); opt.innerHTML = ''; }, 400);
+                setTimeout(() => {
+                    addMsg("Selected: <strong>Branding</strong> ($500 Setup · One-time). Ready to begin? What is your <strong>Full Name</strong>?");
+                    showOptions(['⬅ Back']);
+                }, 400);
             } else if (low.includes('scan') || low === '4') {
                 user_data.package = 'Brand Scan';
                 state = 'FORM_NAME';
-                setTimeout(() => { addMsg("Selected: <strong>Brand Scan</strong> ($19). What is your <strong>Full Name</strong>?"); opt.innerHTML = ''; }, 400);
+                setTimeout(() => {
+                    addMsg("Selected: <strong>Brand Scan</strong> ($19 · Deep Audit). Ready to begin? What is your <strong>Full Name</strong>?");
+                    showOptions(['⬅ Back']);
+                }, 400);
             }
         } else if (state === 'WEBSITE_PATH') {
             if (val === 'E-Commerce') {
@@ -107,21 +113,29 @@
                 }, 400);
             } else if (val === 'Custom Site') {
                 state = 'FORM_NAME';
-                setTimeout(() => { addMsg("For custom builds, I need your details. What is your <strong>Full Name</strong>?"); opt.innerHTML = ''; }, 400);
+                setTimeout(() => {
+                    addMsg("For custom builds, I need your details. What is your <strong>Full Name</strong>?");
+                    showOptions(['⬅ Back']);
+                }, 400);
             } else if (PKG_CONFIG[val]) {
                 user_data.package = val;
                 state = 'FORM_NAME';
                 const pkg = PKG_CONFIG[val];
                 setTimeout(() => {
                     addMsg(`Selected: <strong>${val}</strong><br>Setup: <strong>${pkg.setup}</strong><br>Pulse: <strong>${pkg.pulse}</strong><br><br>Ready to secure this build. What is your <strong>Full Name</strong>?`);
-                    opt.innerHTML = '';
+                    showOptions(['⬅ Back']);
                 }, 400);
             }
         } else if (state === 'AI_PATH') {
+            if (val === 'Back') { resetToRoot(); return; }
             user_data.package = 'AI Consultancy - ' + val;
             state = 'FORM_NAME';
-            setTimeout(() => { addMsg(`Targeting <strong>${val}</strong>. Shall we initiate the intake? What is your <strong>Full Name</strong>?`); opt.innerHTML = ''; }, 400);
+            setTimeout(() => {
+                addMsg(`Targeting <strong>${val}</strong>. Shall we initiate the intake? What is your <strong>Full Name</strong>?`);
+                showOptions(['⬅ Back']);
+            }, 400);
         } else if (state === 'FORM_NAME') {
+            if (val === '⬅ Back') { resetToRoot(); return; }
             user_data.name = val;
             state = 'FORM_EMAIL';
             addMsg("Thank you. What is your <strong>Best Email</strong> for the formal proposal?", false);
