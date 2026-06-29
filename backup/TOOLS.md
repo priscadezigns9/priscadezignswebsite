@@ -141,3 +141,9 @@ SOVSYGNAL push method (confirmed Jun19 18:48 AST):
 - Push pattern: run stage_push.py <repo> <prefix> to fetch LIVE SHAs and build payloads, then curl -d "$(cat pnow_<repo>_<page>.json)" inline
 - CRITICAL: Always run stage_push.py immediately before push curl calls — stale SHAs cause 409 conflicts
 - Do NOT use -d @file.json (blocked), shell loops with $(curl ...) (credential restriction), or build_payloads_s.py (uses stale SHAs from prior session)
+
+## Sierra Lead Intake Backend
+- **Webhook URL:** https://script.google.com/macros/s/AKfycbxvwv6Wjfba9pNQr_tJvkID-cXnv8sv27igAokZb5ged0qHJ1fbd_7Of6IDsopurVZwRQ/exec
+- **Lead Sheet ID:** 1LYaDhpQ_e9d_Un_ckplPay7iAHxghFvf3Sm3BFRDhE0
+- **Lead Sheet URL:** https://docs.google.com/spreadsheets/d/1LYaDhpQ_e9d_Un_ckplPay7iAHxghFvf3Sm3BFRDhE0/edit
+- **Reuse:** Any client chatbot — just change the `source` field. Each brand/domain gets its own tab automatically.
