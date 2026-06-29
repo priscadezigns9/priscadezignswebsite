@@ -145,7 +145,7 @@
             addMsg("Data synchronized. Delivering your brief to the Architect now...", false);
 
             // ── Silent backend POST ─────────────────────────────
-            var WEBHOOK = 'SIERRA_WEBHOOK_URL';
+            var WEBHOOK = 'https://script.google.com/macros/s/AKfycbx3iV3jsFpD7yeiWdC-RLmRb0vSxYeL5FgqBzwhlj6ZiF_9tvB5_foAA5qsoemEfYjGOA/exec';
             var payload = JSON.stringify({
                 name:    user_data.name    || '',
                 email:   user_data.email   || '',
