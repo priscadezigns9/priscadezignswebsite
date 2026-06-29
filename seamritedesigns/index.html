@@ -880,18 +880,13 @@ if ('serviceWorker' in navigator) {
 (function(){
   var WA="18687910293";
   var BASE="https://wa.me/"+WA+"?text=";
-  var WEBHOOK="https://script.google.com/macros/s/AKfycbxvwv6Wjfba9pNQr_tJvkID-cXnv8sv27igAokZb5ged0qHJ1fbd_7Of6IDsopurVZwRQ/exec";
-  var state='chat'; // chat | name | email | done
-  var lead={interest:'',name:'',email:''};
-
   var replies={
     custom:["Alice specialises in bespoke custom clothing — from everyday wear to special occasion pieces. 🧵 What type of garment are you looking to create?","Custom pieces are Alice's passion! She works with you from concept to final fitting. Do you have a fabric, style, or occasion in mind?"],
     uniform:["Seamrite Designs handles school uniforms for groups of all sizes! 🎓 Which school and how many uniforms do you need?","We do school uniforms with great quality and turnaround. Can you share the school name and quantity?"],
     art:["Neh Neh features original Caribbean artwork — paintings, mixed media, and wearable art. 🎨 Are you looking for a wall piece or wearable art?","Alice's collection draws from Caribbean culture and architectural style. Would you like to know what's currently available?"],
-    price:["Pricing depends on the piece — custom garments start from consultation. Want me to get Alice to reach out directly?","Every piece is priced by fabric, complexity, and size. The fastest way to get a quote is to have Alice contact you. Shall I arrange that?"],
-    def:["Lovely! Let me connect you with Alice so she can give you all the details. 💕","Alice would love to help personally. Can I grab your name and email so she can follow up?"]
+    price:["Pricing depends on the piece — custom garments start from consultation. Want Alice to send you a quote directly on WhatsApp?","Every piece is priced by fabric, complexity, and size. The fastest way to get a quote is to chat with Alice directly. Shall I connect you?"],
+    def:["Lovely! Let me connect you with Alice directly so she can give you all the details. 💕","Alice would love to help personally. I'll send you over to her WhatsApp now!"]
   };
-
   function getReply(m){
     m=m.toLowerCase();
     if(m.includes('custom')||m.includes('cloth')||m.includes('dress')||m.includes('outfit')||m.includes('sew'))return replies.custom[Math.floor(Math.random()*2)];
@@ -900,88 +895,10 @@ if ('serviceWorker' in navigator) {
     if(m.includes('price')||m.includes('cost')||m.includes('how much')||m.includes('rate'))return replies.price[Math.floor(Math.random()*2)];
     return replies.def[Math.floor(Math.random()*2)];
   }
-
-  function addMsg(t,isAlice){
-    var b=document.getElementById('smrtChatBody');
-    var d=document.createElement('div');
-    d.className='smrt-msg '+(isAlice?'sierra':'user');
-    d.textContent=t;
-    b.appendChild(d);
-    b.scrollTop=b.scrollHeight;
-  }
-
-  function addWA(pre){
-    var b=document.getElementById('smrtChatBody');
-    var a=document.createElement('a');
-    a.href=BASE+encodeURIComponent("Hi Alice! Sierra connected me. "+(pre||"I'd like to learn more about Seamrite Designs."));
-    a.target="_blank";
-    a.className="smrt-wa-btn";
-    a.textContent="📲 Message Alice on WhatsApp →";
-    b.appendChild(a);
-    b.scrollTop=b.scrollHeight;
-  }
-
-  function submitLead(){
-    var payload=JSON.stringify({
-      name: lead.name,
-      email: lead.email,
-      package: lead.interest || 'General Inquiry',
-      source: 'Seamrite Designs Chatbot'
-    });
-    fetch(WEBHOOK,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:payload}).catch(function(){});
-  }
-
-  function promptName(){
-    state='name';
-    setTimeout(function(){ addMsg("Before I connect you — what's your name?", true); },400);
-  }
-
-  function promptEmail(){
-    state='email';
-    setTimeout(function(){ addMsg("Thanks "+lead.name+"! And your email address so Alice can follow up?", true); },400);
-  }
-
-  function finishLead(){
-    state='done';
-    submitLead();
-    setTimeout(function(){
-      addMsg("Perfect! Alice will be in touch within 24 hours. You can also reach her directly on WhatsApp now. 💕", true);
-      addWA(lead.interest);
-    },400);
-  }
-
-  window.smrtSend=function(){
-    var i=document.getElementById('smrtInput');
-    var v=i.value.trim();
-    if(!v)return;
-    addMsg(v, false);
-    i.value='';
-    document.querySelectorAll('.smrt-quick').forEach(function(el){el.remove();});
-
-    if(state==='name'){
-      lead.name=v;
-      promptEmail();
-      return;
-    }
-    if(state==='email'){
-      lead.email=v;
-      finishLead();
-      return;
-    }
-    // Normal chat
-    lead.interest=v;
-    setTimeout(function(){
-      var r=getReply(v);
-      addMsg(r, true);
-      // After first reply, start lead capture
-      setTimeout(function(){ promptName(); }, 900);
-    },650);
-  };
-
-  window.smrtQuick=function(t){
-    document.getElementById('smrtInput').value=t;
-    smrtSend();
-  };
+  function addMsg(t,c){var b=document.getElementById('smrtChatBody'),d=document.createElement('div');d.className='smrt-msg '+c;d.textContent=t;b.appendChild(d);b.scrollTop=b.scrollHeight;}
+  function addWA(pre){var b=document.getElementById('smrtChatBody'),a=document.createElement('a');a.href=BASE+encodeURIComponent("Hi Alice! Sierra connected me. "+(pre||"I'd like to learn more about Seamrite Designs."));a.target="_blank";a.className="smrt-wa-btn";a.textContent="📲 Message Alice on WhatsApp →";b.appendChild(a);b.scrollTop=b.scrollHeight;}
+  window.smrtSend=function(){var i=document.getElementById('smrtInput'),v=i.value.trim();if(!v)return;addMsg(v,'user');i.value='';document.querySelectorAll('.smrt-quick').forEach(function(el){el.remove();});setTimeout(function(){var r=getReply(v);addMsg(r,'sierra');if(r.includes('WhatsApp')||r.includes('Alice')||r.includes('connect')||r.includes('quote'))addWA(v);},650);};
+  window.smrtQuick=function(t){document.getElementById('smrtInput').value=t;smrtSend();};
 })();
 </script>
 </body>
