@@ -131,11 +131,16 @@
         } else if (state === 'SCAN_DOMAIN') {
             if (val === '⬅ Back') { resetToRoot(); return; }
             user_data.domain = val;
-            state = 'FORM_NAME';
             i.placeholder = 'Type only for custom requests...';
             setTimeout(() => {
-                addMsg("Domain locked: <strong>" + val + "</strong>. We'll run the full audit on that. What is your <strong>Full Name</strong>?");
+                addMsg("Domain locked: <strong>" + val + "</strong>. Running your Brand Scan now — click below to see your live results 👇");
+                const scanUrl = 'https://priscadezigns.org/scan/?domain=' + encodeURIComponent(val);
                 showOptions(['⬅ Back']);
+                const linkEl = document.createElement('div');
+                linkEl.style.cssText = 'padding:10px 0;';
+                linkEl.innerHTML = '<a href="' + scanUrl + '" target="_blank" style="display:inline-block;background:#301934;color:white;padding:12px 24px;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;letter-spacing:1px;">🔍 Open My Brand Scan →</a>';
+                document.getElementById('chat-messages').appendChild(linkEl);
+                document.getElementById('chat-messages').scrollTop = 99999;
             }, 400);
         } else if (state === 'AI_PATH') {
             if (val === 'Back') { resetToRoot(); return; }
