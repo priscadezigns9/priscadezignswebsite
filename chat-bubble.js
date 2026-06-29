@@ -99,10 +99,12 @@
                 }, 400);
             } else if (low.includes('scan') || low === '4') {
                 user_data.package = 'Brand Scan';
-                state = 'FORM_NAME';
+                state = 'SCAN_DOMAIN';
                 setTimeout(() => {
-                    addMsg("Selected: <strong>Brand Scan</strong> ($19 · Deep Audit). Ready to begin? What is your <strong>Full Name</strong>?");
+                    addMsg("🔍 <strong>Brand Scan</strong> — Deep Audit ($19).<br><br>Enter your existing domain below so we can run the diagnostic:");
                     showOptions(['⬅ Back']);
+                    i.placeholder = 'e.g. yourbusiness.com';
+                    i.focus();
                 }, 400);
             }
         } else if (state === 'WEBSITE_PATH') {
@@ -126,6 +128,15 @@
                     showOptions(['⬅ Back']);
                 }, 400);
             }
+        } else if (state === 'SCAN_DOMAIN') {
+            if (val === '⬅ Back') { resetToRoot(); return; }
+            user_data.domain = val;
+            state = 'FORM_NAME';
+            i.placeholder = 'Type only for custom requests...';
+            setTimeout(() => {
+                addMsg("Domain locked: <strong>" + val + "</strong>. We'll run the full audit on that. What is your <strong>Full Name</strong>?");
+                showOptions(['⬅ Back']);
+            }, 400);
         } else if (state === 'AI_PATH') {
             if (val === 'Back') { resetToRoot(); return; }
             user_data.package = 'AI Consultancy - ' + val;
@@ -152,6 +163,7 @@
                     name:    user_data.name    || '',
                     email:   user_data.email   || '',
                     package: user_data.package || '',
+                    domain:  user_data.domain  || '',
                     source:  window.location.hostname || 'priscadezigns.org',
                     _subject: '🔥 New Lead: ' + (user_data.name || 'Unknown') + ' — ' + (user_data.package || 'General')
                 })
