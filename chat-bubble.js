@@ -145,7 +145,7 @@
             addMsg("Data synchronized. Delivering your brief to the Architect now...", false);
 
             // ── Silent backend POST ─────────────────────────────
-            var WEBHOOK = 'https://script.google.com/macros/s/AKfycbx3iV3jsFpD7yeiWdC-RLmRb0vSxYeL5FgqBzwhlj6ZiF_9tvB5_foAA5qsoemEfYjGOA/exec';
+            var WEBHOOK = 'https://script.google.com/macros/s/AKfycbxvwv6Wjfba9pNQr_tJvkID-cXnv8sv27igAokZb5ged0qHJ1fbd_7Of6IDsopurVZwRQ/exec';
             var payload = JSON.stringify({
                 name:    user_data.name    || '',
                 email:   user_data.email   || '',
@@ -154,7 +154,8 @@
             });
             fetch(WEBHOOK, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
                 body: payload
             }).catch(function() {});
             // ────────────────────────────────────────────────────
