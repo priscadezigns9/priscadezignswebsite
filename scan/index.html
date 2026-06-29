@@ -25,6 +25,7 @@
         nav { background: var(--purple); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
         nav a { color: #fff; text-decoration: none; font-size: 0.75rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
         nav a:hover { opacity: 1; }
+        .nav-logo img { height: 38px; width: auto; display: block; }
         .nav-logo { font-family: var(--font-heading); font-size: 1.1rem; color: var(--lilac); font-weight: 900; letter-spacing: 1px; }
 
         /* HERO */
@@ -138,7 +139,7 @@
 <body>
 
 <nav>
-    <a href="/" class="nav-logo">Prisca Dezigns</a>
+    <a href="/" class="nav-logo"><img src="/assets/logo.png" alt="Prisca Dezigns" onerror="this.style.display='none';this.nextSibling.style.display='inline'"/><span style="display:none;font-family:var(--font-heading);font-size:1.1rem;color:var(--lilac);font-weight:900;">Prisca Dezigns</span></a>
     <a href="/">← Back to Home</a>
 </nav>
 
@@ -150,7 +151,7 @@
     <div class="scan-form">
         <input type="text" id="domain-input" placeholder="yourbusiness.com" autocomplete="off" />
         <input type="email" id="email-input" placeholder="your@email.com" autocomplete="off" />
-        <button id="scan-btn" onclick="startScan()">Run Free Scan</button>
+        <button id="scan-btn">Run Free Scan</button>
     </div>
     <p style="margin-top:14px; font-size:0.72rem; opacity:0.45;">No account needed. Report delivered to your inbox.</p>
 </div>
@@ -239,13 +240,26 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Load Supabase async — non-blocking
+(function(){
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.async = true;
+    s.onload = function() {
+        window._supaReady = true;
+        window._supaClient = window.supabase.createClient(
+            'https://ennyjdmwtdaxuqfjkaum.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVubnlqZG13dGRheHVxZmpraGF1bSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzE2MDY1NTcwLCJleHAiOjIwMzE2NDE1NzB9.xhJdTIavFv5A2Ei-7oHMJ77jrLrYr9KcAHnHj3rkFGY'
+        );
+    };
+    document.head.appendChild(s);
+})();
+</script>
 <script>
 
-// ── Supabase ──────────────────────────────────────────────────────────────
-const SUPA_URL = 'https://ennyjdmwtdaxuqfjkaum.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVubnlqZG13dGRheHVxZmpraGF1bSIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzE2MDY1NTcwLCJleHAiOjIwMzE2NDE1NzB9.xhJdTIavFv5A2Ei-7oHMJ77jrLrYr9KcAHnHj3rkFGY';
-const supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+// ── Supabase (loaded async — use window._supaClient) ─────────────────────
+function getSupabase() { return window._supaClient || null; }
 
 let scanData = {};
 
@@ -477,7 +491,8 @@ Prisca Dezigns | priscadezigns.org | 342-4101`;
 // ── LOG TO SUPABASE ───────────────────────────────────────────────────────
 async function logToSupabase(domain, email, data) {
     try {
-        await supabase.from('client_leads').insert([{
+        const sb = getSupabase(); if (!sb) return;
+        await sb.from('client_leads').insert([{
             name: `Brand Scan — ${domain}`,
             email: email,
             package: 'BRAND SCAN (FREE)',
@@ -633,14 +648,14 @@ function closePayment() {
 function handlePaypalClick() {
     // Log payment intent to Supabase
     if (scanData.domain) {
-        supabase.from('client_leads').insert([{
+        const sb = getSupabase(); if (sb) sb.from('client_leads').insert([{
             name: `FULL REPORT REQUEST — ${scanData.domain}`,
             email: scanData.email || '',
             package: 'BRAND SCAN ($19 FULL REPORT)',
             brand: 'Prisca Dezigns',
             message: `Domain: ${scanData.domain} | Score: ${scanData.data?.overall}/100 — Client clicked PayPal unlock`,
             created_at: new Date().toISOString()
-        }]).then(()=>{});
+        }]).then(()=>{}).catch(()=>{});
     }
     setTimeout(closePayment, 800);
 }
@@ -652,11 +667,25 @@ function resetScan() {
     document.querySelector('.hero').scrollIntoView({behavior:'smooth'});
 }
 
-// ── Pre-fill domain from query param (Sierra chat passes it) ──────────────
+// ── Wire up button + pre-fill domain from query param ────────────────────
 window.addEventListener('DOMContentLoaded', () => {
+    // Pre-fill from Sierra chat deep link
     const params = new URLSearchParams(window.location.search);
     const d = params.get('domain');
     if (d) document.getElementById('domain-input').value = d;
+
+    // Button click — primary trigger
+    document.getElementById('scan-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        startScan();
+    });
+
+    // Enter key on inputs
+    ['domain-input','email-input'].forEach(function(id) {
+        document.getElementById(id).addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') startScan();
+        });
+    });
 });
 
 </script>
