@@ -142,9 +142,25 @@
         } else if (state === 'FORM_EMAIL') {
             user_data.email = val;
             state = 'COMPLETE';
-            addMsg("Data synchronized. I am delivering your brief to the Architect now.", false);
-            setTimeout(() => addMsg("Intake Complete. Priscilla will reach out within 24 hours. Látom. 🙏", false), 800);
-            setTimeout(() => resetToRoot(), 3000);
+            addMsg("Data synchronized. Delivering your brief to the Architect now...", false);
+
+            // ── Silent backend POST ─────────────────────────────
+            var WEBHOOK = 'SIERRA_WEBHOOK_URL';
+            var payload = JSON.stringify({
+                name:    user_data.name    || '',
+                email:   user_data.email   || '',
+                package: user_data.package || '',
+                source:  window.location.hostname || 'priscadezigns.org'
+            });
+            fetch(WEBHOOK, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: payload
+            }).catch(function() {});
+            // ────────────────────────────────────────────────────
+
+            setTimeout(() => addMsg("Intake complete. Priscilla will reach out within 24 hours. Látom. 🙏", false), 800);
+            setTimeout(() => resetToRoot(), 4000);
         }
     }
 
