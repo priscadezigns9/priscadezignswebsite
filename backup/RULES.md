@@ -220,6 +220,10 @@ God Mode is a universal administrative layer for the Architect. It provides real
 - **Reporting Mandate:** If a deployment is skipped for any brand during a session (ALPHA, BRAVO, etc.), I must provide a specific data-backed "WHY" (e.g., "Visual Cooldown active," "No High-Fidelity primary signal found," or "Asset failed quality audit").
 - **Zero-Filler Policy:** Quality over frequency. I will never post filler content to hit a quota, but for high-priority brands (Autodrome, Couture Gallery, etc.), I will exhaust all primary niche sources (Press Kits, Newsrooms, Official Socials) before reporting a "No Signal" status.
 
+## Outreach Signature Rule (Effective 2026-06-29)
+- **Prisca Dezigns pitches/drafts:** Do NOT include the user's name (Priscilla) in the sign-off. Sign off as "Prisca Dezigns" or "The Prisca Dezigns Team" only.
+- **Evolve Mobility pitches/drafts:** Include "Priscilla Narine — Independent Contractor | Evolve Mobility" as the signature.
+
 ## WhatsApp Automation Tiers (v1.2) - 2026-06-28
 - **Enterprise/High-Ticket Tier:** Use **360dialog** (Official API). Best for clients with $2,000+ TTD/mo budgets and high message volumes.
 - **Micro-SME Tier (The "Architect-Proof" Tier):** Use lower-cost alternatives (e.g., Evolution API, Z-API) for clients with < 10 employees to keep "Pulse Fees" accessible.
