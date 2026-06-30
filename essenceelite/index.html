@@ -35,169 +35,467 @@
   </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>.sidebar { position: fixed; right: -400px; top: 0; width: 400px; height: 100vh; background: rgba(5,5,5,0.98); backdrop-filter: blur(25px); border-left: 1px solid #222; transition: 0.5s cubic-bezier(0.8,0,0.2,1); z-index: 10000; overflow-y: auto; font-family: sans-serif; } .sidebar.active { right: 0; } .sidebar-header { padding: 30px; border-bottom: 1px solid #111; display: flex; justify-content: space-between; align-items: center; color: white; } .close-btn { background: none; border: none; color: #555; font-size: 2rem; cursor: pointer; } .sidebar-tabs { display: flex; border-bottom: 1px solid #111; } .sidebar-tabs button { flex: 1; background: none; border: none; color: #444; padding: 15px; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.3s; } @media (max-width: 480px) { .sidebar { width: 100%; right: -100%; } }</style><style>
-        :root { --gold: #D4AF37; --bg: #0A0A0F; --text: #FFFFFF; --dim: #888; --border: rgba(255,255,255,0.08); }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
-        
-        nav { height: 90px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 6%; position: sticky; top: 0; background: #fff; border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1000; }
-        .logo-group { display: flex; align-items: center; gap: 15px; text-decoration: none; }
-        .logo-mark { width: 40px; height: 40px; background: #000; border-radius: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #fff; font-size: 1.2rem; }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: #000; letter-spacing: 2px; }
-        
-        .nav-links { display: flex; gap: 30px; }
-        .nav-links a { color: #111; text-decoration: none; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; transition: 0.3s; }
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- SIDEBAR (unchanged) -->
+    <style>.sidebar { position: fixed; right: -400px; top: 0; width: 400px; height: 100vh; background: rgba(5,5,5,0.98); backdrop-filter: blur(25px); border-left: 1px solid #222; transition: 0.5s cubic-bezier(0.8,0,0.2,1); z-index: 10000; overflow-y: auto; font-family: sans-serif; } .sidebar.active { right: 0; } .sidebar-header { padding: 30px; border-bottom: 1px solid #111; display: flex; justify-content: space-between; align-items: center; color: white; } .close-btn { background: none; border: none; color: #555; font-size: 2rem; cursor: pointer; } .sidebar-tabs { display: flex; border-bottom: 1px solid #111; } .sidebar-tabs button { flex: 1; background: none; border: none; color: #444; padding: 15px; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.3s; } @media (max-width: 480px) { .sidebar { width: 100%; right: -100%; } }</style>
+
+    <style>
+        /* ── TOKENS ── */
+        :root {
+            --gold:   #D4AF37;
+            --gold-dim: rgba(212,175,55,0.15);
+            --bg:     #0A0A0F;
+            --bg2:    #0D0D14;
+            --card:   #111116;
+            --text:   #FFFFFF;
+            --dim:    #888;
+            --dim2:   #555;
+            --border: rgba(255,255,255,0.07);
+            --border-gold: rgba(212,175,55,0.35);
+            --font-serif: 'Playfair Display', serif;
+            --font-sans:  'Inter', sans-serif;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); background: var(--bg); color: var(--text); line-height: 1.6; }
+
+        /* ── NAV ── */
+        nav {
+            height: 72px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 6%;
+            position: sticky; top: 0;
+            background: rgba(10,10,15,0.96);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+        }
+        .logo-group { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .logo-mark {
+            width: 38px; height: 38px; background: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; color: #000; font-size: 1.2rem;
+            font-family: var(--font-serif);
+        }
+        .logo-text { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; color: var(--text); letter-spacing: 3px; text-transform: uppercase; }
+
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-links a { color: var(--dim); text-decoration: none; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; transition: color 0.2s; }
         .nav-links a:hover { color: var(--gold); }
+        .nav-links a.nav-cta { color: var(--gold); border: 1px solid var(--border-gold); padding: 8px 18px; }
+        .nav-links a.nav-cta:hover { background: var(--gold-dim); }
 
-        .hero { height: 80vh; position: relative; display: flex; align-items: center; padding: 0 6%; overflow: hidden; border-bottom: 1px solid var(--border); }
-        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(45deg, #0A0A0F 30%, transparent), url('https://m.media-amazon.com/images/I/71xVLhLWrvL._AC_SL1500_.jpg'); background-size: contain; background-repeat: no-repeat; background-position: right center; opacity: 0.6; z-index: -1; }
-        .hero-content { max-width: 800px; }
-        .label { color: var(--gold); text-transform: uppercase; letter-spacing: 6px; font-size: 0.75rem; font-weight: 900; margin-bottom: 20px; display: block; }
-        h1 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 6rem; margin: 0 0 30px; line-height: 0.9; font-weight: 900; }
-        .hero p { font-size: 1.2rem; color: var(--dim); max-width: 500px; margin-bottom: 40px; font-weight: 300; }
+        /* ── HERO ── */
+        .hero {
+            min-height: 82vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding: 0 6%;
+            gap: 60px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 80% 50%, rgba(212,175,55,0.06) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero-left { position: relative; z-index: 1; }
+        .label {
+            display: inline-block;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-size: 0.68rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            border-left: 2px solid var(--gold);
+            padding-left: 12px;
+        }
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: clamp(3.5rem, 7vw, 6rem);
+            line-height: 0.95;
+            font-weight: 900;
+            margin-bottom: 28px;
+            color: var(--text);
+        }
+        .hero p {
+            font-size: 1rem;
+            color: var(--dim);
+            max-width: 420px;
+            margin-bottom: 40px;
+            font-weight: 300;
+            line-height: 1.7;
+        }
+        .btn-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+        .btn {
+            display: inline-block; padding: 16px 36px;
+            background: var(--gold); color: #000;
+            text-decoration: none; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem;
+            transition: 0.3s;
+        }
+        .btn:hover { opacity: 0.88; transform: translateY(-2px); }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-gold);
+            color: var(--gold);
+            padding: 15px 35px;
+        }
+        .btn-outline:hover { background: var(--gold-dim); }
+        .btn-amazon { background: #FF9900; color: #000; }
+        .btn-ghost {
+            background: none; border: none;
+            color: var(--gold); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px; font-size: 0.72rem;
+            text-decoration: none;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-ghost::after { content: '→'; }
 
-        .btn-group { display: flex; gap: 20px; }
-        .btn { display: inline-block; padding: 20px 45px; background: #fff; color: #000; text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; transition: 0.4s; }
-        .btn:hover { background: #fff; transform: translateY(-3px); }
-        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
-        .btn-outline:hover { background: #fff; color: #000; }
+        /* Hero image panel */
+        .hero-right {
+            position: relative; z-index: 1;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .hero-img-frame {
+            width: 100%; max-width: 480px; aspect-ratio: 4/5;
+            background: var(--card);
+            border: 1px solid var(--border-gold);
+            overflow: hidden;
+            position: relative;
+        }
+        .hero-img-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .hero-img-tag {
+            position: absolute; bottom: 20px; left: 20px;
+            background: rgba(10,10,15,0.9);
+            border: 1px solid var(--border-gold);
+            padding: 10px 16px;
+            font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--gold);
+        }
 
-        .section { padding: 120px 6%; }
-        .section-header { margin-bottom: 80px; text-align: center; }
-        .section-header .label { margin-bottom: 10px; }
-        .section-header h2 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 4rem; margin: 0; }
+        /* ── BRAND STRIP ── */
+        .brand-strip {
+            padding: 28px 6%;
+            background: #000;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 20px; overflow: hidden;
+        }
+        .brand-strip-label { font-size: 0.62rem; color: var(--dim2); text-transform: uppercase; letter-spacing: 3px; font-weight: 700; flex-shrink: 0; }
+        .brand-strip-divider { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+        .brand-name { font-family: var(--font-serif); font-weight: 700; color: var(--dim2); font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; transition: color 0.3s; }
+        .brand-name:hover { color: var(--gold); }
 
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-        .feature-card { background: #111116; border: 1px solid var(--border); padding: 50px 30px; text-decoration: none; color: inherit; transition: 0.5s; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .feature-card:hover { border-color: var(--gold); transform: translateY(-15px); background: #15151C; }
-        
-        .feature-img-box { width: 100%; aspect-ratio: 1/1; background: #fff; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 0; }
-        .feature-img-box img { width: 100%; height: 100%; object-fit: contain; }
-        
-        .feature-card h3 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 15px; }
-        .feature-card p { color: var(--dim); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.6; flex-grow: 1; }
-        .feature-link { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 5px; }
+        /* ── SECTION WRAPPER ── */
+        .section { padding: 100px 6%; }
+        .section-alt { background: var(--bg2); }
 
-        .brands-strip { padding: 60px 6%; background: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .brand-logo { font-family: 'Playfair Display', serif; font-weight: 700; color: #444; font-size: 1.2rem; letter-spacing: 4px; text-transform: uppercase; }
+        /* Section header — structured like a spreadsheet row */
+        .section-header {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            margin-bottom: 50px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-header-left { }
+        .section-header h2 { font-family: var(--font-serif); font-style: italic; font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; margin-top: 8px; }
+        .section-header-meta { font-size: 0.7rem; color: var(--dim); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
+        .section-header a { color: var(--gold); text-decoration: none; font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+        .section-header a:hover { text-decoration: underline; }
 
-        footer { padding: 100px 6%; border-top: 1px solid var(--border); display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 80px; }
-        .footer-brand .logo-text { font-size: 1.5rem; color: var(--gold); font-weight: 900; display: block; margin-bottom: 20px; }
-        .footer-brand p { color: var(--dim); font-size: 0.9rem; }
-        .footer-links h4 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px; color: #fff; }
-        .footer-links a { display: block; color: var(--dim); text-decoration: none; font-size: 0.85rem; margin-bottom: 15px; transition: 0.3s; }
+        /* ── DATA GRID — spreadsheet-inspired card layout ── */
+        .data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+        .data-card {
+            background: var(--card);
+            padding: 36px 28px;
+            text-decoration: none; color: inherit;
+            display: flex; flex-direction: column;
+            transition: background 0.3s;
+            position: relative;
+        }
+        .data-card:hover { background: #15151E; }
+        .data-card:hover .data-card-arrow { color: var(--gold); opacity: 1; }
+
+        /* Top row — like a spreadsheet header cell */
+        .data-card-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+        }
+        .data-tag {
+            font-size: 0.62rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--gold);
+            border-left: 2px solid var(--gold);
+            padding-left: 8px;
+        }
+        .data-index { font-size: 0.62rem; color: var(--dim2); font-weight: 700; letter-spacing: 1px; }
+
+        /* Image cell */
+        .data-img {
+            width: 100%; aspect-ratio: 4/3;
+            background: #fff; overflow: hidden;
+            margin-bottom: 24px; flex-shrink: 0;
+        }
+        .data-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .data-card:hover .data-img img { transform: scale(1.04); }
+
+        .data-card h3 { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
+        .data-card p { color: var(--dim); font-size: 0.85rem; line-height: 1.65; flex-grow: 1; margin-bottom: 22px; }
+        .data-card-arrow { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; color: var(--dim2); opacity: 0.6; transition: 0.3s; }
+
+        /* ── EVENTS TABLE — true spreadsheet row layout ── */
+        .events-table { display: flex; flex-direction: column; border: 1px solid var(--border); }
+        .events-table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            padding: 14px 24px;
+            background: rgba(212,175,55,0.08);
+            border-bottom: 1px solid var(--border-gold);
+        }
+        .events-table-header span {
+            font-size: 0.62rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--gold);
+        }
+        .event-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            padding: 22px 24px;
+            border-bottom: 1px solid var(--border);
+            text-decoration: none; color: inherit;
+            transition: background 0.2s;
+            align-items: center;
+        }
+        .event-row:last-child { border-bottom: none; }
+        .event-row:hover { background: rgba(212,175,55,0.04); }
+        .event-row:hover .event-link { color: var(--gold); }
+        .event-name { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
+        .event-desc { font-size: 0.82rem; color: var(--dim); line-height: 1.5; }
+        .event-type { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--dim); }
+        .event-link { font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--dim2); transition: color 0.2s; }
+
+        /* Status tag */
+        .status-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border: 1px solid var(--border-gold);
+            color: var(--gold);
+            font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            padding: 80px 6% 50px;
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 60px;
+        }
+        .footer-brand .logo-text { font-family: var(--font-serif); font-size: 1.4rem; color: var(--gold); font-weight: 900; display: block; margin-bottom: 18px; letter-spacing: 3px; }
+        .footer-brand p { color: var(--dim); font-size: 0.85rem; line-height: 1.7; }
+        .footer-links h4 { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 24px; color: var(--text); font-weight: 900; }
+        .footer-links a { display: block; color: var(--dim); text-decoration: none; font-size: 0.82rem; margin-bottom: 12px; transition: color 0.2s; }
         .footer-links a:hover { color: var(--gold); }
+        .footer-bottom {
+            grid-column: 1 / -1;
+            padding-top: 40px; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 16px;
+        }
+        .footer-bottom .copyright { font-size: 0.68rem; color: var(--dim2); letter-spacing: 3px; text-transform: uppercase; }
+        .footer-social { display: flex; gap: 24px; }
+        .footer-social a { color: var(--dim); text-decoration: none; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
+        .footer-social a:hover { color: var(--gold); }
 
-        .copyright { grid-column: 1 / -1; padding-top: 80px; border-top: 1px solid var(--border); text-align: center; font-size: 0.75rem; color: #444; letter-spacing: 3px; text-transform: uppercase; }
+        /* Affiliate bar */
+        .affiliate-bar {
+            padding: 18px 6%;
+            background: #050508;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .affiliate-bar p { color: var(--dim2); font-size: 0.68rem; line-height: 1.6; max-width: 700px; }
+        .affiliate-bar a { color: var(--dim2); text-decoration: underline; }
+        .affiliate-links { display: flex; gap: 20px; flex-shrink: 0; }
+        .affiliate-links a { color: var(--dim2); text-decoration: none; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .affiliate-links a:hover { color: var(--gold); }
 
+        /* ── RESPONSIVE ── */
         @media (max-width: 1024px) {
-            h1 { font-size: 4rem; }
-            .grid { grid-template-columns: 1fr 1fr; }
+            .hero { grid-template-columns: 1fr; min-height: auto; padding: 80px 6%; }
+            .hero-right { display: none; }
+            .data-grid { grid-template-columns: 1fr 1fr; }
             footer { grid-template-columns: 1fr; gap: 40px; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; }
+        }
+        @media (max-width: 640px) {
+            .data-grid { grid-template-columns: 1fr; }
+            .nav-links { gap: 18px; }
+            .events-table-header, .event-row { grid-template-columns: 1fr; gap: 6px; padding: 18px 16px; }
+            .brand-strip { flex-wrap: wrap; gap: 14px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- NAV -->
     <nav>
-        
-        
-        
-        <a href="./" class="logo-group" style="display:flex; align-items:center; gap:15px; text-decoration:none;">
-            <div class="logo-mark" style="width:40px; height:40px; background:#000; border-radius:0; display:flex; align-items:center; justify-content:center; font-weight:900; color:#fff; font-size:1.6rem; font-family:'Playfair Display', serif;">E</div>
-            <div style="display:flex; flex-direction:column; gap:0;">
-                <span style="font-family:'Playfair Display', serif; font-size:1.3rem; font-weight:700; color:#000; letter-spacing:2px; text-transform:uppercase; line-height:1;">Essence</span>
-                <span style="font-family:'Playfair Display', serif; font-size:1.3rem; font-weight:700; color:#000; letter-spacing:2px; text-transform:uppercase; line-height:1;">Elite</span>
+        <a href="./" class="logo-group">
+            <div class="logo-mark">E</div>
+            <div style="display:flex;flex-direction:column;line-height:1.1;">
+                <span class="logo-text" style="font-size:0.85rem;">Essence</span>
+                <span class="logo-text" style="font-size:0.85rem;">Elite</span>
             </div>
         </a>
-
-
-
         <div class="nav-links">
             <a href="shop/">Collections</a>
-            <a href="/blogs/essenceelite/" target="_blank">Blog</a><a href="/essenceelite/events/" style="text-decoration:none; color:var(--gold); font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:0.75rem; margin-left:30px;">Events</a>
+            <a href="/blogs/essenceelite/" target="_blank">Blog</a>
+            <a href="/essenceelite/events/" class="nav-cta">Events</a>
             <a href="/brands/">The Network</a>
-            
         </div>
     </nav>
 
+    <!-- HERO -->
     <header class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-content">
-            <span class="label">Primary Origin</span>
+        <div class="hero-left">
+            <span class="label">Primary Origin · 2026</span>
             <h1>The Fragrance<br>Standard.</h1>
             <p>High-fidelity olfactive curation. Discover trending signatures and elite heritage brands for the 2026 cycle.</p>
-            <div class="btn-group">
-                <a href="shop/" class="btn">Explore Boutique</a><a href="https://www.amazon.com/s?k=perfume&tag=priscadezigns-20" class="btn" style="background:#FF9900; border-color:#FF9900; margin-left:15px;">Amazon Store</a>
-                <a href="/blogs/essenceelite/" target="_blank" class="btn btn-outline">Read Blog</a><a href="/essenceelite/events/" style="text-decoration:none; color:var(--gold); font-weight:700; letter-spacing:2px; text-transform:uppercase; font-size:0.75rem; margin-left:30px;">Events</a>
+            <div class="btn-row">
+                <a href="shop/" class="btn">Explore Boutique</a>
+                <a href="https://www.amazon.com/s?k=perfume&tag=priscadezigns-20" class="btn btn-amazon">Amazon Store</a>
+                <a href="/blogs/essenceelite/" target="_blank" class="btn-ghost">Read Blog</a>
+            </div>
+        </div>
+        <div class="hero-right">
+            <div class="hero-img-frame">
+                <img src="https://m.media-amazon.com/images/I/71xVLhLWrvL._AC_SL1500_.jpg" alt="Artisanal Fragrance">
+                <div class="hero-img-tag">Olfactive Intelligence · 2026</div>
             </div>
         </div>
     </header>
 
-    <div class="brands-strip">
-        <div class="brand-logo">Creed</div>
-        <div class="brand-logo">Le Labo</div>
-        <div class="brand-logo">Byredo</div>
-        <div class="brand-logo">Tom Ford</div>
-        <div class="brand-logo">Diptyque</div>
+    <!-- BRAND STRIP -->
+    <div class="brand-strip">
+        <span class="brand-strip-label">Featured Houses</span>
+        <div class="brand-strip-divider"></div>
+        <span class="brand-name">Creed</span>
+        <div class="brand-strip-divider"></div>
+        <span class="brand-name">Le Labo</span>
+        <div class="brand-strip-divider"></div>
+        <span class="brand-name">Byredo</span>
+        <div class="brand-strip-divider"></div>
+        <span class="brand-name">Tom Ford</span>
+        <div class="brand-strip-divider"></div>
+        <span class="brand-name">Diptyque</span>
     </div>
 
+    <!-- TRENDING — data grid -->
     <section class="section">
         <div class="section-header">
-            <span class="label">Trending Blog</span>
-            <h2>Olfactive Trends</h2>
+            <div class="section-header-left">
+                <span class="label">Trending Collections</span>
+                <h2>Olfactive Trends</h2>
+            </div>
+            <div style="text-align:right;">
+                <div class="section-header-meta">2026 Cycle</div>
+                <a href="shop/">View All →</a>
+            </div>
         </div>
-        <div class="grid">
-            <a href="shop/?q=creed" class="feature-card">
-                <div class="feature-img-box">
-                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&q=80" alt="Creed Aventus" style="width:100%;height:100%;object-fit:cover;">
+
+        <div class="data-grid">
+            <a href="shop/?q=creed" class="data-card">
+                <div class="data-card-meta">
+                    <span class="data-tag">Masculine · Heritage</span>
+                    <span class="data-index">01</span>
+                </div>
+                <div class="data-img">
+                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&q=80" alt="Creed Aventus">
                 </div>
                 <h3>Creed Aventus</h3>
                 <p>The 2026 standard for power and complexity. An elite signature for primary-origin lifestyles.</p>
-                <span class="feature-link">View Product →</span>
+                <span class="data-card-arrow">View Product →</span>
             </a>
-            <a href="shop/?q=lelabo" class="feature-card">
-                <div class="feature-img-box">
-                    <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&q=80" alt="Santal 33" style="width:100%;height:100%;object-fit:cover;">
+            <a href="shop/?q=lelabo" class="data-card">
+                <div class="data-card-meta">
+                    <span class="data-tag">Unisex · Molecular</span>
+                    <span class="data-index">02</span>
+                </div>
+                <div class="data-img">
+                    <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&q=80" alt="Santal 33">
                 </div>
                 <h3>Le Labo Santal 33</h3>
                 <p>Minimalist molecular intelligence. A trending signal of intellectual and olfactive clarity.</p>
-                <span class="feature-link">View Product →</span>
+                <span class="data-card-arrow">View Product →</span>
             </a>
-            <a href="shop/?q=parfums" class="feature-card">
-                <div class="feature-img-box">
-                    <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800&q=80" alt="Layton" style="width:100%;height:100%;object-fit:cover;">
+            <a href="shop/?q=parfums" class="data-card">
+                <div class="data-card-meta">
+                    <span class="data-tag">Heritage · Luxury</span>
+                    <span class="data-index">03</span>
+                </div>
+                <div class="data-img">
+                    <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800&q=80" alt="Layton">
                 </div>
                 <h3>Parfums de Marly</h3>
                 <p>Heritage luxury meets modern projection. High-fidelity compositions for elite events.</p>
-                <span class="feature-link">View Product →</span>
+                <span class="data-card-arrow">View Product →</span>
             </a>
         </div>
     </section>
 
-    <section class="section" style="background: #0D0D14; border-top: 1px solid var(--border);">
+    <!-- EVENTS — spreadsheet table layout -->
+    <section class="section section-alt">
         <div class="section-header">
-            <span class="label">Elite Experiences</span>
-            <h2>Luxury Events</h2>
+            <div class="section-header-left">
+                <span class="label">Elite Experiences</span>
+                <h2>Luxury Events</h2>
+            </div>
+            <div style="text-align:right;">
+                <div class="section-header-meta">Global Calendar</div>
+                <a href="/essenceelite/events/">All Events →</a>
+            </div>
         </div>
-        <div class="grid">
-            <a href="https://www.perfume-week.com/en/" target="_blank" rel="noopener" class="feature-card">
-                <h3>Paris Perfume Week 2026</h3>
-                <p>The definitive olfactory cultural movement by NEZ. A celebration of global scent culture at Palais Brongniart.</p>
-                <span class="feature-link">Official Event →</span>
+
+        <div class="events-table">
+            <div class="events-table-header">
+                <span>Event</span>
+                <span>Category</span>
+                <span>Access</span>
+            </div>
+            <a href="https://www.perfume-week.com/en/" target="_blank" rel="noopener" class="event-row">
+                <div>
+                    <div class="event-name">Paris Perfume Week 2026</div>
+                    <div class="event-desc">The definitive olfactory cultural movement by NEZ. A celebration of global scent culture at Palais Brongniart.</div>
+                </div>
+                <div class="event-type">Cultural / Live</div>
+                <div class="event-link">Official Event →</div>
             </a>
-            <a href="https://www.fragranceinnovation.com/en/" target="_blank" rel="noopener" class="feature-card">
-                <h3>Fragrance Innovation Summit</h3>
-                <p>Strategic insights on market trends, emerging technologies, and the future of olfactive intelligence.</p>
-                <span class="feature-link">Official Summit →</span>
+            <a href="https://www.fragranceinnovation.com/en/" target="_blank" rel="noopener" class="event-row">
+                <div>
+                    <div class="event-name">Fragrance Innovation Summit</div>
+                    <div class="event-desc">Strategic insights on market trends, emerging technologies, and the future of olfactive intelligence.</div>
+                </div>
+                <div class="event-type">Summit / B2B</div>
+                <div class="event-link">Official Summit →</div>
             </a>
-            <a href="https://fragrance.org/" target="_blank" rel="noopener" class="feature-card">
-                <h3>The Fragrance Foundation</h3>
-                <p>Access the global dialogue on fragrance awards, community, and olfactive heritage.</p>
-                <span class="feature-link">Official Foundation →</span>
+            <a href="https://fragrance.org/" target="_blank" rel="noopener" class="event-row">
+                <div>
+                    <div class="event-name">The Fragrance Foundation</div>
+                    <div class="event-desc">Access the global dialogue on fragrance awards, community, and olfactive heritage.</div>
+                </div>
+                <div class="event-type">Foundation / Awards</div>
+                <div class="event-link">Official Foundation →</div>
             </a>
         </div>
     </section>
 
+    <!-- FOOTER -->
     <footer>
         <div class="footer-brand">
             <span class="logo-text">ESSENCE ELITE</span>
@@ -206,24 +504,32 @@
         <div class="footer-links">
             <h4>Intelligence</h4>
             <a href="shop/">The Boutique</a>
-            <a href="/blogs/essenceelite/" target="_blank">Blog (Blog)</a>
+            <a href="/blogs/essenceelite/" target="_blank">Blog</a>
             <a href="/brands/">The Network</a>
-            
         </div>
-        <div class="copyright">
-            &copy; 2026 ESSENCE ELITE | MANAGED BY THE NETWORK HUB
+        <div class="footer-links">
+            <h4>Events</h4>
+            <a href="/essenceelite/events/">All Events</a>
+            <a href="https://www.perfume-week.com/en/" target="_blank" rel="noopener">Paris Perfume Week</a>
+            <a href="https://fragrance.org/" target="_blank" rel="noopener">Fragrance Foundation</a>
         </div>
-      <div style="text-align:center;padding:16px 0;border-top:1px solid rgba(255,255,255,0.1);margin-top:16px;">
-    <a href="https://www.facebook.com/priscilla.narine/" target="_blank" rel="noopener" style="margin:0 12px;color:inherit;text-decoration:none;">Facebook</a>
-    <a href="https://www.instagram.com/prisca.adaa/" target="_blank" rel="noopener" style="margin:0 12px;color:inherit;text-decoration:none;">Instagram</a>
-    <a href="https://www.threads.net/@prisca.adaa" target="_blank" rel="noopener" style="margin:0 12px;color:inherit;text-decoration:none;">Threads</a>
-  </div>
-</footer>
-    <div style="padding: 20px 6%; background: #050508; color: #666; font-size: 0.7rem; text-align: center; border-top: 1px solid var(--border);">
-        <p>Essence Elite is a participant in the Amazon Services LLC Associates Program. As an Amazon Associate, we earn from qualifying purchases at no additional cost to you.</p>
-        <p style="margin-top:10px;"><a href="/privacy-policy/" style="color:inherit;text-decoration:underline;">Privacy Policy</a> | <a href="/terms/" style="color:inherit;text-decoration:underline;">Terms of Service</a></p>
-    </div>
+        <div class="footer-bottom">
+            <span class="copyright">&copy; 2026 ESSENCE ELITE | MANAGED BY THE NETWORK HUB</span>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/priscilla.narine/" target="_blank" rel="noopener">Facebook</a>
+                <a href="https://www.instagram.com/prisca.adaa/" target="_blank" rel="noopener">Instagram</a>
+                <a href="https://www.threads.net/@prisca.adaa" target="_blank" rel="noopener">Threads</a>
+            </div>
+        </div>
+    </footer>
 
+    <div class="affiliate-bar">
+        <p>Essence Elite is a participant in the Amazon Services LLC Associates Program. As an Amazon Associate, we earn from qualifying purchases at no additional cost to you.</p>
+        <div class="affiliate-links">
+            <a href="/privacy-policy/">Privacy Policy</a>
+            <a href="/terms/">Terms</a>
+        </div>
+    </div>
 
 <!-- START UNIFIED PAYMENT MODAL -->
 <div id="payModal" class="modal-overlay">
@@ -231,20 +537,17 @@
     <span class="modal-close-btn" onclick="closePayModal()">✕</span>
     <h2 id="modal-title" style="margin-top: 0; margin-bottom: 5px; font-family: inherit; font-size: 1.5rem;">Secure Payment</h2>
     <p style="font-size: 0.85rem; color: #666; margin-bottom: 20px;">Reference: <span id="payment-ref" style="font-weight: bold; color: #000; font-family: monospace;"></span></p>
-    
     <div class="modal-tab-container">
       <button class="modal-tab-btn active" onclick="togglePayTab('paypal', this)">PayPal</button>
       <button class="modal-tab-btn" onclick="togglePayTab('bank', this)">Bank Transfer</button>
       <button class="modal-tab-btn" onclick="togglePayTab('crypto', this)">Crypto</button>
     </div>
-
     <div id="pay-paypal" class="pay-panel active">
       <div style="text-align: center; padding: 15px 0;">
         <p style="margin-bottom: 15px; font-size: 0.95rem;">Pay securely with your PayPal balance or credit card.</p>
         <a href="https://paypal.me/priscadezigns" target="_blank" class="pay-btn-primary" style="background: #0070ba;">Proceed to PayPal</a>
       </div>
     </div>
-
     <div id="pay-bank" class="pay-panel">
       <div class="pay-data-card">
         <p><strong>Beneficiary:</strong> Prisca Dezigns</p>
@@ -255,7 +558,6 @@
         <p style="margin-top: 10px; font-size: 0.75rem; color: #888;">(US Payoneer Account)</p>
       </div>
     </div>
-
     <div id="pay-crypto" class="pay-panel">
       <div class="crypto-row">
         <label>BTC Address</label>
@@ -337,12 +639,7 @@
 </script>
 <!-- END UNIFIED PAYMENT MODAL -->
 
-<div id="sidebar" class="sidebar"><div class="sidebar-header"><h2 style="font-size:1.1rem; margin:0; font-weight: 900;">PRISCION WALLET</h2><button onclick="toggleSidebar()" class="close-btn">&times;</button></div><div class="sidebar-tabs"><button id="tab-assets" onclick="switchWalletTabCore('assets')">Assets</button><button id="tab-vault" onclick="switchWalletTabCore('vault')">Vault</button><button id="tab-shop" onclick="switchWalletTabCore('shop')">Hub</button><button id="tab-sync" onclick="switchWalletTabCore('sync')">Security</button></div><div id="wallet-main-view"></div></div><script src="wallet-core.js"></script><script>function toggleSidebar(){ const s=document.getElementById('sidebar'); s.classList.toggle('active'); if(s.classList.contains('active')){ if(typeof initializeWallet==='function') initializeWallet('sidebar'); } }</script></body>
+<div id="sidebar" class="sidebar"><div class="sidebar-header"><h2 style="font-size:1.1rem; margin:0; font-weight: 900;">PRISCION WALLET</h2><button onclick="toggleSidebar()" class="close-btn">&times;</button></div><div class="sidebar-tabs"><button id="tab-assets" onclick="switchWalletTabCore('assets')">Assets</button><button id="tab-vault" onclick="switchWalletTabCore('vault')">Vault</button><button id="tab-shop" onclick="switchWalletTabCore('shop')">Hub</button><button id="tab-sync" onclick="switchWalletTabCore('sync')">Security</button></div><div id="wallet-main-view"></div></div><script src="wallet-core.js"></script><script>function toggleSidebar(){ const s=document.getElementById('sidebar'); s.classList.toggle('active'); if(s.classList.contains('active')){ if(typeof initializeWallet==='function') initializeWallet('sidebar'); } }</script>
+
+</body>
 </html>
-
-
-
-
-
-
-
