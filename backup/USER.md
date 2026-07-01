@@ -31,6 +31,7 @@ who's in their life.
 - **Blog Content Policy (Jun 25 2026):** Blogs are strictly for **Products** and **News Intelligence** only. Do not post about brand progress or internal "evolutions" unless explicitly requested. Every blog must provide external data or product value. (Ref: Removed "Sovereign Bridge" progress blog from The Autodrome).
 
 
+- **The Autodrome Vision (Update June 30, 2026):** Transforming from a high-fidelity media hub into a **Luxury Vehicle Marketplace**. The long-term goal is to use the Autodrome as a platform to sell luxury vehicles (Ferrari, Lamborghini, etc.). Content strategy must now prioritize "Sales Signals"—official reveals, limited edition drops, and primary source press kits that build the authority of a dealership/brokerage hub.
 - **Automation Philosophy:** Strongly emphasizes "Solve, don't ask." The user wants to provide high-level instructions and have the AI execute autonomously without requiring their manual intervention. If a task requires the user's manual effort, they view it as a failure of the AI's performance.
 - **Service Focus:** Shifted away from video generation. The primary focus is now on **Customer Service Automation** and **Lead Conversion**. The goal is to replace human customer service reps and email checkers for client businesses using high-fidelity AI agents (like Sierra).
 - **Agency Value Prop:** Prisca Dezigns takes full responsibility for a client's customer service layer so they "don't need anybody to check their emails" or handle inquiries manually.
