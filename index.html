@@ -984,22 +984,24 @@
         });
         window.addEventListener('mouseup', () => { isDragging = false; });
 
-        // High-fidelity touch sensitivity update
-        let touchStartY = 0;
+        // Touch — one clean swipe per gesture, no glitch
+        let touchStartY = 0, touchStartX = 0, touchHandled = false;
         window.addEventListener('touchstart', (e) => {
             touchStartY = e.touches[0].clientY;
+            touchStartX = e.touches[0].clientX;
+            touchHandled = false;
         }, { passive: true });
 
         window.addEventListener('touchmove', (e) => {
-            if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
-            
+            if (isAnimating || touchHandled || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
             const touchY = e.touches[0].clientY;
+            const touchX = e.touches[0].clientX;
             const dy = touchStartY - touchY;
-            const TOUCH_THRESHOLD = 20; // Sensitive light flick
-
-            if (Math.abs(dy) >= TOUCH_THRESHOLD) {
+            const dx = Math.abs(touchStartX - touchX);
+            const TOUCH_THRESHOLD = 45;
+            if (Math.abs(dy) >= TOUCH_THRESHOLD && Math.abs(dy) > dx) {
+                touchHandled = true;
                 rotateSlices(dy > 0 ? 'next' : 'prev');
-                touchStartY = touchY; // Reset starting point for fluid swiping
             }
         }, { passive: true });
 
