@@ -491,8 +491,6 @@
             }
             .footer-info { font-size: 0.6rem; max-width: 200px; margin: 0 auto; line-height: 1.3; }
             #interaction-guide { margin-bottom: 10px !important; font-size: 0.5rem; }
-            #mobile-leaking-btn { display:block !important; }
-            main { align-items:center; }
             
             .back-to-home { top: 15px; right: 15px; font-size: 0.55rem; padding: 8px 20px; }
             
@@ -592,10 +590,6 @@
                 <a href="https://priscadezigns.org/privacy.html" style="pointer-events: auto; display: block; text-align: center; color: var(--accent); font-size: 0.65rem; font-weight: 900; letter-spacing: 3px; text-decoration: none; text-transform: uppercase; font-family: var(--font-body); margin-bottom: 20px;">Privacy</a>
             </div>
             <div id="canvas-container"></div>
-            <!-- Mobile-only leads banner -->
-            <a href="services/" id="mobile-leaking-btn" style="display:none;background:#E53935;color:#FFFFF0;text-align:center;padding:9px 16px;font-size:0.6rem;font-weight:900;letter-spacing:0.16em;text-decoration:none;text-transform:uppercase;border-radius:4px;margin-bottom:12px;">
-              ⚡ YOUR LEADS ARE LEAKING → FIX IT NOW
-            </a>
             <div id="scroll-indicator"></div>
             <div id="mobile-menu"></div>
         </section>
@@ -834,8 +828,7 @@
         ];
 
         let currentIndex = 0;
-        let isAnimating = false;
-        const isMobile = /Mobi|Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0); 
+        let isAnimating = false; 
         const searchInput = document.getElementById('neural-search');
         const searchResults = document.getElementById('search-results');
         searchInput.oninput = (e) => {
@@ -864,7 +857,6 @@
             const direction = dir === 'next' ? 1 : -1;
             currentIndex = (currentIndex + direction + brands.length) % brands.length;
             gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * direction), duration: 0.8, ease: "power2.out", onComplete: () => { isAnimating = false; } });
-            setTimeout(() => { isAnimating = false; }, 1000);
             updateUI(currentIndex);
         }
 
@@ -992,41 +984,29 @@
         });
         window.addEventListener('mouseup', () => { isDragging = false; });
 
-        // Touch — robust single-swipe, measured on touchend only
-        let touchStartY = 0, touchStartX = 0;
+        // High-fidelity touch sensitivity update
+        let touchStartY = 0;
         window.addEventListener('touchstart', (e) => {
-            touchStartY = e.changedTouches[0].clientY;
-            touchStartX = e.changedTouches[0].clientX;
+            touchStartY = e.touches[0].clientY;
         }, { passive: true });
 
-        window.addEventListener('touchend', (e) => {
+        window.addEventListener('touchmove', (e) => {
             if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
-            const touchEndY = e.changedTouches[0].clientY;
-            const touchEndX = e.changedTouches[0].clientX;
-            const dy = touchStartY - touchEndY;
-            const dx = Math.abs(touchStartX - touchEndX);
-            const TOUCH_THRESHOLD = 30;
-            // Only fire on clear vertical swipe, not horizontal scroll
-            if (Math.abs(dy) >= TOUCH_THRESHOLD && Math.abs(dy) > dx) {
+            
+            const touchY = e.touches[0].clientY;
+            const dy = touchStartY - touchY;
+            const TOUCH_THRESHOLD = 20; // Sensitive light flick
+
+            if (Math.abs(dy) >= TOUCH_THRESHOLD) {
                 rotateSlices(dy > 0 ? 'next' : 'prev');
+                touchStartY = touchY; // Reset starting point for fluid swiping
             }
         }, { passive: true });
 
         let wheelAccumulator = 0;
         const WHEEL_THRESHOLD = 25; // Reduced from default behavior for higher sensitivity
 
-        // Block wheel events that originate from touch (desktop mode on phone)
-        let touchActive = false, touchCooldown = null;
-        window.addEventListener('touchstart', () => {
-            touchActive = true;
-            clearTimeout(touchCooldown);
-        }, { passive: true });
-        window.addEventListener('touchend', () => {
-            touchCooldown = setTimeout(() => { touchActive = false; }, 700);
-        }, { passive: true });
-
         window.addEventListener('wheel', (e) => { 
-            if (touchActive) return; // Block wheel during/after touch gesture
             if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
             
             wheelAccumulator += e.deltaY;
