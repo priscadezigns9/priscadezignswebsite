@@ -337,7 +337,7 @@
 
     <!-- NAV -->
     <nav>
-        <a class="nav-logo" href="/">Prisca Dezigns</a>
+        <a class="nav-logo" href="/"><img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="Prisca Dezigns" style="height:48px;width:auto;display:block;"></a>
         <a class="nav-back" href="/">← Back to Globe</a>
     </nav>
 
@@ -482,12 +482,281 @@
             Tell us about your business. We'll show you exactly 
             where the system breaks down and what it takes to fix it.
         </p>
-        <a href="/#packages" class="final-cta-btn">
+        <a href="/#packages" class="final-cta-btn" id="get-started-btn">
             Get Started Today
             <span>→</span>
         </a>
         <div class="final-cta-note">No commitment. No fluff. Just a real conversation.</div>
     </section>
+
+
+    <!-- ── CHATBOT ───────────────────────────────────────────────── -->
+    <style>
+        #pd-chat-bubble {
+            position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+            width: 58px; height: 58px; border-radius: 50%;
+            background: var(--purple);
+            border: 2px solid var(--lilac);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(48,25,52,0.25);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #pd-chat-bubble:hover {
+            transform: scale(1.08);
+            box-shadow: 0 12px 40px rgba(48,25,52,0.35);
+        }
+        #pd-chat-bubble svg { width: 24px; height: 24px; fill: var(--lilac); }
+        #pd-chat-bubble .chat-close { display: none; font-size: 1.4rem; color: var(--lilac); font-weight: 700; line-height: 1; }
+        #pd-chat-bubble.open svg { display: none; }
+        #pd-chat-bubble.open .chat-close { display: block; }
+
+        #pd-chat-window {
+            position: fixed; bottom: 100px; right: 28px; z-index: 9998;
+            width: 360px; max-height: 520px;
+            background: var(--ivory);
+            border: 1px solid rgba(48,25,52,0.12);
+            box-shadow: 0 24px 60px rgba(48,25,52,0.18);
+            display: flex; flex-direction: column;
+            opacity: 0; pointer-events: none;
+            transform: translateY(16px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        #pd-chat-window.open {
+            opacity: 1; pointer-events: all;
+            transform: translateY(0);
+        }
+        .chat-header {
+            background: var(--purple);
+            padding: 18px 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .chat-header-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: var(--lilac);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 900; color: var(--purple);
+            font-family: var(--font-heading);
+            flex-shrink: 0;
+        }
+        .chat-header-info { flex: 1; }
+        .chat-header-name {
+            font-size: 0.82rem; font-weight: 700;
+            letter-spacing: 0.1em; color: var(--ivory);
+        }
+        .chat-header-status {
+            font-size: 0.68rem; color: var(--lilac);
+            display: flex; align-items: center; gap: 5px; margin-top: 2px;
+        }
+        .status-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #4ade80;
+            animation: pulse-green 2s ease-in-out infinite;
+        }
+        @keyframes pulse-green {
+            0%,100% { opacity:1; } 50% { opacity:0.4; }
+        }
+        .chat-messages {
+            flex: 1; overflow-y: auto;
+            padding: 20px 16px; display: flex;
+            flex-direction: column; gap: 12px;
+            max-height: 300px;
+        }
+        .chat-messages::-webkit-scrollbar { width: 4px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--lilac); border-radius: 4px; }
+        .msg {
+            max-width: 80%; font-size: 0.82rem; line-height: 1.6;
+            padding: 10px 14px;
+            animation: fadeUp 0.2s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(6px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .msg.bot {
+            background: var(--purple); color: var(--ivory);
+            align-self: flex-start; border-radius: 0 12px 12px 12px;
+        }
+        .msg.user {
+            background: var(--lilac); color: var(--purple);
+            align-self: flex-end; border-radius: 12px 12px 0 12px;
+            font-weight: 600;
+        }
+        .chat-quick-replies {
+            padding: 8px 16px 12px;
+            display: flex; flex-wrap: wrap; gap: 7px;
+        }
+        .qr-btn {
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.08em; padding: 7px 14px;
+            border: 1px solid rgba(48,25,52,0.25);
+            background: transparent; cursor: pointer;
+            color: var(--purple); border-radius: 100px;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+            font-family: var(--font-body);
+        }
+        .qr-btn:hover {
+            background: var(--purple); color: var(--ivory);
+            border-color: var(--purple);
+        }
+        .chat-input-row {
+            display: flex; border-top: 1px solid rgba(48,25,52,0.1);
+        }
+        #chat-input {
+            flex: 1; border: none; background: transparent;
+            padding: 14px 16px; font-size: 0.82rem;
+            font-family: var(--font-body); color: var(--purple);
+            outline: none;
+        }
+        #chat-input::placeholder { color: rgba(48,25,52,0.35); }
+        #chat-send {
+            background: var(--purple); border: none; cursor: pointer;
+            padding: 0 18px; color: var(--lilac);
+            font-size: 1.1rem; transition: background 0.2s;
+        }
+        #chat-send:hover { background: var(--lilac); color: var(--purple); }
+
+        @media (max-width: 480px) {
+            #pd-chat-window { width: calc(100vw - 20px); right: 10px; bottom: 90px; }
+        }
+    </style>
+
+    <!-- Bubble -->
+    <div id="pd-chat-bubble" onclick="toggleChat()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+        </svg>
+        <span class="chat-close">✕</span>
+    </div>
+
+    <!-- Window -->
+    <div id="pd-chat-window">
+        <div class="chat-header">
+            <div class="chat-header-avatar">P</div>
+            <div class="chat-header-info">
+                <div class="chat-header-name">Prisca Dezigns</div>
+                <div class="chat-header-status">
+                    <div class="status-dot"></div> Online now
+                </div>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-quick-replies" id="quick-replies"></div>
+        <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMsg()" />
+            <button id="chat-send" onclick="sendMsg()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        const BOT_FLOWS = {
+            start: {
+                msg: "Hey 👋 I'm here to help. Are you looking to grow your business online?",
+                replies: ["Yes, I need a website", "I need more leads", "Tell me about automation", "What do you charge?"]
+            },
+            "Yes, I need a website": {
+                msg: "Great choice. A high-fidelity website is the first step to building authority online. We design websites that rank, load fast, and convert visitors into real inquiries. Want to see our packages?",
+                replies: ["See packages", "How long does it take?", "Talk to someone"]
+            },
+            "I need more leads": {
+                msg: "That's exactly what we solve. Our lead automation system qualifies every enquiry the second it comes in — so only serious buyers reach you. No more chasing time-wasters.",
+                replies: ["How does it work?", "See packages", "Talk to someone"]
+            },
+            "Tell me about automation": {
+                msg: "We build AI systems that respond to your leads 24/7, filter out browsers from buyers, and follow up automatically until they're ready to pay. You focus on closing — the system handles the rest.",
+                replies: ["I want this", "What's the cost?", "See packages"]
+            },
+            "What do you charge?": {
+                msg: "Our packages start from entry-level and scale to full enterprise automation. Click below to see exactly what's included at each tier.",
+                replies: ["See packages", "Talk to someone"]
+            },
+            "See packages": {
+                msg: "Taking you to our packages now 👇",
+                replies: [],
+                action: () => { window.location.href = "/#packages"; }
+            },
+            "How long does it take?": {
+                msg: "Most websites are delivered within 7–14 days. Automation systems take 2–4 weeks depending on complexity. We work fast without cutting corners.",
+                replies: ["See packages", "Talk to someone"]
+            },
+            "How does it work?": {
+                msg: "We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, and routes only serious buyers to you. Everything else is handled automatically.",
+                replies: ["I want this", "See packages", "Talk to someone"]
+            },
+            "What's the cost?": {
+                msg: "Packages start from entry level with a monthly Pulse fee for automation maintenance. See the full breakdown below.",
+                replies: ["See packages", "Talk to someone"]
+            },
+            "I want this": {
+                msg: "Perfect. Let's get you set up. Click 'Get Started' to see the packages, or reach out directly.",
+                replies: ["See packages", "Talk to someone"]
+            },
+            "Talk to someone": {
+                msg: "Absolutely. Send us a message at priscadezigns.org or WhatsApp us directly at +1 (868) 342-4101. We'll get back to you fast.",
+                replies: ["See packages", "Start over"]
+            },
+            "Start over": {
+                msg: "No problem! What can I help you with?",
+                replies: ["Yes, I need a website", "I need more leads", "Tell me about automation", "What do you charge?"]
+            }
+        };
+
+        let chatOpen = false;
+        let chatStarted = false;
+
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            document.getElementById('pd-chat-bubble').classList.toggle('open', chatOpen);
+            document.getElementById('pd-chat-window').classList.toggle('open', chatOpen);
+            if (chatOpen && !chatStarted) {
+                chatStarted = true;
+                setTimeout(() => runFlow('start'), 400);
+            }
+        }
+
+        function runFlow(key) {
+            const flow = BOT_FLOWS[key];
+            if (!flow) return;
+            addMsg(flow.msg, 'bot');
+            const qr = document.getElementById('quick-replies');
+            qr.innerHTML = '';
+            if (flow.action) { setTimeout(flow.action, 900); return; }
+            flow.replies.forEach(r => {
+                const btn = document.createElement('button');
+                btn.className = 'qr-btn';
+                btn.textContent = r;
+                btn.onclick = () => {
+                    qr.innerHTML = '';
+                    addMsg(r, 'user');
+                    setTimeout(() => runFlow(r), 600);
+                };
+                qr.appendChild(btn);
+            });
+        }
+
+        function addMsg(text, type) {
+            const msgs = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'msg ' + type;
+            div.textContent = text;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function sendMsg() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            addMsg(text, 'user');
+            setTimeout(() => {
+                addMsg("Thanks for reaching out! For a quick response, WhatsApp us at +1 (868) 342-4101 or fill out the form at priscadezigns.org.", 'bot');
+            }, 700);
+        }
+
+        // Auto-open after 8s
+        setTimeout(() => { if (!chatOpen) toggleChat(); }, 8000);
+    </script>
 
 </body>
 </html>
