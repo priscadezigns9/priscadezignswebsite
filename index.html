@@ -577,10 +577,6 @@
                 </header>
 
                 <main>
-                        <!-- Mobile-only leads banner -->
-                        <a href="services/" id="mobile-leaking-btn" style="display:none;background:#E53935;color:#FFFFF0;text-align:center;padding:9px 16px;font-size:0.6rem;font-weight:900;letter-spacing:0.16em;text-decoration:none;text-transform:uppercase;border-radius:4px;margin-bottom:12px;">
-                          ⚡ YOUR LEADS ARE LEAKING → FIX IT NOW
-                        </a>
                         <div class="brand-text-content">
                             <div class="brand-label" id="current-sector">SYSTEM ENTRY</div>
                             <h1 id="current-brand">BRAND SCAN</h1>
@@ -834,7 +830,8 @@
         ];
 
         let currentIndex = 0;
-        let isAnimating = false; 
+        let isAnimating = false;
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0); 
         const searchInput = document.getElementById('neural-search');
         const searchResults = document.getElementById('search-results');
         searchInput.oninput = (e) => {
@@ -1015,6 +1012,8 @@
         const WHEEL_THRESHOLD = 25; // Reduced from default behavior for higher sensitivity
 
         window.addEventListener('wheel', (e) => { 
+            // Disable on touch/mobile devices — use touchend instead
+            if (isMobile) return;
             if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
             
             wheelAccumulator += e.deltaY;
@@ -1032,6 +1031,14 @@
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobile-menu');
         
+        // Add Leads CTA at top of mobile menu
+        const leadsItem = document.createElement('a');
+        leadsItem.href = 'services/';
+        leadsItem.className = 'mobile-menu-item';
+        leadsItem.textContent = '⚡ YOUR LEADS ARE LEAKING';
+        leadsItem.style.cssText = 'color:#E53935;font-weight:900;';
+        mobileMenu.appendChild(leadsItem);
+
         brands.forEach((brand, index) => {
             const item = document.createElement('div');
             item.className = 'mobile-menu-item';
