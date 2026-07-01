@@ -990,23 +990,22 @@
         });
         window.addEventListener('mouseup', () => { isDragging = false; });
 
-        // Touch — one clean swipe per gesture, no glitch
-        let touchStartY = 0, touchStartX = 0, touchHandled = false;
+        // Touch — robust single-swipe, measured on touchend only
+        let touchStartY = 0, touchStartX = 0;
         window.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
-            touchStartX = e.touches[0].clientX;
-            touchHandled = false;
+            touchStartY = e.changedTouches[0].clientY;
+            touchStartX = e.changedTouches[0].clientX;
         }, { passive: true });
 
-        window.addEventListener('touchmove', (e) => {
-            if (isAnimating || touchHandled || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
-            const touchY = e.touches[0].clientY;
-            const touchX = e.touches[0].clientX;
-            const dy = touchStartY - touchY;
-            const dx = Math.abs(touchStartX - touchX);
-            const TOUCH_THRESHOLD = 45;
-            if (Math.abs(dy) >= TOUCH_THRESHOLD && Math.abs(dy) > dx) {
-                touchHandled = true;
+        window.addEventListener('touchend', (e) => {
+            if (isAnimating || modal.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
+            const touchEndY = e.changedTouches[0].clientY;
+            const touchEndX = e.changedTouches[0].clientX;
+            const dy = touchStartY - touchEndY;
+            const dx = Math.abs(touchStartX - touchEndX);
+            const TOUCH_THRESHOLD = 40;
+            // Only fire on clear vertical swipe, not horizontal scroll
+            if (Math.abs(dy) >= TOUCH_THRESHOLD && Math.abs(dy) > dx * 1.5) {
                 rotateSlices(dy > 0 ? 'next' : 'prev');
             }
         }, { passive: true });
