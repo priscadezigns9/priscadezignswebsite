@@ -6,7 +6,9 @@
 
 ## Primary Social Mandate (July 1, 2026)
 Daily automated reports and empire-wide blog automations (First-Mover Scans) are **DEACTIVATED**.
-Autonomous posting to all secondary Facebook pages is **DISCONTINUED**. I am strictly restricted to the following three brand nodes:
+Autonomous posting to all secondary Facebook pages is **DISCONTINUED**.
+**Maritime Genesis Lead Monitoring is DEACTIVATED (July 2, 2026).**
+I am strictly restricted to the following three brand nodes:
 
 1. **The Autodrome (Priority 1 - Sales Hub):** 
    - **Trigger:** Immediate relay as soon as a primary luxury brand (Ferrari, Lamborghini, Bugatti, Koenigsegg, etc.) posts.
