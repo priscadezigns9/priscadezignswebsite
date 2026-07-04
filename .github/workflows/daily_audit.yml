@@ -1,0 +1,56 @@
+name: Daily Site Audit
+
+on:
+  schedule:
+    # Runs daily at 7:00 AM Trinidad time (11:00 UTC)
+    - cron: "0 11 * * *"
+  workflow_dispatch: {} # lets you trigger it manually from the Actions tab
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run audit
+        id: audit
+        run: |
+          set +e
+          python3 scripts/daily_audit.py | tee report.md
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Open issue if problems found
+        if: steps.audit.outputs.exit_code != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('report.md', 'utf8');
+            const today = new Date().toISOString().slice(0, 10);
+            // Avoid duplicate open issues: reuse one titled "Site Audit Alert"
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'site-audit'
+            });
+            if (issues.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues.data[0].number,
+                body: `## Audit re-run ${today}\n\n${body}`
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Site Audit Alert — ${today}`,
+                body: body,
+                labels: ['site-audit']
+              });
+            }
