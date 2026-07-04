@@ -1026,13 +1026,29 @@
         leadForm.onsubmit = async (e) => {
             e.preventDefault();
             submitBtn.disabled = true; submitBtn.innerText = "SENDING...";
-            const data = {
-                name: document.getElementById('user-name').value,
-                email: document.getElementById('user-email').value,
-                package: document.getElementById('target-package').value,
-                brand: "Prisca Dezigns"
-            };
+            const name = document.getElementById('user-name').value;
+            const email = document.getElementById('user-email').value;
+            const pkg = document.getElementById('target-package').value;
+            const data = { name, email, package: pkg, brand: "Prisca Dezigns" };
+
+            // Save to Supabase
             const { error } = await supabaseClient.from('client_leads').insert([data]);
+
+            // Fire FormSubmit email notification (silent, no redirect)
+            try {
+                const fsData = new FormData();
+                fsData.append('name', name);
+                fsData.append('email', email);
+                fsData.append('package', pkg);
+                fsData.append('source', 'priscadezigns.org');
+                fsData.append('_captcha', 'false');
+                fsData.append('_template', 'table');
+                await fetch('https://formsubmit.co/priscillanarine@gmail.com', {
+                    method: 'POST',
+                    body: fsData
+                });
+            } catch(fsErr) { /* silent fail */ }
+
             if (error) {
                 formMsg.style.color = "#EF4444"; formMsg.innerText = "ERROR: UPLINK FAILED.";
                 submitBtn.disabled = false; submitBtn.innerText = "TRY AGAIN";
