@@ -2539,5 +2539,245 @@
   }
 })();
 </script>
+
+<!-- PANTRIQ CHATBOT -->
+<style>
+  #pq-chat{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:'Inter',sans-serif;}
+  #pq-chat-win{width:330px;background:#fff;border-radius:20px;overflow:hidden;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(27,42,74,0.2);border:1px solid rgba(212,175,55,0.2);}
+  #pq-chat-win.open{display:flex;}
+  .pq-head{background:linear-gradient(135deg,#1B2A4A,#2E4A7A);padding:14px 16px;display:flex;align-items:center;gap:10px;}
+  .pq-av{width:38px;height:38px;border-radius:50%;background:rgba(212,175,55,0.2);border:2px solid #D4AF37;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#D4AF37;flex-shrink:0;}
+  .pq-head-info h4{font-size:0.88rem;color:#fff;font-weight:700;margin:0;}
+  .pq-head-info p{font-size:0.7rem;color:rgba(255,255,255,0.65);margin:0;}
+  .pq-close{margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:1.2rem;line-height:1;padding:0;}
+  .pq-msgs{padding:14px;display:flex;flex-direction:column;gap:10px;max-height:280px;overflow-y:auto;background:#F8F7F4;}
+  .pq-msg{padding:10px 13px;border-radius:14px;font-size:0.83rem;line-height:1.55;max-width:88%;white-space:pre-wrap;}
+  .pq-msg.bot{background:#fff;color:#1B2A4A;border:1px solid rgba(212,175,55,0.2);align-self:flex-start;border-bottom-left-radius:4px;}
+  .pq-msg.usr{background:linear-gradient(135deg,#1B2A4A,#2E4A7A);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+  .pq-btns{padding:10px 12px;display:flex;flex-wrap:wrap;gap:7px;background:#fff;border-top:1px solid #F0EDE5;}
+  .pq-btn{background:#fff;border:1px solid rgba(212,175,55,0.5);color:#1B2A4A;padding:7px 11px;border-radius:20px;font-size:0.78rem;font-weight:600;cursor:pointer;text-align:left;transition:all .2s;line-height:1.3;}
+  .pq-btn:hover{background:#D4AF37;color:#fff;border-color:#D4AF37;}
+  .pq-btn.back{background:#F8F7F4;color:#888;border-color:#e0ddd5;font-size:0.72rem;}
+  .pq-btn.back:hover{background:#e0ddd5;color:#555;}
+  .pq-inp-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #F0EDE5;background:#fff;}
+  .pq-inp{flex:1;border:1px solid #e0ddd5;border-radius:20px;padding:8px 14px;font-size:0.82rem;outline:none;font-family:inherit;color:#1B2A4A;}
+  .pq-inp:focus{border-color:#D4AF37;}
+  .pq-send{background:linear-gradient(135deg,#D4AF37,#E8C84A);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .pq-send svg{width:16px;height:16px;fill:#fff;}
+  #pq-toggle-outer{display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;}
+  #pq-toggle-outer .pq-label{font-size:10px;font-weight:800;letter-spacing:1px;color:#fff;background:rgba(27,42,74,0.9);padding:3px 9px;border-radius:100px;backdrop-filter:blur(4px);}
+  .pq-toggle{width:54px;height:54px;background:linear-gradient(135deg,#1B2A4A,#2E4A7A);border:2px solid #D4AF37;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(27,42,74,0.35);transition:transform .2s,box-shadow .2s;}
+  .pq-toggle:hover{transform:scale(1.07);}
+  .pq-toggle svg{width:24px;height:24px;fill:#D4AF37;}
+  .pq-badge{position:absolute;top:20px;right:-4px;width:18px;height:18px;background:#e84c3d;border-radius:50%;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;}
+  .pq-ext-btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:9px 15px;border-radius:20px;font-size:0.8rem;font-weight:700;margin-top:2px;}
+  .pq-ext-btn.amz{background:#FF9900;color:#fff;}
+  .pq-ext-btn.wa{background:#25D366;color:#fff;}
+</style>
+
+<div id="pq-chat">
+  <div id="pq-chat-win">
+    <div class="pq-head">
+      <div class="pq-av">P</div>
+      <div class="pq-head-info">
+        <h4>Pantriq Shop</h4>
+        <p>&#x1F7E2; Online &#8212; replies instantly</p>
+      </div>
+      <button class="pq-close" onclick="pqToggle()">&#x2715;</button>
+    </div>
+    <div class="pq-msgs" id="pq-msgs">
+      <div class="pq-msg bot">Hi there! &#x1F44B; Welcome to <strong>Pantriq</strong>. Browse our shop below or type what you are looking for!</div>
+    </div>
+    <div class="pq-btns" id="pq-btns"></div>
+    <div class="pq-inp-row">
+      <input class="pq-inp" id="pq-inp" placeholder="Search products..." onkeydown="if(event.key==='Enter')pqSend()"/>
+      <button class="pq-send" onclick="pqSend()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+    </div>
+  </div>
+  <div id="pq-toggle-outer">
+    <span class="pq-label">Pantriq</span>
+    <button class="pq-toggle" id="pq-toggle-btn" onclick="pqToggle()">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </button>
+    <div class="pq-badge" id="pq-badge">1</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var WA = '18683424101';
+  var opened = false;
+
+  var PRODUCTS = [
+    {id:'PQ1',name:'Airtight Canister Set (24-Piece)',cat:'Airtight Containers',price:'From $35',badge:'Best Seller',rating:'4.8 (12,400+)',desc:'Vtopmart clear canisters with bamboo lids. Keep flour, sugar, rice and pasta fresher for longer. Stackable and BPA-free.',link:'https://www.amazon.com/s?k=vtopmart+airtight+food+storage+containers+24+piece&tag=priscadezigns-20',keys:['canister','airtight','flour','sugar','rice','pasta','bamboo','container','vtopmart']},
+    {id:'PQ2',name:'Rotating Lazy Susan Turntable',cat:'Pantry Storage',price:'From $16',badge:'',rating:'4.7 (9,200+)',desc:'LAMU clear rotating organiser. Perfect for spices, condiments and cans. Smooth 360 degree spin, fits most shelves and fridges.',link:'https://www.amazon.com/s?k=lazy+susan+turntable+pantry+organiser&tag=priscadezigns-20',keys:['lazy','susan','turntable','rotating','spin','shelf','condiment']},
+    {id:'PQ3',name:'Clear Fridge Bin Set (8-Pack)',cat:'Fridge Organisers',price:'From $28',badge:"Amazon's Choice",rating:'4.8 (18,700+)',desc:'HOOJO clear refrigerator bins. Stackable, easy-pull design. Corral veggies, drinks and deli items neatly.',link:'https://www.amazon.com/s?k=HOOJO+refrigerator+organiser+bins&tag=priscadezigns-20',keys:['fridge','bin','refrigerator','veggie','drink','deli','hoojo','clear']},
+    {id:'PQ4',name:'Tiered Countertop Spice Rack',cat:'Spice Racks',price:'From $22',badge:'Staff Pick',rating:'4.6 (7,800+)',desc:'3-tier bamboo spice rack. Fits 30+ jars, holds standard and wide-mouth bottles. Keeps countertops tidy.',link:'https://www.amazon.com/s?k=tiered+bamboo+spice+rack+countertop&tag=priscadezigns-20',keys:['spice','rack','bamboo','tier','jar','countertop','bottle']},
+    {id:'PQ5',name:'Stackable Pantry Containers (Set of 12)',cat:'Food Storage',price:'From $32',badge:'',rating:'4.7 (5,300+)',desc:'Vtopmart stackable clear drawers. Modular design that grows with your pantry. Perfect for snacks, pouches and packets.',link:'https://www.amazon.com/s?k=vtopmart+stackable+clear+storage+drawers&tag=priscadezigns-20',keys:['stackable','drawer','modular','snack','pouch','packet','storage']},
+    {id:'PQ6',name:'Chalkboard Label Kit (270 Labels)',cat:'Label and Sort',price:'From $10',badge:'Must Have',rating:'4.5 (4,100+)',desc:'Write-on, wipe-off chalkboard stickers. Multiple shapes and sizes for jars, bins, baskets and containers.',link:'https://www.amazon.com/s?k=chalkboard+pantry+labels+kit&tag=priscadezigns-20',keys:['label','chalkboard','sticker','jar','basket','sort','write','kit']}
+  ];
+
+  function addMsg(txt, type){
+    var d=document.createElement('div');
+    d.className='pq-msg '+type;
+    d.textContent=txt;
+    document.getElementById('pq-msgs').appendChild(d);
+    document.getElementById('pq-msgs').scrollTop=9999;
+  }
+
+  function setButtons(btns){
+    var el=document.getElementById('pq-btns');
+    el.innerHTML='';
+    btns.forEach(function(b){
+      var btn=document.createElement('button');
+      btn.className='pq-btn'+(b.back?' back':'');
+      btn.textContent=b.label;
+      btn.onclick=b.fn;
+      el.appendChild(btn);
+    });
+  }
+
+  function addExtBtn(href, cls, html){
+    var a=document.createElement('a');
+    a.href=href; a.target='_blank'; a.rel='noopener';
+    a.className='pq-ext-btn '+cls;
+    a.innerHTML=html;
+    var wrap=document.createElement('div');
+    wrap.className='pq-msg bot';
+    wrap.style.cssText='background:transparent;padding:0 0 0 8px;';
+    wrap.appendChild(a);
+    document.getElementById('pq-msgs').appendChild(wrap);
+    document.getElementById('pq-msgs').scrollTop=9999;
+  }
+
+  function showMenu(){
+    setButtons([
+      {label:'Shop All Products',fn:function(){addMsg('Browse All Products','usr');showAll();}},
+      {label:'Shop by Category', fn:function(){addMsg('Shop by Category','usr');showCats();}},
+      {label:'Talk to Us',       fn:function(){addMsg('Talk to Us','usr');showContact();}}
+    ]);
+  }
+
+  function showAll(){
+    setTimeout(function(){
+      addMsg('All 6 products in our shop — tap one for details:','bot');
+      var btns=PRODUCTS.map(function(p){
+        return {label:p.name+' — '+p.price, fn:function(){addMsg(p.name,'usr');showProduct(p);}};
+      });
+      btns.push({label:'<- Back',back:true,fn:function(){addMsg('Back','usr');showMenu();}});
+      setButtons(btns);
+    },420);
+  }
+
+  function showCats(){
+    var cats={};
+    PRODUCTS.forEach(function(p){ if(!cats[p.cat]) cats[p.cat]=[]; cats[p.cat].push(p); });
+    setTimeout(function(){
+      addMsg('Choose a category:','bot');
+      var btns=Object.keys(cats).map(function(cat){
+        return {label:cat+' ('+cats[cat].length+')',fn:function(){addMsg(cat,'usr');showCatList(cat,cats[cat]);}};
+      });
+      btns.push({label:'<- Back',back:true,fn:function(){showMenu();}});
+      setButtons(btns);
+    },420);
+  }
+
+  function showCatList(catName,list){
+    setTimeout(function(){
+      addMsg(catName+':','bot');
+      var btns=list.map(function(p){
+        return {label:p.name+' — '+p.price,fn:function(){addMsg(p.name,'usr');showProduct(p);}};
+      });
+      btns.push({label:'<- Categories',back:true,fn:function(){showCats();}});
+      setButtons(btns);
+    },420);
+  }
+
+  function showProduct(p){
+    document.getElementById('pq-btns').innerHTML='';
+    setTimeout(function(){
+      var txt=p.name+(p.badge?' ['+p.badge+']':'')+'
+
+Price: '+p.price+' on Amazon
+Rating: '+p.rating+'
+Category: '+p.cat+'
+
+'+p.desc+'
+
+Tap below to view on Amazon or chat with us!';
+      addMsg(txt,'bot');
+      setTimeout(function(){
+        addExtBtn(p.link,'amz','View on Amazon');
+        addExtBtn('https://wa.me/'+WA+'?text='+encodeURIComponent('Hi Pantriq! I am interested in the '+p.name+' ('+p.price+'). Can you help me?'),'wa','Chat on WhatsApp');
+        setTimeout(function(){
+          setButtons([
+            {label:'<- All Products',back:true,fn:function(){showAll();}},
+            {label:'Main Menu',back:true,fn:function(){showMenu();}}
+          ]);
+        },300);
+      },380);
+    },480);
+  }
+
+  function showContact(){
+    document.getElementById('pq-btns').innerHTML='';
+    setTimeout(function(){
+      addMsg('We would love to help you!
+
+Reach out on WhatsApp and a Pantriq specialist will assist you with product recommendations, bulk orders, or any questions.','bot');
+      setTimeout(function(){
+        addExtBtn('https://wa.me/'+WA+'?text='+encodeURIComponent('Hi Pantriq! I found your website and would love help with pantry organisation.'),'wa','Chat on WhatsApp');
+        setTimeout(function(){
+          setButtons([{label:'<- Main Menu',back:true,fn:function(){showMenu();}}]);
+        },300);
+      },350);
+    },440);
+  }
+
+  window.pqToggle=function(){
+    var win=document.getElementById('pq-chat-win');
+    var badge=document.getElementById('pq-badge');
+    var btn=document.getElementById('pq-toggle-btn');
+    opened=!opened;
+    if(opened){
+      win.classList.add('open');
+      badge.style.display='none';
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="#D4AF37" width="22" height="22"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+    } else {
+      win.classList.remove('open');
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="#D4AF37" width="22" height="22"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
+    }
+  };
+
+  window.pqSend=function(){
+    var inp=document.getElementById('pq-inp');
+    var txt=inp.value.trim();
+    if(!txt) return;
+    addMsg(txt,'usr');
+    inp.value='';
+    document.getElementById('pq-btns').innerHTML='';
+    var t=txt.toLowerCase();
+    setTimeout(function(){
+      if(t.indexOf('contact')>=0||t.indexOf('talk')>=0||t.indexOf('help')>=0||t.indexOf('speak')>=0){showContact();return;}
+      var matched=PRODUCTS.filter(function(p){
+        return p.keys.some(function(k){return t.indexOf(k)>=0;})||t.indexOf(p.name.toLowerCase().split(' ')[0])>=0;
+      });
+      if(matched.length===1){showProduct(matched[0]);}
+      else if(matched.length>1){
+        addMsg('Products matching your search:','bot');
+        var btns=matched.map(function(p){return {label:p.name+' — '+p.price,fn:function(){addMsg(p.name,'usr');showProduct(p);}};});
+        btns.push({label:'<- Main Menu',back:true,fn:showMenu});
+        setButtons(btns);
+      } else {
+        addMsg('No exact match for "'+txt+'" — here are all our products:','bot');
+        setTimeout(showAll,300);
+      }
+    },500);
+  };
+
+  showMenu();
+})();
+</script>
+<!-- END PANTRIQ CHATBOT -->
 </body>
 </html>
