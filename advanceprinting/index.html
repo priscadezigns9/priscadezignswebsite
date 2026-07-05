@@ -534,7 +534,8 @@ function submitQuote(e){
       <button class="pd-send" onclick="pdSend()">&#10148;</button>
     </div>
   </div>
-  <div id="pd-toggle-wrap">
+  <div id="pd-toggle-wrap" style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+    <span style="font-size:10px;font-weight:800;letter-spacing:1px;color:#fff;background:rgba(27,42,107,0.9);padding:3px 8px;border-radius:100px;backdrop-filter:blur(4px);">PrintCraft</span>
     <button class="pd-toggle" id="pd-toggle-btn" onclick="pdToggle()">
       <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
     </button>
@@ -545,82 +546,165 @@ function submitQuote(e){
 <script>
 (function(){
   var QRS = [
-  ['Get a Print Quote 🖨️', 'Tell us what you need — banner size, quantity, material — on WhatsApp and we\'ll send you a quote within the hour!'],
-  ['Banners & Signage 🪧', 'We print vinyl banners, flex banners, foam boards, and more. WhatsApp us your specs and artwork for a fast quote.'],
-  ['Business Cards & Flyers 📄', 'Full-colour business cards and flyers at great prices. Send us your design on WhatsApp and we\'ll confirm turnaround time.'],
-  ['Rush Orders ⚡', 'Need it fast? We offer same-day and next-day printing for select items. WhatsApp us now to check availability.']
-];
+    {
+      label: 'Vinyl Banners 🪧',
+      submenu: [
+        {label: '2ft x 4ft Vinyl Banner', price: 'TTD $85', desc: 'Weather-resistant vinyl, full-colour print, hem and grommets included.'},
+        {label: '3ft x 6ft Vinyl Banner', price: 'TTD $145', desc: 'Heavy-duty outdoor vinyl. Perfect for storefronts and events.'},
+        {label: '4ft x 8ft Vinyl Banner', price: 'TTD $210', desc: 'Large-format display banner. Includes reinforced edges.'},
+        {label: '6ft x 10ft Vinyl Banner', price: 'TTD $320', desc: 'Extra-large event banner. Double-stitched hem, rust-proof grommets.'}
+      ]
+    },
+    {
+      label: 'Business Cards 💳',
+      submenu: [
+        {label: '250 Cards — Gloss Finish', price: 'TTD $75', desc: '350gsm, full-colour both sides, gloss laminate.'},
+        {label: '500 Cards — Gloss Finish', price: 'TTD $120', desc: 'Same premium stock, better value for networking.'},
+        {label: '500 Cards — Matte Finish', price: 'TTD $140', desc: 'Soft-touch matte. Elegant and professional.'},
+        {label: '1000 Cards — Any Finish', price: 'TTD $200', desc: 'Best value. Gloss or matte finish, your choice.'}
+      ]
+    },
+    {
+      label: 'Flyers and Posters 📄',
+      submenu: [
+        {label: 'A5 Flyers x 500', price: 'TTD $130', desc: '130gsm gloss, full-colour single or double sided.'},
+        {label: 'A4 Flyers x 500', price: 'TTD $180', desc: 'Full-colour, ideal for promotions and menus.'},
+        {label: 'A3 Poster x 100', price: 'TTD $160', desc: '200gsm gloss poster stock. Vibrant print quality.'},
+        {label: 'A2 Poster x 50', price: 'TTD $190', desc: 'Large-format poster. Great for events and retail.'}
+      ]
+    },
+    {
+      label: 'Rush Orders 🔥',
+      submenu: [
+        {label: 'Same-Day Printing', price: 'TTD +$50 surcharge', desc: 'Order before 10am for same-day pickup. Limited availability.'},
+        {label: 'Next-Day Printing', price: 'TTD +$25 surcharge', desc: 'Order by 3pm for next-day collection. Most items eligible.'}
+      ]
+    }
+  ];
   var DEFAULT = 'Thanks for contacting PrintCraft T&T! Send us your print requirements on WhatsApp and we\'ll get you a quote fast. 🖨️';
-  var WA = '18680000000';
-  var WA_MSG = 'Hi! I found PrintCraft T&T online and I need a print quote.';
+  var WA = '18683424101';
+  var WA_MSG = 'Hi PrintCraft! I found you online and need a print quote.';
   var opened = false;
 
-  // Render quick reply buttons
-  var qrEl = document.getElementById('pd-qr');
-  QRS.forEach(function(q){
-    var b = document.createElement('button');
-    b.className = 'pd-qrb';
-    b.textContent = q[0];
-    b.onclick = function(){ pdQR(q[0], q[1]); };
-    qrEl.appendChild(b);
-  });
+  /* ── WA button helper ── */
+  function pdWABtn(waText){
+    var btn = document.createElement('a');
+    btn.href = 'https://wa.me/'+WA+'?text='+encodeURIComponent(waText||WA_MSG);
+    btn.target='_blank'; btn.rel='noopener';
+    btn.style.cssText='display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;padding:10px 18px;border-radius:24px;font-size:13px;font-weight:700;margin-top:6px;cursor:pointer;';
+    btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.563 4.14 1.535 5.874L0 24l6.306-1.506A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.848 0-3.592-.484-5.112-1.33l-.366-.214-3.746.894.944-3.641-.237-.376A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>Order on WhatsApp';
+    var wrap=document.createElement('div');
+    wrap.className='pd-msg bot';
+    wrap.style.cssText='background:transparent;padding:0 0 0 8px;';
+    wrap.appendChild(btn);
+    document.getElementById('pd-msgs').appendChild(wrap);
+    document.getElementById('pd-msgs').scrollTop=9999;
+  }
+
+  /* ── Render category buttons ── */
+  function renderCategories(){
+    var qrEl=document.getElementById('pd-qr');
+    qrEl.innerHTML='';
+    QRS.forEach(function(cat){
+      var b=document.createElement('button');
+      b.className='pd-qrb';
+      b.textContent=cat.label;
+      b.onclick=function(){ showSubmenu(cat); };
+      qrEl.appendChild(b);
+    });
+    qrEl.style.display='flex';
+  }
+
+  /* ── Show submenu (size/qty options) ── */
+  function showSubmenu(cat){
+    pdAddMsg(cat.label,'usr');
+    var qrEl=document.getElementById('pd-qr');
+    qrEl.innerHTML='';
+    // Back button
+    var back=document.createElement('button');
+    back.className='pd-qrb';
+    back.style.cssText='background:rgba(0,0,0,0.08);color:#555;font-size:11px;';
+    back.textContent='← Back';
+    back.onclick=renderCategories;
+    qrEl.appendChild(back);
+    // Item buttons
+    cat.submenu.forEach(function(item){
+      var b=document.createElement('button');
+      b.className='pd-qrb';
+      b.textContent=item.label+' — '+item.price;
+      b.onclick=function(){ showItem(item, cat.label); };
+      qrEl.appendChild(b);
+    });
+    setTimeout(function(){
+      pdAddMsg('Here are the options for '+cat.label.replace(/[^\w\s&]/g,'').trim()+':','bot');
+    },400);
+  }
+
+  /* ── Show item price + WA button ── */
+  function showItem(item, catLabel){
+    pdAddMsg(item.label,'usr');
+    document.getElementById('pd-qr').style.display='none';
+    setTimeout(function(){
+      var reply=item.label+'\n\nPrice: '+item.price+'\n\n'+item.desc+'\n\nReady to order? Tap the WhatsApp button below and we will get your job started right away!';
+      pdAddMsg(reply,'bot');
+      var waText='Hi PrintCraft! I am interested in: '+item.label+' ('+item.price+'). Please confirm availability and turnaround time.';
+      setTimeout(function(){ pdWABtn(waText); },350);
+    },500);
+  }
+
+  /* ── Init: render category buttons ── */
+  renderCategories();
 
   window.pdToggle = function(){
-    var win = document.getElementById('pd-chat-win');
-    var badge = document.getElementById('pd-badge');
-    var btn = document.getElementById('pd-toggle-btn');
-    opened = !opened;
+    var win=document.getElementById('pd-chat-win');
+    var badge=document.getElementById('pd-badge');
+    var btn=document.getElementById('pd-toggle-btn');
+    opened=!opened;
     if(opened){
       win.classList.add('open');
-      badge.style.display = 'none';
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+      badge.style.display='none';
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
     } else {
       win.classList.remove('open');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
     }
   };
 
-  window.pdQR = function(label, reply){
-    pdAddMsg(label, 'usr');
-    document.getElementById('pd-qr').style.display = 'none';
-    setTimeout(function(){
-      pdAddMsg(reply, 'bot');
-      // Add WA button after reply
-      setTimeout(function(){
-        var wa = document.createElement('div'); wa.className = 'pd-msg bot'; wa.textContent = 'Call or visit us to complete your inquiry. We look forward to serving you!'; document.getElementById('pd-msgs').appendChild(wa);
-        document.getElementById('pd-msgs').scrollTop = 9999;
-      }, 300);
-    }, 550);
-  };
-
   window.pdSend = function(){
-    var inp = document.getElementById('pd-inp');
-    var txt = inp.value.trim();
+    var inp=document.getElementById('pd-inp');
+    var txt=inp.value.trim();
     if(!txt) return;
-    pdAddMsg(txt, 'usr');
-    inp.value = '';
-    document.getElementById('pd-qr').style.display = 'none';
+    pdAddMsg(txt,'usr');
+    inp.value='';
+    document.getElementById('pd-qr').style.display='none';
     setTimeout(function(){
-      var t = txt.toLowerCase();
-      var reply = DEFAULT;
-      QRS.forEach(function(q){
-        var kws = q[0].toLowerCase().replace(/[^a-z ]/g,'').split(' ');
-        kws.forEach(function(k){ if(k.length>3 && t.includes(k)) reply = q[1]; });
+      var t=txt.toLowerCase();
+      var matched=null;
+      QRS.forEach(function(cat){
+        cat.submenu.forEach(function(item){
+          if(t.indexOf(item.label.toLowerCase().substring(0,6))>=0) matched=item;
+        });
+        if(t.indexOf(cat.label.toLowerCase().replace(/[^\w ]/g,'').trim().substring(0,5))>=0 && !matched) showSubmenu(cat);
       });
-      pdAddMsg(reply, 'bot');
-      setTimeout(function(){
-        var wa = document.createElement('div'); wa.className = 'pd-msg bot'; wa.textContent = 'Call or visit us to complete your inquiry. We look forward to serving you!'; document.getElementById('pd-msgs').appendChild(wa);
-        document.getElementById('pd-msgs').scrollTop = 9999;
-      }, 300);
-    }, 550);
+      if(matched){
+        var reply=matched.label+'\n\nPrice: '+matched.price+'\n\n'+matched.desc;
+        pdAddMsg(reply,'bot');
+        var waText='Hi PrintCraft! I am interested in: '+matched.label+' ('+matched.price+').';
+        setTimeout(function(){ pdWABtn(waText); },350);
+      } else if(!matched){
+        pdAddMsg(DEFAULT,'bot');
+        setTimeout(function(){ renderCategories(); },400);
+      }
+    },550);
   };
 
-  function pdAddMsg(txt, type){
-    var d = document.createElement('div');
-    d.className = 'pd-msg ' + type;
-    d.textContent = txt;
+  function pdAddMsg(txt,type){
+    var d=document.createElement('div');
+    d.className='pd-msg '+type;
+    d.style.whiteSpace='pre-wrap';
+    d.textContent=txt;
     document.getElementById('pd-msgs').appendChild(d);
-    document.getElementById('pd-msgs').scrollTop = 9999;
+    document.getElementById('pd-msgs').scrollTop=9999;
   }
 })();
 </script>
