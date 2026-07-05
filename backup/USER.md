@@ -250,7 +250,7 @@ who's in their life.
 - **Threads:** @priscillanarine → https://www.threads.net/@priscillanarine
 - **Facebook Personal:** facebook.com/priscilla.narine
 - **Brand Part (@priscadezigns):** The official Prisca Dezigns signal. Focused on building brand-level authority on the blockchain.
-- **The "GM" System:** Every morning (AST), post "GM ☀️" to both accounts. This is a non-negotiable cultural signal in the crypto space to maintain active presence.
+- **The "GM" System:** DEACTIVATED (July 4, 2026). Previously used for daily "GM ☀️" posts to X/Twitter.
 - **The Magic:** Proactively interact with the community via the personal account to build traction for the brand account.
 ## Network Gaming & Explorer Blueprint (2026-06-05)
 - **Group Explorer**: The Prisca Dezigns Wallet will feature a built-in browser/explorer to access all Network brands (Atelia, Nurasen, etc.).
