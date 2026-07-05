@@ -51,3 +51,40 @@ Full pipeline + AI stack for Prisca Dezigns client service tiers.
 2. Assign tier (Website only / Website+WA / Website+WA+Email)
 3. Pick pipeline and AI based on their size
 4. Build → test → hand off
+
+## Supabase Project Map
+| Project Name | Project ID | Credential | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Trogon** | `sazhdnqzaqpqcralmthh` | `supabase-trogon-admin` | Main project — outreach_leads, client_leads |
+| **Old/Wrong** | `sktpjacowqaedddtrhuz` | none | Do NOT use — was old homepage reference |
+
+## Supabase PAT
+- Credential: `supabase-pat`
+- Base URL: `https://api.supabase.com`
+- Use for: running SQL via `/v1/projects/{id}/database/query`
+
+## Trogon Tables
+| Table | Purpose |
+| :--- | :--- |
+| `outreach_leads` | 166 B2B outreach records for email campaigns |
+| `client_leads` | Website lead form submissions (name, email, package, brand, created_at) |
+
+## GitHub — Prisca Dezigns Website
+- Repo: `priscadezigns9/priscadezignswebsite`
+- Credential: `github_pat_sovereign_v5`
+- Live site: `https://priscadezigns.org`
+- Local working copy: `/app/state/348c474f-a208-44c4-8f27-8fce3e8d6785/work/index.html`
+- Authoritative restore base: `index_fixed.html` (full desktop UI intact)
+- Push method: GET sha first, build JSON payload, PUT via API
+
+## ImprovMX
+- Credential: `improvmx-api`
+- Account email: `priscillanarine@gmail.com`
+- Auth: Basic — `api:KEY` base64 encoded = `YXBpOnNrX2YyZTZmNDg2Mzc4NzRlODhhOGMyODU1MjgyNTc3MjRj`
+- Status: `priscadezigns.org` registered under a different ImprovMX account — needs DNS claim
+- Pending: create `hello@priscadezigns.org` → `priscillanarine@gmail.com` once domain is claimed
+
+## Gmail Send — Critical Rule (2026-07-04)
+**NEVER use `--body "$(cat file)"` — shell substitution does NOT expand inside the gog tool.**
+**ALWAYS use `--body-file "/absolute/path/to/file"` for sending from a file.**
+Example: `gog gmail send --to "email@email.com" --subject "Subject" --body-file "/app/state/.../work/body_combo_send.txt"`
