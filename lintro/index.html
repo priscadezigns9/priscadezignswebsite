@@ -722,131 +722,217 @@
 
 <script>
 (function(){
-  var PROPERTIES = [
-  {id:'L001',name:'4-Bed Executive Home — San Diego, Chaguanas',type:'sale',bedrooms:4,bathrooms:3,area:'San Diego',district:'Chaguanas',price:'TTD $2,800,000',desc:'Spacious executive home in gated community. Open-plan kitchen, double garage, covered patio, landscaped garden. 3,200 sq ft.',keywords:['san diego','chaguanas','4 bed','executive','sale','buy']},
-  {id:'L002',name:'3-Bed Townhouse — Maraval, Port of Spain',type:'sale',bedrooms:3,bathrooms:2,area:'Maraval',district:'Port of Spain',price:'TTD $3,500,000',desc:'Modern townhouse in prestigious Maraval. Fully tiled, AC throughout, private parking, hillside views. 2,400 sq ft.',keywords:['maraval','port of spain','townhouse','3 bed','sale','buy']},
-  {id:'L003',name:'2-Bed Apartment — Westmoorings, Diego Martin',type:'rental',bedrooms:2,bathrooms:2,area:'Westmoorings',district:'Diego Martin',price:'TTD $7,500/month',desc:'Fully furnished waterfront apartment. Pool access, 24hr security, backup generator. 1,100 sq ft.',keywords:['westmoorings','diego martin','apartment','2 bed','rental','rent','furnished']},
-  {id:'L004',name:'5-Bed Luxury Villa — Goodwood Park, San Fernando',type:'sale',bedrooms:5,bathrooms:4,area:'Goodwood Park',district:'San Fernando',price:'TTD $5,200,000',desc:'Luxury villa with private pool, home cinema, gym, wraparound terrace. Gated compound. 4,800 sq ft.',keywords:['goodwood','san fernando','villa','luxury','5 bed','pool','sale','buy']},
-  {id:'L005',name:'Commercial Office Space — Park Street, Port of Spain',type:'rental',bedrooms:0,bathrooms:2,area:'Park Street',district:'Port of Spain',price:'TTD $18,000/month',desc:'Prime commercial space in central Port of Spain. 2,000 sq ft, open floor plan, fibre-ready, parking included.',keywords:['commercial','office','park street','port of spain','rental','rent','business']},
-  {id:'L006',name:'3-Bed Family Home — Cunupia, Chaguanas',type:'sale',bedrooms:3,bathrooms:2,area:'Cunupia',district:'Chaguanas',price:'TTD $1,650,000',desc:'Well-maintained family home on quiet residential street. Covered carport, fruit trees, concrete fence. 1,800 sq ft.',keywords:['cunupia','chaguanas','3 bed','family','sale','buy','affordable']}
-];
-var QRS = [
-  ['Properties for Sale', null],
-  ['Rental Listings', null],
-  ['Property Valuation', 'We offer free property valuations. An agent will assess your property within 24 hours. Tap WhatsApp below to book!'],
-  ['Talk to an Agent', 'Our agents are available Mon-Fri 8am-5pm and Sat 9am-1pm. Tap WhatsApp below to connect with a Lintro specialist!']
-];
-  var DEFAULT = 'Thanks for reaching out to Lintro! Ask about a specific area (e.g. San Diego, Maraval, Westmoorings) or say for sale or for rent to see listings.';
+
+  /* ═══════════════════════════════════════
+     LINTRO PROPERTY DATABASE
+  ═══════════════════════════════════════ */
+  var DB = {
+    sale: [
+      {id:'L001',label:'4-Bed Executive Home — San Diego, Chaguanas',price:'TTD $2,800,000',beds:4,baths:3,size:'3,200 sq ft',features:'Gated community · Open-plan kitchen · Double garage · Covered patio · Landscaped garden'},
+      {id:'L002',label:'3-Bed Townhouse — Maraval, Port of Spain',price:'TTD $3,500,000',beds:3,baths:2,size:'2,400 sq ft',features:'Prestigious address · Fully tiled · AC throughout · Private parking · Hillside views'},
+      {id:'L003',label:'5-Bed Luxury Villa — Goodwood Park, San Fernando',price:'TTD $5,200,000',beds:5,baths:4,size:'4,800 sq ft',features:'Private pool · Home cinema · Fully-equipped gym · Wraparound terrace · Gated compound'},
+      {id:'L004',label:'3-Bed Family Home — Cunupia, Chaguanas',price:'TTD $1,650,000',beds:3,baths:2,size:'1,800 sq ft',features:'Quiet residential street · Covered carport · Fruit trees · Concrete fence · Near highway'}
+    ],
+    rental: [
+      {id:'L005',label:'2-Bed Apartment — Westmoorings, Diego Martin',price:'TTD $7,500/month',beds:2,baths:2,size:'1,100 sq ft',features:'Fully furnished · Waterfront views · Pool access · 24hr security · Backup generator'},
+      {id:'L006',label:'1-Bed Studio — Lange Park, Chaguanas',price:'TTD $3,200/month',beds:1,baths:1,size:'650 sq ft',features:'Modern finish · AC · Tiled throughout · Secure parking · Near Trincity Mall'},
+      {id:'L007',label:'3-Bed House — Diego Martin',price:'TTD $5,800/month',beds:3,baths:2,size:'1,600 sq ft',features:'Quiet neighbourhood · Covered parking · Yard space · Pet-friendly · Near highway'}
+    ],
+    commercial: [
+      {id:'L008',label:'Office Space — Park Street, Port of Spain',price:'TTD $18,000/month',beds:0,baths:2,size:'2,000 sq ft',features:'Central POS location · Open floor plan · Fibre-ready · Backup power · Parking included'},
+      {id:'L009',label:'Retail Unit — High Street, San Fernando',price:'TTD $9,500/month',beds:0,baths:1,size:'900 sq ft',features:'Heavy foot traffic · Display windows · Storage room · Air-conditioned · Immediate availability'},
+      {id:'L010',label:'Warehouse — Barataria, East Trinidad',price:'TTD $14,000/month',beds:0,baths:2,size:'4,500 sq ft',features:'Ground-floor loading bay · 20ft ceiling height · 3-phase power · Gated yard · CCTV'}
+    ],
+    valuation: null,
+    agent: null
+  };
+
   var WA = '18683424101';
-  var WA_MSG = 'Hi! I found Lintro online and I have a property inquiry.';
   var opened = false;
 
-  // Render quick reply buttons
-  var qrEl = document.getElementById('pd-qr');
-  QRS.forEach(function(q){
-    var b = document.createElement('button');
-    b.className = 'pd-qrb';
-    b.textContent = q[0];
-    b.onclick = function(){ pdQR(q[0], q[1]); };
-    qrEl.appendChild(b);
-  });
+  /* ── WA Button ── */
+  function pdWABtn(waText){
+    var btn=document.createElement('a');
+    btn.href='https://wa.me/'+WA+'?text='+encodeURIComponent(waText);
+    btn.target='_blank'; btn.rel='noopener';
+    btn.style.cssText='display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;padding:10px 18px;border-radius:24px;font-size:13px;font-weight:700;margin-top:6px;cursor:pointer;';
+    btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.563 4.14 1.535 5.874L0 24l6.306-1.506A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.848 0-3.592-.484-5.112-1.33l-.366-.214-3.746.894.944-3.641-.237-.376A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>Chat on WhatsApp';
+    var wrap=document.createElement('div');
+    wrap.className='pd-msg bot';
+    wrap.style.cssText='background:transparent;padding:0 0 0 8px;';
+    wrap.appendChild(btn);
+    document.getElementById('pd-msgs').appendChild(wrap);
+    document.getElementById('pd-msgs').scrollTop=9999;
+  }
 
+  /* ── Add message ── */
+  function pdAddMsg(txt,type){
+    var d=document.createElement('div');
+    d.className='pd-msg '+type;
+    d.style.whiteSpace='pre-wrap';
+    d.textContent=txt;
+    document.getElementById('pd-msgs').appendChild(d);
+    document.getElementById('pd-msgs').scrollTop=9999;
+  }
+
+  /* ── Set buttons in the QR area ── */
+  function setButtons(btns){
+    var qrEl=document.getElementById('pd-qr');
+    qrEl.innerHTML='';
+    btns.forEach(function(b){
+      var el=document.createElement('button');
+      el.className='pd-qrb';
+      if(b.style) el.style.cssText=b.style;
+      el.textContent=b.label;
+      el.onclick=b.action;
+      qrEl.appendChild(el);
+    });
+    qrEl.style.display='flex';
+  }
+
+  /* ══════════════════════════════
+     LEVEL 1 — Main categories
+  ══════════════════════════════ */
+  function showCategories(){
+    setButtons([
+      {label:'🏠 Properties for Sale', action:function(){ userSaid('Properties for Sale'); showListings('sale'); }},
+      {label:'🔑 Rental Listings',     action:function(){ userSaid('Rental Listings');     showListings('rental'); }},
+      {label:'🏢 Commercial Space',    action:function(){ userSaid('Commercial Space');     showListings('commercial'); }},
+      {label:'📊 Property Valuation',  action:function(){ userSaid('Property Valuation');  showValuation(); }},
+      {label:'👤 Talk to an Agent',    action:function(){ userSaid('Talk to an Agent');    showAgent(); }}
+    ]);
+  }
+
+  /* ══════════════════════════════
+     LEVEL 2 — Listing cards
+  ══════════════════════════════ */
+  function showListings(type){
+    var list=DB[type];
+    var typeLabel = type==='sale'?'Properties for Sale': type==='rental'?'Rental Listings':'Commercial Space';
+    setTimeout(function(){
+      pdAddMsg('Here are our available '+typeLabel+' — tap one for full details:','bot');
+      var btns=list.map(function(p){
+        return {
+          label: p.label+'\n'+p.price,
+          style: 'text-align:left;white-space:pre-wrap;line-height:1.4;padding:10px 14px;',
+          action: function(){ userSaid(p.label); showProperty(p, type); }
+        };
+      });
+      btns.push({label:'← Back', style:'background:rgba(0,0,0,0.06);color:#555;font-size:11px;', action:function(){ userSaid('← Back'); showCategories(); }});
+      setButtons(btns);
+    },450);
+  }
+
+  /* ══════════════════════════════
+     LEVEL 3 — Full property detail
+  ══════════════════════════════ */
+  function showProperty(p, type){
+    document.getElementById('pd-qr').style.display='none';
+    setTimeout(function(){
+      var detail = p.label
+        + '\n\n📋 Listing #'+p.id
+        + '\n💰 Price: '+p.price
+        + (p.beds>0 ? '\n🛏 Bedrooms: '+p.beds+' | Bathrooms: '+p.baths : '')
+        + '\n📐 Size: '+p.size
+        + '\n✅ '+p.features.split(' · ').join('\n✅ ');
+      pdAddMsg(detail,'bot');
+      var waText='Hi Lintro! I am interested in listing #'+p.id+' — '+p.label+' at '+p.price+'. Please send me more details and schedule a viewing.';
+      setTimeout(function(){
+        pdWABtn(waText);
+        // Back button after WA
+        setTimeout(function(){
+          setButtons([
+            {label:'← View More '+(type==='sale'?'Sales':type==='rental'?'Rentals':'Commercial'), action:function(){ showListings(type); }},
+            {label:'🏠 Main Menu', action:showCategories}
+          ]);
+        },300);
+      },350);
+    },500);
+  }
+
+  /* ══════════════════════════════
+     Valuation & Agent shortcuts
+  ══════════════════════════════ */
+  function showValuation(){
+    document.getElementById('pd-qr').style.display='none';
+    setTimeout(function(){
+      pdAddMsg('We offer free property valuations across Trinidad.\n\nAn agent will visit your property and provide a full written report within 24–48 hours. Tap the button below and one of our specialists will arrange a convenient time with you.','bot');
+      setTimeout(function(){
+        pdWABtn('Hi Lintro! I would like to book a free property valuation. Please contact me to arrange a visit.');
+        setTimeout(function(){ setButtons([{label:'🏠 Main Menu', action:showCategories}]); },300);
+      },350);
+    },450);
+  }
+
+  function showAgent(){
+    document.getElementById('pd-qr').style.display='none';
+    setTimeout(function(){
+      pdAddMsg('Our agents are available:\nMon – Fri: 8:00 AM – 5:00 PM\nSaturday: 9:00 AM – 1:00 PM\n\nTap WhatsApp below to be connected with a Lintro property specialist right now.','bot');
+      setTimeout(function(){
+        pdWABtn('Hi Lintro! I would like to speak with a property agent. Please connect me.');
+        setTimeout(function(){ setButtons([{label:'🏠 Main Menu', action:showCategories}]); },300);
+      },350);
+    },450);
+  }
+
+  /* ── Helper: show what user "clicked" as a message ── */
+  function userSaid(txt){
+    pdAddMsg(txt,'usr');
+  }
+
+  /* ══════════════════════════════
+     TOGGLE
+  ══════════════════════════════ */
   window.pdToggle = function(){
-    var win = document.getElementById('pd-chat-win');
-    var badge = document.getElementById('pd-badge');
-    var btn = document.getElementById('pd-toggle-btn');
-    opened = !opened;
+    var win=document.getElementById('pd-chat-win');
+    var badge=document.getElementById('pd-badge');
+    var btn=document.getElementById('pd-toggle-btn');
+    opened=!opened;
     if(opened){
       win.classList.add('open');
-      badge.style.display = 'none';
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+      badge.style.display='none';
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
     } else {
       win.classList.remove('open');
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
     }
   };
 
-  window.pdQR = function(label, reply){
-    pdAddMsg(label, 'usr');
-    document.getElementById('pd-qr').style.display = 'none';
-    setTimeout(function(){
-      pdAddMsg(reply, 'bot');
-      // Add WA button after reply
-      setTimeout(function(){
-        var wa = document.createElement('div'); wa.className = 'pd-msg bot'; wa.textContent = 'Call or visit us to complete your inquiry. We look forward to serving you!'; document.getElementById('pd-msgs').appendChild(wa);
-        document.getElementById('pd-msgs').scrollTop = 9999;
-      }, 300);
-    }, 550);
-  };
-
-  function pdWABtn(waText){
-    var btn = document.createElement('a');
-    btn.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(waText || WA_MSG);
-    btn.target = '_blank';
-    btn.rel = 'noopener';
-    btn.style.cssText = 'display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;padding:10px 18px;border-radius:24px;font-size:13px;font-weight:700;margin-top:6px;cursor:pointer;';
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.563 4.14 1.535 5.874L0 24l6.306-1.506A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.848 0-3.592-.484-5.112-1.33l-.366-.214-3.746.894.944-3.641-.237-.376A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>WhatsApp Us';
-    var wrap = document.createElement('div');
-    wrap.className = 'pd-msg bot';
-    wrap.style.cssText = 'background:transparent;padding:0 0 0 8px;';
-    wrap.appendChild(btn);
-    document.getElementById('pd-msgs').appendChild(wrap);
-    document.getElementById('pd-msgs').scrollTop = 9999;
-  }
-
-  function findProperty(t){
-    var best=null, bestScore=0;
-    PROPERTIES.forEach(function(p){
-      var score=0;
-      p.keywords.forEach(function(k){ if(t.indexOf(k)>=0) score++; });
-      if(score>bestScore){bestScore=score;best=p;}
-    });
-    return bestScore>0?best:null;
-  }
-
+  /* ── Free-type fallback ── */
   window.pdSend = function(){
-    var inp = document.getElementById('pd-inp');
-    var txt = inp.value.trim();
+    var inp=document.getElementById('pd-inp');
+    var txt=inp.value.trim();
     if(!txt) return;
-    pdAddMsg(txt, 'usr');
-    inp.value = '';
-    document.getElementById('pd-qr').style.display = 'none';
+    pdAddMsg(txt,'usr');
+    inp.value='';
+    var t=txt.toLowerCase();
+    document.getElementById('pd-qr').style.display='none';
     setTimeout(function(){
-      var t = txt.toLowerCase();
-      var isSale = t.indexOf('sale')>=0||t.indexOf('buy')>=0||t.indexOf('purchase')>=0;
-      var isRent = t.indexOf('rent')>=0||t.indexOf('rental')>=0||t.indexOf('lease')>=0;
-      var prop = findProperty(t);
-      var reply, waText;
-      if(prop){
-        reply = prop.name + '\n\nListing #' + prop.id + '\nPrice: ' + prop.price + (prop.bedrooms>0?'\nBedrooms: '+prop.bedrooms+' | Bathrooms: '+prop.bathrooms:'') + '\nLocation: '+prop.area+', '+prop.district+'\n\n'+prop.desc;
-        waText = 'Hi Lintro! I am interested in listing #'+prop.id+' — '+prop.name+'. Please send me more details.';
-      } else if(isSale){
-        reply = 'Here are our properties for sale:\n\n';
-        PROPERTIES.filter(function(p){return p.type==='sale';}).forEach(function(p){ reply+=p.name+'\n'+p.price+'\n\n'; });
-        reply+='Ask me about a specific area for full details!';
-        waText='Hi Lintro! I am looking for properties for sale. Please send me your full listings.';
-      } else if(isRent){
-        reply = 'Here are our rental listings:\n\n';
-        PROPERTIES.filter(function(p){return p.type==='rental';}).forEach(function(p){ reply+=p.name+'\n'+p.price+'\n\n'; });
-        reply+='Ask me about a specific area for full details!';
-        waText='Hi Lintro! I am looking to rent a property. Please send me your current listings.';
-      } else {
-        reply = DEFAULT;
-        waText = WA_MSG;
+      if(t.indexOf('sale')>=0||t.indexOf('buy')>=0)            { showListings('sale'); }
+      else if(t.indexOf('rent')>=0||t.indexOf('rental')>=0)    { showListings('rental'); }
+      else if(t.indexOf('commercial')>=0||t.indexOf('office')>=0||t.indexOf('warehouse')>=0) { showListings('commercial'); }
+      else if(t.indexOf('valuation')>=0||t.indexOf('value')>=0){ showValuation(); }
+      else if(t.indexOf('agent')>=0||t.indexOf('speak')>=0)    { showAgent(); }
+      else {
+        // Try matching a property by keyword
+        var matched=null;
+        ['sale','rental','commercial'].forEach(function(type){
+          DB[type].forEach(function(p){
+            if(!matched && t.indexOf(p.label.toLowerCase().split(' ')[0])>=0) matched={p:p,type:type};
+          });
+        });
+        if(matched){ showProperty(matched.p, matched.type); }
+        else {
+          pdAddMsg('I can help you find the right property! Choose an option below:','bot');
+          setTimeout(showCategories,300);
+        }
       }
-      pdAddMsg(reply,'bot');
-      setTimeout(function(){ pdWABtn(waText); },350);
-    },550);
+    },500);
   };
 
-  function pdAddMsg(txt, type){
-    var d = document.createElement('div');
-    d.className = 'pd-msg ' + type;
-    d.style.whiteSpace='pre-wrap';
-    d.textContent = txt;
-    document.getElementById('pd-msgs').appendChild(d);
-    document.getElementById('pd-msgs').scrollTop = 9999;
-  }
+  /* ── Init ── */
+  showCategories();
+
 })();
 </script>
 <!-- ============ END PD CHATBOT ============ -->
