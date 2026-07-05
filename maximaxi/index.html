@@ -296,5 +296,159 @@ footer{background:#060e09;padding:48px 5% 32px;color:rgba(255,255,255,0.4);}
   </div>
 </footer>
 
+
+<!-- ============ PD CHATBOT WIDGET ============ -->
+<style>
+  #pd-chat{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:'Inter',system-ui,sans-serif;}
+  #pd-chat-win{width:320px;background:#fff;border-radius:16px;overflow:hidden;display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.18);}
+  #pd-chat-win.open{display:flex;}
+  .pd-ch{background:#1a8a3a;padding:16px 18px;display:flex;align-items:center;gap:12px;}
+  .pd-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+  .pd-ch-info h4{font-size:0.88rem;color:#fff;font-weight:700;margin:0;}
+  .pd-ch-info p{font-size:0.7rem;color:rgba(255,255,255,0.75);margin:0;}
+  .pd-close{margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:1.2rem;padding:0;line-height:1;}
+  .pd-close:hover{color:#fff;}
+  .pd-msgs{padding:16px;display:flex;flex-direction:column;gap:10px;min-height:160px;max-height:240px;overflow-y:auto;background:#f8f8f8;}
+  .pd-msg{max-width:86%;padding:9px 13px;border-radius:12px;font-size:0.82rem;line-height:1.55;}
+  .pd-msg.bot{background:#fff;color:#1a1a1a;align-self:flex-start;border:1px solid #eee;border-radius:4px 12px 12px 12px;}
+  .pd-msg.usr{background:#1a8a3a;color:#fff;align-self:flex-end;border-radius:12px 12px 4px 12px;}
+  .pd-qr{padding:0 14px 12px;display:flex;flex-wrap:wrap;gap:6px;background:#f8f8f8;}
+  .pd-qrb{background:none;border:1px solid #ddd;color:#333;padding:5px 11px;border-radius:20px;font-size:0.72rem;cursor:pointer;font-family:inherit;transition:all .15s;}
+  .pd-qrb:hover{background:#1a8a3a;color:#fff;border-color:#1a8a3a;}
+  .pd-inp-row{display:flex;gap:8px;padding:12px;border-top:1px solid #eee;background:#fff;}
+  .pd-inp{flex:1;background:#f5f5f5;border:1px solid #e5e5e5;color:#1a1a1a;padding:9px 13px;border-radius:8px;font-size:0.82rem;outline:none;font-family:inherit;}
+  .pd-inp:focus{border-color:#1a8a3a;}
+  .pd-send{background:#1a8a3a;border:none;border-radius:8px;padding:9px 13px;cursor:pointer;color:#fff;font-size:0.9rem;transition:background .15s;}
+  .pd-send:hover{background:#0d6128;}
+  .pd-wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:10px 18px;border-radius:8px;font-size:0.76rem;font-weight:700;text-decoration:none;margin:0 14px 14px;font-family:inherit;transition:background .15s;}
+  .pd-wa:hover{background:#128C7E;}
+  .pd-toggle{width:52px;height:52px;background:#1a8a3a;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,0.25);transition:background .2s,transform .15s;}
+  .pd-toggle:hover{background:#0d6128;transform:scale(1.06);}
+  .pd-toggle svg{width:22px;height:22px;fill:#fff;}
+  .pd-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:#ff3b30;border-radius:50%;font-size:0.6rem;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;}
+  #pd-toggle-wrap{position:relative;}
+</style>
+
+<div id="pd-chat">
+  <div id="pd-chat-win">
+    <div class="pd-ch">
+      <div class="pd-av">💬</div>
+      <div class="pd-ch-info">
+        <h4>Trini Transit</h4>
+        <p>🟢 Online — replies instantly</p>
+      </div>
+      <button class="pd-close" onclick="pdToggle()" title="Close">✕</button>
+    </div>
+    <div class="pd-msgs" id="pd-msgs">
+      <div class="pd-msg bot">Hi there! 👋 Welcome to <strong>Trini Transit</strong>. How can I help you today?</div>
+    </div>
+    <div class="pd-qr" id="pd-qr"></div>
+    <div class="pd-inp-row">
+      <input class="pd-inp" id="pd-inp" placeholder="Type a message..." onkeydown="if(event.key==='Enter')pdSend()"/>
+      <button class="pd-send" onclick="pdSend()">&#10148;</button>
+    </div>
+  </div>
+  <div id="pd-toggle-wrap">
+    <button class="pd-toggle" id="pd-toggle-btn" onclick="pdToggle()">
+      <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </button>
+    <div class="pd-badge" id="pd-badge">1</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var QRS = [
+  ['Book a Maxi 🚌', 'Tell us your date, pickup location, destination, and group size on WhatsApp and we\'ll confirm availability and pricing right away!'],
+  ['School Trips 🏫', 'We specialise in safe, reliable school and university trips across Trinidad. WhatsApp us for group rates and availability.'],
+  ['Airport Runs ✈️', 'We cover Piarco Airport pickups and drop-offs. Send us your flight info on WhatsApp and we\'ll handle the rest.'],
+  ['Corporate Events 🏢', 'Planning a company event or team outing? We have packages for groups of all sizes. WhatsApp us for a custom quote.']
+];
+  var DEFAULT = 'Thanks for contacting Trini Transit! Tell us your transport needs on WhatsApp and we\'ll book you in. 🚌';
+  var WA = '18680000000';
+  var WA_MSG = 'Hi! I found Trini Transit online and I need group transport.';
+  var opened = false;
+
+  // Render quick reply buttons
+  var qrEl = document.getElementById('pd-qr');
+  QRS.forEach(function(q){
+    var b = document.createElement('button');
+    b.className = 'pd-qrb';
+    b.textContent = q[0];
+    b.onclick = function(){ pdQR(q[0], q[1]); };
+    qrEl.appendChild(b);
+  });
+
+  window.pdToggle = function(){
+    var win = document.getElementById('pd-chat-win');
+    var badge = document.getElementById('pd-badge');
+    var btn = document.getElementById('pd-toggle-btn');
+    opened = !opened;
+    if(opened){
+      win.classList.add('open');
+      badge.style.display = 'none';
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+    } else {
+      win.classList.remove('open');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
+    }
+  };
+
+  window.pdQR = function(label, reply){
+    pdAddMsg(label, 'usr');
+    document.getElementById('pd-qr').style.display = 'none';
+    setTimeout(function(){
+      pdAddMsg(reply, 'bot');
+      // Add WA button after reply
+      setTimeout(function(){
+        var wa = document.createElement('a');
+        wa.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(WA_MSG);
+        wa.target = '_blank';
+        wa.className = 'pd-wa';
+        wa.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.554 4.103 1.523 5.824L0 24l6.385-1.506A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.805 9.805 0 01-5.032-1.386l-.36-.214-3.733.881.939-3.618-.235-.372A9.808 9.808 0 012.182 12C2.182 6.573 6.573 2.182 12 2.182S21.818 6.573 21.818 12 17.427 21.818 12 21.818z"/></svg> Continue on WhatsApp';
+        document.getElementById('pd-msgs').appendChild(wa);
+        document.getElementById('pd-msgs').scrollTop = 9999;
+      }, 300);
+    }, 550);
+  };
+
+  window.pdSend = function(){
+    var inp = document.getElementById('pd-inp');
+    var txt = inp.value.trim();
+    if(!txt) return;
+    pdAddMsg(txt, 'usr');
+    inp.value = '';
+    document.getElementById('pd-qr').style.display = 'none';
+    setTimeout(function(){
+      var t = txt.toLowerCase();
+      var reply = DEFAULT;
+      QRS.forEach(function(q){
+        var kws = q[0].toLowerCase().replace(/[^a-z ]/g,'').split(' ');
+        kws.forEach(function(k){ if(k.length>3 && t.includes(k)) reply = q[1]; });
+      });
+      pdAddMsg(reply, 'bot');
+      setTimeout(function(){
+        var wa = document.createElement('a');
+        wa.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(WA_MSG);
+        wa.target = '_blank';
+        wa.className = 'pd-wa';
+        wa.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.554 4.103 1.523 5.824L0 24l6.385-1.506A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.805 9.805 0 01-5.032-1.386l-.36-.214-3.733.881.939-3.618-.235-.372A9.808 9.808 0 012.182 12C2.182 6.573 6.573 2.182 12 2.182S21.818 6.573 21.818 12 17.427 21.818 12 21.818z"/></svg> Continue on WhatsApp';
+        document.getElementById('pd-msgs').appendChild(wa);
+        document.getElementById('pd-msgs').scrollTop = 9999;
+      }, 300);
+    }, 550);
+  };
+
+  function pdAddMsg(txt, type){
+    var d = document.createElement('div');
+    d.className = 'pd-msg ' + type;
+    d.textContent = txt;
+    document.getElementById('pd-msgs').appendChild(d);
+    document.getElementById('pd-msgs').scrollTop = 9999;
+  }
+})();
+</script>
+<!-- ============ END PD CHATBOT ============ -->
+
 </body>
 </html>
