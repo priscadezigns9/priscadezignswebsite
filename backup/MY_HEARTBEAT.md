@@ -5,7 +5,6 @@
 - [ ] **Dreaming Anime Global Scan:** Monitor Crunchyroll and Netflix Anime for high-fidelity trailers/news.
 
 ## Recurring
-- [ ] Daily morning "GM ☀️" posts to @priscillanarine and @priscadezigns (X/Twitter).
 - [ ] Maintain "Heritage Anchor" (San Fernando, Trinidad) in all metadata.
 - Watch the Crunchyroll Facebook page (https://www.facebook.com/Crunchyroll) for immediate news relays for Dreaming Anime.
 - Watch the Netflix Anime Facebook page (https://www.facebook.com/NetflixAnime) for exclusive trailers for Dreaming Anime.
