@@ -110,8 +110,14 @@ function removeBase() {
  if (oldName) updateTemplateBtn(oldName, false);
 }
 function toggleAddon(id) {
- if (!cart.base) return;
- cart.addons[id] = !cart.addons[id];
+ if (!cart.base) {
+   // If no template selected, uncheck it and bail
+   var inp = document.getElementById('check-' + id + '-input');
+   if (inp) inp.checked = false;
+   return;
+ }
+ var inp = document.getElementById('check-' + id + '-input');
+ cart.addons[id] = inp ? inp.checked : !cart.addons[id];
  renderCart();
  updateAddonCards();
 }
@@ -127,6 +133,8 @@ function renderCart() {
  document.getElementById('cart-mo-total').textContent = '$0.00 / mo';
  var co = document.getElementById('cart-checkout');
  co.classList.add('disabled'); co.href = '#';
+ var chk = document.getElementById('cd-agree-chk');
+ if (chk) chk.checked = false;
  updateBadge();
  return;
  }
@@ -152,7 +160,9 @@ function renderCart() {
  var msg = lines.join('%0A');
  var co = document.getElementById('cart-checkout');
  co.href = 'https://wa.me/18683424101?text=' + msg;
- co.classList.remove('disabled');
+ var agrChk = document.getElementById('cd-agree-chk');
+ if (agrChk && agrChk.checked) { co.classList.remove('disabled'); }
+ else { co.classList.add('disabled'); }
  updateBadge();
 }
 function updateAddonCards() {
@@ -207,6 +217,16 @@ function openCart() {
 function closeCart() {
  document.getElementById('cart-drawer').classList.remove('open');
  document.getElementById('cart-overlay').classList.remove('open');
+}
+function updateAgreement() {
+ var chk = document.getElementById('cd-agree-chk');
+ var btn = document.getElementById('cart-checkout');
+ if (!btn || !chk) return;
+ if (chk.checked && cart.base) {
+   btn.classList.remove('disabled');
+ } else {
+   btn.classList.add('disabled');
+ }
 }
 renderCart();
 
