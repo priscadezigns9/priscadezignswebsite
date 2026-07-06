@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grain — Creative Portfolio Template | Prisca Dezigns</title>
+  <meta name="description" content="Grain — a cinematic text-mask portfolio template for consultants, artists, freelancers, coaches & photographers. Built by Prisca Dezigns.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+  <style>
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ─── TOKENS ─── */
+    :root {
+      --bg:      #000000;
+      --text:    #ffffff;
+      --muted:   rgba(255,255,255,0.42);
+      --dim:     rgba(255,255,255,0.18);
+      --display: 'Bebas Neue', Impact, sans-serif;
+      --body:    'Inter', system-ui, sans-serif;
+      --italic:  'Playfair Display', Georgia, serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; }
+
+    /* ─── COOKIE NOTICE (exact Grain style) ─── */
+    .cookie-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 500;
+      padding: 14px clamp(20px, 4vw, 48px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      background: var(--bg);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .cookie-bar a { text-decoration: underline; color: var(--muted); }
+    .cookie-bar button {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.35);
+      color: var(--text);
+      padding: 6px 18px;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 100px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .cookie-bar button:hover { background: rgba(255,255,255,0.08); }
+    .cookie-bar.hidden { display: none; }
+
+    /* ─── HEADER ─── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px clamp(20px, 4vw, 48px);
+    }
+
+    /* :: GRAIN wordmark — two dots + name */
+    .wordmark {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--body);
+      font-weight: 400;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      opacity: 0.9;
+    }
+    .wordmark-dots {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .wordmark-dots span {
+      display: flex;
+      gap: 3px;
+    }
+    .wordmark-dots i {
+      display: block;
+      width: 3px; height: 3px;
+      background: var(--text);
+      border-radius: 50%;
+    }
+
+    nav {
+      display: flex;
+      gap: clamp(24px, 4vw, 48px);
+      align-items: center;
+    }
+    nav a {
+      font-family: var(--body);
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    nav a:hover,
+    nav a.active { color: var(--text); }
+
+    /* ─────────────────────────────────────────────────
+       HERO — image masked through giant text letterforms
+       Exact Grain Post Production technique:
+       background-clip: text on a massive display heading,
+       with a parallax scrolling bg image.
+    ───────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      width: 100%;
+      /* tall enough for the scroll-parallax effect */
+      min-height: 100svh;
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    /* The sticky text-mask container */
+    .hero-mask-wrap {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Each masked line */
+    .mask-line {
+      display: block;
+      width: 100%;
+      font-family: var(--display);
+      font-size: clamp(18vw, 22vw, 26vw);
+      line-height: 0.88;
+      text-align: center;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+
+      /* THE MAGIC: image shows through the text letterforms */
+      color: transparent;
+      background-size: cover;
+      background-position: center;
+      -webkit-background-clip: text;
+      background-clip: text;
+
+      /* Subtle parallax — JS updates this */
+      will-change: background-position;
+    }
+
+    .mask-line-1 {
+      background-image: url('https://images.unsplash.com/photo-1519638399535-1b036603ac77?w=1800&q=85&fit=crop');
+      background-position: center 30%;
+    }
+    .mask-line-2 {
+      background-image: url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1800&q=85&fit=crop');
+      background-position: center 60%;
+    }
+
+    /* ─────────────────────────────────────────────────
+       PORTFOLIO — horizontal marquee strip
+    ───────────────────────────────────────────────── */
+    .portfolio {
+      padding: clamp(80px, 14vh, 160px) 0 clamp(60px, 10vh, 120px);
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    .portfolio-heading {
+      padding: 0 clamp(20px, 5vw, 60px);
+      margin-bottom: clamp(40px, 7vh, 80px);
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    .portfolio-heading h2 {
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: clamp(0.72rem, 1.4vw, 0.82rem);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .portfolio-heading .count {
+      font-family: var(--italic);
+      font-style: italic;
+      font-size: clamp(0.72rem, 1.4vw, 0.82rem);
+      color: var(--dim);
+    }
+
+    /* The drag-scrollable rail */
+    .port-rail {
+      display: flex;
+      gap: clamp(10px, 2vw, 20px);
+      padding: 0 clamp(20px, 5vw, 60px);
+      overflow-x: auto;
+      cursor: grab;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .port-rail::-webkit-scrollbar { display: none; }
+    .port-rail.dragging { cursor: grabbing; user-select: none; }
+
+    .port-item {
+      flex-shrink: 0;
+      width: clamp(260px, 32vw, 420px);
+    }
+
+    .port-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      background: #111;
+      position: relative;
+    }
+    .port-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      transition: transform 0.8s ease;
+    }
+    .port-item:hover .port-img img { transform: scale(1.04); }
+
+    .port-meta {
+      margin-top: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .port-title {
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: clamp(0.82rem, 1.6vw, 0.95rem);
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+    .port-service {
+      font-family: var(--italic);
+      font-style: italic;
+      font-size: clamp(0.72rem, 1.3vw, 0.8rem);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* ─────────────────────────────────────────────────
+       MARQUEE — scrolling client / discipline strip
+    ───────────────────────────────────────────────── */
+    .marquee-wrap {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      padding: 18px 0;
+      white-space: nowrap;
+    }
+    .marquee-track {
+      display: inline-flex;
+      gap: 0;
+      animation: marquee 24s linear infinite;
+    }
+    .marquee-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 24px;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .marquee-item::after {
+      content: '·';
+      color: var(--dim);
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ─────────────────────────────────────────────────
+       ABOUT
+    ───────────────────────────────────────────────── */
+    .about {
+      padding: clamp(80px, 14vh, 160px) clamp(20px, 5vw, 60px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 8vw, 120px);
+      align-items: start;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .about-left {}
+    .about-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .about-body {
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      line-height: 1.65;
+      color: rgba(255,255,255,0.82);
+      max-width: 520px;
+    }
+    .about-body strong {
+      color: var(--text);
+      font-weight: 400;
+    }
+    .about-cta {
+      display: inline-block;
+      margin-top: 36px;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text);
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      padding-bottom: 3px;
+      transition: border-color 0.2s;
+    }
+    .about-cta:hover { border-color: var(--text); }
+
+    .about-right {}
+    .about-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+    }
+    .stat {}
+    .stat-num {
+      font-family: var(--display);
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      line-height: 1;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ─────────────────────────────────────────────────
+       SERVICES (discipline list)
+    ───────────────────────────────────────────────── */
+    .services {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: clamp(60px, 10vh, 120px) clamp(20px, 5vw, 60px);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .services-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: clamp(40px, 7vh, 80px);
+    }
+    .services-header h2 {
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .svc-list {
+      display: flex;
+      flex-direction: column;
+    }
+    .svc-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: clamp(20px, 3.5vh, 32px) 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      gap: 24px;
+      transition: background 0.2s;
+      cursor: default;
+    }
+    .svc-row:hover .svc-name { color: rgba(255,255,255,0.6); }
+    .svc-name {
+      font-family: var(--display);
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      color: var(--text);
+      transition: color 0.3s;
+      line-height: 1;
+    }
+    .svc-desc {
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-align: right;
+      max-width: 200px;
+      line-height: 1.5;
+    }
+
+    /* ─────────────────────────────────────────────────
+       FULL-BLEED IMAGE BREAK
+    ───────────────────────────────────────────────── */
+    .img-break {
+      width: 100%;
+      height: clamp(300px, 60vh, 700px);
+      overflow: hidden;
+      position: relative;
+    }
+    .img-break img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    /* ─────────────────────────────────────────────────
+       CONTACT / FOOTER
+    ───────────────────────────────────────────────── */
+    .contact-section {
+      padding: clamp(80px, 14vh, 160px) clamp(20px, 5vw, 60px);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .contact-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: clamp(24px, 5vh, 56px);
+    }
+    .contact-cta {
+      display: block;
+      font-family: var(--display);
+      font-size: clamp(3rem, 8vw, 8rem);
+      line-height: 1;
+      letter-spacing: 0.01em;
+      color: var(--text);
+      transition: opacity 0.2s;
+    }
+    .contact-cta:hover { opacity: 0.6; }
+
+    .contact-grid {
+      margin-top: clamp(48px, 8vh, 100px);
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 40px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 32px;
+    }
+    .contact-col-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .contact-col-val {
+      font-size: 0.82rem;
+      color: var(--text);
+      font-weight: 300;
+    }
+    .contact-col-val a { transition: opacity 0.2s; }
+    .contact-col-val a:hover { opacity: 0.5; }
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 24px clamp(20px, 5vw, 60px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* ─────────────────────────────────────────────────
+       DEMO BAR
+    ───────────────────────────────────────────────── */
+    .demo-bar {
+      position: fixed;
+      bottom: 48px; left: 0; right: 0;
+      text-align: center;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      pointer-events: none;
+      z-index: 300;
+    }
+    .demo-bar a {
+      color: rgba(255,255,255,0.6);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      pointer-events: auto;
+    }
+    .cookie-bar + .demo-bar { bottom: 64px; }
+
+    /* ─────────────────────────────────────────────────
+       MOBILE
+    ───────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .mask-line {
+        font-size: clamp(22vw, 28vw, 35vw);
+      }
+
+      .about {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .about-right { order: -1; }
+      .about-stats { flex-direction: row; flex-wrap: wrap; gap: 24px; }
+
+      .contact-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      nav { gap: 20px; }
+      .svc-name { font-size: clamp(1.6rem, 8vw, 3rem); }
+    }
+
+    @media (max-width: 480px) {
+      .contact-grid { grid-template-columns: 1fr; }
+      .services-header { flex-direction: column; gap: 8px; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ── COOKIE NOTICE ── -->
+<div class="cookie-bar" id="cookieBar">
+  <span>[Your Name] uses cookies to ensure that we give you the best experience on our website. <a href="#">Learn more</a>.</span>
+  <button onclick="document.getElementById('cookieBar').classList.add('hidden')">Accept</button>
+</div>
+
+<!-- ── DEMO NOTICE ── -->
+<div class="demo-bar">
+  ✦ Template Demo — Grain by Prisca Dezigns &nbsp;·&nbsp;
+  <a href="https://priscadezigns.org/templates/">Choose This Template →</a>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <a class="wordmark" href="#">
+    <span class="wordmark-dots">
+      <span><i></i><i></i></span>
+      <span><i></i><i></i></span>
+    </span>
+    [Your Name]
+  </a>
+  <nav>
+    <a href="#portfolio" class="active">Work</a>
+    <a href="#services">Services</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<!-- ══════════════════════════════════
+     HERO — image-through-text mask
+     ══════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-mask-wrap">
+    <span class="mask-line mask-line-1" id="maskLine1">[YOUR]</span>
+    <span class="mask-line mask-line-2" id="maskLine2">[NAME]</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     PORTFOLIO — drag-scroll rail
+     ══════════════════════════════════ -->
+<section class="portfolio" id="portfolio">
+  <div class="portfolio-heading">
+    <h2>Selected Work</h2>
+    <span class="count">08 Projects</span>
+  </div>
+  <div class="port-rail" id="portRail">
+
+    <div class="port-item">
+      <div class="port-img">
+        <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80&fit=crop" alt="Project 01">
+      </div>
+      <div class="port-meta">
+        <span class="port-title">[Client / Project Name]</span>
+        <span class="port-service">[Service Type]</span>
+      </div>
+    </div>
+
+    <div class="port-item">
+      <div class="port-img">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80&fit=crop" alt="Project 02">
+      </div>
+      <div class="port-meta">
+        <span class="port-title">[Client / Project Name]</span>
+        <span class="port-service">[Service Type]</span>
+      </div>
+    </div>
+
+    <div class="port-item">
+      <div class="port-img">
+        <img src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=800&q=80&fit=crop" alt="Project 03">
+      </div>
+      <div class="port-meta">
+        <span class="port-title">[Client / Project Name]</span>
+        <span class="port-service">[Service Type]</span>
+      </div>
+    </div>
+
+    <div class="port-item">
+      <div class="port-img">
+        <img src="https://images.unsplash.com/photo-1488716820095-cbe80883c496?w=800&q=80&fit=crop" alt="Project 04">
+      </div>
+      <div class="port-meta">
+        <span class="port-title">[Client / Project Name]</span>
+        <span class="port-service">[Service Type]</span>
+      </div>
+    </div>
+
+    <div class="port-item">
+      <div class="port-img">
+        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80&fit=crop" alt="Project 05">
+      </div>
+      <div class="port-meta">
+        <span class="port-title">[Client / Project Name]</span>
+        <span class="port-service">[Service Type]</span>
+      </div>
+    </div>
+
+    <div class="port-item">
+      <div class="port-img">
+        <img src="https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?w=800&q=80&fit=crop" alt="Project 06">
+      </div>
+      <div class="port-meta">
+        <span class="port-title">[Client / Project Name]</span>
+        <span class="port-service">[Service Type]</span>
+      </div>
+    </div>
+
+    <div class="port-item">
+      <div class="port-img">
+        <img src="https://images.unsplash.com/photo-1519638399535-1b036603ac77?w=800&q=80&fit=crop" alt="Project 07">
+      </div>
+      <div class="port-meta">
+        <span class="port-title">[Client / Project Name]</span>
+        <span class="port-service">[Service Type]</span>
+      </div>
+    </div>
+
+    <div class="port-item">
+      <div class="port-img">
+        <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80&fit=crop" alt="Project 08">
+      </div>
+      <div class="port-meta">
+        <span class="port-title">[Client / Project Name]</span>
+        <span class="port-service">[Service Type]</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     MARQUEE — disciplines / clients
+     ══════════════════════════════════ -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Photography</span>
+    <span class="marquee-item">Consultation</span>
+    <span class="marquee-item">Art Direction</span>
+    <span class="marquee-item">Brand Identity</span>
+    <span class="marquee-item">Coaching</span>
+    <span class="marquee-item">Strategy</span>
+    <span class="marquee-item">Creative Direction</span>
+    <span class="marquee-item">Editorial</span>
+    <span class="marquee-item">Freelance</span>
+    <span class="marquee-item">Photography</span>
+    <span class="marquee-item">Consultation</span>
+    <span class="marquee-item">Art Direction</span>
+    <span class="marquee-item">Brand Identity</span>
+    <span class="marquee-item">Coaching</span>
+    <span class="marquee-item">Strategy</span>
+    <span class="marquee-item">Creative Direction</span>
+    <span class="marquee-item">Editorial</span>
+    <span class="marquee-item">Freelance</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ABOUT
+     ══════════════════════════════════ -->
+<section class="about" id="about">
+  <div class="about-left">
+    <p class="about-label">About</p>
+    <p class="about-body">
+      <strong>[Your Name]</strong> is a [your discipline] based in [your city].
+      Working at the intersection of [field one] and [field two], the focus is on
+      creating work that is precise, considered, and built to last.
+      <br><br>
+      Every project begins with listening — understanding what is needed,
+      what is missing, and what only you can bring to the world.
+    </p>
+    <a href="#contact" class="about-cta">Get in touch</a>
+  </div>
+
+  <div class="about-right">
+    <div class="about-stats">
+      <div class="stat">
+        <div class="stat-num">08+</div>
+        <div class="stat-label">Years of experience</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">120+</div>
+        <div class="stat-label">Projects delivered</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">40+</div>
+        <div class="stat-label">Clients worldwide</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     FULL-BLEED IMAGE BREAK
+     ══════════════════════════════════ -->
+<div class="img-break">
+  <img src="https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?w=1800&q=85&fit=crop" alt="Studio">
+</div>
+
+<!-- ══════════════════════════════════
+     SERVICES
+     ══════════════════════════════════ -->
+<section class="services" id="services">
+  <div class="services-header">
+    <h2>Services</h2>
+  </div>
+  <div class="svc-list">
+    <div class="svc-row">
+      <span class="svc-name">Photography</span>
+      <span class="svc-desc">Editorial, portrait,<br>campaign & lifestyle</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-name">Direction</span>
+      <span class="svc-desc">Creative & art<br>direction for brands</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-name">Consulting</span>
+      <span class="svc-desc">Brand, strategy<br>& visual identity</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-name">Coaching</span>
+      <span class="svc-desc">1-on-1 sessions,<br>workshops & mentorship</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     CONTACT
+     ══════════════════════════════════ -->
+<section class="contact-section" id="contact">
+  <p class="contact-label">Get in touch</p>
+  <a href="mailto:hello@yourdomain.com" class="contact-cta">
+    Let's work<br>together
+  </a>
+
+  <div class="contact-grid">
+    <div>
+      <p class="contact-col-label">Email</p>
+      <p class="contact-col-val"><a href="mailto:hello@yourdomain.com">hello@yourdomain.com</a></p>
+    </div>
+    <div>
+      <p class="contact-col-label">Based in</p>
+      <p class="contact-col-val">[Your City, Country]</p>
+    </div>
+    <div>
+      <p class="contact-col-label">Social</p>
+      <p class="contact-col-val">
+        <a href="#" target="_blank">Instagram</a><br>
+        <a href="#" target="_blank">LinkedIn</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <span>[Your Name] © 2026</span>
+  <span>All rights reserved</span>
+  <span>Built by <a href="https://priscadezigns.org" style="color:inherit;text-decoration:underline">Prisca Dezigns</a></span>
+</footer>
+
+<script>
+  /* ── Parallax on hero text masks ── */
+  (function() {
+    const line1 = document.getElementById('maskLine1');
+    const line2 = document.getElementById('maskLine2');
+
+    function onScroll() {
+      const sy = window.scrollY;
+      const h  = window.innerHeight;
+      const pct = sy / h;
+
+      // Line 1 scrolls slower than bg (depth illusion)
+      const y1 = 30 + pct * 28;
+      const y2 = 60 - pct * 20;
+
+      if (line1) line1.style.backgroundPosition = `center ${y1}%`;
+      if (line2) line2.style.backgroundPosition = `center ${y2}%`;
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  /* ── Drag-scroll on portfolio rail ── */
+  (function() {
+    const rail = document.getElementById('portRail');
+    if (!rail) return;
+    let isDown = false, startX = 0, scrollLeft = 0;
+
+    rail.addEventListener('mousedown', e => {
+      isDown = true;
+      rail.classList.add('dragging');
+      startX = e.pageX - rail.offsetLeft;
+      scrollLeft = rail.scrollLeft;
+    });
+    document.addEventListener('mouseup', () => {
+      isDown = false;
+      rail.classList.remove('dragging');
+    });
+    rail.addEventListener('mouseleave', () => {
+      isDown = false;
+      rail.classList.remove('dragging');
+    });
+    rail.addEventListener('mousemove', e => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - rail.offsetLeft;
+      rail.scrollLeft = scrollLeft - (x - startX) * 1.4;
+    });
+
+    // Touch support
+    let touchStart = 0, touchScrollLeft = 0;
+    rail.addEventListener('touchstart', e => {
+      touchStart = e.touches[0].pageX;
+      touchScrollLeft = rail.scrollLeft;
+    }, { passive: true });
+    rail.addEventListener('touchmove', e => {
+      const diff = touchStart - e.touches[0].pageX;
+      rail.scrollLeft = touchScrollLeft + diff;
+    }, { passive: true });
+  })();
+
+  /* ── Smooth scroll nav links ── */
+  document.querySelectorAll('nav a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('nav a').forEach(l => l.classList.remove('active'));
+      a.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
