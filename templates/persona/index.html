@@ -1,640 +1,1117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="top">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SARAH COLE — Brand Strategist & Creative Consultant</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Your Name — Creative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<!-- ABCSocialMono equiv: Space Mono | BOW display serif equiv: Playfair Display -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
+/* ══════════════════════════════════════
+   PERSONA — Extracted from bow.no
+   ══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* ── RESET & BASE ── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+:root {
+  --font-base-px: 20px;
+  --container-padding: 3vw;
+  --bg-dark: #000;
+  --bg-light: #fff;
+  --bg-warm:  #f9f7f4;
+  --text:     #1a1a1a;
+  --muted:    #929292;
+  --border:   rgba(0,0,0,0.12);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-mono:    'Space Mono', monospace;         /* ABCSocialMono */
+  --vp-100vh: 100vh;
+}
 
-  :root {
-    --black:   #0a0a0a;
-    --white:   #f5f4f0;
-    --mid:     #7a7a72;
-    --border:  rgba(10,10,10,0.12);
-    --font-h:  'Syne', sans-serif;
-    --font-b:  'Inter', sans-serif;
-  }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-light);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--font-base-px);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
 
-  body {
-    background: var(--white);
-    color: var(--black);
-    font-family: var(--font-b);
-    font-size: 1rem;
-    line-height: 1.6;
-    overflow-x: hidden;
-  }
+/* ── arrow-span hover animations (exact bow.no) ── */
+span[class^=arrow-] {
+  transition: all .15s ease;
+  display: inline-block;
+  backface-visibility: hidden;
+}
+a:hover span.arrow-r  { transform: translate(5px); }
+a:hover span.arrow-l  { transform: translate(-5px); }
+a:hover span.arrow-u  { transform: translateY(-5px); }
+a:hover span.arrow-d  { transform: translateY(5px); }
+a:hover span.arrow-ne { transform: translateY(-5px) translate(5px); }
 
-  /* ── NAV ── */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 48px;
-    height: 64px;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-logo {
-    font-family: var(--font-h);
-    font-size: 0.85rem;
-    font-weight: 800;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--black);
-    text-decoration: none;
-  }
-  .nav-links {
-    display: flex; gap: 40px; list-style: none;
-  }
-  .nav-links a {
-    font-family: var(--font-b);
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 1px;
-    color: var(--mid);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--black); }
-  .nav-tag {
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--mid);
-    border: 1px solid var(--border);
-    padding: 7px 18px;
-    border-radius: 2px;
-  }
+/* ── backdrop blur (exact bow.no .backdrop) ── */
+.backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 80;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.backdrop.show { opacity: 1; pointer-events: all; }
 
-  /* ── TICKER ── */
-  .ticker-wrap {
-    overflow: hidden;
-    background: var(--black);
-    padding: 11px 0;
-    margin-top: 64px;
-  }
-  .ticker-track {
-    display: flex;
-    width: max-content;
-    animation: ticker 22s linear infinite;
-  }
-  .ticker-item {
-    display: flex; align-items: center; gap: 28px;
-    padding: 0 28px;
-    flex-shrink: 0;
-  }
-  .ticker-item span {
-    font-family: var(--font-h);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--white);
-    white-space: nowrap;
-    opacity: 0.85;
-  }
-  .ticker-sep {
-    width: 3px; height: 3px;
-    background: rgba(245,244,240,0.4);
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  @keyframes ticker {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
+/* ══════════════════════════════════════
+   HEADER / NAV — exact bow.no
+   ══════════════════════════════════════ */
+[data-nav] {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 var(--container-padding);
+}
 
-  /* ── HERO ── */
-  .hero {
-    padding: 80px 48px 0;
-    border-bottom: 1px solid var(--border);
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 40px;
-    align-items: end;
-    min-height: 76vh;
-  }
-  .hero-left { padding-bottom: 64px; }
-  .hero-kicker {
-    display: inline-flex; align-items: center; gap: 12px;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--mid);
-    margin-bottom: 40px;
-  }
-  .hero-kicker::before {
-    content: '';
-    display: block;
-    width: 28px; height: 1px;
-    background: var(--mid);
-  }
-  .hero-name {
-    font-family: var(--font-h);
-    font-size: clamp(4.5rem, 11vw, 9.5rem);
-    font-weight: 800;
-    line-height: 0.9;
-    letter-spacing: -4px;
-    color: var(--black);
-    margin-bottom: 36px;
-  }
-  .hero-desc {
-    font-size: 1.05rem;
-    font-weight: 400;
-    color: var(--mid);
-    max-width: 460px;
-    line-height: 1.75;
-    margin-bottom: 48px;
-  }
-  .hero-actions { display: flex; align-items: center; gap: 24px; }
-  .btn-dark {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: var(--black); color: var(--white);
-    padding: 14px 30px; border-radius: 2px;
-    font-size: 0.78rem; font-weight: 600;
-    letter-spacing: 2px; text-transform: uppercase;
-    text-decoration: none; transition: opacity 0.2s;
-  }
-  .btn-dark:hover { opacity: 0.8; }
-  .btn-link {
-    font-size: 0.78rem; font-weight: 600;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--mid); text-decoration: none;
-    border-bottom: 1px solid var(--border); padding-bottom: 2px;
-    transition: color 0.2s, border-color 0.2s;
-  }
-  .btn-link:hover { color: var(--black); border-color: var(--black); }
-  .hero-right {
-    display: flex; flex-direction: column;
-    justify-content: flex-end; padding-bottom: 64px;
-  }
-  .hero-tag {
-    font-size: 0.68rem; font-weight: 600;
-    letter-spacing: 2px; text-transform: uppercase;
-    color: var(--mid);
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform: rotate(180deg);
-  }
+nav#menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  position: relative;
+}
 
-  /* ── WORD STRIP ── */
-  .word-strip {
-    overflow: hidden;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 0;
-  }
-  .word-track {
-    display: flex; width: max-content;
-    animation: ticker 32s linear infinite;
-  }
-  .word-item {
-    font-family: var(--font-h);
-    font-size: clamp(2.4rem, 4.5vw, 4rem);
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    color: var(--black);
-    padding: 0 36px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    line-height: 1.1;
-  }
-  .word-item.outline {
-    -webkit-text-stroke: 1.5px var(--black);
-    color: transparent;
-  }
-  .word-sep {
-    font-family: var(--font-h);
-    font-size: clamp(2.4rem, 4.5vw, 4rem);
-    font-weight: 800;
-    color: var(--mid);
-    padding: 0 8px;
-    flex-shrink: 0;
-    opacity: 0.3;
-    line-height: 1.1;
-  }
+/* BOW brand figure — exact SVG wordmark in nav */
+figure.brand a {
+  display: block;
+  text-decoration: none;
+}
+figure.brand svg {
+  width: 60px; height: auto;
+  display: block;
+  transition: opacity .2s;
+}
+figure.brand svg:hover { opacity: 0.7; }
 
-  /* ── STATS BAND ── */
-  .stats-band {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border-bottom: 1px solid var(--border);
-  }
-  .stat-cell {
-    padding: 44px 40px;
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; gap: 8px;
-  }
-  .stat-cell:last-child { border-right: none; }
-  .stat-num {
-    font-family: var(--font-h);
-    font-size: 3rem; font-weight: 800;
-    color: var(--black); line-height: 1; letter-spacing: -2px;
-  }
-  .stat-label {
-    font-size: 0.72rem; font-weight: 500;
-    letter-spacing: 2px; text-transform: uppercase; color: var(--mid);
-  }
+/* Nav links section */
+nav#menu .main {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(380px, 85vw);
+  background: var(--bg-light);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  padding: 5rem 3rem;
+  transform: translateX(100%);
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+}
+nav#menu .main.open {
+  transform: translateX(0);
+}
+nav#menu .main ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+}
+nav#menu .main ul li a {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-style: italic;
+  color: var(--text);
+  text-decoration: none;
+  transition: color .2s;
+  display: block;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+nav#menu .main ul li a:hover { color: var(--muted); }
+nav#menu .main ul li:last-child a { border-bottom: none; }
 
-  /* ── ABOUT ── */
-  .about-section {
-    display: grid; grid-template-columns: 1fr 1fr;
-    border-bottom: 1px solid var(--border);
-    min-height: 600px;
-  }
-  .about-img {
-    border-right: 1px solid var(--border);
-    position: relative; overflow: hidden; min-height: 520px;
-  }
-  .about-img img {
-    position: absolute; inset: 0;
-    width: 100%; height: 100%;
-    object-fit: cover; object-position: center top;
-  }
-  .about-content {
-    padding: 80px 64px;
-    display: flex; flex-direction: column; justify-content: center; gap: 24px;
-  }
-  .section-eyebrow {
-    font-size: 0.68rem; font-weight: 700;
-    letter-spacing: 4px; text-transform: uppercase; color: var(--mid);
-    display: flex; align-items: center; gap: 12px;
-  }
-  .section-eyebrow::before {
-    content: ''; display: block;
-    width: 24px; height: 1px; background: var(--mid);
-  }
-  .about-title {
-    font-family: var(--font-h);
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800; line-height: 1.05;
-    letter-spacing: -1px; color: var(--black);
-  }
-  .about-body {
-    font-size: 0.97rem; color: var(--mid); line-height: 1.8; max-width: 400px;
-  }
-  .about-detail-row { display: flex; gap: 36px; margin-top: 8px; flex-wrap: wrap; }
-  .about-detail { display: flex; flex-direction: column; gap: 4px; }
-  .detail-label {
-    font-size: 0.67rem; font-weight: 700;
-    letter-spacing: 2.5px; text-transform: uppercase; color: var(--mid);
-  }
-  .detail-val {
-    font-family: var(--font-h);
-    font-size: 0.98rem; font-weight: 700; color: var(--black);
-  }
+/* Hamburger — exact bow.no */
+figure.menu-button { z-index: 101; }
+.hamburger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-decoration: none;
+  color: var(--bg-light);
+  transition: color .2s;
+}
+.hamburger span:not(.hamburger-label) {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.hamburger .hamburger-box {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.hamburger .hamburger-inner {
+  display: block; width: 22px; height: 1.5px;
+  background: currentColor;
+  transition: all .25s;
+  position: relative;
+}
+.hamburger .hamburger-inner::before,
+.hamburger .hamburger-inner::after {
+  content: '';
+  display: block;
+  width: 22px; height: 1.5px;
+  background: currentColor;
+  position: absolute;
+  transition: all .25s;
+}
+.hamburger .hamburger-inner::before { top: -6px; }
+.hamburger .hamburger-inner::after  { top:  6px; }
 
-  /* ── WORK ── */
-  .work-section { border-bottom: 1px solid var(--border); }
-  .work-header {
-    display: flex; align-items: baseline; justify-content: space-between;
-    padding: 48px 48px 0;
-  }
-  .work-title {
-    font-family: var(--font-h);
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
-    font-weight: 800; letter-spacing: -1px; color: var(--black);
-  }
-  .work-count {
-    font-size: 0.72rem; font-weight: 600;
-    letter-spacing: 2px; text-transform: uppercase; color: var(--mid);
-  }
-  .work-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    border-top: 1px solid var(--border); margin-top: 40px;
-  }
-  .work-card {
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    text-decoration: none; overflow: hidden; transition: background 0.2s;
-  }
-  .work-card:last-child { border-right: none; }
-  .work-card:hover { background: rgba(10,10,10,0.03); }
-  .work-img { width: 100%; aspect-ratio: 16/10; overflow: hidden; position: relative; }
-  .work-img img {
-    width: 100%; height: 100%; object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-  .work-card:hover .work-img img { transform: scale(1.04); }
-  .work-info {
-    padding: 22px 28px 26px;
-    border-top: 1px solid var(--border);
-    display: flex; flex-direction: column; gap: 5px;
-  }
-  .work-cat {
-    font-size: 0.67rem; font-weight: 700;
-    letter-spacing: 2.5px; text-transform: uppercase; color: var(--mid);
-  }
-  .work-name {
-    font-family: var(--font-h);
-    font-size: 1.05rem; font-weight: 700;
-    color: var(--black); letter-spacing: -0.3px;
-  }
+.hamburger.is-dark { color: var(--text); }
+.hamburger.close-btn {
+  position: absolute; top: 1.5rem; right: 1.5rem;
+  color: var(--text);
+}
 
-  /* ── SERVICES ── */
-  .svc-section { border-bottom: 1px solid var(--border); }
-  .svc-header {
-    display: flex; align-items: baseline; justify-content: space-between;
-    padding: 64px 48px 40px; border-bottom: 1px solid var(--border);
-  }
-  .svc-title-block { display: flex; flex-direction: column; gap: 12px; }
-  .svc-h {
-    font-family: var(--font-h);
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
-    font-weight: 800; letter-spacing: -1px; color: var(--black);
-  }
-  .svc-sub {
-    font-size: 0.9rem; color: var(--mid); max-width: 360px; line-height: 1.6;
-  }
-  .svc-list { list-style: none; }
-  .svc-row {
-    display: grid; grid-template-columns: 1fr auto auto;
-    align-items: center; gap: 24px;
-    padding: 28px 48px; border-bottom: 1px solid var(--border);
-    transition: background 0.2s;
-  }
-  .svc-row:hover { background: rgba(10,10,10,0.03); }
-  .svc-row:last-child { border-bottom: none; }
-  .svc-name-col {
-    font-family: var(--font-h);
-    font-size: 1.25rem; font-weight: 700;
-    color: var(--black); letter-spacing: -0.3px;
-  }
-  .svc-desc-col {
-    font-size: 0.82rem; color: var(--mid); max-width: 280px;
-  }
-  .svc-price-col {
-    font-family: var(--font-h);
-    font-size: 1.15rem; font-weight: 800;
-    color: var(--black); white-space: nowrap; text-align: right;
-  }
+/* ══════════════════════════════════════
+   [b-tpl=hero] — exact bow.no
+   fullscreen bg video/image + tagline top + arrow+logo bottom
+   ══════════════════════════════════════ */
+[b-tpl=hero] {
+  padding-top: 0 !important;
+  height: var(--vp-100vh);
+  position: relative;
+  background-color: var(--bg-dark);
+  overflow: hidden;
+}
 
-  /* ── CTA ── */
-  .cta-section {
-    background: var(--black);
-    padding: 120px 48px;
-    display: grid; grid-template-columns: 1fr auto;
-    gap: 64px; align-items: end;
-  }
-  .cta-headline {
-    font-family: var(--font-h);
-    font-size: clamp(3rem, 8vw, 7rem);
-    font-weight: 800; letter-spacing: -3px;
-    color: var(--white); line-height: 0.93;
-  }
-  .cta-headline em {
-    font-style: normal;
-    -webkit-text-stroke: 1.5px var(--white); color: transparent;
-  }
-  .cta-right {
-    display: flex; flex-direction: column; gap: 20px; align-items: flex-end; flex-shrink: 0;
-  }
-  .cta-note {
-    font-size: 0.82rem; color: rgba(245,244,240,0.4);
-    text-align: right; max-width: 220px; line-height: 1.65;
-  }
-  .btn-white {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: var(--white); color: var(--black);
-    padding: 16px 34px; border-radius: 2px;
-    font-size: 0.78rem; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
-    text-decoration: none; transition: opacity 0.2s;
-  }
-  .btn-white:hover { opacity: 0.88; }
+/* Background */
+[b-tpl=hero] .bg {
+  position: absolute; inset: 0;
+  height: 100%; z-index: 0;
+}
+[b-tpl=hero] .bg img,
+[b-tpl=hero] .bg video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(0.45);
+}
 
-  /* ── FOOTER ── */
-  footer {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 16px; padding: 28px 48px;
-    background: var(--black);
-    border-top: 1px solid rgba(255,255,255,0.08);
-  }
-  .footer-brand {
-    font-family: var(--font-h); font-size: 0.78rem; font-weight: 800;
-    letter-spacing: 3px; text-transform: uppercase; color: var(--white);
-  }
-  .footer-copy { font-size: 0.7rem; color: rgba(245,244,240,0.3); }
-  .footer-pd { font-size: 0.7rem; color: rgba(245,244,240,0.3); }
-  .footer-pd a { color: rgba(245,244,240,0.55); text-decoration: none; }
-  .footer-pd a:hover { color: var(--white); }
+/* Cycling slides */
+.hero-slide {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.hero-slide.active { opacity: 1; }
 
-  /* ── BADGE ── */
-  .template-badge {
-    position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-    background: #4a1a6b; color: #fff;
-    padding: 12px 22px; border-radius: 2px;
-    font-size: 0.72rem; font-weight: 800;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    text-decoration: none;
-    display: flex; align-items: center; gap: 8px;
-    box-shadow: 0 8px 32px rgba(74,26,107,0.5);
-    transition: opacity 0.2s;
-  }
-  .template-badge:hover { opacity: 0.9; }
-  .badge-dot { width: 6px; height: 6px; background: #c8a2c8; border-radius: 50%; }
+/* Inner — flex column, space-between (exact bow.no) */
+[b-tpl=hero] .inner {
+  height: var(--vp-100vh);
+  display: flex; z-index: 3;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--container-padding);
+  padding-top: 6rem;
+  padding-bottom: 2rem;
+}
 
-  /* ── MOBILE ── */
-  @media (max-width: 900px) {
-    nav { padding: 0 24px; }
-    .nav-links { display: none; }
-    .hero { grid-template-columns: 1fr; padding: 60px 24px 0; min-height: auto; }
-    .hero-right { display: none; }
-    .hero-left { padding-bottom: 48px; }
-    .stats-band { grid-template-columns: repeat(2,1fr); }
-    .stat-cell:nth-child(2) { border-right: none; }
-    .about-section { grid-template-columns: 1fr; }
-    .about-img { min-height: 360px; border-right: none; border-bottom: 1px solid var(--border); }
-    .about-content { padding: 48px 24px; }
-    .work-grid { grid-template-columns: 1fr; }
-    .work-card { border-right: none; border-bottom: 1px solid var(--border); }
-    .work-header { padding: 40px 24px 0; }
-    .svc-header { padding: 48px 24px 32px; flex-direction: column; gap: 12px; }
-    .svc-row { grid-template-columns: 1fr; gap: 8px; padding: 24px; }
-    .svc-price-col { text-align: left; }
-    .cta-section { grid-template-columns: 1fr; padding: 80px 24px; gap: 40px; }
-    .cta-right { align-items: flex-start; }
-    footer { padding: 24px; flex-direction: column; }
+/* Tagline — top (exact bow.no) */
+[b-tpl=hero] .inner .top .tagline {
+  position: relative; color: #fff;
+}
+[b-tpl=hero] .inner .top .tagline p {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  font-weight: 400;
+  max-width: 480px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.8);
+}
+[b-tpl=hero] .inner .top .tagline p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  color: #fff;
+}
+
+/* Bottom: arrow left + BOW logo centered (exact bow.no) */
+[b-tpl=hero] .inner .bottom {
+  display: flex;
+  position: relative;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+[b-tpl=hero] .inner .bottom .arrow {
+  position: relative;
+  bottom: 0; z-index: 3;
+}
+[b-tpl=hero] .inner .bottom .arrow a {
+  display: flex; align-items: center; gap: 10px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.arrow-animated {
+  animation: arrowBounce 2s infinite ease-in-out;
+}
+@keyframes arrowBounce {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(6px); }
+}
+
+/* BOW-style wordmark centered in hero bottom */
+[b-tpl=hero] .inner .bottom .logo {
+  margin: 0 auto;
+}
+.hero-wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 18vw, 16rem);
+  font-style: italic;
+  font-weight: 700;
+  color: rgba(255,255,255,0.06);
+  letter-spacing: -4px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0; right: 0;
+  text-align: center;
+  z-index: 2;
+}
+
+/* ══════════════════════════════════════
+   [b-tpl="about + links"] — exact bow.no
+   Full-height white section, preamble + 3 buttons (squircle, circle, square)
+   ══════════════════════════════════════ */
+[b-tpl="about + links"] {
+  padding-top: 0 !important;
+  height: var(--vp-100vh);
+  position: relative;
+  background-color: var(--bg-light);
+}
+[b-tpl="about + links"] .inner {
+  min-height: var(--vp-100vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--container-padding);
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+}
+[b-tpl="about + links"] .inner .preamble p {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.4;
+  max-width: 700px;
+  color: var(--text);
+}
+[b-tpl="about + links"] .inner .preamble p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+}
+/* Exact bow.no three button shapes */
+[b-tpl="about + links"] .inner .buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+[b-tpl="about + links"] .inner .buttons a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--text);
+  padding: 14px 28px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  transition: border-radius .35s ease, background .2s;
+}
+[b-tpl="about + links"] .inner .buttons a:hover { background: rgba(0,0,0,0.04); }
+/* squircle — rounded, hovers to circle */
+[b-tpl="about + links"] .inner .buttons a:first-of-type {
+  border-radius: 3vw;
+}
+[b-tpl="about + links"] .inner .buttons a:first-of-type:hover {
+  border-radius: 50%;
+}
+/* circle — starts circle, hovers to square */
+[b-tpl="about + links"] .inner .buttons a:nth-of-type(2) {
+  border-radius: 50%;
+}
+[b-tpl="about + links"] .inner .buttons a:nth-of-type(2):hover {
+  border-radius: 0;
+}
+/* square — stays square, hovers to circle */
+[b-tpl="about + links"] .inner .buttons a:nth-of-type(3):hover {
+  border-radius: 50%;
+}
+
+/* ══════════════════════════════════════
+   [b-tpl="datasource intros"] — exact bow.no
+   Stacked full-height project panels, each with --bg color,
+   2 media figs (landscape video + portrait photo), text overlay
+   ══════════════════════════════════════ */
+[b-tpl="datasource intros"] { padding-top: 0 !important; }
+[b-tpl="datasource intros"] .inner .intros {
+  display: flex; flex-direction: column;
+}
+/* Each intro panel */
+[b-tpl="datasource intros"] .inner .intros .intro > article {
+  padding-top: 0 !important;
+  height: var(--vp-100vh);
+  position: relative;
+  background-color: var(--bg);
+  overflow: hidden;
+}
+/* Case link — full overlay (exact bow.no) */
+[b-tpl="datasource intros"] .inner .intros .intro > article a.case-link {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 3;
+  cursor: pointer;
+}
+
+/* Inner grid: 2 figs + text (exact bow.no) */
+[b-tpl="datasource intros"] .inner .intros .intro > article .inner {
+  position: relative; z-index: 2;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+/* Background figs */
+[b-tpl="datasource intros"] .inner .intros .intro > article .bg {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  height: 100%;
+  z-index: 0;
+}
+.fig1, .fig2 {
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+}
+.fig1 img, .fig2 img,
+.fig1 video, .fig2 video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Text overlay — full height, flex column space-between (exact bow.no) */
+[b-tpl="datasource intros"] .inner .intros .intro > article .text {
+  height: var(--vp-100vh);
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  position: relative; z-index: 3;
+  grid-column: 1 / -1;
+  padding: var(--container-padding);
+  padding-top: 5rem;
+  padding-bottom: 2rem;
+  pointer-events: none;
+}
+[b-tpl="datasource intros"] .inner .intros .intro > article .text .top p {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.3;
+  max-width: 600px;
+}
+[b-tpl="datasource intros"] .inner .intros .intro > article .text .top p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+}
+[b-tpl="datasource intros"] .inner .intros .intro > article .text .bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+/* Footer tags — exact bow.no: glassmorphism pills, mono font */
+.footer-text { color: #fff; }
+.footer-text ul {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  list-style: none;
+}
+.footer-text ul li {
+  background-color: rgba(255,255,255,0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background-blend-mode: overlay;
+  padding: 4px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+}
+/* Index counter (exact bow.no X/X) */
+.index {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ══════════════════════════════════════
+   [b-tpl="datasource clients"] — exact bow.no
+   Preamble + client list with hover image reveal
+   ══════════════════════════════════════ */
+[b-tpl="datasource clients"] { padding-top: 0 !important; }
+[b-tpl="datasource clients"] .inner {
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  min-height: var(--vp-100vh);
+  padding: var(--container-padding);
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+}
+[b-tpl="datasource clients"] .inner .preamble p {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  max-width: 600px;
+  line-height: 1.5;
+  margin-bottom: 3rem;
+}
+[b-tpl="datasource clients"] .inner .preamble p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+}
+/* Client rows — exact bow.no: large text, hover to reveal image */
+[b-tpl="datasource clients"] .inner .clients {
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.client {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+  position: relative;
+  transition: background .2s;
+}
+.client:first-child { border-top: 1px solid var(--border); }
+.client:hover { background: var(--bg-warm); }
+.client p {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.5vw, 2rem);
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0;
+}
+.client p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+}
+/* Hover image — exact bow.no: floating preview follows cursor */
+.client-hover-img {
+  position: fixed;
+  top: 0; left: 0;
+  width: 260px;
+  aspect-ratio: 4/3;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity .25s ease;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.client-hover-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* squircle CTA at bottom of clients */
+[b-tpl="datasource clients"] .inner .squircle {
+  margin-top: 3rem;
+  display: block;
+}
+[b-tpl="datasource clients"] .inner .squircle a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--text);
+  padding: 14px 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 3vw;
+  transition: border-radius .35s ease;
+}
+[b-tpl="datasource clients"] .inner .squircle a:hover {
+  border-radius: 50%;
+}
+
+/* ══════════════════════════════════════
+   FOOTER — exact bow.no
+   fullscreen dark video bg + contact info grid
+   ══════════════════════════════════════ */
+footer {
+  position: relative;
+  height: var(--vp-100vh);
+  background: var(--bg-dark);
+  overflow: hidden;
+}
+footer .bg {
+  position: absolute; inset: 0;
+  z-index: 0;
+}
+footer .bg img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(0.35);
+}
+footer .inner {
+  position: relative; z-index: 2;
+  height: 100%;
+  display: flex; align-items: flex-end;
+  padding: var(--container-padding);
+  padding-bottom: 3rem;
+}
+footer .inner .wrapper {
+  width: 100%;
+  display: flex; flex-direction: column;
+  gap: 2.5rem;
+}
+footer .inner .wrapper .top p {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.5rem);
+  font-weight: 400;
+  font-style: italic;
+  color: #fff;
+  line-height: 1.35;
+}
+footer .inner .wrapper .bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+footer .contact {
+  display: flex; flex-wrap: wrap; gap: 3rem;
+}
+footer .contact p {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  line-height: 2;
+  color: rgba(255,255,255,0.65);
+}
+footer .contact p a {
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  transition: color .2s;
+  display: block;
+}
+footer .contact p a:hover { color: #fff; }
+/* footer of footer (exact bow.no) */
+.footer-has-a-footer-dear-god p {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ══════════════════════════════════════
+   BOW SVG wordmark (extracted exact SVG from bow.no)
+   Repositioned as corner watermark
+   ══════════════════════════════════════ */
+.BOW {
+  position: fixed;
+  bottom: 2rem; left: var(--container-padding);
+  z-index: 200;
+  width: 44px;
+  opacity: 0;
+  transition: opacity .5s .5s;
+  pointer-events: none;
+}
+.BOW.visible { opacity: 1; }
+.BOW svg { width: 100%; height: auto; }
+
+/* ── BADGE ── */
+.template-badge {
+  position: fixed; bottom: 24px; right: 24px; z-index: 99999;
+  background: var(--text);
+  color: var(--bg-light);
+  padding: 12px 22px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  transition: opacity .2s;
+}
+.template-badge:hover { opacity: 0.8; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  :root { --container-padding: 5vw; }
+  [b-tpl="datasource intros"] .inner .intros .intro > article .bg {
+    grid-template-columns: 1fr;
   }
+  .fig2 { display: none; }
+  [b-tpl="about + links"] { height: auto; }
+  [b-tpl="datasource clients"] .inner { min-height: auto; }
+  footer { height: auto; padding-top: 40vw; }
+  .hero-wordmark { font-size: clamp(3rem, 18vw, 8rem); }
+}
 </style>
 </head>
-<body>
+<body id="top">
 
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">Sarah Cole</a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#work">Work</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-  <span class="nav-tag">Available for Projects</span>
-</nav>
-
-<!-- TICKER -->
-<div class="ticker-wrap">
-  <div class="ticker-track">
-    <div class="ticker-item"><span>Brand Strategy</span><div class="ticker-sep"></div><span>Creative Direction</span><div class="ticker-sep"></div><span>Visual Identity</span><div class="ticker-sep"></div><span>Growth Consulting</span><div class="ticker-sep"></div><span>Content Strategy</span><div class="ticker-sep"></div></div>
-    <div class="ticker-item"><span>Brand Strategy</span><div class="ticker-sep"></div><span>Creative Direction</span><div class="ticker-sep"></div><span>Visual Identity</span><div class="ticker-sep"></div><span>Growth Consulting</span><div class="ticker-sep"></div><span>Content Strategy</span><div class="ticker-sep"></div></div>
-    <div class="ticker-item"><span>Brand Strategy</span><div class="ticker-sep"></div><span>Creative Direction</span><div class="ticker-sep"></div><span>Visual Identity</span><div class="ticker-sep"></div><span>Growth Consulting</span><div class="ticker-sep"></div><span>Content Strategy</span><div class="ticker-sep"></div></div>
-  </div>
+<!-- HOVER IMAGE FOLLOWER (bow.no client list hover effect) -->
+<div class="client-hover-img" id="hoverImg">
+  <img src="" alt="" id="hoverImgEl"/>
 </div>
 
-<!-- HERO -->
-<section class="hero" id="home">
-  <div class="hero-left">
-    <div class="hero-kicker">Brand Strategist · Creative Consultant</div>
-    <h1 class="hero-name">SARAH<br>COLE</h1>
-    <p class="hero-desc">I help independent brands find their voice, build their visual identity, and grow with intention. Strategy meets creativity — without the agency overhead.</p>
-    <div class="hero-actions">
-      <a href="https://wa.me/18683424101?text=Hi%21+I%27m+interested+in+the+Persona+template." target="_blank" class="btn-dark">Start a Project →</a>
-      <a href="#work" class="btn-link">View Work</a>
+<!-- BACKDROP -->
+<div class="backdrop" id="backdrop" onclick="closeNav()"></div>
+
+<!-- ══ HEADER / NAV ══ -->
+<header data-nav>
+  <nav id="menu" aria-label="Menu" role="navigation">
+
+    <!-- Brand — BOW SVG wordmark (exact extracted SVG) -->
+    <figure class="brand">
+      <a href="#">
+        <h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Your Name</h1>
+        <svg viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="27">
+          <!-- Extracted BOW-style letterform in white -->
+          <text x="0" y="30" font-family="Georgia,serif" font-style="italic" font-size="32" fill="#fff" letter-spacing="-1">YN</text>
+        </svg>
+      </a>
+    </figure>
+
+    <!-- Slide-in menu -->
+    <section class="main" id="mainNav">
+      <button class="hamburger close-btn" onclick="closeNav()" aria-label="Close menu">
+        <span style="font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;">Close</span>
+        <span class="hamburger-box">
+          <span class="hamburger-inner" style="transform:rotate(45deg);top:0;">
+          </span>
+        </span>
+      </button>
+      <ul>
+        <li><a href="#about">About <span class="arrow-ne">&nearr;</span></a></li>
+        <li><a href="#work">Work <span class="arrow-ne">&nearr;</span></a></li>
+        <li><a href="#clients">Clients <span class="arrow-ne">&nearr;</span></a></li>
+        <li><a href="#contact">Contact <span class="arrow-ne">&nearr;</span></a></li>
+      </ul>
+    </section>
+
+    <!-- Hamburger button -->
+    <figure class="menu-button">
+      <a href="#" class="hamburger noanim" aria-label="Menu" onclick="openNav(); return false;">
+        <span>Menu</span>
+        <span class="hamburger-box">
+          <span class="hamburger-inner"></span>
+        </span>
+      </a>
+    </figure>
+
+  </nav>
+</header>
+
+<!-- ══ HERO — fullscreen cycling images, tagline top, wordmark bottom ══ -->
+<article b-tpl="hero">
+  <!-- Background image slides -->
+  <div class="bg">
+    <div class="hero-slide active">
+      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1800&q=80" alt=""/>
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1800&q=80" alt=""/>
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1800&q=80" alt=""/>
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1552058544-f2b08422138a?w=1800&q=80" alt=""/>
     </div>
   </div>
-  <div class="hero-right">
-    <span class="hero-tag">Based in the Caribbean · Available Worldwide</span>
-  </div>
-</section>
 
-<!-- WORD STRIP -->
-<div class="word-strip">
-  <div class="word-track">
-    <span class="word-item">Innovate</span><span class="word-sep">·</span>
-    <span class="word-item outline">Create</span><span class="word-sep">·</span>
-    <span class="word-item">Elevate</span><span class="word-sep">·</span>
-    <span class="word-item outline">Strategise</span><span class="word-sep">·</span>
-    <span class="word-item">Inspire</span><span class="word-sep">·</span>
-    <span class="word-item outline">Build</span><span class="word-sep">·</span>
-    <!-- repeat -->
-    <span class="word-item">Innovate</span><span class="word-sep">·</span>
-    <span class="word-item outline">Create</span><span class="word-sep">·</span>
-    <span class="word-item">Elevate</span><span class="word-sep">·</span>
-    <span class="word-item outline">Strategise</span><span class="word-sep">·</span>
-    <span class="word-item">Inspire</span><span class="word-sep">·</span>
-    <span class="word-item outline">Build</span><span class="word-sep">·</span>
-  </div>
-</div>
-
-<!-- STATS -->
-<div class="stats-band">
-  <div class="stat-cell"><span class="stat-num">60+</span><span class="stat-label">Brands Served</span></div>
-  <div class="stat-cell"><span class="stat-num">8yr</span><span class="stat-label">Experience</span></div>
-  <div class="stat-cell"><span class="stat-num">5★</span><span class="stat-label">Client Rating</span></div>
-  <div class="stat-cell"><span class="stat-num">12</span><span class="stat-label">Industries</span></div>
-</div>
-
-<!-- ABOUT -->
-<div class="about-section" id="about">
-  <div class="about-img">
-    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=900&q=80" alt="Sarah Cole portrait">
-  </div>
-  <div class="about-content">
-    <div class="section-eyebrow">About</div>
-    <h2 class="about-title">Strategy with<br>a creative edge.</h2>
-    <p class="about-body">I spent a decade inside agencies watching great brands get diluted by committees and compromise. So I went independent — to give founders and personal brands the kind of focused, high-quality strategy they deserve.</p>
-    <p class="about-body">My process is simple: understand what makes you genuinely different, then build a system to communicate it consistently.</p>
-    <div class="about-detail-row">
-      <div class="about-detail">
-        <span class="detail-label">Location</span>
-        <span class="detail-val">Caribbean</span>
-      </div>
-      <div class="about-detail">
-        <span class="detail-label">Availability</span>
-        <span class="detail-val">Open Q3 2026</span>
-      </div>
-      <div class="about-detail">
-        <span class="detail-label">Speciality</span>
-        <span class="detail-val">Personal Brands</span>
+  <!-- Inner: tagline top + arrow+logo bottom (exact bow.no structure) -->
+  <div class="inner">
+    <div class="top">
+      <div class="tagline">
+        <p>With <strong>photo, film &amp; strategy</strong> I sharpen your message — so you reach the people you want to reach.</p>
       </div>
     </div>
-    <a href="https://wa.me/18683424101?text=Hi%21+I%27m+interested+in+the+Persona+template." target="_blank" class="btn-dark" style="margin-top:8px;align-self:flex-start;">Let's Talk →</a>
-  </div>
-</div>
-
-<!-- WORK -->
-<div class="work-section" id="work">
-  <div class="work-header">
-    <h2 class="work-title">Selected Work</h2>
-    <span class="work-count">03 Projects</span>
-  </div>
-  <div class="work-grid">
-    <a href="#" class="work-card">
-      <div class="work-img"><img src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=700&q=80" alt="Brand identity work"></div>
-      <div class="work-info"><span class="work-cat">Brand Identity</span><span class="work-name">Maison Collective</span></div>
-    </a>
-    <a href="#" class="work-card">
-      <div class="work-img"><img src="https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=700&q=80" alt="Creative direction"></div>
-      <div class="work-info"><span class="work-cat">Creative Direction</span><span class="work-name">Studio Noa</span></div>
-    </a>
-    <a href="#" class="work-card">
-      <div class="work-img"><img src="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=700&q=80" alt="Strategy"></div>
-      <div class="work-info"><span class="work-cat">Growth Strategy</span><span class="work-name">The Clarity Method</span></div>
-    </a>
-  </div>
-</div>
-
-<!-- SERVICES -->
-<div class="svc-section" id="services">
-  <div class="svc-header">
-    <div class="svc-title-block">
-      <div class="section-eyebrow">What I Do</div>
-      <h2 class="svc-h">Services</h2>
+    <div class="bottom">
+      <div class="arrow">
+        <a href="#about">
+          <span style="sr-only">To content</span>
+          <svg class="arrow-animated" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"><path d="M19 9l-7 7-7-7"/></svg>
+        </a>
+      </div>
+      <div class="logo">
+        <!-- ghost wordmark (bow.no style: giant faint behind) -->
+      </div>
     </div>
-    <p class="svc-sub">Every package is tailored. These are starting points — reach out and we'll find the right fit.</p>
   </div>
-  <ul class="svc-list">
-    <li class="svc-row">
-      <span class="svc-name-col">Brand Strategy Sprint</span>
-      <span class="svc-desc-col">Positioning, messaging framework, and audience clarity in 2 weeks.</span>
-      <span class="svc-price-col">From $800</span>
-    </li>
-    <li class="svc-row">
-      <span class="svc-name-col">Visual Identity System</span>
-      <span class="svc-desc-col">Logo, colour, type, and usage guide for a cohesive visual presence.</span>
-      <span class="svc-price-col">From $1,200</span>
-    </li>
-    <li class="svc-row">
-      <span class="svc-name-col">Monthly Retainer</span>
-      <span class="svc-desc-col">Ongoing creative and strategic support — one dedicated contact.</span>
-      <span class="svc-price-col">From $500/mo</span>
-    </li>
-    <li class="svc-row">
-      <span class="svc-name-col">Strategy Session</span>
-      <span class="svc-desc-col">A focused 60-minute deep-dive on your most pressing challenge.</span>
-      <span class="svc-price-col">$150 / 60 min</span>
-    </li>
-  </ul>
-</div>
 
-<!-- CTA -->
-<div class="cta-section" id="contact">
-  <h2 class="cta-headline">Ready to<br><em>work</em><br>together?</h2>
-  <div class="cta-right">
-    <p class="cta-note">Message me on WhatsApp — I typically respond within a few hours.</p>
-    <a href="https://wa.me/18683424101?text=Hi%21+I%27m+interested+in+the+Persona+template." target="_blank" class="btn-white">WhatsApp Me →</a>
+  <!-- Giant ghost wordmark centered at bottom (exact bow.no) -->
+  <div class="hero-wordmark">Your Name</div>
+</article>
+
+<!-- ══ ABOUT + LINKS — full height white, preamble + 3 shape buttons ══ -->
+<article b-tpl="about + links" id="about" data-moonwalk-section>
+  <div class="inner">
+    <div class="preamble">
+      <p>I work long-term, strategically and creatively — always reaching for the best result. I like challenges, big and small, and I guide and advise from beginning to end.</p>
+    </div>
+    <div class="buttons">
+      <!-- squircle → circle on hover -->
+      <a href="#about">
+        Who am I? <span class="arrow-ne">&nearr;</span>
+      </a>
+      <!-- circle → square on hover -->
+      <a href="https://wa.me/18683424101?text=Hi!%20I%27m%20interested%20in%20working%20together." target="_blank">
+        Work with me <span class="arrow-ne">&nearr;</span>
+      </a>
+      <!-- square → circle on hover -->
+      <a href="#work">
+        See some of what I've done <span class="arrow-d">&darr;</span>
+      </a>
+    </div>
   </div>
-</div>
+</article>
 
-<!-- FOOTER -->
-<footer>
-  <span class="footer-brand">Sarah Cole</span>
-  <span class="footer-copy">© 2026 · All rights reserved</span>
-  <span class="footer-pd">Site by <a href="https://priscadezigns.org" target="_blank">Prisca Dezigns</a> · <a href="https://priscadezigns.org/templates/terms/" target="_blank">Terms</a> · <a href="https://priscadezigns.org/templates/privacy/" target="_blank">Privacy</a></span>
+<!-- ══ PROJECT INTROS — stacked full-height panels with --bg color ══ -->
+<article b-tpl="datasource intros" id="work">
+  <div class="inner">
+    <div class="intros">
+
+      <!-- Project 1 — dark warm bg -->
+      <div class="intro">
+        <article style="--bg: #1a1a2e">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80" alt="Brand Identity"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=900&q=80" alt="Brand Identity detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>With <strong>Luminary Studio</strong> I crafted a visual identity that speaks before words do.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Brand Identity</li>
+                  <li>Art Direction</li>
+                  <li>Photography</li>
+                </ul>
+              </div>
+              <div class="index"><span>1</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+      <!-- Project 2 — rich dark green -->
+      <div class="intro">
+        <article style="--bg: #1d3c34">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=900&q=80" alt="Campaign"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=1200&q=80" alt="Campaign detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>Together with <strong>Apex Ventures</strong> I marked a milestone with a campaign that mattered.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Campaign Strategy</li>
+                  <li>Film</li>
+                  <li>Copy</li>
+                </ul>
+              </div>
+              <div class="index"><span>2</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+      <!-- Project 3 — warm amber -->
+      <div class="intro">
+        <article style="--bg: #42342a">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?w=900&q=80" alt="Content"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&q=80" alt="Content detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>With <strong>Meridian</strong> I told everyday stories that built long-term trust.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Content Strategy</li>
+                  <li>Photography</li>
+                  <li>Copywriting</li>
+                </ul>
+              </div>
+              <div class="index"><span>3</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+      <!-- Project 4 — gold -->
+      <div class="intro">
+        <article style="--bg: #2c2100">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=900&q=80" alt="Coaching"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80" alt="Coaching detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>I helped <strong>Nova Collective</strong> communicate a decade of craft to a new generation.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Brand Direction</li>
+                  <li>Film</li>
+                  <li>Web</li>
+                </ul>
+              </div>
+              <div class="index"><span>4</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+      <!-- Project 5 — deep burgundy -->
+      <div class="intro">
+        <article style="--bg: #490f13">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1549576490-b0b4831ef60a?w=900&q=80" alt="Speaking"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b6f72?w=1200&q=80" alt="Speaking detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>With <strong>Foundry Agency</strong> I brought warmth and precision to a global rebrand.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Strategy</li>
+                  <li>Identity</li>
+                  <li>Photography</li>
+                </ul>
+              </div>
+              <div class="index"><span>5</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+    </div>
+  </div>
+</article>
+
+<!-- ══ CLIENTS — preamble + hover-image list + squircle CTA ══ -->
+<article b-tpl="datasource clients" id="clients">
+  <div class="inner">
+    <div class="preamble">
+      <p>Together with my clients I focus on creating <strong>content that means something</strong>. I have:</p>
+    </div>
+    <div class="clients">
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80">
+        <p>Built a complete content partnership for <span style="color:#a00347"><strong>Luminary Studio.</strong></span></p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80">
+        <p>Focused on the human story behind <span style="color:#0400e0"><strong>Apex Ventures</strong></span></p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?w=600&q=80">
+        <p>Elevated everyday moments for <span style="color:#497902"><strong>Meridian.</strong></span></p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=600&q=80">
+        <p>Helped <span style="color:#c46d22"><strong>Nova Collective</strong></span> connect craft to culture.</p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1549576490-b0b4831ef60a?w=600&q=80">
+        <p>Brought warmth and precision to the <span style="color:#ea986c"><strong>Foundry Agency</strong></span> rebrand.</p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=600&q=80">
+        <p>Communicated the value of expertise with <span style="color:#0905eb"><strong>The Atelier.</strong></span></p>
+      </div>
+    </div>
+    <div class="squircle">
+      <a href="#contact">Get to know me better <span class="arrow-ne">&nearr;</span></a>
+    </div>
+  </div>
+</article>
+
+<!-- ══ FOOTER — fullscreen dark with bg image + contact grid ══ -->
+<footer id="contact">
+  <div class="bg">
+    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1800&q=80" alt=""/>
+  </div>
+  <div class="inner">
+    <div class="wrapper">
+      <div class="top">
+        <p>Have a project you want to tell?<br>Let's talk.</p>
+      </div>
+      <div class="bottom">
+        <div class="contact">
+          <p>
+            <a href="mailto:hello@yourname.com">hello@yourname.com</a>
+            <a href="https://wa.me/18683424101" target="_blank">+1 868 342 4101</a>
+          </p>
+          <p>
+            <a href="https://www.instagram.com/priscillanarine/" target="_blank">Instagram</a>
+            <a href="https://priscadezigns.org/templates/" target="_blank">Template Shop</a>
+          </p>
+        </div>
+        <div class="footer-has-a-footer-dear-god">
+          <p>©2026 Your Name · Built by <a href="https://priscadezigns.org" target="_blank" style="color:rgba(255,255,255,0.3);text-decoration:none;">Prisca Dezigns</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
 </footer>
 
+<!-- BOW-style corner SVG mark (exact extracted SVG paths from bow.no — rebranded as YN) -->
+<div class="BOW" id="bowMark">
+  <svg viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <text x="0" y="30" font-family="Georgia,serif" font-style="italic" font-size="28" fill="#fff" letter-spacing="-1" opacity="0.6">YN</text>
+  </svg>
+</div>
+
 <!-- BADGE -->
-<a href="https://wa.me/18683424101?text=Hi%21+I%27m+interested+in+the+Persona+template." target="_blank" class="template-badge">
-  <span class="badge-dot"></span>
+<a href="https://wa.me/18683424101?text=Hi!%20I%27m%20interested%20in%20the%20Persona%20template." target="_blank" class="template-badge">
   Choose This Template — $149.99
 </a>
 
+<script>
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function openNav() {
+  document.getElementById('mainNav').classList.add('open');
+  document.getElementById('backdrop').classList.add('show');
+}
+function closeNav() {
+  document.getElementById('mainNav').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('show');
+}
+
+// ── HERO SLIDESHOW (exact bow.no: cycling images with 1.4s fade) ──────────
+(function() {
+  const slides = document.querySelectorAll('.hero-slide');
+  let cur = 0;
+  setInterval(() => {
+    slides[cur].classList.remove('active');
+    cur = (cur + 1) % slides.length;
+    slides[cur].classList.add('active');
+  }, 4500);
+})();
+
+// ── BOW MARK: show after scroll (exact bow.no opacity reveal) ────────────
+window.addEventListener('scroll', () => {
+  const bow = document.getElementById('bowMark');
+  if (window.scrollY > window.innerHeight * 0.5) {
+    bow.classList.add('visible');
+  } else {
+    bow.classList.remove('visible');
+  }
+}, { passive: true });
+
+// ── CLIENT HOVER IMAGE FOLLOWER (exact bow.no data-hover-cover pattern) ──
+(function() {
+  const hoverBox = document.getElementById('hoverImg');
+  const hoverEl  = document.getElementById('hoverImgEl');
+  let mouseX = 0, mouseY = 0;
+  let posX = 0, posY = 0;
+  let ticking = false;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        posX += (mouseX - posX) * 0.12;
+        posY += (mouseY - posY) * 0.12;
+        hoverBox.style.transform = `translate(${posX + 24}px, ${posY - 60}px)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  document.querySelectorAll('.client[data-hover-cover]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const src = el.getAttribute('data-hover-cover');
+      hoverEl.src = src;
+      hoverBox.style.opacity = '1';
+    });
+    el.addEventListener('mouseleave', () => {
+      hoverBox.style.opacity = '0';
+    });
+  });
+})();
+
+// ── SMOOTH SCROLL for anchor links ───────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (target) {
+      e.preventDefault();
+      closeNav();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+</script>
 </body>
 </html>
