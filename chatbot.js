@@ -23,10 +23,10 @@ const PKGS={
     {name:"Maintenance",price:"$97/mo",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
   ],
   templates:[
-    {name:"Tier 01 — Template Only",price:"$149.99 setup · $19.99/mo",desc:"Choose a template · Logo & colours swapped in · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
-    {name:"Tier 02 — Template + Copy",price:"$199.99 setup · $19.99/mo",desc:"Everything in Tier 01 · Professional copywriting for all sections · Delivered in 48-72hrs"},
-    {name:"Tier 03 — Template + Chatbot",price:"$199.99 setup · $29.99/mo",desc:"Everything in Tier 01 · AI chatbot answering your FAQs 24/7 · $49.99 one-time bot setup included"},
-    {name:"Tier 04 — Micro Store",price:"$249.99 setup · $29.99/mo",desc:"Full product store · All products uploaded with copy · WhatsApp order buttons per product · Live in 72-96hrs"}
+    {name:"Tier 01 — Template Only",price:"$149.99 USD setup · $19.99 USD/mo",desc:"Choose any of our 23 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
+    {name:"Tier 02 — Template + Copy",price:"$199.99 USD setup · $19.99 USD/mo",desc:"Everything in Tier 01 · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
+    {name:"Tier 03 — Template + Chatbot",price:"$199.99 USD setup · $29.99 USD/mo",desc:"Everything in Tier 01 · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $49.99 one-time bot setup included"},
+    {name:"Tier 04 — Micro Store",price:"$249.99 USD setup · $29.99 USD/mo",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs"}
   ]
 };
 
@@ -103,7 +103,7 @@ const STEPS={
     ]
   },
   pkg_templates:{
-    bot:"The Template Shop is faster, simpler, and more affordable than a custom build. Pick a design, send your content, go live in 24 hours. No tech needed.",
+    bot:"23 ready-made templates. Pick a design, send your content, go live in 24 hours. From $149.99 USD setup + $19.99 USD/mo. No tech needed.",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse all 22 templates",s:"microstore"},
       {l:"What's included?",s:"templates_included"},
@@ -115,7 +115,7 @@ const STEPS={
   },
 
   microstore:{
-    bot:"22 live templates - pick your niche to find the best match:",
+    bot:"23 live templates - pick your niche to find the best match:",
     r:[
       {l:"\uD83D\uDCF8 Portfolio & Creative",s:"ms_portfolio"},
       {l:"\uD83C\uDFC6 Coach & Consultant",s:"ms_coach"},
@@ -136,7 +136,7 @@ const STEPS={
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   ms_store:{
-    bot:"Best for businesses selling products online:\n\n\u2756 Luxe - Luxury Fashion | Boutique Store\n\u2756 Glow - Skincare | Beauty Product Shop\n\u2756 Paws - Pet | Vet | Animal Care Store\n\u2756 Optica - Luxury Product Catalogue\n\u2756 Atelier - Jewelry | Artisan | Handcraft Store",
+    bot:"Best for businesses selling products online:\n\n\u2756 Luxe - Luxury Fashion | Boutique Store\n\u2756 Glow - Skincare | Beauty Product Shop\n\u2756 Paws - Pet | Vet | Animal Care Store\n\u2756 Optica - Luxury Product Catalogue\n\u2756 Atelier - Jewelry | Artisan | Handcraft Store\n\u2756 Monsieur - Clothing | Apparel | Fashion Brand",
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   ms_wellness:{
@@ -152,15 +152,15 @@ const STEPS={
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   ms_lifestyle:{
-    bot:"Best for travel, adventure and lifestyle brands:\n\n\u2756 Horizon - Travel Photographer | Tourism\n\u2756 Obvious - Minimalist Lifestyle Brand\n\u2756 Folio - Adventure | Documentary Portfolio",
+    bot:"Best for travel, adventure and lifestyle brands:\n\n\u2756 Horizon - Travel Photographer | Tourism\n\u2756 Obvious - Minimalist Lifestyle Brand\n\u2756 Folio - Adventure | Documentary Portfolio\n\u2756 Monsieur - Fashion Brand | Editorial Drops",
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   ms_all:{
-    bot:"All 22 templates:\n\nFolio | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier\n\nEvery template: logo swap + mobile-optimised + live in 24hrs + $149.99 setup + $19.99/mo",
+    bot:"All 23 templates:\n\nFolio | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nAll templates: $149.99 USD setup · $19.99 USD/mo · Live in 24hrs · Logo + content swapped\nMicro Store upgrade: $249.99 USD setup · $29.99 USD/mo",
     r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   microstore_info:{
-    bot:"The Micro Store (Tier 04) turns any template into a full product shop:\n\n\u2756 All products uploaded with copy & photos\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 setup - $29.99/mo",
+    bot:"The Micro Store (Tier 04) turns any of our 23 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 USD setup · $29.99 USD/mo",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
       {l:"I'm ready - let's go",s:"talk"},
@@ -168,7 +168,7 @@ const STEPS={
     ]
   },
   templates_chatbot:{
-    bot:"The chatbot add-on ($49.99 one-time setup) answers your business FAQs 24/7 - pricing, services, hours, how to book. Monthly hosting with chatbot: $29.99/mo.",
+    bot:"The chatbot add-on ($49.99 USD one-time setup) answers your business FAQs 24/7 - pricing, services, hours, how to book. Monthly: $29.99 USD/mo (hosting + SSL + updates + bot).",
     r:[
       {l:"Add chatbot to my template",s:"talk"},
       {l:"Template only is fine",s:"microstore"},
@@ -176,7 +176,7 @@ const STEPS={
     ]
   },
   templates_included:{
-    bot:"Every template includes:\n\u2756 Your logo & colours swapped in\n\u2756 Photos & content replaced\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 $149.99 setup - $19.99/mo hosting\n\nAdd-ons: Chatbot $49.99 | Copy $4.99/update | Micro Store from $249.99",
+    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 $149.99 USD setup · $19.99 USD/mo hosting\n\nAdd-ons: Copywriting +$50 USD | Chatbot +$49.99 USD one-time | Micro Store from $249.99 USD",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse templates",s:"microstore"},
       {l:"Add chatbot - $49.99",s:"templates_chatbot"},
