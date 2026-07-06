@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obvious — Creative Portfolio Template | Prisca Dezigns</title>
+  <meta name="description" content="Obvious — a dark, cinematic portfolio template for creators, photographers, freelancers, artists & consultants. Built by Prisca Dezigns.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ── TOKENS ── */
+    :root {
+      --bg:        #0b0d0c;
+      --bg2:       #0f1110;
+      --text:      #e8e6e1;
+      --muted:     rgba(232,230,225,0.38);
+      --dim:       rgba(232,230,225,0.18);
+      --card-r:    20px;
+      --nav-h:     56px;
+      --serif:     'DM Serif Display', Georgia, serif;
+      --sans:      'DM Sans', system-ui, sans-serif;
+    }
+
+    /* ── BASE ── */
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      min-height: 100svh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ── AMBIENT GLOW (exact obvious.tv radial blob system) ── */
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .ambient::before {
+      content: '';
+      position: absolute;
+      width: 60vw; height: 60vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(60,90,80,0.28) 0%, transparent 70%);
+      top: -15vw; left: -15vw;
+      animation: blobA 18s ease-in-out infinite alternate;
+    }
+    .ambient::after {
+      content: '';
+      position: absolute;
+      width: 50vw; height: 50vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(80,60,50,0.22) 0%, transparent 70%);
+      bottom: -10vw; right: -10vw;
+      animation: blobB 22s ease-in-out infinite alternate;
+    }
+    @keyframes blobA { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(8vw,6vw) scale(1.1)} }
+    @keyframes blobB { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(-6vw,-8vw) scale(1.15)} }
+
+    /* ── NAV ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 clamp(20px, 4vw, 48px);
+      z-index: 100;
+      pointer-events: none;
+    }
+    header > * { pointer-events: auto; }
+
+    .logo {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: clamp(0.9rem, 1.8vw, 1rem);
+      letter-spacing: 0.01em;
+      color: var(--text);
+      opacity: 0.92;
+      transition: opacity 0.2s;
+    }
+    .logo:hover { opacity: 1; }
+
+    nav {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: clamp(32px, 5vw, 72px);
+    }
+    nav a {
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    nav a.active,
+    nav a:hover { color: var(--text); }
+
+    .nav-contact {
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .nav-contact:hover { color: var(--text); }
+
+    /* ── PAGE VIEWS ── */
+    .page { display: none; position: relative; z-index: 1; min-height: 100svh; }
+    .page.active { display: block; }
+
+    /* ══════════════════════════════════
+       HOME — scrolling card stack
+       ══════════════════════════════════ */
+    #page-home {
+      padding-top: var(--nav-h);
+    }
+
+    .cards-feed {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(16px, 3vw, 28px);
+      padding: clamp(24px, 5vh, 64px) clamp(16px, 5vw, 48px) clamp(80px, 10vh, 120px);
+    }
+
+    /* Each work card */
+    .work-card {
+      width: min(860px, 92vw);
+      border-radius: var(--card-r);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      background: #1a1c1b;
+      flex-shrink: 0;
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.4s ease;
+    }
+    .work-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .work-card:hover { box-shadow: 0 24px 64px rgba(0,0,0,0.55); }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      position: relative;
+    }
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+      transition: transform 0.7s ease;
+    }
+    .work-card:hover .card-img img { transform: scale(1.04); }
+
+    /* gradient overlay so text is always readable */
+    .card-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        transparent 30%,
+        rgba(10,12,11,0.72) 100%
+      );
+    }
+
+    .card-label {
+      position: absolute;
+      bottom: clamp(16px, 3vw, 28px);
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 2;
+      pointer-events: none;
+      width: 90%;
+    }
+    .card-label .name {
+      display: block;
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+      color: var(--text);
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+    }
+    .card-label .role {
+      display: block;
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: clamp(0.82rem, 1.8vw, 0.92rem);
+      color: rgba(232,230,225,0.62);
+      margin-top: 3px;
+      letter-spacing: 0.01em;
+    }
+
+    /* ══════════════════════════════════
+       WORK PAGE — name grid (Film page)
+       ══════════════════════════════════ */
+    #page-work {
+      display: none;
+      padding: calc(var(--nav-h) + clamp(80px, 18vh, 180px)) clamp(20px, 8vw, 120px) 80px;
+      min-height: 100svh;
+    }
+    #page-work.active { display: block; }
+
+    .work-names {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: clamp(8px, 2vw, 14px) clamp(20px, 4vw, 48px);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .work-names a {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      color: var(--text);
+      letter-spacing: 0.01em;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .work-names a:hover { color: var(--muted); }
+
+    /* ══════════════════════════════════
+       CONTACT PAGE
+       ══════════════════════════════════ */
+    #page-contact {
+      display: none;
+      padding: calc(var(--nav-h) + clamp(80px, 18vh, 180px)) clamp(20px, 8vw, 80px) 80px;
+      min-height: 100svh;
+    }
+    #page-contact.active { display: block; }
+
+    .contact-block {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(32px, 6vh, 56px);
+    }
+
+    /* Primary contacts (2-col) */
+    .contact-primary {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: clamp(24px, 6vw, 80px);
+    }
+    .contact-person {
+      text-align: center;
+    }
+    .contact-person .c-name {
+      font-family: var(--sans);
+      font-weight: 300;
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+    .contact-person .c-role {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(0.78rem, 1.6vw, 0.88rem);
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .contact-person .c-email {
+      display: block;
+      font-size: clamp(0.78rem, 1.6vw, 0.85rem);
+      color: var(--muted);
+      margin-top: 6px;
+      transition: color 0.2s;
+    }
+    .contact-person .c-email:hover { color: var(--text); }
+
+    /* Secondary row */
+    .contact-secondary {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: clamp(24px, 5vw, 64px);
+    }
+
+    /* Direct line */
+    .contact-direct {
+      display: flex;
+      justify-content: center;
+      gap: clamp(24px, 5vw, 56px);
+      flex-wrap: wrap;
+    }
+    .contact-direct span, .contact-direct a {
+      font-size: clamp(0.82rem, 1.8vw, 0.9rem);
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .contact-direct a:hover { color: var(--text); }
+
+    /* Social link at very bottom */
+    .contact-social {
+      display: flex;
+      justify-content: center;
+      padding-top: clamp(16px, 4vh, 40px);
+    }
+    .contact-social a {
+      font-size: 0.82rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+    .contact-social a:hover { color: var(--text); }
+
+    /* ══════════════════════════════════
+       DEMO BANNER
+       ══════════════════════════════════ */
+    .demo-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(11,13,12,0.92);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(232,230,225,0.08);
+      padding: 10px 24px;
+      text-align: center;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(232,230,225,0.45);
+      z-index: 200;
+    }
+    .demo-bar a {
+      color: var(--text);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* ══════════════════════════════════
+       MOBILE
+       ══════════════════════════════════ */
+    @media (max-width: 768px) {
+      nav { gap: 24px; }
+      nav a, .nav-contact { font-size: 0.78rem; }
+      .logo { font-size: 0.85rem; }
+
+      .work-card { width: 92vw; }
+      .card-img { aspect-ratio: 4/3; }
+
+      .work-names { gap: 10px 24px; }
+      .work-names a { font-size: 0.95rem; }
+
+      .contact-primary,
+      .contact-secondary { gap: 28px; }
+    }
+
+    @media (max-width: 480px) {
+      nav {
+        position: static;
+        transform: none;
+        gap: 16px;
+      }
+      header {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 14px 20px 10px;
+        gap: 12px;
+      }
+      .nav-contact { display: none; } /* shown in nav on small screens */
+    }
+  </style>
+</head>
+<body>
+
+<!-- Ambient glow blobs -->
+<div class="ambient"></div>
+
+<!-- ── HEADER ── -->
+<header>
+  <a class="logo" href="#" onclick="showPage('home');return false;">[Your Name]</a>
+  <nav>
+    <a href="#" class="active" id="nav-home"   onclick="showPage('home');return false;">Work</a>
+    <a href="#" id="nav-work"    onclick="showPage('work');return false;">About</a>
+    <a href="#" id="nav-contact" onclick="showPage('contact');return false;">Contact</a>
+  </nav>
+  <a class="nav-contact" href="#" onclick="showPage('contact');return false;">Contact</a>
+</header>
+
+<!-- ══════════════════════════════
+     HOME — scrolling card feed
+     ══════════════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="cards-feed">
+
+    <div class="work-card">
+      <div class="card-img">
+        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=1200&q=80&fit=crop" alt="Project 01">
+      </div>
+      <div class="card-label">
+        <span class="name">[Your Name]</span>
+        <span class="role">for [Client / Brand]</span>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="card-img">
+        <img src="https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?w=1200&q=80&fit=crop" alt="Project 02">
+      </div>
+      <div class="card-label">
+        <span class="name">[Project Title]</span>
+        <span class="role">for [Client / Brand]</span>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="card-img">
+        <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1200&q=80&fit=crop" alt="Project 03">
+      </div>
+      <div class="card-label">
+        <span class="name">[Project Title]</span>
+        <span class="role">for [Client / Brand]</span>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="card-img">
+        <img src="https://images.unsplash.com/photo-1488716820095-cbe80883c496?w=1200&q=80&fit=crop" alt="Project 04">
+      </div>
+      <div class="card-label">
+        <span class="name">[Project Title]</span>
+        <span class="role">for [Client / Brand]</span>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="card-img">
+        <img src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=1200&q=80&fit=crop" alt="Project 05">
+      </div>
+      <div class="card-label">
+        <span class="name">[Project Title]</span>
+        <span class="role">for [Client / Brand]</span>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="card-img">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1200&q=80&fit=crop" alt="Project 06">
+      </div>
+      <div class="card-label">
+        <span class="name">[Project Title]</span>
+        <span class="role">for [Client / Brand]</span>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="card-img">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&q=80&fit=crop" alt="Project 07">
+      </div>
+      <div class="card-label">
+        <span class="name">[Project Title]</span>
+        <span class="role">for [Client / Brand]</span>
+      </div>
+    </div>
+
+    <div class="work-card">
+      <div class="card-img">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=1200&q=80&fit=crop" alt="Project 08">
+      </div>
+      <div class="card-label">
+        <span class="name">[Project Title]</span>
+        <span class="role">for [Client / Brand]</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     WORK / ABOUT — name list
+     ══════════════════════════════ -->
+<div class="page" id="page-work">
+  <div class="work-names">
+    <a href="#">[Project One]</a>
+    <a href="#">[Project Two]</a>
+    <a href="#">[Project Three]</a>
+    <a href="#">[Project Four]</a>
+    <a href="#">[Project Five]</a>
+    <a href="#">[Project Six]</a>
+    <a href="#">[Project Seven]</a>
+    <a href="#">[Project Eight]</a>
+    <a href="#">[Project Nine]</a>
+    <a href="#">[Project Ten]</a>
+    <a href="#">[Project Eleven]</a>
+    <a href="#">[Project Twelve]</a>
+    <a href="#">[Project Thirteen]</a>
+    <a href="#">[Project Fourteen]</a>
+    <a href="#">[Project Fifteen]</a>
+    <a href="#">[Project Sixteen]</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     CONTACT
+     ══════════════════════════════ -->
+<div class="page" id="page-contact">
+  <div class="contact-block">
+
+    <!-- Primary -->
+    <div class="contact-primary">
+      <div class="contact-person">
+        <div class="c-name">[Your Full Name]</div>
+        <a href="mailto:hello@yourdomain.com" class="c-email">hello@yourdomain.com</a>
+      </div>
+      <div class="contact-person">
+        <div class="c-name">[Studio / Agency Name]</div>
+        <a href="mailto:studio@yourdomain.com" class="c-email">studio@yourdomain.com</a>
+      </div>
+    </div>
+
+    <!-- Secondary — roles -->
+    <div class="contact-secondary">
+      <div class="contact-person">
+        <div class="c-name">[Collaborator Name] <span class="c-role">Photographer</span></div>
+        <a href="mailto:collab@yourdomain.com" class="c-email">collab@yourdomain.com</a>
+      </div>
+      <div class="contact-person">
+        <div class="c-name">[Manager Name] <span class="c-role">Creative Director</span></div>
+        <a href="mailto:mgmt@yourdomain.com" class="c-email">mgmt@yourdomain.com</a>
+      </div>
+      <div class="contact-person">
+        <div class="c-name">[Agent Name] <span class="c-role">Booking</span></div>
+        <a href="mailto:booking@yourdomain.com" class="c-email">booking@yourdomain.com</a>
+      </div>
+    </div>
+
+    <!-- Direct line -->
+    <div class="contact-direct">
+      <a href="mailto:hello@yourdomain.com">hello@yourdomain.com</a>
+      <span>+1 (000) 000-0000</span>
+    </div>
+
+    <!-- Social -->
+    <div class="contact-social">
+      <a href="#" target="_blank">Instagram</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- Demo banner -->
+<div class="demo-bar">
+  ✦ Template Demo — Obvious by Prisca Dezigns &nbsp;·&nbsp;
+  <a href="https://priscadezigns.org/templates/">Choose This Template →</a>
+</div>
+
+<script>
+  /* ── Page switching ── */
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    const map = { home: 'nav-home', work: 'nav-work', contact: 'nav-contact' };
+    const el = document.getElementById(map[id]);
+    if (el) el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (id === 'home') initCards();
+  }
+
+  /* ── Scroll-reveal for home cards ── */
+  function initCards() {
+    const cards = document.querySelectorAll('.work-card');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    cards.forEach((c, i) => {
+      c.style.transitionDelay = (i * 0.07) + 's';
+      obs.observe(c);
+    });
+  }
+
+  /* ── Staggered entry on load ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    // Slight delay so first cards animate in on load
+    setTimeout(initCards, 80);
+  });
+</script>
+
+</body>
+</html>
