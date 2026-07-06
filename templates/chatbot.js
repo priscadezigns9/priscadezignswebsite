@@ -25,7 +25,7 @@ const PKGS={
   templates:[
     {name:"Tier 01 — Template Only",price:"$149.99 USD setup · $19.99 USD/mo",desc:"Choose any of our 23 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
     {name:"Tier 02 — Template + Copy",price:"$199.99 USD setup · $19.99 USD/mo",desc:"Everything in Tier 01 · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
-    {name:"Tier 03 — Template + Chatbot",price:"$199.99 USD setup · $49.99 USD/mo",desc:"Everything in Tier 01 · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $49.99 one-time bot setup included"},
+    {name:"Tier 03 — Template + Chatbot",price:"$249.99 USD setup · $49.99 USD/mo",desc:"Everything in Tier 01 · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $49.99 one-time bot setup included"},
     {name:"Tier 04 — Micro Store",price:"$249.99 USD setup · $29.99 USD/mo",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs"}
   ]
 };
