@@ -165,11 +165,20 @@ function renderCart() {
  lines.push('%0ASetup Total: $' + totalSetup.toFixed(2));
  lines.push('Monthly Total: $' + totalMo.toFixed(2) + '%2Fmo');
  var msg = lines.join('%0A');
- var co = document.getElementById('cart-checkout');
- co.href = 'https://wa.me/18683424101?text=' + msg;
+ // ── PayPal button ──
+ var paypalBtn = document.getElementById('cart-paypal');
+ if (paypalBtn) paypalBtn.href = 'https://paypal.me/priscadezigns9/' + totalSetup.toFixed(2) + 'USD';
+ // ── Bank Transfer button → WhatsApp with bank note ──
+ var bankMsg = msg + '%0A%0A%F0%9F%8F%A6%20Payment%20Method%3A%20Bank%20Transfer%0APlease%20send%20your%20proof%20of%20payment%20%2B%20your%20brand%20details%20(business%20name%2C%20logo%2C%20colours%2C%20description)%20to%20this%20chat.%0AI%20will%20send%20you%20the%20bank%20details%20to%20complete%20your%20transfer.';
+ var bankBtn = document.getElementById('cart-bank');
+ if (bankBtn) bankBtn.href = 'https://wa.me/18683424101?text=' + bankMsg;
+ // ── Enable/disable both based on agreement ──
  var agrChk = document.getElementById('cd-agree-chk');
- if (agrChk && agrChk.checked) { co.classList.remove('disabled'); }
- else { co.classList.add('disabled'); }
+ var btns = [paypalBtn, bankBtn];
+ btns.forEach(function(b){ if (!b) return;
+   if (agrChk && agrChk.checked && !agrChk.disabled) { b.classList.remove('disabled'); }
+   else { b.classList.add('disabled'); b.href='#'; }
+ });
  updateBadge();
 }
 function updateAddonCards() {
@@ -241,14 +250,13 @@ function openTerms() {
 }
 function updateAgreement() {
  var chk = document.getElementById('cd-agree-chk');
- var btn = document.getElementById('cart-checkout');
- if (!btn || !chk) return;
- // Both conditions must be true: terms opened+accepted AND a template selected
- if (chk.checked && !chk.disabled && cart.base) {
-   btn.classList.remove('disabled');
- } else {
-   btn.classList.add('disabled');
- }
+ if (!chk) return;
+ var btns = [document.getElementById('cart-paypal'), document.getElementById('cart-bank')];
+ btns.forEach(function(btn){
+   if (!btn) return;
+   if (chk.checked && !chk.disabled && cart.base) { btn.classList.remove('disabled'); }
+   else { btn.classList.add('disabled'); btn.href='#'; }
+ });
 }
 renderCart();
 
