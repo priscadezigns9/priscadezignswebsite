@@ -32,14 +32,14 @@
     let user_data = {};
 
     const PKG_CONFIG = {
-        'Starter': { setup: '$297', pulse: '$97/mo', desc: 'Basic Brand Identity' },
-        'Growth': { setup: '$597', pulse: '$197/mo', desc: 'Active Scaling' },
-        'Trusted': { setup: '$1,200', pulse: '$297/mo', desc: 'High-Fidelity Authority' },
-        'E-Starter': { setup: '$497', pulse: '$147/mo', desc: 'Core E-Commerce' },
-        'E-Growth': { setup: '$1,497', pulse: '$347/mo', desc: 'Sales Engine' },
-        'E-Trusted': { setup: '$2,500', pulse: '$497/mo', desc: 'Enterprise Commerce' },
-        'Branding': { setup: '$500', pulse: 'N/A', desc: 'Neural Identity' },
-        'Brand Scan': { setup: '$19', pulse: 'N/A', desc: 'Deep-Audit' }
+        'Starter': { desc: 'Basic Brand Identity' },
+        'Growth': { desc: 'Active Scaling' },
+        'Trusted': { desc: 'High-Fidelity Authority' },
+        'E-Starter': { desc: 'Core E-Commerce' },
+        'E-Growth': { desc: 'Sales Engine' },
+        'E-Trusted': { desc: 'Enterprise Commerce' },
+        'Branding': { desc: 'Neural Identity' },
+        'Brand Scan': { desc: 'Deep-Audit' }
     };
 
     function addMsg(txt, u) {
@@ -87,21 +87,21 @@
             } else if (low.includes('ai') || low === '2') {
                 state = 'AI_PATH';
                 setTimeout(() => {
-                    addMsg("AI Consultancy: <strong>Tier 1 ($1,500 + $50/mo)</strong> | <strong>Tier 2 ($8,000 + $800/mo)</strong> | <strong>Tier 3 ($15,000 + $1,500/mo)</strong>. Which tier are we targeting?");
-                    showOptions(['Tier 1 ($1,500)', 'Tier 2 ($8,000)', 'Tier 3 ($15,000)', 'Back']);
+                    addMsg("AI Consultancy: <strong>Tier 1</strong> | <strong>Tier 2</strong> | <strong>Tier 3</strong>. Which tier are we targeting?");
+                    showOptions(['Tier 1', 'Tier 2', 'Tier 3', 'Back']);
                 }, 400);
             } else if (low.includes('branding') || low === '3') {
                 user_data.package = 'Branding';
                 state = 'FORM_NAME';
                 setTimeout(() => {
-                    addMsg("Selected: <strong>Branding</strong> ($500 Setup · One-time). Ready to begin? What is your <strong>Full Name</strong>?");
+                    addMsg("Selected: <strong>Branding</strong>. Ready to begin? What is your <strong>Full Name</strong>?");
                     showOptions(['⬅ Back']);
                 }, 400);
             } else if (low.includes('scan') || low === '4') {
                 user_data.package = 'Brand Scan';
                 state = 'SCAN_DOMAIN';
                 setTimeout(() => {
-                    addMsg("🔍 <strong>Brand Scan</strong> — Deep Audit ($19).<br><br>Enter your existing domain below so we can run the diagnostic:");
+                    addMsg("🔍 <strong>Brand Scan</strong> — Deep Audit.<br><br>Enter your existing domain below so we can run the diagnostic:");
                     showOptions(['⬅ Back']);
                     i.placeholder = 'e.g. yourbusiness.com';
                     i.focus();
