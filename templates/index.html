@@ -23,6 +23,50 @@
 </style>
 <!-- v20260706-1052 -->
 <!-- deploy: v26 -->
+<style>
+/* ── CART SYSTEM ────────────────────────────────── */
+#cart-btn{position:relative;display:inline-flex;align-items:center;gap:7px;background:var(--text);color:#fff;border:none;padding:9px 18px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px;cursor:pointer;font-family:var(--font-b);transition:background .2s;}
+#cart-btn:hover{background:var(--purple);}
+#cart-count{background:var(--purple);color:#fff;border-radius:100px;font-size:9px;font-weight:800;padding:2px 7px;min-width:18px;text-align:center;display:none;}
+#cart-count.vis{display:inline-block;}
+/* Drawer overlay */
+#cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:900;opacity:0;pointer-events:none;transition:opacity .25s;}
+#cart-overlay.open{opacity:1;pointer-events:all;}
+/* Drawer */
+#cart-drawer{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:420px;background:#fff;z-index:901;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,0.15);}
+#cart-drawer.open{transform:translateX(0);}
+.cart-hdr{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--border);}
+.cart-hdr h3{font-family:var(--font-h);font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;}
+#cart-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1;padding:4px;}
+#cart-close:hover{color:var(--text);}
+#cart-items{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px;}
+.cart-empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:13px;line-height:1.8;}
+.cart-empty strong{display:block;font-family:var(--font-h);font-size:1.5rem;color:var(--text);margin-bottom:8px;}
+.cart-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px;background:var(--surface);border-radius:10px;border:1px solid var(--border);}
+.cart-item-info{flex:1;}
+.ci-name{font-weight:700;font-size:13px;color:var(--text);}
+.ci-detail{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.6;}
+.ci-remove{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;line-height:1;padding:2px 4px;flex-shrink:0;}
+.ci-remove:hover{color:#cc0000;}
+.cart-footer{border-top:1px solid var(--border);padding:20px 24px;}
+.cart-total-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.cart-total-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.cart-total-val{font-family:var(--font-h);font-size:1.6rem;font-weight:800;color:var(--text);letter-spacing:-1px;}
+.cart-mo-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:20px;}
+#cart-checkout{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:100px;font-size:13px;font-weight:700;letter-spacing:0.5px;cursor:pointer;font-family:var(--font-b);text-decoration:none;transition:background .2s;}
+#cart-checkout:hover{background:#1da851;}
+#cart-checkout svg{width:20px;height:20px;fill:#fff;flex-shrink:0;}
+#cart-checkout.disabled{background:#ccc;pointer-events:none;}
+/* Add to cart buttons */
+.p-cta-add{display:inline-flex;align-items:center;gap:7px;margin-top:auto;padding-top:18px;background:var(--purple);color:#fff;border:none;border-radius:100px;padding:11px 22px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:var(--font-b);transition:background .2s;width:100%;justify-content:center;}
+.p-cta-add:hover{background:var(--purple-d);}
+.p-cta-add.added{background:#1a7a3c;}
+.p-cta-add.added::before{content:'✓  ';}
+/* Swap base button (only one base allowed) */
+.p-cta-swap{display:inline-flex;align-items:center;justify-content:center;gap:7px;margin-top:auto;padding:11px 22px;background:transparent;color:var(--purple);border:1.5px solid var(--purple);border-radius:100px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:var(--font-b);transition:all .2s;width:100%;}
+.p-cta-swap:hover{background:var(--purple);color:#fff;}
+@media(max-width:500px){#cart-drawer{max-width:100%;}}
+</style>
 </head>
 <body>
 <header>
@@ -35,7 +79,7 @@
 <a href="#faq">FAQ</a>
 <a href="/templates/terms/">Terms</a>
 <a href="/templates/privacy/">Privacy</a>
-<a href="https://wa.me/18683424101?text=Hi!%20I%20want%20to%20get%20a%20template%20website." target="_blank" class="nav-cta">Get Started</a>
+<button id="cart-btn" onclick="openCart()"><span>🛒 Cart</span><span id="cart-count"></span></button>
 </nav>
 </header>
 <section class="hero">
@@ -557,7 +601,7 @@
 <div class="p-feat">Live on your subdomain in 24 hours</div>
 <div class="p-feat">SSL, mobile-ready, SEO basics included</div>
 <div class="p-feat">1 complimentary content round</div>
-<a href="https://wa.me/18683424101?text=Hi!%20I%27d%20like%20a%20Template%20Website." target="_blank" class="p-cta">Get Started →</a>
+<button id="btn-website" class="p-cta-add" onclick="addToCart('website')">Add to Cart</button>
 <a href="/templates/" class="p-browse-btn">Browse Templates →</a>
 </div>
 </div>
@@ -576,7 +620,7 @@
 <div class="p-feat">Up to 12 products included at launch</div>
 <div class="p-feat">Add more products at $9.99 each</div>
 <div class="p-feat">Everything in Template Site included</div>
-<a href="https://wa.me/18683424101?text=Hi!%20I%27d%20like%20the%20Micro%20Store." target="_blank" class="p-cta">Get Started →</a>
+<button id="btn-store" class="p-cta-add" onclick="addToCart('store')">Add to Cart</button>
 <a href="/templates/" class="p-browse-btn">Browse Templates →</a>
 </div>
 </div>
@@ -586,15 +630,15 @@
 <div class="price-card">
 <div class="p-eyebrow">Add-On</div>
 <div class="p-name">Copywriting</div>
-<div class="p-amount"><sup>+$</sup>50<span style="font-size:1.5rem;opacity:.5">.00</span></div>
-<div class="p-sub">One-time, added at setup</div>
+<div class="p-amount"><sup>+$</sup>49<span style="font-size:1.5rem;opacity:.5">.99</span></div>
+<div class="p-sub">One-time add-on</div>
 <div class="p-sub" style="color:#6600CC;font-weight:700;font-size:12px;margin-top:4px;">+ $4.99 / update after launch</div>
 <div class="p-divider"></div>
 <div class="p-feat">We write your headline, bio &amp; service copy</div>
 <div class="p-feat">Based on a short intake form you fill in</div>
 <div class="p-feat">$4.99 flat per edit after go-live</div>
 <div class="p-feat">Works with Website or Micro Store</div>
-<a href="https://wa.me/18683424101?text=Hi!%20I%27d%20like%20to%20add%20Copywriting." target="_blank" class="p-cta">Add to My Package →</a>
+<button id="btn-copy" class="p-cta-add" onclick="addToCart('copy')">Add to Cart</button>
 </div>
 <div class="price-card">
 <div class="p-eyebrow">Add-On</div>
@@ -607,7 +651,7 @@
 <div class="p-feat">Hours, location, services, contact info</div>
 <div class="p-feat">Works with new or existing sites</div>
 <div class="p-feat">Website total: $69.99/mo &nbsp;·&nbsp; Store: $84.99/mo</div>
-<a href="https://wa.me/18683424101?text=Hi!%20I%27d%20like%20to%20add%20the%20AI%20Chatbot." target="_blank" class="p-cta">Add to My Package →</a>
+<button id="btn-chatbot" class="p-cta-add" onclick="addToCart('chatbot')">Add to Cart</button>
 </div>
 </div>
 
@@ -852,5 +896,173 @@ No — and that's standard across all professional template services (Squarespac
   });
 })();
 </script>
+
+<!-- Cart overlay + drawer -->
+<div id="cart-overlay" onclick="closeCart()"></div>
+<div id="cart-drawer">
+  <div class="cart-hdr">
+    <h3>Your Order</h3>
+    <button id="cart-close" onclick="closeCart()" aria-label="Close cart">✕</button>
+  </div>
+  <div id="cart-items">
+    <div class="cart-empty" id="cart-empty-msg">
+      <strong>Your cart is empty</strong>
+      Choose a website or micro store below to get started.
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Setup Total</span>
+      <span class="cart-total-val" id="cart-setup-total">$0.00</span>
+    </div>
+    <div class="cart-mo-row">
+      <span>Monthly</span>
+      <span id="cart-mo-total">$0.00 / mo</span>
+    </div>
+    <a id="cart-checkout" class="disabled" href="#" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.558 4.114 1.528 5.843L0 24l6.335-1.528A11.944 11.944 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.01-1.374l-.36-.214-3.724.977.994-3.633-.234-.374A9.818 9.818 0 0112 2.182c5.424 0 9.818 4.394 9.818 9.818 0 5.424-4.394 9.818-9.818 9.818z"/></svg>
+      Checkout via WhatsApp
+    </a>
+  </div>
+</div>
+
+<script>
+// ── CART STATE ─────────────────────────────────────────────────
+var cart = { base: null, addons: [] };
+var ITEMS = {
+  website:  { id:'website',  name:'Template Website', setup:149.99, mo:19.99, type:'base' },
+  store:    { id:'store',    name:'Micro Store',       setup:249.99, mo:34.99, type:'base' },
+  copy:     { id:'copy',     name:'Copywriting Add-On',setup:49.99,  mo:0,     type:'addon', note:'$4.99 per update after launch' },
+  chatbot:  { id:'chatbot',  name:'AI Chatbot Add-On', setup:299.99, mo:49.99, type:'addon', note:'Works with any package' },
+};
+
+function addToCart(id) {
+  var item = ITEMS[id];
+  if (!item) return;
+  if (item.type === 'base') {
+    cart.base = item;
+    // reset add-on button states when base changes
+    updateButtons();
+  } else {
+    var idx = cart.addons.findIndex(function(a){ return a.id === id; });
+    if (idx > -1) {
+      cart.addons.splice(idx, 1);
+    } else {
+      cart.addons.push(item);
+    }
+  }
+  renderCart();
+  updateButtons();
+  openCart();
+}
+
+function removeFromCart(id) {
+  if (id === cart.base?.id) {
+    cart.base = null;
+  } else {
+    cart.addons = cart.addons.filter(function(a){ return a.id !== id; });
+  }
+  renderCart();
+  updateButtons();
+}
+
+function renderCart() {
+  var container = document.getElementById('cart-items');
+  var emptyMsg  = document.getElementById('cart-empty-msg');
+  var allItems  = cart.base ? [cart.base].concat(cart.addons) : cart.addons;
+
+  // remove existing cart-item divs
+  container.querySelectorAll('.cart-item').forEach(function(el){ el.remove(); });
+
+  if (allItems.length === 0) {
+    emptyMsg.style.display = '';
+    document.getElementById('cart-setup-total').textContent = '$0.00';
+    document.getElementById('cart-mo-total').textContent    = '$0.00 / mo';
+    document.getElementById('cart-checkout').classList.add('disabled');
+    document.getElementById('cart-checkout').href = '#';
+    return;
+  }
+
+  emptyMsg.style.display = 'none';
+  var totalSetup = 0, totalMo = 0;
+
+  allItems.forEach(function(item) {
+    totalSetup += item.setup;
+    totalMo    += item.mo;
+    var div = document.createElement('div');
+    div.className = 'cart-item';
+    var detail = '$' + item.setup.toFixed(2) + ' setup';
+    if (item.mo > 0) detail += ' + $' + item.mo.toFixed(2) + '/mo';
+    if (item.note) detail += '\n' + item.note;
+    div.innerHTML =
+      '<div class="cart-item-info">' +
+        '<div class="ci-name">' + item.name + '</div>' +
+        '<div class="ci-detail">' + detail.replace('\n','<br>') + '</div>' +
+      '</div>' +
+      '<button class="ci-remove" onclick="removeFromCart(\'' + item.id + '\')" aria-label="Remove">✕</button>';
+    container.appendChild(div);
+  });
+
+  document.getElementById('cart-setup-total').textContent = '$' + totalSetup.toFixed(2);
+  document.getElementById('cart-mo-total').textContent    = '$' + totalMo.toFixed(2) + ' / mo';
+
+  // Build WhatsApp message
+  var lines = ['Hi! I\'d like to place an order:%0A'];
+  allItems.forEach(function(item) {
+    var line = '%E2%9C%85 ' + item.name + ' — $' + item.setup.toFixed(2) + ' setup';
+    if (item.mo > 0) line += ' + $' + item.mo.toFixed(2) + '/mo';
+    lines.push(line);
+  });
+  lines.push('%0ASetup Total: $' + totalSetup.toFixed(2));
+  lines.push('Monthly Total: $' + totalMo.toFixed(2) + '/mo');
+  var waMsg = lines.join('%0A');
+  document.getElementById('cart-checkout').href = 'https://wa.me/18683424101?text=' + waMsg;
+  document.getElementById('cart-checkout').classList.remove('disabled');
+}
+
+function updateButtons() {
+  // Base buttons
+  ['website','store'].forEach(function(id) {
+    var btn = document.getElementById('btn-' + id);
+    if (!btn) return;
+    if (cart.base && cart.base.id === id) {
+      btn.textContent = '✓  Added';
+      btn.className = 'p-cta-add added';
+    } else if (cart.base && cart.base.id !== id) {
+      btn.textContent = 'Switch to This';
+      btn.className = 'p-cta-swap';
+    } else {
+      btn.textContent = 'Add to Cart';
+      btn.className = 'p-cta-add';
+    }
+  });
+  // Add-on buttons
+  ['copy','chatbot'].forEach(function(id) {
+    var btn = document.getElementById('btn-' + id);
+    if (!btn) return;
+    var inCart = cart.addons.some(function(a){ return a.id === id; });
+    if (inCart) {
+      btn.textContent = '✓  Added';
+      btn.className = 'p-cta-add added';
+    } else {
+      btn.textContent = 'Add to Cart';
+      btn.className = 'p-cta-add';
+    }
+  });
+  // Cart count badge
+  var count = (cart.base ? 1 : 0) + cart.addons.length;
+  var badge = document.getElementById('cart-count');
+  if (count > 0) {
+    badge.textContent = count;
+    badge.classList.add('vis');
+  } else {
+    badge.classList.remove('vis');
+  }
+}
+
+function openCart()  { document.getElementById('cart-drawer').classList.add('open'); document.getElementById('cart-overlay').classList.add('open'); }
+function closeCart() { document.getElementById('cart-drawer').classList.remove('open'); document.getElementById('cart-overlay').classList.remove('open'); }
+</script>
+
 </body>
 </html>
