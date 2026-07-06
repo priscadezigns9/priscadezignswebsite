@@ -546,6 +546,302 @@ footer {
   footer { grid-template-columns: 1fr; text-align:center; }
   .f-logo { margin: 0 auto; }
 }
+
+/* ══════════════════════════════════
+   FAQ SECTION
+══════════════════════════════════ */
+.faq-section {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 clamp(20px,5vw,48px) clamp(60px,10vh,100px);
+}
+.faq-item {
+  border-bottom: 1px solid var(--border);
+}
+.faq-q {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 22px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-body);
+  font-size: clamp(0.9rem,1.6vw,1rem);
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+}
+.faq-q .faq-icon {
+  flex-shrink: 0;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  color: var(--accent);
+  transition: transform 0.35s ease, background 0.2s;
+  line-height: 1;
+}
+.faq-item.open .faq-q .faq-icon {
+  transform: rotate(45deg);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  font-size: clamp(0.82rem,1.4vw,0.9rem);
+  color: var(--muted-text);
+  line-height: 1.75;
+  padding-bottom: 0;
+}
+.faq-item.open .faq-a {
+  max-height: 400px;
+  padding-bottom: 22px;
+}
+.faq-a a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ══════════════════════════════════
+   CHATBOT WIDGET
+══════════════════════════════════ */
+/* Floating bubble */
+.cb-bubble {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  z-index: 9000;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(102,0,204,0.45);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.cb-bubble:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(102,0,204,0.6); }
+.cb-bubble svg { width: 22px; height: 22px; fill: #fff; }
+.cb-bubble .cb-close-icon { display: none; }
+.cb-bubble.open .cb-chat-icon { display: none; }
+.cb-bubble.open .cb-close-icon { display: block; }
+
+/* Notification dot */
+.cb-dot {
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 11px; height: 11px;
+  background: #ff4d4d;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  animation: cb-pulse 2s infinite;
+}
+@keyframes cb-pulse {
+  0%,100% { transform: scale(1); opacity:1; }
+  50%      { transform: scale(1.3); opacity:0.7; }
+}
+.cb-bubble.open .cb-dot { display: none; }
+
+/* Chat window */
+.cb-window {
+  position: fixed;
+  bottom: 92px; right: 28px;
+  z-index: 8999;
+  width: min(380px, calc(100vw - 32px));
+  max-height: 540px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px) scale(0.97);
+  transform-origin: bottom right;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.cb-window.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+/* Header */
+.cb-head {
+  background: var(--accent);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.cb-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.cb-head-info {}
+.cb-head-name {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+}
+.cb-head-sub {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.72);
+  display: flex; align-items: center; gap: 4px;
+}
+.cb-head-sub::before {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: #5effa0;
+  border-radius: 50%;
+}
+
+/* Messages area */
+.cb-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f8f7fc;
+  scroll-behavior: smooth;
+}
+.cb-messages::-webkit-scrollbar { width: 4px; }
+.cb-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+
+/* Message bubbles */
+.cb-msg {
+  max-width: 88%;
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  animation: cb-pop 0.22s ease;
+}
+@keyframes cb-pop {
+  from { opacity:0; transform: translateY(6px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.cb-msg.bot {
+  background: #fff;
+  color: #1a1a1a;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  align-self: flex-start;
+}
+.cb-msg.user {
+  background: var(--accent);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+
+/* Typing indicator */
+.cb-typing {
+  display: flex; gap: 4px; align-items: center;
+  padding: 10px 13px;
+  background: #fff;
+  border-radius: 14px; border-bottom-left-radius: 4px;
+  width: fit-content;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  align-self: flex-start;
+}
+.cb-typing span {
+  width: 6px; height: 6px;
+  background: #bbb;
+  border-radius: 50%;
+  animation: cb-bounce 1.2s infinite;
+}
+.cb-typing span:nth-child(2) { animation-delay: 0.2s; }
+.cb-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes cb-bounce {
+  0%,60%,100% { transform: translateY(0); }
+  30%          { transform: translateY(-5px); }
+}
+
+/* Quick-reply chips */
+.cb-chips {
+  padding: 8px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: #f8f7fc;
+  flex-shrink: 0;
+  border-top: 1px solid #ece9f5;
+}
+.cb-chip {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  background: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.cb-chip:hover { background: var(--accent); color: #fff; }
+
+/* Input bar */
+.cb-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fff;
+  border-top: 1px solid #ece9f5;
+  flex-shrink: 0;
+}
+.cb-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: #1a1a1a;
+  background: transparent;
+}
+.cb-input::placeholder { color: #bbb; }
+.cb-send {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.cb-send:hover { background: #5500bb; transform: scale(1.08); }
+.cb-send svg { width: 14px; height: 14px; fill: #fff; }
+
+/* Powered-by footer */
+.cb-powered {
+  text-align: center;
+  padding: 6px;
+  font-size: 0.6rem;
+  color: #bbb;
+  background: #fff;
+  border-top: 1px solid #ece9f5;
+  flex-shrink: 0;
+}
+.cb-powered a { color: #888; text-decoration: none; }
 </style>
 </head>
 <body>
@@ -558,6 +854,7 @@ footer {
   <nav class="nav-links">
     <a href="#templates">Templates</a>
     <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
     <a href="/templates/terms/">Terms</a>
     <a href="/templates/privacy/">Privacy</a>
     <a href="https://wa.me/18683424101?text=Hi!%20I%20want%20to%20get%20a%20template%20website." target="_blank" class="nav-cta">Get Started</a>
@@ -1058,6 +1355,260 @@ footer {
   <p class="contract-note">Fill in your details, tick your tier, sign, and send back via WhatsApp or email before work begins.</p>
 </div>
 
+
+<!-- FAQ -->
+<div class="section-head" id="faq">
+  <h2>FAQ</h2>
+  <span class="section-tag">Common Questions</span>
+</div>
+
+<div class="faq-section">
+
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      Can I use my own domain?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      Yes — absolutely. You can connect any domain you already own, or we can help you purchase one. Domain connection is included in all tiers at no extra charge. If you don't have a domain yet, we'll guide you through picking and registering one (typical cost: $10–$15/year through a registrar like Namecheap or Google Domains).
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      Can I upgrade to a custom website later?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      Yes. Your template setup is a stepping stone, not a dead end. When you're ready to scale — more pages, custom features, a booking system, or a full rebrand — we move you into our Agency tier starting at $500. Your domain, content, and brand assets all carry over. Nothing is wasted.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      What does the maintenance plan include?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      Your monthly hosting fee ($19.99–$29.99/mo depending on tier) covers: site hosting &amp; uptime, SSL certificate (https security), plugin &amp; platform updates, and basic performance monitoring. It does not include content changes — those are billed at $4.99 flat per copywriting update (Tier 02+). There are no surprise fees.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      What happens if I don't have content?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      No content? No problem — that's exactly what Tier 02 is for. We write your headline, bio, service descriptions, and call-to-action copy from scratch based on a short intake form you fill in. If you have some content but it needs polishing, we handle that too. We never leave a site blank or with placeholder text when it goes live.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-q" aria-expanded="false">
+      How long does delivery take?
+      <span class="faq-icon">+</span>
+    </button>
+    <div class="faq-a">
+      Once your service agreement is signed and your setup fee is paid, your site is live within <strong>24 hours</strong> for Tier 01 (template + your existing content). Tier 02 (+ copywriting) takes <strong>48–72 hours</strong> as we write and review your copy first. Tier 03 (+ chatbot) adds up to 24 hours on top for bot configuration. Rush delivery is available on request.
+    </div>
+  </div>
+
+</div>
+
+<!-- CHATBOT WIDGET -->
+<button class="cb-bubble" id="cbBubble" aria-label="Open chat">
+  <span class="cb-dot"></span>
+  <!-- Chat icon -->
+  <svg class="cb-chat-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/>
+  </svg>
+  <!-- Close icon -->
+  <svg class="cb-close-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18 6L6 18M6 6l12 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  </svg>
+</button>
+
+<div class="cb-window" id="cbWindow" role="dialog" aria-label="Prisca Dezigns chat">
+  <div class="cb-head">
+    <div class="cb-avatar">✦</div>
+    <div class="cb-head-info">
+      <div class="cb-head-name">Prisca Dezigns</div>
+      <div class="cb-head-sub">Online now</div>
+    </div>
+  </div>
+  <div class="cb-messages" id="cbMessages"></div>
+  <div class="cb-chips" id="cbChips"></div>
+  <div class="cb-input-row">
+    <input class="cb-input" id="cbInput" type="text" placeholder="Ask a question…" autocomplete="off">
+    <button class="cb-send" id="cbSend" aria-label="Send">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+    </button>
+  </div>
+  <div class="cb-powered">Powered by <a href="https://priscadezigns.org" target="_blank">Prisca Dezigns</a></div>
+</div>
+
+<script>
+(function () {
+
+  /* ── Knowledge base ── */
+  const KB = [
+    {
+      keys: ['domain','own domain','custom domain','url','link','connect'],
+      answer: 'Yes — you can connect any domain you already own, and domain connection is included in all tiers at no extra charge. No domain yet? We help you pick and register one (usually $10–$15/yr). Just mention it when you get started. 🌐'
+    },
+    {
+      keys: ['upgrade','custom','custom website','scale','full website','more pages','bigger'],
+      answer: 'Absolutely. Your template is a launchpad, not a ceiling. When you're ready to scale, we move you into our Agency tier (from $500). Your domain, content, and brand assets carry over — nothing is wasted. 🚀'
+    },
+    {
+      keys: ['maintenance','hosting','plan','monthly','uptime','ssl','updates','include'],
+      answer: 'Your monthly fee ($19.99–$29.99/mo) covers hosting, SSL certificate, platform updates, and uptime monitoring. Content changes are billed separately at $4.99 flat per update (Tier 02+). No hidden fees. 🛡️'
+    },
+    {
+      keys: ['content','no content','copy','text','write','words','blank','placeholder','copywriting'],
+      answer: 'No content? That's what Tier 02 is for. We write your headline, bio, service descriptions, and CTAs from scratch using a short intake form. We never launch a site with placeholder text. ✍️'
+    },
+    {
+      keys: ['delivery','how long','time','when','ready','live','24','48','hours','fast'],
+      answer: 'Tier 01 goes live in <strong>24 hours</strong> once your agreement is signed and fee is paid. Tier 02 (+ copywriting) takes <strong>48–72 hours</strong>. Tier 03 (+ chatbot) adds up to 24 hours. Rush delivery available on request. ⚡'
+    },
+    {
+      keys: ['price','cost','how much','tier','pricing','fee','pay','cheap','afford'],
+      answer: 'Three tiers: <strong>Tier 01</strong> — $149.99 setup + $19.99/mo. <strong>Tier 02</strong> — $149.99 + copywriting at $4.99/update. <strong>Tier 03</strong> — $199.99 setup + $29.99/mo includes a chatbot. All one-time setup fees. 💎'
+    },
+    {
+      keys: ['template','templates','design','how many','style','look','choose'],
+      answer: 'We have 12 premium templates — each extracted from real high-end studio sites. Dark editorial, clean white, cinematic, minimal — there's a style for every brand. Scroll up to browse them all. 🎨'
+    },
+    {
+      keys: ['start','get started','begin','order','sign','agreement','next step','how do i'],
+      answer: 'Easy: 1) Choose your template and tier. 2) Download and sign the Service Agreement. 3) Pay your setup fee. 4) We build and go live. Click <strong>"Choose ❖"</strong> on any template to start on WhatsApp. 📲'
+    },
+    {
+      keys: ['whatsapp','contact','reach','talk','speak','message','email'],
+      answer: 'The fastest way to reach us is WhatsApp — click any "Get Started" or "Choose ❖" button on this page. You can also email us at <a href="mailto:hello@priscadezigns.org">hello@priscadezigns.org</a>. 💬'
+    },
+    {
+      keys: ['refund','cancel','money back','guarantee'],
+      answer: 'Once work has begun, setup fees are non-refundable (covered in the Service Agreement). You can cancel your monthly hosting plan anytime with 7 days' notice. We stand behind our quality — if something isn't right, we fix it. 📄'
+    },
+    {
+      keys: ['mobile','phone','responsive','tablet','device'],
+      answer: 'Every template is 100% mobile-first and fully responsive — built to look sharp on phones, tablets, and desktops. Photos are scaled to preserve faces and key subjects. 📱'
+    },
+  ];
+
+  const QUICK = [
+    'How long does delivery take?',
+    'Can I use my own domain?',
+    'What's included in maintenance?',
+    'I don't have content',
+    'Can I upgrade later?',
+  ];
+
+  const FALLBACK = 'Great question! For anything not covered here, reach out directly on WhatsApp — click any "Get Started" button on this page and we'll reply fast. 💬';
+
+  /* ── DOM refs ── */
+  const bubble   = document.getElementById('cbBubble');
+  const win      = document.getElementById('cbWindow');
+  const msgs     = document.getElementById('cbMessages');
+  const chips    = document.getElementById('cbChips');
+  const input    = document.getElementById('cbInput');
+  const sendBtn  = document.getElementById('cbSend');
+
+  let opened = false;
+
+  /* ── Toggle ── */
+  bubble.addEventListener('click', () => {
+    opened = !opened;
+    bubble.classList.toggle('open', opened);
+    win.classList.toggle('open', opened);
+    if (opened && msgs.children.length === 0) initChat();
+    if (opened) setTimeout(() => input.focus(), 350);
+  });
+
+  /* ── Init greeting ── */
+  function initChat() {
+    addBot("Hi there 👋 I'm the Prisca Dezigns assistant. Ask me anything about our templates, pricing, or process — or pick a quick question below.", 0);
+    buildChips();
+  }
+
+  /* ── Add bot message ── */
+  function addBot(text, delay = 900) {
+    // Show typing indicator
+    const typing = document.createElement('div');
+    typing.className = 'cb-typing';
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    msgs.appendChild(typing);
+    scrollBottom();
+
+    setTimeout(() => {
+      typing.remove();
+      const m = document.createElement('div');
+      m.className = 'cb-msg bot';
+      m.innerHTML = text;
+      msgs.appendChild(m);
+      scrollBottom();
+    }, delay);
+  }
+
+  /* ── Add user message ── */
+  function addUser(text) {
+    const m = document.createElement('div');
+    m.className = 'cb-msg user';
+    m.textContent = text;
+    msgs.appendChild(m);
+    scrollBottom();
+  }
+
+  /* ── Scroll to bottom ── */
+  function scrollBottom() {
+    setTimeout(() => { msgs.scrollTop = msgs.scrollHeight; }, 50);
+  }
+
+  /* ── Build chips ── */
+  function buildChips() {
+    chips.innerHTML = '';
+    QUICK.forEach(q => {
+      const b = document.createElement('button');
+      b.className = 'cb-chip';
+      b.textContent = q;
+      b.addEventListener('click', () => handleInput(q));
+      chips.appendChild(b);
+    });
+  }
+
+  /* ── Match & respond ── */
+  function respond(text) {
+    const lower = text.toLowerCase();
+    for (const entry of KB) {
+      if (entry.keys.some(k => lower.includes(k))) {
+        addBot(entry.answer);
+        return;
+      }
+    }
+    addBot(FALLBACK);
+  }
+
+  /* ── Handle input ── */
+  function handleInput(val) {
+    const text = (val || input.value).trim();
+    if (!text) return;
+    addUser(text);
+    input.value = '';
+    chips.innerHTML = '';
+    respond(text);
+    // After each answer, offer chips again after delay
+    setTimeout(buildChips, 1800);
+  }
+
+  sendBtn.addEventListener('click', () => handleInput());
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') handleInput(); });
+
+})();
+</script>
+
 <!-- FOOTER -->
 <footer>
   <a href="https://priscadezigns.org" class="f-logo">
@@ -1066,6 +1617,7 @@ footer {
   <div class="f-links">
     <a href="#templates">Templates</a>
     <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
     <a href="/templates/terms/">Terms of Use</a>
     <a href="/templates/privacy/">Privacy Policy</a>
     <a href="https://priscadezigns.org">Main Site</a>
