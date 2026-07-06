@@ -134,7 +134,13 @@ function renderCart() {
  var co = document.getElementById('cart-checkout');
  co.classList.add('disabled'); co.href = '#';
  var chk = document.getElementById('cd-agree-chk');
- if (chk) chk.checked = false;
+ if (chk) { chk.checked = false; chk.disabled = true; }
+ var step1 = document.getElementById('cd-step1');
+ var step2 = document.getElementById('cd-step2');
+ var readBtn = document.getElementById('cd-read-btn');
+ if (step1) step1.classList.remove('done');
+ if (step2) step2.classList.remove('unlocked');
+ if (readBtn) { readBtn.classList.remove('done'); readBtn.textContent = 'Read Terms'; }
  updateBadge();
  return;
  }
@@ -155,6 +161,7 @@ function renderCart() {
  lines.push('%E2%9C%85 ' + encodeURIComponent(cart.base.name) + ' (' + encodeURIComponent(p.label) + ') %E2%80%94 $' + cart.base.setup.toFixed(2) + ' setup %2B $' + cart.base.mo.toFixed(2) + '%2Fmo');
  if (cart.addons.copy) lines.push('%E2%9C%85 Copywriting Add-On %E2%80%94 %2B$49.99 setup');
  if (cart.addons.chatbot) lines.push('%E2%9C%85 AI Chatbot Add-On %E2%80%94 %2B$299.99 setup %2B $49.99%2Fmo');
+ lines.push('%0A%E2%9C%85 I have read and agree to the Terms of Use %26 service agreement');
  lines.push('%0ASetup Total: $' + totalSetup.toFixed(2));
  lines.push('Monthly Total: $' + totalMo.toFixed(2) + '%2Fmo');
  var msg = lines.join('%0A');
@@ -218,11 +225,26 @@ function closeCart() {
  document.getElementById('cart-drawer').classList.remove('open');
  document.getElementById('cart-overlay').classList.remove('open');
 }
+function openTerms() {
+ // Open terms in new tab
+ window.open('/templates/terms/', '_blank', 'noopener');
+ // Mark step 1 done
+ var step1 = document.getElementById('cd-step1');
+ var readBtn = document.getElementById('cd-read-btn');
+ if (step1) step1.classList.add('done');
+ if (readBtn) { readBtn.classList.add('done'); readBtn.innerHTML = '&#10003; Terms Opened'; }
+ // Unlock step 2
+ var step2 = document.getElementById('cd-step2');
+ var chk = document.getElementById('cd-agree-chk');
+ if (step2) step2.classList.add('unlocked');
+ if (chk) chk.disabled = false;
+}
 function updateAgreement() {
  var chk = document.getElementById('cd-agree-chk');
  var btn = document.getElementById('cart-checkout');
  if (!btn || !chk) return;
- if (chk.checked && cart.base) {
+ // Both conditions must be true: terms opened+accepted AND a template selected
+ if (chk.checked && !chk.disabled && cart.base) {
    btn.classList.remove('disabled');
  } else {
    btn.classList.add('disabled');
