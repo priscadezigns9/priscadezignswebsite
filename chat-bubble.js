@@ -2,51 +2,68 @@
     const container = document.createElement('div');
     container.id = 'prisca-chat-widget';
     container.style.cssText = "position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: 'Inter', sans-serif;";
-    
+
     container.innerHTML = `
         <button id="chat-toggle" style="background: #301934; border: none; width: 65px; height: 65px; border-radius: 50%; cursor: pointer; box-shadow: 0 8px 32px rgba(48,25,52,0.3); display: flex; align-items: center; justify-content: center; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="white"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </button>
-        <div id="chat-window" style="display: none; position: absolute; bottom: 85px; right: 0; width: 400px; height: 620px; background: #FFFFF0; border-radius: 20px; flex-direction: column; box-shadow: 0 12px 48px rgba(0,0,0,0.25); overflow: hidden; border: 1px solid rgba(48,25,52,0.1); transition: all 0.3s ease;">
-            <div style="background: #301934; color: white; padding: 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
+        <div id="chat-window" style="display: none; position: absolute; bottom: 85px; right: 0; width: 380px; max-height: 540px; background: #ffffff; border-radius: 20px; flex-direction: column; box-shadow: 0 12px 48px rgba(0,0,0,0.2); overflow: hidden; border: 1px solid rgba(48,25,52,0.1);">
+            <div style="background: #301934; color: white; padding: 18px 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 10px; height: 10px; background: #00FF00; border-radius: 50%; box-shadow: 0 0 8px #00FF00;"></div>
-                    <span>SIERRA | Neural Scout</span>
+                    <div style="width: 9px; height: 9px; background: #00FF00; border-radius: 50%; box-shadow: 0 0 6px #00FF00;"></div>
+                    <div>
+                        <div style="font-size: 0.95rem; font-weight: 700;">Virtual Assistant</div>
+                        <div style="font-size: 0.72rem; opacity: 0.6; font-weight: 400;">Online — here to help</div>
+                    </div>
                 </div>
-                <button id="close-chat" style="background:none; border:none; color:white; cursor:pointer; font-size:24px; opacity: 0.8;">&times;</button>
+                <button id="close-chat" style="background:none; border:none; color:white; cursor:pointer; font-size:22px; opacity:0.7; line-height:1;">&times;</button>
             </div>
-            <div id="chat-messages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #ffffff;"></div>
-            <div id="chat-options" style="padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 8px; background: #ffffff; border-top: 1px solid #f0f0f0;"></div>
-            <div style="padding: 20px; border-top: 1px solid #eee; display: flex; gap: 10px; background: #ffffff;">
-                <input type="text" id="user-input" placeholder="Type only for custom requests..." style="flex: 1; padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 12px; outline: none; font-size: 0.95rem;">
-                <button id="send-btn" style="background: #301934; color: white; border: none; padding: 0 20px; border-radius: 12px; cursor: pointer; font-weight: 600;">Send</button>
+            <div id="chat-messages" style="flex: 1; padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #fafafa; max-height: 340px;"></div>
+            <div id="chat-options" style="padding: 10px 16px 6px; display: flex; flex-wrap: wrap; gap: 8px; background: #ffffff; border-top: 1px solid #f0f0f0;"></div>
+            <div style="padding: 12px 16px 16px; background: #ffffff;">
+                <div style="font-size: 0.7rem; color: #aaa; text-align: center; letter-spacing: 0.04em;">Powered by Prisca Dezigns</div>
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(container);
 
-    const t = document.getElementById('chat-toggle'), w = document.getElementById('chat-window'), c = document.getElementById('close-chat'), i = document.getElementById('user-input'), s = document.getElementById('send-btn'), m = document.getElementById('chat-messages'), opt = document.getElementById('chat-options');
-    
-    let state = 'ROOT';
-    let user_data = {};
+    const t = document.getElementById('chat-toggle'),
+          w = document.getElementById('chat-window'),
+          cl = document.getElementById('close-chat'),
+          m = document.getElementById('chat-messages'),
+          opt = document.getElementById('chat-options');
 
-    const PKG_CONFIG = {
-        'Starter': { desc: 'Basic Brand Identity' },
-        'Growth': { desc: 'Active Scaling' },
-        'Trusted': { desc: 'High-Fidelity Authority' },
-        'E-Starter': { desc: 'Core E-Commerce' },
-        'E-Growth': { desc: 'Sales Engine' },
-        'E-Trusted': { desc: 'Enterprise Commerce' },
-        'Branding': { desc: 'Neural Identity' },
-        'Brand Scan': { desc: 'Deep-Audit' }
+    // ── FAQ KNOWLEDGE BASE ─────────────────────────────────────────
+    // Client fills in BUSINESS_INFO before deploying
+    const BUSINESS_INFO = {
+        name:     'Your Business',
+        tagline:  'Here to help you.',
+        hours:    'Monday – Friday, 9am – 5pm',
+        location: 'Your City, Your Country',
+        contact:  'Contact us via the form on this page.',
+        services: 'We offer a range of professional services tailored to your needs. Use the menu above to explore.',
+        about:    'We are a dedicated team focused on delivering quality results for every client.',
+        returns:  'We stand behind our work. Reach out and we will make it right.',
     };
 
-    function addMsg(txt, u) {
+    function addMsg(txt, isUser) {
         const d = document.createElement('div');
         d.innerHTML = txt;
-        d.style.cssText = `padding:12px 16px; border-radius:15px; font-size:0.95rem; line-height:1.5; max-width:85%; align-self:${u?'flex-end':'flex-start'}; background:${u?'#301934':'#f1f1f1'}; color:${u?'white':'#333'}; box-shadow: 0 2px 4px rgba(0,0,0,0.05);`;
-        m.appendChild(d); m.scrollTop = m.scrollHeight;
+        d.style.cssText = `
+            padding: 11px 15px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            max-width: 88%;
+            align-self: ${isUser ? 'flex-end' : 'flex-start'};
+            background: ${isUser ? '#301934' : '#ffffff'};
+            color: ${isUser ? 'white' : '#333'};
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            border: ${isUser ? 'none' : '1px solid #eeeeee'};
+        `;
+        m.appendChild(d);
+        m.scrollTop = m.scrollHeight;
     }
 
     function showOptions(options) {
@@ -54,137 +71,57 @@
         options.forEach(o => {
             const b = document.createElement('button');
             b.innerText = o;
-            b.style.cssText = "padding: 10px 18px; border: 1.5px solid #301934; border-radius: 12px; background: white; color: #301934; cursor: pointer; font-size: 0.85rem; font-weight: 700; transition: all 0.2s;";
+            b.style.cssText = "padding: 8px 14px; border: 1.5px solid #301934; border-radius: 100px; background: white; color: #301934; cursor: pointer; font-size: 0.78rem; font-weight: 700; transition: all 0.2s; margin-bottom: 6px;";
             b.onmouseover = () => { b.style.background = '#301934'; b.style.color = 'white'; };
-            b.onmouseout = () => { b.style.background = 'white'; b.style.color = '#301934'; };
-            b.onclick = () => handleInput(o);
+            b.onmouseout  = () => { b.style.background = 'white';   b.style.color = '#301934'; };
+            b.onclick = () => handleSelect(o);
             opt.appendChild(b);
         });
     }
 
-    function resetToRoot() {
-        state = 'ROOT';
-        addMsg("Greetings. I am Sierra. Select a path to evolve your infrastructure:");
-        showOptions(['1. 🌐 Websites', '2. 🧠 AI Consultancy', '3. 🎨 Branding', '4. 🔍 Brand Scan']);
+    const MENU = [
+        '🕐 Hours',
+        '📍 Location',
+        '💼 Services',
+        '👋 About Us',
+        '📞 How to Contact',
+    ];
+
+    function showMenu() {
+        setTimeout(() => {
+            addMsg("Hi there! 👋 I'm here to answer quick questions. What would you like to know?");
+            showOptions(MENU);
+        }, 300);
     }
 
-    function handleInput(val) {
-        const low = val.toLowerCase();
-        if (state !== 'FORM_NAME' && state !== 'FORM_EMAIL') addMsg(val, true);
-        
-        if (low.includes('back') || low === '0') {
-            resetToRoot();
-            return;
-        }
+    function handleSelect(val) {
+        addMsg(val, true);
+        opt.innerHTML = '';
 
-        if (state === 'ROOT') {
-            if (low.includes('website') || low === '1') {
-                state = 'WEBSITE_PATH';
-                setTimeout(() => {
-                    addMsg("Select your Website Architectural tier:");
-                    showOptions(['Starter', 'Growth', 'Trusted', 'E-Commerce', 'Custom Site', 'Back']);
-                }, 400);
-            } else if (low.includes('ai') || low === '2') {
-                state = 'AI_PATH';
-                setTimeout(() => {
-                    addMsg("AI Consultancy: <strong>Tier 1</strong> | <strong>Tier 2</strong> | <strong>Tier 3</strong>. Which tier are we targeting?");
-                    showOptions(['Tier 1', 'Tier 2', 'Tier 3', 'Back']);
-                }, 400);
-            } else if (low.includes('branding') || low === '3') {
-                user_data.package = 'Branding';
-                state = 'FORM_NAME';
-                setTimeout(() => {
-                    addMsg("Selected: <strong>Branding</strong>. Ready to begin? What is your <strong>Full Name</strong>?");
-                    showOptions(['⬅ Back']);
-                }, 400);
-            } else if (low.includes('scan') || low === '4') {
-                user_data.package = 'Brand Scan';
-                state = 'SCAN_DOMAIN';
-                setTimeout(() => {
-                    addMsg("🔍 <strong>Brand Scan</strong> — Deep Audit.<br><br>Enter your existing domain below so we can run the diagnostic:");
-                    showOptions(['⬅ Back']);
-                    i.placeholder = 'e.g. yourbusiness.com';
-                    i.focus();
-                }, 400);
+        setTimeout(() => {
+            if (val.includes('Hours')) {
+                addMsg("⏰ <strong>Our Hours</strong><br>" + BUSINESS_INFO.hours);
+            } else if (val.includes('Location')) {
+                addMsg("📍 <strong>Where We Are</strong><br>" + BUSINESS_INFO.location);
+            } else if (val.includes('Services')) {
+                addMsg("💼 <strong>What We Do</strong><br>" + BUSINESS_INFO.services);
+            } else if (val.includes('About')) {
+                addMsg("👋 <strong>About Us</strong><br>" + BUSINESS_INFO.about);
+            } else if (val.includes('Contact')) {
+                addMsg("📞 <strong>Get in Touch</strong><br>" + BUSINESS_INFO.contact);
             }
-        } else if (state === 'WEBSITE_PATH') {
-            if (val === 'E-Commerce') {
-                setTimeout(() => {
-                    addMsg("Select your E-Commerce tier:");
-                    showOptions(['E-Starter', 'E-Growth', 'E-Trusted', 'Back']);
-                }, 400);
-            } else if (val === 'Custom Site') {
-                state = 'FORM_NAME';
-                setTimeout(() => {
-                    addMsg("For custom builds, I need your details. What is your <strong>Full Name</strong>?");
-                    showOptions(['⬅ Back']);
-                }, 400);
-            } else if (PKG_CONFIG[val]) {
-                user_data.package = val;
-                state = 'FORM_NAME';
-                const pkg = PKG_CONFIG[val];
-                setTimeout(() => {
-                    addMsg(`Selected: <strong>${val}</strong><br>Setup: <strong>${pkg.setup}</strong><br>Pulse: <strong>${pkg.pulse}</strong><br><br>Ready to secure this build. What is your <strong>Full Name</strong>?`);
-                    showOptions(['⬅ Back']);
-                }, 400);
-            }
-        } else if (state === 'SCAN_DOMAIN') {
-            if (val === '⬅ Back') { resetToRoot(); return; }
-            user_data.domain = val;
-            i.placeholder = 'Type only for custom requests...';
             setTimeout(() => {
-                addMsg("Domain locked: <strong>" + val + "</strong>. Running your Brand Scan now — click below to see your live results 👇");
-                const scanUrl = 'https://priscadezigns.org/scan/?domain=' + encodeURIComponent(val);
-                showOptions(['⬅ Back']);
-                const linkEl = document.createElement('div');
-                linkEl.style.cssText = 'padding:10px 0;';
-                linkEl.innerHTML = '<a href="' + scanUrl + '" target="_blank" style="display:inline-block;background:#301934;color:white;padding:12px 24px;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.85rem;letter-spacing:1px;">🔍 Open My Brand Scan →</a>';
-                document.getElementById('chat-messages').appendChild(linkEl);
-                document.getElementById('chat-messages').scrollTop = 99999;
-            }, 400);
-        } else if (state === 'AI_PATH') {
-            if (val === 'Back') { resetToRoot(); return; }
-            user_data.package = 'AI Consultancy - ' + val;
-            state = 'FORM_NAME';
-            setTimeout(() => {
-                addMsg(`Targeting <strong>${val}</strong>. Shall we initiate the intake? What is your <strong>Full Name</strong>?`);
-                showOptions(['⬅ Back']);
-            }, 400);
-        } else if (state === 'FORM_NAME') {
-            if (val === '⬅ Back') { resetToRoot(); return; }
-            user_data.name = val;
-            state = 'FORM_EMAIL';
-            addMsg("Thank you. What is your <strong>Best Email</strong> for the formal proposal?", false);
-        } else if (state === 'FORM_EMAIL') {
-            user_data.email = val;
-            state = 'COMPLETE';
-            addMsg("Data synchronized. Delivering your brief to the Architect now...", false);
-
-            // ── Silent backend POST via Formsubmit ──────────────
-            fetch('https://formsubmit.co/ajax/priscillanarine@gmail.com', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({
-                    name:    user_data.name    || '',
-                    email:   user_data.email   || '',
-                    package: user_data.package || '',
-                    domain:  user_data.domain  || '',
-                    source:  window.location.hostname || 'priscadezigns.org',
-                    _subject: '🔥 New Lead: ' + (user_data.name || 'Unknown') + ' — ' + (user_data.package || 'General')
-                })
-            }).catch(function() {});
-            // ────────────────────────────────────────────────────
-
-            setTimeout(() => addMsg("Intake complete. Priscilla will reach out within 24 hours. Látom. 🙏", false), 800);
-            setTimeout(() => resetToRoot(), 4000);
-        }
+                addMsg("Anything else I can help with?");
+                showOptions([...MENU, '✅ That's all, thanks!']);
+            }, 600);
+        }, 380);
     }
 
     t.onclick = () => {
-        w.style.display = w.style.display === 'none' ? 'flex' : 'none';
-        if (m.innerHTML === '') resetToRoot();
+        const open = w.style.display === 'none' || w.style.display === '';
+        w.style.display = open ? 'flex' : 'none';
+        if (open && m.innerHTML === '') showMenu();
     };
-    c.onclick = () => w.style.display = 'none';
-    s.onclick = () => { const val = i.value.trim(); if (val) handleInput(val); i.value = ''; };
-    i.onkeypress = (e) => { if (e.key === 'Enter') s.click(); };
+    cl.onclick = () => { w.style.display = 'none'; };
+
 })();
