@@ -119,7 +119,7 @@
 
   /* ABOUT */
   .about { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border); }
-  .about-img-col { background: url("https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=800&q=80") center/cover no-repeat; min-height: 480px; position: relative; }
+  .about-img-col { background: url("https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=800&q=80") center/cover no-repeat; min-height: clamp(260px, 50vw, 480px); position: relative; }
   .about-img-col-label { position: absolute; bottom: 24px; left: 24px; font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; color: rgba(0,0,0,0.3); }
   .about-text-col { padding: 80px 56px; display: flex; flex-direction: column; justify-content: center; }
   .section-eyebrow { font-size: 0.6rem; font-weight: 500; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
@@ -127,7 +127,7 @@
   .section-body { font-size: 0.9rem; color: var(--muted); line-height: 1.85; margin-bottom: 36px; max-width: 440px; }
 
   /* SERVICES — Mennour-style: clean listed rows */
-  .services { padding: 80px 48px; max-width: 1200px; margin: 0 auto; }
+  .services { padding: 80px 48px; max-width: min(1200px, 92vw); margin: 0 auto; }
   .svc-list { margin-top: 48px; }
   .svc-row {
     display: flex; align-items: center; justify-content: space-between;
@@ -171,13 +171,208 @@
     .work-cell:nth-child(1) { grid-row: auto; }
     .work-cell:nth-child(4) { grid-column: auto; }
     .about { grid-template-columns: 1fr; }
-    .about-img-col { min-height: 260px; }
+    .about-img-col { min-height: clamp(180px, 30vw, 260px); }
     .about-text-col { padding: 48px 24px; }
     .services { padding: 48px 24px; }
     .svc-desc { display: none; }
     .cta-band { padding: 64px 24px; }
     footer { padding: 24px; }
   }
+
+  /* Craft — image fit fixes */
+  .project img, .card img, .work-item img,
+  .gallery img, .portfolio img, img {
+    object-fit: cover;
+    object-position: center top;
+  }
+
+/* ═══════════════════════════════════════════════════════
+   UNIVERSAL RESPONSIVE PATCH — Prisca Dezigns Templates
+   Applied: 2026-07-06
+   ═══════════════════════════════════════════════════════ */
+
+/* 1. Every image in a photo container must cover its box
+      and keep faces at the top so heads never get cropped */
+.hero img, .hero video,
+.hero-img img, .hero-image img,
+.about-img img, .about-image img,
+.feat-img img, .feature-img img,
+.slide-img img, .gallery-img img,
+.project-img img, .case-img img,
+.profile-img img, .portrait img,
+.team-img img, .headshot img,
+.fig1 img, .fig2 img,
+.bg img, .bg video,
+.card-img img, .card img > img,
+.media-panel img, .reel-panel img,
+[class*="-photo"] img,
+[class*="-image"] img,
+[class*="img-wrap"] img,
+section img:not([class*="logo"]):not([class*="icon"]):not([class*="brand"]) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;  /* keeps faces — top of frame */
+  display: block;
+}
+
+/* 2. Image wrapper containers must have a defined height
+      so object-fit has something to fill */
+.hero, .hero-wrap,
+.hero-img, .hero-image,
+.about-img, .feat-img,
+.slide-img, .gallery-img,
+.project-img, .case-img,
+.profile-img, .portrait,
+.fig1, .fig2,
+.card-img,
+[class*="-photo"],
+[class*="-image"]:not(section):not(article) {
+  overflow: hidden;
+  position: relative;
+}
+
+/* 3. Max-width containers: replace fixed px with responsive max */
+.container, .inner, .wrapper, .content,
+[class*="container"], [class*="inner"],
+[class*="wrapper"] {
+  max-width: min(100%, var(--container-max, 1200px));
+  width: 100%;
+}
+
+/* ── MOBILE: ≤ 768px ────────────────────────────── */
+@media (max-width: 768px) {
+  /* Reset any fixed pixel widths on sections */
+  section, article, header, footer, main,
+  .container, .inner, .wrapper, .content,
+  [class*="container"], [class*="inner"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+
+  /* Hero: full viewport height, never cropped */
+  .hero, [class*="hero"],
+  [b-tpl="hero"] {
+    min-height: 100svh;
+    height: auto !important;
+  }
+
+  /* Stack any 2-col or multi-col grid to single column */
+  [class*="grid"],
+  [class*="two-col"],
+  [class*="split"],
+  [class*="columns"],
+  .stats, .stat-row,
+  .services-grid, .service-grid,
+  .cards, .card-row,
+  .team-grid, .gallery-grid,
+  .features-grid, .work-grid,
+  .about-grid, .contact-grid {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+
+  /* Remove fixed pixel heights on images — let them scale */
+  .hero-img, .hero-image,
+  .about-img, .feat-img,
+  .slide-img, .project-img,
+  .case-img, .profile-img,
+  .fig1, .fig2,
+  [class*="-photo"],
+  [class*="-image"]:not(section):not(article) {
+    height: 56vw !important;   /* 16:9ish — safe for any face shot */
+    min-height: 220px;
+    max-height: 480px;
+  }
+
+  /* Full-height panel images (Velocity reel, Persona panels) */
+  [class*="panel"] img,
+  [class*="reel"] img,
+  .intro > article .bg img,
+  .intro > article .bg video {
+    height: 100% !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    object-position: center center;
+  }
+
+  /* Nav: stack or shrink */
+  nav ul {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  /* Typography scaling — clamp already handles most, but enforce min */
+  h1 { font-size: clamp(2rem, 10vw, 4rem) !important; }
+  h2 { font-size: clamp(1.4rem, 7vw, 2.5rem) !important; }
+  h3 { font-size: clamp(1.1rem, 5vw, 1.8rem) !important; }
+  p  { font-size: clamp(0.95rem, 4vw, 1.1rem) !important; }
+
+  /* Hide decorative side-by-side second fig on small screens */
+  .fig2 { display: none; }
+  .fig1 { width: 100% !important; }
+
+  /* Buttons: full width on mobile */
+  .cta-btn, .btn, .button,
+  [class*="btn"], [class*="cta"],
+  .squircle a, .bubble-cta {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Ticker/marquee: reduce gap */
+  .ticker-track { gap: 2rem !important; }
+
+  /* Footer grid → stack */
+  footer .grid,
+  footer .inner,
+  footer .wrapper,
+  footer .contact {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+  }
+}
+
+/* ── SMALL PHONES: ≤ 480px ──────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --container-padding: 4vw !important;
+  }
+
+  .hero-img, .hero-image,
+  .about-img, .feat-img,
+  .slide-img, .project-img,
+  [class*="-photo"],
+  [class*="-image"]:not(section):not(article) {
+    height: 70vw !important;
+    min-height: 200px;
+  }
+
+  /* Hazel May speech bubbles — shrink on tiny screens */
+  .bubble-word {
+    font-size: clamp(1.6rem, 9vw, 3rem) !important;
+  }
+}
+
+/* ── TABLET: 769px – 1024px ─────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container, .inner, .wrapper {
+    padding-left: 4vw;
+    padding-right: 4vw;
+  }
+  /* 3-col grids → 2-col on tablet */
+  [class*="grid-3"],
+  .three-col,
+  .services-grid:has(> :nth-child(3)),
+  .cards:has(> :nth-child(3)) {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════ */
 </style>
 </head>
 <body>
