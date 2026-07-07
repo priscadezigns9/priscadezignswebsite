@@ -8,28 +8,33 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- tsParticles for interactive star-field -->
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════
    STELLAR — Sky of Stars Portfolio
-   Stars are scattered like a night sky:
-   big ones, small ones, floating freely.
-   Buttons are big enough to hold words.
+   Three-colour scheme:
+     #F5C842 — Starlight Gold (primary accent)
+     #7B6CFF — Nebula Violet (secondary accent)
+     #06060E — Deep Space (background)
    Prisca Dezigns © 2026
 ═══════════════════════════════════════════ */
 :root {
-  --bg:        #06060E;
-  --surface:   #0D0D1A;
-  --gold:      #F5C842;
-  --gold-10:   rgba(245,200,66,0.10);
-  --gold-18:   rgba(245,200,66,0.18);
-  --gold-30:   rgba(245,200,66,0.30);
-  --white:     #FFFFFF;
-  --muted:     rgba(255,255,255,0.42);
-  --border:    rgba(245,200,66,0.16);
+  --bg:         #06060E;
+  --surface:    #0D0D1A;
+  --gold:       #F5C842;
+  --violet:     #7B6CFF;
+  --gold-10:    rgba(245,200,66,0.10);
+  --gold-18:    rgba(245,200,66,0.18);
+  --gold-30:    rgba(245,200,66,0.30);
+  --violet-10:  rgba(123,108,255,0.10);
+  --violet-20:  rgba(123,108,255,0.20);
+  --violet-40:  rgba(123,108,255,0.40);
+  --white:      #FFFFFF;
+  --muted:      rgba(255,255,255,0.42);
+  --border:     rgba(245,200,66,0.16);
+  --border-v:   rgba(123,108,255,0.20);
 
-  /* ── Perfect 5-point star ──────────────
-     outer r=50%, inner r=21%
-     angles: points at 90°, then every 72° */
   --star: polygon(
     50.00%  0.00%,
     62.94% 29.29%,
@@ -57,49 +62,26 @@ body {
 }
 
 /* ───────────────────────────────────────────
-   STAR SHAPES — utility classes
-   .sz-* controls the star's square bounding box
-─────────────────────────────────────────── */
-.star-shape {
-  clip-path: var(--star);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-/* Sizes — sky has variety */
-.sz-xs  { width: 60px;  height: 60px;  }   /* tiny twinkle */
-.sz-sm  { width: 100px; height: 100px; }   /* small star */
-.sz-md  { width: 180px; height: 180px; }   /* medium star */
-.sz-lg  { width: 260px; height: 260px; }   /* large star */
-.sz-xl  { width: 340px; height: 340px; }   /* hero star */
-.sz-xxl { width: 420px; height: 420px; }   /* centrepiece */
-
-/* Fill variants */
-.star-gold    { background: var(--gold); }
-.star-surface { background: var(--surface); border: 1px solid var(--border); }
-.star-dim     { background: var(--gold-10); border: 1px solid var(--border); }
-.star-photo   { background: #111; overflow: hidden; }
-.star-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
-
-/* ───────────────────────────────────────────
-   NAV — simple, transparent
+   NAV
 ─────────────────────────────────────────── */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 clamp(24px, 5vw, 64px);
   height: 68px;
-  background: rgba(6,6,14,0.85);
-  backdrop-filter: blur(18px);
+  background: rgba(6,6,14,0.88);
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
 }
 .nav-logo {
   display: flex; align-items: center; gap: 10px;
   font-family: var(--font-h); font-size: 0.95rem; font-weight: 800;
   color: var(--gold); text-decoration: none;
+}
+.nav-logo-star {
+  width: 26px; height: 26px;
+  background: var(--gold); clip-path: var(--star);
+  flex-shrink: 0;
 }
 .nav-links {
   display: flex; gap: 36px; list-style: none;
@@ -110,10 +92,21 @@ nav {
   color: var(--muted); text-decoration: none; transition: color .2s;
 }
 .nav-links a:hover { color: var(--gold); }
+.nav-cta {
+  width: 80px; height: 80px;
+  background: var(--gold); clip-path: var(--star);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  font-family: var(--font-h); font-size: 0.55rem; font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: #06060E; text-decoration: none;
+  padding: 14px; line-height: 1.35;
+  transition: transform .2s, filter .2s;
+}
+.nav-cta:hover { transform: scale(1.12) rotate(10deg); filter: brightness(1.1); }
 
 /* ───────────────────────────────────────────
-   HERO — a night sky of scattered stars
-   Buttons float in the sky, not locked to nav
+   HERO — tsParticles star-field background
 ─────────────────────────────────────────── */
 .hero {
   position: relative;
@@ -127,86 +120,66 @@ nav {
   overflow: hidden;
 }
 
-/* Deep space glow */
-.hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 70% 60% at 50% 45%, rgba(245,200,66,0.05) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 40% at 20% 80%, rgba(245,200,66,0.03) 0%, transparent 60%),
-    radial-gradient(ellipse 30% 30% at 80% 20%, rgba(245,200,66,0.03) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-/* Sky — scattered stars layer, behind the headline */
-.sky {
-  position: absolute; inset: 0;
-  pointer-events: none;
+/* tsParticles canvas sits behind everything */
+#tsparticles {
+  position: absolute;
+  inset: 0;
   z-index: 0;
 }
 
-/* Each free-floating star in the sky */
-.sky-star {
-  position: absolute;
-  clip-path: var(--star);
-  background: var(--gold);
-  animation: drift var(--dur, 8s) ease-in-out infinite;
-  animation-delay: var(--del, 0s);
-  opacity: var(--op, 0.12);
+/* Deep space radial glow on top of particles */
+.hero-glow {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    radial-gradient(ellipse 65% 55% at 50% 45%, rgba(245,200,66,0.05) 0%, transparent 65%),
+    radial-gradient(ellipse 35% 35% at 15% 75%, rgba(123,108,255,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 30% 30% at 85% 20%, rgba(123,108,255,0.05) 0%, transparent 50%);
+  pointer-events: none;
 }
 
-@keyframes drift {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33%       { transform: translateY(-14px) rotate(12deg); }
-  66%       { transform: translateY(6px) rotate(-8deg); }
-}
-
-/* Hero text — sits on top of the sky */
 .hero-content {
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
   display: flex; flex-direction: column;
-  align-items: center; gap: 0;
+  align-items: center;
 }
+
 .hero-eyebrow {
   display: flex; align-items: center; gap: 10px;
   font-family: var(--font-h); font-size: 0.68rem; font-weight: 700;
   letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold);
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 .hero-eyebrow .e-star {
   width: 9px; height: 9px;
-  background: var(--gold);
-  clip-path: var(--star);
-  display: inline-block;
+  background: var(--gold); clip-path: var(--star); display: inline-block;
 }
+
 .hero-name {
   font-family: var(--font-h);
   font-size: clamp(3.8rem, 11vw, 9rem);
   font-weight: 800; line-height: 0.93; letter-spacing: -0.04em;
   color: var(--white);
 }
-.hero-name .gold { color: var(--gold); }
+.hero-name .gold   { color: var(--gold); }
+.hero-name .violet { color: var(--violet); }
+
 .hero-role {
   font-family: var(--font-h);
-  font-size: clamp(0.85rem, 2.5vw, 1.2rem); font-weight: 400;
+  font-size: clamp(0.85rem, 2.5vw, 1.15rem); font-weight: 400;
   color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
-  margin-top: 18px; margin-bottom: 72px;
+  margin-top: 18px; margin-bottom: 68px;
 }
+/* Role separator dots in violet */
+.hero-role .sep { color: var(--violet); margin: 0 8px; }
 
-/* ── HERO BUTTON STARS ──────────────────────
-   These are BIG stars floating in the sky.
-   They drift independently — not nav-locked.
-   Sized to fit 2-line text comfortably.    */
-.hero-star-btns {
-  position: relative; z-index: 1;
+/* Hero star buttons */
+.hero-btns {
   display: flex; align-items: center;
-  justify-content: center; flex-wrap: wrap;
-  gap: 48px;
+  justify-content: center; gap: 52px; flex-wrap: wrap;
+  position: relative; z-index: 2;
 }
 
-/* Primary gold star button */
 .btn-star-hero {
-  position: relative;
   width: 200px; height: 200px;
   clip-path: var(--star);
   background: var(--gold);
@@ -216,40 +189,54 @@ nav {
   letter-spacing: 0.08em; text-transform: uppercase;
   text-decoration: none; border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  text-align: center; line-height: 1.45; padding: 52px;
-  transition: transform .3s ease, filter .3s ease;
+  text-align: center; line-height: 1.5; padding: 52px;
   animation: btnDrift1 9s ease-in-out infinite;
+  transition: filter .3s;
 }
-.btn-star-hero:hover {
-  transform: scale(1.09) rotate(14deg);
-  filter: brightness(1.15);
-}
-@keyframes btnDrift1 {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  40%       { transform: translateY(-18px) rotate(8deg); }
-  70%       { transform: translateY(7px) rotate(-4deg); }
-}
+.btn-star-hero:hover { filter: brightness(1.18); animation-play-state: paused; transform: scale(1.08) rotate(12deg); }
 
-/* Ghost star button */
-.btn-star-hero-ghost {
-  position: relative;
+.btn-star-violet {
   width: 200px; height: 200px;
   clip-path: var(--star);
-  background: var(--gold-10);
-  color: var(--gold);
+  background: var(--violet);
+  color: #ffffff;
   font-family: var(--font-h);
   font-size: 0.82rem; font-weight: 800;
   letter-spacing: 0.08em; text-transform: uppercase;
   text-decoration: none; border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  text-align: center; line-height: 1.45; padding: 52px;
-  transition: transform .3s ease, background .3s ease;
+  text-align: center; line-height: 1.5; padding: 52px;
   animation: btnDrift2 11s ease-in-out infinite;
   animation-delay: 1.5s;
+  transition: filter .3s;
 }
-.btn-star-hero-ghost:hover {
-  transform: scale(1.09) rotate(-14deg);
-  background: var(--gold-18);
+.btn-star-violet:hover { filter: brightness(1.15); animation-play-state: paused; transform: scale(1.08) rotate(-12deg); }
+
+/* Floating "Open to Work" star — free in sky */
+.hero-float-star {
+  position: absolute;
+  top: clamp(82px, 15vh, 144px);
+  right: clamp(32px, 8vw, 120px);
+  z-index: 3;
+  width: 110px; height: 110px;
+  clip-path: var(--star);
+  background: var(--violet-10);
+  border: 1px solid rgba(123,108,255,0.35);
+  color: var(--violet);
+  font-family: var(--font-h);
+  font-size: 0.55rem; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: none;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; line-height: 1.4; padding: 24px;
+  animation: btnDrift2 12s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+@keyframes btnDrift1 {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40%       { transform: translateY(-18px) rotate(8deg); }
+  70%       { transform: translateY(7px) rotate(-4deg); }
 }
 @keyframes btnDrift2 {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -257,60 +244,49 @@ nav {
   65%       { transform: translateY(-16px) rotate(6deg); }
 }
 
-/* Small "available" star drifting near top — not part of nav */
-.hero-mini-star-btn {
-  position: absolute;
-  top: clamp(80px, 15vh, 140px);
-  right: clamp(30px, 8vw, 120px);
-  z-index: 2;
-  width: 110px; height: 110px;
-  clip-path: var(--star);
-  background: var(--gold-10);
-  border: 1px solid rgba(245,200,66,0.3);
-  color: var(--gold);
-  font-family: var(--font-h);
-  font-size: 0.55rem; font-weight: 800;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  text-decoration: none;
-  display: flex; align-items: center; justify-content: center;
-  text-align: center; line-height: 1.4; padding: 24px;
-  animation: drift 12s ease-in-out infinite;
-  animation-delay: 3s;
-  transition: background .2s;
-}
-.hero-mini-star-btn:hover { background: var(--gold-18); }
-
 /* ───────────────────────────────────────────
-   TICKER
+   SKILL TAGS — replaces the ticker
+   Horizontal pill tags with fade-in stagger
 ─────────────────────────────────────────── */
-.ticker {
-  overflow: hidden;
-  background: var(--gold-10);
+.skill-band {
+  padding: 48px clamp(24px, 5vw, 80px);
+  background: var(--surface);
   border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  padding: 18px 0;
+  border-bottom: 1px solid var(--border-v);
+  display: flex; flex-wrap: wrap;
+  gap: 14px; justify-content: center;
+  align-items: center;
 }
-.ticker-track {
-  display: inline-flex;
-  animation: scroll 28s linear infinite;
-}
-@keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.ticker-item {
-  display: inline-flex; align-items: center; gap: 20px;
-  padding: 0 32px;
+.skill-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px;
+  border-radius: 999px;
   font-family: var(--font-h); font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--gold); white-space: nowrap;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  border: 1px solid; white-space: nowrap;
+  opacity: 0; transform: translateY(12px);
+  transition: opacity .5s ease, transform .5s ease, background .2s, color .2s;
 }
-.ticker-item .t-star {
-  width: 10px; height: 10px;
-  background: var(--gold); clip-path: var(--star);
-  opacity: 0.65; flex-shrink: 0;
+.skill-tag.gold-tag {
+  background: var(--gold-10); color: var(--gold); border-color: var(--border);
+}
+.skill-tag.violet-tag {
+  background: var(--violet-10); color: var(--violet); border-color: var(--border-v);
+}
+.skill-tag.white-tag {
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.65); border-color: rgba(255,255,255,0.12);
+}
+.skill-tag:hover { background: var(--gold-18); color: var(--gold); border-color: var(--border); }
+.skill-tag.visible { opacity: 1; transform: translateY(0); }
+/* star dot inside tag */
+.skill-tag .tag-star {
+  width: 7px; height: 7px;
+  clip-path: var(--star); display: inline-block; flex-shrink: 0;
+  background: currentColor; opacity: 0.6;
 }
 
 /* ───────────────────────────────────────────
-   WORKS — photos cut into stars of varying size
-   arranged like a constellation, not a grid
+   WORKS — constellation
 ─────────────────────────────────────────── */
 .works {
   padding: clamp(80px, 12vw, 160px) clamp(24px, 5vw, 80px);
@@ -319,12 +295,14 @@ nav {
 .sec-label {
   display: flex; align-items: center; gap: 8px;
   font-family: var(--font-h); font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 0.2em; text-transform: uppercase;
+  letter-spacing: 0.20em; text-transform: uppercase;
   color: var(--gold); margin-bottom: 10px;
 }
 .sec-label .s-star {
-  width: 9px; height: 9px;
-  background: var(--gold); clip-path: var(--star);
+  width: 9px; height: 9px; background: var(--gold); clip-path: var(--star);
+}
+.sec-label .s-violet {
+  width: 7px; height: 7px; background: var(--violet); clip-path: var(--star);
 }
 .sec-title {
   font-family: var(--font-h);
@@ -332,48 +310,40 @@ nav {
   font-weight: 800; line-height: 1.0; letter-spacing: -0.03em;
   margin-bottom: 80px;
 }
-.sec-title em { font-style: normal; color: var(--gold); }
+.sec-title em.gold   { font-style: normal; color: var(--gold); }
+.sec-title em.violet { font-style: normal; color: var(--violet); }
 
-/* Constellation layout — absolute positioned stars */
 .constellation {
   position: relative;
-  width: 100%;
-  height: 760px;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%; height: 760px;
+  max-width: 1200px; margin: 0 auto;
 }
-
 .c-star {
   position: absolute;
-  clip-path: var(--star);
-  overflow: hidden;
+  clip-path: var(--star); overflow: hidden;
   transition: transform .35s ease, filter .35s ease;
   cursor: pointer;
 }
 .c-star:hover { transform: scale(1.07) rotate(8deg) !important; filter: brightness(1.15); }
 .c-star img {
   width: 100%; height: 100%;
-  object-fit: cover; object-position: center;
-  display: block;
+  object-fit: cover; object-position: center; display: block;
 }
-
-/* Seven constellation points — varying sizes, natural sky placement */
-/* Orion-like scatter */
-.c-1 { width: 300px; height: 300px; top:  10px; left:  3%;  }   /* big — top left  */
-.c-2 { width: 200px; height: 200px; top:  60px; left: 32%;  }   /* med — top mid   */
-.c-3 { width: 250px; height: 250px; top:   0px; left: 58%;  }   /* large — top right */
-.c-4 { width: 160px; height: 160px; top: 270px; left: 15%;  }   /* small — mid left */
-.c-5 { width: 290px; height: 290px; top: 230px; left: 45%;  }   /* big — mid right  */
-.c-6 { width: 180px; height: 180px; top: 490px; left:  6%;  }   /* med — bot left   */
-.c-7 { width: 240px; height: 240px; top: 460px; left: 55%;  }   /* large — bot right */
-
-/* Caption below each star */
+.c-1 { width: 300px; height: 300px; top:  10px; left:  3%;  }
+.c-2 { width: 200px; height: 200px; top:  60px; left: 32%;  }
+.c-3 { width: 250px; height: 250px; top:   0px; left: 58%;  }
+.c-4 { width: 160px; height: 160px; top: 270px; left: 15%;  }
+.c-5 { width: 290px; height: 290px; top: 230px; left: 45%;  }
+.c-6 { width: 180px; height: 180px; top: 490px; left:  6%;  }
+.c-7 { width: 240px; height: 240px; top: 460px; left: 55%;  }
+.c-lines {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none; opacity: 0.07;
+}
 .c-cap {
-  position: absolute;
-  bottom: -58px; left: 50%;
-  transform: translateX(-50%);
-  text-align: center; white-space: nowrap;
-  pointer-events: none;
+  position: absolute; bottom: -58px; left: 50%;
+  transform: translateX(-50%); text-align: center;
+  white-space: nowrap; pointer-events: none;
 }
 .c-cap span { display: block; }
 .c-cap .c-name {
@@ -383,27 +353,17 @@ nav {
   font-size: 0.66rem; color: var(--gold);
   letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px;
 }
-
-/* Number badge star */
 .c-num {
-  position: absolute;
-  top: 16%; right: -6%;
+  position: absolute; top: 16%; right: -6%;
   width: 40px; height: 40px;
-  background: var(--gold); clip-path: var(--star);
+  background: var(--violet); clip-path: var(--star);
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-h); font-size: 0.58rem; font-weight: 800;
-  color: #06060E; z-index: 2;
-}
-
-/* Faint connecting lines drawn in SVG overlay */
-.c-lines {
-  position: absolute; inset: 0; z-index: 0;
-  pointer-events: none;
-  opacity: 0.08;
+  color: #fff; z-index: 2;
 }
 
 /* ───────────────────────────────────────────
-   ABOUT — star portrait + bio + stat stars
+   ABOUT
 ─────────────────────────────────────────── */
 .about {
   padding: clamp(80px, 12vw, 160px) clamp(24px, 5vw, 80px);
@@ -418,36 +378,25 @@ nav {
   justify-content: center; gap: clamp(48px, 7vw, 100px);
   flex-wrap: wrap;
 }
-
-/* Left — portrait + floating small stars */
-.about-left {
-  position: relative; flex-shrink: 0;
-}
+.about-left { position: relative; flex-shrink: 0; }
 .about-portrait {
   width: 320px; height: 320px;
-  clip-path: var(--star);
-  overflow: hidden;
-  flex-shrink: 0;
+  clip-path: var(--star); overflow: hidden;
 }
 .about-portrait img {
   width: 100%; height: 100%;
   object-fit: cover; object-position: center top; display: block;
 }
-
-/* Small decorative stars scattered around the portrait */
 .about-deco {
-  position: absolute;
-  clip-path: var(--star);
-  background: var(--gold);
-  animation: drift 8s ease-in-out infinite;
+  position: absolute; clip-path: var(--star);
+  animation: btnDrift1 8s ease-in-out infinite;
 }
-.about-deco-1 { width: 50px; height: 50px; top: -20px; right: -20px; opacity: 0.25; animation-duration: 9s; }
-.about-deco-2 { width: 28px; height: 28px; bottom: 20px; left: -18px; opacity: 0.35; animation-delay: 2s; animation-duration: 7s; }
-.about-deco-3 { width: 16px; height: 16px; top: 50%; right: -36px; opacity: 0.50; animation-delay: 4s; animation-duration: 6s; }
+.about-deco-1 { width: 50px; height: 50px; top: -20px; right: -20px; background: var(--gold); opacity: 0.25; animation-duration: 9s; }
+.about-deco-2 { width: 28px; height: 28px; bottom: 20px; left: -18px; background: var(--violet); opacity: 0.45; animation-delay: 2s; animation-duration: 7s; }
+.about-deco-3 { width: 16px; height: 16px; top: 50%; right: -36px; background: var(--gold); opacity: 0.50; animation-delay: 4s; animation-duration: 6s; }
 
-/* Right — bio text (NOT star-clipped — readable prose) */
 .about-right {
-  max-width: 520px; display: flex; flex-direction: column; gap: 24px;
+  max-width: 520px; display: flex; flex-direction: column; gap: 22px;
   padding-top: 20px;
 }
 .about-right h2 {
@@ -455,101 +404,82 @@ nav {
   font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 800; line-height: 1.05; letter-spacing: -0.02em;
 }
-.about-right h2 em { font-style: normal; color: var(--gold); }
+.about-right h2 em.gold   { font-style: normal; color: var(--gold); }
+.about-right h2 em.violet { font-style: normal; color: var(--violet); }
 .about-right p { font-size: 0.9rem; color: var(--muted); line-height: 1.85; }
 
-/* Stat row — each number in its own gold star, DIFFERENT SIZES */
 .stats-sky {
   display: flex; align-items: center;
-  gap: clamp(20px, 3vw, 40px); flex-wrap: wrap;
-  margin-top: 8px;
+  gap: clamp(16px, 3vw, 36px); flex-wrap: wrap; margin-top: 8px;
 }
 .stat-star {
-  clip-path: var(--star);
-  background: var(--gold);
+  clip-path: var(--star); background: var(--gold);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center; flex-shrink: 0;
 }
-/* Varying star sizes for stats — sky feel */
 .stat-star.a { width: 160px; height: 160px; padding: 38px 28px; }
 .stat-star.b { width: 130px; height: 130px; padding: 30px 22px; }
 .stat-star.c { width: 110px; height: 110px; padding: 24px 18px; }
 .stat-star.d {
   width: 130px; height: 130px; padding: 30px 22px;
-  background: var(--gold-10); border: 1px solid var(--border); color: var(--gold);
+  background: var(--violet); /* violet stat star */
 }
 .stat-star .num {
   font-family: var(--font-h); font-size: 1.5rem; font-weight: 800;
   color: #06060E; line-height: 1;
 }
-.stat-star.d .num { color: var(--gold); font-size: 1.2rem; }
+.stat-star.d .num { color: #fff; font-size: 1.2rem; }
 .stat-star .lbl {
   font-family: var(--font-h); font-size: 0.52rem; font-weight: 700;
   letter-spacing: 0.09em; text-transform: uppercase;
   color: rgba(6,6,14,0.60); margin-top: 5px; padding: 0 6px; line-height: 1.35;
 }
-.stat-star.d .lbl { color: var(--muted); }
+.stat-star.d .lbl { color: rgba(255,255,255,0.65); }
 
 /* ───────────────────────────────────────────
-   SERVICES — stars of different sizes floating
+   SERVICES
 ─────────────────────────────────────────── */
 .services {
   padding: clamp(80px, 12vw, 160px) clamp(24px, 5vw, 80px);
-  text-align: center;
-  position: relative; overflow: hidden;
+  text-align: center; position: relative; overflow: hidden;
 }
 .services .sec-title { margin-bottom: 80px; }
-
-/* Sky of service stars — NOT a rigid grid */
 .svc-sky {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0;
-  min-height: 480px;
-  max-width: 1100px;
-  margin: 0 auto;
+  position: relative; display: flex;
+  align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 0;
+  min-height: 480px; max-width: 1100px; margin: 0 auto;
 }
-
 .svc-star {
-  position: relative;
-  clip-path: var(--star);
+  position: relative; clip-path: var(--star);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   text-align: center; flex-shrink: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
   transition: transform .3s, filter .3s;
-  cursor: default;
-  margin: -20px; /* stars overlap slightly for sky density */
+  cursor: default; margin: -20px;
 }
-.svc-star:hover {
-  transform: scale(1.1) rotate(10deg);
-  filter: brightness(1.1);
-  z-index: 5;
-}
+.svc-star:hover { transform: scale(1.1) rotate(10deg); filter: brightness(1.1); z-index: 5; }
 .svc-star .icon { font-size: 1.5rem; margin-bottom: 8px; line-height: 1; }
 .svc-star .name {
   font-family: var(--font-h); font-size: 0.72rem; font-weight: 800;
-  letter-spacing: 0.07em; text-transform: uppercase; color: var(--gold);
+  letter-spacing: 0.07em; text-transform: uppercase;
   line-height: 1.35;
 }
-
-/* Service stars — deliberately varied sizes */
-.svc-star.s1 { width: 230px; height: 230px; padding: 56px 44px; margin-top: 60px; }
-.svc-star.s2 { width: 190px; height: 190px; padding: 46px 36px; }
-.svc-star.s3 { width: 260px; height: 260px; padding: 66px 52px; }
-.svc-star.s4 { width: 170px; height: 170px; padding: 40px 30px; margin-top: 80px; }
-.svc-star.s5 { width: 215px; height: 215px; padding: 52px 40px; margin-top: 20px; }
-
-/* Highlight centre star gold */
-.svc-star.s3 { background: var(--gold-10); border-color: var(--gold-30); }
+/* Colour the service stars with the 3-colour palette */
+.svc-star.s1 { width: 230px; height: 230px; padding: 56px 44px; margin-top: 60px; background: var(--surface); border: 1px solid var(--border); }
+.svc-star.s1 .name { color: var(--gold); }
+.svc-star.s2 { width: 190px; height: 190px; padding: 46px 36px; background: var(--violet-10); border: 1px solid var(--border-v); }
+.svc-star.s2 .name { color: var(--violet); }
+.svc-star.s3 { width: 260px; height: 260px; padding: 66px 52px; background: var(--gold-10); border: 1px solid var(--gold-30); }
+.svc-star.s3 .name { color: var(--gold); }
+.svc-star.s4 { width: 170px; height: 170px; padding: 40px 30px; margin-top: 80px; background: var(--surface); border: 1px solid var(--border-v); }
+.svc-star.s4 .name { color: var(--violet); }
+.svc-star.s5 { width: 215px; height: 215px; padding: 52px 40px; margin-top: 20px; background: var(--violet-20); border: 1px solid var(--border-v); }
+.svc-star.s5 .name { color: #fff; }
 
 /* ───────────────────────────────────────────
-   CTA
+   CTA — fixed text overflow in star box
 ─────────────────────────────────────────── */
 .cta {
   padding: clamp(80px, 12vw, 160px) clamp(24px, 5vw, 80px);
@@ -562,53 +492,73 @@ nav {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
   width: 700px; height: 700px;
-  background: var(--gold); clip-path: var(--star);
-  opacity: 0.02; pointer-events: none;
+  background: var(--violet); clip-path: var(--star);
+  opacity: 0.025; pointer-events: none;
 }
 .cta-inner {
   position: relative; z-index: 1;
   display: flex; flex-direction: column;
-  align-items: center; gap: 56px;
+  align-items: center; gap: 52px;
 }
 .cta-headline {
   font-family: var(--font-h);
   font-size: clamp(2.4rem, 6vw, 5.5rem);
   font-weight: 800; line-height: 0.96; letter-spacing: -0.03em;
 }
-.cta-headline em { font-style: normal; color: var(--gold); }
+.cta-headline em.gold   { font-style: normal; color: var(--gold); }
+.cta-headline em.violet { font-style: normal; color: var(--violet); }
 .cta-sub { font-size: 1rem; color: var(--muted); max-width: 400px; }
 
-/* CTA star info box */
-.cta-info-star {
-  width: 360px; height: 360px;
-  clip-path: var(--star);
-  background: var(--gold);
+/* ── CTA info star — FIXED ──────────────────
+   Removed clip-path from the text container.
+   Instead, ring of stars around a clear text block.
+   This way text is NEVER clipped or hidden.   */
+.cta-info-ring {
+  position: relative;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  text-align: center; padding: 90px 70px;
+  text-align: center;
+  padding: 60px 48px;
+  gap: 12px;
 }
-.cta-info-star h3 {
-  font-family: var(--font-h); font-size: 1.1rem; font-weight: 800;
-  color: #06060E; letter-spacing: 0.04em; text-transform: uppercase;
+/* Decorative star ring around the text — using pseudo + box of stars */
+.cta-info-ring::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--violet-10);
+  clip-path: var(--star);
+  z-index: 0;
+  width: 380px; height: 380px;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.cta-info-ring > * { position: relative; z-index: 1; }
+.cta-info-ring h3 {
+  font-family: var(--font-h); font-size: 1.3rem; font-weight: 800;
+  color: var(--white); letter-spacing: 0.04em; text-transform: uppercase;
   line-height: 1.3;
 }
-.cta-info-star p {
-  font-size: 0.68rem; color: rgba(6,6,14,0.55);
-  margin-top: 10px; line-height: 1.6;
+.cta-info-ring p {
+  font-size: 0.82rem; color: var(--muted);
+  line-height: 1.7; max-width: 260px;
+}
+.cta-info-ring .cta-tag {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 20px; border-radius: 999px;
+  background: var(--violet-20); border: 1px solid var(--border-v);
+  font-family: var(--font-h); font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--violet);
+  margin-top: 4px;
+}
+.cta-info-ring .cta-tag .t-star {
+  width: 7px; height: 7px;
+  background: var(--violet); clip-path: var(--star);
 }
 
-/* CTA buttons — big floating stars */
 .cta-btns {
   display: flex; align-items: center;
-  justify-content: center; gap: 56px;
-  flex-wrap: wrap;
-}
-.cta-btns .btn-star-hero {
-  animation: btnDrift1 10s ease-in-out infinite;
-}
-.cta-btns .btn-star-hero-ghost {
-  animation: btnDrift2 12s ease-in-out infinite;
-  animation-delay: 2s;
+  justify-content: center; gap: 56px; flex-wrap: wrap;
 }
 
 /* ───────────────────────────────────────────
@@ -625,7 +575,7 @@ footer {
   font-family: var(--font-h); font-size: 0.9rem; font-weight: 800;
   color: var(--gold); text-decoration: none;
 }
-.footer-brand-star {
+.footer-star {
   width: 22px; height: 22px;
   background: var(--gold); clip-path: var(--star);
 }
@@ -649,23 +599,18 @@ footer {
   .c-5 { width: 200px; height: 200px; top: 350px; left: 55%;  }
   .c-6 { width: 160px; height: 160px; top: 570px; left: 15%;  }
   .c-7 { width: 180px; height: 180px; top: 550px; left: 58%;  }
-  .about-left { align-self: center; }
-  .about-portrait { width: 250px; height: 250px; }
-  .svc-sky { gap: 0; }
   .svc-star { margin: -14px; }
 }
 
 @media (max-width: 768px) {
   nav { padding: 0 20px; }
   .nav-links { display: none; }
-  .hero-mini-star-btn { display: none; }
-
+  .hero-float-star { display: none; }
   .hero { padding: 90px 20px 60px; }
-  .btn-star-hero, .btn-star-hero-ghost {
+  .btn-star-hero, .btn-star-violet {
     width: 170px; height: 170px;
     font-size: 0.74rem; padding: 42px;
   }
-
   .constellation { height: 900px; }
   .c-1 { width: 170px; height: 170px; top: 0;    left: 2%;   }
   .c-2 { width: 130px; height: 130px; top: 10px; left: 52%;  }
@@ -674,30 +619,26 @@ footer {
   .c-5 { width: 170px; height: 170px; top: 310px;left: 56%;  }
   .c-6 { width: 140px; height: 140px; top: 500px;left: 12%;  }
   .c-7 { width: 155px; height: 155px; top: 480px;left: 57%;  }
-
   .stat-star.a { width: 130px; height: 130px; padding: 30px 22px; }
   .stat-star.b { width: 110px; height: 110px; padding: 24px 18px; }
   .stat-star.c { width:  90px; height:  90px; padding: 18px 14px; }
   .stat-star.d { width: 110px; height: 110px; padding: 24px 18px; }
   .stat-star .num { font-size: 1.2rem; }
   .stat-star.d .num { font-size: 1rem; }
-
   .svc-star.s1 { width: 180px; height: 180px; padding: 44px 34px; }
   .svc-star.s2 { width: 150px; height: 150px; padding: 36px 28px; }
   .svc-star.s3 { width: 210px; height: 210px; padding: 52px 40px; }
   .svc-star.s4 { width: 140px; height: 140px; padding: 34px 26px; }
   .svc-star.s5 { width: 170px; height: 170px; padding: 42px 32px; }
-
-  .cta-info-star { width: 280px; height: 280px; padding: 68px 52px; }
+  .cta-info-ring::before { width: 300px; height: 300px; }
   .cta-btns { gap: 32px; }
-
   footer { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 
 @media (max-width: 480px) {
   .hero-name { font-size: clamp(2.8rem, 13vw, 4rem); }
   .hero-btns { gap: 20px; }
-  .btn-star-hero, .btn-star-hero-ghost {
+  .btn-star-hero, .btn-star-violet {
     width: 150px; height: 150px;
     font-size: 0.68rem; padding: 36px;
   }
@@ -705,11 +646,12 @@ footer {
   .c-1 { width: 140px; height: 140px; }
   .c-2 { width: 105px; height: 105px; }
   .c-3 { width: 120px; height: 120px; }
-  .c-4 { width: 90px;  height: 90px;  }
+  .c-4 { width:  90px; height:  90px; }
   .c-5 { width: 140px; height: 140px; }
   .c-6 { width: 110px; height: 110px; }
   .c-7 { width: 125px; height: 125px; }
   .stats-sky { gap: 10px; }
+  .skill-band { gap: 10px; }
 }
 </style>
 </head>
@@ -718,7 +660,7 @@ footer {
 <!-- ════ NAV ════════════════════════════════ -->
 <nav>
   <a href="#" class="nav-logo">
-    <div class="star-shape sz-xs star-gold" style="width:26px;height:26px;"></div>
+    <div class="nav-logo-star"></div>
     [Your Name]
   </a>
   <ul class="nav-links">
@@ -727,35 +669,18 @@ footer {
     <li><a href="#services">Services</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
-  <!-- Small star nav button — deliberately NOT the same as hero buttons -->
-  <a href="#contact" class="star-shape star-gold" style="width:80px;height:80px;clip-path:var(--star);font-family:var(--font-h);font-size:0.55rem;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:#06060E;text-decoration:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;line-height:1.35;transition:transform .2s,filter .2s;" onmouseover="this.style.transform='scale(1.12) rotate(10deg)'" onmouseout="this.style.transform=''">Hire<br>Me</a>
+  <a href="#contact" class="nav-cta">Hire<br>Me</a>
 </nav>
 
-<!-- ════ HERO — NIGHT SKY ════════════════════ -->
+<!-- ════ HERO ════════════════════════════════ -->
 <section class="hero">
+  <!-- tsParticles star-field canvas -->
+  <div id="tsparticles"></div>
+  <div class="hero-glow"></div>
 
-  <!-- Background sky — scattered tiny/medium stars at various depths -->
-  <div class="sky" aria-hidden="true">
-    <!-- Tiny twinkles -->
-    <div class="sky-star" style="width:14px;height:14px;top:8%;left:12%;--op:0.20;--dur:7s;--del:0s;"></div>
-    <div class="sky-star" style="width:10px;height:10px;top:15%;left:40%;--op:0.15;--dur:9s;--del:1.2s;"></div>
-    <div class="sky-star" style="width:18px;height:18px;top:22%;left:68%;--op:0.18;--dur:8s;--del:2.4s;"></div>
-    <div class="sky-star" style="width:8px; height:8px; top:35%;left:85%;--op:0.25;--dur:6s;--del:0.6s;"></div>
-    <div class="sky-star" style="width:12px;height:12px;top:55%;left:5%; --op:0.18;--dur:10s;--del:3s;"></div>
-    <div class="sky-star" style="width:9px; height:9px; top:70%;left:30%;--op:0.15;--dur:8s;--del:1.8s;"></div>
-    <div class="sky-star" style="width:16px;height:16px;top:78%;left:70%;--op:0.20;--dur:9s;--del:4s;"></div>
-    <div class="sky-star" style="width:7px; height:7px; top:90%;left:52%;--op:0.12;--dur:7s;--del:2s;"></div>
-    <!-- Medium ambient stars -->
-    <div class="sky-star" style="width:40px;height:40px;top:10%;left:80%;--op:0.08;--dur:12s;--del:0s;"></div>
-    <div class="sky-star" style="width:55px;height:55px;top:60%;left:90%;--op:0.06;--dur:14s;--del:5s;"></div>
-    <div class="sky-star" style="width:35px;height:35px;top:82%;left:2%; --op:0.07;--dur:11s;--del:2s;"></div>
-    <div class="sky-star" style="width:28px;height:28px;top:30%;left:2%; --op:0.10;--dur:10s;--del:3.5s;"></div>
-  </div>
+  <!-- Floating "Open to Work" star in the sky -->
+  <a href="#contact" class="hero-float-star">Open<br>to Work</a>
 
-  <!-- Floating "Available" mini star — top right, free in the sky -->
-  <a href="#contact" class="hero-mini-star-btn">Open<br>to Work</a>
-
-  <!-- Hero text content -->
   <div class="hero-content">
     <div class="hero-eyebrow">
       <span class="e-star"></span>
@@ -765,107 +690,81 @@ footer {
     <h1 class="hero-name">
       [Your<br><span class="gold">Name]</span>
     </h1>
-    <p class="hero-role">Brand Designer &nbsp;✦&nbsp; Visual Director &nbsp;✦&nbsp; Creative</p>
+    <p class="hero-role">
+      Brand Designer
+      <span class="sep">✦</span>
+      Visual Director
+      <span class="sep">✦</span>
+      Creative
+    </p>
 
-    <!-- Big star buttons — floating in the sky, drifting independently -->
-    <div class="hero-star-btns">
+    <div class="hero-btns">
       <a href="#work"    class="btn-star-hero">View<br>My Work</a>
-      <a href="#contact" class="btn-star-hero-ghost">Let's<br>Talk</a>
+      <a href="#contact" class="btn-star-violet">Let's<br>Talk</a>
     </div>
   </div>
-
 </section>
 
-<!-- ════ TICKER ═══════════════════════════════ -->
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track">
-    <span class="ticker-item">Brand Identity <span class="t-star"></span></span>
-    <span class="ticker-item">UI/UX Design <span class="t-star"></span></span>
-    <span class="ticker-item">Web Development <span class="t-star"></span></span>
-    <span class="ticker-item">Motion Graphics <span class="t-star"></span></span>
-    <span class="ticker-item">Visual Direction <span class="t-star"></span></span>
-    <span class="ticker-item">Creative Strategy <span class="t-star"></span></span>
-    <span class="ticker-item">Photography <span class="t-star"></span></span>
-    <span class="ticker-item">Art Direction <span class="t-star"></span></span>
-    <span class="ticker-item">Brand Identity <span class="t-star"></span></span>
-    <span class="ticker-item">UI/UX Design <span class="t-star"></span></span>
-    <span class="ticker-item">Web Development <span class="t-star"></span></span>
-    <span class="ticker-item">Motion Graphics <span class="t-star"></span></span>
-    <span class="ticker-item">Visual Direction <span class="t-star"></span></span>
-    <span class="ticker-item">Creative Strategy <span class="t-star"></span></span>
-    <span class="ticker-item">Photography <span class="t-star"></span></span>
-    <span class="ticker-item">Art Direction <span class="t-star"></span></span>
-  </div>
+<!-- ════ SKILL TAGS (replaces ticker) ════════ -->
+<div class="skill-band" id="skillBand">
+  <span class="skill-tag gold-tag"><span class="tag-star"></span>Brand Identity</span>
+  <span class="skill-tag violet-tag"><span class="tag-star"></span>UI / UX Design</span>
+  <span class="skill-tag white-tag"><span class="tag-star"></span>Web Development</span>
+  <span class="skill-tag gold-tag"><span class="tag-star"></span>Motion Graphics</span>
+  <span class="skill-tag violet-tag"><span class="tag-star"></span>Visual Direction</span>
+  <span class="skill-tag white-tag"><span class="tag-star"></span>Creative Strategy</span>
+  <span class="skill-tag gold-tag"><span class="tag-star"></span>Photography</span>
+  <span class="skill-tag violet-tag"><span class="tag-star"></span>Art Direction</span>
+  <span class="skill-tag white-tag"><span class="tag-star"></span>Typography</span>
+  <span class="skill-tag gold-tag"><span class="tag-star"></span>Campaign Design</span>
 </div>
 
-<!-- ════ WORKS — photo constellation ═══════════ -->
+<!-- ════ WORKS ═══════════════════════════════ -->
 <section class="works" id="work">
-  <div class="sec-label"><span class="s-star"></span>Selected Work</div>
-  <h2 class="sec-title">Projects that<br><em>define me</em></h2>
+  <div class="sec-label"><span class="s-star"></span><span class="s-violet"></span> Selected Work</div>
+  <h2 class="sec-title">Projects that<br><em class="gold">define</em> <em class="violet">me</em></h2>
 
   <div class="constellation">
-    <!-- SVG connecting lines between the star positions -->
     <svg class="c-lines" viewBox="0 0 1200 760" preserveAspectRatio="none">
-      <!-- rough midpoints of each star for connecting lines -->
-      <!-- c-1 top-left → c-2 top-mid -->
       <line x1="150" y1="150" x2="424" y2="160" stroke="#F5C842" stroke-width="1"/>
-      <!-- c-2 → c-3 top-right -->
       <line x1="424" y1="160" x2="820" y2="125" stroke="#F5C842" stroke-width="1"/>
-      <!-- c-2 → c-4 mid-left -->
-      <line x1="424" y1="160" x2="255" y2="350" stroke="#F5C842" stroke-width="1"/>
-      <!-- c-3 → c-5 mid-right -->
-      <line x1="820" y1="125" x2="740" y2="375" stroke="#F5C842" stroke-width="1"/>
-      <!-- c-4 → c-6 bot-left -->
+      <line x1="424" y1="160" x2="255" y2="350" stroke="#7B6CFF" stroke-width="1"/>
+      <line x1="820" y1="125" x2="740" y2="375" stroke="#7B6CFF" stroke-width="1"/>
       <line x1="255" y1="350" x2="186" y2="580" stroke="#F5C842" stroke-width="1"/>
-      <!-- c-5 → c-7 bot-right -->
       <line x1="740" y1="375" x2="780" y2="580" stroke="#F5C842" stroke-width="1"/>
-      <!-- c-6 → c-7 bottom link -->
-      <line x1="186" y1="580" x2="780" y2="580" stroke="#F5C842" stroke-width="1"/>
+      <line x1="186" y1="580" x2="780" y2="580" stroke="#7B6CFF" stroke-width="1"/>
     </svg>
 
-    <!-- Star 1 — Big, top left -->
     <div class="c-star c-1">
       <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" alt="Brand Identity">
       <div class="c-num">01</div>
       <div class="c-cap"><span class="c-name">[Project Title]</span><span class="c-cat">Brand Identity</span></div>
     </div>
-
-    <!-- Star 2 — Medium, top mid -->
     <div class="c-star c-2">
       <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&q=80" alt="UI Design">
       <div class="c-num">02</div>
       <div class="c-cap"><span class="c-name">[Project Title]</span><span class="c-cat">UI / UX</span></div>
     </div>
-
-    <!-- Star 3 — Large, top right -->
     <div class="c-star c-3">
       <img src="https://images.unsplash.com/photo-1542744094-24638eff58bb?w=800&q=80" alt="Photography">
       <div class="c-num">03</div>
       <div class="c-cap"><span class="c-name">[Project Title]</span><span class="c-cat">Photography</span></div>
     </div>
-
-    <!-- Star 4 — Small, mid left -->
     <div class="c-star c-4">
       <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80" alt="Motion">
       <div class="c-num">04</div>
       <div class="c-cap"><span class="c-name">[Project Title]</span><span class="c-cat">Motion</span></div>
     </div>
-
-    <!-- Star 5 — Big, mid right -->
     <div class="c-star c-5">
       <img src="https://images.unsplash.com/photo-1634942537034-2531766767d1?w=800&q=80" alt="Visual Direction">
       <div class="c-num">05</div>
       <div class="c-cap"><span class="c-name">[Project Title]</span><span class="c-cat">Visual Direction</span></div>
     </div>
-
-    <!-- Star 6 — Medium, bottom left -->
     <div class="c-star c-6">
       <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=80" alt="Editorial">
       <div class="c-num">06</div>
       <div class="c-cap"><span class="c-name">[Project Title]</span><span class="c-cat">Editorial</span></div>
     </div>
-
-    <!-- Star 7 — Large, bottom right -->
     <div class="c-star c-7">
       <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80" alt="Portrait">
       <div class="c-num">07</div>
@@ -877,7 +776,6 @@ footer {
 <!-- ════ ABOUT ═══════════════════════════════ -->
 <section class="about" id="about">
   <div class="about-wrap">
-    <!-- Portrait in a star — with small decorative stars floating around it -->
     <div class="about-left">
       <div class="about-portrait">
         <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80" alt="[Your Name]">
@@ -886,35 +784,18 @@ footer {
       <div class="about-deco about-deco-2"></div>
       <div class="about-deco about-deco-3"></div>
     </div>
-
-    <!-- Bio text -->
     <div class="about-right">
       <div class="sec-label"><span class="s-star"></span>About Me</div>
-      <h2>Crafting stories<br>through <em>design</em></h2>
+      <h2>Crafting stories<br>through <em class="gold">design</em> &amp; <em class="violet">vision</em></h2>
       <p>I'm a creative professional based in [Your City]. I blend strategy with aesthetics to build brands and digital experiences that connect, convert, and last.</p>
       <p>With [X] years in the field, I've worked with startups, agencies, and global brands — always leading with purpose and precision.</p>
-
-      <!-- Stats — different sized gold stars like a mini constellation -->
       <div class="stats-sky">
-        <div class="stat-star a">
-          <span class="num">40+</span>
-          <span class="lbl">Projects<br>Done</span>
-        </div>
-        <div class="stat-star b">
-          <span class="num">5★</span>
-          <span class="lbl">Average<br>Rating</span>
-        </div>
-        <div class="stat-star c">
-          <span class="num">6yr</span>
-          <span class="lbl">Experience</span>
-        </div>
-        <div class="stat-star d">
-          <span class="num">100%</span>
-          <span class="lbl">Client<br>Satisfaction</span>
-        </div>
+        <div class="stat-star a"><span class="num">40+</span><span class="lbl">Projects<br>Done</span></div>
+        <div class="stat-star b"><span class="num">5★</span><span class="lbl">Average<br>Rating</span></div>
+        <div class="stat-star c"><span class="num">6yr</span><span class="lbl">Experience</span></div>
+        <div class="stat-star d"><span class="num">100%</span><span class="lbl">Satisfaction</span></div>
       </div>
-
-      <div style="margin-top:24px;">
+      <div style="margin-top:28px;">
         <a href="#contact" class="btn-star-hero" style="display:inline-flex;animation:none;">Work<br>With Me</a>
       </div>
     </div>
@@ -924,30 +805,13 @@ footer {
 <!-- ════ SERVICES ═══════════════════════════ -->
 <section class="services" id="services">
   <div class="sec-label" style="justify-content:center;"><span class="s-star"></span>What I Do</div>
-  <h2 class="sec-title">Services built<br><em>for impact</em></h2>
-
-  <!-- Stars of different sizes, slightly overlapping, scattered feel -->
+  <h2 class="sec-title">Services built<br>for <em class="violet">impact</em></h2>
   <div class="svc-sky">
-    <div class="svc-star s1">
-      <div class="icon">✦</div>
-      <div class="name">Brand<br>Identity</div>
-    </div>
-    <div class="svc-star s2">
-      <div class="icon">◈</div>
-      <div class="name">Web<br>Design</div>
-    </div>
-    <div class="svc-star s3">
-      <div class="icon">★</div>
-      <div class="name">Visual<br>Direction</div>
-    </div>
-    <div class="svc-star s4">
-      <div class="icon">◆</div>
-      <div class="name">Motion<br>Design</div>
-    </div>
-    <div class="svc-star s5">
-      <div class="icon">✿</div>
-      <div class="name">Photo<br>Direction</div>
-    </div>
+    <div class="svc-star s1"><div class="icon">✦</div><div class="name">Brand<br>Identity</div></div>
+    <div class="svc-star s2"><div class="icon">◈</div><div class="name">Web<br>Design</div></div>
+    <div class="svc-star s3"><div class="icon">★</div><div class="name">Visual<br>Direction</div></div>
+    <div class="svc-star s4"><div class="icon">◆</div><div class="name">Motion<br>Design</div></div>
+    <div class="svc-star s5"><div class="icon">✿</div><div class="name">Photo<br>Direction</div></div>
   </div>
 </section>
 
@@ -955,19 +819,19 @@ footer {
 <section class="cta" id="contact">
   <div class="cta-bg-star"></div>
   <div class="cta-inner">
-    <h2 class="cta-headline">Ready to build<br>something <em>stellar?</em></h2>
+    <h2 class="cta-headline">Ready to build<br>something <em class="gold">stellar?</em></h2>
     <p class="cta-sub">Pick up a star and let's create something the world notices.</p>
 
-    <!-- Info star -->
-    <div class="cta-info-star">
-      <h3>Let's Work<br>Together</h3>
-      <p>Drop a message — I respond within 24 hours</p>
+    <!-- Info ring — star shape behind, text fully readable in front -->
+    <div class="cta-info-ring">
+      <h3>Let's Work Together</h3>
+      <p>Drop a message and I'll get back to you within 24 hours. Let's make something great.</p>
+      <span class="cta-tag"><span class="t-star"></span>Currently Available</span>
     </div>
 
-    <!-- Big floating star buttons in CTA sky -->
     <div class="cta-btns">
       <a href="mailto:[your@email.com]" class="btn-star-hero">Email<br>Me</a>
-      <a href="https://wa.me/" class="btn-star-hero-ghost">WhatsApp<br>Me</a>
+      <a href="https://wa.me/" class="btn-star-violet">WhatsApp<br>Me</a>
     </div>
   </div>
 </section>
@@ -975,7 +839,7 @@ footer {
 <!-- ════ FOOTER ══════════════════════════════ -->
 <footer>
   <a href="#" class="footer-brand">
-    <div class="footer-brand-star"></div>
+    <div class="footer-star"></div>
     [Your Name]
   </a>
   <div class="footer-links">
@@ -987,5 +851,92 @@ footer {
   <span class="footer-copy">© 2026 [Your Name] · All rights reserved</span>
 </footer>
 
+<!-- ════ JS ══════════════════════════════════ -->
+<script>
+// ── tsParticles — Interactive Star Field ─────────────────────────────
+// Gold + violet stars float in the hero.
+// On mouse move they are repelled (like a real night sky being disturbed).
+tsParticles.load("tsparticles", {
+  fullScreen: { enable: false },
+  background: { color: { value: "transparent" } },
+  fpsLimit: 60,
+  interactivity: {
+    events: {
+      onHover: { enable: true, mode: "repulse" },
+      onClick: { enable: true, mode: "push" },
+      resize: true
+    },
+    modes: {
+      repulse: { distance: 120, duration: 0.5, speed: 0.4 },
+      push:    { quantity: 2 }
+    }
+  },
+  particles: {
+    number: {
+      value: 90,
+      density: { enable: true, area: 900 }
+    },
+    color: {
+      value: ["#F5C842", "#7B6CFF", "#ffffff"]
+    },
+    shape: {
+      type: "star",
+      options: {
+        star: { sides: 5, inset: 2 }
+      }
+    },
+    opacity: {
+      value: { min: 0.08, max: 0.55 },
+      animation: {
+        enable: true,
+        speed: 0.6,
+        minimumValue: 0.06,
+        sync: false
+      }
+    },
+    size: {
+      value: { min: 2, max: 7 },
+      animation: {
+        enable: true,
+        speed: 1.2,
+        minimumValue: 1,
+        sync: false
+      }
+    },
+    move: {
+      enable: true,
+      speed: { min: 0.2, max: 0.8 },
+      direction: "none",
+      random: true,
+      straight: false,
+      outModes: { default: "out" },
+      attract: { enable: false }
+    },
+    rotate: {
+      value: { min: 0, max: 360 },
+      animation: { enable: true, speed: 3, sync: false }
+    }
+  },
+  detectRetina: true
+});
+
+// ── Skill tags — stagger fade-in on scroll ────────────────────────────
+(function() {
+  const tags = document.querySelectorAll('.skill-tag');
+  const band = document.getElementById('skillBand');
+  if (!band) return;
+
+  const observer = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting) {
+      tags.forEach(function(tag, i) {
+        setTimeout(function() { tag.classList.add('visible'); }, i * 80);
+      });
+      observer.disconnect();
+    }
+  }, { threshold: 0.2 });
+
+  observer.observe(band);
+})();
+</script>
 </body>
 </html>
