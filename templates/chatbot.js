@@ -39,7 +39,16 @@ const STEPS={
       {l:"\uD83E\uDD16 I need AI automation",s:"automation"},
       {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
       {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
-      {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"}
+      {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"},
+      {l:"\uD83D\uDE04 Tell me a joke",s:"joke"}
+    ]
+  },
+
+  joke:{
+    bot:"__joke__",
+    r:[
+      {l:"\uD83D\uDE02 Another one",s:"joke"},
+      {l:"\u2190 Back to start",s:"start"}
     ]
   },
 
@@ -488,7 +497,7 @@ function go(key,userTxt){
   q.innerHTML='';
   var s=STEPS[key]||STEPS.start;
   setTimeout(function(){
-    addMsg(s.bot,'bot');
+    addMsg(s.bot==='__joke__'?nextJoke():s.bot,'bot');
     setBack(hist.length>0);
     if(s.scan){
       var isHome=window.location.pathname==='/'||window.location.pathname.endsWith('index.html')||window.location.pathname==='';
