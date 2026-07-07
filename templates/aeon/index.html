@@ -813,6 +813,39 @@ footer {
 <!-- ════════════════════════════════════════════
      SCRIPTS
 ════════════════════════════════════════════ -->
+<!-- Loader runs in plain script — isolated from module errors -->
+<script>
+(function() {
+  var loaderBar = document.getElementById('loaderBar');
+  var loaderPct = document.getElementById('loaderPct');
+  var loader    = document.getElementById('loader');
+  var loadPct   = 0;
+  var fakeLoad  = setInterval(function() {
+    loadPct += Math.random() * 12;
+    if (loadPct > 95) loadPct = 95;
+    loaderBar.style.width  = loadPct + '%';
+    loaderPct.textContent  = Math.round(loadPct) + '%';
+  }, 80);
+  function hideLoader() {
+    clearInterval(fakeLoad);
+    loaderBar.style.width = '100%';
+    loaderPct.textContent = '100%';
+    setTimeout(function() {
+      loader.style.transition = 'opacity 0.8s ease';
+      loader.style.opacity    = '0';
+      setTimeout(function() {
+        loader.style.display = 'none';
+        window.__loaderDone  = true;
+        if (window.__startHeroAnim) window.__startHeroAnim();
+      }, 820);
+    }, 300);
+  }
+  // Always dismiss after 2.4s max — no matter what the 3D does
+  setTimeout(hideLoader, 2400);
+  window.__hideLoader = hideLoader;
+})();
+</script>
+
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import { EffectComposer }  from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
@@ -823,21 +856,6 @@ import { OutputPass }      from 'https://cdn.jsdelivr.net/npm/three@0.160.0/exam
 import gsap               from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/+esm';
 import ScrollTrigger      from 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/ScrollTrigger/+esm';
 import Lenis              from 'https://cdn.jsdelivr.net/npm/lenis@1.1.14/+esm';
-
-// ══════════════════════════════════════════════════
-// LOADER
-// ══════════════════════════════════════════════════
-const loaderBar = document.getElementById('loaderBar');
-const loaderPct = document.getElementById('loaderPct');
-const loader    = document.getElementById('loader');
-
-let loadPct = 0;
-const fakeLoad = setInterval(() => {
-  loadPct += Math.random() * 12;
-  if (loadPct > 95) loadPct = 95;
-  loaderBar.style.width = loadPct + '%';
-  loaderPct.textContent = Math.round(loadPct) + '%';
-}, 80);
 
 // ══════════════════════════════════════════════════
 // CUSTOM CURSOR
@@ -1374,24 +1392,17 @@ function loop(ts) {
 requestAnimationFrame(loop);
 
 // ══════════════════════════════════════════════════
-// FINISH LOADER → ENTER EXPERIENCE
+// WIRE HERO ANIM TO LOADER CALLBACK
 // ══════════════════════════════════════════════════
-setTimeout(() => {
-  clearInterval(fakeLoad);
-  loaderBar.style.width  = '100%';
-  loaderPct.textContent  = '100%';
-  setTimeout(() => {
-    gsap.to('#loader', {
-      opacity: 0, duration: 0.8, ease: 'power2.in',
-      onComplete: () => {
-        loader.style.display = 'none';
-        started = true;
-        startHeroAnim();
-        ScrollTrigger.refresh();
-      }
-    });
-  }, 300);
-}, 1800);
+window.__startHeroAnim = () => {
+  started = true;
+  startHeroAnim();
+  ScrollTrigger.refresh();
+};
+// If loader already dismissed before module finished, fire now
+if (window.__loaderDone) {
+  window.__startHeroAnim();
+}
 
 </script>
 </body>
