@@ -90,9 +90,8 @@ const STEPS={
     bot:"Find us and follow along across all platforms \uD83D\uDC47",
     r:[
       {l:"\uD83D\uDCF8 Instagram",url:"https://www.instagram.com/priscadezigns"},
-      {l:"\uD83D\uDCD8 Facebook",url:"https://www.facebook.com/priscadezigns"},
       {l:"\uD83E\uDDF5 Threads",url:"https://www.threads.net/@priscadezigns"},
-      {l:"\uD83C\uDFB5 TikTok",url:"https://www.tiktok.com/@priscadezigns"},
+      {l:"\uD83C\uDFB5 TikTok",url:"https://www.tiktok.com/@priscionai"},
       {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
       {l:"\u2190 Back",s:"about"}
     ]
