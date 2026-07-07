@@ -50,8 +50,10 @@ const STEPS={
       {l:"\uD83D\uDCC5 How long have you been operating?",s:"about_history"},
       {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
       {l:"\uD83D\uDC69\u200D\uD83D\uDCBB Who is behind it?",s:"about_founder"},
-      {l:"\uD83D\uDCF1 Find us on social media",s:"about_social"},
-      {l:"\uD83C\uDF10 Visit the main site",url:"https://priscadezigns.org"},
+      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
+      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
+      {l:"\u2764\uFE0F The Way Made Known (TWMK)",s:"about_twmk"},
+      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
       {l:"\u2190 Back to start",s:"start"}
     ]
   },
@@ -66,8 +68,10 @@ const STEPS={
   about_founder:{
     bot:"Prisca Dezigns is led by Priscilla Narine — she studied Analytical Chemistry at UWI but took the entrepreneurial path after discovering web design and the power of AI in business. What started as curiosity became a full-service agency. She built Prisca Dezigns to give businesses access to the same calibre of digital infrastructure that large companies use — without the agency price tag or the technical headache.",
     r:[
-      {l:"\uD83D\uDCF1 Find us on social media",s:"about_social"},
-      {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
+      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
+      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
+      {l:"\u2764\uFE0F The Way Made Known",s:"about_twmk"},
+      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
       {l:"\u2190 Back",s:"about"}
     ]
   },
@@ -75,7 +79,9 @@ const STEPS={
     bot:"We specialise in three areas:\n\n\u2756 Website Design & Development — custom builds, template sites, e-commerce stores\n\u2756 AI & Automation — chatbots, WhatsApp automation, lead capture, CRM setup\n\u2756 Brand Architecture — logo, domain, social setup, copywriting, SEO\n\nEverything is done for you. You provide the content, we handle the rest.",
     r:[
       {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
-      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
+      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
+      {l:"\u2764\uFE0F The Way Made Known",s:"about_twmk"},
+      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
       {l:"Talk to someone",s:"talk"},
       {l:"\u2190 Back",s:"about"}
     ]
@@ -88,6 +94,33 @@ const STEPS={
       {l:"\uD83E\uDDF5 Threads",url:"https://www.threads.net/@priscadezigns"},
       {l:"\uD83C\uDFB5 TikTok",url:"https://www.tiktok.com/@priscadezigns"},
       {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
+      {l:"\u2190 Back",s:"about"}
+    ]
+  },
+  about_brands:{
+    bot:"Prisca Dezigns operates a network of specialised brand pages. Tap any to visit \uD83D\uDC47",
+    r:[
+      {l:"\uD83C\uDFCE\uFE0F The Autodrome",url:"https://www.facebook.com/theautodrome"},
+      {l:"\u26A1 Dreaming Anime",url:"https://www.facebook.com/dreaminganime"},
+      {l:"\uD83C\uDFA8 NehNeh",url:"https://www.facebook.com/nehnehofficial"},
+      {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
+      {l:"\uD83D\uDECD\uFE0F Template Shop",url:"https://priscadezigns.org/templates/"},
+      {l:"\u2190 Back",s:"about"}
+    ]
+  },
+  about_twmk:{
+    bot:"The Way Made Known (TWMK) is the faith and mission foundation at the heart of Prisca Dezigns. It is the backbone of everything we build — a Gospel-driven NGO committed to evidence-based, Bible-centred proclamation. Every product, every project, and every dollar earned is part of a larger mission that goes far beyond business.",
+    r:[
+      {l:"\uD83C\uDF0D Visit TWMK",url:"https://priscadezigns.org"},
+      {l:"\uD83E\uDD1D Support the mission",s:"talk"},
+      {l:"\u2190 Back",s:"about"}
+    ]
+  },
+  about_email:{
+    bot:"Prefer email? Tap below to send us a message directly. We typically respond within 24 hours on business days. \uD83D\uDCE7",
+    r:[
+      {l:"\uD83D\uDCE7 Email us now",url:"mailto:hello@priscadezigns.org"},
+      {l:"\uD83D\uDCAC WhatsApp instead",s:"talk"},
       {l:"\u2190 Back",s:"about"}
     ]
   },
