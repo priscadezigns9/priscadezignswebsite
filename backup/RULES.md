@@ -34,3 +34,25 @@ God Mode is a universal administrative layer for the Architect. It provides real
 ## Quality Control & Assurance (QC/QA) Protocols
 - **Surgical Edit Only**: Full file rewrites are BANNED for established pages. 
 - **Zero Regression**: Before modifying a file, check `RULES.md` for design constraints.
+
+## GitHub Push Rule (CRITICAL — 2026-07-06)
+**NEVER fetch the full file content from GitHub before editing.**
+- Always work from the local `index.html` (or any file) already in the workspace.
+- Only fetch the `sha` from GitHub (using `| python3 -c "...print(...['sha'])"`) — nothing else.
+- Fetching the full file from GitHub and re-editing it risks restoring previously removed content.
+- Pattern: READ local → EDIT local → GET sha only from GitHub → PUT with local b64 content.
+
+## Chatbot Sync Rule (CRITICAL — 2026-07-06)
+**ALL chatbots across priscadezigns.org must always reflect the same STEPS and flows.**
+- **NO PRICING in any Prisca Dezigns chatbot.** All package cards show name + description only. All price mentions replaced with WhatsApp CTA. Client template chatbots also never show pricing.
+- The master chatbot logic lives in `/chatbot.js` (root) — this is the single source of truth for the main site.
+- The template shop chatbot lives in `/templates/chatbot.js` — separate scope, do not cross-contaminate.
+- Any page with an **inline chatbot script** (like services/index.html) must be converted to load `/chatbot.js` externally.
+- When any chatbot change is made (new flows, removed features), check ALL of the following:
+  1. `/index.html` (inline STEPS — check if it still has any; convert to external if so)
+  2. `/chatbot.js` (root shared)
+  3. `/services/index.html` (external — auto-synced via `/chatbot.js`)
+  4. Any other page with an inline chatbot found via: `grep -rn "const STEPS"`
+- **Known pages with inline chatbots:** `index.html` (main site)
+- **Known external chatbot pages:** `services/index.html` → loads `/chatbot.js`
+- **Template shop chatbot:** `/templates/chatbot.js` — managed separately
