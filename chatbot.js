@@ -498,6 +498,51 @@ function finishIntake(skipped){
     q.appendChild(a);
     addQR('← Start over','start');
   },700);
+
+  // Rating prompt — appears after WhatsApp button
+  setTimeout(function(){
+    addMsg('One last thing — how was your experience with our chatbot today? 😊','bot');
+    showRating(d.name);
+  },1800);
+}
+
+function showRating(clientName){
+  var q=document.getElementById('chat-qr');
+  q.innerHTML='';
+  var labels=[['⭐','Poor'],['⭐⭐','Fair'],['⭐⭐⭐','Good'],['⭐⭐⭐⭐','Great'],['⭐⭐⭐⭐⭐','Excellent']];
+  labels.forEach(function(pair,i){
+    var b=document.createElement('button');
+    b.className='qrb';
+    b.textContent=pair[0]+' '+pair[1];
+    (function(score){
+      b.onclick=function(){ submitRating(score,clientName); };
+    })(i+1);
+    q.appendChild(b);
+  });
+}
+
+function submitRating(score,clientName){
+  var q=document.getElementById('chat-qr');
+  q.innerHTML='';
+  var response=score>=4
+    ? 'Thank you so much, '+clientName+'! We really appreciate that. 🙏 We\'ll be in touch soon!'
+    : score===3
+    ? 'Thanks for the feedback, '+clientName+'! We\'re always looking to improve. 🙏'
+    : 'Thanks for being honest, '+clientName+'. We\'ll use this to do better. 🙏';
+  addMsg(response,'bot');
+  var SB_URL='https://sazhdnqzaqpqcralmthh.supabase.co';
+  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+  fetch(SB_URL+'/rest/v1/client_leads',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+    body:JSON.stringify({
+      name:(clientName||'Unknown')+' — Rating',
+      email:'(rating)',
+      package:score+'/5 stars',
+      brand:'Prisca Dezigns (Chatbot Rating)'
+    })
+  }).catch(function(){});
+  setTimeout(function(){ addQR('← Start over','start'); },600);
 }
 
 let open=false,started=false,hist=[];
