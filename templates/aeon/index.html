@@ -4,113 +4,101 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AEON — Build systems that outlast you.</title>
-<meta name="description" content="AEON is a premium AI agency template. The site is a descent — each depth a stage of building a machine-powered brand.">
-
+<meta name="description" content="AEON — premium AI agency template. A descent into intelligence.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --abyss:#020304;
-    --abyss-2:#0a0c0f;
     --bone:#f0ede6;
     --dim:#888b91;
     --gold:#C8A96E;
-    --ember:#e05c3a;
-    --violet:#6B5CE7;
-    --ice:#a0c8d8;
     --hair:rgba(240,237,230,0.08);
     --ease:cubic-bezier(.19,1,.22,1);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  html{background:var(--abyss);}
-  body{
-    background:var(--abyss);color:var(--bone);
-    font-family:'Space Grotesk',sans-serif;font-weight:300;
-    overflow-x:hidden;
-  }
+  html,body{background:var(--abyss);color:var(--bone);font-family:'Space Grotesk',sans-serif;font-weight:300;overflow-x:hidden;}
   ::selection{background:var(--gold);color:var(--abyss);}
   a{color:inherit;text-decoration:none;}
-  .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.05em;}
 
-  #stage{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block;}
+  #stage{position:fixed;inset:0;z-index:0;}
 
-  /* Film grain */
-  .film{
-    position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.035;mix-blend-mode:overlay;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  /* Vignette */
-  .frame{
-    position:fixed;inset:0;z-index:2;pointer-events:none;
-    background:radial-gradient(ellipse at 50% 50%, transparent 48%, rgba(0,0,0,.65) 100%);
-  }
+  /* vignette */
+  .frame{position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 50%,transparent 44%,rgba(0,0,0,.7) 100%);}
 
   /* ── HUD ── */
-  .hud{position:fixed;inset:0;z-index:60;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:28px clamp(20px,4vw,56px);}
+  .hud{position:fixed;inset:0;z-index:60;pointer-events:none;
+    display:flex;flex-direction:column;justify-content:space-between;
+    padding:28px clamp(20px,4vw,56px);}
   .hud>*{pointer-events:auto;}
   .hud-top{display:flex;justify-content:space-between;align-items:center;}
   .wordmark{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:.32em;}
   .wordmark em{font-style:normal;color:var(--gold);}
   .menu{display:flex;gap:clamp(16px,3vw,44px);font-size:11px;text-transform:uppercase;letter-spacing:.15em;}
-  .menu a{color:var(--dim);transition:color .3s var(--ease);}
+  .menu a{color:var(--dim);transition:color .3s;}
   .menu a:hover{color:var(--gold);}
   .hud-bottom{display:flex;justify-content:space-between;align-items:flex-end;font-size:10px;color:var(--dim);}
-
   .depth-meter{display:flex;align-items:center;gap:12px;}
   .depth-rail{width:110px;height:1px;background:var(--hair);position:relative;}
-  .depth-rail span{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--gold);box-shadow:0 0 8px var(--gold);transition:width .2s linear;}
+  .depth-rail span{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--gold);transition:width .2s linear;}
   .depth-read{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bone);min-width:80px;}
-
   .sig{font-family:'JetBrains Mono',monospace;text-align:right;line-height:1.8;font-size:10px;}
-  .sig b{color:var(--gold);font-weight:500;}
+  .sig b{color:var(--gold);}
 
-  /* ── Gate / Loader ── */
-  .gate{position:fixed;inset:0;z-index:1000;background:var(--abyss);display:flex;align-items:center;justify-content:center;transition:opacity 1.2s var(--ease),visibility 1.2s;}
+  /* ── Gate ── */
+  .gate{position:fixed;inset:0;z-index:1000;background:var(--abyss);
+    display:flex;align-items:center;justify-content:center;
+    transition:opacity 1.2s var(--ease),visibility 1.2s;}
   .gate.done{opacity:0;visibility:hidden;pointer-events:none;}
-  .gate-inner{text-align:center;}
-  .gate .g-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(24px,5vw,44px);letter-spacing:.34em;overflow:hidden;}
-  .gate .g-mark span{display:inline-block;transform:translateY(110%);}
-  .gate .g-line{width:1px;height:72px;background:var(--hair);margin:28px auto 0;position:relative;overflow:hidden;}
-  .gate .g-line i{position:absolute;top:0;left:0;width:100%;height:0%;background:var(--gold);box-shadow:0 0 12px var(--gold);}
-  .gate .g-pct{margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);}
+  .g-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(24px,5vw,44px);
+    letter-spacing:.34em;overflow:hidden;text-align:center;}
+  .g-mark span{display:inline-block;transform:translateY(110%);}
+  .g-line{width:1px;height:72px;background:var(--hair);margin:28px auto 0;position:relative;overflow:hidden;}
+  .g-line i{position:absolute;top:0;left:0;width:100%;height:0%;background:var(--gold);}
+  .g-pct{margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);text-align:center;}
 
   /* ── Content ── */
   main{position:relative;z-index:10;}
-  section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 clamp(20px,6vw,100px);position:relative;}
+  section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding:0 clamp(20px,6vw,100px);position:relative;}
 
-  .kicker{display:flex;align-items:center;gap:14px;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:28px;}
+  .kicker{display:flex;align-items:center;gap:14px;font-size:10px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--dim);margin-bottom:28px;}
   .kicker::before{content:'';width:44px;height:1px;background:var(--gold);}
-  .kicker .depth-tag{font-family:'JetBrains Mono',monospace;color:var(--gold);}
+  .kicker .dt{font-family:'JetBrains Mono',monospace;color:var(--gold);}
 
   h1,h2{font-family:'Syne',sans-serif;font-weight:700;line-height:.95;letter-spacing:-.018em;}
   .title-xl{font-size:clamp(50px,11vw,158px);}
   .title-lg{font-size:clamp(36px,7vw,92px);max-width:14ch;}
-
   .lede{margin-top:32px;max-width:52ch;color:var(--dim);font-size:clamp(15px,1.4vw,18px);line-height:1.8;}
   .lede b{color:var(--bone);font-weight:400;}
   .lede .au{color:var(--gold);}
 
-  .drop-cue{position:absolute;bottom:48px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-size:10px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase;}
-  .drop-cue .chev{width:10px;height:10px;border-right:1px solid var(--gold);border-bottom:1px solid var(--gold);transform:rotate(45deg);animation:sink 2s var(--ease) infinite;}
-  @keyframes sink{0%,100%{transform:rotate(45deg) translate(0,0);opacity:1;}50%{transform:rotate(45deg) translate(5px,5px);opacity:.3;}}
+  .drop-cue{position:absolute;bottom:48px;left:50%;transform:translateX(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    font-size:10px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase;}
+  .drop-cue .chev{width:10px;height:10px;border-right:1px solid var(--gold);
+    border-bottom:1px solid var(--gold);transform:rotate(45deg);animation:sink 2s var(--ease) infinite;}
+  @keyframes sink{0%,100%{transform:rotate(45deg) translate(0,0);opacity:1;}
+    50%{transform:rotate(45deg) translate(5px,5px);opacity:.3;}}
 
-  /* Ledger table */
   .ledger{margin-top:46px;max-width:700px;}
-  .ledger-row{display:flex;justify-content:space-between;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--hair);gap:24px;}
+  .ledger-row{display:flex;justify-content:space-between;align-items:baseline;
+    padding:20px 0;border-bottom:1px solid var(--hair);gap:24px;}
   .ledger-row .k{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);white-space:nowrap;}
   .ledger-row .v{color:var(--dim);font-size:14px;text-align:right;max-width:46ch;line-height:1.65;}
 
-  /* Stat band */
   .stat-band{display:flex;gap:clamp(28px,6vw,88px);margin-top:54px;flex-wrap:wrap;}
-  .stat .n{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(32px,4.5vw,60px);color:var(--bone);}
+  .stat .n{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(32px,4.5vw,60px);}
   .stat .n i{font-style:normal;color:var(--gold);}
   .stat .d{margin-top:6px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);max-width:18ch;}
 
-  /* Cases / Work */
   .cases{margin-top:54px;border-top:1px solid var(--hair);}
-  .case{display:grid;grid-template-columns:90px 1fr auto;gap:clamp(14px,3vw,44px);align-items:center;padding:32px 0;border-bottom:1px solid var(--hair);transition:padding-left .45s var(--ease);}
+  .case{display:grid;grid-template-columns:90px 1fr auto;gap:clamp(14px,3vw,44px);
+    align-items:center;padding:32px 0;border-bottom:1px solid var(--hair);
+    transition:padding-left .45s var(--ease);}
   .case:hover{padding-left:18px;}
   .case .idx{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);}
   .case h3{font-family:'Syne',sans-serif;font-weight:600;font-size:clamp(18px,2.3vw,28px);}
@@ -118,99 +106,91 @@
   .case .yr{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);}
   @media(max-width:640px){.case{grid-template-columns:1fr;gap:8px;}}
 
-  /* Final CTA */
   .final-title{font-size:clamp(44px,12vw,180px);}
-  .final-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:28px;margin-top:56px;padding-top:34px;border-top:1px solid var(--hair);}
-  .mail{font-family:'JetBrains Mono',monospace;font-size:clamp(14px,2vw,20px);color:var(--bone);border-bottom:1px solid var(--gold);padding-bottom:6px;transition:color .3s var(--ease),letter-spacing .4s var(--ease);}
+  .final-row{display:flex;justify-content:space-between;align-items:flex-end;
+    flex-wrap:wrap;gap:28px;margin-top:56px;padding-top:34px;border-top:1px solid var(--hair);}
+  .mail{font-family:'JetBrains Mono',monospace;font-size:clamp(14px,2vw,20px);
+    border-bottom:1px solid var(--gold);padding-bottom:6px;transition:color .3s,letter-spacing .4s;}
   .mail:hover{color:var(--gold);letter-spacing:.04em;}
-
-  .btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--gold);color:var(--abyss);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;padding:14px 32px;margin-top:36px;transition:opacity .3s;}
+  .btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--gold);
+    color:var(--abyss);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;
+    letter-spacing:.12em;text-transform:uppercase;padding:14px 32px;margin-top:36px;transition:opacity .3s;}
   .btn-cta:hover{opacity:.82;}
 
-  footer{padding:44px clamp(20px,6vw,100px) 66px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:10px;color:var(--dim);letter-spacing:.12em;}
+  footer{padding:44px clamp(20px,6vw,100px) 66px;display:flex;justify-content:space-between;
+    flex-wrap:wrap;gap:14px;font-size:10px;color:var(--dim);letter-spacing:.12em;}
 
-  /* Animation helpers */
   .rise{opacity:0;will-change:transform,opacity;}
   .word-mask{overflow:hidden;display:block;}
   .word-mask span{display:inline-block;will-change:transform;}
-
-  @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
 </style>
 </head>
 <body>
 
-<!-- Loader -->
 <div class="gate" id="gate">
-  <div class="gate-inner">
+  <div>
     <div class="g-mark"><span id="gateMark">AEON</span></div>
     <div class="g-line"><i id="gateFill"></i></div>
-    <div class="g-pct mono" id="gatePct">LAYER 0000m</div>
+    <div class="g-pct" id="gatePct">LAYER 0000m</div>
   </div>
 </div>
 
 <canvas id="stage"></canvas>
-<div class="film"></div>
 <div class="frame"></div>
 
-<!-- HUD -->
 <div class="hud">
   <div class="hud-top">
     <div class="wordmark">AE<em>ON</em></div>
     <nav class="menu">
-      <a href="#layer-0">Layer</a>
-      <a href="#layer-1200">Systems</a>
-      <a href="#layer-3800">Work</a>
-      <a href="#layer-floor">Start</a>
+      <a href="#s0">Layer</a>
+      <a href="#s1">Systems</a>
+      <a href="#s2">Work</a>
+      <a href="#s4">Start</a>
     </nav>
   </div>
   <div class="hud-bottom">
     <div class="depth-meter">
       <div class="depth-rail"><span id="depthFill"></span></div>
-      <div class="depth-read mono" id="depthRead">0000m</div>
+      <div class="depth-read" style="font-family:'JetBrains Mono',monospace" id="depthRead">0000m</div>
     </div>
-    <div class="sig mono">AI-POWERED AGENCY<br><b>PRISCA DEZIGNS</b></div>
+    <div class="sig">AI-POWERED AGENCY<br><b>PRISCA DEZIGNS</b></div>
   </div>
 </div>
 
 <main>
-
-  <!-- 0m — SURFACE -->
-  <section id="layer-0">
-    <div class="kicker rise"><span class="depth-tag">0000m</span> The surface</div>
+  <section id="s0">
+    <div class="kicker rise"><span class="dt">0000m</span> The surface</div>
     <h1 class="title-xl">
       <span class="word-mask"><span>Most brands</span></span>
       <span class="word-mask"><span>stay shallow.</span></span>
     </h1>
     <p class="lede rise">
-      [Agency Name] builds the other kind. We are a premium AI-powered agency for businesses who need systems with <b>depth</b> — automation, identity, and intelligence — not a website that dies after launch.
-      <span class="au"> This page is a descent. Scroll to go deeper.</span>
+      [Agency Name] builds the other kind — AI-powered systems with <b>depth</b>. Automation, identity, intelligence. Not a website that dies after launch.
+      <span class="au"> Scroll to descend.</span>
     </p>
     <div class="drop-cue"><div class="chev"></div>Begin descent</div>
   </section>
 
-  <!-- 1200m — INTELLIGENCE LAYER -->
-  <section class="depth-ch" id="layer-1200" data-depth="1200" data-label="Intelligence layer">
-    <div class="kicker rise"><span class="depth-tag">1200m</span> Intelligence — where the machine learns your brand</div>
+  <section id="s1">
+    <div class="kicker rise"><span class="dt">1200m</span> Intelligence layer</div>
     <h2 class="title-lg">
-      <span class="word-mask"><span>First, the</span></span>
-      <span class="word-mask"><span>system learns</span></span>
+      <span class="word-mask"><span>First, it learns</span></span>
       <span class="word-mask"><span>to speak.</span></span>
     </h2>
     <div class="ledger rise">
-      <div class="ledger-row"><span class="k">BRAND ARCHITECTURE</span><span class="v">We extract your voice, values, and visual DNA — then encode it so every automated touchpoint sounds like you, not a bot.</span></div>
-      <div class="ledger-row"><span class="k">AI CUSTOMER SERVICE</span><span class="v">Replace manual email checkers and WhatsApp responders with a trained agent that handles inquiries, qualifies leads, and escalates on cue.</span></div>
-      <div class="ledger-row"><span class="k">LEAD PIPELINES</span><span class="v">Automated intake flows that capture, score, and route every inbound lead — from first message to booked call — without you lifting a finger.</span></div>
+      <div class="ledger-row"><span class="k">BRAND ARCHITECTURE</span><span class="v">We encode your voice, values, and visual DNA so every automated touchpoint sounds like you — not a bot.</span></div>
+      <div class="ledger-row"><span class="k">AI CUSTOMER SERVICE</span><span class="v">Replace manual email checkers and WhatsApp responders with a trained agent that handles inquiries 24/7.</span></div>
+      <div class="ledger-row"><span class="k">LEAD PIPELINES</span><span class="v">Automated intake flows that capture, score, and route every inbound lead — from first message to booked call.</span></div>
     </div>
   </section>
 
-  <!-- 3800m — AUTOMATION LAYER -->
-  <section class="depth-ch" id="layer-3800" data-depth="3800" data-label="Automation layer">
-    <div class="kicker rise"><span class="depth-tag">3800m</span> Automation — where pressure forms decision</div>
+  <section id="s2">
+    <div class="kicker rise"><span class="dt">3800m</span> Automation layer</div>
     <h2 class="title-lg">
       <span class="word-mask"><span>Then, it learns</span></span>
       <span class="word-mask"><span>to operate.</span></span>
     </h2>
-    <p class="lede rise">Down here there is no light except what your system generates itself. We build the execution layer — routing, response, escalation, payment — engineered to hold its shape under real business pressure.</p>
+    <p class="lede rise">Down here there is no light except what your system generates. We build the execution layer — routing, response, escalation — engineered to hold under real business pressure.</p>
     <div class="stat-band rise">
       <div class="stat"><div class="n">24<i>h</i></div><div class="d">average deployment window</div></div>
       <div class="stat"><div class="n">98<i>%</i></div><div class="d">client satisfaction rate</div></div>
@@ -218,62 +198,41 @@
     </div>
   </section>
 
-  <!-- 7400m — THE RECORD -->
-  <section class="depth-ch" id="layer-7400" data-depth="7400" data-label="The record">
-    <div class="kicker rise"><span class="depth-tag">7400m</span> Hadal — what we've built down here</div>
-    <h2 class="title-lg">
-      <span class="word-mask"><span>The record.</span></span>
-    </h2>
+  <section id="s3">
+    <div class="kicker rise"><span class="dt">7400m</span> The record</div>
+    <h2 class="title-lg"><span class="word-mask"><span>The record.</span></span></h2>
     <div class="cases rise">
-      <div class="case">
-        <span class="idx">R–01</span>
-        <div><h3>AI Customer Service Agent</h3><p>Full WhatsApp + email automation for a local retail client. Handles 200+ inquiries/week with zero manual intervention.</p></div>
-        <span class="yr">2026</span>
-      </div>
-      <div class="case">
-        <span class="idx">R–02</span>
-        <div><h3>Lead Conversion System</h3><p>Automated intake → qualification → booking pipeline. Client response time dropped from 6 hours to 90 seconds.</p></div>
-        <span class="yr">2026</span>
-      </div>
-      <div class="case">
-        <span class="idx">R–03</span>
-        <div><h3>Premium Template Shop</h3><p>High-fidelity WebGL-driven storefront with automated order fulfillment, email nurture flows, and Supabase lead capture.</p></div>
-        <span class="yr">2026</span>
-      </div>
-      <div class="case">
-        <span class="idx">R–04</span>
-        <div><h3>Brand Architecture Package</h3><p>Complete identity system — visual DNA, AI-trained voice, full web presence — deployed in under 48 hours.</p></div>
-        <span class="yr">2025</span>
-      </div>
+      <div class="case"><span class="idx">R–01</span><div><h3>AI Customer Service Agent</h3><p>Full WhatsApp + email automation. Handles 200+ inquiries/week with zero manual intervention.</p></div><span class="yr">2026</span></div>
+      <div class="case"><span class="idx">R–02</span><div><h3>Lead Conversion System</h3><p>Automated intake → qualification → booking. Response time: 6 hours → 90 seconds.</p></div><span class="yr">2026</span></div>
+      <div class="case"><span class="idx">R–03</span><div><h3>Premium Template Shop</h3><p>WebGL storefront with automated fulfillment, email nurture flows, and Supabase lead capture.</p></div><span class="yr">2026</span></div>
+      <div class="case"><span class="idx">R–04</span><div><h3>Brand Architecture Package</h3><p>Complete identity system — visual DNA, AI voice, full web presence — deployed in 48 hours.</p></div><span class="yr">2025</span></div>
     </div>
   </section>
 
-  <!-- 10900m — THE FLOOR / CONTACT -->
-  <section id="layer-floor" data-depth="10900" data-label="The floor">
-    <div class="kicker rise"><span class="depth-tag">10900m</span> The floor — nowhere deeper to go</div>
+  <section id="s4">
+    <div class="kicker rise"><span class="dt">10900m</span> The floor</div>
     <h2 class="final-title">
       <span class="word-mask"><span>Build deep</span></span>
       <span class="word-mask"><span>with us.</span></span>
     </h2>
     <div class="final-row rise">
       <div>
-        <a href="https://wa.me/[your-number]" class="mail">[your@email.com]</a>
+        <a href="mailto:[your@email.com]" class="mail">[your@email.com]</a>
         <br>
         <a href="https://wa.me/[your-number]" class="btn-cta">WhatsApp Us →</a>
       </div>
-      <div class="mono" style="font-size:11px;color:var(--dim);line-height:1.9;text-align:right;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);line-height:1.9;text-align:right;">
         Selective intake — limited builds per month<br>
-        All projects are fully functional — never demos<br>
+        All projects fully functional — never demos<br>
         Replies within 24 hours
       </div>
     </div>
   </section>
 
   <footer>
-    <span class="mono">© MMXXVI [AGENCY NAME]</span>
-    <span class="mono">POWERED BY PRISCA DEZIGNS AI SYSTEMS</span>
+    <span style="font-family:'JetBrains Mono',monospace">© MMXXVI [AGENCY NAME]</span>
+    <span style="font-family:'JetBrains Mono',monospace">POWERED BY PRISCA DEZIGNS AI SYSTEMS</span>
   </footer>
-
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -281,12 +240,7 @@
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 
 <script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
 
 <script type="module">
@@ -297,329 +251,154 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { ShaderPass }     from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass }     from 'three/addons/postprocessing/OutputPass.js';
 
-const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const isMobile  = matchMedia('(max-width: 760px)').matches;
-const lowPower  = (navigator.hardwareConcurrency || 4) <= 4;
-const budget    = (isMobile || lowPower) ? 'low' : 'high';
+gsap.registerPlugin(ScrollTrigger);
 
-/* ─────────────────────────────────────────────────────────────────
-   CONCEPT: the entire site is one continuous camera DIVE.
-   Scroll = depth. Camera travels down a vertical shaft.
-   Four procedural "stations" hang at different depths, each a
-   different morph state of the same shader-displaced form.
-───────────────────────────────────────────────────────────────── */
+const isMobile = innerWidth < 760;
+const budget   = (navigator.hardwareConcurrency || 4) <= 4 || isMobile ? 'low' : 'high';
 
-const noiseGLSL = `
-  vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
-  vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
-  vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
-  vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-  float snoise(vec3 v){
-    const vec2 C=vec2(1.0/6.0,1.0/3.0);
-    const vec4 D=vec4(0.0,0.5,1.0,2.0);
-    vec3 i=floor(v+dot(v,C.yyy));
-    vec3 x0=v-i+dot(i,C.xxx);
-    vec3 g=step(x0.yzx,x0.xyz);
-    vec3 l=1.0-g;
-    vec3 i1=min(g.xyz,l.zxy);
-    vec3 i2=max(g.xyz,l.zxy);
-    vec3 x1=x0-i1+C.xxx;
-    vec3 x2=x0-i2+C.yyy;
-    vec3 x3=x0-D.yyy;
-    i=mod289(i);
-    vec4 p=permute(permute(permute(
-      i.z+vec4(0.0,i1.z,i2.z,1.0))+
-      i.y+vec4(0.0,i1.y,i2.y,1.0))+
-      i.x+vec4(0.0,i1.x,i2.x,1.0));
-    float n_=0.142857142857;
-    vec3 ns=n_*D.wyz-D.xzx;
-    vec4 j=p-49.0*floor(p*ns.z*ns.z);
-    vec4 x_=floor(j*ns.z);
-    vec4 y_=floor(j-7.0*x_);
-    vec4 x=x_*ns.x+ns.yyyy;
-    vec4 y=y_*ns.x+ns.yyyy;
-    vec4 h=1.0-abs(x)-abs(y);
-    vec4 b0=vec4(x.xy,y.xy);
-    vec4 b1=vec4(x.zw,y.zw);
-    vec4 s0=floor(b0)*2.0+1.0;
-    vec4 s1=floor(b1)*2.0+1.0;
-    vec4 sh=-step(h,vec4(0.0));
-    vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
-    vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-    vec3 p0=vec3(a0.xy,h.x);
-    vec3 p1=vec3(a0.zw,h.y);
-    vec3 p2=vec3(a1.xy,h.z);
-    vec3 p3=vec3(a1.zw,h.w);
-    vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-    p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
-    vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
-    m=m*m;
-    return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-  }
-`;
+/* ─────────────────────────────────────────────────────────────
+   THE SLINKY
+   A ring of flat arcs — like the web.with.ai reference.
+   Each arc is a curved wire that sweeps from one side of the
+   disc to the other, passing through a Z-depth curve.
+   The BOUNCE: scroll drives a travelling sine wave across the
+   arc index, so each wire flicks forward then back — the classic
+   slinky in-motion look.
+───────────────────────────────────────────────────────────────*/
+
+const DISC_R      = isMobile ? 1.6 : 2.2;   // outer radius of the disc
+const ARC_COUNT   = budget === 'low' ? 52 : 80; // number of wires
+const PTS_PER_ARC = budget === 'low' ? 32 : 48; // smoothness of each wire
+const WIRE_R      = 0.013;                   // wire tube radius
+const WIRE_SEGS   = budget === 'low' ? 4 : 6;
+
+// scroll state
+let scrollP    = 0;   // 0..1
+let camY       = 0;   // world Y of camera (descent)
+const DIVE_Y   = 50;
 
 /* ── Renderer ── */
 const canvas   = document.getElementById('stage');
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio, budget==='low' ? 1.5 : 2));
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, budget === 'low' ? 1.5 : 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
+renderer.toneMappingExposure = 0.95;
 
 /* ── Scene ── */
 const scene = new THREE.Scene();
-scene.fog   = new THREE.FogExp2(0x020304, 0.042);
+scene.fog   = new THREE.FogExp2(0x020304, 0.03);
 
-/* ── Camera ── */
-const camera = new THREE.PerspectiveCamera(46, innerWidth/innerHeight, 0.1, 200);
-camera.position.set(0, 0, 5.2);
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 200);
+camera.position.set(0, 0, 5.5);
 
-const DIVE_DEPTH = 60;
-const camState   = { y: 0 };
+/* ── Lights ── */
+scene.add(new THREE.AmbientLight(0x161820, 2.0));
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
+keyLight.position.set(4, 6, 8);
+scene.add(keyLight);
+const rimLight = new THREE.DirectionalLight(0xaabbd0, 0.8);
+rimLight.position.set(-5, -4, -3);
+scene.add(rimLight);
+const movingLight = new THREE.PointLight(0xffffff, 2.5, 18, 2);
+scene.add(movingLight);
 
-/* ── Lights — chrome needs hard directional, not coloured glow ── */
-scene.add(new THREE.AmbientLight(0x111318, 1.8));
-const lamp = new THREE.PointLight(0xffffff, 3.5, 20, 2);
-scene.add(lamp);
-const keyL = new THREE.DirectionalLight(0xffffff, 2.2);
-keyL.position.set(3, 4, 6); scene.add(keyL);
-const fillL = new THREE.DirectionalLight(0xd0d8e8, 0.6);
-fillL.position.set(-4, -3, -4); scene.add(fillL);
-
-/* ═══════════════════════════════════════════════════════════════
-   SLINKY — a sunflower of chrome arcs, face-on to the camera.
-   Each "petal" is a thin curved wire anchored at the centre and
-   arcing outward. On scroll/bounce they oscillate in Z with a
-   radial phase offset so it looks like a slinky bouncing.
-
-   Reference image: web.with.ai reel — dense chrome arcs fanning
-   from a dark centre void, the whole thing spinning slowly.
-═══════════════════════════════════════════════════════════════ */
-
-const ARC_COUNT   = budget === 'low' ? 48 : 72;   // number of petals
-const ARC_PTS     = budget === 'low' ? 40 : 60;   // points per arc
-const ARC_R_INNER = 0.18;  // arc starts near centre
-const ARC_R_OUTER = 2.55;  // arc tip radius
-const TUBE_R      = 0.018; // wire thickness
-const TUBE_SEGS   = budget === 'low' ? 5 : 8;
-
-// Scroll / bounce state
-const slinkState = {
-  bounce: 0,      // 0..1 driven by scroll, drives Z wave amplitude
-  scrollProg: 0,  // raw scroll 0..1
-};
-
-// Chrome ShaderMaterial
-const chromeMat = new THREE.ShaderMaterial({
-  uniforms: {
-    uTime:  { value: 0 },
-    uBounce:{ value: 0 }, // 0=flat, 1=full bounce
-  },
-  vertexShader: `
-    varying vec3  vNormal;
-    varying vec3  vWorld;
-    void main(){
-      vNormal = normalize(normalMatrix * normal);
-      vec4 w  = modelMatrix * vec4(position, 1.0);
-      vWorld  = w.xyz;
-      gl_Position = projectionMatrix * viewMatrix * w;
-    }
-  `,
-  fragmentShader: `
-    varying vec3 vNormal;
-    varying vec3 vWorld;
-    void main(){
-      vec3  V    = normalize(cameraPosition - vWorld);
-      vec3  N    = normalize(vNormal);
-      float ndv  = clamp(dot(N, V), 0.0, 1.0);
-      float fres = pow(1.0 - ndv, 3.2);
-      vec3  L    = normalize(vec3(0.5, 0.7, 1.0));
-      float spec = pow(max(dot(reflect(-L, N), V), 0.0), 90.0);
-      vec3  base = vec3(0.82, 0.82, 0.84) * (0.5 + ndv * 0.5);
-      base      += vec3(spec * 0.95);
-      base      += vec3(fres * 0.18);
-      gl_FragColor = vec4(base, 1.0);
-    }
-  `,
-  side: THREE.DoubleSide,
+/* ── Chrome material ── */
+const chromeMat = new THREE.MeshStandardMaterial({
+  color:      0xd8d8dc,
+  metalness:  1.0,
+  roughness:  0.08,
+  envMapIntensity: 1.4,
 });
 
-// Group that holds all arcs — we rotate the group for the slow spin
-const slinkGroup = new THREE.Group();
-scene.add(slinkGroup);
-
-// Build one arc petal
-// arcIdx = 0..ARC_COUNT-1, bounceAmp = how far Z oscillates
-function buildArc(arcIdx, bounceAmp, time) {
+/* ── Build one arc ──
+   arcIdx : 0..ARC_COUNT-1
+   bounce : 0..1  — how far the tip bends in Z
+   time   : seconds — drives the travelling wave phase
+*/
+function buildArcGeo(arcIdx, bounce, time) {
+  // Base angle of this arc around the disc
   const baseAngle = (arcIdx / ARC_COUNT) * Math.PI * 2;
-  // Phase offset per arc — this is what gives the "slinky wave" look
-  const phase     = baseAngle;
 
-  const pts = [];
-  for (let i = 0; i <= ARC_PTS; i++) {
-    const t = i / ARC_PTS;
-    // Arc sweeps from inner to outer radius along its own radial direction
-    const r   = ARC_R_INNER + (ARC_R_OUTER - ARC_R_INNER) * t;
-    const x   = Math.cos(baseAngle) * r;
-    const y   = Math.sin(baseAngle) * r;
-    // Z oscillation: each arc bounces with its own phase
-    // t controls how much the tip bends vs the root (root stays still)
-    const zWave = Math.sin(time * 2.4 + phase) * bounceAmp * t * t;
-    pts.push(new THREE.Vector3(x, y, zWave));
+  // Travelling wave phase — offset per arc index creates the ripple
+  const wavePhase = (arcIdx / ARC_COUNT) * Math.PI * 2;
+  // The wave amplitude modulated by scroll: bigger bounce when scrolling
+  const amp       = bounce * DISC_R * 0.7;
+  // Current Z peak for this arc (shifts with time so the wave travels)
+  const zPeak     = Math.sin(time * 1.8 + wavePhase) * amp;
+
+  const points = [];
+  for (let j = 0; j <= PTS_PER_ARC; j++) {
+    const t = j / PTS_PER_ARC;            // 0 = one edge, 1 = other edge
+
+    // Each arc sweeps from -DISC_R to +DISC_R along its own axis
+    // The arc axis is perpendicular to baseAngle
+    const perpAngle = baseAngle + Math.PI * 0.5;
+    const sweep     = (t - 0.5) * 2;      // -1 .. +1
+
+    // Position along the arc axis (the chord of the arc)
+    const px = Math.cos(perpAngle) * sweep * DISC_R;
+    const py = Math.sin(perpAngle) * sweep * DISC_R;
+
+    // Z: a parabola that peaks in the middle of the arc
+    // The parabola amplitude follows the travelling wave
+    const para = 1.0 - sweep * sweep;     // 0 at edges, 1 at centre
+    const pz   = para * zPeak;
+
+    points.push(new THREE.Vector3(px, py, pz));
   }
-  return new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.0);
+
+  const curve = new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.0);
+  return new THREE.TubeGeometry(curve, PTS_PER_ARC, WIRE_R, WIRE_SEGS, false);
 }
 
-// Create all arc meshes
+/* ── Create disc group ── */
+const discGroup = new THREE.Group();
+scene.add(discGroup);
+
 const arcMeshes = [];
 const arcGeos   = [];
+
 for (let i = 0; i < ARC_COUNT; i++) {
-  const curve = buildArc(i, 0, 0);
-  const geo   = new THREE.TubeGeometry(curve, ARC_PTS, TUBE_R, TUBE_SEGS, false);
-  const mesh  = new THREE.Mesh(geo, chromeMat);
-  slinkGroup.add(mesh);
+  const geo  = buildArcGeo(i, 0, 0);
+  const mesh = new THREE.Mesh(geo, chromeMat);
+  discGroup.add(mesh);
   arcMeshes.push(mesh);
   arcGeos.push(geo);
 }
 
-// Rebuild all arcs (called in render loop, throttled)
-let rebuildFrame  = 0;
-function rebuildArcs(bounceAmp, time) {
-  for (let i = 0; i < ARC_COUNT; i++) {
-    arcGeos[i].dispose();
-    const curve       = buildArc(i, bounceAmp, time);
-    const geo         = new THREE.TubeGeometry(curve, ARC_PTS, TUBE_R, TUBE_SEGS, false);
-    arcMeshes[i].geometry = geo;
-    arcGeos[i]        = geo;
-  }
-}
-
-const stations = []; // compat
-
-/* ── Marine snow / drifting particles ── */
-const COUNT = budget === 'low' ? 700 : 2000;
-const pPos  = new Float32Array(COUNT * 3);
-for (let i = 0; i < COUNT; i++) {
-  pPos[i*3]   = (Math.random()-.5) * 22;
-  pPos[i*3+1] = -Math.random() * (DIVE_DEPTH + 15) + 6;
-  pPos[i*3+2] = (Math.random()-.5) * 22 - 2;
-}
-const pGeo = new THREE.BufferGeometry();
-pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-const pMat = new THREE.ShaderMaterial({
-  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-  uniforms: { uTime: { value: 0 }, uColor: { value: new THREE.Color('#C8A96E') } },
-  vertexShader:`
-    uniform float uTime;
-    void main(){
-      vec3 p = position;
-      p.x += sin(uTime*0.15 + position.y*0.7)*0.35;
-      p.y += sin(uTime*0.1  + position.x)*0.2;
-      vec4 mv = modelViewMatrix * vec4(p,1.0);
-      gl_PointSize = 14.0 / -mv.z;
-      gl_Position  = projectionMatrix * mv;
-    }
-  `,
-  fragmentShader:`
-    uniform vec3 uColor;
-    void main(){
-      float d = length(gl_PointCoord - 0.5);
-      gl_FragColor = vec4(uColor, smoothstep(0.5, 0.0, d)*0.4);
-    }
-  `
-});
-scene.add(new THREE.Points(pGeo, pMat));
-
-/* ── Post-processing: bloom + chromatic aberration + radial DoF ── */
+/* ── Post ── */
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(
-  new THREE.Vector2(innerWidth, innerHeight),
-  budget === 'low' ? 0.20 : 0.28, 0.5, 0.5
-); // low bloom — chrome look, not neon
+// Bloom very subtle — chrome look, not neon
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.18, 0.5, 0.6);
 composer.addPass(bloom);
-
-const grade = new ShaderPass({
-  uniforms: {
-    tDiffuse: { value: null },
-    uAb:      { value: 0.0016 },
-    uFocus:   { value: 0.0 }
-  },
-  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+// Chromatic aberration + vignette pass
+const gradePass = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, uAb: { value: 0.0012 } },
+  vertexShader:  `varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
   fragmentShader:`
     uniform sampler2D tDiffuse;
     uniform float uAb;
-    uniform float uFocus;
     varying vec2 vUv;
     void main(){
-      vec2 dir  = vUv - 0.5;
-      float edge = length(dir);
-      float r = texture2D(tDiffuse, vUv - dir*uAb*(1.0+edge*2.0)).r;
-      float g = texture2D(tDiffuse, vUv).g;
-      float b = texture2D(tDiffuse, vUv + dir*uAb*(1.0+edge*2.0)).b;
-      vec3 c = vec3(r,g,b);
-      float blurAmt = smoothstep(0.25, 0.75, edge)*(0.5+uFocus);
-      vec2 o = dir*0.006*blurAmt;
-      vec3 blur = (texture2D(tDiffuse,vUv+o).rgb
-                 + texture2D(tDiffuse,vUv-o).rgb
-                 + texture2D(tDiffuse,vUv+vec2(o.y,-o.x)).rgb
-                 + texture2D(tDiffuse,vUv+vec2(-o.y,o.x)).rgb)*0.25;
-      c = mix(c, blur, blurAmt*0.8);
-      c *= mix(0.5, 1.0, smoothstep(0.85, 0.2, edge));
-      gl_FragColor = vec4(c, 1.0);
+      vec2 d=vUv-.5; float e=length(d);
+      float r=texture2D(tDiffuse,vUv-d*uAb*(1.+e)).r;
+      float g=texture2D(tDiffuse,vUv).g;
+      float b=texture2D(tDiffuse,vUv+d*uAb*(1.+e)).b;
+      gl_FragColor=vec4(r,g,b,1.);
     }
   `
 });
-composer.addPass(grade);
+composer.addPass(gradePass);
 composer.addPass(new OutputPass());
 
-/* ── Mouse drift ── */
-const m = { x:0, y:0, tx:0, ty:0 };
+/* ── Mouse ── */
+const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
 addEventListener('pointermove', e => {
-  m.tx = (e.clientX / innerWidth  - .5) * 2;
-  m.ty = (e.clientY / innerHeight - .5) * 2;
+  mouse.tx = (e.clientX / innerWidth  - .5) * 2;
+  mouse.ty = (e.clientY / innerHeight - .5) * 2;
 });
-
-/* ── Render loop ── */
-const clock = new THREE.Clock();
-function tick() {
-  requestAnimationFrame(tick);
-  const t = clock.getElapsedTime();
-
-  m.x += (m.tx - m.x) * 0.045;
-  m.y += (m.ty - m.y) * 0.045;
-
-  chromeMat.uniforms.uTime.value   = t;
-  chromeMat.uniforms.uBounce.value = slinkState.bounce;
-
-  // Rebuild arcs every 2 frames — bounce amplitude and time both drive Z wave
-  rebuildFrame++;
-  if (rebuildFrame % 2 === 0) {
-    rebuildArcs(slinkState.bounce * 1.4, t);
-  }
-
-  // Group follows camera down the shaft — stays centred in screen
-  slinkGroup.position.y = camState.y;
-
-  // Slow Z spin — the portal rotate from the reference
-  slinkGroup.rotation.z = t * 0.055;
-
-  // Very slight mouse tilt to show 3D depth
-  slinkGroup.rotation.x =  m.y * 0.06;
-  slinkGroup.rotation.y = -m.x * 0.06;
-
-  pMat.uniforms.uTime.value = t;
-
-  camera.position.x = m.x * 0.4;
-  camera.position.y = camState.y + Math.sin(t * 0.28) * 0.06 - m.y * 0.25;
-  camera.position.z = 5.5;
-  camera.lookAt(0, camState.y, 0);
-
-  lamp.position.set(0, camState.y + 1.5, 4.5);
-
-  composer.render();
-}
-tick();
 
 /* ── Resize ── */
 addEventListener('resize', () => {
@@ -629,89 +408,116 @@ addEventListener('resize', () => {
   composer.setSize(innerWidth, innerHeight);
 });
 
-/* ─────────────────────────────────────────────────────────────────
-   LENIS + GSAP — scroll drives the dive
-───────────────────────────────────────────────────────────────── */
-gsap.registerPlugin(ScrollTrigger);
+/* ── Render loop ── */
+const clock = new THREE.Clock();
+let   rebuildTick = 0;
 
-if (!reducedMotion && window.Lenis) {
-  const lenis = new window.Lenis({
-    duration: 1.2,
-    easing: x => 1 - Math.pow(1-x, 3),
-    smoothWheel: true,
-    smoothTouch: false
-  });
+function tick() {
+  requestAnimationFrame(tick);
+  const t = clock.getElapsedTime();
+
+  mouse.x += (mouse.tx - mouse.x) * 0.05;
+  mouse.y += (mouse.ty - mouse.y) * 0.05;
+
+  // Disc follows camera Y (stays in view as we descend)
+  discGroup.position.y = camY;
+
+  // Slow Z spin — the key visual from the reference
+  discGroup.rotation.z = t * 0.06;
+
+  // Gentle tilt toward mouse
+  discGroup.rotation.x =  mouse.y * 0.05;
+  discGroup.rotation.y = -mouse.x * 0.05;
+
+  // Rebuild arc geometries every 2 frames — drives the bounce
+  rebuildTick++;
+  if (rebuildTick % 2 === 0) {
+    // bounce amplitude: sine of scroll progress → peaks mid-scroll
+    const bounceAmp = Math.abs(Math.sin(scrollP * Math.PI * 2.5));
+    for (let i = 0; i < ARC_COUNT; i++) {
+      arcGeos[i].dispose();
+      const geo        = buildArcGeo(i, bounceAmp, t);
+      arcMeshes[i].geometry = geo;
+      arcGeos[i]       = geo;
+    }
+  }
+
+  // Camera
+  camera.position.x = mouse.x * 0.35;
+  camera.position.y = camY + mouse.y * -0.25 + Math.sin(t * 0.25) * 0.06;
+  camera.position.z = 5.5;
+  camera.lookAt(0, camY, 0);
+
+  // Moving light orbits the disc
+  movingLight.position.set(
+    Math.sin(t * 0.5) * 5,
+    camY + Math.cos(t * 0.4) * 3,
+    4
+  );
+
+  composer.render();
+}
+tick();
+
+/* ─────────────────────────────────────────────────────────────
+   LENIS + ScrollTrigger
+───────────────────────────────────────────────────────────────*/
+if (window.Lenis) {
+  const lenis = new window.Lenis({ duration: 1.25, easing: x => 1 - Math.pow(1 - x, 3), smoothWheel: true });
   lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add(time => lenis.raf(time * 1000));
+  gsap.ticker.add(t => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
 }
 
-/* Master dive: scroll → camera depth + HUD + slinky bounce */
+// Master scroll → camera depth + HUD
 ScrollTrigger.create({
   trigger: document.body,
   start: 'top top', end: 'bottom bottom',
-  scrub: 1.2,
+  scrub: 1.0,
   onUpdate(self) {
-    const p = self.progress;
-    slinkState.scrollProg = p;
+    scrollP = self.progress;
+    camY    = -scrollP * DIVE_Y * 0.82;
 
-    // Camera descends
-    camState.y = -p * DIVE_DEPTH * 0.82;
+    const m = Math.round(scrollP * 10900);
+    document.getElementById('depthRead').textContent = String(m).padStart(4, '0') + 'm';
+    document.getElementById('depthFill').style.width = (scrollP * 100).toFixed(1) + '%';
 
-    // HUD
-    const meters = Math.round(p * 10900);
-    document.getElementById('depthRead').textContent = String(meters).padStart(4,'0') + 'm';
-    document.getElementById('depthFill').style.width = (p * 100).toFixed(1) + '%';
-
-    // Post-processing — keep clean, no neon
-    bloom.strength              = budget === 'low' ? 0.18 : 0.24;
-    grade.uniforms.uFocus.value = p * 0.2;
-    scene.fog.density           = 0.025 + p * 0.015;
-
-    // ── Slinky bounce amplitude ──
-    // Ramps up fast as soon as user scrolls, then holds, then fades
-    // Peak bounce = arcs bend out to max Z (looks like slinky mid-drop)
-    // Creates 2 full bounce peaks across the scroll journey
-    const wave = Math.sin(p * Math.PI * 2.5);          // 2.5 bounces over full scroll
-    slinkState.bounce = Math.max(0, wave);              // only positive half = outward bounce
+    scene.fog.density = 0.025 + scrollP * 0.018;
   }
 });
 
-/* Word-mask headline reveals */
+// Word-mask reveals
 document.querySelectorAll('.word-mask span').forEach(el => {
-  gsap.fromTo(el, { yPercent: 115 }, {
+  gsap.fromTo(el, { yPercent: 112 }, {
     yPercent: 0, duration: 1.2, ease: 'power4.out',
     scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' }
   });
 });
 
-/* Rise elements */
+// Rise elements
 gsap.utils.toArray('.rise').forEach(el => {
-  gsap.fromTo(el, { opacity: 0, y: 40 }, {
+  gsap.fromTo(el, { opacity: 0, y: 38 }, {
     opacity: 1, y: 0, duration: 1.1, ease: 'power3.out',
     scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' }
   });
 });
 
-/* ── Gate / Loader ── */
+/* ── Gate ── */
 gsap.fromTo('#gateMark', { yPercent: 110 }, { yPercent: 0, duration: 1.1, ease: 'power4.out', delay: 0.15 });
-
-let depth = 0;
-const gateTimer = setInterval(() => {
-  depth += Math.random() * 1400;
-  if (depth >= 10900) {
-    depth = 10900;
-    clearInterval(gateTimer);
+let gDepth = 0;
+const gTimer = setInterval(() => {
+  gDepth += Math.random() * 1300;
+  if (gDepth >= 10900) {
+    gDepth = 10900;
+    clearInterval(gTimer);
     document.getElementById('gateFill').style.height = '100%';
-    document.getElementById('gatePct').textContent   = 'LAYER 10900m — READY';
-    gsap.to('#gate', {
-      opacity: 0, duration: 1, delay: 0.4, ease: 'power2.inOut',
-      onComplete() { document.getElementById('gate').classList.add('done'); }
-    });
+    document.getElementById('gatePct').textContent = 'LAYER 10900m — READY';
+    gsap.to('#gate', { opacity: 0, duration: 1, delay: 0.4, ease: 'power2.inOut',
+      onComplete() { document.getElementById('gate').classList.add('done'); } });
     return;
   }
-  document.getElementById('gateFill').style.height = (depth/10900*100).toFixed(0) + '%';
-  document.getElementById('gatePct').textContent   = 'LAYER ' + String(Math.round(depth)).padStart(4,'0') + 'm';
+  document.getElementById('gateFill').style.height = (gDepth / 10900 * 100).toFixed(0) + '%';
+  document.getElementById('gatePct').textContent = 'LAYER ' + String(Math.round(gDepth)).padStart(4, '0') + 'm';
 }, 130);
 
 </script>
