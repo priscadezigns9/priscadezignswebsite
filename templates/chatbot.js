@@ -278,7 +278,7 @@ const STEPS={
     ]
   },
   templates_chatbot:{
-    bot:"The AI Chatbot add-on plugs a live AI agent into your template site. It answers your business FAQs 24/7 — services, pricing, hours, how to book — and captures leads while you sleep.\n\n❖ $399.99 one-time setup\n❖ $49.99/mo ongoing\n\nAdds on top of your template site fee.",
+    bot:"The AI Chatbot add-on plugs a live AI agent into your template site. It answers your business FAQs 24/7 — services, pricing, hours, how to book — and captures leads while you sleep.\n\n❖ $349.99 one-time setup\n❖ $49.99/mo ongoing\n\nAdds on top of your template site fee.",
     r:[
       {l:"Add chatbot to my template",s:"talk"},
       {l:"Template only is fine",s:"microstore"},
@@ -286,7 +286,7 @@ const STEPS={
     ]
   },
   templates_included:{
-    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Hosted on your subdomain\n\nPricing:\n❖ Standard templates — $149.99 setup · $19.99/mo\n❖ Premium 3D templates (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\n\nAdd-ons:\n❖ Copywriting — $49.99 one-time\n❖ AI Chatbot — $399.99 setup · $49.99/mo\n❖ Micro Store — $249.99 setup · $34.99/mo",
+    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Hosted on your subdomain\n\nPricing:\n❖ Standard templates — $149.99 setup · $19.99/mo\n❖ Premium 3D templates (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\n\nAdd-ons:\n❖ Copywriting — $49.99 one-time\n❖ AI Chatbot — $349.99 setup · $49.99/mo\n❖ Micro Store — $249.99 setup · $34.99/mo",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse templates",s:"microstore"},
       {l:"Add chatbot",s:"templates_chatbot"},
