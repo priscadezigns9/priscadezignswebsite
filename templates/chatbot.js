@@ -15,9 +15,9 @@ const PKGS={
     {name:"E-Trusted",price:"$2,500 TTD",desc:"Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"}
   ],
   ai:[
-    {name:"AI Tier 1",price:"$1,500 USD + $150/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · AI Training & Configuration · Monthly Performance Report · 1 Month Free Maintenance"},
-    {name:"AI Tier 2",price:"$3,500 USD + $300/mo",desc:"Everything in Tier 1 · Multi-Channel Automation · Advanced Workflow Automation · 1 Month Free Maintenance"},
-    {name:"AI Tier 3",price:"$6,000 USD + $600/mo",desc:"Full Enterprise AI Deployment · Enterprise-Grade Infrastructure · Full Business Intelligence Automation · Direct Consultation & Support · 1 Month Free Maintenance"}
+    {name:"AI Tier 1",price:"$1,500 USD + $50/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · AI Training & Configuration · Monthly Performance Report · 1 Month Free Maintenance"},
+    {name:"AI Tier 2",price:"$3,500 USD + $150/mo",desc:"Everything in Tier 1 · Multi-Channel Automation · Advanced Workflow Automation · 1 Month Free Maintenance"},
+    {name:"AI Tier 3",price:"$6,000 USD + $300/mo",desc:"Full Enterprise AI Deployment · Enterprise-Grade Infrastructure · Full Business Intelligence Automation · Direct Consultation & Support · 1 Month Free Maintenance"}
   ],
   continuity:[
     {name:"Maintenance",price:"$97/mo",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
