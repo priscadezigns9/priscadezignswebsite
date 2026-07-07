@@ -420,6 +420,27 @@ function advanceIntake(userText){
   }
 }
 
+function saveIntakeLead(d){
+  var SB_URL='https://sazhdnqzaqpqcralmthh.supabase.co';
+  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+  var payload={
+    name: d.name||'—',
+    email: '(chatbot) '+(d.biz||'—'),
+    package: (d.goal||'—')+' | Budget: '+(d.budget||'—'),
+    brand: 'Prisca Dezigns (Chatbot)'
+  };
+  fetch(SB_URL+'/rest/v1/client_leads',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':SB_KEY,
+      'Authorization':'Bearer '+SB_KEY,
+      'Prefer':'return=minimal'
+    },
+    body:JSON.stringify(payload)
+  }).catch(function(){});
+}
+
 function finishIntake(skipped){
   intake.active=false;
   var d=intake.data;
@@ -435,6 +456,8 @@ function finishIntake(skipped){
     addQR('← Start over','start');
     return;
   }
+
+  saveIntakeLead(d);
 
   var summary="Perfect, "+d.name+"! Here's what I've got:\n";
   if(d.biz)  summary+="🏢 Business: "+d.biz+"\n";
