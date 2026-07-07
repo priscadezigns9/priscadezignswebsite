@@ -242,28 +242,90 @@ function closeCart() {
  document.getElementById('cart-overlay').classList.remove('open');
 }
 function openTerms() {
- // Open terms in new tab
- window.open('/templates/terms/', '_blank', 'noopener');
- // Mark step 1 done
- var step1 = document.getElementById('cd-step1');
+ var existing = document.getElementById('pd-terms-modal');
+ if (existing) { existing.style.display='flex'; return; }
+ var overlay = document.createElement('div');
+ overlay.id = 'pd-terms-modal';
+ overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:16px;';
+ var html = '';
+ html += '<div style="background:#fff;border-radius:14px;max-width:600px;width:100%;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;">';
+ html += '<div style="background:#6600CC;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;">';
+ html += '<span style="color:#fff;font-weight:700;font-size:0.9rem;letter-spacing:0.05em;">SERVICE AGREEMENT \u2014 PRISCA DEZIGNS</span>';
+ html += '<button onclick="acceptTerms()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;cursor:pointer;border-radius:6px;padding:6px 12px;font-size:0.75rem;font-weight:700;">\u2713 Accept & Close</button>';
+ html += '</div>';
+ html += '<div style="padding:20px 24px;overflow-y:auto;font-size:0.82rem;color:#333;line-height:1.7;">';
+ html += '<p><strong>1. Services.</strong> Prisca Dezigns will deliver the selected template package as described at checkout. Work begins after receipt of full setup payment.</p>';
+ html += '<p><strong>2. Payment.</strong> Setup fees are due in full before work commences. Monthly fees are billed in advance. No refunds after delivery of the completed site.</p>';
+ html += '<p><strong>3. Intellectual Property.</strong> The template design, code, and structure remain the intellectual property of Prisca Dezigns. You receive a licence to use your customised version while your subscription is active. You own your content (copy, images, logo).</p>';
+ html += '<p><strong>4. Revisions.</strong> Each package includes one round of revisions. Additional revision rounds are billed at $49.99 each.</p>';
+ html += '<p><strong>5. Client Responsibilities.</strong> You are responsible for providing all content within 5 business days of payment. Delays extend the delivery timeline accordingly.</p>';
+ html += '<p><strong>6. Hosting & Maintenance.</strong> Monthly fees cover hosting, SSL, uptime monitoring, and minor content updates. Major redesigns are billed separately.</p>';
+ html += '<p><strong>7. Termination.</strong> Either party may terminate with 30 days written notice. No refund is issued for the current billing period on termination.</p>';
+ html += '<p><strong>8. Limitation of Liability.</strong> Prisca Dezigns is not liable for indirect or consequential damages. Total liability shall not exceed fees paid in the prior 30 days.</p>';
+ html += '<p><strong>9. Governing Law.</strong> This agreement is governed by the laws of Trinidad and Tobago.</p>';
+ html += '<p style="margin-top:16px;padding:12px;background:#f0e6ff;border-radius:8px;font-size:0.78rem;color:#6600CC;"><strong>By ticking the checkbox, you confirm you have read and agree to these terms.</strong></p>';
+ html += '</div>';
+ html += '<div style="padding:12px 20px;background:#fafafa;border-top:1px solid #eee;display:flex;justify-content:flex-end;">';
+ html += '<button onclick="acceptTerms()" style="background:#6600CC;color:#fff;border:none;cursor:pointer;border-radius:8px;padding:10px 24px;font-size:0.82rem;font-weight:700;letter-spacing:0.04em;">I Have Read \u2014 Accept & Continue</button>';
+ html += '</div>';
+ html += '</div>';
+ overlay.innerHTML = html;
+ document.body.appendChild(overlay);
+ overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.style.display='none'; });
+}
+
+function acceptTerms() {
+ var modal = document.getElementById('pd-terms-modal');
+ if (modal) modal.style.display = 'none';
+ var step1   = document.getElementById('cd-step1');
  var readBtn = document.getElementById('cd-read-btn');
- if (step1) step1.classList.add('done');
- if (readBtn) { readBtn.classList.add('done'); readBtn.innerHTML = '&#10003; Terms Opened'; }
- // Unlock step 2
+ if (step1)   step1.classList.add('done');
+ if (readBtn) { readBtn.classList.add('done'); readBtn.innerHTML = '\u2713 Terms Read'; }
  var step2 = document.getElementById('cd-step2');
- var chk = document.getElementById('cd-agree-chk');
+ var chk   = document.getElementById('cd-agree-chk');
  if (step2) step2.classList.add('unlocked');
- if (chk) chk.disabled = false;
+ if (chk)   { chk.disabled = false; }
 }
 function updateAgreement() {
  var chk = document.getElementById('cd-agree-chk');
- if (!chk) return;
- var btns = [document.getElementById('cart-paypal'), document.getElementById('cart-bank')];
- btns.forEach(function(btn){
-   if (!btn) return;
-   if (chk.checked && !chk.disabled && cart.base) { btn.classList.remove('disabled'); }
-   else { btn.classList.add('disabled'); btn.setAttribute('href','javascript:void(0)'); }
- });
+ if (!chk || !cart.base) return;
+ var unlocked = chk.checked && !chk.disabled;
+ var p = PRICES[cart.base.type] || {};
+ var totalSetup = cart.base.setup
+   + (cart.addons.copy    ? PRICES.copy.setup    : 0)
+   + (cart.addons.chatbot ? PRICES.chatbot.setup : 0);
+ var totalMo = cart.base.mo
+   + (cart.addons.copy    ? PRICES.copy.mo    : 0)
+   + (cart.addons.chatbot ? PRICES.chatbot.mo : 0);
+ // Build order lines for WhatsApp bank transfer
+ var orderLines = [];
+ orderLines.push('Hi%21%20I%27d%20like%20to%20place%20an%20order%20via%20bank%20transfer%3A%0A');
+ orderLines.push('%F0%9F%9B%92%20' + encodeURIComponent(cart.base.name) + '%20%E2%80%94%20' + encodeURIComponent(p.label||'Template'));
+ if (cart.addons.copy)    orderLines.push('%E2%9E%95%20Copywriting%20Add-On');
+ if (cart.addons.chatbot) orderLines.push('%E2%9E%95%20AI%20Chatbot%20Add-On');
+ orderLines.push('%0A%F0%9F%92%B3%20Setup%20Total%3A%20%24' + totalSetup.toFixed(2));
+ orderLines.push('%F0%9F%93%85%20Monthly%3A%20%24' + totalMo.toFixed(2) + '%2Fmo');
+ orderLines.push('%0ACould%20you%20please%20send%20me%20your%20banking%20details%20so%20I%20can%20complete%20the%20transfer%3F');
+ var paypalBtn = document.getElementById('cart-paypal');
+ var bankBtn   = document.getElementById('cart-bank');
+ if (paypalBtn) {
+   if (unlocked) {
+     paypalBtn.href = 'https://www.paypal.com/paypalme/priscadezigns9/' + totalSetup.toFixed(2);
+     paypalBtn.classList.remove('disabled');
+   } else {
+     paypalBtn.classList.add('disabled');
+     paypalBtn.setAttribute('href','javascript:void(0)');
+   }
+ }
+ if (bankBtn) {
+   if (unlocked) {
+     bankBtn.href = 'https://wa.me/18683424101?text=' + orderLines.join('%0A');
+     bankBtn.classList.remove('disabled');
+   } else {
+     bankBtn.classList.add('disabled');
+     bankBtn.setAttribute('href','javascript:void(0)');
+   }
+ }
 }
 
 // ── Save cart order to Supabase + notify via email & Telegram ──
