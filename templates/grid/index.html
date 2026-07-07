@@ -1,557 +1,678 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Your Brand</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>Grid — Visual Portfolio</title>
+<meta name="description" content="Visual director. Editorial and commercial work.">
 <style>
-/*──────────────────────────────────
-  BASE
-──────────────────────────────────*/
+/* ── RESET ──────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;}
-body{
-  background:#0a0a0a;
-  color:#e8e8e4;
-  font-family:'Inter',system-ui,sans-serif;
-  font-size:13px;line-height:1.6;
-  -webkit-font-smoothing:antialiased;
+:where(:not(html,iframe,canvas,img,svg,video):not(svg *)){all:unset;display:revert}
+a,button{cursor:pointer}
+::-webkit-scrollbar{display:none}
+html{scrollbar-width:none}
+
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root{
+  --bg:#ffffff;
+  --fg:#000000;
+  --sub:rgba(0,0,0,0.38);
+  --pad:10px;
+  --gap:1px;
+  --h-header:38px;
+  --h-strip:0px;
+  --font:Arial,Helvetica,sans-serif;
+  --ease-bounce:cubic-bezier(.86,0,.14,1);
+  --cols:4;
+}
+@media(max-width:767px){:root{--cols:2;--h-header:76px}}
+
+/* ── BASE ────────────────────────────────────────────────── */
+html,body{
+  width:100%;height:100%;
+  background:var(--bg);color:var(--fg);
+  font-family:var(--font);
+  font-size:10px;line-height:12px;
+  letter-spacing:.02em;font-weight:700;
+  overflow:hidden;
+}
+@media(max-width:767px){body{overflow:unset;height:unset}}
+
+/* ── HEADER ──────────────────────────────────────────────── */
+#header{
+  position:fixed;top:0;left:0;right:0;
+  z-index:1000;
+  background:var(--bg);
+  border-bottom:1px solid transparent;
+}
+
+/* Filmstrip row */
+#strip{
+  width:100%;height:var(--h-strip);
+  overflow:hidden;
+  display:flex;gap:var(--gap);
+  transition:height .345s var(--ease-bounce);
+  background:var(--bg);
+}
+#strip.open{--h-strip:40px;height:40px}
+.strip-thumb{
+  flex:none;height:100%;
+  aspect-ratio:3/2;
+  overflow:hidden;
+  opacity:.4;
+  cursor:pointer;
+  transition:opacity .3s;
+}
+.strip-thumb:hover,.strip-thumb.active{opacity:1}
+.strip-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Nav bar */
+#navbar{
+  height:var(--h-header);
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  align-items:center;
+  padding:0 var(--pad);
+  gap:var(--pad);
+}
+@media(max-width:767px){
+  #navbar{grid-template-columns:1fr 1fr;grid-template-rows:auto auto}
+}
+
+.nav-left{display:flex;align-items:center;gap:calc(var(--pad)*2)}
+.nav-project-name{color:var(--fg);font-size:10px;line-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:24ch}
+.nav-timer{color:var(--sub);font-size:10px;font-variant-numeric:tabular-nums;min-width:8ch}
+.nav-credits-btn{color:var(--sub);font-size:10px;cursor:pointer;text-transform:uppercase;transition:color .2s}
+.nav-credits-btn:hover{color:var(--fg)}
+
+.nav-center{display:flex;align-items:center;justify-content:center;gap:calc(var(--pad)*2)}
+.nav-filter{font-size:10px;text-transform:uppercase;color:var(--sub);cursor:pointer;transition:color .2s;padding:2px 0;border-bottom:1px solid transparent}
+.nav-filter:hover{color:var(--fg)}
+.nav-filter.active{color:var(--fg);border-bottom-color:var(--fg)}
+
+.nav-right{display:flex;align-items:center;justify-content:flex-end;gap:calc(var(--pad)*2)}
+.nav-name{font-size:10px;text-transform:uppercase;color:var(--fg)}
+.nav-about-btn{font-size:10px;text-transform:uppercase;color:var(--sub);cursor:pointer;transition:color .2s}
+.nav-about-btn:hover,.nav-about-btn.active{color:var(--fg)}
+
+@media(max-width:767px){
+  .nav-left{grid-column:1;grid-row:1}
+  .nav-center{grid-column:2;grid-row:1;justify-content:flex-end}
+  .nav-right{grid-column:1/-1;grid-row:2;justify-content:space-between}
+}
+
+/* ── MAIN STAGE ──────────────────────────────────────────── */
+#stage{
+  position:fixed;
+  top:var(--h-header);left:0;right:0;
+  bottom:0;
+  overflow-y:auto;
   overflow-x:hidden;
+  cursor:grab;
+  -ms-overflow-style:none;scrollbar-width:none;
 }
-a{color:inherit;text-decoration:none;}
-img{display:block;width:100%;height:auto;}
+#stage:active{cursor:grabbing}
+#stage::-webkit-scrollbar{display:none}
+@media(max-width:767px){
+  #stage{position:static;margin-top:var(--h-header);height:unset;overflow:unset;cursor:default}
+}
 
-/*──────────────────────────────────
-  NAV
-──────────────────────────────────*/
-.site-nav{
-  position:fixed;top:0;left:0;right:0;z-index:300;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 24px;height:44px;
-  background:rgba(10,10,10,0.95);
-  border-bottom:1px solid #1c1c1c;
+/* ── GRID ────────────────────────────────────────────────── */
+#grid{
+  display:grid;
+  grid-template-columns:repeat(var(--cols),1fr);
+  grid-auto-rows:25vw;
+  gap:var(--gap);
+  width:100%;
+  padding-bottom:calc(var(--h-header)*2);
 }
-.nav-logo{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:13px;font-weight:700;letter-spacing:0.12em;
-  text-transform:uppercase;color:#e8e8e4;
+@media(max-width:767px){
+  #grid{grid-auto-rows:45vw}
 }
-.nav-right{display:flex;align-items:center;gap:6px;}
-.nav-right a{
-  font-size:11px;font-weight:400;color:#666;
-  padding:5px 12px;letter-spacing:0.06em;
-  transition:color .15s;
-}
-.nav-right a:hover{color:#e8e8e4;}
-.nav-right a.pill{
-  border:1px solid #2a2a2a;border-radius:100px;
-  color:#aaa;transition:border-color .2s,color .2s;
-}
-.nav-right a.pill:hover{border-color:#e8e8e4;color:#e8e8e4;}
 
-/*──────────────────────────────────
-  HERO — giant stacked text
-──────────────────────────────────*/
-.hero{
-  min-height:100vh;
-  display:flex;flex-direction:column;
-  justify-content:flex-end;
-  padding:0 24px 48px;
-  padding-top:44px;
+/* ── CELL ────────────────────────────────────────────────── */
+.cell{
   position:relative;
   overflow:hidden;
-  border-bottom:1px solid #1c1c1c;
+  background:var(--bg);
 }
-/* subtle grid background */
-.hero::before{
-  content:'';position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size:80px 80px;
+.cell-num{
+  position:absolute;bottom:var(--pad);left:var(--pad);
+  font-size:10px;color:var(--fg);z-index:2;
   pointer-events:none;
 }
-.hero-meta{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:48px;position:relative;z-index:1;
+.cell-off{
+  position:absolute;bottom:var(--pad);left:var(--pad);
+  font-size:10px;color:var(--sub);z-index:2;
+  pointer-events:none;display:flex;align-items:center;gap:4px;
 }
-.hero-meta-left{
-  font-size:10px;font-weight:500;letter-spacing:0.14em;
-  text-transform:uppercase;color:#444;
+.cell-off svg{width:12px;height:12px;flex-shrink:0}
+.cell img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+  opacity:0;
+  transition:opacity .456s ease-in;
 }
-.hero-meta-right{
-  font-size:10px;color:#444;letter-spacing:0.06em;
+.cell img.loaded{opacity:1}
+.cell[data-has-img]:hover img{opacity:.88}
+.cell-view{
+  position:absolute;bottom:var(--pad);left:var(--pad);
+  font-size:10px;color:var(--fg);z-index:3;
+  background:var(--bg);padding:2px 6px;
+  opacity:0;transition:opacity .234s;
+  pointer-events:none;
+  display:flex;align-items:center;gap:4px;
 }
-.hero-title{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:clamp(60px,11vw,168px);
-  font-weight:800;
-  letter-spacing:-4px;
-  line-height:0.88;
-  color:#e8e8e4;
-  position:relative;z-index:1;
-}
-.hero-title .line{display:block;overflow:hidden;}
-.hero-title .line span{
-  display:inline-block;
-  animation:slide-up .9s cubic-bezier(0.16,1,0.3,1) both;
-}
-.hero-title .line:nth-child(2) span{animation-delay:.08s;}
-.hero-title .line:nth-child(3) span{animation-delay:.16s;}
-@keyframes slide-up{
-  from{transform:translateY(105%);}
-  to{transform:translateY(0);}
-}
-.hero-bottom{
-  display:flex;align-items:flex-end;justify-content:space-between;
-  margin-top:52px;position:relative;z-index:1;
-}
-.hero-desc{
-  font-size:13px;font-weight:300;color:#777;
-  max-width:300px;line-height:1.75;
-}
-.hero-cta{
-  display:inline-flex;align-items:center;gap:10px;
-  border:1px solid #333;border-radius:100px;
-  padding:12px 24px;
-  font-size:12px;font-weight:500;letter-spacing:0.04em;
-  color:#e8e8e4;
-  transition:background .2s,border-color .2s;
-}
-.hero-cta:hover{background:#1a1a1a;border-color:#555;}
-.hero-cta .arr{
-  width:22px;height:22px;border-radius:50%;
-  background:#333;display:flex;align-items:center;justify-content:center;
-  font-size:11px;transition:background .2s;
-}
-.hero-cta:hover .arr{background:#555;}
+.cell[data-has-img]:hover .cell-view{opacity:1}
+.cell[data-has-img]:hover .cell-num{opacity:0}
+.cell[data-has-img]{cursor:pointer}
 
-/*──────────────────────────────────
-  INDEX COUNTER ROW
-──────────────────────────────────*/
-.index-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 24px;
-  border-bottom:1px solid #1c1c1c;
-}
-.index-row-label{
-  font-size:10px;font-weight:500;letter-spacing:0.14em;
-  text-transform:uppercase;color:#444;
-}
-.index-row-count{
-  font-size:10px;color:#444;letter-spacing:0.06em;
-}
+/* Spanning cells */
+.span-2c{grid-column:span 2}
+.span-2r{grid-row:span 2}
+.span-2c.span-2r{grid-column:span 2;grid-row:span 2}
 
-/*──────────────────────────────────
-  WORK GRID — dark image tiles
-──────────────────────────────────*/
-.work-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:1px;
-  background:#1c1c1c;
-  border-bottom:1px solid #1c1c1c;
+/* ── ABOUT DRAWER ────────────────────────────────────────── */
+#about-drawer{
+  position:fixed;
+  top:var(--h-header);right:0;
+  width:min(400px,100vw);
+  bottom:0;
+  background:var(--bg);
+  z-index:900;
+  transform:translateX(100%);
+  transition:transform .45s cubic-bezier(.32,.72,0,1);
+  overflow-y:auto;
+  padding:calc(var(--pad)*3) calc(var(--pad)*2);
+  border-left:1px solid rgba(0,0,0,.08);
+  display:flex;flex-direction:column;gap:calc(var(--pad)*3);
+  -ms-overflow-style:none;scrollbar-width:none;
 }
-.work-tile{
-  position:relative;
-  background:#0f0f0f;
-  overflow:hidden;
-  cursor:pointer;
-  aspect-ratio:4/3;
-}
-.work-tile.wide{grid-column:span 2;aspect-ratio:16/6;}
-.work-tile img{
-  width:100%;height:100%;object-fit:cover;
-  transition:transform .8s cubic-bezier(0.16,1,0.3,1),opacity .4s;
-  opacity:.7;filter:grayscale(15%);
-}
-.work-tile:hover img{transform:scale(1.04);opacity:.9;filter:grayscale(0%);}
-/* bottom info bar */
-.tile-info{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:16px 20px;
-  background:linear-gradient(transparent, rgba(0,0,0,0.72));
-  display:flex;align-items:flex-end;justify-content:space-between;
-  transform:translateY(4px);opacity:0;
-  transition:opacity .3s,transform .3s;
-}
-.work-tile:hover .tile-info{opacity:1;transform:translateY(0);}
-.tile-name{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:15px;font-weight:600;color:#e8e8e4;letter-spacing:-0.2px;
-}
-.tile-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
-.tile-tag{
-  font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
-  color:rgba(255,255,255,0.5);
-  border:1px solid rgba(255,255,255,0.15);
-  padding:3px 9px;border-radius:100px;
-}
-/* always-visible tile number top-right */
-.tile-num{
-  position:absolute;top:14px;right:16px;
-  font-size:10px;color:rgba(255,255,255,0.25);
-  letter-spacing:0.08em;
-}
+#about-drawer.open{transform:translateX(0)}
+#about-drawer::-webkit-scrollbar{display:none}
+.about-label{font-size:10px;text-transform:uppercase;color:var(--sub);margin-bottom:var(--pad)}
+.about-name{font-size:28px;line-height:30px;font-weight:700;letter-spacing:-.01em;margin-bottom:calc(var(--pad)*2)}
+.about-bio{font-size:11px;line-height:18px;font-weight:400;color:var(--sub);max-width:38ch}
+.about-bio p+p{margin-top:12px}
+.about-links{display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:calc(var(--pad)*3)}
+.about-link{font-size:10px;text-transform:uppercase;color:var(--sub);text-decoration:none;border-bottom:1px solid rgba(0,0,0,.12);padding-bottom:4px;transition:color .2s,border-color .2s}
+.about-link:hover{color:var(--fg);border-color:var(--fg)}
 
-/*──────────────────────────────────
-  STATEMENT — full-width text block
-──────────────────────────────────*/
-.statement{
-  padding:80px 24px;
-  border-bottom:1px solid #1c1c1c;
-  display:grid;
-  grid-template-columns:200px 1fr;
-  gap:40px;
-  align-items:start;
+/* ── CREDITS DRAWER ──────────────────────────────────────── */
+#credits-drawer{
+  position:fixed;
+  top:var(--h-header);left:0;
+  width:min(360px,100vw);
+  bottom:0;
+  background:var(--bg);
+  z-index:900;
+  transform:translateX(-100%);
+  transition:transform .45s cubic-bezier(.32,.72,0,1);
+  overflow-y:auto;
+  padding:calc(var(--pad)*3) calc(var(--pad)*2);
+  border-right:1px solid rgba(0,0,0,.08);
+  -ms-overflow-style:none;scrollbar-width:none;
 }
-.statement-label{
-  font-size:10px;font-weight:500;letter-spacing:0.14em;
-  text-transform:uppercase;color:#444;
-  padding-top:8px;
-}
-.statement-text{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:clamp(22px,3.2vw,42px);
-  font-weight:400;
-  letter-spacing:-1px;
-  line-height:1.25;
-  color:#e8e8e4;
-}
-.statement-text em{font-style:italic;color:#666;}
+#credits-drawer.open{transform:translateX(0)}
+#credits-drawer::-webkit-scrollbar{display:none}
+.credits-title{font-size:10px;text-transform:uppercase;color:var(--sub);margin-bottom:calc(var(--pad)*2)}
+.credits-list{display:grid;grid-template-columns:auto 1fr;gap:4px calc(var(--pad)*3)}
+.credits-list dt{font-size:10px;color:var(--sub);text-transform:uppercase;white-space:nowrap}
+.credits-list dd{font-size:10px;color:var(--fg);font-weight:400}
 
-/*──────────────────────────────────
-  SERVICES TABLE
-──────────────────────────────────*/
-.services-section{border-bottom:1px solid #1c1c1c;}
-.services-head{
-  display:grid;
-  grid-template-columns:200px 1fr auto;
-  padding:14px 24px;
-  border-bottom:1px solid #1c1c1c;
+/* ── LIGHTBOX ────────────────────────────────────────────── */
+#lightbox{
+  position:fixed;inset:0;
+  z-index:2000;
+  background:#000;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+  display:flex;align-items:center;justify-content:center;
 }
-.services-head span{
-  font-size:10px;font-weight:500;letter-spacing:0.14em;
-  text-transform:uppercase;color:#444;
+#lightbox.open{opacity:1;pointer-events:all}
+#lightbox img{
+  max-width:100%;max-height:100%;
+  object-fit:contain;
+  display:block;
 }
-.svc-row{
-  display:grid;
-  grid-template-columns:200px 1fr auto;
-  align-items:center;
-  padding:0 24px;
-  border-bottom:1px solid #1a1a1a;
-  min-height:54px;
-  cursor:default;
-  transition:background .2s;
+/* lightbox controls bar */
+#lb-bar{
+  position:fixed;bottom:0;left:0;
+  width:min(25vw,380px);
+  background:var(--bg);
+  padding:var(--pad) calc(var(--pad)*1.5);
+  display:flex;align-items:center;gap:calc(var(--pad)*2);
+  z-index:2001;
+  font-size:10px;text-transform:uppercase;
 }
-.svc-row:hover{background:#111;}
-.svc-row:last-child{border-bottom:none;}
-.svc-num{font-size:10px;color:#444;letter-spacing:0.06em;}
-.svc-name{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:clamp(15px,2vw,22px);
-  font-weight:500;letter-spacing:-0.3px;color:#e8e8e4;
+@media(max-width:767px){#lb-bar{width:100vw}}
+.lb-btn{color:var(--fg);cursor:pointer;transition:color .2s;font-size:10px;font-weight:700;font-family:var(--font)}
+.lb-btn:hover{color:var(--sub)}
+#lb-timer{color:var(--sub);font-variant-numeric:tabular-nums;font-size:10px;font-weight:700;font-family:var(--font)}
+#lb-close-btn{
+  position:fixed;bottom:var(--pad);
+  left:calc(min(25vw,380px) - 20px - var(--pad)*1.5);
+  background:var(--bg);
+  z-index:2001;padding:var(--pad) calc(var(--pad)*1.5);
+  font-size:10px;font-weight:700;cursor:pointer;text-transform:uppercase;
+  font-family:var(--font);
+  transition:color .2s;
 }
-.svc-cat{
-  font-size:10px;font-weight:500;letter-spacing:0.1em;
-  text-transform:uppercase;color:#444;
-  text-align:right;
+@media(max-width:767px){#lb-close-btn{left:auto;right:0}}
+#lb-close-btn:hover{color:var(--sub)}
+#lb-prev,#lb-next{
+  position:fixed;top:50%;
+  background:none;border:none;cursor:pointer;
+  padding:calc(var(--pad)*3);z-index:2001;
+  color:rgba(255,255,255,.5);font-size:10px;font-weight:700;font-family:var(--font);
+  transform:translateY(-50%);
+  transition:color .2s;text-transform:uppercase;
 }
+#lb-prev{left:0}
+#lb-next{right:0}
+#lb-prev:hover,#lb-next:hover{color:#fff}
 
-/*──────────────────────────────────
-  INFO STRIP — about text
-──────────────────────────────────*/
-.info-strip{
-  display:grid;
-  grid-template-columns:200px 1fr 1fr;
-  gap:0;
-  padding:64px 24px;
-  border-bottom:1px solid #1c1c1c;
-  align-items:start;
-  gap:32px;
+/* ── SCROLL INDICATOR ─────────────────────────────────────── */
+#scroll-ind{
+  position:fixed;inset:0;
+  pointer-events:none;z-index:500;
+  background:linear-gradient(270deg,transparent,rgba(255,255,255,.6),rgba(0,0,0,.04),transparent);
+  opacity:1;
+  animation:scrollFade 2.5s ease-out 1s forwards;
 }
-.info-label{
-  font-size:10px;font-weight:500;letter-spacing:0.14em;
-  text-transform:uppercase;color:#444;
-  padding-top:4px;
-}
-.info-body p{
-  font-size:13px;font-weight:300;color:#888;
-  line-height:1.8;margin-bottom:12px;
-}
-.info-body p strong{color:#e8e8e4;font-weight:500;}
-.info-body a{
-  font-size:12px;font-weight:500;color:#e8e8e4;
-  border-bottom:1px solid #333;padding-bottom:1px;
-  transition:border-color .2s;
-}
-.info-body a:hover{border-color:#e8e8e4;}
+@keyframes scrollFade{to{opacity:0}}
 
-/*──────────────────────────────────
-  CONTACT BLOCK
-──────────────────────────────────*/
-.contact-block{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  min-height:50vh;
-  border-bottom:1px solid #1c1c1c;
+/* ── BACKDROP ────────────────────────────────────────────── */
+#backdrop{
+  position:fixed;inset:0;z-index:800;
+  background:#000;opacity:0;pointer-events:none;
+  transition:opacity .45s;
 }
-.contact-left{
-  padding:64px 24px;
-  border-right:1px solid #1c1c1c;
-  display:flex;flex-direction:column;justify-content:space-between;
-}
-.contact-left h2{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:clamp(36px,6vw,88px);
-  font-weight:800;letter-spacing:-3px;line-height:0.9;
-  color:#e8e8e4;
-}
-.contact-left h2 em{
-  font-style:italic;font-weight:400;
-  color:#444;display:block;
-}
-.contact-cta{
-  display:inline-flex;align-items:center;gap:12px;
-  width:fit-content;
-  border:1px solid #2a2a2a;border-radius:100px;
-  padding:14px 28px;
-  font-size:13px;font-weight:500;color:#e8e8e4;
-  transition:background .2s,border-color .2s;
-  margin-top:40px;
-}
-.contact-cta:hover{background:#161616;border-color:#555;}
-.contact-right{
-  padding:64px 24px;
-  display:flex;flex-direction:column;justify-content:space-between;
-}
-.contact-right h3{
-  font-size:10px;font-weight:500;letter-spacing:0.14em;
-  text-transform:uppercase;color:#444;
-  margin-bottom:28px;
-}
-.contact-links{display:flex;flex-direction:column;gap:4px;}
-.contact-links a{
-  font-family:'Syne',system-ui,sans-serif;
-  font-size:clamp(18px,2.4vw,32px);
-  font-weight:400;letter-spacing:-0.5px;
-  color:#444;transition:color .2s;
-  padding:4px 0;
-  border-bottom:1px solid #1a1a1a;
-}
-.contact-links a:hover{color:#e8e8e4;}
-.contact-links a:last-child{border-bottom:none;}
-
-/*──────────────────────────────────
-  FOOTER
-──────────────────────────────────*/
-.site-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:16px 24px;
-  border-top:1px solid #1c1c1c;
-}
-.footer-left p{font-size:10px;color:#444;letter-spacing:0.04em;}
-.footer-left a{color:#444;transition:color .2s;}
-.footer-left a:hover{color:#e8e8e4;}
-.footer-right{display:flex;gap:20px;}
-.footer-right a{font-size:10px;color:#444;letter-spacing:0.04em;transition:color .2s;}
-.footer-right a:hover{color:#e8e8e4;}
-
-/*──────────────────────────────────
-  MOBILE
-──────────────────────────────────*/
-@media(max-width:768px){
-  .site-nav{padding:0 16px;}
-  .hero{padding:0 16px 36px;padding-top:44px;}
-  .hero-title{letter-spacing:-2px;}
-  .work-grid{grid-template-columns:1fr;}
-  .work-tile.wide{grid-column:span 1;aspect-ratio:4/3;}
-  .statement{grid-template-columns:1fr;gap:16px;padding:48px 16px;}
-  .services-head,.svc-row{grid-template-columns:1fr auto;padding:0 16px;}
-  .svc-num{display:none;}
-  .info-strip{grid-template-columns:1fr;gap:20px;padding:48px 16px;}
-  .contact-block{grid-template-columns:1fr;}
-  .contact-left{padding:48px 16px;border-right:none;border-bottom:1px solid #1c1c1c;}
-  .contact-right{padding:40px 16px;}
-  .site-footer{flex-direction:column;gap:10px;padding:16px;text-align:center;}
-  .footer-right{flex-wrap:wrap;justify-content:center;}
-  .index-row,.hero-meta{padding:12px 16px;}
-}
+#backdrop.show{opacity:.15;pointer-events:all}
 </style>
 </head>
 <body>
 
-<!-- ═══ NAV ═══ -->
-<nav class="site-nav">
-  <span class="nav-logo">Your Brand™</span>
-  <div class="nav-right">
-    <a href="#work">Work</a>
-    <a href="#services">Services</a>
-    <a href="#about">About</a>
-    <a href="#contact" class="pill">Contact ↗</a>
-  </div>
-</nav>
+<!-- HEADER -->
+<header id="header">
+  <div id="strip"></div>
+  <nav id="navbar">
+    <div class="nav-left">
+      <span class="nav-project-name" id="nav-project">— —</span>
+      <span class="nav-timer" id="nav-timer">00:00:00</span>
+      <button class="nav-credits-btn" id="credits-btn">Credits</button>
+    </div>
+    <div class="nav-center">
+      <button class="nav-filter active" data-filter="all">All</button>
+      <button class="nav-filter" data-filter="editorial">Editorial</button>
+      <button class="nav-filter" data-filter="commercial">Commercial</button>
+      <button class="nav-filter" data-filter="portrait">Portrait</button>
+    </div>
+    <div class="nav-right">
+      <span class="nav-name">ALEX MERCER</span>
+      <button class="nav-about-btn" id="about-btn">About</button>
+    </div>
+  </nav>
+</header>
 
-<!-- ═══ HERO ═══ -->
-<section class="hero">
-  <div class="hero-meta">
-    <span class="hero-meta-left">Est. 2020 &nbsp;/&nbsp; Your City</span>
-    <span class="hero-meta-right">Creative Studio — Brand &amp; Digital</span>
-  </div>
-
-  <h1 class="hero-title">
-    <span class="line"><span>Bold</span></span>
-    <span class="line"><span>Ideas.</span></span>
-    <span class="line"><span>Built.</span></span>
-  </h1>
-
-  <div class="hero-bottom">
-    <p class="hero-desc">
-      We build brands and digital experiences for businesses ready to be seen, remembered, and chosen.
-    </p>
-    <a class="hero-cta" href="https://wa.me/18683424101?text=Hi%2C+I%27m+interested+in+working+together" target="_blank">
-      Start a project
-      <span class="arr">↗</span>
-    </a>
-  </div>
-</section>
-
-<!-- ═══ INDEX ROW ═══ -->
-<div class="index-row">
-  <span class="index-row-label">Selected Work</span>
-  <span class="index-row-count">05 Projects</span>
+<!-- MAIN STAGE -->
+<div id="stage">
+  <div id="grid"></div>
 </div>
 
-<!-- ═══ WORK GRID ═══ -->
-<section class="work-grid" id="work">
+<!-- SCROLL HINT -->
+<div id="scroll-ind"></div>
 
-  <div class="work-tile wide">
-    <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=85&auto=format&fit=crop" alt="Project 01" loading="eager"/>
-    <span class="tile-num">01</span>
-    <div class="tile-info">
-      <span class="tile-name">Brand Identity</span>
-      <div class="tile-tags"><span class="tile-tag">Strategy</span><span class="tile-tag">Identity</span></div>
+<!-- ABOUT DRAWER -->
+<div id="about-drawer">
+  <div>
+    <p class="about-label">Visual Director</p>
+    <h1 class="about-name">Alex<br>Mercer.</h1>
+    <div class="about-bio">
+      <p>Visual director and photographer working across editorial, commercial, and portraiture. Based in New York.</p>
+      <p>Clients include independent labels, cultural institutions, and fashion brands seeking image work that resists the obvious.</p>
+      <p>Available for commissions, creative direction, and long-form collaborations.</p>
     </div>
   </div>
-
-  <div class="work-tile">
-    <img src="https://images.unsplash.com/photo-1503174971373-b1f69850bded?w=900&q=85&auto=format&fit=crop" alt="Project 02" loading="lazy"/>
-    <span class="tile-num">02</span>
-    <div class="tile-info">
-      <span class="tile-name">Web Design</span>
-      <div class="tile-tags"><span class="tile-tag">Digital</span><span class="tile-tag">UX</span></div>
-    </div>
+  <div class="about-links">
+    <a href="#" class="about-link">Instagram</a>
+    <a href="#" class="about-link">Behance</a>
+    <a href="#" class="about-link">LinkedIn</a>
   </div>
+</div>
 
-  <div class="work-tile">
-    <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=900&q=85&auto=format&fit=crop" alt="Project 03" loading="lazy"/>
-    <span class="tile-num">03</span>
-    <div class="tile-info">
-      <span class="tile-name">Campaign</span>
-      <div class="tile-tags"><span class="tile-tag">Content</span><span class="tile-tag">Social</span></div>
-    </div>
-  </div>
+<!-- CREDITS DRAWER -->
+<div id="credits-drawer">
+  <p class="credits-title" id="credits-title">— Credits</p>
+  <dl class="credits-list" id="credits-list"></dl>
+</div>
 
-  <div class="work-tile">
-    <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=900&q=85&auto=format&fit=crop" alt="Project 04" loading="lazy"/>
-    <span class="tile-num">04</span>
-    <div class="tile-info">
-      <span class="tile-name">Visual Direction</span>
-      <div class="tile-tags"><span class="tile-tag">Art Direction</span></div>
-    </div>
-  </div>
+<!-- BACKDROP -->
+<div id="backdrop" id="backdrop"></div>
 
-  <div class="work-tile">
-    <img src="https://images.unsplash.com/photo-1604076913837-52ab5629fde9?w=900&q=85&auto=format&fit=crop" alt="Project 05" loading="lazy"/>
-    <span class="tile-num">05</span>
-    <div class="tile-info">
-      <span class="tile-name">Product Launch</span>
-      <div class="tile-tags"><span class="tile-tag">Brand</span><span class="tile-tag">Web</span></div>
-    </div>
-  </div>
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <img id="lb-img" src="" alt="">
+  <button id="lb-prev">‹ Prev</button>
+  <button id="lb-next">Next ›</button>
+</div>
+<div id="lb-bar">
+  <button class="lb-btn" id="lb-pause">Pause</button>
+  <span id="lb-timer">00:00:00</span>
+  <button class="lb-btn" id="lb-sound">Sound Off</button>
+</div>
+<button id="lb-close-btn">Close</button>
 
-</section>
+<script>
+(function(){
+'use strict';
 
-<!-- ═══ STATEMENT ═══ -->
-<section class="statement">
-  <span class="statement-label">Our Approach</span>
-  <p class="statement-text">
-    We don't make pretty things for the sake of it.
-    Every decision — visual, verbal, structural — <em>serves a purpose.</em>
-    We build brands that earn attention and hold it.
-  </p>
-</section>
+/* ── DATA ──────────────────────────────────────────────────── */
+const PROJECTS = [
+  {
+    id:'p1', title:'Nocturne — Series I', filter:'editorial',
+    credits:{'Direction':'Alex Mercer','Styling':'Camille Voss','Production':'Studio Nadir','Location':'Warehouse 7, Brooklyn'},
+    items:[
+      {id:'1.1',img:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=85&auto=format',span:''},
+      {id:'1.2',img:'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=900&q=85&auto=format',span:'span-2c'},
+      {id:'1.3',img:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&q=85&auto=format',span:'span-2r'},
+      {id:'1.4',img:'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=900&q=85&auto=format',span:''},
+      {id:'1.5',img:'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=900&q=85&auto=format',span:''},
+      {id:'1.6',img:null,span:''},
+      {id:'1.7',img:null,span:''},
+      {id:'1.8',img:'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=900&q=85&auto=format',span:'span-2c'},
+    ]
+  },
+  {
+    id:'p2', title:'Contour — Campaign', filter:'commercial',
+    credits:{'Direction':'Alex Mercer','Client':'Maison Veldt','Retouch':'O. Sato','Year':'2025'},
+    items:[
+      {id:'2.1',img:'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=900&q=85&auto=format',span:'span-2c span-2r'},
+      {id:'2.2',img:'https://images.unsplash.com/photo-1617019114583-affb34d1b3cd?w=900&q=85&auto=format',span:''},
+      {id:'2.3',img:'https://images.unsplash.com/photo-1541823709867-1b206113eafd?w=900&q=85&auto=format',span:''},
+      {id:'2.4',img:null,span:''},
+      {id:'2.5',img:'https://images.unsplash.com/photo-1500048993953-d23a436266cf?w=900&q=85&auto=format',span:''},
+      {id:'2.6',img:'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=900&q=85&auto=format',span:'span-2c'},
+      {id:'2.7',img:null,span:''},
+    ]
+  },
+  {
+    id:'p3', title:'Threshold', filter:'portrait',
+    credits:{'Direction':'Alex Mercer','Subject':'Various','Format':'Medium format film','Year':'2024'},
+    items:[
+      {id:'3.1',img:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=85&auto=format',span:''},
+      {id:'3.2',img:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=900&q=85&auto=format',span:'span-2r'},
+      {id:'3.3',img:'https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=900&q=85&auto=format',span:''},
+      {id:'3.4',img:null,span:''},
+      {id:'3.5',img:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=900&q=85&auto=format',span:''},
+      {id:'3.6',img:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=85&auto=format',span:'span-2c'},
+      {id:'3.7',img:null,span:''},
+      {id:'3.8',img:null,span:''},
+    ]
+  },
+  {
+    id:'p4', title:'Latitude — Editorial', filter:'editorial',
+    credits:{'Direction':'Alex Mercer','Magazine':'Aperture Quarterly','Styling':'L. Fontaine','Year':'2025'},
+    items:[
+      {id:'4.1',img:'https://images.unsplash.com/photo-1496440737103-cd596325d314?w=900&q=85&auto=format',span:'span-2c'},
+      {id:'4.2',img:null,span:''},
+      {id:'4.3',img:null,span:''},
+      {id:'4.4',img:'https://images.unsplash.com/photo-1581382575275-97901c2635b7?w=900&q=85&auto=format',span:'span-2r'},
+      {id:'4.5',img:'https://images.unsplash.com/photo-1581382575275-97901c2635b7?w=900&q=85&auto=format',span:''},
+      {id:'4.6',img:'https://images.unsplash.com/photo-1499996860823-5214fcc65f8f?w=900&q=85&auto=format',span:'span-2c'},
+      {id:'4.7',img:null,span:''},
+    ]
+  }
+];
 
-<!-- ═══ SERVICES ═══ -->
-<section class="services-section" id="services">
-  <div class="services-head">
-    <span>No.</span>
-    <span>Service</span>
-    <span>Category</span>
-  </div>
-  <div class="svc-row"><span class="svc-num">01</span><span class="svc-name">Brand Strategy</span><span class="svc-cat">Foundation</span></div>
-  <div class="svc-row"><span class="svc-num">02</span><span class="svc-name">Visual Identity</span><span class="svc-cat">Design</span></div>
-  <div class="svc-row"><span class="svc-num">03</span><span class="svc-name">Web Design</span><span class="svc-cat">Digital</span></div>
-  <div class="svc-row"><span class="svc-num">04</span><span class="svc-name">Copywriting</span><span class="svc-cat">Content</span></div>
-  <div class="svc-row"><span class="svc-num">05</span><span class="svc-name">AI Chatbot Setup</span><span class="svc-cat">Automation</span></div>
-  <div class="svc-row"><span class="svc-num">06</span><span class="svc-name">Social Media</span><span class="svc-cat">Growth</span></div>
-  <div class="svc-row"><span class="svc-num">07</span><span class="svc-name">Photography Direction</span><span class="svc-cat">Visual</span></div>
-  <div class="svc-row"><span class="svc-num">08</span><span class="svc-name">Online Store</span><span class="svc-cat">eCommerce</span></div>
-</section>
+/* ── STATE ──────────────────────────────────────────────── */
+let currentFilter = 'all';
+let currentProject = PROJECTS[0];
+let lbItems = [];
+let lbIndex = 0;
+let lbTimerStart = null;
+let lbTimerInterval = null;
+let navTimerInterval = null;
+let navTimerStart = Date.now();
+let drawerOpen = null; // 'about' | 'credits' | null
 
-<!-- ═══ ABOUT ═══ -->
-<section class="info-strip" id="about">
-  <span class="info-label">About</span>
-  <div class="info-body">
-    <p>
-      <strong>Your Brand</strong> is a compact creative studio working with ambitious businesses across every industry. We specialise in brand identity, digital experience, and visual communication.
-    </p>
-    <p>
-      Our work is built to last — not to trend. We take on a limited number of projects at a time so every client gets our full attention.
-    </p>
-    <a href="https://wa.me/18683424101?text=Hi%2C+I%27d+like+to+know+more+about+your+services" target="_blank">Work with us →</a>
-  </div>
-  <div class="info-body">
-    <p>Live in 24 hours. Custom branded. No hidden fees.</p>
-    <p>Every template includes logo swap, colour match, content upload, SSL, and mobile optimisation. Copywriting, AI chatbot, and online store available as add-ons.</p>
-  </div>
-</section>
+/* ── ELEMENTS ───────────────────────────────────────────── */
+const grid         = document.getElementById('grid');
+const strip        = document.getElementById('strip');
+const navProject   = document.getElementById('nav-project');
+const navTimer     = document.getElementById('nav-timer');
+const creditsBtnEl = document.getElementById('credits-btn');
+const aboutBtnEl   = document.getElementById('about-btn');
+const aboutDrawer  = document.getElementById('about-drawer');
+const creditsDrawer= document.getElementById('credits-drawer');
+const creditsTitle = document.getElementById('credits-title');
+const creditsList  = document.getElementById('credits-list');
+const backdrop     = document.getElementById('backdrop');
+const lightbox     = document.getElementById('lightbox');
+const lbImg        = document.getElementById('lb-img');
+const lbBar        = document.getElementById('lb-bar');
+const lbCloseBtn   = document.getElementById('lb-close-btn');
+const lbPause      = document.getElementById('lb-pause');
+const lbSound      = document.getElementById('lb-sound');
+const lbTimerEl    = document.getElementById('lb-timer');
+const lbPrevBtn    = document.getElementById('lb-prev');
+const lbNextBtn    = document.getElementById('lb-next');
+const filters      = document.querySelectorAll('.nav-filter');
 
-<!-- ═══ CONTACT ═══ -->
-<section class="contact-block" id="contact">
-  <div class="contact-left">
-    <h2>
-      Let's build
-      <em>something.</em>
-    </h2>
-    <a class="contact-cta" href="https://wa.me/18683424101?text=Hi%2C+I%27m+ready+to+start+a+project" target="_blank">
-      Start a project ↗
-    </a>
-  </div>
-  <div class="contact-right">
-    <h3>Find us</h3>
-    <div class="contact-links">
-      <a href="https://www.instagram.com/priscadezigns" target="_blank">Instagram</a>
-      <a href="https://www.facebook.com/priscadezigns" target="_blank">Facebook</a>
-      <a href="https://wa.me/18683424101" target="_blank">WhatsApp</a>
-      <a href="https://priscadezigns.org/templates/" target="_blank">Browse Templates</a>
-    </div>
-  </div>
-</section>
+/* ── UTILS ──────────────────────────────────────────────── */
+function fmtTime(ms){
+  const t = Math.floor(ms/1000);
+  const h = String(Math.floor(t/3600)).padStart(2,'0');
+  const m = String(Math.floor((t%3600)/60)).padStart(2,'0');
+  const s = String(t%60).padStart(2,'0');
+  return h+':'+m+':'+s;
+}
 
-<!-- ═══ FOOTER ═══ -->
-<footer class="site-footer">
-  <div class="footer-left">
-    <p>© 2025 Your Brand. Built by <a href="https://priscadezigns.org" target="_blank">Prisca Dezigns</a>.</p>
-  </div>
-  <div class="footer-right">
-    <a href="#">Privacy</a>
-    <a href="#">Terms</a>
-    <a href="https://wa.me/18683424101?text=Hi%2C+I%27d+like+a+Noir+website" target="_blank">Get This Template</a>
-  </div>
-</footer>
+/* ── NAV TIMER ──────────────────────────────────────────── */
+function startNavTimer(){
+  clearInterval(navTimerInterval);
+  navTimerStart = Date.now();
+  navTimerInterval = setInterval(()=>{
+    navTimer.textContent = fmtTime(Date.now()-navTimerStart);
+  },1000);
+}
 
+/* ── BUILD STRIP ────────────────────────────────────────── */
+function buildStrip(project){
+  strip.innerHTML='';
+  project.items.filter(i=>i.img).forEach((item,idx)=>{
+    const t=document.createElement('div');
+    t.className='strip-thumb';
+    t.dataset.idx=idx;
+    const img=document.createElement('img');
+    img.src=item.img.replace('w=900','w=200');
+    img.loading='lazy'; img.alt='';
+    t.appendChild(img);
+    t.addEventListener('click',()=>openLightbox(project,idx));
+    strip.appendChild(t);
+  });
+}
+
+/* ── BUILD GRID ─────────────────────────────────────────── */
+function buildGrid(filter){
+  grid.innerHTML='';
+  const visible = filter==='all'
+    ? PROJECTS
+    : PROJECTS.filter(p=>p.filter===filter);
+
+  visible.forEach(project=>{
+    project.items.forEach(item=>{
+      const cell=document.createElement('div');
+      cell.className='cell'+(item.span?' '+item.span:'');
+      if(item.img){
+        cell.dataset.hasImg='1';
+        cell.dataset.projectId=project.id;
+        cell.dataset.itemId=item.id;
+        const img=document.createElement('img');
+        img.src=item.img;
+        img.loading='lazy'; img.alt=item.id;
+        img.addEventListener('load',()=>img.classList.add('loaded'));
+        // fire if cached
+        if(img.complete) img.classList.add('loaded');
+        cell.appendChild(img);
+
+        const num=document.createElement('span');
+        num.className='cell-num'; num.textContent=item.id;
+        cell.appendChild(num);
+
+        const view=document.createElement('span');
+        view.className='cell-view';
+        view.innerHTML='<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> View';
+        cell.appendChild(view);
+
+        cell.addEventListener('click',()=>{
+          setActiveProject(project);
+          const imgItems=project.items.filter(i=>i.img);
+          const idx=imgItems.findIndex(i=>i.id===item.id);
+          openLightbox(project,idx>=0?idx:0);
+        });
+      } else {
+        const off=document.createElement('span');
+        off.className='cell-off';
+        off.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Off';
+        cell.appendChild(off);
+      }
+      grid.appendChild(cell);
+    });
+  });
+}
+
+/* ── SET ACTIVE PROJECT ─────────────────────────────────── */
+function setActiveProject(project){
+  currentProject=project;
+  navProject.textContent=project.title;
+  buildStrip(project);
+  strip.classList.add('open');
+  startNavTimer();
+  // update credits
+  creditsTitle.textContent=project.title+' — Credits';
+  creditsList.innerHTML='';
+  Object.entries(project.credits).forEach(([k,v])=>{
+    const dt=document.createElement('dt'); dt.textContent=k;
+    const dd=document.createElement('dd'); dd.textContent=v;
+    creditsList.appendChild(dt);
+    creditsList.appendChild(dd);
+  });
+}
+
+/* ── LIGHTBOX ────────────────────────────────────────────── */
+function openLightbox(project, imgIdx){
+  lbItems=project.items.filter(i=>i.img);
+  lbIndex=Math.max(0,Math.min(imgIdx,lbItems.length-1));
+  showLbImage(lbIndex);
+  lightbox.classList.add('open');
+  // update strip active
+  document.querySelectorAll('.strip-thumb').forEach((t,i)=>t.classList.toggle('active',i===lbIndex));
+  // timer
+  clearInterval(lbTimerInterval);
+  lbTimerStart=Date.now();
+  lbTimerInterval=setInterval(()=>{
+    lbTimerEl.textContent=fmtTime(Date.now()-lbTimerStart);
+  },1000);
+}
+
+function showLbImage(idx){
+  lbIndex=idx;
+  lbImg.src=lbItems[idx].img;
+  document.querySelectorAll('.strip-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
+}
+
+function closeLightbox(){
+  lightbox.classList.remove('open');
+  clearInterval(lbTimerInterval);
+  lbTimerEl.textContent='00:00:00';
+}
+
+lbCloseBtn.addEventListener('click', closeLightbox);
+lbPrevBtn.addEventListener('click',()=>{ if(lbIndex>0) showLbImage(lbIndex-1); });
+lbNextBtn.addEventListener('click',()=>{ if(lbIndex<lbItems.length-1) showLbImage(lbIndex+1); });
+lbPause.addEventListener('click',()=>{ lbPause.textContent=lbPause.textContent==='Pause'?'Play':'Pause'; });
+lbSound.addEventListener('click',()=>{ lbSound.textContent=lbSound.textContent==='Sound Off'?'Sound On':'Sound Off'; });
+
+// keyboard
+document.addEventListener('keydown',e=>{
+  if(!lightbox.classList.contains('open')) return;
+  if(e.key==='Escape') closeLightbox();
+  if(e.key==='ArrowLeft' && lbIndex>0) showLbImage(lbIndex-1);
+  if(e.key==='ArrowRight' && lbIndex<lbItems.length-1) showLbImage(lbIndex+1);
+});
+
+// swipe on lightbox
+let lbTouchX=0;
+lightbox.addEventListener('touchstart',e=>{lbTouchX=e.touches[0].clientX;},{passive:true});
+lightbox.addEventListener('touchend',e=>{
+  const dx=lbTouchX-e.changedTouches[0].clientX;
+  if(Math.abs(dx)>40){
+    if(dx>0 && lbIndex<lbItems.length-1) showLbImage(lbIndex+1);
+    else if(dx<0 && lbIndex>0) showLbImage(lbIndex-1);
+  }
+});
+
+/* ── DRAWERS ─────────────────────────────────────────────── */
+function openDrawer(which){
+  if(drawerOpen===which){ closeDrawers(); return; }
+  closeDrawers(false);
+  drawerOpen=which;
+  backdrop.classList.add('show');
+  if(which==='about'){
+    aboutDrawer.classList.add('open');
+    aboutBtnEl.classList.add('active');
+  } else {
+    creditsDrawer.classList.add('open');
+    creditsBtnEl.classList.add('active');
+  }
+}
+function closeDrawers(clearState=true){
+  aboutDrawer.classList.remove('open');
+  creditsDrawer.classList.remove('open');
+  backdrop.classList.remove('show');
+  aboutBtnEl.classList.remove('active');
+  creditsBtnEl.classList.remove('active');
+  if(clearState) drawerOpen=null;
+}
+
+aboutBtnEl.addEventListener('click',()=>openDrawer('about'));
+creditsBtnEl.addEventListener('click',()=>{
+  if(!currentProject.credits || Object.keys(currentProject.credits).length===0) return;
+  openDrawer('credits');
+});
+backdrop.addEventListener('click',closeDrawers);
+
+/* ── FILTERS ─────────────────────────────────────────────── */
+filters.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    filters.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter=btn.dataset.filter;
+    buildGrid(currentFilter);
+    closeDrawers();
+    strip.classList.remove('open');
+    navProject.textContent='— —';
+    clearInterval(navTimerInterval);
+    navTimer.textContent='00:00:00';
+  });
+});
+
+/* ── HOVER STRIP EXPAND ──────────────────────────────────── */
+// strip expands when a project is active, hover keeps it
+strip.addEventListener('mouseenter',()=>{ if(currentProject) strip.classList.add('open'); });
+
+/* ── INIT ────────────────────────────────────────────────── */
+buildGrid('all');
+// pre-warm credits for first project
+setActiveProject(PROJECTS[0]);
+strip.classList.remove('open'); // starts collapsed
+navProject.textContent='— —';
+clearInterval(navTimerInterval);
+navTimer.textContent='00:00:00';
+
+})();
+</script>
 </body>
 </html>
