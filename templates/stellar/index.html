@@ -234,6 +234,26 @@ footer { padding: clamp(24px,4vw,44px) clamp(24px,5vw,64px); display: flex; alig
   .hero-btns { gap: 20px; }
   .btn-star-hero, .btn-star-violet { width: 148px; height: 148px; font-size: 0.68rem; padding: 34px; }
 }
+
+/* ── Star Burst Keyframes ── */
+@keyframes starFlash {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes starRing {
+  0%   { width: 0;     height: 0;     opacity: 1;   border-width: 4px; }
+  50%  { opacity: 0.8; border-width: 2px; }
+  100% { width: 360px; height: 360px; opacity: 0;   border-width: 1px; }
+}
+@keyframes starRay {
+  0%   { height: 0px;   opacity: 1; }
+  50%  { opacity: 0.9; }
+  100% { height: 120px; opacity: 0; }
+}
+@keyframes starSpark {
+  0%   { transform: translate(-50%,-50%) translate(0,0);                          opacity: 1; }
+  100% { transform: translate(-50%,-50%) translate(var(--tx),var(--ty)); opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -488,6 +508,83 @@ document.addEventListener('DOMContentLoaded', function() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 });
+
+/* ── Star Burst on Click ── */
+(function() {
+  function burst(btn) {
+    var isGold  = btn.classList.contains('btn-star-hero');
+    var coreCol = isGold ? '#F5C842' : '#7B6CFF';
+    var glowRgb = isGold ? '245,200,66' : '123,108,255';
+
+    /* 1 — full-screen flash */
+    var flash = document.createElement('div');
+    flash.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;' +
+      'background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(' + glowRgb + ',0.25) 0%,rgba(' + glowRgb + ',0) 100%);' +
+      'animation:starFlash 0.5s ease-out forwards;';
+    document.body.appendChild(flash);
+    setTimeout(function(){ flash.remove(); }, 550);
+
+    /* centre of clicked button */
+    var rect = btn.getBoundingClientRect();
+    var cx = rect.left + rect.width  / 2;
+    var cy = rect.top  + rect.height / 2;
+
+    /* 2 — ring shockwave */
+    var ring = document.createElement('div');
+    ring.style.cssText = 'position:fixed;border-radius:50%;pointer-events:none;z-index:9998;' +
+      'left:' + cx + 'px;top:' + cy + 'px;width:0;height:0;' +
+      'border:3px solid ' + coreCol + ';' +
+      'box-shadow:0 0 12px 2px ' + coreCol + ';' +
+      'transform:translate(-50%,-50%);' +
+      'animation:starRing 0.65s ease-out forwards;';
+    document.body.appendChild(ring);
+    setTimeout(function(){ ring.remove(); }, 700);
+
+    /* 3 — 8 spike rays */
+    for (var i = 0; i < 8; i++) {
+      (function(idx){
+        var angle = (idx / 8) * 360;
+        var ray = document.createElement('div');
+        ray.style.cssText = 'position:fixed;pointer-events:none;z-index:9997;' +
+          'left:' + cx + 'px;top:' + cy + 'px;width:3px;height:0;' +
+          'background:linear-gradient(to top,' + coreCol + ',transparent);' +
+          'box-shadow:0 0 4px ' + coreCol + ';' +
+          'transform-origin:50% 100%;' +
+          'transform:translate(-50%,0) rotate(' + angle + 'deg);' +
+          'animation:starRay 0.6s ease-out forwards;';
+        document.body.appendChild(ray);
+        setTimeout(function(){ ray.remove(); }, 650);
+      })(i);
+    }
+
+    /* 4 — 14 particle sparks */
+    for (var j = 0; j < 14; j++) {
+      (function(idx){
+        var angle = (idx / 14) * Math.PI * 2;
+        var dist  = 55 + Math.random() * 90;
+        var tx = Math.cos(angle) * dist;
+        var ty = Math.sin(angle) * dist;
+        var size = 3 + Math.random() * 4;
+        var spark = document.createElement('div');
+        spark.style.cssText = 'position:fixed;pointer-events:none;z-index:9997;border-radius:50%;' +
+          'left:' + cx + 'px;top:' + cy + 'px;' +
+          'width:' + size + 'px;height:' + size + 'px;' +
+          'background:' + coreCol + ';' +
+          'box-shadow:0 0 8px 2px ' + coreCol + ';' +
+          'transform:translate(-50%,-50%);' +
+          'animation:starSpark 0.75s ease-out forwards;';
+        spark.style.setProperty('--tx', tx + 'px');
+        spark.style.setProperty('--ty', ty + 'px');
+        document.body.appendChild(spark);
+        setTimeout(function(){ spark.remove(); }, 800);
+      })(j);
+    }
+  }
+
+  document.querySelectorAll('.btn-star-hero, .btn-star-violet').forEach(function(btn) {
+    btn.addEventListener('click', function() { burst(btn); });
+  });
+})();
 
 (function() {
   const tags = document.querySelectorAll('.skill-tag');
