@@ -167,7 +167,7 @@ function renderCart() {
  var msg = lines.join('%0A');
  // ── PayPal button — paypal.me/priscadezigns9/AMOUNT sends directly to priscadezigns9@gmail.com ──
  var paypalBtn = document.getElementById('cart-paypal');
- if (paypalBtn) paypalBtn.href = 'https://www.paypal.me/priscadezigns9/' + totalSetup.toFixed(2);
+ if (paypalBtn) paypalBtn.href = 'https://www.paypal.com/paypalme/priscadezigns9/' + totalSetup.toFixed(2);
  // ── Bank Transfer button → WhatsApp with full order + request for banking info ──
  var orderLines = [];
  orderLines.push('Hi%21%20I%27d%20like%20to%20place%20an%20order%20via%20bank%20transfer%3A%0A');
@@ -282,4 +282,5 @@ document.addEventListener('DOMContentLoaded', function() {
  });
 });
 renderCart();
+
 
