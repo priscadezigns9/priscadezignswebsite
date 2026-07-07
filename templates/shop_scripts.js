@@ -266,6 +266,35 @@ function updateAgreement() {
  });
 }
 
+// ── Save cart order to Supabase + notify via email & Telegram ──
+function saveCartOrder(method) {
+  if (!cart.base) return;
+  var SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+  var addons = [];
+  if (cart.addons.copy)    addons.push('Copywriting Add-On');
+  if (cart.addons.chatbot) addons.push('AI Chatbot Add-On');
+  var p = PRICES[cart.base.type] || {};
+  var totalSetup = cart.base.setup + (cart.addons.copy ? PRICES.copy.setup : 0) + (cart.addons.chatbot ? PRICES.chatbot.setup : 0);
+  var totalMo    = cart.base.mo   + (cart.addons.copy ? PRICES.copy.mo    : 0) + (cart.addons.chatbot ? PRICES.chatbot.mo    : 0);
+  var payload = {
+    name:    'Shop Order — ' + cart.base.name,
+    email:   '(shop) payment method: ' + method,
+    package: cart.base.name + (addons.length ? ' + ' + addons.join(' + ') : '') + ' | Setup: $' + totalSetup.toFixed(2) + ' | Monthly: $' + totalMo.toFixed(2) + '/mo',
+    brand:   'Prisca Dezigns (Template Shop)'
+  };
+  fetch(SB_URL + '/rest/v1/client_leads', {
+    method: 'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'apikey':        SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Prefer':        'return=minimal'
+    },
+    body: JSON.stringify(payload)
+  }).catch(function(){});
+}
+
 // ── Payment button click handlers — close cart first, then navigate ──
 document.addEventListener('DOMContentLoaded', function() {
  ['cart-paypal','cart-bank'].forEach(function(id) {
@@ -276,6 +305,8 @@ document.addEventListener('DOMContentLoaded', function() {
      if (btn.classList.contains('disabled')) return;
      var dest = btn.getAttribute('href');
      if (!dest || dest === '#') return;
+     var method = id === 'cart-paypal' ? 'PayPal' : 'Bank Transfer';
+     saveCartOrder(method);
      closeCart();
      setTimeout(function(){ window.open(dest, '_blank', 'noopener'); }, 180);
    });
