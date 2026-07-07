@@ -12,7 +12,8 @@ const PKGS={
   ecommerce:[
     {name:"E-Starter",desc:"1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance"},
     {name:"E-Growth",desc:"2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
-    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"}
+    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"},
+    {name:"E-Commerce Maintenance",desc:"E-Commerce Store Uptime & Security Monitoring · Monthly Product & Content Updates · High-Fidelity Technical Backups · Priority Support · $199.99/mo"}
   ],
   ai:[
     {name:"AI Tier 1",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · AI Training & Configuration · Monthly Performance Report · 1 Month Free Maintenance"},
@@ -40,6 +41,7 @@ const STEPS={
       {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
       {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
       {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"},
+      {l:"\uD83D\uDCBC Tell us about your business",s:"talk"},
       {l:"\uD83D\uDE04 Tell me a joke",s:"joke"}
     ]
   },
@@ -111,6 +113,7 @@ const STEPS={
       {l:"\uD83E\uDDF5 SeamRite Designs \u00B7 NehNeh",url:"/seamritedesigns/"},
       {l:"\uD83C\uDFCE\uFE0F The Autodrome",url:"/theautodrome/"},
       {l:"\u26A1 Dreaming Anime",url:"https://dreaminganime.com"},
+      {l:"\u26A1\uFE0F Evolve Mobility",url:"https://driveevolve.com"},
       {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
       {l:"\uD83D\uDECD\uFE0F Template Shop",url:"https://priscadezigns.org/templates/"},
       {l:"\u2190 Back",s:"about"}
