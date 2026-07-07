@@ -23,7 +23,7 @@ const PKGS={
     {name:"Maintenance",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
   ],
   templates:[
-    {name:"Website",desc:"Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
+    {name:"Template Site",desc:"Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
     {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
     {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · Contact us for current pricing"},
     {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs"}
@@ -32,18 +32,76 @@ const PKGS={
 
 const STEPS={
   start:{
-    bot:"Hey \uD83D\uDC4B What brings you here today?",
+    bot:"Hey \uD83D\uDC4B Welcome to Prisca Dezigns. What can I help you with today?",
     r:[
       {l:"\uD83C\uDFA8 I want a template site",s:"pkg_templates"},
-      {l:"\uD83D\uDDFA\uFE0F Browse the 22 templates",s:"microstore"},
       {l:"\uD83C\uDFC7 I need a custom website",s:"need_website"},
-      {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
       {l:"\uD83E\uDD16 I need AI automation",s:"automation"},
-      {l:"\uD83D\uDCE6 See agency packages",s:"pkg_menu"}
+      {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
+      {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
+      {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"}
     ]
   },
+
+  /* ── ABOUT BRANCH ── */
+  about:{
+    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago. We design, build and launch websites, e-commerce stores, and AI automation systems for businesses across the Caribbean and beyond. Every project is built to a professional standard — no templates handed to you to figure out, no drag-and-drop builders. We do it all for you.",
+    r:[
+      {l:"\uD83D\uDCC5 How long have you been operating?",s:"about_history"},
+      {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
+      {l:"\uD83D\uDC69\u200D\uD83D\uDCBB Who is behind it?",s:"about_founder"},
+      {l:"\uD83D\uDCF1 Find us on social media",s:"about_social"},
+      {l:"\uD83C\uDF10 Visit the main site",url:"https://priscadezigns.org"},
+      {l:"\u2190 Back to start",s:"start"}
+    ]
+  },
+  about_history:{
+    bot:"Prisca Dezigns has been operating since 2019. What started as a freelance web design operation grew into a full-service digital agency covering websites, branding, e-commerce, and AI-powered customer service automation. Over the years we have served clients across Trinidad & Tobago and the wider Caribbean, delivering high-fidelity digital products with a focus on accuracy, speed, and results.",
+    r:[
+      {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
+      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
+      {l:"\u2190 Back",s:"about"}
+    ]
+  },
+  about_founder:{
+    bot:"Prisca Dezigns is led by Priscilla Narine — a certified Project Manager, Web Designer, and Administrative Professional with 6+ years of experience in high-volume data management and digital architecture. She built Prisca Dezigns to give businesses access to the same calibre of digital infrastructure that large companies use — without the agency price tag or the technical headache.",
+    r:[
+      {l:"\uD83D\uDCF1 Find us on social media",s:"about_social"},
+      {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
+      {l:"\u2190 Back",s:"about"}
+    ]
+  },
+  about_services:{
+    bot:"We specialise in three areas:\n\n\u2756 Website Design & Development — custom builds, template sites, e-commerce stores\n\u2756 AI & Automation — chatbots, WhatsApp automation, lead capture, CRM setup\n\u2756 Brand Architecture — logo, domain, social setup, copywriting, SEO\n\nEverything is done for you. You provide the content, we handle the rest.",
+    r:[
+      {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
+      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
+      {l:"Talk to someone",s:"talk"},
+      {l:"\u2190 Back",s:"about"}
+    ]
+  },
+  about_social:{
+    bot:"Find us and follow along across all platforms \uD83D\uDC47",
+    r:[
+      {l:"\uD83D\uDCF8 Instagram",url:"https://www.instagram.com/priscadezigns"},
+      {l:"\uD83D\uDCD8 Facebook",url:"https://www.facebook.com/priscadezigns"},
+      {l:"\uD83E\uDDF5 Threads",url:"https://www.threads.net/@priscadezigns"},
+      {l:"\uD83C\uDFB5 TikTok",url:"https://www.tiktok.com/@priscadezigns"},
+      {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
+      {l:"\u2190 Back",s:"about"}
+    ]
+  },
+  about_location:{
+    bot:"We are based in San Fernando, Trinidad & Tobago and serve clients across the Caribbean and internationally. All work is done remotely — no in-person meetings required. We communicate via WhatsApp, email, and video call.",
+    r:[
+      {l:"Talk to someone",s:"talk"},
+      {l:"\u2190 Back",s:"about"}
+    ]
+  },
+
+  /* ── WEBSITE BRANCH ── */
   need_website:{
-    bot:"Our custom websites are built from scratch - fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
+    bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
     r:[
       {l:"\u26A1 Need it in 24hrs",s:"pkg_oneday"},
       {l:"I need a full custom build",s:"pkg_standard"},
@@ -53,8 +111,10 @@ const STEPS={
   },
   no_website:{bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",r:[],pkg:"standard"},
   bad_website:{bot:"A website that doesn't convert is just an expensive business card. Here's what a full rebuild looks like:",r:[],pkg:"standard"},
+
+  /* ── LEADS BRANCH ── */
   more_leads:{
-    bot:"Most businesses don't have a lead problem - they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
+    bot:"Most businesses don't have a lead problem — they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
     r:[
       {l:"No one responds fast enough",s:"slow_response"},
       {l:"Hard to tell who's serious",s:"filter_leads"},
@@ -63,23 +123,25 @@ const STEPS={
     ]
   },
   slow_response:{
-    bot:"78% of leads buy from the first business that responds. Our AI responds instantly - 24/7, even at 2am on a Sunday.",
+    bot:"78% of leads buy from the first business that responds. Our AI responds instantly — 24/7, even at 2am on a Sunday.",
     r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
   filter_leads:{
-    bot:"Our lead filter qualifies every enquiry the second it lands - budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
+    bot:"Our lead filter qualifies every enquiry the second it lands — budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
     r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
   no_system:{
-    bot:"We build the whole system from scratch - AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
+    bot:"We build the whole system from scratch — AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
     r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
   how_it_works:{
     bot:"We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up automatically. Setup takes 2-4 weeks.",
     r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
+
+  /* ── AUTOMATION BRANCH ── */
   automation:{
-    bot:"We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up - all day, every day. What are you trying to automate?",
+    bot:"We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up — all day, every day. What are you trying to automate?",
     r:[
       {l:"Customer service / enquiries",s:"how_it_works"},
       {l:"WhatsApp automation",s:"whatsapp_auto"},
@@ -91,21 +153,26 @@ const STEPS={
     bot:"We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
     r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
+
+  /* ── PACKAGES MENU ── */
   pkg_menu:{
-    bot:"Our agency packages are full custom builds - designed, developed and delivered by Prisca Dezigns. Which fits you?",
+    bot:"Our full service range — from template sites to enterprise AI. What fits your stage?",
     r:[
       {l:"\u26A1 1-Day Website",s:"pkg_oneday"},
+      {l:"\uD83C\uDFA8 Template Sites",s:"pkg_templates"},
       {l:"\uD83C\uDF10 Custom Website Packages",s:"pkg_standard"},
       {l:"\uD83D\uDED2 E-Commerce Packages",s:"pkg_ecommerce"},
       {l:"\uD83E\uDD16 AI Consultancy",s:"pkg_ai"},
       {l:"\uD83D\uDD27 Maintenance",s:"pkg_continuity"},
-      {l:"\uD83C\uDFA8 I want a template instead",s:"pkg_templates"}
+      {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"}
     ]
   },
+
+  /* ── TEMPLATE BRANCH ── */
   pkg_templates:{
     bot:"24 ready-made templates. Pick a design, send your content, go live in 24 hours. No tech needed.",
     r:[
-      {l:"\uD83D\uDDFA\uFE0F Browse all 22 templates",s:"microstore"},
+      {l:"\uD83D\uDDFA\uFE0F Browse all templates",s:"microstore"},
       {l:"What's included?",s:"templates_included"},
       {l:"\uD83D\uDECD\uFE0F Micro Store option",s:"microstore_info"},
       {l:"\uD83E\uDD16 Template + Chatbot option",s:"templates_chatbot"},
@@ -113,9 +180,8 @@ const STEPS={
       {l:"Talk to someone",s:"talk"}
     ]
   },
-
   microstore:{
-    bot:"23 live templates - pick your niche to find the best match:",
+    bot:"24 live templates — pick your niche to find the best match:",
     r:[
       {l:"\uD83D\uDCF8 Portfolio & Creative",s:"ms_portfolio"},
       {l:"\uD83C\uDFC6 Coach & Consultant",s:"ms_coach"},
@@ -124,51 +190,51 @@ const STEPS={
       {l:"\u2728 Beauty & Skincare",s:"ms_beauty"},
       {l:"\uD83D\uDE80 Tech & Startup",s:"ms_tech"},
       {l:"\uD83C\uDF0D Lifestyle & Travel",s:"ms_lifestyle"},
-      {l:"\uD83D\uDCCB Show all 22",s:"ms_all"}
+      {l:"\uD83D\uDCCB Show all 24",s:"ms_all"}
     ]
   },
   ms_portfolio:{
-    bot:"Best for creatives who showcase their work:\n\n\u2756 Folio - Photographer | Artist | Portfolio\n\u2756 Studio - Creative Studio | Tech Brand\n\u2756 Craft - Handmade | Maker | Artisan\n\u2756 Marquee - Video | Content Creator\n\u2756 Noir - Fashion Editorial | Dark Luxury",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
+    bot:"Best for creatives who showcase their work:\n\n\u2756 Folio — Photographer | Artist | Portfolio\n\u2756 Folio II — Minimal 3-Column Portfolio\n\u2756 Studio — Creative Studio | Tech Brand\n\u2756 Craft — Handmade | Maker | Artisan\n\u2756 Marquee — Video | Content Creator\n\u2756 Noir — Fashion Editorial | Dark Luxury",
+    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_coach:{
-    bot:"Best for professionals who sell their expertise:\n\n\u2756 Persona - Personal Brand | Coach | Influencer\n\u2756 Consult - Consultant | Doctor | Lawyer\n\u2756 Summit - Author | Speaker | Mentor\n\u2756 Obvious - Minimalist Personal Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
+    bot:"Best for professionals who sell their expertise:\n\n\u2756 Persona — Personal Brand | Coach | Influencer\n\u2756 Consult — Consultant | Doctor | Lawyer\n\u2756 Summit — Author | Speaker | Mentor\n\u2756 Obvious — Minimalist Personal Brand",
+    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_store:{
-    bot:"Best for businesses selling products online:\n\n\u2756 Luxe - Luxury Fashion | Boutique Store\n\u2756 Glow - Skincare | Beauty Product Shop\n\u2756 Paws - Pet | Vet | Animal Care Store\n\u2756 Optica - Luxury Product Catalogue\n\u2756 Atelier - Jewelry | Artisan | Handcraft Store\n\u2756 Monsieur - Clothing | Apparel | Fashion Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
+    bot:"Best for businesses selling products online:\n\n\u2756 Luxe — Luxury Fashion | Boutique Store\n\u2756 Glow — Skincare | Beauty Product Shop\n\u2756 Paws — Pet | Vet | Animal Care Store\n\u2756 Optica — Luxury Product Catalogue\n\u2756 Atelier — Jewelry | Artisan | Handcraft Store\n\u2756 Monsieur — Clothing | Apparel | Fashion Brand",
+    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_wellness:{
-    bot:"Best for fitness pros and wellness brands:\n\n\u2756 Velocity - Fitness Coach | Trainer | Athlete\n\u2756 Momentum - Motivator | Gym | Sports Brand\n\u2756 Serene - Yoga | Meditation | Spa | Holistic\n\u2756 Aura - Holistic Health | Wellness Coach",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
+    bot:"Best for fitness pros and wellness brands:\n\n\u2756 Velocity — Fitness Coach | Trainer | Athlete\n\u2756 Momentum — Motivator | Gym | Sports Brand\n\u2756 Serene — Yoga | Meditation | Spa | Holistic\n\u2756 Aura — Holistic Health | Wellness Coach",
+    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_beauty:{
-    bot:"Best for beauty, skincare and spa businesses:\n\n\u2756 Aura - Beauty | Skincare | Wellness Spa\n\u2756 Glow - Skincare | Beauty Product Store\n\u2756 Serene - Spa | Wellness | Holistic Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
+    bot:"Best for beauty, skincare and spa businesses:\n\n\u2756 Aura — Beauty | Skincare | Wellness Spa\n\u2756 Glow — Skincare | Beauty Product Store\n\u2756 Serene — Spa | Wellness | Holistic Brand",
+    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_tech:{
-    bot:"Best for tech brands, SaaS and startups:\n\n\u2756 Launch - SaaS | App Launch | Startup Brand\n\u2756 Volt - Tech Builder | Developer | SaaS\n\u2756 Studio - Creative Studio | Tech Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
+    bot:"Best for tech brands, SaaS and startups:\n\n\u2756 Launch — SaaS | App Launch | Startup Brand\n\u2756 Volt — Tech Builder | Developer | SaaS\n\u2756 Studio — Creative Studio | Tech Brand",
+    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_lifestyle:{
-    bot:"Best for travel, adventure and lifestyle brands:\n\n\u2756 Horizon - Travel Photographer | Tourism\n\u2756 Obvious - Minimalist Lifestyle Brand\n\u2756 Folio - Adventure | Documentary Portfolio\n\u2756 Monsieur - Fashion Brand | Editorial Drops",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
+    bot:"Best for travel, adventure and lifestyle brands:\n\n\u2756 Horizon — Travel Photographer | Tourism\n\u2756 Obvious — Minimalist Lifestyle Brand\n\u2756 Folio — Adventure | Documentary Portfolio\n\u2756 Monsieur — Fashion Brand | Editorial Drops",
+    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_all:{
-    bot:"All 24 templates:\n\nFolio | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur | Nexus\n\nAll templates · Live in 24hrs · Logo + content swapped\nContact us for current pricing",
-    r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
+    bot:"All 24 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nAll templates · Live in 24hrs · Logo + content swapped · Contact us for pricing",
+    r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   microstore_info:{
-    bot:"The Micro Store (Micro Store) turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 Contact us for pricing",
+    bot:"The Micro Store turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 Contact us for pricing",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
-      {l:"I'm ready - let's go",s:"talk"},
+      {l:"I'm ready — let's go",s:"talk"},
       {l:"\u2190 Back to templates",s:"pkg_templates"}
     ]
   },
   templates_chatbot:{
-    bot:"The AI Chatbot add-on includes hosting, SSL, updates, and an AI bot answering your business FAQs 24/7: pricing, services, hours, how to book. Talk to us for pricing.",
+    bot:"The AI Chatbot add-on plugs a live AI agent into your template site. It answers your business FAQs 24/7 — services, pricing, hours, how to book — and captures leads while you sleep. Contact us for current pricing.",
     r:[
       {l:"Add chatbot to my template",s:"talk"},
       {l:"Template only is fine",s:"microstore"},
@@ -176,17 +242,23 @@ const STEPS={
     ]
   },
   templates_included:{
-    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Ask us for current pricing\n\nAdd-ons available: Copywriting | AI Chatbot | Micro Store",
+    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Hosted on your subdomain\n\nAdd-ons available: Copywriting | AI Chatbot | Micro Store\nContact us for current pricing.",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse templates",s:"microstore"},
       {l:"Add chatbot",s:"templates_chatbot"},
       {l:"\uD83D\uDECD\uFE0F Micro Store option",s:"microstore_info"},
-      {l:"I'm ready - let's go",s:"talk"}
+      {l:"I'm ready — let's go",s:"talk"}
     ]
   },
+  template_ip:{
+    bot:"The template design — layout, code, colours, structure — is the intellectual property of Prisca Dezigns. What's yours is your content: your photos, your logo, your business name, and your text. You get a licence to use your customised version while your subscription is active.",
+    r:[{l:"\u2190 Back to templates",s:"pkg_templates"},{l:"Talk to someone",s:"talk"}]
+  },
+
+  /* ── PACKAGE STEPS ── */
   pkg_oneday:{
-    bot:"The 1-Day Website is a fully custom site built to your brand, live within 24 hours. One flat fee. Hosting included after.",
-    r:[{l:"What's included?",s:"oneday_included"},{l:"I want this - let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
+    bot:"The 1-Day Website is a fully custom site built to your brand and live within 24 hours. One flat fee. Hosting included after.",
+    r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
   },
   oneday_included:{
     bot:"Your 1-Day Site includes:\n\u2756 Full custom design (not a template)\n\u2756 Mobile-first, fast-loading\n\u2756 SEO + GEO + AEO optimised\n\u2756 WhatsApp & contact integration\n\u2756 Live in 24 hours\nOne flat fee. Maintenance included after.",
@@ -195,14 +267,33 @@ const STEPS={
   pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
   pkg_ecommerce:{bot:"Here are our E-Commerce Packages:",r:[],pkg:"ecommerce"},
   pkg_ai:{bot:"Here are our AI Consultancy Packages:",r:[],pkg:"ai"},
-  pkg_continuity:{bot:"Our System Continuity Package:",r:[],pkg:"continuity"},
+  pkg_continuity:{bot:"Our System Continuity Package keeps your site fast, secure, and up to date:",r:[],pkg:"continuity"},
   pkg_tpl_tiers:{bot:"Our Template Tiers:",r:[],pkg:"templates"},
-  brand_scan:{bot:"Enter your domain and we'll run a real-time diagnostic on your digital identity and brand footprint.",r:[],scan:true},
-  template_ip:{
-    bot:"The template design - layout, code, colours, structure - is the intellectual property of Prisca Dezigns. What's yours is your content: photos, logo, business name, and text. You get a licence to use the template while your subscription is active.",
-    r:[{l:"\u2190 Back to templates",s:"pkg_templates"},{l:"Talk to someone",s:"talk"}]
+
+  brand_scan:{
+    bot:"Enter your domain and we'll run a real-time diagnostic on your digital identity and brand footprint.",
+    r:[],scan:true
   },
-  talk:{bot:"Tap below to start a WhatsApp conversation with us directly. We'll get back to you fast.",r:[],wa:true}
+
+  /* ── TALK / CONTACT ── */
+  talk:{
+    bot:"Tap below to start a WhatsApp conversation with us directly. We respond fast.",
+    r:[],wa:true
+  },
+
+  /* ── FAQ / MISC ── */
+  faq_turnaround:{
+    bot:"Template sites go live in 24 hours. Custom websites take 3-7 business days depending on scope. E-commerce stores take 3-5 days. AI automation systems take 2-4 weeks. All timelines start from when you send your content.",
+    r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
+  },
+  faq_payment:{
+    bot:"We accept PayPal and bank transfer. For template orders you can pay directly through our template shop. For custom projects we send a quote via WhatsApp first.",
+    r:[{l:"Open template shop",url:"https://priscadezigns.org/templates/"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
+  },
+  faq_hosting:{
+    bot:"Yes — all our sites are hosted by us. Template sites are hosted on a subdomain (yourbrand.priscadezigns.org) or your own custom domain. Hosting is included in the monthly fee. No technical setup required on your end.",
+    r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
+  }
 };
 
 let open=false,started=false,hist=[];
