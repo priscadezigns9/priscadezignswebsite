@@ -3,236 +3,256 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AEON — Build systems that outlast you.</title>
-<meta name="description" content="AEON — premium AI agency template. A descent into intelligence.">
+<title>MONOLITH — Descend into intelligence.</title>
+<meta name="description" content="MONOLITH is an applied AI studio. The site is a descent — each depth a stage of building a machine mind.">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
   :root{
-    --abyss:#020304;
-    --bone:#f0ede6;
-    --dim:#888b91;
-    --gold:#C8A96E;
-    --hair:rgba(240,237,230,0.08);
+    --abyss:#030405;
+    --abyss-2:#0b0d10;
+    --bone:#f2efe8;
+    --dim:#8a8d93;
+    --gold:#d8b26e;
+    --ember:#ff6b4a;
+    --ice:#9fd8e8;
+    --hair:rgba(242,239,232,0.09);
     --ease:cubic-bezier(.19,1,.22,1);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{background:var(--abyss);color:var(--bone);font-family:'Space Grotesk',sans-serif;font-weight:300;overflow-x:hidden;}
+  html{background:var(--abyss);}
+  body{
+    background:var(--abyss); color:var(--bone);
+    font-family:'Space Grotesk',sans-serif; font-weight:300;
+    overflow-x:hidden;
+  }
   ::selection{background:var(--gold);color:var(--abyss);}
   a{color:inherit;text-decoration:none;}
+  .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.05em;}
 
-  #stage{position:fixed;inset:0;z-index:0;}
+  #stage{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block;}
 
-  /* vignette */
-  .frame{position:fixed;inset:0;z-index:2;pointer-events:none;
-    background:radial-gradient(ellipse at 50% 50%,transparent 44%,rgba(0,0,0,.7) 100%);}
+  .film{
+    position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.04;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .frame{
+    position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,.6) 100%);
+  }
 
-  /* ── HUD ── */
-  .hud{position:fixed;inset:0;z-index:60;pointer-events:none;
-    display:flex;flex-direction:column;justify-content:space-between;
-    padding:28px clamp(20px,4vw,56px);}
+  /* ---------- HUD ---------- */
+  .hud{position:fixed;inset:0;z-index:60;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:26px clamp(20px,4vw,52px);}
   .hud>*{pointer-events:auto;}
   .hud-top{display:flex;justify-content:space-between;align-items:center;}
-  .wordmark{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:.32em;}
+  .wordmark{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:.28em;}
   .wordmark em{font-style:normal;color:var(--gold);}
-  .menu{display:flex;gap:clamp(16px,3vw,44px);font-size:11px;text-transform:uppercase;letter-spacing:.15em;}
-  .menu a{color:var(--dim);transition:color .3s;}
+  .menu{display:flex;gap:clamp(18px,3vw,44px);font-size:11px;text-transform:uppercase;letter-spacing:.14em;}
+  .menu a{color:var(--dim);transition:color .3s var(--ease);position:relative;}
   .menu a:hover{color:var(--gold);}
   .hud-bottom{display:flex;justify-content:space-between;align-items:flex-end;font-size:10px;color:var(--dim);}
+
   .depth-meter{display:flex;align-items:center;gap:12px;}
   .depth-rail{width:110px;height:1px;background:var(--hair);position:relative;}
-  .depth-rail span{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--gold);transition:width .2s linear;}
+  .depth-rail span{position:absolute;left:0;top:0;height:100%;width:0%;background:var(--gold);box-shadow:0 0 8px var(--gold);}
   .depth-read{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--bone);min-width:80px;}
-  .sig{font-family:'JetBrains Mono',monospace;text-align:right;line-height:1.8;font-size:10px;}
-  .sig b{color:var(--gold);}
 
-  /* ── Gate ── */
-  .gate{position:fixed;inset:0;z-index:1000;background:var(--abyss);
-    display:flex;align-items:center;justify-content:center;
-    transition:opacity 1.2s var(--ease),visibility 1.2s;}
+  .sig{font-family:'JetBrains Mono',monospace;text-align:right;line-height:1.7;font-size:10px;}
+  .sig b{color:var(--gold);font-weight:500;}
+
+  /* ---------- Loader ---------- */
+  .gate{position:fixed;inset:0;z-index:1000;background:var(--abyss);display:flex;align-items:center;justify-content:center;transition:opacity 1.1s var(--ease),visibility 1.1s;}
+  .gate-inner{text-align:center;}
+  .gate .g-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(26px,5vw,44px);letter-spacing:.32em;overflow:hidden;}
+  .gate .g-mark span{display:inline-block;transform:translateY(110%);}
+  .gate .g-line{width:1px;height:70px;background:var(--hair);margin:26px auto 0;position:relative;overflow:hidden;}
+  .gate .g-line i{position:absolute;top:0;left:0;width:100%;height:0%;background:var(--gold);}
+  .gate .g-pct{margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);}
   .gate.done{opacity:0;visibility:hidden;pointer-events:none;}
-  .g-mark{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(24px,5vw,44px);
-    letter-spacing:.34em;overflow:hidden;text-align:center;}
-  .g-mark span{display:inline-block;transform:translateY(110%);}
-  .g-line{width:1px;height:72px;background:var(--hair);margin:28px auto 0;position:relative;overflow:hidden;}
-  .g-line i{position:absolute;top:0;left:0;width:100%;height:0%;background:var(--gold);}
-  .g-pct{margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);text-align:center;}
 
-  /* ── Content ── */
+  /* ---------- Story ---------- */
   main{position:relative;z-index:10;}
-  section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
-    padding:0 clamp(20px,6vw,100px);position:relative;}
+  section{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 clamp(20px,6vw,96px);position:relative;}
 
-  .kicker{display:flex;align-items:center;gap:14px;font-size:10px;letter-spacing:.22em;
-    text-transform:uppercase;color:var(--dim);margin-bottom:28px;}
+  .kicker{display:flex;align-items:center;gap:14px;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:26px;}
   .kicker::before{content:'';width:44px;height:1px;background:var(--gold);}
-  .kicker .dt{font-family:'JetBrains Mono',monospace;color:var(--gold);}
+  .kicker .depth-tag{font-family:'JetBrains Mono',monospace;color:var(--gold);}
 
-  h1,h2{font-family:'Syne',sans-serif;font-weight:700;line-height:.95;letter-spacing:-.018em;}
-  .title-xl{font-size:clamp(50px,11vw,158px);}
-  .title-lg{font-size:clamp(36px,7vw,92px);max-width:14ch;}
-  .lede{margin-top:32px;max-width:52ch;color:var(--dim);font-size:clamp(15px,1.4vw,18px);line-height:1.8;}
+  h1,h2{font-family:'Syne',sans-serif;font-weight:700;line-height:.96;letter-spacing:-0.015em;}
+  .title-xl{font-size:clamp(44px,8.5vw,124px);max-width:11ch;}
+  .title-lg{font-size:clamp(38px,7vw,96px);max-width:13ch;}
+
+  .lede{margin-top:30px;max-width:50ch;color:var(--dim);font-size:clamp(15px,1.4vw,18px);line-height:1.75;}
   .lede b{color:var(--bone);font-weight:400;}
   .lede .au{color:var(--gold);}
 
-  .drop-cue{position:absolute;bottom:48px;left:50%;transform:translateX(-50%);
-    display:flex;flex-direction:column;align-items:center;gap:10px;
-    font-size:10px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase;}
-  .drop-cue .chev{width:10px;height:10px;border-right:1px solid var(--gold);
-    border-bottom:1px solid var(--gold);transform:rotate(45deg);animation:sink 2s var(--ease) infinite;}
-  @keyframes sink{0%,100%{transform:rotate(45deg) translate(0,0);opacity:1;}
-    50%{transform:rotate(45deg) translate(5px,5px);opacity:.3;}}
+  .drop-cue{position:absolute;bottom:44px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-size:10px;letter-spacing:.24em;color:var(--dim);text-transform:uppercase;}
+  .drop-cue .chev{width:10px;height:10px;border-right:1px solid var(--gold);border-bottom:1px solid var(--gold);transform:rotate(45deg);animation:sink 2s var(--ease) infinite;}
+  @keyframes sink{0%,100%{transform:rotate(45deg) translate(0,0);opacity:1;}50%{transform:rotate(45deg) translate(5px,5px);opacity:.3;}}
 
-  .ledger{margin-top:46px;max-width:700px;}
-  .ledger-row{display:flex;justify-content:space-between;align-items:baseline;
-    padding:20px 0;border-bottom:1px solid var(--hair);gap:24px;}
+  .ledger{margin-top:44px;max-width:680px;}
+  .ledger-row{display:flex;justify-content:space-between;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--hair);gap:24px;}
   .ledger-row .k{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);white-space:nowrap;}
-  .ledger-row .v{color:var(--dim);font-size:14px;text-align:right;max-width:46ch;line-height:1.65;}
+  .ledger-row .v{color:var(--dim);font-size:14px;text-align:right;max-width:44ch;line-height:1.6;}
 
-  .stat-band{display:flex;gap:clamp(28px,6vw,88px);margin-top:54px;flex-wrap:wrap;}
-  .stat .n{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(32px,4.5vw,60px);}
+  .stat-band{display:flex;gap:clamp(30px,6vw,90px);margin-top:52px;flex-wrap:wrap;}
+  .stat .n{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(34px,4.5vw,62px);color:var(--bone);}
   .stat .n i{font-style:normal;color:var(--gold);}
-  .stat .d{margin-top:6px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);max-width:18ch;}
+  .stat .d{margin-top:6px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);max-width:18ch;}
 
   .cases{margin-top:54px;border-top:1px solid var(--hair);}
-  .case{display:grid;grid-template-columns:90px 1fr auto;gap:clamp(14px,3vw,44px);
-    align-items:center;padding:32px 0;border-bottom:1px solid var(--hair);
-    transition:padding-left .45s var(--ease);}
-  .case:hover{padding-left:18px;}
+  .case{display:grid;grid-template-columns:90px 1fr auto;gap:clamp(16px,3vw,44px);align-items:center;padding:30px 0;border-bottom:1px solid var(--hair);transition:padding-left .45s var(--ease);}
+  .case:hover{padding-left:16px;}
   .case .idx{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);}
-  .case h3{font-family:'Syne',sans-serif;font-weight:600;font-size:clamp(18px,2.3vw,28px);}
-  .case p{color:var(--dim);font-size:13px;margin-top:6px;max-width:52ch;line-height:1.65;}
+  .case h3{font-family:'Syne',sans-serif;font-weight:600;font-size:clamp(19px,2.4vw,30px);}
+  .case p{color:var(--dim);font-size:13px;margin-top:6px;max-width:52ch;line-height:1.6;}
   .case .yr{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);}
   @media(max-width:640px){.case{grid-template-columns:1fr;gap:8px;}}
 
-  .final-title{font-size:clamp(44px,12vw,180px);}
-  .final-row{display:flex;justify-content:space-between;align-items:flex-end;
-    flex-wrap:wrap;gap:28px;margin-top:56px;padding-top:34px;border-top:1px solid var(--hair);}
-  .mail{font-family:'JetBrains Mono',monospace;font-size:clamp(14px,2vw,20px);
-    border-bottom:1px solid var(--gold);padding-bottom:6px;transition:color .3s,letter-spacing .4s;}
+  .final-title{font-size:clamp(46px,12.5vw,190px);}
+  .final-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:28px;margin-top:54px;padding-top:32px;border-top:1px solid var(--hair);}
+  .mail{font-family:'JetBrains Mono',monospace;font-size:clamp(15px,2vw,21px);color:var(--bone);border-bottom:1px solid var(--gold);padding-bottom:6px;transition:color .3s var(--ease),letter-spacing .4s var(--ease);}
   .mail:hover{color:var(--gold);letter-spacing:.04em;}
-  .btn-cta{display:inline-flex;align-items:center;gap:10px;background:var(--gold);
-    color:var(--abyss);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;
-    letter-spacing:.12em;text-transform:uppercase;padding:14px 32px;margin-top:36px;transition:opacity .3s;}
-  .btn-cta:hover{opacity:.82;}
 
-  footer{padding:44px clamp(20px,6vw,100px) 66px;display:flex;justify-content:space-between;
-    flex-wrap:wrap;gap:14px;font-size:10px;color:var(--dim);letter-spacing:.12em;}
+  footer{padding:44px clamp(20px,6vw,96px) 64px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:10px;color:var(--dim);letter-spacing:.12em;}
 
   .rise{opacity:0;will-change:transform,opacity;}
   .word-mask{overflow:hidden;display:block;}
   .word-mask span{display:inline-block;will-change:transform;}
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms!important;transition-duration:.01ms!important;}
+  }
 </style>
 </head>
 <body>
 
 <div class="gate" id="gate">
-  <div>
-    <div class="g-mark"><span id="gateMark">AEON</span></div>
+  <div class="gate-inner">
+    <div class="g-mark"><span id="gateMark">MONOLITH</span></div>
     <div class="g-line"><i id="gateFill"></i></div>
-    <div class="g-pct" id="gatePct">LAYER 0000m</div>
+    <div class="g-pct mono" id="gatePct">DEPTH 0000m</div>
   </div>
 </div>
 
 <canvas id="stage"></canvas>
+<div class="film"></div>
 <div class="frame"></div>
 
 <div class="hud">
   <div class="hud-top">
-    <div class="wordmark">AE<em>ON</em></div>
+    <div class="wordmark">MONO<em>LITH</em></div>
     <nav class="menu">
-      <a href="#s0">Layer</a>
-      <a href="#s1">Systems</a>
-      <a href="#s2">Work</a>
-      <a href="#s4">Start</a>
+      <a href="#descend">Descend</a>
+      <a href="#record">Record</a>
+      <a href="#surface">Surface</a>
     </nav>
   </div>
   <div class="hud-bottom">
     <div class="depth-meter">
       <div class="depth-rail"><span id="depthFill"></span></div>
-      <div class="depth-read" style="font-family:'JetBrains Mono',monospace" id="depthRead">0000m</div>
+      <div class="depth-read mono" id="depthRead">0000m</div>
     </div>
-    <div class="sig">AI-POWERED AGENCY<br><b>PRISCA DEZIGNS</b></div>
+    <div class="sig mono">APPLIED INTELLIGENCE<br><b>EST. MMXXI</b></div>
   </div>
 </div>
 
 <main>
-  <section id="s0">
-    <div class="kicker rise"><span class="dt">0000m</span> The surface</div>
+
+  <!-- 0m — SURFACE -->
+  <section id="descend">
+    <div class="kicker rise"><span class="depth-tag">0000m</span> The surface</div>
     <h1 class="title-xl">
-      <span class="word-mask"><span>Most brands</span></span>
-      <span class="word-mask"><span>stay shallow.</span></span>
+      <span class="word-mask"><span>Most AI</span></span>
+      <span class="word-mask"><span>is shallow.</span></span>
     </h1>
-    <p class="lede rise">
-      [Agency Name] builds the other kind — AI-powered systems with <b>depth</b>. Automation, identity, intelligence. Not a website that dies after launch.
-      <span class="au"> Scroll to descend.</span>
-    </p>
+    <p class="lede rise">MONOLITH builds the other kind. We are an applied AI studio for companies who need systems with <b>depth</b> — perception, judgment, and restraint — not a demo that dies in production. <span class="au">This site is a descent. Scroll to go deeper.</span></p>
     <div class="drop-cue"><div class="chev"></div>Begin descent</div>
   </section>
 
-  <section id="s1">
-    <div class="kicker rise"><span class="dt">1200m</span> Intelligence layer</div>
+  <!-- 1200m — SIGHT -->
+  <section class="depth-ch" data-depth="1200" data-label="Twilight layer">
+    <div class="kicker rise"><span class="depth-tag">1200m</span> Twilight — where sight is engineered</div>
     <h2 class="title-lg">
-      <span class="word-mask"><span>First, it learns</span></span>
-      <span class="word-mask"><span>to speak.</span></span>
+      <span class="word-mask"><span>First, the</span></span>
+      <span class="word-mask"><span>machine learns</span></span>
+      <span class="word-mask"><span>to see.</span></span>
     </h2>
     <div class="ledger rise">
-      <div class="ledger-row"><span class="k">BRAND ARCHITECTURE</span><span class="v">We encode your voice, values, and visual DNA so every automated touchpoint sounds like you — not a bot.</span></div>
-      <div class="ledger-row"><span class="k">AI CUSTOMER SERVICE</span><span class="v">Replace manual email checkers and WhatsApp responders with a trained agent that handles inquiries 24/7.</span></div>
-      <div class="ledger-row"><span class="k">LEAD PIPELINES</span><span class="v">Automated intake flows that capture, score, and route every inbound lead — from first message to booked call.</span></div>
+      <div class="ledger-row"><span class="k">DATA STRATA</span><span class="v">We excavate your real data — logs, calls, exceptions — and cut it into layers a model can actually learn from.</span></div>
+      <div class="ledger-row"><span class="k">RETRIEVAL</span><span class="v">Memory architectures that surface the right fact at the right depth, not the loudest one.</span></div>
+      <div class="ledger-row"><span class="k">EVALUATION</span><span class="v">Harnesses that measure sight before we ever trust judgment.</span></div>
     </div>
   </section>
 
-  <section id="s2">
-    <div class="kicker rise"><span class="dt">3800m</span> Automation layer</div>
+  <!-- 3800m — JUDGMENT -->
+  <section class="depth-ch" data-depth="3800" data-label="Midnight layer">
+    <div class="kicker rise"><span class="depth-tag">3800m</span> Midnight — where pressure forms judgment</div>
     <h2 class="title-lg">
       <span class="word-mask"><span>Then, it learns</span></span>
-      <span class="word-mask"><span>to operate.</span></span>
+      <span class="word-mask"><span>to decide.</span></span>
     </h2>
-    <p class="lede rise">Down here there is no light except what your system generates. We build the execution layer — routing, response, escalation — engineered to hold under real business pressure.</p>
+    <p class="lede rise">Down here there is no light except what the system generates itself. We build the reasoning layer — routing, tool use, refusal, escalation — engineered to hold its shape under production pressure.</p>
     <div class="stat-band rise">
-      <div class="stat"><div class="n">24<i>h</i></div><div class="d">average deployment window</div></div>
-      <div class="stat"><div class="n">98<i>%</i></div><div class="d">client satisfaction rate</div></div>
-      <div class="stat"><div class="n">0</div><div class="d">unmonitored live agents</div></div>
+      <div class="stat"><div class="n">280<i>ms</i></div><div class="d">median decision latency</div></div>
+      <div class="stat"><div class="n">99.<i>3%</i></div><div class="d">policy adherence, rolling 90d</div></div>
+      <div class="stat"><div class="n">0</div><div class="d">unreviewed autonomous actions</div></div>
     </div>
   </section>
 
-  <section id="s3">
-    <div class="kicker rise"><span class="dt">7400m</span> The record</div>
-    <h2 class="title-lg"><span class="word-mask"><span>The record.</span></span></h2>
+  <!-- 7400m — THE RECORD -->
+  <section class="depth-ch" id="record" data-depth="7400" data-label="Hadal layer">
+    <div class="kicker rise"><span class="depth-tag">7400m</span> Hadal — what we've built down here</div>
+    <h2 class="title-lg">
+      <span class="word-mask"><span>The record.</span></span>
+    </h2>
     <div class="cases rise">
-      <div class="case"><span class="idx">R–01</span><div><h3>AI Customer Service Agent</h3><p>Full WhatsApp + email automation. Handles 200+ inquiries/week with zero manual intervention.</p></div><span class="yr">2026</span></div>
-      <div class="case"><span class="idx">R–02</span><div><h3>Lead Conversion System</h3><p>Automated intake → qualification → booking. Response time: 6 hours → 90 seconds.</p></div><span class="yr">2026</span></div>
-      <div class="case"><span class="idx">R–03</span><div><h3>Premium Template Shop</h3><p>WebGL storefront with automated fulfillment, email nurture flows, and Supabase lead capture.</p></div><span class="yr">2026</span></div>
-      <div class="case"><span class="idx">R–04</span><div><h3>Brand Architecture Package</h3><p>Complete identity system — visual DNA, AI voice, full web presence — deployed in 48 hours.</p></div><span class="yr">2025</span></div>
+      <div class="case">
+        <span class="idx">R–01</span>
+        <div><h3>Fleet dispatch cortex</h3><p>Autonomous re-routing for 400+ vehicles. Re-plans the entire network in under a second, every second.</p></div>
+        <span class="yr">2025</span>
+      </div>
+      <div class="case">
+        <span class="idx">R–02</span>
+        <div><h3>Underwriting engine</h3><p>Manual review time down 61% with full audit-grade reasoning trails on every decision.</p></div>
+        <span class="yr">2025</span>
+      </div>
+      <div class="case">
+        <span class="idx">R–03</span>
+        <div><h3>Clinical triage assistant</h3><p>Physician-in-the-loop by design. Live across 12 clinics, escalating exactly when it should.</p></div>
+        <span class="yr">2024</span>
+      </div>
+      <div class="case">
+        <span class="idx">R–04</span>
+        <div><h3>Demand forecasting core</h3><p>Store-level prediction that re-learns weekly instead of quarterly.</p></div>
+        <span class="yr">2024</span>
+      </div>
     </div>
   </section>
 
-  <section id="s4">
-    <div class="kicker rise"><span class="dt">10900m</span> The floor</div>
+  <!-- 10900m — THE FLOOR / CONTACT -->
+  <section id="surface" data-depth="10900" data-label="The floor">
+    <div class="kicker rise"><span class="depth-tag">10900m</span> The floor — nowhere deeper to go</div>
     <h2 class="final-title">
-      <span class="word-mask"><span>Build deep</span></span>
+      <span class="word-mask"><span>Go deep</span></span>
       <span class="word-mask"><span>with us.</span></span>
     </h2>
     <div class="final-row rise">
-      <div>
-        <a href="mailto:[your@email.com]" class="mail">[your@email.com]</a>
-        <br>
-        <a href="https://wa.me/[your-number]" class="btn-cta">WhatsApp Us →</a>
-      </div>
-      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);line-height:1.9;text-align:right;">
-        Selective intake — limited builds per month<br>
-        All projects fully functional — never demos<br>
-        Replies within 24 hours
+      <a href="mailto:studio@monolith.systems" class="mail">studio@monolith.systems</a>
+      <div class="mono" style="font-size:11px;color:var(--dim);line-height:1.8;text-align:right;">
+        Selective intake — two builds per quarter<br>Replies surface within 48 hours
       </div>
     </div>
   </section>
 
   <footer>
-    <span style="font-family:'JetBrains Mono',monospace">© MMXXVI [AGENCY NAME]</span>
-    <span style="font-family:'JetBrains Mono',monospace">POWERED BY PRISCA DEZIGNS AI SYSTEMS</span>
+    <span class="mono">© MMXXVI MONOLITH SYSTEMS</span>
+    <span class="mono">PROCEDURAL — NO STATIC ASSETS WERE HARMED</span>
   </footer>
+
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -240,286 +260,487 @@
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 
 <script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
 </script>
 
 <script type="module">
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass }     from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { ShaderPass }     from 'three/addons/postprocessing/ShaderPass.js';
-import { OutputPass }     from 'three/addons/postprocessing/OutputPass.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
-gsap.registerPlugin(ScrollTrigger);
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = matchMedia('(max-width: 760px)').matches;
+const lowPower = (navigator.hardwareConcurrency || 4) <= 4;
+const budget = (isMobile || lowPower) ? 'low' : 'high';
 
-const isMobile = innerWidth < 760;
-const budget   = (navigator.hardwareConcurrency || 4) <= 4 || isMobile ? 'low' : 'high';
+/* ------------------------------------------------------------------
+   CONCEPT: the whole site is one continuous camera DIVE.
+   Scroll = depth. The camera travels down a vertical shaft in space.
+   A procedural metallic double-helix spans the full dive; scroll
+   rotates it and tightens its coil in the vertex shader.
+------------------------------------------------------------------ */
 
-/* ─────────────────────────────────────────────────────────────
-   THE SLINKY
-   A ring of flat arcs — like the web.with.ai reference.
-   Each arc is a curved wire that sweeps from one side of the
-   disc to the other, passing through a Z-depth curve.
-   The BOUNCE: scroll drives a travelling sine wave across the
-   arc index, so each wire flicks forward then back — the classic
-   slinky in-motion look.
-───────────────────────────────────────────────────────────────*/
+const noiseGLSL = `
+  vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+  vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+  vec4 permute(vec4 x){return mod289(((x*34.0)+1.0)*x);}
+  vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+  float snoise(vec3 v){
+    const vec2 C=vec2(1.0/6.0,1.0/3.0);
+    const vec4 D=vec4(0.0,0.5,1.0,2.0);
+    vec3 i=floor(v+dot(v,C.yyy));
+    vec3 x0=v-i+dot(i,C.xxx);
+    vec3 g=step(x0.yzx,x0.xyz);
+    vec3 l=1.0-g;
+    vec3 i1=min(g.xyz,l.zxy);
+    vec3 i2=max(g.xyz,l.zxy);
+    vec3 x1=x0-i1+C.xxx;
+    vec3 x2=x0-i2+C.yyy;
+    vec3 x3=x0-D.yyy;
+    i=mod289(i);
+    vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+    float n_=0.142857142857;
+    vec3 ns=n_*D.wyz-D.xzx;
+    vec4 j=p-49.0*floor(p*ns.z*ns.z);
+    vec4 x_=floor(j*ns.z);
+    vec4 y_=floor(j-7.0*x_);
+    vec4 x=x_*ns.x+ns.yyyy;
+    vec4 y=y_*ns.x+ns.yyyy;
+    vec4 h=1.0-abs(x)-abs(y);
+    vec4 b0=vec4(x.xy,y.xy);
+    vec4 b1=vec4(x.zw,y.zw);
+    vec4 s0=floor(b0)*2.0+1.0;
+    vec4 s1=floor(b1)*2.0+1.0;
+    vec4 sh=-step(h,vec4(0.0));
+    vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;
+    vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+    vec3 p0=vec3(a0.xy,h.x);
+    vec3 p1=vec3(a0.zw,h.y);
+    vec3 p2=vec3(a1.xy,h.z);
+    vec3 p3=vec3(a1.zw,h.w);
+    vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+    p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+    vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
+    m=m*m;
+    return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+  }
+`;
 
-const DISC_R      = isMobile ? 1.6 : 2.2;   // outer radius of the disc
-const ARC_COUNT   = budget === 'low' ? 52 : 80; // number of wires
-const PTS_PER_ARC = budget === 'low' ? 32 : 48; // smoothness of each wire
-const WIRE_R      = 0.013;                   // wire tube radius
-const WIRE_SEGS   = budget === 'low' ? 4 : 6;
-
-// scroll state
-let scrollP    = 0;   // 0..1
-let camY       = 0;   // world Y of camera (descent)
-const DIVE_Y   = 50;
-
-/* ── Renderer ── */
-const canvas   = document.getElementById('stage');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, budget === 'low' ? 1.5 : 2));
+const canvas = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio, budget==='low'?1.5:2));
 renderer.setSize(innerWidth, innerHeight);
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.95;
 
-/* ── Scene ── */
 const scene = new THREE.Scene();
-scene.fog   = new THREE.FogExp2(0x020304, 0.03);
+scene.fog = new THREE.FogExp2(0x030405, 0.028);
 
-const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 200);
-camera.position.set(0, 0, 5.5);
+const camera = new THREE.PerspectiveCamera(46, innerWidth/innerHeight, 0.1, 200);
 
-/* ── Lights ── */
-scene.add(new THREE.AmbientLight(0x161820, 2.0));
-const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
-keyLight.position.set(4, 6, 8);
-scene.add(keyLight);
-const rimLight = new THREE.DirectionalLight(0xaabbd0, 0.8);
-rimLight.position.set(-5, -4, -3);
-scene.add(rimLight);
-const movingLight = new THREE.PointLight(0xffffff, 2.5, 18, 2);
-scene.add(movingLight);
+// Camera dive path: from y=0 down to y=-DIVE_DEPTH
+const DIVE_DEPTH = 60;
+const camState = { y: 0, push: 0 };
+const spiralRot = { y: 0 }; // scroll-driven base rotation of the ring
+const pulse = { v: 0 };     // glow pulse near chapter boundaries
 
-/* ── Chrome material ── */
-const chromeMat = new THREE.MeshStandardMaterial({
-  color:      0xd8d8dc,
-  metalness:  1.0,
-  roughness:  0.08,
-  envMapIntensity: 1.4,
+/* Lights — a "dive lamp" that follows the camera + colored abyss lights */
+scene.add(new THREE.AmbientLight(0x14161c, 1.4));
+const lamp = new THREE.PointLight(0xf2efe8, 2.6, 24, 2);
+scene.add(lamp);
+const goldLight = new THREE.DirectionalLight(0xd8b26e, 1.2);
+goldLight.position.set(5, 3, 4);
+scene.add(goldLight);
+const iceLight = new THREE.DirectionalLight(0x9fd8e8, 0.9);
+iceLight.position.set(-5, -6, -3);
+scene.add(iceLight);
+
+/* ------------------------------------------------------------------
+   METALLIC SPIRAL MATERIAL — polished chrome/gold surface.
+   uScroll drives a live twist along the strand so the spiral
+   visibly coils tighter and rotates as the user scrolls.
+------------------------------------------------------------------ */
+function makeSpiralMaterial(colorA, colorB, glow){
+  return new THREE.ShaderMaterial({
+    uniforms:{
+      uTime:{value:0},
+      uScroll:{value:0},       // 0..1 page progress -> twist + shimmer
+      uTravel:{value:0},       // 0..1 how "in transit" the form is -> melts while moving
+      uNear:{value:0},         // 0..1 proximity to camera -> darker, crisper, less glow
+      uColorA:{value:new THREE.Color(colorA)},
+      uColorB:{value:new THREE.Color(colorB)},
+      uGlow:{value:new THREE.Color(glow)},
+      uPulse:{value:0}
+    },
+    vertexShader:`
+      uniform float uTime;
+      uniform float uScroll;
+      uniform float uTravel;
+      varying vec3 vNormal;
+      varying vec3 vWorld;
+      varying float vBand;
+      varying float vMolten;
+      varying float vZ;
+      void main(){
+        vec3 p = position;
+        float ang = atan(p.y, p.x);
+        // RIGID BODY: the coil's shape never changes. All motion comes
+        // from the group transform (position/rotation/scale) — the
+        // geometry itself is solid metal.
+        vec3 tw = p;
+        vBand = sin(ang*6.0 + uTime*0.4);
+        vMolten = 0.0;
+        vZ = tw.z; // local depth: front windings vs back windings
+        vNormal = normalize(normalMatrix * normal);
+        vec4 w = modelMatrix * vec4(tw,1.0);
+        vWorld = w.xyz;
+        gl_Position = projectionMatrix * viewMatrix * w;
+      }
+    `,
+    fragmentShader:`
+      uniform vec3 uColorA;
+      uniform vec3 uColorB;
+      uniform vec3 uGlow;
+      uniform float uPulse;
+      uniform float uNear;
+      varying vec3 vNormal;
+      varying vec3 vWorld;
+      varying float vBand;
+      varying float vMolten;
+      varying float vZ;
+      void main(){
+        vec3 N = normalize(vNormal);
+        vec3 V = normalize(cameraPosition - vWorld);
+        float fres = pow(1.0 - clamp(dot(V,N),0.0,1.0), 2.0);
+        vec3 L = normalize(vec3(0.6, 0.8, 0.5));
+        vec3 H = normalize(L + V);
+        // FORM SHADING: each tube has a lit side and a DEEP shade side —
+        // this is what makes the coils read as round 3D metal
+        float diff = clamp(dot(N, L), 0.0, 1.0);
+        float form = mix(0.08, 1.0, diff);
+        // DEPTH OCCLUSION: windings curving away to the back sink into black
+        float depthShade = mix(0.18, 1.0, smoothstep(-1.1, 0.9, vZ));
+        // up close the highlight tightens into a hard, crisp sliver
+        float shininess = mix(90.0, 18.0, vMolten) * mix(1.0, 2.6, uNear);
+        float spec = pow(max(dot(N,H),0.0), shininess)
+                   * mix(1.0, 0.6, uNear) * mix(1.0, 0.8, vMolten);
+        float brushed = smoothstep(0.15, 0.9, vBand*0.5+0.5);
+        vec3 base = mix(uColorA, uColorB, brushed);
+        base *= form * depthShade;
+        // restrained fresnel edge sheen only — no glow, no rim
+        vec3 color = mix(base, vec3(0.95), fres * mix(0.35, 0.2, uNear) * depthShade)
+                   + spec * depthShade;
+        // exposure pull-down as it nears the lens: darker body, shape reads by contrast
+        color *= mix(1.0, 0.66, uNear);
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `
+  });
+}
+
+/* ------------------------------------------------------------------
+   THE RING — a toroidal coil (slinky bent into a circle), face-on
+   to the camera like a chrome iris. Content sits in its hole.
+   Fully procedural: one curve equation, no assets.
+------------------------------------------------------------------ */
+class TorusCoil extends THREE.Curve{
+  constructor(R, r, windings, phase){
+    super();
+    this.R = R; this.r = r; this.N = windings; this.phase = phase;
+  }
+  getPoint(t){
+    const u = t * Math.PI * 2;                    // around the ring
+    const v = t * Math.PI * 2 * this.N + this.phase; // around the coil
+    const w = this.R + this.r * Math.cos(v);
+    return new THREE.Vector3(
+      w * Math.cos(u),
+      w * Math.sin(u),      // ring lies in the XY plane -> faces the camera
+      this.r * Math.sin(v)
+    );
+  }
+}
+
+const spiralGroup = new THREE.Group();
+spiralGroup.position.set(0, 0, -1.2);
+scene.add(spiralGroup);
+
+const tubularSegs = budget==='low' ? 1400 : 3000;
+const radialSegs  = budget==='low' ? 5 : 7;
+
+// monochrome chrome, like the reference — silver strands on black
+const strandMats = [
+  makeSpiralMaterial('#15171b','#eef0f4','#cfd6e0'),
+  makeSpiralMaterial('#101216','#c8ccd4','#eef0f4'),
+];
+const spiralParts = [];
+// two interleaved coils double the strand density for that dense wire look
+[0, Math.PI].forEach((phase,i)=>{
+  const curve = new TorusCoil(2.6, 1.05, 42, phase);
+  const geo = new THREE.TubeGeometry(curve, tubularSegs, 0.028, radialSegs, true);
+  const mesh = new THREE.Mesh(geo, strandMats[i]);
+  spiralGroup.add(mesh);
+  spiralParts.push(mesh);
 });
 
-/* ── Build one arc ──
-   arcIdx : 0..ARC_COUNT-1
-   bounce : 0..1  — how far the tip bends in Z
-   time   : seconds — drives the travelling wave phase
-*/
-function buildArcGeo(arcIdx, bounce, time) {
-  // Base angle of this arc around the disc
-  const baseAngle = (arcIdx / ARC_COUNT) * Math.PI * 2;
+// faint inner guide ring to catch light on the hole's edge
+const innerMat = makeSpiralMaterial('#101216','#eef0f4','#cfd6e0');
+const innerGeo = new THREE.TorusGeometry(1.55, 0.012, budget==='low'?5:7, budget==='low'?90:160);
+const innerRing = new THREE.Mesh(innerGeo, innerMat);
+spiralGroup.add(innerRing);
+spiralParts.push(innerRing);
 
-  // Travelling wave phase — offset per arc index creates the ripple
-  const wavePhase = (arcIdx / ARC_COUNT) * Math.PI * 2;
-  // The wave amplitude modulated by scroll: bigger bounce when scrolling
-  const amp       = bounce * DISC_R * 0.7;
-  // Current Z peak for this arc (shifts with time so the wave travels)
-  const zPeak     = Math.sin(time * 1.8 + wavePhase) * amp;
+/* ------------------------------------------------------------------
+   THE JOURNEY — the form travels THROUGH the site as you scroll.
+   Each chapter has a waypoint (position / scale / tilt). Between
+   waypoints it melts into fluid; on arrival it freezes into chrome.
+------------------------------------------------------------------ */
+const waypoints = [
+  // p: page progress where the form is "parked" at this pose
+  { p:0.00, x:3.8,  y:0.1,  z:-2.2, s:0.58, rx:0.65, ry:-0.9 }, // hero — angled like a coin mid-turn, right edge
+  { p:0.22, x:3.0,  y:0.2,  z:-2.8, s:0.55, rx:0.35, ry:-0.6 }, // twilight — tucks slightly deeper
+  { p:0.44, x:2.2,  y:-0.4, z:-4.2, s:0.75, rx:-0.4, ry:0.8  }, // midnight — drifts down, near edge-on
+  { p:0.66, x:0.4,  y:1.5,  z:-6.0, s:0.80, rx:0.95, ry:0.2  }, // record — recedes overhead like a halo
+  { p:0.90, x:0.0,  y:0.0,  z:-1.1, s:1.00, rx:0.0,  ry:0.0  }, // the floor — returns center, face-on
+];
+// narrow screens: the ring rides top-right above the copy instead of beside it
+if(isMobile){
+  waypoints.forEach(w=>{ w.x *= 0.42; w.s *= 0.85; });
+  Object.assign(waypoints[0], { x:1.15, y:2.4, z:-2.6, s:0.5 });
+  Object.assign(waypoints[1], { x:1.2,  y:2.2 });
+}
+const journeyTarget = { x:0, y:0, z:-1.2, s:1, rx:0, ry:0, travel:0 };
 
-  const points = [];
-  for (let j = 0; j <= PTS_PER_ARC; j++) {
-    const t = j / PTS_PER_ARC;            // 0 = one edge, 1 = other edge
-
-    // Each arc sweeps from -DISC_R to +DISC_R along its own axis
-    // The arc axis is perpendicular to baseAngle
-    const perpAngle = baseAngle + Math.PI * 0.5;
-    const sweep     = (t - 0.5) * 2;      // -1 .. +1
-
-    // Position along the arc axis (the chord of the arc)
-    const px = Math.cos(perpAngle) * sweep * DISC_R;
-    const py = Math.sin(perpAngle) * sweep * DISC_R;
-
-    // Z: a parabola that peaks in the middle of the arc
-    // The parabola amplitude follows the travelling wave
-    const para = 1.0 - sweep * sweep;     // 0 at edges, 1 at centre
-    const pz   = para * zPeak;
-
-    points.push(new THREE.Vector3(px, py, pz));
+function easeInOut(u){ return u*u*(3-2*u); }
+function sampleJourney(p){
+  // clamp into range
+  if(p <= waypoints[0].p){ Object.assign(journeyTarget, waypoints[0]); journeyTarget.travel = 0; return; }
+  const last = waypoints[waypoints.length-1];
+  if(p >= last.p){ Object.assign(journeyTarget, last); journeyTarget.travel = 0; return; }
+  for(let i=0;i<waypoints.length-1;i++){
+    const a = waypoints[i], b = waypoints[i+1];
+    if(p >= a.p && p < b.p){
+      const u = easeInOut((p - a.p)/(b.p - a.p));
+      journeyTarget.x = a.x + (b.x - a.x)*u;
+      journeyTarget.y = a.y + (b.y - a.y)*u;
+      journeyTarget.z = a.z + (b.z - a.z)*u;
+      journeyTarget.s = a.s + (b.s - a.s)*u;
+      journeyTarget.rx = a.rx + (b.rx - a.rx)*u;
+      journeyTarget.ry = a.ry + (b.ry - a.ry)*u;
+      // travel peaks mid-leg: this is what melts the metal in motion
+      journeyTarget.travel = Math.pow(Math.sin(u*Math.PI), 1.4);
+      return;
+    }
   }
-
-  const curve = new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.0);
-  return new THREE.TubeGeometry(curve, PTS_PER_ARC, WIRE_R, WIRE_SEGS, false);
 }
 
-/* ── Create disc group ── */
-const discGroup = new THREE.Group();
-scene.add(discGroup);
-
-const arcMeshes = [];
-const arcGeos   = [];
-
-for (let i = 0; i < ARC_COUNT; i++) {
-  const geo  = buildArcGeo(i, 0, 0);
-  const mesh = new THREE.Mesh(geo, chromeMat);
-  discGroup.add(mesh);
-  arcMeshes.push(mesh);
-  arcGeos.push(geo);
+/* Ambient dust — a thin silver haze drifting around the ring */
+const COUNT = budget==='low' ? 500 : 1400;
+const pos = new Float32Array(COUNT*3);
+for(let i=0;i<COUNT;i++){
+  pos[i*3]   = (Math.random()-0.5)*26;
+  pos[i*3+1] = (Math.random()-0.5)*16;
+  pos[i*3+2] = (Math.random()-0.5)*14 - 4;
 }
-
-/* ── Post ── */
-const composer = new EffectComposer(renderer);
-composer.addPass(new RenderPass(scene, camera));
-// Bloom very subtle — chrome look, not neon
-const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.18, 0.5, 0.6);
-composer.addPass(bloom);
-// Chromatic aberration + vignette pass
-const gradePass = new ShaderPass({
-  uniforms: { tDiffuse: { value: null }, uAb: { value: 0.0012 } },
-  vertexShader:  `varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-  fragmentShader:`
-    uniform sampler2D tDiffuse;
-    uniform float uAb;
-    varying vec2 vUv;
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+const pMat = new THREE.ShaderMaterial({
+  transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
+  uniforms:{ uTime:{value:0}, uColor:{value:new THREE.Color('#aeb6c2')} },
+  vertexShader:`
+    uniform float uTime;
     void main(){
-      vec2 d=vUv-.5; float e=length(d);
-      float r=texture2D(tDiffuse,vUv-d*uAb*(1.+e)).r;
-      float g=texture2D(tDiffuse,vUv).g;
-      float b=texture2D(tDiffuse,vUv+d*uAb*(1.+e)).b;
-      gl_FragColor=vec4(r,g,b,1.);
+      vec3 p = position;
+      p.x += sin(uTime*0.15 + position.y*0.7)*0.35;
+      p.y += sin(uTime*0.1 + position.x)*0.2;
+      vec4 mv = modelViewMatrix * vec4(p,1.0);
+      gl_PointSize = 14.0 / -mv.z;
+      gl_Position = projectionMatrix * mv;
+    }
+  `,
+  fragmentShader:`
+    uniform vec3 uColor;
+    void main(){
+      float d = length(gl_PointCoord - 0.5);
+      gl_FragColor = vec4(uColor, smoothstep(0.5,0.0,d)*0.4);
     }
   `
 });
-composer.addPass(gradePass);
-composer.addPass(new OutputPass());
+scene.add(new THREE.Points(pGeo, pMat));
 
-/* ── Mouse ── */
-const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-addEventListener('pointermove', e => {
-  mouse.tx = (e.clientX / innerWidth  - .5) * 2;
-  mouse.ty = (e.clientY / innerHeight - .5) * 2;
+/* Post: focus/grade pass only (radial soft-focus fakes shallow DoF). No bloom — clean dark metal. */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const grade = new ShaderPass({
+  uniforms:{ tDiffuse:{value:null}, uAb:{value:0.0016}, uFocus:{value:0.0} },
+  vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+  fragmentShader:`
+    uniform sampler2D tDiffuse;
+    uniform float uAb;
+    uniform float uFocus;
+    varying vec2 vUv;
+    void main(){
+      vec2 dir = vUv - 0.5;
+      float edge = length(dir);
+      // chromatic aberration grows toward edges
+      float r = texture2D(tDiffuse, vUv - dir*uAb*(1.0+edge*2.0)).r;
+      float g = texture2D(tDiffuse, vUv).g;
+      float b = texture2D(tDiffuse, vUv + dir*uAb*(1.0+edge*2.0)).b;
+      vec3 c = vec3(r,g,b);
+      // soft radial defocus: blend a 4-tap blur at edges (cheap DoF feel)
+      float blurAmt = smoothstep(0.25, 0.75, edge) * (0.5 + uFocus);
+      vec2 o = dir * 0.006 * blurAmt;
+      vec3 blur = ( texture2D(tDiffuse, vUv+o).rgb + texture2D(tDiffuse, vUv-o).rgb
+                  + texture2D(tDiffuse, vUv+vec2(o.y,-o.x)).rgb + texture2D(tDiffuse, vUv+vec2(-o.y,o.x)).rgb )*0.25;
+      c = mix(c, blur, blurAmt*0.8);
+      c *= mix(0.5, 1.0, smoothstep(0.85, 0.2, edge));
+      gl_FragColor = vec4(c,1.0);
+    }
+  `
+});
+composer.addPass(grade);
+
+/* Mouse drift */
+const m = {x:0,y:0,tx:0,ty:0};
+addEventListener('pointermove', e=>{
+  m.tx = (e.clientX/innerWidth - .5)*2;
+  m.ty = (e.clientY/innerHeight - .5)*2;
 });
 
-/* ── Resize ── */
-addEventListener('resize', () => {
-  camera.aspect = innerWidth / innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-  composer.setSize(innerWidth, innerHeight);
-});
-
-/* ── Render loop ── */
 const clock = new THREE.Clock();
-let   rebuildTick = 0;
-
-function tick() {
+function tick(){
   requestAnimationFrame(tick);
   const t = clock.getElapsedTime();
+  m.x += (m.tx-m.x)*0.045;
+  m.y += (m.ty-m.y)*0.045;
 
-  mouse.x += (mouse.tx - mouse.x) * 0.05;
-  mouse.y += (mouse.ty - mouse.y) * 0.05;
+  spiralParts.forEach((s)=>{
+    s.material.uniforms.uTime.value = t;
+    s.material.uniforms.uPulse.value = pulse.v;
+  });
+  // flow toward the current journey waypoint — eased, so motion feels liquid
+  const g = spiralGroup;
+  g.position.x += (journeyTarget.x - g.position.x) * 0.055;
+  g.position.y += (journeyTarget.y - g.position.y) * 0.055;
+  g.position.z += (journeyTarget.z - g.position.z) * 0.055;
+  const sTarget = journeyTarget.s;
+  g.scale.x += (sTarget - g.scale.x) * 0.055;
+  g.scale.y = g.scale.z = g.scale.x;
+  // the iris spins with the scroll; journey tilt + mouse keep it alive
+  g.rotation.z = spiralRot.y + t*0.04;
+  g.rotation.x += ((journeyTarget.rx + m.y*0.16) - g.rotation.x) * 0.06;
+  g.rotation.y += ((journeyTarget.ry + m.x*0.2)  - g.rotation.y) * 0.06;
+  pMat.uniforms.uTime.value = t;
 
-  // Disc follows camera Y (stays in view as we descend)
-  discGroup.position.y = camY;
+  // cinematic framing: slow push-in as the story deepens, subtle parallax
+  camera.position.x = m.x*0.35;
+  camera.position.y = -m.y*0.25 + Math.sin(t*0.3)*0.05;
+  camera.position.z = 7.4 - camState.push;
+  camera.lookAt(0, 0, -1.2);
 
-  // Slow Z spin — the key visual from the reference
-  discGroup.rotation.z = t * 0.06;
-
-  // Gentle tilt toward mouse
-  discGroup.rotation.x =  mouse.y * 0.05;
-  discGroup.rotation.y = -mouse.x * 0.05;
-
-  // Rebuild arc geometries every 2 frames — drives the bounce
-  rebuildTick++;
-  if (rebuildTick % 2 === 0) {
-    // bounce amplitude: sine of scroll progress → peaks mid-scroll
-    const bounceAmp = Math.abs(Math.sin(scrollP * Math.PI * 2.5));
-    for (let i = 0; i < ARC_COUNT; i++) {
-      arcGeos[i].dispose();
-      const geo        = buildArcGeo(i, bounceAmp, t);
-      arcMeshes[i].geometry = geo;
-      arcGeos[i]       = geo;
-    }
-  }
-
-  // Camera
-  camera.position.x = mouse.x * 0.35;
-  camera.position.y = camY + mouse.y * -0.25 + Math.sin(t * 0.25) * 0.06;
-  camera.position.z = 5.5;
-  camera.lookAt(0, camY, 0);
-
-  // Moving light orbits the disc
-  movingLight.position.set(
-    Math.sin(t * 0.5) * 5,
-    camY + Math.cos(t * 0.4) * 3,
-    4
-  );
+  lamp.position.set(camera.position.x+1.2, camera.position.y+0.8, 3.2);
 
   composer.render();
 }
 tick();
 
-/* ─────────────────────────────────────────────────────────────
-   LENIS + ScrollTrigger
-───────────────────────────────────────────────────────────────*/
-if (window.Lenis) {
-  const lenis = new window.Lenis({ duration: 1.25, easing: x => 1 - Math.pow(1 - x, 3), smoothWheel: true });
+addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+});
+
+/* ------------------------------------------------------------------
+   LENIS + GSAP — scroll drives the dive
+------------------------------------------------------------------ */
+gsap.registerPlugin(ScrollTrigger);
+
+if(!reducedMotion && window.Lenis){
+  const lenis = new window.Lenis({ duration:1.2, easing:x=>1-Math.pow(1-x,3), smoothWheel:true, smoothTouch:false });
   lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.add(time=>lenis.raf(time*1000));
   gsap.ticker.lagSmoothing(0);
 }
 
-// Master scroll → camera depth + HUD
+/* Master dive: page scroll -> camera depth + HUD depth meter */
 ScrollTrigger.create({
   trigger: document.body,
-  start: 'top top', end: 'bottom bottom',
-  scrub: 1.0,
-  onUpdate(self) {
-    scrollP = self.progress;
-    camY    = -scrollP * DIVE_Y * 0.82;
-
-    const m = Math.round(scrollP * 10900);
-    document.getElementById('depthRead').textContent = String(m).padStart(4, '0') + 'm';
-    document.getElementById('depthFill').style.width = (scrollP * 100).toFixed(1) + '%';
-
-    scene.fog.density = 0.025 + scrollP * 0.018;
+  start:'top top', end:'bottom bottom',
+  scrub: 0.8,
+  onUpdate(self){
+    const p = self.progress;
+    camState.push = p * 2.2; // slow cinematic dolly toward the iris
+    const meters = Math.round(p * 10900);
+    document.getElementById('depthRead').textContent = String(meters).padStart(4,'0') + 'm';
+    document.getElementById('depthFill').style.width = (p*100).toFixed(1) + '%';
+    // keep fog light — the wire ring needs contrast to read
+    scene.fog.density = 0.028 + p*0.012;
+    // JOURNEY: where is the form on its route through the site?
+    sampleJourney(p);
+    // PROXIMITY: how close is the form to the lens right now?
+    // camera z = 7.4 - push; group z = journeyTarget.z
+    const camZ = 7.4 - p * 2.2;
+    const dist = camZ - journeyTarget.z;                  // ~8.6 far ... ~5.9 close
+    const near = THREE.MathUtils.clamp((8.4 - dist) / 2.4, 0, 1);
+    // the ring turns gently with the scroll — under one full revolution total
+    spiralRot.y = p * Math.PI * 1.6;
+    spiralParts.forEach(s=>{
+      s.material.uniforms.uScroll.value = p;
+      s.material.uniforms.uTravel.value = journeyTarget.travel;
+      s.material.uniforms.uNear.value = near;
+    });
+    // defocus also eases off up close — near = sharp
+    grade.uniforms.uFocus.value = p*0.3 * (1.0 - near*0.8);
+    // glow swells only faintly at chapter thresholds
+    pulse.v = (Math.pow(Math.abs(Math.sin(p * Math.PI * 5)), 3.0) * 0.3 + journeyTarget.travel*0.2) * (1.0 - near*0.6);
   }
 });
 
-// Word-mask reveals
-document.querySelectorAll('.word-mask span').forEach(el => {
-  gsap.fromTo(el, { yPercent: 112 }, {
-    yPercent: 0, duration: 1.2, ease: 'power4.out',
-    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' }
+/* Word-mask headline reveals */
+document.querySelectorAll('.word-mask span').forEach(el=>{
+  gsap.fromTo(el, {yPercent:115}, {
+    yPercent:0, duration:1.2, ease:'power4.out',
+    scrollTrigger:{ trigger: el, start:'top 88%', toggleActions:'play none none reverse' }
   });
 });
 
-// Rise elements
-gsap.utils.toArray('.rise').forEach(el => {
-  gsap.fromTo(el, { opacity: 0, y: 38 }, {
-    opacity: 1, y: 0, duration: 1.1, ease: 'power3.out',
-    scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none reverse' }
+/* Body element rises */
+gsap.utils.toArray('.rise').forEach(el=>{
+  gsap.fromTo(el, {opacity:0, y:40}, {
+    opacity:1, y:0, duration:1.1, ease:'power3.out',
+    scrollTrigger:{ trigger: el, start:'top 90%', toggleActions:'play none none reverse' }
   });
 });
 
-/* ── Gate ── */
-gsap.fromTo('#gateMark', { yPercent: 110 }, { yPercent: 0, duration: 1.1, ease: 'power4.out', delay: 0.15 });
-let gDepth = 0;
-const gTimer = setInterval(() => {
-  gDepth += Math.random() * 1300;
-  if (gDepth >= 10900) {
-    gDepth = 10900;
-    clearInterval(gTimer);
-    document.getElementById('gateFill').style.height = '100%';
-    document.getElementById('gatePct').textContent = 'LAYER 10900m — READY';
-    gsap.to('#gate', { opacity: 0, duration: 1, delay: 0.4, ease: 'power2.inOut',
-      onComplete() { document.getElementById('gate').classList.add('done'); } });
+/* ------------------------------------------------------------------
+   GATE (loader)
+------------------------------------------------------------------ */
+gsap.to('#gateMark', { y:'0%', duration:1, ease:'power4.out', delay:0.15,
+  onStart(){ document.getElementById('gateMark').style.transform='translateY(110%)'; }
+});
+gsap.fromTo('#gateMark', {yPercent:110}, {yPercent:0, duration:1.1, ease:'power4.out', delay:0.15});
+
+let depth = 0;
+const gateTimer = setInterval(()=>{
+  depth += Math.random()*1400;
+  if(depth >= 10900){
+    depth = 10900;
+    clearInterval(gateTimer);
+    document.getElementById('gateFill').style.height='100%';
+    document.getElementById('gatePct').textContent='DEPTH 10900m — READY';
+    gsap.to('#gate', { opacity:0, duration:1, delay:0.4, ease:'power2.inOut',
+      onComplete(){ document.getElementById('gate').classList.add('done'); }
+    });
     return;
   }
-  document.getElementById('gateFill').style.height = (gDepth / 10900 * 100).toFixed(0) + '%';
-  document.getElementById('gatePct').textContent = 'LAYER ' + String(Math.round(gDepth)).padStart(4, '0') + 'm';
+  document.getElementById('gateFill').style.height = (depth/10900*100).toFixed(0)+'%';
+  document.getElementById('gatePct').textContent = 'DEPTH ' + String(Math.round(depth)).padStart(4,'0') + 'm';
 }, 130);
-
 </script>
+
 </body>
 </html>
