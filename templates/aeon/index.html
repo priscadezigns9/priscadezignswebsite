@@ -387,101 +387,114 @@ const fillL = new THREE.DirectionalLight(0xd0d8e8, 0.6);
 fillL.position.set(-4, -3, -4); scene.add(fillL);
 
 /* ═══════════════════════════════════════════════════════════════
-   SLINKY — face-on radial disc, helix axis = Z (toward camera).
-   Looks exactly like the reference: dense chrome rings forming
-   a portal. Scroll compresses the depth (Z-spread of coils).
-   Text content sits inside the centre void.
+   SLINKY — a sunflower of chrome arcs, face-on to the camera.
+   Each "petal" is a thin curved wire anchored at the centre and
+   arcing outward. On scroll/bounce they oscillate in Z with a
+   radial phase offset so it looks like a slinky bouncing.
+
+   Reference image: web.with.ai reel — dense chrome arcs fanning
+   from a dark centre void, the whole thing spinning slowly.
 ═══════════════════════════════════════════════════════════════ */
 
-// Parameters
-const COILS     = budget === 'low' ? 38 : 52;  // ring count
-const COIL_R    = 2.6;    // outer radius of the disc
-const INNER_R   = 0.72;   // clear centre void (content lives here)
-const TUBE_R    = 0.028;  // cross-section of the wire
-const SPINE_PTS = budget === 'low' ? 180 : 280;
-const TUBE_SEGS = budget === 'low' ? 6 : 10;
+const ARC_COUNT   = budget === 'low' ? 48 : 72;   // number of petals
+const ARC_PTS     = budget === 'low' ? 40 : 60;   // points per arc
+const ARC_R_INNER = 0.18;  // arc starts near centre
+const ARC_R_OUTER = 2.55;  // arc tip radius
+const TUBE_R      = 0.018; // wire thickness
+const TUBE_SEGS   = budget === 'low' ? 5 : 8;
 
-// Scroll state
-const slinkState = { compress: 0 }; // 0=spread, 1=flat
+// Scroll / bounce state
+const slinkState = {
+  bounce: 0,      // 0..1 driven by scroll, drives Z wave amplitude
+  scrollProg: 0,  // raw scroll 0..1
+};
 
-// Build spine: helix axis along Z, rings spread across Z depth
-function buildSpinePoints(compress) {
-  const pts     = [];
-  // total Z depth: spread out when compress=0, collapse to thin disc at compress=1
-  const zSpread = 3.2 * (1.0 - compress * 0.88);
-  for (let i = 0; i <= SPINE_PTS; i++) {
-    const t     = i / SPINE_PTS;
-    const angle = t * Math.PI * 2 * COILS;
-    // radius varies slightly per ring for the "sunflower" fan look
-    const r     = INNER_R + (COIL_R - INNER_R) * (0.3 + 0.7 * t);
-    const x     = Math.cos(angle) * r;
-    const y     = Math.sin(angle) * r;
-    const z     = (t - 0.5) * zSpread; // Z is the depth axis
-    pts.push(new THREE.Vector3(x, y, z));
-  }
-  return pts;
-}
-
-// Chrome material — clean white metal, minimal glow
-const slinkMat = new THREE.ShaderMaterial({
+// Chrome ShaderMaterial
+const chromeMat = new THREE.ShaderMaterial({
   uniforms: {
     uTime:  { value: 0 },
-    uTilt:  { value: 0 }, // scroll-driven tilt
+    uBounce:{ value: 0 }, // 0=flat, 1=full bounce
   },
   vertexShader: `
-    varying vec3 vNormal;
-    varying vec3 vWorld;
-    varying float vT;
-    attribute float aT;
+    varying vec3  vNormal;
+    varying vec3  vWorld;
     void main(){
       vNormal = normalize(normalMatrix * normal);
       vec4 w  = modelMatrix * vec4(position, 1.0);
       vWorld  = w.xyz;
-      vT      = (position.z + 1.6) / 3.2; // 0..1 across Z depth
       gl_Position = projectionMatrix * viewMatrix * w;
     }
   `,
   fragmentShader: `
-    uniform float uTime;
-    varying vec3  vNormal;
-    varying vec3  vWorld;
-    varying float vT;
+    varying vec3 vNormal;
+    varying vec3 vWorld;
     void main(){
       vec3  V    = normalize(cameraPosition - vWorld);
       vec3  N    = normalize(vNormal);
-      // angle-of-incidence → metallic sheen
       float ndv  = clamp(dot(N, V), 0.0, 1.0);
-      float fres = pow(1.0 - ndv, 3.5);
-      // sharp specular lobe
-      vec3  L    = normalize(vec3(0.4, 0.6, 1.0));
-      float spec = pow(max(dot(reflect(-L, N), V), 0.0), 80.0);
-      // base chrome: near-white with slight warm/cool shift
-      float warm = 0.88 + vT * 0.12;
-      vec3  base = vec3(warm, warm * 0.97, warm * 0.94);
-      vec3  col  = base * (0.55 + ndv * 0.45);
-      col       += vec3(spec * 0.9);
-      col       += vec3(fres * 0.25); // very subtle rim, no colour
-      gl_FragColor = vec4(col, 1.0);
+      float fres = pow(1.0 - ndv, 3.2);
+      vec3  L    = normalize(vec3(0.5, 0.7, 1.0));
+      float spec = pow(max(dot(reflect(-L, N), V), 0.0), 90.0);
+      vec3  base = vec3(0.82, 0.82, 0.84) * (0.5 + ndv * 0.5);
+      base      += vec3(spec * 0.95);
+      base      += vec3(fres * 0.18);
+      gl_FragColor = vec4(base, 1.0);
     }
   `,
   side: THREE.DoubleSide,
 });
 
-// Build and add
-let slinkCurve = new THREE.CatmullRomCurve3(buildSpinePoints(0), false, 'catmullrom', 0.5);
-let slinkGeo   = new THREE.TubeGeometry(slinkCurve, SPINE_PTS, TUBE_R, TUBE_SEGS, false);
-const slinky   = new THREE.Mesh(slinkGeo, slinkMat);
-scene.add(slinky);
+// Group that holds all arcs — we rotate the group for the slow spin
+const slinkGroup = new THREE.Group();
+scene.add(slinkGroup);
 
-let rebuildFrame = 0;
-function rebuildSlinky(compress) {
-  slinkGeo.dispose();
-  slinkCurve      = new THREE.CatmullRomCurve3(buildSpinePoints(compress), false, 'catmullrom', 0.5);
-  slinkGeo        = new THREE.TubeGeometry(slinkCurve, SPINE_PTS, TUBE_R, TUBE_SEGS, false);
-  slinky.geometry = slinkGeo;
+// Build one arc petal
+// arcIdx = 0..ARC_COUNT-1, bounceAmp = how far Z oscillates
+function buildArc(arcIdx, bounceAmp, time) {
+  const baseAngle = (arcIdx / ARC_COUNT) * Math.PI * 2;
+  // Phase offset per arc — this is what gives the "slinky wave" look
+  const phase     = baseAngle;
+
+  const pts = [];
+  for (let i = 0; i <= ARC_PTS; i++) {
+    const t = i / ARC_PTS;
+    // Arc sweeps from inner to outer radius along its own radial direction
+    const r   = ARC_R_INNER + (ARC_R_OUTER - ARC_R_INNER) * t;
+    const x   = Math.cos(baseAngle) * r;
+    const y   = Math.sin(baseAngle) * r;
+    // Z oscillation: each arc bounces with its own phase
+    // t controls how much the tip bends vs the root (root stays still)
+    const zWave = Math.sin(time * 2.4 + phase) * bounceAmp * t * t;
+    pts.push(new THREE.Vector3(x, y, zWave));
+  }
+  return new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.0);
 }
 
-const stations = []; // unused, kept for render loop compat
+// Create all arc meshes
+const arcMeshes = [];
+const arcGeos   = [];
+for (let i = 0; i < ARC_COUNT; i++) {
+  const curve = buildArc(i, 0, 0);
+  const geo   = new THREE.TubeGeometry(curve, ARC_PTS, TUBE_R, TUBE_SEGS, false);
+  const mesh  = new THREE.Mesh(geo, chromeMat);
+  slinkGroup.add(mesh);
+  arcMeshes.push(mesh);
+  arcGeos.push(geo);
+}
+
+// Rebuild all arcs (called in render loop, throttled)
+let rebuildFrame  = 0;
+function rebuildArcs(bounceAmp, time) {
+  for (let i = 0; i < ARC_COUNT; i++) {
+    arcGeos[i].dispose();
+    const curve       = buildArc(i, bounceAmp, time);
+    const geo         = new THREE.TubeGeometry(curve, ARC_PTS, TUBE_R, TUBE_SEGS, false);
+    arcMeshes[i].geometry = geo;
+    arcGeos[i]        = geo;
+  }
+}
+
+const stations = []; // compat
 
 /* ── Marine snow / drifting particles ── */
 const COUNT = budget === 'low' ? 700 : 2000;
@@ -576,32 +589,33 @@ function tick() {
   m.x += (m.tx - m.x) * 0.045;
   m.y += (m.ty - m.y) * 0.045;
 
-  slinkMat.uniforms.uTime.value = t;
+  chromeMat.uniforms.uTime.value   = t;
+  chromeMat.uniforms.uBounce.value = slinkState.bounce;
 
-  // Rebuild every 4 frames — compress changes with scroll
+  // Rebuild arcs every 2 frames — bounce amplitude and time both drive Z wave
   rebuildFrame++;
-  if (rebuildFrame % 4 === 0) {
-    rebuildSlinky(slinkState.compress);
+  if (rebuildFrame % 2 === 0) {
+    rebuildArcs(slinkState.bounce * 1.4, t);
   }
 
-  // Slinky tracks the camera's Y position (stays centred on screen as we dive)
-  slinky.position.y = camState.y;
+  // Group follows camera down the shaft — stays centred in screen
+  slinkGroup.position.y = camState.y;
 
-  // Slow continuous Z-rotation — gives the spinning portal effect
-  slinky.rotation.z  = t * 0.04;
+  // Slow Z spin — the portal rotate from the reference
+  slinkGroup.rotation.z = t * 0.055;
 
-  // Subtle mouse tilt — very gentle so the disc face stays mostly toward camera
-  slinky.rotation.x  =  m.y * 0.08;
-  slinky.rotation.y  =  m.x * 0.08;
+  // Very slight mouse tilt to show 3D depth
+  slinkGroup.rotation.x =  m.y * 0.06;
+  slinkGroup.rotation.y = -m.x * 0.06;
 
   pMat.uniforms.uTime.value = t;
 
-  camera.position.x = m.x * 0.5;
-  camera.position.y = camState.y + Math.sin(t * 0.3) * 0.08 - m.y * 0.3;
+  camera.position.x = m.x * 0.4;
+  camera.position.y = camState.y + Math.sin(t * 0.28) * 0.06 - m.y * 0.25;
   camera.position.z = 5.5;
   camera.lookAt(0, camState.y, 0);
 
-  lamp.position.set(0, camState.y + 2, 4);
+  lamp.position.set(0, camState.y + 1.5, 4.5);
 
   composer.render();
 }
@@ -632,13 +646,14 @@ if (!reducedMotion && window.Lenis) {
   gsap.ticker.lagSmoothing(0);
 }
 
-/* Master dive: page scroll → camera depth + HUD + slinky compress */
+/* Master dive: scroll → camera depth + HUD + slinky bounce */
 ScrollTrigger.create({
   trigger: document.body,
   start: 'top top', end: 'bottom bottom',
-  scrub: 1.0,
+  scrub: 1.2,
   onUpdate(self) {
     const p = self.progress;
+    slinkState.scrollProg = p;
 
     // Camera descends
     camState.y = -p * DIVE_DEPTH * 0.82;
@@ -648,20 +663,17 @@ ScrollTrigger.create({
     document.getElementById('depthRead').textContent = String(meters).padStart(4,'0') + 'm';
     document.getElementById('depthFill').style.width = (p * 100).toFixed(1) + '%';
 
-    // Post-processing — keep bloom LOW (clean chrome look)
-    bloom.strength         = budget === 'low' ? 0.22 : 0.30;
-    grade.uniforms.uFocus.value = p * 0.25;
-    scene.fog.density      = 0.028 + p * 0.018;
+    // Post-processing — keep clean, no neon
+    bloom.strength              = budget === 'low' ? 0.18 : 0.24;
+    grade.uniforms.uFocus.value = p * 0.2;
+    scene.fog.density           = 0.025 + p * 0.015;
 
-    // ── Slinky compress ──
-    // 0–35%  : compress in  (spread Z → flat disc)
-    // 35–65% : flat, camera flies through the void centre
-    // 65–100%: spreads back out the other side
-    let compress;
-    if (p < 0.35)      compress = p / 0.35;
-    else if (p < 0.65) compress = 1.0;
-    else               compress = 1.0 - (p - 0.65) / 0.35;
-    slinkState.compress = compress;
+    // ── Slinky bounce amplitude ──
+    // Ramps up fast as soon as user scrolls, then holds, then fades
+    // Peak bounce = arcs bend out to max Z (looks like slinky mid-drop)
+    // Creates 2 full bounce peaks across the scroll journey
+    const wave = Math.sin(p * Math.PI * 2.5);          // 2.5 bounces over full scroll
+    slinkState.bounce = Math.max(0, wave);              // only positive half = outward bounce
   }
 });
 
