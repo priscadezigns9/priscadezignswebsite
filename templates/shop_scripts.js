@@ -165,9 +165,17 @@ function renderCart() {
  lines.push('%0ASetup Total: $' + totalSetup.toFixed(2));
  lines.push('Monthly Total: $' + totalMo.toFixed(2) + '%2Fmo');
  var msg = lines.join('%0A');
- // ── PayPal button — paypal.me/priscadezigns9/AMOUNT sends directly to priscadezigns9@gmail.com ──
+ // ── PayPal button — WhatsApp pre-fill so client identifies themselves before payment ──
  var paypalBtn = document.getElementById('cart-paypal');
- if (paypalBtn) paypalBtn.href = 'https://www.paypal.com/paypalme/priscadezigns9/' + totalSetup.toFixed(2);
+ var ppLines = [];
+ ppLines.push('Hi%21%20I%27d%20like%20to%20pay%20via%20PayPal%3A%0A');
+ ppLines.push('%F0%9F%9B%92%20' + encodeURIComponent(cart.base.name) + '%20%E2%80%94%20' + encodeURIComponent(p.label));
+ if (cart.addons.copy)    ppLines.push('%E2%9E%95%20Copywriting%20Add-On');
+ if (cart.addons.chatbot) ppLines.push('%E2%9E%95%20AI%20Chatbot%20Add-On');
+ ppLines.push('%0A%F0%9F%92%B3%20Setup%20Total%3A%20%24' + totalSetup.toFixed(2));
+ ppLines.push('%F0%9F%93%85%20Monthly%3A%20%24' + totalMo.toFixed(2) + '%2Fmo');
+ ppLines.push('%0ACould%20you%20please%20send%20me%20your%20PayPal%20link%20so%20I%20can%20complete%20the%20payment%3F');
+ if (paypalBtn) paypalBtn.href = 'https://wa.me/18683424101?text=' + ppLines.join('%0A');
  // ── Bank Transfer button → WhatsApp with full order + request for banking info ──
  var orderLines = [];
  orderLines.push('Hi%21%20I%27d%20like%20to%20place%20an%20order%20via%20bank%20transfer%3A%0A');
@@ -309,8 +317,16 @@ function updateAgreement() {
  var paypalBtn = document.getElementById('cart-paypal');
  var bankBtn   = document.getElementById('cart-bank');
  if (paypalBtn) {
+   var ppLines2 = [];
+   ppLines2.push('Hi%21%20I%27d%20like%20to%20pay%20via%20PayPal%3A%0A');
+   ppLines2.push('%F0%9F%9B%92%20' + encodeURIComponent(cart.base.name));
+   if (cart.addons.copy)    ppLines2.push('%E2%9E%95%20Copywriting%20Add-On');
+   if (cart.addons.chatbot) ppLines2.push('%E2%9E%95%20AI%20Chatbot%20Add-On');
+   ppLines2.push('%0A%F0%9F%92%B3%20Setup%3A%20%24' + totalSetup.toFixed(2));
+   ppLines2.push('%F0%9F%93%85%20Monthly%3A%20%24' + totalMo.toFixed(2) + '%2Fmo');
+   ppLines2.push('%0ACould%20you%20please%20send%20me%20your%20PayPal%20link%20so%20I%20can%20complete%20the%20payment%3F');
    if (unlocked) {
-     paypalBtn.href = 'https://www.paypal.com/paypalme/priscadezigns9/' + totalSetup.toFixed(2);
+     paypalBtn.href = 'https://wa.me/18683424101?text=' + ppLines2.join('%0A');
      paypalBtn.classList.remove('disabled');
    } else {
      paypalBtn.classList.add('disabled');
