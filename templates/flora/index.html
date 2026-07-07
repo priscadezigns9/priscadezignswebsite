@@ -76,6 +76,29 @@ ul{list-style:none}
 /* ── MAIN CONTENT ── */
 #content{margin-left:var(--nav-w);position:relative}
 
+/* ── SECTION FADE-IN ANIMATION ── */
+.section,
+.work-grid,
+.archive-strip,
+.split-section,
+.cta-strip,
+footer{
+  opacity:0;
+  transform:translateY(18px);
+  transition:opacity .65s ease, transform .65s ease;
+}
+.section.visible,
+.work-grid.visible,
+.archive-strip.visible,
+.split-section.visible,
+.cta-strip.visible,
+footer.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+/* hero always visible */
+.hero{opacity:1;transform:none}
+
 /* ── HERO ── */
 .hero{
   position:relative;height:100vh;width:100%;overflow:hidden;
@@ -777,22 +800,55 @@ footer{
 </div><!-- end #content -->
 
 <script>
+// ── INTERSECTION OBSERVER — fade in on scroll ──
+var fadeEls = document.querySelectorAll(
+  '.section, .work-grid, .archive-strip, .split-section, .cta-strip, footer'
+);
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:0.08});
+fadeEls.forEach(function(el){ observer.observe(el); });
+
+// ── NAV: expand sub-menu ──
 function toggleNav(el){
-  var g=el.closest('.nav-group');
-  var isOpen=g.classList.contains('open');
-  document.querySelectorAll('.nav-group').forEach(function(x){x.classList.remove('open');});
-  if(!isOpen)g.classList.add('open');
+  var g = el.closest('.nav-group');
+  var isOpen = g.classList.contains('open');
+  document.querySelectorAll('.nav-group').forEach(function(x){ x.classList.remove('open'); });
+  if(!isOpen) g.classList.add('open');
 }
+
+// ── NAV: scroll + fade reveal ──
 function scrollTo(id){
-  var el=document.getElementById(id);
-  if(el)el.scrollIntoView({behavior:'smooth'});
+  var el = document.getElementById(id);
+  if(!el) return;
+  // Reveal the section immediately so it's visible when scrolled to
+  el.classList.add('visible');
+  // Also reveal the next sibling if it's a work-grid or split-section
+  var next = el.nextElementSibling;
+  if(next) next.classList.add('visible');
+  el.scrollIntoView({behavior:'smooth', block:'start'});
   document.getElementById('side-nav').classList.remove('open');
 }
-// close mobile nav on outside click
+
+// ── Nav sub-links also trigger fade ──
+document.querySelectorAll('.nav-sub a[href^="#"]').forEach(function(a){
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    var id = a.getAttribute('href').replace('#','');
+    scrollTo(id);
+  });
+});
+
+// ── Close mobile nav on outside click ──
 document.addEventListener('click',function(e){
-  var nav=document.getElementById('side-nav');
-  var toggle=document.getElementById('mobile-toggle');
-  if(nav.classList.contains('open')&&!nav.contains(e.target)&&e.target!==toggle){
+  var nav = document.getElementById('side-nav');
+  var toggle = document.getElementById('mobile-toggle');
+  if(nav.classList.contains('open') && !nav.contains(e.target) && e.target !== toggle){
     nav.classList.remove('open');
   }
 });
