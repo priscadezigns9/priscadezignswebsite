@@ -99,6 +99,7 @@ const STEPS={
   about_brands:{
     bot:"Prisca Dezigns operates a network of specialised brand pages. Tap any to visit \uD83D\uDC47",
     r:[
+      {l:"\uD83E\uDDF5 SeamRite Designs",url:"https://seamritedesigns.priscadezigns.org"},
       {l:"\uD83C\uDFCE\uFE0F The Autodrome",url:"https://www.facebook.com/theautodrome"},
       {l:"\u26A1 Dreaming Anime",url:"https://www.facebook.com/dreaminganime"},
       {l:"\uD83C\uDFA8 NehNeh",url:"https://www.facebook.com/nehnehofficial"},
