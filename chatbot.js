@@ -112,7 +112,7 @@ const STEPS={
     bot:"The Way Made Known (TWMK) is the faith foundation at the heart of Prisca Dezigns.\n\n❖ A Gospel-driven NGO\n❖ Committed to evidence-based, Bible-centred proclamation\n❖ The backbone of everything we build\n\nEvery product, every project, and every dollar earned is part of a mission that goes far beyond business.",
     r:[
       {l:"\uD83C\uDF0D Visit TWMK",url:"https://priscadezigns.org"},
-      {l:"\uD83E\uDD1D Support the mission",s:"talk"},
+      {l:"\uD83E\uDD1D Support the mission",url:"https://paypal.me/priscadezigns9"},
       {l:"\u2190 Back",s:"about"}
     ]
   },
