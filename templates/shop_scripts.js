@@ -177,7 +177,7 @@ function renderCart() {
  var btns = [paypalBtn, bankBtn];
  btns.forEach(function(b){ if (!b) return;
    if (agrChk && agrChk.checked && !agrChk.disabled) { b.classList.remove('disabled'); }
-   else { b.classList.add('disabled'); b.href='#'; }
+   else { b.classList.add('disabled'); b.setAttribute('href','javascript:void(0)'); }
  });
  updateBadge();
 }
@@ -255,8 +255,24 @@ function updateAgreement() {
  btns.forEach(function(btn){
    if (!btn) return;
    if (chk.checked && !chk.disabled && cart.base) { btn.classList.remove('disabled'); }
-   else { btn.classList.add('disabled'); btn.href='#'; }
+   else { btn.classList.add('disabled'); btn.setAttribute('href','javascript:void(0)'); }
  });
 }
+
+// ── Payment button click handlers — close cart first, then navigate ──
+document.addEventListener('DOMContentLoaded', function() {
+ ['cart-paypal','cart-bank'].forEach(function(id) {
+   var btn = document.getElementById(id);
+   if (!btn) return;
+   btn.addEventListener('click', function(e) {
+     e.preventDefault();
+     if (btn.classList.contains('disabled')) return;
+     var dest = btn.getAttribute('href');
+     if (!dest || dest === '#') return;
+     closeCart();
+     setTimeout(function(){ window.open(dest, '_blank', 'noopener'); }, 180);
+   });
+ });
+});
 renderCart();
 
