@@ -108,6 +108,7 @@ function removeBase() {
  cart.addons.chatbot = false;
  renderCart();
  updateAllButtons();
+ updateAgreement();
  if (oldName) updateTemplateBtn(oldName, false);
 }
 function toggleAddon(id) {
@@ -121,6 +122,7 @@ function toggleAddon(id) {
  cart.addons[id] = inp ? inp.checked : !cart.addons[id];
  renderCart();
  updateAddonCards();
+ updateAgreement();
 }
 function renderCart() {
  var hasBase = !!cart.base;
@@ -132,8 +134,10 @@ function renderCart() {
  if (!hasBase) {
  document.getElementById('cart-setup-total').textContent = '$0.00';
  document.getElementById('cart-mo-total').textContent = '$0.00 / mo';
- var co = document.getElementById('cart-checkout');
- co.classList.add('disabled'); co.href = '#';
+ var ppBtn = document.getElementById('cart-paypal');
+ var bnBtn = document.getElementById('cart-bank');
+ if (ppBtn) { ppBtn.classList.add('disabled'); ppBtn.href = '#'; }
+ if (bnBtn) { bnBtn.classList.add('disabled'); bnBtn.href = '#'; }
  var chk = document.getElementById('cd-agree-chk');
  if (chk) { chk.checked = false; chk.disabled = true; }
  var step1 = document.getElementById('cd-step1');
