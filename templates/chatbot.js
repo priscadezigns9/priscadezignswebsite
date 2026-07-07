@@ -39,7 +39,104 @@ const STEPS={
       {l:"\uD83E\uDD16 I need AI automation",s:"automation"},
       {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
       {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
+      {l:"\uD83C\uDF1F Why Prisca Dezigns?",s:"why_us"},
+      {l:"\uD83D\uDE97 Evolve Mobility — Luxury Cars",s:"evolve"},
       {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"}
+    ]
+  },
+
+  /* ── WHY US / SALES BRANCH ── */
+  why_us:{
+    bot:"Great question. Here's the short version: Wix and Squarespace charge you every month to do the work yourself. We charge you once to do it FOR you. \uD83D\uDE0A",
+    r:[
+      {l:"\uD83E\uDD1C Us vs Wix & Squarespace",s:"vs_wix"},
+      {l:"\u2756 Our unfair advantages",s:"our_pros"},
+      {l:"\uD83D\uDCB0 What does it actually cost?",s:"cost_breakdown"},
+      {l:"\u26A1 The 24-Hour Guarantee",s:"guarantee"},
+      {l:"\uD83E\uDD23 Wait... tell me a joke first",s:"joke"},
+      {l:"\u2190 Back to start",s:"start"}
+    ]
+  },
+  vs_wix:{
+    bot:"Let's be honest about what Wix and Squarespace actually are:\n\n\uD83D\uDD34 You pay every single month — forever\n\uD83D\uDD34 You do all the work yourself (drag, drop, cry)\n\uD83D\uDD34 Generic templates every other business is using\n\uD83D\uDD34 SEO is basic — Google ignores most of them\n\uD83D\uDD34 No one to call when it breaks at 2am\n\uD83D\uDD34 Your site looks like everyone else's site\n\nWith Prisca Dezigns:\n\n\u2705 One setup fee — done\n\u2705 We build everything, you just send content\n\u2705 Custom design no one else has\n\u2705 SEO, GEO & AEO built in from day one\n\u2705 We're here when things go sideways\n\u2705 Live in 24 hours",
+    r:[
+      {l:"\u2756 Our unfair advantages",s:"our_pros"},
+      {l:"\u26A1 The 24-Hour Guarantee",s:"guarantee"},
+      {l:"I'm sold — let's talk",s:"talk"},
+      {l:"\u2190 Back",s:"why_us"}
+    ]
+  },
+  our_pros:{
+    bot:"Here's what makes us different — and we mean actually different:\n\n\uD83C\uDFC6 Done-For-You, not Done-By-You\nYou send us your logo and content. We handle everything else. No tutorials, no drag-and-drop nightmares.\n\n\u26A1 24-Hour Delivery\nTemplate sites go live within 24 hours of receiving your content. Not 3 weeks. Not 'we'll get back to you.' 24 hours.\n\n\uD83E\uDD16 AI Built-In\nEvery project can include a 24/7 AI chatbot that handles enquiries while you sleep — so you wake up to warm leads, not cold emails.\n\n\uD83D\uDCCA SEO That Actually Works\nWe build with Technical SEO, GEO (Google Maps/local signals), and AEO (Answer Engine Optimisation for AI search). Your competitors on Wix aren't doing this.\n\n\uD83D\uDD12 You Own Your Brand\nYour site, your content, your domain. No platform lock-in.\n\n\uD83C\uDDFB\uD83C\uDDF3 Caribbean-Born, Globally Competitive\nWe understand small business in T&T and the Caribbean — the budget, the hustle, and the vision.",
+    r:[
+      {l:"\uD83E\uDD1C Us vs Wix & Squarespace",s:"vs_wix"},
+      {l:"\uD83D\uDCB0 What does it actually cost?",s:"cost_breakdown"},
+      {l:"I'm ready — let's go",s:"talk"},
+      {l:"\u2190 Back",s:"why_us"}
+    ]
+  },
+  cost_breakdown:{
+    bot:"Let's do the math \uD83E\uDDEE\n\nWix Business Plan: ~$27/mo = $324/year\nSquarespace Business: ~$33/mo = $396/year\n\n...and you still have to build it, maintain it, write the copy, and figure out why the mobile version looks broken.\n\nPrisca Dezigns Template Site: one setup fee, then a low monthly hosting fee.\n\nYear 1: you break even. Year 2+: you're saving money AND your site looks better than theirs.\n\nOh — and we do the work. They don't. \uD83D\uDE0E",
+    r:[
+      {l:"\uD83C\uDFA8 See template options",s:"pkg_templates"},
+      {l:"\u26A1 The 24-Hour Guarantee",s:"guarantee"},
+      {l:"Talk to someone",s:"talk"},
+      {l:"\u2190 Back",s:"why_us"}
+    ]
+  },
+  guarantee:{
+    bot:"\u26A1 The 24-Hour Guarantee\n\nSend us your logo, your photos, and your copy — we go live within 24 hours.\n\nNot a draft. Not a preview link. LIVE. On a real URL. Accessible by real people. Right now.\n\nIf your competitor is still waiting on their Wix site to 'publish'... you're already winning.",
+    r:[
+      {l:"\uD83C\uDFA8 Browse templates",s:"microstore"},
+      {l:"Let's get started",s:"talk"},
+      {l:"\u2190 Back",s:"why_us"}
+    ]
+  },
+  joke:{
+    bot:"Okay okay \uD83D\uDE02\n\nHow many Wix users does it take to change a light bulb?\n\nNobody knows — they're still dragging and dropping it into position.\n\n\uD83D\uDCA1 Meanwhile our clients went live in 24 hours.",
+    r:[
+      {l:"\uD83D\uDE02 Okay I'm sold",s:"talk"},
+      {l:"\uD83C\uDFA8 Show me the templates",s:"pkg_templates"},
+      {l:"\uD83E\uDD1C Us vs Wix & Squarespace",s:"vs_wix"},
+      {l:"\u2190 Back to start",s:"start"}
+    ]
+  },
+
+  /* ── EVOLVE MOBILITY BRANCH ── */
+  evolve:{
+    bot:"Welcome to Evolve Mobility \uD83D\uDE97\u2728\n\nEvolve is our luxury vehicle platform — curating high-fidelity supercars, electric performance vehicles, and premium automotive experiences across the Caribbean and beyond.",
+    r:[
+      {l:"\uD83C\uDFCE\uFE0F Browse luxury vehicles",s:"evolve_cars"},
+      {l:"\u26A1 Electric & Hybrid",s:"evolve_ev"},
+      {l:"\uD83C\uDFC6 Why Evolve?",s:"evolve_why"},
+      {l:"\uD83D\uDCF1 Visit Evolve",url:"https://priscadezigns.org/evolve/"},
+      {l:"\u2190 Back to start",s:"start"}
+    ]
+  },
+  evolve_cars:{
+    bot:"Our curated fleet represents the absolute pinnacle of automotive engineering:\n\n\uD83D\uDD34 Ferrari — The art of speed, Italian-crafted\n\uD83D\uDFE0 Lamborghini — Raw power meets avant-garde design\n\uD83D\uDFE3 Bugatti — Fewer than 500 exist worldwide\n\uD83D\uDFE2 Koenigsegg — Handbuilt hypercars, limited to a handful per year\n\uD83D\uDD35 Rolls-Royce — The definition of effortless luxury\n\uD83D\uDFE1 Bentley — Power and refinement in equal measure\n\nEvery vehicle on Evolve is sourced from verified dealers and primary manufacturer networks.",
+    r:[
+      {l:"\u26A1 Electric & Hybrid",s:"evolve_ev"},
+      {l:"\uD83C\uDFC6 Why choose Evolve?",s:"evolve_why"},
+      {l:"\uD83D\uDCF1 Visit Evolve",url:"https://priscadezigns.org/evolve/"},
+      {l:"\u2190 Back",s:"evolve"}
+    ]
+  },
+  evolve_ev:{
+    bot:"\u26A1 The Future Is Already Fast\n\nElectric doesn't mean slow anymore:\n\n\u26A1 Rimac Nevera — 1,914 hp, 0-60 in 1.85 seconds (yes, really)\n\u26A1 Porsche Taycan Turbo GT — The perfect daily hypercar\n\u26A1 Ferrari SF90 Stradale — Hybrid V8, 986 hp, Italian soul intact\n\u26A1 McLaren Artura — V6 hybrid, lighter than its predecessor\n\u26A1 Lotus Emeya — Gran Turismo reimagined in electric\n\nThe future of performance is electric. Evolve is already there.",
+    r:[
+      {l:"\uD83C\uDFCE\uFE0F See all luxury vehicles",s:"evolve_cars"},
+      {l:"\uD83C\uDFC6 Why choose Evolve?",s:"evolve_why"},
+      {l:"\uD83D\uDCF1 Visit Evolve",url:"https://priscadezigns.org/evolve/"},
+      {l:"\u2190 Back",s:"evolve"}
+    ]
+  },
+  evolve_why:{
+    bot:"\uD83C\uDFC6 Why Evolve Mobility?\n\n\u2756 Curated — Only the highest-fidelity vehicles make the list. No compromises.\n\u2756 Verified — Every listing sourced from primary manufacturer networks and authorised dealers.\n\u2756 Caribbean-First — A luxury automotive platform built specifically for the Caribbean market and serious buyers across the region.\n\u2756 No Noise — No ads, no spam, no filler. Pure automotive intelligence.\n\n\"We didn't build a car website. We built a statement.\"",
+    r:[
+      {l:"\uD83C\uDFCE\uFE0F Browse vehicles",s:"evolve_cars"},
+      {l:"\uD83D\uDCF1 Visit Evolve",url:"https://priscadezigns.org/evolve/"},
+      {l:"\u2190 Back",s:"evolve"}
     ]
   },
 
