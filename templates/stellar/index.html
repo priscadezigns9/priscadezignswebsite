@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════
    STELLAR — Sky of Stars Portfolio
@@ -38,6 +38,25 @@
 html { scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--white); font-family: var(--font-b); overflow-x: hidden; }
 
+/* Deep-space layered background */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,   rgba(18,10,42,0.95) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 15% 55%,  rgba(20,12,50,0.6)  0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 85% 70%,  rgba(12,8,35,0.55)  0%, transparent 55%),
+    linear-gradient(170deg, #070510 0%, #06060E 45%, #08060F 100%);
+}
+
+/* Hero nebula bloom — sits behind the name */
+.hero-glow-nebula {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 42% at 50% 38%, rgba(123,108,255,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 30% 25% at 72% 62%, rgba(245,200,66,0.05)  0%, transparent 55%);
+}
+
 /* NAV */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
@@ -56,7 +75,7 @@ nav {
 
 /* HERO */
 .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 100px clamp(24px, 6vw, 80px) 80px; overflow: hidden; }
-#tsparticles { position: absolute; inset: 0; z-index: 0; }
+#stellar-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 .hero-glow { position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse 65% 55% at 50% 45%, rgba(245,200,66,0.05) 0%, transparent 65%), radial-gradient(ellipse 35% 35% at 15% 75%, rgba(123,108,255,0.06) 0%, transparent 55%), radial-gradient(ellipse 30% 30% at 85% 20%, rgba(123,108,255,0.05) 0%, transparent 50%); pointer-events: none; }
 .hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
 .hero-eyebrow { display: flex; align-items: center; gap: 10px; font-family: var(--font-h); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 24px; }
@@ -223,8 +242,9 @@ footer { padding: clamp(24px,4vw,44px) clamp(24px,5vw,64px); display: flex; alig
 </nav>
 
 <section class="hero">
-  <div id="tsparticles"></div>
+  <canvas id="stellar-canvas"></canvas>
   <div class="hero-glow"></div>
+  <div class="hero-glow-nebula"></div>
   <a href="#contact" class="hero-float-star">Open<br>to Work</a>
   <div class="hero-content">
     <div class="hero-eyebrow"><span class="e-star"></span>Creative Portfolio<span class="e-star"></span></div>
@@ -336,25 +356,182 @@ footer { padding: clamp(24px,4vw,44px) clamp(24px,5vw,64px); display: flex; alig
 </footer>
 
 <script>
-tsParticles.load("tsparticles", {
-  fullScreen: { enable: false },
-  background: { color: { value: "transparent" } },
-  fpsLimit: 60,
-  interactivity: {
-    events: { onHover: { enable: true, mode: "repulse" }, onClick: { enable: true, mode: "push" }, resize: true },
-    modes: { repulse: { distance: 120, duration: 0.5, speed: 0.4 }, push: { quantity: 2 } }
-  },
-  particles: {
-    number: { value: 90, density: { enable: true, area: 900 } },
-    color: { value: ["#F5C842", "#7B6CFF", "#ffffff"] },
-    shape: { type: "star", options: { star: { sides: 5, inset: 2 } } },
-    opacity: { value: { min: 0.08, max: 0.55 }, animation: { enable: true, speed: 0.6, minimumValue: 0.06, sync: false } },
-    size: { value: { min: 2, max: 7 }, animation: { enable: true, speed: 1.2, minimumValue: 1, sync: false } },
-    move: { enable: true, speed: { min: 0.2, max: 0.8 }, direction: "none", random: true, straight: false, outModes: { default: "out" } },
-    rotate: { value: { min: 0, max: 360 }, animation: { enable: true, speed: 3, sync: false } }
-  },
-  detectRetina: true
-});
+/* ─────────────────────────────────────────────────────────────
+   STELLAR — Three-layer 3D Star Field
+   Layer 0 (FAR):  tiny, dim, slow — deep background stars
+   Layer 1 (MID):  medium, moderate — main star plane
+   Layer 2 (NEAR): large, bright, glowing halos — foreground stars
+   Mouse parallax shifts each layer at a different depth ratio.
+───────────────────────────────────────────────────────────── */
+(function() {
+  const canvas = document.getElementById('stellar-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 2000);
+  camera.position.z = 400;
+
+  const GOLD   = new THREE.Color('#F5C842');
+  const VIOLET = new THREE.Color('#7B6CFF');
+  const WHITE  = new THREE.Color('#ffffff');
+  const ICE    = new THREE.Color('#b8d8ff');
+
+  /* ── Star layer factory ── */
+  function makeLayer(count, zRange, sizeRange, colors, opacity, glow) {
+    const pos   = new Float32Array(count * 3);
+    const col   = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+    const twinkle = new Float32Array(count); // per-star phase offset
+
+    for (let i = 0; i < count; i++) {
+      pos[i*3]   = (Math.random() - 0.5) * 2400;
+      pos[i*3+1] = (Math.random() - 0.5) * 2400;
+      pos[i*3+2] = zRange[0] + Math.random() * (zRange[1] - zRange[0]);
+      const c = colors[Math.floor(Math.random() * colors.length)];
+      col[i*3]   = c.r;
+      col[i*3+1] = c.g;
+      col[i*3+2] = c.b;
+      sizes[i]   = sizeRange[0] + Math.random() * (sizeRange[1] - sizeRange[0]);
+      twinkle[i] = Math.random() * Math.PI * 2;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color',    new THREE.BufferAttribute(col, 3));
+    geo.setAttribute('size',     new THREE.BufferAttribute(sizes, 1));
+    geo.setAttribute('twinkle',  new THREE.BufferAttribute(twinkle, 1));
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime:    { value: 0 },
+        uOpacity: { value: opacity },
+        uGlow:    { value: glow },
+        uDpr:     { value: renderer.getPixelRatio() }
+      },
+      vertexShader: `
+        attribute float size;
+        attribute float twinkle;
+        attribute vec3 color;
+        varying vec3 vColor;
+        varying float vTwinkle;
+        varying float vSize;
+        uniform float uTime;
+        uniform float uDpr;
+        void main() {
+          vColor   = color;
+          vTwinkle = twinkle;
+          vSize    = size;
+          vec4 mv  = modelViewMatrix * vec4(position, 1.0);
+          float tw = 0.72 + 0.28 * sin(uTime * 0.9 + twinkle);
+          gl_PointSize  = size * tw * uDpr * (300.0 / -mv.z);
+          gl_Position   = projectionMatrix * mv;
+        }
+      `,
+      fragmentShader: `
+        varying vec3  vColor;
+        varying float vTwinkle;
+        varying float vSize;
+        uniform float uOpacity;
+        uniform float uGlow;
+        uniform float uTime;
+        void main() {
+          vec2 uv  = gl_PointCoord - 0.5;
+          float d  = length(uv);
+          if (d > 0.5) discard;
+
+          /* sharp core */
+          float core = smoothstep(0.18, 0.0, d);
+          /* mid glow ring */
+          float ring = smoothstep(0.5, 0.05, d) * (1.0 - smoothstep(0.05, 0.18, d)) * uGlow;
+          /* soft outer halo only on large near stars */
+          float halo = smoothstep(0.5, 0.0, d) * uGlow * 0.45;
+
+          float tw   = 0.72 + 0.28 * sin(uTime * 0.9 + vTwinkle);
+          float alpha = (core + ring + halo) * uOpacity * tw;
+
+          /* spike cross — adds a 4-point diffraction look on the core */
+          float spike = max(
+            smoothstep(0.12, 0.0, abs(uv.x)) * smoothstep(0.5, 0.0, abs(uv.y)),
+            smoothstep(0.12, 0.0, abs(uv.y)) * smoothstep(0.5, 0.0, abs(uv.x))
+          ) * uGlow * 0.6;
+          alpha = min(1.0, alpha + spike * uOpacity * tw);
+
+          vec3 finalColor = mix(vColor, vec3(1.0), core * 0.4);
+          gl_FragColor = vec4(finalColor, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexColors: true
+    });
+
+    const points = new THREE.Points(geo, mat);
+    points.userData = { mat, twinkle: geo.attributes.twinkle };
+    return points;
+  }
+
+  /* ── Build the 3 layers ── */
+  // FAR — 800 tiny dim white/ice stars, deep z
+  const far  = makeLayer(800, [-400, -150], [0.6, 1.8],  [WHITE, ICE],         0.28, 0.0);
+  // MID — 400 medium gold/violet/white stars, mid z
+  const mid  = makeLayer(400, [-100,   50], [1.5, 3.5],  [WHITE, GOLD, VIOLET],0.55, 0.3);
+  // NEAR — 80 large bright stars with halos, close z
+  const near = makeLayer( 80, [  80,  200], [3.5, 7.0],  [GOLD, VIOLET, WHITE],0.90, 1.0);
+
+  scene.add(far, mid, near);
+
+  /* ── Mouse parallax ── */
+  const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+  document.addEventListener('mousemove', e => {
+    mouse.tx = (e.clientX / innerWidth  - 0.5) * 2;
+    mouse.ty = (e.clientY / innerHeight - 0.5) * 2;
+  });
+
+  /* ── Render loop ── */
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // smooth mouse follow
+    mouse.x += (mouse.tx - mouse.x) * 0.04;
+    mouse.y += (mouse.ty - mouse.y) * 0.04;
+
+    // update uniforms
+    far.material.uniforms.uTime.value  = t;
+    mid.material.uniforms.uTime.value  = t;
+    near.material.uniforms.uTime.value = t;
+
+    // parallax — each layer drifts a different amount
+    far.position.x  =  mouse.x * 6;
+    far.position.y  = -mouse.y * 6;
+    mid.position.x  =  mouse.x * 18;
+    mid.position.y  = -mouse.y * 18;
+    near.position.x =  mouse.x * 42;
+    near.position.y = -mouse.y * 42;
+
+    // very slow ambient drift on each layer
+    far.rotation.z  = t * 0.0004;
+    mid.rotation.z  = t * 0.0006;
+    near.rotation.z = t * 0.0012;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    far.material.uniforms.uDpr.value  = renderer.getPixelRatio();
+    mid.material.uniforms.uDpr.value  = renderer.getPixelRatio();
+    near.material.uniforms.uDpr.value = renderer.getPixelRatio();
+  });
+})();
 
 (function() {
   const tags = document.querySelectorAll('.skill-tag');
