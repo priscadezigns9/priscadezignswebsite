@@ -165,13 +165,20 @@ function renderCart() {
  lines.push('%0ASetup Total: $' + totalSetup.toFixed(2));
  lines.push('Monthly Total: $' + totalMo.toFixed(2) + '%2Fmo');
  var msg = lines.join('%0A');
- // ── PayPal button ──
+ // ── PayPal button — paypal.me/priscadezigns9/AMOUNT sends directly to priscadezigns9@gmail.com ──
  var paypalBtn = document.getElementById('cart-paypal');
- if (paypalBtn) paypalBtn.href = 'https://paypal.me/priscadezigns9/' + totalSetup.toFixed(2) + 'USD';
- // ── Bank Transfer button → WhatsApp with bank note ──
- var bankMsg = msg + '%0A%0A%F0%9F%8F%A6%20Payment%20Method%3A%20Bank%20Transfer%0APlease%20send%20your%20proof%20of%20payment%20%2B%20your%20brand%20details%20(business%20name%2C%20logo%2C%20colours%2C%20description)%20to%20this%20chat.%0AI%20will%20send%20you%20the%20bank%20details%20to%20complete%20your%20transfer.';
+ if (paypalBtn) paypalBtn.href = 'https://www.paypal.me/priscadezigns9/' + totalSetup.toFixed(2);
+ // ── Bank Transfer button → WhatsApp with full order + request for banking info ──
+ var orderLines = [];
+ orderLines.push('Hi%21%20I%27d%20like%20to%20place%20an%20order%20via%20bank%20transfer%3A%0A');
+ orderLines.push('%F0%9F%9B%92%20' + encodeURIComponent(cart.base.name) + '%20%E2%80%94%20' + encodeURIComponent(p.label));
+ if (cart.addons.copy) orderLines.push('%E2%9E%95%20Copywriting%20Add-On');
+ if (cart.addons.chatbot) orderLines.push('%E2%9E%95%20AI%20Chatbot%20Add-On');
+ orderLines.push('%0A%F0%9F%92%B3%20Setup%20Total%3A%20%24' + totalSetup.toFixed(2));
+ orderLines.push('%F0%9F%93%85%20Monthly%3A%20%24' + totalMo.toFixed(2) + '%2Fmo');
+ orderLines.push('%0ACould%20you%20please%20send%20me%20your%20banking%20details%20so%20I%20can%20complete%20the%20transfer%3F');
  var bankBtn = document.getElementById('cart-bank');
- if (bankBtn) bankBtn.href = 'https://wa.me/18683424101?text=' + bankMsg;
+ if (bankBtn) bankBtn.href = 'https://wa.me/18683424101?text=' + orderLines.join('%0A');
  // ── Enable/disable both based on agreement ──
  var agrChk = document.getElementById('cd-agree-chk');
  var btns = [paypalBtn, bankBtn];
@@ -203,7 +210,7 @@ function updateBadge() {
 function updateAllButtons() {
  document.querySelectorAll('.t-add-btn').forEach(function(btn) {
  btn.classList.remove('in-cart');
- btn.textContent = 'Add to Cart →';
+ btn.textContent = 'Add to Cart';
  });
  if (cart.base) {
  document.querySelectorAll('.t-add-btn').forEach(function(btn) {
@@ -222,7 +229,7 @@ function updateTemplateBtn(name, inCart) {
  var m = oc.match(/addTemplate\('([^']+)'/);
  if (m && m[1] === name) {
  if (inCart) { btn.classList.add('in-cart'); btn.textContent = '✓ In Cart'; }
- else { btn.classList.remove('in-cart'); btn.textContent = 'Add to Cart →'; }
+ else { btn.classList.remove('in-cart'); btn.textContent = 'Add to Cart'; }
  }
  });
 }
