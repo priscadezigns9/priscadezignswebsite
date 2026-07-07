@@ -86,7 +86,7 @@ var PRICES = {
  premium: { setup: 299.99, mo: 19.99, label: 'Premium 3D Template Website' },
  store: { setup: 249.99, mo: 34.99, label: 'Micro Store' },
  copy: { setup: 49.99, mo: 0, moNote: '$4.99 per update' },
- chatbot: { setup: 399.99, mo: 49.99 }
+ chatbot: { setup: 349.99, mo: 49.99 }
 };
 function addTemplate(name, type) {
  type = type || 'website';
@@ -161,7 +161,7 @@ function renderCart() {
  lines.push('Hi! I%27d like to place an order:%0A');
  lines.push('%E2%9C%85 ' + encodeURIComponent(cart.base.name) + ' (' + encodeURIComponent(p.label) + ') %E2%80%94 $' + cart.base.setup.toFixed(2) + ' setup %2B $' + cart.base.mo.toFixed(2) + '%2Fmo');
  if (cart.addons.copy) lines.push('%E2%9C%85 Copywriting Add-On %E2%80%94 %2B$49.99 setup');
- if (cart.addons.chatbot) lines.push('%E2%9C%85 AI Chatbot Add-On %E2%80%94 %2B$399.99 setup %2B $49.99%2Fmo');
+ if (cart.addons.chatbot) lines.push('%E2%9C%85 AI Chatbot Add-On %E2%80%94 %2B$349.99 setup %2B $49.99%2Fmo');
  lines.push('%0A%E2%9C%85 I have read and agree to the Terms of Use %26 service agreement');
  lines.push('%0ASetup Total: $' + totalSetup.toFixed(2));
  lines.push('Monthly Total: $' + totalMo.toFixed(2) + '%2Fmo');
