@@ -277,8 +277,8 @@ const STEPS={
 
   /* ── TALK / CONTACT ── */
   talk:{
-    bot:"Tap below to start a WhatsApp conversation with us directly. We respond fast.",
-    r:[],wa:true
+    bot:"Let's make sure you get the right recommendation. I'll ask you a few quick questions about your business — won't take long! 😄",
+    r:[],intake:true
   },
 
   /* ── FAQ / MISC ── */
@@ -295,6 +295,131 @@ const STEPS={
     r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
   }
 };
+
+// ── JOKES ──
+const JOKES=[
+  "Why did the website go to therapy? It had too many unresolved issues. 😅",
+  "My client said 'make it pop'. I added confetti. They meant the colours. We don't talk about that project. 🎊",
+  "Why don't web designers go outside? Because they get too many requests. 🌐",
+  "A client once told me to make the logo bigger. The logo was already the entire homepage. 🔍",
+  "Why did the developer go broke? Because he used up all his cache. 💸",
+  "I told my client the website needed breathing room. They asked if it had asthma. 🫁",
+  "Why did the AI get promoted? It had a neural network... and excellent people skills. 🤖",
+  "A client asked for a 'simple' website. Six revisions later we had an animated 3D solar system. 🪐",
+  "Why do programmers prefer dark mode? Because light attracts bugs. 🐛",
+  "My client wanted the site to feel 'alive'. I added a heartbeat animation. They wanted plants. 🌿"
+];
+var jokeIdx = Math.floor(Math.random()*JOKES.length);
+function nextJoke(){
+  var j=JOKES[jokeIdx%JOKES.length];
+  jokeIdx++;
+  return j;
+}
+
+// ── INTAKE CONVERSATION STATE ──
+var intake={active:false,step:0,data:{}};
+var intakeSteps=[
+  {key:'name',   ask:"First — what's your name? 😊"},
+  {key:'biz',    ask:function(d){return "Nice to meet you, "+d.name+"! What's your business called? (Or describe what you do if you don't have a name yet)"}},
+  {key:'type',   ask:"What type of business is it? (e.g. coach, salon, restaurant, clothing brand, tech startup…)"},
+  {key:'goal',   ask:"And what's the main thing you're trying to achieve right now? More leads? A new website? Automating your customer service?"},
+  {key:'budget', ask:"Last one — do you have a rough budget in mind? No pressure either way, it just helps me point you to the right option 🙏"}
+];
+
+function startIntake(){
+  intake.active=true;
+  intake.step=0;
+  intake.data={};
+  var q=document.getElementById('chat-qr');
+  q.innerHTML='';
+  // show first question after short delay
+  setTimeout(function(){
+    addMsg(intakeSteps[0].ask,'bot');
+    showIntakeInput();
+  },420);
+}
+
+function showIntakeInput(){
+  var q=document.getElementById('chat-qr');
+  q.innerHTML='';
+  // add a skip button
+  var skip=document.createElement('button');
+  skip.className='qrb';
+  skip.textContent='Skip — just take me to WhatsApp';
+  skip.onclick=function(){ intake.active=false; finishIntake(true); };
+  q.appendChild(skip);
+  // focus the text input
+  var inp=document.getElementById('chat-inp');
+  if(inp) setTimeout(function(){ inp.focus(); },100);
+}
+
+function advanceIntake(userText){
+  var currentStep=intakeSteps[intake.step];
+  intake.data[currentStep.key]=userText;
+  intake.step++;
+
+  // Occasionally drop a joke between questions
+  if(intake.step===2 || intake.step===4){
+    setTimeout(function(){ addMsg(nextJoke(),'bot'); },300);
+  }
+
+  if(intake.step < intakeSteps.length){
+    var nextQ=intakeSteps[intake.step].ask;
+    if(typeof nextQ==='function') nextQ=nextQ(intake.data);
+    setTimeout(function(){
+      addMsg(nextQ,'bot');
+      showIntakeInput();
+    },intake.step===2||intake.step===4?900:500);
+  } else {
+    // All questions answered — build summary and WhatsApp link
+    setTimeout(function(){ finishIntake(false); },500);
+  }
+}
+
+function finishIntake(skipped){
+  intake.active=false;
+  var d=intake.data;
+  var q=document.getElementById('chat-qr');
+  q.innerHTML='';
+
+  if(skipped || !d.name){
+    addMsg("No worries — tap below and we'll pick up the conversation on WhatsApp 👇",'bot');
+    var a=document.createElement('a');
+    a.href=WA;a.target='_blank';a.rel='noopener';
+    a.className='qrb wa';a.innerHTML=WA_SVG+' Chat on WhatsApp';
+    q.appendChild(a);
+    addQR('← Start over','start');
+    return;
+  }
+
+  var summary="Perfect, "+d.name+"! Here's what I've got:\n";
+  if(d.biz)  summary+="🏢 Business: "+d.biz+"\n";
+  if(d.type) summary+="📂 Type: "+d.type+"\n";
+  if(d.goal) summary+="🎯 Goal: "+d.goal+"\n";
+  if(d.budget) summary+="💳 Budget: "+d.budget+"\n";
+  summary+="\nI'm sending this straight to the team so we can come back to you with exactly the right recommendation. 🚀";
+  addMsg(summary,'bot');
+
+  // Build WhatsApp pre-fill
+  var msg="Hi! I just came from your website chatbot.\n\n";
+  msg+="👤 Name: "+(d.name||'—')+"\n";
+  msg+="🏢 Business: "+(d.biz||'—')+"\n";
+  msg+="📂 Type: "+(d.type||'—')+"\n";
+  msg+="🎯 Goal: "+(d.goal||'—')+"\n";
+  msg+="💳 Budget: "+(d.budget||'—')+"\n\n";
+  msg+="Looking forward to hearing from you!";
+
+  setTimeout(function(){
+    addMsg(nextJoke(),'bot');
+    var a=document.createElement('a');
+    a.href=WA+'?text='+encodeURIComponent(msg);
+    a.target='_blank';a.rel='noopener';
+    a.className='qrb wa';
+    a.innerHTML=WA_SVG+' Send to WhatsApp';
+    q.appendChild(a);
+    addQR('← Start over','start');
+  },700);
+}
 
 let open=false,started=false,hist=[];
 
@@ -358,6 +483,10 @@ function go(key,userTxt){
       addQR('\u2190 All packages','pkg_menu');
       return;
     }
+    if(s.intake){
+      startIntake();
+      return;
+    }
     if(s.pkg){
       renderPkgs(PKGS[s.pkg]);
       addQR('\u2190 All packages','pkg_menu');
@@ -407,8 +536,14 @@ window.chatSend=function(){
   var i=document.getElementById('chat-inp');
   var t=i.value.trim();if(!t)return;i.value='';
   addMsg(t,'usr');
+  // If intake conversation is active, route the answer through it
+  if(intake.active){
+    advanceIntake(t);
+    return;
+  }
+  // Otherwise generic fallback — forward text to WhatsApp
   setTimeout(function(){
-    addMsg("Got it! Tap below for the fastest response \uD83D\uDC47",'bot');
+    addMsg("Got it! Tap below and we'll pick this up on WhatsApp \uD83D\uDC47",'bot');
     var q=document.getElementById('chat-qr');q.innerHTML='';
     var a=document.createElement('a');
     a.href=WA+'?text='+encodeURIComponent(t);a.target='_blank';a.rel='noopener';
