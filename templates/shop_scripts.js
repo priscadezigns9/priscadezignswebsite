@@ -20,7 +20,7 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
  'pet': ['pet','animals','veterinary','grooming','paws','dog','cat'],
  'photographer': ['photographer','film','reel','portfolio','folio','video','filmmaker','videographer'],
  'personal-brand':['personal brand','persona','opus','author','speaker','blogger','influencer','brand'],
- 'ecommerce': ['shop','store','product','ecommerce','online store','sell','retail','boutique','luxe','glow','paws','optica','atelier','monsieur'],
+ 'ecommerce': ['ecommerce','online store','craft','luxe','glow','paws','optica','atelier','monsieur'],
  };
  var activeCat = 'all';
  var searchQ = '';
