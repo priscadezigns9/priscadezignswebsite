@@ -99,10 +99,9 @@ const STEPS={
   about_brands:{
     bot:"Prisca Dezigns operates a network of specialised brand pages. Tap any to visit \uD83D\uDC47",
     r:[
-      {l:"\uD83E\uDDF5 SeamRite Designs",url:"https://seamritedesigns.priscadezigns.org"},
-      {l:"\uD83C\uDFCE\uFE0F The Autodrome",url:"https://www.facebook.com/theautodrome"},
-      {l:"\u26A1 Dreaming Anime",url:"https://www.facebook.com/dreaminganime"},
-      {l:"\uD83C\uDFA8 NehNeh",url:"https://www.facebook.com/nehnehofficial"},
+      {l:"\uD83E\uDDF5 SeamRite Designs \u00B7 NehNeh",url:"https://seamritedesigns.priscadezigns.org"},
+      {l:"\uD83C\uDFCE\uFE0F The Autodrome",url:"https://theautodrome.priscadezigns.org"},
+      {l:"\u26A1 Dreaming Anime",url:"https://dreaminganime.com"},
       {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
       {l:"\uD83D\uDECD\uFE0F Template Shop",url:"https://priscadezigns.org/templates/"},
       {l:"\u2190 Back",s:"about"}
@@ -111,7 +110,7 @@ const STEPS={
   about_twmk:{
     bot:"The Way Made Known (TWMK) is the faith foundation at the heart of Prisca Dezigns.\n\n❖ A Gospel-driven NGO\n❖ Committed to evidence-based, Bible-centred proclamation\n❖ The backbone of everything we build\n\nEvery product, every project, and every dollar earned is part of a mission that goes far beyond business.",
     r:[
-      {l:"\uD83C\uDF0D Visit TWMK",url:"https://priscadezigns.org"},
+      {l:"\uD83C\uDF0D Visit TWMK",url:"https://thewaymadeknown.com"},
       {l:"\uD83E\uDD1D Support the mission",url:"https://paypal.me/priscadezigns9"},
       {l:"\u2190 Back",s:"about"}
     ]
