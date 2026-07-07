@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadence — Urban Bicycle Brand Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0a0a0a;--white:#ffffff;--off:#f4f4f2;
+  --mid:#6b6b6b;--border:#e0e0e0;--accent:#e63329;
+  --dark2:#1a1a1a;--yellow:#f5c400;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Barlow',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden}
+
+/* ── SCROLL REVEAL ── */
+[data-reveal]{opacity:0;transform:translateY(32px);transition:opacity 0.7s cubic-bezier(.22,.68,0,1.1),transform 0.7s cubic-bezier(.22,.68,0,1.1)}
+[data-reveal].revealed{opacity:1;transform:translateY(0)}
+[data-reveal="left"]{transform:translateX(-40px);opacity:0}[data-reveal="left"].revealed{transform:translateX(0);opacity:1}
+[data-reveal="right"]{transform:translateX(40px);opacity:0}[data-reveal="right"].revealed{transform:translateX(0);opacity:1}
+[data-reveal="fade"]{transform:none;opacity:0}[data-reveal="fade"].revealed{opacity:1}
+[data-delay="1"]{transition-delay:.1s}[data-delay="2"]{transition-delay:.2s}
+[data-delay="3"]{transition-delay:.3s}[data-delay="4"]{transition-delay:.4s}
+[data-delay="5"]{transition-delay:.5s}[data-delay="6"]{transition-delay:.6s}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:300;height:62px;background:var(--black);display:flex;align-items:center;justify-content:space-between;padding:0 40px;transition:height .3s,background .3s}
+nav.light{background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--white);text-decoration:none;transition:color .3s}
+nav.light .nav-logo{color:var(--black)}
+.nav-links{display:flex;gap:0;list-style:none}
+.nav-links > li{position:relative}
+.nav-links > li > a,.nav-links > li > button{display:flex;align-items:center;gap:5px;padding:0 16px;height:62px;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.82);text-decoration:none;background:none;border:none;cursor:pointer;transition:color .2s;white-space:nowrap}
+nav.light .nav-links > li > a,nav.light .nav-links > li > button{color:var(--mid)}
+.nav-links > li > a:hover,.nav-links > li > button:hover{color:var(--white)}
+nav.light .nav-links > li > a:hover,nav.light .nav-links > li > button:hover{color:var(--black)}
+.nav-drop{display:none;position:absolute;top:62px;left:0;background:var(--black);min-width:180px;border-top:2px solid var(--accent);padding:8px 0;z-index:400}
+nav.light .nav-drop{background:var(--white);box-shadow:0 8px 32px rgba(0,0,0,.1)}
+.nav-drop a{display:block;padding:10px 20px;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);text-decoration:none;transition:color .2s,background .2s}
+nav.light .nav-drop a{color:var(--mid)}
+.nav-drop a:hover{color:var(--white);background:var(--accent)}
+nav.light .nav-drop a:hover{color:var(--white)}
+.nav-links > li:hover .nav-drop{display:block}
+.nav-caret{font-size:.6rem;transition:transform .2s}
+.nav-links > li:hover .nav-caret{transform:rotate(180deg)}
+.nav-right{display:flex;gap:20px;align-items:center}
+.nav-icon{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.8);font-size:.82rem;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:5px}
+nav.light .nav-icon{color:var(--mid)}
+.nav-icon:hover{color:var(--white)}
+nav.light .nav-icon:hover{color:var(--black)}
+.nav-cart-count{background:var(--accent);color:var(--white);font-size:.6rem;font-weight:800;width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-left:2px}
+
+/* ── HERO SLIDESHOW ── */
+.hero{height:100vh;position:relative;overflow:hidden;background:var(--black)}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease}
+.slide.active{opacity:1;z-index:1}
+.slide img{width:100%;height:100%;object-fit:cover;display:block}
+.slide-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.72) 0%,rgba(0,0,0,.2) 60%,transparent 100%)}
+.slide-content{position:absolute;bottom:0;left:0;right:0;top:0;display:flex;align-items:center;padding:0 80px;z-index:2}
+.slide-inner{max-width:620px}
+.slide-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:14px;opacity:0;transform:translateY(12px);transition:all .6s .2s}
+.slide.active .slide-eyebrow{opacity:1;transform:translateY(0)}
+.slide-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(3.5rem,7vw,6.5rem);font-weight:900;line-height:.95;letter-spacing:-.01em;text-transform:uppercase;color:var(--white);margin-bottom:18px;opacity:0;transform:translateY(20px);transition:all .7s .35s}
+.slide.active .slide-title{opacity:1;transform:translateY(0)}
+.slide-sub{font-size:.97rem;color:rgba(255,255,255,.72);max-width:400px;line-height:1.72;margin-bottom:32px;opacity:0;transform:translateY(16px);transition:all .7s .5s}
+.slide.active .slide-sub{opacity:1;transform:translateY(0)}
+.slide-cta{display:inline-block;background:var(--accent);color:var(--white);padding:13px 32px;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;transition:background .2s,transform .2s;opacity:0;transform:translateY(14px);transition:all .7s .65s,background .2s}
+.slide.active .slide-cta{opacity:1;transform:translateY(0)}
+.slide-cta:hover{background:var(--white);color:var(--black)}
+.hero-dots{position:absolute;bottom:36px;left:80px;display:flex;gap:10px;z-index:10}
+.hero-dot{width:28px;height:3px;background:rgba(255,255,255,.35);cursor:pointer;transition:background .3s,width .3s}
+.hero-dot.active{background:var(--white);width:48px}
+.hero-pause{position:absolute;bottom:30px;right:40px;background:none;border:1.5px solid rgba(255,255,255,.35);color:rgba(255,255,255,.6);font-size:.68rem;font-family:'Barlow Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;cursor:pointer;z-index:10;transition:all .2s}
+.hero-pause:hover{border-color:var(--white);color:var(--white)}
+
+/* ── PROMO BAR ── */
+.promo-bar{background:var(--yellow);padding:11px 0;overflow:hidden;border-top:1px solid rgba(0,0,0,.08)}
+.promo-track{display:flex;gap:60px;animation:promoscroll 24s linear infinite;width:max-content}
+.promo-item{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--black);white-space:nowrap}
+.promo-sep{color:var(--accent)}
+@keyframes promoscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── CATEGORY STRIP ── */
+.cat-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.cat-tile{position:relative;overflow:hidden;border-right:1px solid var(--border);cursor:pointer;text-decoration:none;display:block}
+.cat-tile:last-child{border-right:none}
+.cat-tile-img{aspect-ratio:3/4;position:relative;overflow:hidden;background:var(--black)}
+.cat-tile-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease,opacity .4s ease;opacity:.85}
+.cat-tile:hover .cat-tile-img img{transform:scale(1.06);opacity:.7}
+.cat-tile-label{position:absolute;bottom:0;left:0;right:0;padding:20px 22px;background:linear-gradient(to top,rgba(0,0,0,.75),transparent);display:flex;align-items:flex-end;justify-content:space-between}
+.cat-tile-name{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--white)}
+.cat-tile-arrow{font-size:1.2rem;color:var(--white);transition:transform .25s}
+.cat-tile:hover .cat-tile-arrow{transform:translateX(5px)}
+
+/* ── FEATURED PRODUCTS ── */
+.featured{padding:72px 48px;background:var(--white)}
+.feat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
+.feat-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(1.6rem,2.8vw,2.4rem);font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--black)}
+.feat-link{font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mid);text-decoration:none;border-bottom:1.5px solid var(--mid);padding-bottom:2px;transition:color .2s,border-color .2s}
+.feat-link:hover{color:var(--black);border-color:var(--black)}
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)}
+.p-card{background:var(--white);overflow:hidden;position:relative;cursor:pointer}
+.p-card:hover .p-img-alt{opacity:1}
+.p-img-wrap{aspect-ratio:3/4;position:relative;overflow:hidden;background:var(--off)}
+.p-img-main,.p-img-alt{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .45s ease}
+.p-img-alt{opacity:0}
+.p-badge{position:absolute;top:12px;left:12px;font-family:'Barlow Condensed',sans-serif;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;z-index:2}
+.p-badge.new{background:var(--black);color:var(--white)}
+.p-badge.sale{background:var(--accent);color:var(--white)}
+.p-badge.hot{background:var(--yellow);color:var(--black)}
+.p-swatches{position:absolute;bottom:12px;left:12px;display:flex;gap:5px;z-index:2;opacity:0;transform:translateY(6px);transition:all .3s}
+.p-card:hover .p-swatches{opacity:1;transform:translateY(0)}
+.p-swatch{width:16px;height:16px;border-radius:50%;border:2px solid var(--white);cursor:pointer}
+.p-info{padding:14px 16px 18px}
+.p-brand{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mid);margin-bottom:3px}
+.p-name{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--black);margin-bottom:6px}
+.p-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.p-price{font-size:.97rem;font-weight:600;color:var(--black)}
+.p-price-old{font-size:.82rem;color:var(--mid);text-decoration:line-through}
+.p-btn{background:var(--black);color:var(--white);border:none;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .2s;white-space:nowrap}
+.p-btn:hover{background:var(--accent)}
+
+/* ── STORY BAND ── */
+.story-band{background:var(--black);padding:96px 80px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.story-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.story-band h2{font-family:'Barlow Condensed',sans-serif;font-size:clamp(2.4rem,4.5vw,4rem);font-weight:900;letter-spacing:.02em;text-transform:uppercase;color:var(--white);margin-bottom:20px;line-height:1}
+.story-band p{font-size:.95rem;color:rgba(255,255,255,.62);line-height:1.82;margin-bottom:32px;max-width:440px}
+.story-link{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--white);text-decoration:none;border-bottom:1.5px solid var(--accent);padding-bottom:3px;transition:color .2s}
+.story-link:hover{color:var(--accent)}
+.story-img{border-radius:2px;overflow:hidden;aspect-ratio:4/5}
+.story-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 6s ease}
+.story-img:hover img{transform:scale(1.04)}
+
+/* ── SPECS BAR ── */
+.specs-bar{background:var(--off);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:48px 80px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px}
+.spec-item{padding:0 32px;border-right:1px solid var(--border)}
+.spec-item:last-child{border-right:none}
+.spec-icon{font-size:1.8rem;margin-bottom:10px}
+.spec-title{font-family:'Barlow Condensed',sans-serif;font-size:1.05rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--black);margin-bottom:6px}
+.spec-desc{font-size:.8rem;color:var(--mid);line-height:1.65}
+
+/* ── EDITORIAL ── */
+.editorial{padding:72px 80px;background:var(--white)}
+.ed-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:24px;margin-top:40px}
+.ed-card{position:relative;overflow:hidden;cursor:pointer;display:block;text-decoration:none}
+.ed-card-img{overflow:hidden;position:relative}
+.ed-card-img img{width:100%;display:block;object-fit:cover;transition:transform .55s ease}
+.ed-card:hover .ed-card-img img{transform:scale(1.05)}
+.ed-card-img.tall{aspect-ratio:3/4}
+.ed-card-img.wide{aspect-ratio:16/9}
+.ed-tag{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:.66rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;background:var(--accent);color:var(--white);padding:4px 10px;margin:14px 0 8px}
+.ed-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--black);margin-bottom:8px;line-height:1.2;transition:color .2s}
+.ed-card:hover .ed-title{color:var(--accent)}
+.ed-sub{font-size:.8rem;color:var(--mid);line-height:1.65}
+
+/* ── REVIEWS ── */
+.reviews{background:var(--off);padding:72px 80px}
+.r-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px}
+.r-card{background:var(--white);padding:28px 26px;border-bottom:3px solid var(--border);transition:border-color .25s,transform .25s}
+.r-card:hover{border-color:var(--accent);transform:translateY(-4px)}
+.r-stars{font-size:.88rem;color:var(--yellow);letter-spacing:2px;margin-bottom:12px}
+.r-text{font-size:.87rem;line-height:1.78;color:var(--mid);font-style:italic;margin-bottom:16px}
+.r-author{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--black)}
+.r-loc{font-size:.72rem;color:var(--mid);font-weight:400;text-transform:none;letter-spacing:0}
+
+/* ── FOOTER ── */
+footer{background:var(--black);padding:64px 80px 28px}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:52px}
+.footer-logo{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--white);margin-bottom:14px}
+.footer-tagline{font-size:.8rem;color:rgba(255,255,255,.42);line-height:1.75;max-width:220px}
+.footer-col h4{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:16px}
+.footer-col a{display:block;font-size:.82rem;color:rgba(255,255,255,.55);text-decoration:none;margin-bottom:10px;transition:color .2s}
+.footer-col a:hover{color:var(--white)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-copy{font-size:.73rem;color:rgba(255,255,255,.28)}
+.footer-badges{display:flex;gap:12px}
+.footer-badge{font-size:.62rem;padding:4px 10px;border:1px solid rgba(255,255,255,.15);border-radius:2px;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){
+  .cat-strip{grid-template-columns:1fr 1fr}
+  .prod-grid{grid-template-columns:1fr 1fr}
+  .ed-grid{grid-template-columns:1fr 1fr}
+  .specs-bar{grid-template-columns:1fr 1fr;gap:32px}
+  .spec-item{border-right:none;padding:0}
+  .story-band{grid-template-columns:1fr;gap:40px;padding:64px 40px}
+  .footer-top{grid-template-columns:1fr 1fr}
+  nav,footer,.featured,.editorial,.reviews{padding-left:24px;padding-right:24px}
+  .slide-content{padding:0 32px}
+  .hero-dots{left:32px}
+  .specs-bar{padding:40px 24px}
+}
+@media(max-width:640px){
+  .prod-grid,.cat-strip,.r-grid,.ed-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  nav{padding:0 20px}
+  .slide-content{padding:0 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <a href="#" class="nav-logo">Cadence</a>
+  <ul class="nav-links">
+    <li>
+      <button>Single Speed <span class="nav-caret">▾</span></button>
+      <div class="nav-drop">
+        <a href="#">Track</a><a href="#">Fixed Gear</a><a href="#">Urban</a>
+      </div>
+    </li>
+    <li>
+      <button>City Bikes <span class="nav-caret">▾</span></button>
+      <div class="nav-drop">
+        <a href="#">Commuter</a><a href="#">Step-Through</a><a href="#">Hybrid</a>
+      </div>
+    </li>
+    <li>
+      <button>E-Bikes <span class="nav-caret">▾</span></button>
+      <div class="nav-drop">
+        <a href="#">City E-Bike</a><a href="#">Cargo E-Bike</a>
+      </div>
+    </li>
+    <li>
+      <button>Gravel <span class="nav-caret">▾</span></button>
+      <div class="nav-drop">
+        <a href="#">Adventure</a><a href="#">Gravel+</a>
+      </div>
+    </li>
+    <li><a href="#">All Bikes</a></li>
+    <li>
+      <button>Accessories <span class="nav-caret">▾</span></button>
+      <div class="nav-drop">
+        <a href="#">Helmets</a><a href="#">Locks</a><a href="#">Bags</a><a href="#">Parts</a>
+      </div>
+    </li>
+  </ul>
+  <div class="nav-right">
+    <a href="#" class="nav-icon">🔍 Search</a>
+    <a href="#" class="nav-icon">🛒 Cart <span class="nav-cart-count">0</span></a>
+  </div>
+</nav>
+
+<!-- HERO SLIDESHOW -->
+<section class="hero" id="hero">
+  <div class="slide active" id="slide-0">
+    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1800&q=85&fit=crop" alt="Urban cycling" loading="eager">
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">New 2025 Collection</div>
+        <h1 class="slide-title">Built<br>to Ride.</h1>
+        <p class="slide-sub">Lightweight frames. Precision components. Bikes designed for city streets and open roads alike.</p>
+        <a href="#products" class="slide-cta">Shop Now</a>
+      </div>
+    </div>
+  </div>
+  <div class="slide" id="slide-1">
+    <img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1800&q=85&fit=crop" alt="E-bike" loading="lazy">
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Electric Collection</div>
+        <h1 class="slide-title">Ride<br>Further.</h1>
+        <p class="slide-sub">Our e-bike lineup takes you further without breaking a sweat. Range up to 60 miles per charge.</p>
+        <a href="#products" class="slide-cta">Shop E-Bikes</a>
+      </div>
+    </div>
+  </div>
+  <div class="slide" id="slide-2">
+    <img src="https://images.unsplash.com/photo-1523740856324-f2ce89135981?w=1800&q=85&fit=crop" alt="Gravel bike" loading="lazy">
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <div class="slide-inner">
+        <div class="slide-eyebrow">Gravel Series</div>
+        <h1 class="slide-title">Any<br>Terrain.</h1>
+        <p class="slide-sub">Engineered for adventure. From paved paths to dirt tracks — the Gravel Series handles it all.</p>
+        <a href="#products" class="slide-cta">Explore Gravel</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-dots" id="hero-dots">
+    <div class="hero-dot active" data-slide="0"></div>
+    <div class="hero-dot" data-slide="1"></div>
+    <div class="hero-dot" data-slide="2"></div>
+  </div>
+  <button class="hero-pause" id="hero-pause">⏸ Pause</button>
+</section>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">
+  <div class="promo-track">
+    <span class="promo-item">🚲 Free Shipping on Orders $99+</span><span class="promo-sep">✦</span>
+    <span class="promo-item">🔧 Lifetime Frame Warranty</span><span class="promo-sep">✦</span>
+    <span class="promo-item">📦 Ships in 24–48 Hours</span><span class="promo-sep">✦</span>
+    <span class="promo-item">🏅 60-Day Returns</span><span class="promo-sep">✦</span>
+    <span class="promo-item">🚲 Free Shipping on Orders $99+</span><span class="promo-sep">✦</span>
+    <span class="promo-item">🔧 Lifetime Frame Warranty</span><span class="promo-sep">✦</span>
+    <span class="promo-item">📦 Ships in 24–48 Hours</span><span class="promo-sep">✦</span>
+    <span class="promo-item">🏅 60-Day Returns</span><span class="promo-sep">✦</span>
+  </div>
+</div>
+
+<!-- CATEGORY STRIP -->
+<div class="cat-strip">
+  <a href="#" class="cat-tile" data-reveal="fade" data-delay="1">
+    <div class="cat-tile-img">
+      <img src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=600&q=80&fit=crop" alt="Single Speed" loading="lazy">
+    </div>
+    <div class="cat-tile-label"><span class="cat-tile-name">Single Speed</span><span class="cat-tile-arrow">→</span></div>
+  </a>
+  <a href="#" class="cat-tile" data-reveal="fade" data-delay="2">
+    <div class="cat-tile-img">
+      <img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&q=80&fit=crop" alt="City Bikes" loading="lazy">
+    </div>
+    <div class="cat-tile-label"><span class="cat-tile-name">City Bikes</span><span class="cat-tile-arrow">→</span></div>
+  </a>
+  <a href="#" class="cat-tile" data-reveal="fade" data-delay="3">
+    <div class="cat-tile-img">
+      <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&fit=crop" alt="E-Bikes" loading="lazy">
+    </div>
+    <div class="cat-tile-label"><span class="cat-tile-name">E-Bikes</span><span class="cat-tile-arrow">→</span></div>
+  </a>
+  <a href="#" class="cat-tile" data-reveal="fade" data-delay="4">
+    <div class="cat-tile-img">
+      <img src="https://images.unsplash.com/photo-1523740856324-f2ce89135981?w=600&q=80&fit=crop" alt="Gravel Bikes" loading="lazy">
+    </div>
+    <div class="cat-tile-label"><span class="cat-tile-name">Gravel</span><span class="cat-tile-arrow">→</span></div>
+  </a>
+</div>
+
+<!-- FEATURED PRODUCTS -->
+<section class="featured" id="products">
+  <div class="feat-head" data-reveal>
+    <h2 class="feat-title">Featured Gear</h2>
+    <a href="#" class="feat-link">View All →</a>
+  </div>
+  <div class="prod-grid">
+    <div class="p-card" data-reveal data-delay="1">
+      <div class="p-img-wrap">
+        <img class="p-img-main" src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=600&q=80&fit=crop" alt="Urban Scout">
+        <img class="p-img-alt" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&fit=crop" alt="Urban Scout alt">
+        <span class="p-badge new">New</span>
+        <div class="p-swatches">
+          <div class="p-swatch" style="background:#0a0a0a"></div>
+          <div class="p-swatch" style="background:#e63329"></div>
+          <div class="p-swatch" style="background:#4a7c59"></div>
+        </div>
+      </div>
+      <div class="p-info">
+        <div class="p-brand">Cadence</div>
+        <div class="p-name">Urban Scout</div>
+        <div class="p-price-row"><span class="p-price">$649.99</span><button class="p-btn">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="p-card" data-reveal data-delay="2">
+      <div class="p-img-wrap">
+        <img class="p-img-main" src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&q=80&fit=crop" alt="Volt E-Bike">
+        <img class="p-img-alt" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&fit=crop" alt="Volt E-Bike alt">
+        <span class="p-badge hot">Hot</span>
+        <div class="p-swatches">
+          <div class="p-swatch" style="background:#0a0a0a"></div>
+          <div class="p-swatch" style="background:#c8b49a"></div>
+        </div>
+      </div>
+      <div class="p-info">
+        <div class="p-brand">Cadence</div>
+        <div class="p-name">Volt E-Bike</div>
+        <div class="p-price-row"><span class="p-price">$1,699.99</span><button class="p-btn">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="p-card" data-reveal data-delay="3">
+      <div class="p-img-wrap">
+        <img class="p-img-main" src="https://images.unsplash.com/photo-1523740856324-f2ce89135981?w=600&q=80&fit=crop" alt="Gravel+ AL">
+        <img class="p-img-alt" src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=600&q=80&fit=crop" alt="Gravel+ AL alt">
+        <span class="p-badge new">New</span>
+        <div class="p-swatches">
+          <div class="p-swatch" style="background:#6b6b6b"></div>
+          <div class="p-swatch" style="background:#0a0a0a"></div>
+        </div>
+      </div>
+      <div class="p-info">
+        <div class="p-brand">Cadence</div>
+        <div class="p-name">Gravel+ AL</div>
+        <div class="p-price-row"><span class="p-price">$999.99</span><button class="p-btn">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="p-card" data-reveal data-delay="4">
+      <div class="p-img-wrap">
+        <img class="p-img-main" src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=600&q=80&fit=crop" alt="City Cruiser">
+        <img class="p-img-alt" src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&q=80&fit=crop" alt="City Cruiser alt">
+        <span class="p-badge sale">Sale</span>
+        <div class="p-swatches">
+          <div class="p-swatch" style="background:#e63329"></div>
+          <div class="p-swatch" style="background:#f5c400"></div>
+          <div class="p-swatch" style="background:#0a0a0a"></div>
+        </div>
+      </div>
+      <div class="p-info">
+        <div class="p-brand">Cadence</div>
+        <div class="p-name">City Cruiser</div>
+        <div class="p-price-row"><span class="p-price">$449.99</span><span class="p-price-old">$549.99</span><button class="p-btn">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="p-card" data-reveal data-delay="1">
+      <div class="p-img-wrap">
+        <img class="p-img-main" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&fit=crop&crop=right" alt="Track Pro">
+        <img class="p-img-alt" src="https://images.unsplash.com/photo-1523740856324-f2ce89135981?w=600&q=80&fit=crop" alt="Track Pro alt">
+        <span class="p-badge new">New</span>
+        <div class="p-swatches">
+          <div class="p-swatch" style="background:#0a0a0a"></div>
+          <div class="p-swatch" style="background:#e63329"></div>
+        </div>
+      </div>
+      <div class="p-info">
+        <div class="p-brand">Cadence</div>
+        <div class="p-name">Track Pro</div>
+        <div class="p-price-row"><span class="p-price">$799.99</span><button class="p-btn">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="p-card" data-reveal data-delay="2">
+      <div class="p-img-wrap">
+        <img class="p-img-main" src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=600&q=80&fit=crop&crop=bottom" alt="Step-Through">
+        <img class="p-img-alt" src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=600&q=80&fit=crop" alt="Step-Through alt">
+        <span class="p-badge hot">Hot</span>
+        <div class="p-swatches">
+          <div class="p-swatch" style="background:#c8b49a"></div>
+          <div class="p-swatch" style="background:#4a7c59"></div>
+        </div>
+      </div>
+      <div class="p-info">
+        <div class="p-brand">Cadence</div>
+        <div class="p-name">Step-Through</div>
+        <div class="p-price-row"><span class="p-price">$549.99</span><button class="p-btn">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="p-card" data-reveal data-delay="3">
+      <div class="p-img-wrap">
+        <img class="p-img-main" src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&q=80&fit=crop&crop=left" alt="Riser Bars">
+        <img class="p-img-alt" src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=600&q=80&fit=crop" alt="Riser Bars alt">
+        <span class="p-badge">Accessory</span>
+        <div class="p-swatches">
+          <div class="p-swatch" style="background:#0a0a0a"></div>
+          <div class="p-swatch" style="background:#c0c0c0"></div>
+        </div>
+      </div>
+      <div class="p-info">
+        <div class="p-brand">Cadence Parts</div>
+        <div class="p-name">Riser Bars</div>
+        <div class="p-price-row"><span class="p-price">$35.99</span><button class="p-btn">Add to Cart</button></div>
+      </div>
+    </div>
+    <div class="p-card" data-reveal data-delay="4">
+      <div class="p-img-wrap">
+        <img class="p-img-main" src="https://images.unsplash.com/photo-1523740856324-f2ce89135981?w=600&q=80&fit=crop&crop=right" alt="Securit Lock">
+        <img class="p-img-alt" src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=600&q=80&fit=crop" alt="Securit Lock alt">
+        <span class="p-badge sale">Sale</span>
+      </div>
+      <div class="p-info">
+        <div class="p-brand">Cadence Security</div>
+        <div class="p-name">Securit Lock</div>
+        <div class="p-price-row"><span class="p-price">$49.99</span><span class="p-price-old">$69.99</span><button class="p-btn">Add to Cart</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY BAND -->
+<section class="story-band" id="story">
+  <div>
+    <div class="story-eyebrow" data-reveal>The Cadence Story</div>
+    <h2 data-reveal data-delay="1">One Mission:<br>Get More<br>People Riding.</h2>
+    <p data-reveal data-delay="2">Cadence was built with a single idea — that riding a bike should be accessible, joyful, and built to last. We design bikes for real riders: commuters, weekend warriors, first-timers, and die-hards.</p>
+    <p data-reveal data-delay="3">Every frame is built to perform. Every component is chosen for reliability. Every price is set so more people can experience the freedom of two wheels.</p>
+    <a href="#" class="story-link" data-reveal data-delay="4">Read our Story →</a>
+  </div>
+  <div class="story-img" data-reveal="right">
+    <img src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=900&q=85&fit=crop" alt="Rider on city street" loading="lazy">
+  </div>
+</section>
+
+<!-- SPECS BAR -->
+<div class="specs-bar">
+  <div class="spec-item" data-reveal data-delay="1"><div class="spec-icon">🏗️</div><div class="spec-title">Aircraft Aluminium</div><div class="spec-desc">6061-T6 alloy frames. Lightweight, strong, and built to absorb road vibration.</div></div>
+  <div class="spec-item" data-reveal data-delay="2"><div class="spec-icon">⚙️</div><div class="spec-title">Precision Components</div><div class="spec-desc">Shimano drivetrains, Tektro brakes. Components chosen for reliability, not just price.</div></div>
+  <div class="spec-item" data-reveal data-delay="3"><div class="spec-icon">🎨</div><div class="spec-title">Custom Colour Options</div><div class="spec-desc">Every model comes in multiple colourways. Find the one that fits your ride identity.</div></div>
+  <div class="spec-item" data-reveal data-delay="4"><div class="spec-icon">🔧</div><div class="spec-title">Lifetime Warranty</div><div class="spec-desc">Lifetime warranty on all frames. Cadence stands behind every bike we sell, forever.</div></div>
+</div>
+
+<!-- EDITORIAL -->
+<section class="editorial">
+  <div class="feat-head" data-reveal>
+    <h2 class="feat-title">Ride Journal</h2>
+    <a href="#" class="feat-link">All Articles →</a>
+  </div>
+  <div class="ed-grid">
+    <a href="#" class="ed-card" data-reveal data-delay="1">
+      <div class="ed-card-img tall"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&fit=crop" alt="Gravel guide" loading="lazy"></div>
+      <span class="ed-tag">Buying Guide</span>
+      <div class="ed-title">First Gravel Bike: The Ultimate Guide</div>
+      <div class="ed-sub">Everything you need to know before buying your first adventure bike.</div>
+    </a>
+    <a href="#" class="ed-card" data-reveal data-delay="2">
+      <div class="ed-card-img wide"><img src="https://images.unsplash.com/photo-1523740856324-f2ce89135981?w=600&q=80&fit=crop" alt="City commute" loading="lazy"></div>
+      <span class="ed-tag">Urban Riding</span>
+      <div class="ed-title">How to Choose a City Commuter</div>
+      <div class="ed-sub">Speed, comfort, or durability — what matters most for your daily ride?</div>
+    </a>
+    <a href="#" class="ed-card" data-reveal data-delay="3">
+      <div class="ed-card-img wide"><img src="https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?w=600&q=80&fit=crop" alt="E-bike tips" loading="lazy"></div>
+      <span class="ed-tag">E-Bikes</span>
+      <div class="ed-title">5 Things Nobody Tells You About E-Bikes</div>
+      <div class="ed-sub">Before you make the switch, here's what to expect from your first electric ride.</div>
+    </a>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews">
+  <div class="feat-head" data-reveal>
+    <h2 class="feat-title">Rider Reviews</h2>
+  </div>
+  <div class="r-grid">
+    <div class="r-card" data-reveal data-delay="1">
+      <div class="r-stars">★★★★★</div>
+      <p class="r-text">"The Urban Scout is everything I wanted in a commuter. Lightweight, responsive, and the build quality is way above the price point."</p>
+      <div class="r-author">Marcus T. <span class="r-loc">— Chicago, IL</span></div>
+    </div>
+    <div class="r-card" data-reveal data-delay="2">
+      <div class="r-stars">★★★★★</div>
+      <p class="r-text">"Switched from driving to riding the Volt E-Bike for my 8-mile commute. Best decision I've made. Full charge lasts me 4 days."</p>
+      <div class="r-author">Sarah K. <span class="r-loc">— Portland, OR</span></div>
+    </div>
+    <div class="r-card" data-reveal data-delay="3">
+      <div class="r-stars">★★★★★</div>
+      <p class="r-text">"Ordered the Gravel+ AL, had it assembled and on the road in two hours. Handled the dirt trails behind my house like a dream on day one."</p>
+      <div class="r-author">Diego R. <span class="r-loc">— Denver, CO</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div data-reveal>
+      <div class="footer-logo">Cadence</div>
+      <p class="footer-tagline">Bicycles built for riding. Designed for the city, engineered for the road.</p>
+    </div>
+    <div class="footer-col" data-reveal data-delay="1"><h4>Shop</h4><a href="#">Single Speed</a><a href="#">City Bikes</a><a href="#">E-Bikes</a><a href="#">Gravel</a><a href="#">Accessories</a></div>
+    <div class="footer-col" data-reveal data-delay="2"><h4>Company</h4><a href="#">Our Story</a><a href="#">Warranty</a><a href="#">Dealer Program</a><a href="#">Careers</a></div>
+    <div class="footer-col" data-reveal data-delay="3"><h4>Support</h4><a href="#">Shipping</a><a href="#">Returns</a><a href="#">FAQ</a><a href="#">Register Bike</a></div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 Cadence. All rights reserved.</span>
+    <div class="footer-badges"><span class="footer-badge">Free Shipping $99+</span><span class="footer-badge">Lifetime Warranty</span></div>
+  </div>
+</footer>
+
+<script>
+// ── STICKY NAV STYLE SWAP ──
+(function(){
+  var nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', function(){
+    nav.classList.toggle('light', window.scrollY > window.innerHeight - 80);
+  }, {passive:true});
+})();
+
+// ── HERO SLIDESHOW ──
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var dots   = document.querySelectorAll('.hero-dot');
+  var pauseBtn = document.getElementById('hero-pause');
+  var current = 0, paused = false, timer;
+
+  function goTo(n){
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  function next(){ goTo(current + 1); }
+
+  function startTimer(){ timer = setInterval(next, 5000); }
+  function stopTimer(){ clearInterval(timer); }
+
+  startTimer();
+
+  dots.forEach(function(dot){
+    dot.addEventListener('click', function(){
+      stopTimer();
+      goTo(parseInt(dot.getAttribute('data-slide'), 10));
+      if(!paused) startTimer();
+    });
+  });
+
+  pauseBtn.addEventListener('click', function(){
+    paused = !paused;
+    if(paused){ stopTimer(); pauseBtn.textContent = '▶ Play'; }
+    else { startTimer(); pauseBtn.textContent = '⏸ Pause'; }
+  });
+
+  // touch swipe
+  var ts = 0;
+  document.getElementById('hero').addEventListener('touchstart', function(e){ ts = e.touches[0].clientX; }, {passive:true});
+  document.getElementById('hero').addEventListener('touchend', function(e){
+    var diff = ts - e.changedTouches[0].clientX;
+    if(Math.abs(diff) > 50){ stopTimer(); goTo(diff > 0 ? current+1 : current-1); if(!paused) startTimer(); }
+  }, {passive:true});
+})();
+
+// ── SCROLL REVEAL ──
+(function(){
+  var els = document.querySelectorAll('[data-reveal]');
+  if(!els.length) return;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.1, rootMargin:'0px 0px -40px 0px'});
+  els.forEach(function(el){ io.observe(el); });
+})();
+
+// ── STAGGER GRIDS ──
+(function(){
+  document.querySelectorAll('.prod-grid,.r-grid,.ed-grid,.cat-strip').forEach(function(grid){
+    var cards = grid.querySelectorAll('[data-reveal]');
+    var io = new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting){
+        cards.forEach(function(c,i){ setTimeout(function(){ c.classList.add('revealed'); }, i*70); });
+        io.disconnect();
+      }
+    }, {threshold:0.05});
+    if(cards.length) io.observe(grid);
+  });
+})();
+
+// ── PRODUCT IMAGE SWAP ON HOVER ──
+(function(){
+  document.querySelectorAll('.p-card').forEach(function(card){
+    var main = card.querySelector('.p-img-main');
+    var alt  = card.querySelector('.p-img-alt');
+    if(!main || !alt) return;
+    card.addEventListener('mouseenter', function(){ alt.style.opacity = '1'; });
+    card.addEventListener('mouseleave', function(){ alt.style.opacity = '0'; });
+  });
+})();
+
+// ── LAZY IMAGE FADE ──
+(function(){
+  document.querySelectorAll('img[loading="lazy"]').forEach(function(img){
+    img.style.cssText += ';opacity:0;transition:opacity .5s ease';
+    if(img.complete){ img.style.opacity='1'; }
+    else { img.addEventListener('load', function(){ img.style.opacity='1'; }); }
+  });
+})();
+
+// ── ADD TO CART FEEDBACK ──
+(function(){
+  document.querySelectorAll('.p-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var orig = btn.textContent;
+      btn.textContent = '✓ Added';
+      btn.style.background = '#4a7c59';
+      setTimeout(function(){ btn.textContent = orig; btn.style.background=''; }, 1400);
+    });
+  });
+})();
+
+// ── PROMO BAR PAUSE ON HOVER ──
+(function(){
+  var t = document.querySelector('.promo-track');
+  if(!t) return;
+  t.addEventListener('mouseenter', function(){ t.style.animationPlayState='paused'; });
+  t.addEventListener('mouseleave', function(){ t.style.animationPlayState='running'; });
+})();
+</script>
+</body>
+</html>
