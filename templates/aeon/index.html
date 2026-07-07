@@ -386,91 +386,112 @@ goldL.position.set(5, 3, 4); scene.add(goldL);
 const violetL = new THREE.DirectionalLight(0x6B5CE7, 1.0);
 violetL.position.set(-5, -6, -3); scene.add(violetL);
 
-/* ── Morphing form material ── */
-function makeFormMaterial(colorA, colorB, glow) {
-  return new THREE.ShaderMaterial({
-    uniforms:{
-      uTime:   { value: 0 },
-      uMorph:  { value: 0 },
-      uAmp:    { value: 0.42 },
-      uColorA: { value: new THREE.Color(colorA) },
-      uColorB: { value: new THREE.Color(colorB) },
-      uGlow:   { value: new THREE.Color(glow) },
-      uPulse:  { value: 0 },
-    },
-    vertexShader:`
-      uniform float uTime;
-      uniform float uMorph;
-      uniform float uAmp;
-      varying vec3 vNormal;
-      varying vec3 vWorld;
-      varying float vN;
-      ${noiseGLSL}
-      void main(){
-        vec3 p = position;
-        // 0: organic fluid
-        float organic = snoise(p*1.4 + uTime*0.18);
-        // 1: faceted crystal
-        float facet   = floor(snoise(p*2.2)*4.0)/4.0;
-        // 2: twist-column
-        float ang     = p.y*(1.2+sin(uTime*0.2)*0.15);
-        vec3 twisted  = vec3(p.x*cos(ang)-p.z*sin(ang), p.y, p.x*sin(ang)+p.z*cos(ang));
-        float twistN  = snoise(twisted*1.1 + uTime*0.1);
-        // 3: monolith — slow breath
-        float still   = sin(uTime*0.5+p.y*2.0)*0.06;
+/* ═══════════════════════════════════════════════════════════════
+   SLINKY — one continuous helical tube that stretches/compresses
+   with scroll. Built as a TubeGeometry following a CatmullRomCurve3
+   spine. Rebuilt every frame via morph so the shape stays intact
+   as the camera passes through it.
+═══════════════════════════════════════════════════════════════ */
 
-        float m = uMorph;
-        float d = organic;
-        d = mix(d, facet,  clamp(m,     0.0, 1.0));
-        d = mix(d, twistN, clamp(m-1.0, 0.0, 1.0));
-        d = mix(d, still,  clamp(m-2.0, 0.0, 1.0));
-        vN = d;
+// --- Slinky geometry parameters ---
+const COILS       = 18;          // number of full loops
+const COIL_R      = 1.05;        // helix radius
+const TUBE_R      = 0.085;       // tube cross-section radius
+const SPINE_PTS   = 260;         // spine resolution
+const TUBE_SEGS   = budget === 'low' ? 8 : 14;  // tube radial segments
+const SLINKY_H    = 44;          // total resting height (world units)
 
-        vec3 displaced = p + normal*d*uAmp;
-        vNormal = normalize(normalMatrix * normal);
-        vec4 w  = modelMatrix * vec4(displaced, 1.0);
-        vWorld  = w.xyz;
-        gl_Position = projectionMatrix * viewMatrix * w;
-      }
-    `,
-    fragmentShader:`
-      uniform vec3  uColorA;
-      uniform vec3  uColorB;
-      uniform vec3  uGlow;
-      uniform float uPulse;
-      varying vec3  vNormal;
-      varying vec3  vWorld;
-      varying float vN;
-      void main(){
-        vec3  V    = normalize(cameraPosition - vWorld);
-        float fres = pow(1.0 - clamp(dot(V, normalize(vNormal)), 0.0, 1.0), 2.2);
-        vec3  base = mix(uColorA, uColorB, vN*0.5+0.5);
-        vec3  metal= mix(base, vec3(1.0), fres*0.85);
-        vec3  rim  = uGlow * fres * (1.5 + uPulse*1.4);
-        gl_FragColor = vec4(metal + rim, 1.0);
-      }
-    `
-  });
+// scroll-driven state (updated by ScrollTrigger)
+const slinkState = {
+  compress: 0,  // 0 = stretched, 1 = fully compressed
+  phase: 0,     // time phase (drives fluid wobble)
+};
+
+// Build the helical spine as an array of Vector3
+function buildSpinePoints(compress, phase) {
+  const pts = [];
+  const h   = SLINKY_H * (1 - compress * 0.72); // compress collapses height
+  for (let i = 0; i <= SPINE_PTS; i++) {
+    const t     = i / SPINE_PTS;
+    const angle = t * Math.PI * 2 * COILS + phase * 0.4;
+    const y     = t * h - h * 0.5;                 // centred on 0
+    // fluid wobble: each ring breathes slightly
+    const wobR  = COIL_R + Math.sin(t * Math.PI * COILS * 2 + phase * 1.1) * 0.12 * (1 - compress * 0.6);
+    const x     = Math.cos(angle) * wobR;
+    const z     = Math.sin(angle) * wobR;
+    pts.push(new THREE.Vector3(x, y, z));
+  }
+  return pts;
 }
 
-/* ── Four depth stations ── */
-const detail = budget === 'low' ? 4 : 6;
-const stations = [];
-const stationDefs = [
-  { y:  0,   morph: 0, colors: ['#2a2d38','#C8A96E','#a0c8d8'], scale: 2.0 }, // surface  — fluid
-  { y: -16,  morph: 1, colors: ['#1e2230','#a0c8d8','#C8A96E'], scale: 1.7 }, // 1200m    — faceted
-  { y: -33,  morph: 2, colors: ['#231d22','#6B5CE7','#C8A96E'], scale: 1.8 }, // 3800m    — twisted
-  { y: -48,  morph: 3, colors: ['#16181e','#f0ede6','#a0c8d8'], scale: 1.6 }, // hadal    — monolith
-];
-stationDefs.forEach(def => {
-  const geo  = new THREE.IcosahedronGeometry(def.scale, detail);
-  const mat  = makeFormMaterial(...def.colors);
-  mat.uniforms.uMorph.value = def.morph;
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.position.set((Math.random()-0.5)*1.2, def.y, -1.5);
-  scene.add(mesh);
-  stations.push(mesh);
+// Slinky material — metallic gold/violet fresnel
+const slinkMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime:   { value: 0 },
+    uPulse:  { value: 0 },
+    uColorA: { value: new THREE.Color('#C8A96E') },
+    uColorB: { value: new THREE.Color('#6B5CE7') },
+    uGlow:   { value: new THREE.Color('#a0c8d8') },
+  },
+  vertexShader: `
+    uniform float uTime;
+    varying vec3  vNormal;
+    varying vec3  vWorld;
+    varying float vT;
+    void main(){
+      vNormal = normalize(normalMatrix * normal);
+      vec4 w  = modelMatrix * vec4(position, 1.0);
+      vWorld  = w.xyz;
+      // vT encodes position along tube for colour gradient
+      vT = (position.y + 22.0) / 44.0;
+      gl_Position = projectionMatrix * viewMatrix * w;
+    }
+  `,
+  fragmentShader: `
+    uniform vec3  uColorA;
+    uniform vec3  uColorB;
+    uniform vec3  uGlow;
+    uniform float uPulse;
+    varying vec3  vNormal;
+    varying vec3  vWorld;
+    varying float vT;
+    void main(){
+      vec3  V    = normalize(cameraPosition - vWorld);
+      vec3  N    = normalize(vNormal);
+      float fres = pow(1.0 - clamp(dot(V, N), 0.0, 1.0), 2.0);
+      // gradient along helix length
+      vec3  base = mix(uColorA, uColorB, vT);
+      // metallic band
+      vec3  half_v = normalize(V + vec3(0.6, 0.8, 0.5));
+      float spec   = pow(max(dot(N, half_v), 0.0), 42.0);
+      vec3  col    = mix(base, vec3(1.0), fres * 0.9);
+      col += vec3(spec * 0.8);
+      col  = mix(col, uGlow * 2.0, fres * (0.35 + uPulse * 0.55));
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `,
+  side: THREE.DoubleSide,
 });
+
+// Build initial tube
+let slinkCurve = new THREE.CatmullRomCurve3(buildSpinePoints(0, 0), false, 'catmullrom', 0.35);
+let slinkGeo   = new THREE.TubeGeometry(slinkCurve, SPINE_PTS, TUBE_R, TUBE_SEGS, false);
+const slinky   = new THREE.Mesh(slinkGeo, slinkMat);
+slinky.position.set(0.6, 0, -0.5); // slight offset so helix sits to the right of text
+scene.add(slinky);
+
+// Rebuild geometry when scroll changes (throttled to every ~3 frames)
+let rebuildFrame = 0;
+function rebuildSlinky(compress, phase) {
+  slinkGeo.dispose();
+  const pts   = buildSpinePoints(compress, phase);
+  slinkCurve  = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.35);
+  slinkGeo    = new THREE.TubeGeometry(slinkCurve, SPINE_PTS, TUBE_R, TUBE_SEGS, false);
+  slinky.geometry = slinkGeo;
+}
+
+// Keep stations array for compatibility with render loop (empty)
+const stations = [];
 
 /* ── Marine snow / drifting particles ── */
 const COUNT = budget === 'low' ? 700 : 2000;
@@ -565,21 +586,33 @@ function tick() {
   m.x += (m.tx - m.x) * 0.045;
   m.y += (m.ty - m.y) * 0.045;
 
-  stations.forEach((s, i) => {
-    s.material.uniforms.uTime.value  = t;
-    s.rotation.y += 0.0016 + i*0.0004 + m.x*0.001;
-    s.rotation.x += 0.0006 + m.y*0.0008;
-    // pulse when camera is near this station's depth
-    const dist = Math.abs(camera.position.y - s.position.y);
-    s.material.uniforms.uPulse.value = Math.max(0, 1 - dist/6);
-  });
+  // ── Slinky ──
+  slinkMat.uniforms.uTime.value = t;
+  slinkState.phase = t;
+
+  // Rebuild geometry every 3 frames (smooth enough, avoids per-frame cost)
+  rebuildFrame++;
+  if (rebuildFrame % 3 === 0) {
+    rebuildSlinky(slinkState.compress, t);
+  }
+
+  // Slow auto-rotation + mouse lean
+  slinky.rotation.y  = t * 0.06 + m.x * 0.18;
+  slinky.rotation.x  = m.y * 0.10;
+
+  // Slinky follows camera down the shaft — always centred in view
+  slinky.position.y  = camState.y;
+
+  // Pulse: brighten near camera z
+  const camDist = Math.abs(camera.position.z - slinky.position.z);
+  slinkMat.uniforms.uPulse.value = Math.max(0, 1 - camDist / 4);
 
   pMat.uniforms.uTime.value = t;
 
   camera.position.x = m.x * 0.7;
   camera.position.y = camState.y + Math.sin(t*0.35)*0.12 - m.y*0.4;
   camera.position.z = 5.2;
-  camera.lookAt(m.x*0.3, camState.y - 1.2, -1.5);
+  camera.lookAt(m.x*0.3, camState.y - 1.2, -0.5);
 
   lamp.position.set(camera.position.x + 1.2, camera.position.y + 0.8, 3.2);
 
@@ -612,20 +645,45 @@ if (!reducedMotion && window.Lenis) {
   gsap.ticker.lagSmoothing(0);
 }
 
-/* Master dive: page scroll → camera depth + HUD */
+/* Master dive: page scroll → camera depth + HUD + slinky */
 ScrollTrigger.create({
   trigger: document.body,
   start: 'top top', end: 'bottom bottom',
   scrub: 0.8,
   onUpdate(self) {
     const p = self.progress;
+
+    // Camera descends
     camState.y = -p * DIVE_DEPTH * 0.82;
+
+    // HUD
     const meters = Math.round(p * 10900);
     document.getElementById('depthRead').textContent  = String(meters).padStart(4,'0') + 'm';
     document.getElementById('depthFill').style.width  = (p * 100).toFixed(1) + '%';
+
+    // Post-processing deepens
     bloom.strength = (budget==='low' ? 0.5 : 0.75) + p * 0.55;
     grade.uniforms.uFocus.value = p * 0.4;
     scene.fog.density = 0.042 + p * 0.032;
+
+    // ── Slinky scroll behaviour ──
+    // First 40% of scroll: slinky compresses (coils stack up)
+    // 40–70%: fully compressed, rotates as camera passes through
+    // 70–100%: stretches back out as camera clears it
+    let compress;
+    if (p < 0.40) {
+      compress = p / 0.40;                          // 0 → 1
+    } else if (p < 0.70) {
+      compress = 1.0;                               // fully compressed
+    } else {
+      compress = 1.0 - (p - 0.70) / 0.30;          // 1 → 0
+    }
+    slinkState.compress = compress;
+
+    // Near-camera zone: clamp tube radius so shape stays clear, not clipped
+    // When camera is inside the helix bounds the geometry stays intact —
+    // the tube radius is fixed; only the spine height changes.
+    // (No special near-clip logic needed — TubeGeometry is solid.)
   }
 });
 
