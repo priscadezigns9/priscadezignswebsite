@@ -4,29 +4,29 @@ const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor
 
 const PKGS={
   standard:[
-    {name:"Starter",price:"$297 TTD",desc:"1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance"},
-    {name:"Growth",price:"$597 TTD",desc:"Manage 1 Brand Page · Full Branding & App/Web Architecture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
-    {name:"Trusted",price:"$1,200 TTD",desc:"Full Website Architecture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
-    {name:"Custom",price:"Bespoke",desc:"Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support"}
+    {name:"Starter",desc:"1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance"},
+    {name:"Growth",desc:"Manage 1 Brand Page · Full Branding & App/Web Architecture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
+    {name:"Trusted",desc:"Full Website Architecture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
+    {name:"Custom",desc:"Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support"}
   ],
   ecommerce:[
-    {name:"E-Starter",price:"$497 TTD",desc:"1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance"},
-    {name:"E-Growth",price:"$1,497 TTD",desc:"2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
-    {name:"E-Trusted",price:"$2,500 TTD",desc:"Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"}
+    {name:"E-Starter",desc:"1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance"},
+    {name:"E-Growth",desc:"2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
+    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"}
   ],
   ai:[
-    {name:"AI Tier 1",price:"$1,500 USD + $50/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · AI Training & Configuration · Monthly Performance Report · 1 Month Free Maintenance"},
-    {name:"AI Tier 2",price:"$3,500 USD + $150/mo",desc:"Everything in Tier 1 · Multi-Channel Automation · Advanced Workflow Automation · 1 Month Free Maintenance"},
-    {name:"AI Tier 3",price:"$6,000 USD + $300/mo",desc:"Full Enterprise AI Deployment · Enterprise-Grade Infrastructure · Full Business Intelligence Automation · Direct Consultation & Support · 1 Month Free Maintenance"}
+    {name:"AI Tier 1",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · AI Training & Configuration · Monthly Performance Report · 1 Month Free Maintenance"},
+    {name:"AI Tier 2",desc:"Everything in Tier 1 · Multi-Channel Automation · Advanced Workflow Automation · 1 Month Free Maintenance"},
+    {name:"AI Tier 3",desc:"Full Enterprise AI Deployment · Enterprise-Grade Infrastructure · Full Business Intelligence Automation · Direct Consultation & Support · 1 Month Free Maintenance"}
   ],
   continuity:[
-    {name:"Maintenance",price:"$97/mo",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
+    {name:"Maintenance",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
   ],
   templates:[
-    {name:"Website",price:"$149.99 USD setup · $19.99 USD/mo",desc:"Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
-    {name:"+ Copywriting Add-On",price:"+$50.00 USD one-time · $4.99/update",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
-    {name:"+ AI Chatbot Add-On",price:"+$299.99 USD setup · $49.99 USD/mo",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $49.99 one-time bot setup included"},
-    {name:"Micro Store",price:"$249.99 USD setup · $34.99 USD/mo",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs"}
+    {name:"Website",desc:"Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
+    {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
+    {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · Contact us for current pricing"},
+    {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs"}
   ]
 };
 
@@ -45,7 +45,7 @@ const STEPS={
   need_website:{
     bot:"Our custom websites are built from scratch - fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
     r:[
-      {l:"\u26A1 Need it in 24hrs - $200",s:"pkg_oneday"},
+      {l:"\u26A1 Need it in 24hrs",s:"pkg_oneday"},
       {l:"I need a full custom build",s:"pkg_standard"},
       {l:"Mine isn't converting",s:"bad_website"},
       {l:"\uD83C\uDFA8 Show me templates instead",s:"pkg_templates"}
@@ -94,7 +94,7 @@ const STEPS={
   pkg_menu:{
     bot:"Our agency packages are full custom builds - designed, developed and delivered by Prisca Dezigns. Which fits you?",
     r:[
-      {l:"\u26A1 1-Day Website - $200",s:"pkg_oneday"},
+      {l:"\u26A1 1-Day Website",s:"pkg_oneday"},
       {l:"\uD83C\uDF10 Custom Website Packages",s:"pkg_standard"},
       {l:"\uD83D\uDED2 E-Commerce Packages",s:"pkg_ecommerce"},
       {l:"\uD83E\uDD16 AI Consultancy",s:"pkg_ai"},
@@ -103,7 +103,7 @@ const STEPS={
     ]
   },
   pkg_templates:{
-    bot:"24 ready-made templates. Pick a design, send your content, go live in 24 hours. From $149.99 USD setup + $19.99 USD/mo. No tech needed.",
+    bot:"24 ready-made templates. Pick a design, send your content, go live in 24 hours. No tech needed.",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse all 22 templates",s:"microstore"},
       {l:"What's included?",s:"templates_included"},
@@ -156,11 +156,11 @@ const STEPS={
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   ms_all:{
-    bot:"All 24 templates:\n\nFolio | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur | Nexus\n\nAll templates: $149.99 USD setup · $19.99 USD/mo · Live in 24hrs · Logo + content swapped\nMicro Store upgrade: $249.99 USD setup · $34.99 USD/mo",
+    bot:"All 24 templates:\n\nFolio | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur | Nexus\n\nAll templates · Live in 24hrs · Logo + content swapped\nContact us for current pricing",
     r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   microstore_info:{
-    bot:"The Micro Store (Micro Store) turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 USD setup · $34.99 USD/mo",
+    bot:"The Micro Store (Micro Store) turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 Contact us for pricing",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
       {l:"I'm ready - let's go",s:"talk"},
@@ -168,7 +168,7 @@ const STEPS={
     ]
   },
   templates_chatbot:{
-    bot:"The chatbot add-on (AI Chatbot add-on) is $249.99 USD setup + $49.99 USD/mo — includes hosting, SSL, updates, and AI bot answering your business FAQs 24/7: pricing, services, hours, how to book.",
+    bot:"The AI Chatbot add-on includes hosting, SSL, updates, and an AI bot answering your business FAQs 24/7: pricing, services, hours, how to book. Talk to us for pricing.",
     r:[
       {l:"Add chatbot to my template",s:"talk"},
       {l:"Template only is fine",s:"microstore"},
@@ -176,20 +176,20 @@ const STEPS={
     ]
   },
   templates_included:{
-    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 $149.99 USD setup · $19.99 USD/mo hosting\n\nAdd-ons: Copywriting included in T02 | Chatbot: $249.99 setup + $49.99/mo | Micro Store: $249.99 setup + $34.99/mo",
+    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Ask us for current pricing\n\nAdd-ons available: Copywriting | AI Chatbot | Micro Store",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse templates",s:"microstore"},
-      {l:"Add chatbot - $49.99",s:"templates_chatbot"},
+      {l:"Add chatbot",s:"templates_chatbot"},
       {l:"\uD83D\uDECD\uFE0F Micro Store option",s:"microstore_info"},
       {l:"I'm ready - let's go",s:"talk"}
     ]
   },
   pkg_oneday:{
-    bot:"The 1-Day Website is a fully custom site built to your brand, live within 24 hours. One flat price: $200. Then $50/mo to keep it live, optimised, and secure.",
+    bot:"The 1-Day Website is a fully custom site built to your brand, live within 24 hours. One flat fee. Hosting included after.",
     r:[{l:"What's included?",s:"oneday_included"},{l:"I want this - let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
   },
   oneday_included:{
-    bot:"Your 1-Day Site includes:\n\u2756 Full custom design (not a template)\n\u2756 Mobile-first, fast-loading\n\u2756 SEO + GEO + AEO optimised\n\u2756 WhatsApp & contact integration\n\u2756 Live in 24 hours\n$200 flat. $50/mo maintenance.",
+    bot:"Your 1-Day Site includes:\n\u2756 Full custom design (not a template)\n\u2756 Mobile-first, fast-loading\n\u2756 SEO + GEO + AEO optimised\n\u2756 WhatsApp & contact integration\n\u2756 Live in 24 hours\nOne flat fee. Maintenance included after.",
     r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
   },
   pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
@@ -299,7 +299,7 @@ function renderPkgs(list){
   var g=document.createElement('div');g.className='cpkg-grid';
   list.forEach(function(p){
     var c=document.createElement('div');c.className='cpkg-card';
-    c.innerHTML='<div class="cpkg-name">'+p.name+'</div><div class="cpkg-price">'+p.price+'</div><div class="cpkg-desc">'+p.desc+'</div>';
+    c.innerHTML='<div class="cpkg-name">'+p.name+'</div><div class="cpkg-desc">'+p.desc+'</div>';
     c.onclick=function(){go('talk','I am interested in '+p.name);};
     g.appendChild(c);
   });
