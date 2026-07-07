@@ -45,7 +45,7 @@ const STEPS={
 
   /* ── ABOUT BRANCH ── */
   about:{
-    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago. We design, build and launch websites, e-commerce stores, and AI automation systems for businesses across the Caribbean and beyond. Every project is built to a professional standard — no templates handed to you to figure out, no drag-and-drop builders. We do it all for you.",
+    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago.\n\n❖ Websites — custom builds, template sites, e-commerce stores\n❖ AI & Automation — chatbots, WhatsApp automation, lead capture\n❖ Brand Architecture — logo, domain, social setup, copywriting\n\nEvery project is built to a professional standard.\nWe do it all for you — no drag-and-drop builders, no DIY.",
     r:[
       {l:"\uD83D\uDCC5 How long have you been operating?",s:"about_history"},
       {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
@@ -58,7 +58,7 @@ const STEPS={
     ]
   },
   about_history:{
-    bot:"Prisca Dezigns was founded in 2023 and began full operations in 2026. What started as a vision for a high-fidelity digital agency grew into a full-service operation covering websites, branding, e-commerce, and AI-powered customer service automation. We serve clients across Trinidad & Tobago and the wider Caribbean, delivering digital products with a focus on accuracy, speed, and results.",
+    bot:"Prisca Dezigns was founded in 2023 and began full operations in 2026.\n\nWhat started as a vision grew into a full-service operation covering:\n\n❖ Websites & branding\n❖ E-commerce stores\n❖ AI-powered customer service automation\n\nServing clients across Trinidad & Tobago and the wider Caribbean — with a focus on accuracy, speed, and results.",
     r:[
       {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
       {l:"\uD83D\uDCF1 Social media",s:"about_social"},
@@ -66,7 +66,7 @@ const STEPS={
     ]
   },
   about_founder:{
-    bot:"Prisca Dezigns is led by Priscilla Narine — she studied Analytical Chemistry at UWI but took the entrepreneurial path after discovering web design and the power of AI in business. What started as curiosity became a full-service agency. She built Prisca Dezigns to give businesses access to the same calibre of digital infrastructure that large companies use — without the agency price tag or the technical headache.",
+    bot:"Prisca Dezigns is led by Priscilla Narine.\n\n❖ Studied Analytical Chemistry at UWI\n❖ Discovered web design and the power of AI in business\n❖ Left the traditional path to build Prisca Dezigns\n\nHer mission: give businesses access to the same calibre of digital infrastructure that large companies use — without the agency price tag or the technical headache.",
     r:[
       {l:"\uD83D\uDCF1 Social media",s:"about_social"},
       {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
@@ -109,7 +109,7 @@ const STEPS={
     ]
   },
   about_twmk:{
-    bot:"The Way Made Known (TWMK) is the faith and mission foundation at the heart of Prisca Dezigns. It is the backbone of everything we build — a Gospel-driven NGO committed to evidence-based, Bible-centred proclamation. Every product, every project, and every dollar earned is part of a larger mission that goes far beyond business.",
+    bot:"The Way Made Known (TWMK) is the faith foundation at the heart of Prisca Dezigns.\n\n❖ A Gospel-driven NGO\n❖ Committed to evidence-based, Bible-centred proclamation\n❖ The backbone of everything we build\n\nEvery product, every project, and every dollar earned is part of a mission that goes far beyond business.",
     r:[
       {l:"\uD83C\uDF0D Visit TWMK",url:"https://priscadezigns.org"},
       {l:"\uD83E\uDD1D Support the mission",s:"talk"},
@@ -125,7 +125,7 @@ const STEPS={
     ]
   },
   about_location:{
-    bot:"We are based in San Fernando, Trinidad & Tobago and serve clients across the Caribbean and internationally. All work is done remotely — no in-person meetings required. We communicate via WhatsApp, email, and video call.",
+    bot:"We are based in San Fernando, Trinidad & Tobago.\n\n❖ Serving clients across the Caribbean and internationally\n❖ All work done remotely — no in-person meetings required\n❖ Communication via WhatsApp, email, and video call",
     r:[
       {l:"Talk to someone",s:"talk"},
       {l:"\u2190 Back",s:"about"}
@@ -134,7 +134,7 @@ const STEPS={
 
   /* ── WEBSITE BRANCH ── */
   need_website:{
-    bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
+    bot:"Our custom websites are built from scratch.\n\n❖ Fully tailored to your brand\n❖ SEO, GEO & AEO optimised\n❖ Mobile-first and fast-loading\n❖ Delivered fast\n\nWhat do you need?",
     r:[
       {l:"\u26A1 Need it in 24hrs",s:"pkg_oneday"},
       {l:"I need a full custom build",s:"pkg_standard"},
@@ -156,25 +156,25 @@ const STEPS={
     ]
   },
   slow_response:{
-    bot:"78% of leads buy from the first business that responds. Our AI responds instantly — 24/7, even at 2am on a Sunday.",
+    bot:"78% of leads buy from the first business that responds.\n\n❖ Our AI responds instantly — 24/7\n❖ Even at 2am on a Sunday\n❖ No missed messages, no missed sales",
     r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
   filter_leads:{
-    bot:"Our lead filter qualifies every enquiry the second it lands — budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
+    bot:"Our lead filter qualifies every enquiry the second it lands.\n\n❖ Checks budget, timeline & intent\n❖ Only serious buyers reach you\n❖ The rest are nurtured automatically",
     r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
   no_system:{
-    bot:"We build the whole system from scratch — AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
+    bot:"We build the whole system from scratch.\n\n❖ AI chatbot\n❖ WhatsApp automation\n❖ Lead capture\n❖ CRM setup\n\nYou walk away with a machine that works while you sleep.",
     r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
   how_it_works:{
-    bot:"We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up automatically. Setup takes 2-4 weeks.",
+    bot:"We connect an AI agent to your WhatsApp, website, or email.\n\n❖ Greets every lead instantly\n❖ Asks qualifying questions\n❖ Routes serious buyers directly to you\n❖ Follows up automatically\n❖ Setup takes 2–4 weeks",
     r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
 
   /* ── AUTOMATION BRANCH ── */
   automation:{
-    bot:"We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up — all day, every day. What are you trying to automate?",
+    bot:"We build AI systems that replace a full-time customer service rep.\n\n❖ Respond to every enquiry instantly\n❖ Qualify leads automatically\n❖ Follow up all day, every day — even at 2am\n\nWhat are you trying to automate?",
     r:[
       {l:"Customer service / enquiries",s:"how_it_works"},
       {l:"WhatsApp automation",s:"whatsapp_auto"},
@@ -183,7 +183,7 @@ const STEPS={
     ]
   },
   whatsapp_auto:{
-    bot:"We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
+    bot:"We integrate an AI agent directly into your WhatsApp Business.\n\n❖ Responds to every message instantly\n❖ Qualifies the lead with smart questions\n❖ Alerts you only when someone is ready to pay\n❖ Works 24/7 — no staff needed",
     r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
   },
 
@@ -284,7 +284,7 @@ const STEPS={
     ]
   },
   template_ip:{
-    bot:"The template design — layout, code, colours, structure — is the intellectual property of Prisca Dezigns. What's yours is your content: your photos, your logo, your business name, and your text. You get a licence to use your customised version while your subscription is active.",
+    bot:"Here's how ownership works:\n\n❖ Design, layout, code & structure — owned by Prisca Dezigns\n❖ Your content (photos, logo, text, business name) — yours completely\n❖ You receive a licence to use your customised version\n❖ Licence remains active while your subscription is active",
     r:[{l:"\u2190 Back to templates",s:"pkg_templates"},{l:"Talk to someone",s:"talk"}]
   },
 
@@ -294,7 +294,7 @@ const STEPS={
     r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
   },
   oneday_included:{
-    bot:"Your 1-Day Site includes:\n\u2756 Full custom design (not a template)\n\u2756 Mobile-first, fast-loading\n\u2756 SEO + GEO + AEO optimised\n\u2756 WhatsApp & contact integration\n\u2756 Live in 24 hours\nOne flat fee. Maintenance included after.",
+    bot:"Your 1-Day Site includes:\n\n\u2756 Full custom design (not a template)\n\u2756 Mobile-first, fast-loading\n\u2756 SEO, GEO & AEO optimised\n\u2756 WhatsApp & contact integration\n\u2756 Live in 24 hours\n\nOne flat fee. Maintenance included after.",
     r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
   },
   pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
@@ -316,15 +316,15 @@ const STEPS={
 
   /* ── FAQ / MISC ── */
   faq_turnaround:{
-    bot:"Template sites go live in 24 hours. Custom websites take 3-7 business days depending on scope. E-commerce stores take 3-5 days. AI automation systems take 2-4 weeks. All timelines start from when you send your content.",
+    bot:"Here are our delivery timelines:\n\n❖ Template sites — live in 24 hours\n❖ Custom websites — 3–7 business days\n❖ E-commerce stores — 3–5 business days\n❖ AI automation systems — 2–4 weeks\n\nAll timelines start from when you send your content.",
     r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
   },
   faq_payment:{
-    bot:"We accept PayPal and bank transfer. For template orders you can pay directly through our template shop. For custom projects we send a quote via WhatsApp first.",
+    bot:"We accept the following payment methods:\n\n❖ PayPal\n❖ Bank transfer\n\nFor template orders — pay directly through our template shop.\nFor custom projects — we send a quote via WhatsApp first.",
     r:[{l:"Open template shop",url:"https://priscadezigns.org/templates/"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
   },
   faq_hosting:{
-    bot:"Yes — all our sites are hosted by us. Template sites are hosted on a subdomain (yourbrand.priscadezigns.org) or your own custom domain. Hosting is included in the monthly fee. No technical setup required on your end.",
+    bot:"Yes — all our sites are hosted by us.\n\n❖ Template sites: hosted on yourbrand.priscadezigns.org\n❖ Or your own custom domain\n❖ Hosting included in the monthly fee\n❖ No technical setup required on your end",
     r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
   }
 };
@@ -562,7 +562,14 @@ function renderPkgs(list){
 function addMsg(txt,type){
   var m=document.getElementById('chat-msgs');
   var d=document.createElement('div');d.className='cmsg '+type;
-  d.textContent=txt;m.appendChild(d);m.scrollTop=m.scrollHeight;
+  // render newlines as <br> for bot messages; escape HTML first for safety
+  if(type==='bot'){
+    var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    d.innerHTML=safe.replace(/\n/g,'<br>');
+  } else {
+    d.textContent=txt;
+  }
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
 }
 
 window.chatSend=function(){
