@@ -21,6 +21,7 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
  'photographer': ['photographer','film','reel','portfolio','folio','video','filmmaker','videographer'],
  'personal-brand':['personal brand','persona','opus','author','speaker','blogger','influencer','brand'],
  'ecommerce': ['ecommerce','online store','craft','luxe','glow','paws','optica','atelier','monsieur'],
+ 'microstore': ['microstore','micro store','terra','vivid','cadence'],
  };
  var activeCat = 'all';
  var searchQ = '';
