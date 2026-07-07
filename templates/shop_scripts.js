@@ -83,7 +83,7 @@ var cart = {
 };
 var PRICES = {
  website: { setup: 149.99, mo: 19.99, label: 'Template Website' },
- premium: { setup: 349.99, mo: 19.99, label: 'Premium 3D Template Website' },
+ premium: { setup: 299.99, mo: 19.99, label: 'Premium 3D Template Website' },
  store: { setup: 249.99, mo: 34.99, label: 'Micro Store' },
  copy: { setup: 49.99, mo: 0, moNote: '$4.99 per update' },
  chatbot: { setup: 399.99, mo: 49.99 }
