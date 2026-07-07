@@ -377,121 +377,111 @@ camera.position.set(0, 0, 5.2);
 const DIVE_DEPTH = 60;
 const camState   = { y: 0 };
 
-/* ── Lights ── */
-scene.add(new THREE.AmbientLight(0x12141a, 1.5));
-const lamp = new THREE.PointLight(0xf0ede6, 2.8, 26, 2);
+/* ── Lights — chrome needs hard directional, not coloured glow ── */
+scene.add(new THREE.AmbientLight(0x111318, 1.8));
+const lamp = new THREE.PointLight(0xffffff, 3.5, 20, 2);
 scene.add(lamp);
-const goldL = new THREE.DirectionalLight(0xC8A96E, 1.3);
-goldL.position.set(5, 3, 4); scene.add(goldL);
-const violetL = new THREE.DirectionalLight(0x6B5CE7, 1.0);
-violetL.position.set(-5, -6, -3); scene.add(violetL);
+const keyL = new THREE.DirectionalLight(0xffffff, 2.2);
+keyL.position.set(3, 4, 6); scene.add(keyL);
+const fillL = new THREE.DirectionalLight(0xd0d8e8, 0.6);
+fillL.position.set(-4, -3, -4); scene.add(fillL);
 
 /* ═══════════════════════════════════════════════════════════════
-   SLINKY — one continuous helical tube that stretches/compresses
-   with scroll. Built as a TubeGeometry following a CatmullRomCurve3
-   spine. Rebuilt every frame via morph so the shape stays intact
-   as the camera passes through it.
+   SLINKY — face-on radial disc, helix axis = Z (toward camera).
+   Looks exactly like the reference: dense chrome rings forming
+   a portal. Scroll compresses the depth (Z-spread of coils).
+   Text content sits inside the centre void.
 ═══════════════════════════════════════════════════════════════ */
 
-// --- Slinky geometry parameters ---
-const COILS       = 18;          // number of full loops
-const COIL_R      = 1.05;        // helix radius
-const TUBE_R      = 0.085;       // tube cross-section radius
-const SPINE_PTS   = 260;         // spine resolution
-const TUBE_SEGS   = budget === 'low' ? 8 : 14;  // tube radial segments
-const SLINKY_H    = 44;          // total resting height (world units)
+// Parameters
+const COILS     = budget === 'low' ? 38 : 52;  // ring count
+const COIL_R    = 2.6;    // outer radius of the disc
+const INNER_R   = 0.72;   // clear centre void (content lives here)
+const TUBE_R    = 0.028;  // cross-section of the wire
+const SPINE_PTS = budget === 'low' ? 180 : 280;
+const TUBE_SEGS = budget === 'low' ? 6 : 10;
 
-// scroll-driven state (updated by ScrollTrigger)
-const slinkState = {
-  compress: 0,  // 0 = stretched, 1 = fully compressed
-  phase: 0,     // time phase (drives fluid wobble)
-};
+// Scroll state
+const slinkState = { compress: 0 }; // 0=spread, 1=flat
 
-// Build the helical spine as an array of Vector3
-function buildSpinePoints(compress, phase) {
-  const pts = [];
-  const h   = SLINKY_H * (1 - compress * 0.72); // compress collapses height
+// Build spine: helix axis along Z, rings spread across Z depth
+function buildSpinePoints(compress) {
+  const pts     = [];
+  // total Z depth: spread out when compress=0, collapse to thin disc at compress=1
+  const zSpread = 3.2 * (1.0 - compress * 0.88);
   for (let i = 0; i <= SPINE_PTS; i++) {
     const t     = i / SPINE_PTS;
-    const angle = t * Math.PI * 2 * COILS + phase * 0.4;
-    const y     = t * h - h * 0.5;                 // centred on 0
-    // fluid wobble: each ring breathes slightly
-    const wobR  = COIL_R + Math.sin(t * Math.PI * COILS * 2 + phase * 1.1) * 0.12 * (1 - compress * 0.6);
-    const x     = Math.cos(angle) * wobR;
-    const z     = Math.sin(angle) * wobR;
+    const angle = t * Math.PI * 2 * COILS;
+    // radius varies slightly per ring for the "sunflower" fan look
+    const r     = INNER_R + (COIL_R - INNER_R) * (0.3 + 0.7 * t);
+    const x     = Math.cos(angle) * r;
+    const y     = Math.sin(angle) * r;
+    const z     = (t - 0.5) * zSpread; // Z is the depth axis
     pts.push(new THREE.Vector3(x, y, z));
   }
   return pts;
 }
 
-// Slinky material — metallic gold/violet fresnel
+// Chrome material — clean white metal, minimal glow
 const slinkMat = new THREE.ShaderMaterial({
   uniforms: {
-    uTime:   { value: 0 },
-    uPulse:  { value: 0 },
-    uColorA: { value: new THREE.Color('#C8A96E') },
-    uColorB: { value: new THREE.Color('#6B5CE7') },
-    uGlow:   { value: new THREE.Color('#a0c8d8') },
+    uTime:  { value: 0 },
+    uTilt:  { value: 0 }, // scroll-driven tilt
   },
   vertexShader: `
-    uniform float uTime;
-    varying vec3  vNormal;
-    varying vec3  vWorld;
+    varying vec3 vNormal;
+    varying vec3 vWorld;
     varying float vT;
+    attribute float aT;
     void main(){
       vNormal = normalize(normalMatrix * normal);
       vec4 w  = modelMatrix * vec4(position, 1.0);
       vWorld  = w.xyz;
-      // vT encodes position along tube for colour gradient
-      vT = (position.y + 22.0) / 44.0;
+      vT      = (position.z + 1.6) / 3.2; // 0..1 across Z depth
       gl_Position = projectionMatrix * viewMatrix * w;
     }
   `,
   fragmentShader: `
-    uniform vec3  uColorA;
-    uniform vec3  uColorB;
-    uniform vec3  uGlow;
-    uniform float uPulse;
+    uniform float uTime;
     varying vec3  vNormal;
     varying vec3  vWorld;
     varying float vT;
     void main(){
       vec3  V    = normalize(cameraPosition - vWorld);
       vec3  N    = normalize(vNormal);
-      float fres = pow(1.0 - clamp(dot(V, N), 0.0, 1.0), 2.0);
-      // gradient along helix length
-      vec3  base = mix(uColorA, uColorB, vT);
-      // metallic band
-      vec3  half_v = normalize(V + vec3(0.6, 0.8, 0.5));
-      float spec   = pow(max(dot(N, half_v), 0.0), 42.0);
-      vec3  col    = mix(base, vec3(1.0), fres * 0.9);
-      col += vec3(spec * 0.8);
-      col  = mix(col, uGlow * 2.0, fres * (0.35 + uPulse * 0.55));
+      // angle-of-incidence → metallic sheen
+      float ndv  = clamp(dot(N, V), 0.0, 1.0);
+      float fres = pow(1.0 - ndv, 3.5);
+      // sharp specular lobe
+      vec3  L    = normalize(vec3(0.4, 0.6, 1.0));
+      float spec = pow(max(dot(reflect(-L, N), V), 0.0), 80.0);
+      // base chrome: near-white with slight warm/cool shift
+      float warm = 0.88 + vT * 0.12;
+      vec3  base = vec3(warm, warm * 0.97, warm * 0.94);
+      vec3  col  = base * (0.55 + ndv * 0.45);
+      col       += vec3(spec * 0.9);
+      col       += vec3(fres * 0.25); // very subtle rim, no colour
       gl_FragColor = vec4(col, 1.0);
     }
   `,
   side: THREE.DoubleSide,
 });
 
-// Build initial tube
-let slinkCurve = new THREE.CatmullRomCurve3(buildSpinePoints(0, 0), false, 'catmullrom', 0.35);
+// Build and add
+let slinkCurve = new THREE.CatmullRomCurve3(buildSpinePoints(0), false, 'catmullrom', 0.5);
 let slinkGeo   = new THREE.TubeGeometry(slinkCurve, SPINE_PTS, TUBE_R, TUBE_SEGS, false);
 const slinky   = new THREE.Mesh(slinkGeo, slinkMat);
-slinky.position.set(0.6, 0, -0.5); // slight offset so helix sits to the right of text
 scene.add(slinky);
 
-// Rebuild geometry when scroll changes (throttled to every ~3 frames)
 let rebuildFrame = 0;
-function rebuildSlinky(compress, phase) {
+function rebuildSlinky(compress) {
   slinkGeo.dispose();
-  const pts   = buildSpinePoints(compress, phase);
-  slinkCurve  = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.35);
-  slinkGeo    = new THREE.TubeGeometry(slinkCurve, SPINE_PTS, TUBE_R, TUBE_SEGS, false);
+  slinkCurve      = new THREE.CatmullRomCurve3(buildSpinePoints(compress), false, 'catmullrom', 0.5);
+  slinkGeo        = new THREE.TubeGeometry(slinkCurve, SPINE_PTS, TUBE_R, TUBE_SEGS, false);
   slinky.geometry = slinkGeo;
 }
 
-// Keep stations array for compatibility with render loop (empty)
-const stations = [];
+const stations = []; // unused, kept for render loop compat
 
 /* ── Marine snow / drifting particles ── */
 const COUNT = budget === 'low' ? 700 : 2000;
@@ -532,8 +522,8 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(
   new THREE.Vector2(innerWidth, innerHeight),
-  budget === 'low' ? 0.6 : 0.9, 0.65, 0.2
-);
+  budget === 'low' ? 0.20 : 0.28, 0.5, 0.5
+); // low bloom — chrome look, not neon
 composer.addPass(bloom);
 
 const grade = new ShaderPass({
@@ -586,35 +576,32 @@ function tick() {
   m.x += (m.tx - m.x) * 0.045;
   m.y += (m.ty - m.y) * 0.045;
 
-  // ── Slinky ──
   slinkMat.uniforms.uTime.value = t;
-  slinkState.phase = t;
 
-  // Rebuild geometry every 3 frames (smooth enough, avoids per-frame cost)
+  // Rebuild every 4 frames — compress changes with scroll
   rebuildFrame++;
-  if (rebuildFrame % 3 === 0) {
-    rebuildSlinky(slinkState.compress, t);
+  if (rebuildFrame % 4 === 0) {
+    rebuildSlinky(slinkState.compress);
   }
 
-  // Slow auto-rotation + mouse lean
-  slinky.rotation.y  = t * 0.06 + m.x * 0.18;
-  slinky.rotation.x  = m.y * 0.10;
+  // Slinky tracks the camera's Y position (stays centred on screen as we dive)
+  slinky.position.y = camState.y;
 
-  // Slinky follows camera down the shaft — always centred in view
-  slinky.position.y  = camState.y;
+  // Slow continuous Z-rotation — gives the spinning portal effect
+  slinky.rotation.z  = t * 0.04;
 
-  // Pulse: brighten near camera z
-  const camDist = Math.abs(camera.position.z - slinky.position.z);
-  slinkMat.uniforms.uPulse.value = Math.max(0, 1 - camDist / 4);
+  // Subtle mouse tilt — very gentle so the disc face stays mostly toward camera
+  slinky.rotation.x  =  m.y * 0.08;
+  slinky.rotation.y  =  m.x * 0.08;
 
   pMat.uniforms.uTime.value = t;
 
-  camera.position.x = m.x * 0.7;
-  camera.position.y = camState.y + Math.sin(t*0.35)*0.12 - m.y*0.4;
-  camera.position.z = 5.2;
-  camera.lookAt(m.x*0.3, camState.y - 1.2, -0.5);
+  camera.position.x = m.x * 0.5;
+  camera.position.y = camState.y + Math.sin(t * 0.3) * 0.08 - m.y * 0.3;
+  camera.position.z = 5.5;
+  camera.lookAt(0, camState.y, 0);
 
-  lamp.position.set(camera.position.x + 1.2, camera.position.y + 0.8, 3.2);
+  lamp.position.set(0, camState.y + 2, 4);
 
   composer.render();
 }
@@ -645,11 +632,11 @@ if (!reducedMotion && window.Lenis) {
   gsap.ticker.lagSmoothing(0);
 }
 
-/* Master dive: page scroll → camera depth + HUD + slinky */
+/* Master dive: page scroll → camera depth + HUD + slinky compress */
 ScrollTrigger.create({
   trigger: document.body,
   start: 'top top', end: 'bottom bottom',
-  scrub: 0.8,
+  scrub: 1.0,
   onUpdate(self) {
     const p = self.progress;
 
@@ -658,32 +645,23 @@ ScrollTrigger.create({
 
     // HUD
     const meters = Math.round(p * 10900);
-    document.getElementById('depthRead').textContent  = String(meters).padStart(4,'0') + 'm';
-    document.getElementById('depthFill').style.width  = (p * 100).toFixed(1) + '%';
+    document.getElementById('depthRead').textContent = String(meters).padStart(4,'0') + 'm';
+    document.getElementById('depthFill').style.width = (p * 100).toFixed(1) + '%';
 
-    // Post-processing deepens
-    bloom.strength = (budget==='low' ? 0.5 : 0.75) + p * 0.55;
-    grade.uniforms.uFocus.value = p * 0.4;
-    scene.fog.density = 0.042 + p * 0.032;
+    // Post-processing — keep bloom LOW (clean chrome look)
+    bloom.strength         = budget === 'low' ? 0.22 : 0.30;
+    grade.uniforms.uFocus.value = p * 0.25;
+    scene.fog.density      = 0.028 + p * 0.018;
 
-    // ── Slinky scroll behaviour ──
-    // First 40% of scroll: slinky compresses (coils stack up)
-    // 40–70%: fully compressed, rotates as camera passes through
-    // 70–100%: stretches back out as camera clears it
+    // ── Slinky compress ──
+    // 0–35%  : compress in  (spread Z → flat disc)
+    // 35–65% : flat, camera flies through the void centre
+    // 65–100%: spreads back out the other side
     let compress;
-    if (p < 0.40) {
-      compress = p / 0.40;                          // 0 → 1
-    } else if (p < 0.70) {
-      compress = 1.0;                               // fully compressed
-    } else {
-      compress = 1.0 - (p - 0.70) / 0.30;          // 1 → 0
-    }
+    if (p < 0.35)      compress = p / 0.35;
+    else if (p < 0.65) compress = 1.0;
+    else               compress = 1.0 - (p - 0.65) / 0.35;
     slinkState.compress = compress;
-
-    // Near-camera zone: clamp tube radius so shape stays clear, not clipped
-    // When camera is inside the helix bounds the geometry stays intact —
-    // the tube radius is fixed; only the spine height changes.
-    // (No special near-clip logic needed — TubeGeometry is solid.)
   }
 });
 
