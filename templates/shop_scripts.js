@@ -21,7 +21,6 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
  'photographer': ['photographer','film','reel','portfolio','folio','video','filmmaker','videographer'],
  'personal-brand':['personal brand','persona','opus','author','speaker','blogger','influencer','brand'],
  'ecommerce': ['ecommerce','online store','craft','luxe','glow','paws','optica','atelier','monsieur'],
- 'microstore': ['microstore','micro store','terra','vivid','cadence'],
  };
  var activeCat = 'all';
  var searchQ = '';
@@ -84,6 +83,7 @@ var cart = {
 };
 var PRICES = {
  website: { setup: 149.99, mo: 19.99, label: 'Template Website' },
+ premium: { setup: 299.99, mo: 19.99, label: 'Premium 3D Template Website' },
  store: { setup: 249.99, mo: 34.99, label: 'Micro Store' },
  copy: { setup: 49.99, mo: 0, moNote: '$4.99 per update' },
  chatbot: { setup: 299.99, mo: 49.99 }
@@ -108,7 +108,6 @@ function removeBase() {
  cart.addons.chatbot = false;
  renderCart();
  updateAllButtons();
- updateAgreement();
  if (oldName) updateTemplateBtn(oldName, false);
 }
 function toggleAddon(id) {
@@ -122,7 +121,6 @@ function toggleAddon(id) {
  cart.addons[id] = inp ? inp.checked : !cart.addons[id];
  renderCart();
  updateAddonCards();
- updateAgreement();
 }
 function renderCart() {
  var hasBase = !!cart.base;
@@ -134,10 +132,8 @@ function renderCart() {
  if (!hasBase) {
  document.getElementById('cart-setup-total').textContent = '$0.00';
  document.getElementById('cart-mo-total').textContent = '$0.00 / mo';
- var ppBtn = document.getElementById('cart-paypal');
- var bnBtn = document.getElementById('cart-bank');
- if (ppBtn) { ppBtn.classList.add('disabled'); ppBtn.href = '#'; }
- if (bnBtn) { bnBtn.classList.add('disabled'); bnBtn.href = '#'; }
+ var co = document.getElementById('cart-checkout');
+ co.classList.add('disabled'); co.href = '#';
  var chk = document.getElementById('cd-agree-chk');
  if (chk) { chk.checked = false; chk.disabled = true; }
  var step1 = document.getElementById('cd-step1');
@@ -284,17 +280,7 @@ function openTerms() {
  html += '</div>';
  overlay.innerHTML = html;
  document.body.appendChild(overlay);
-  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.style.display='none'; });
- overlay.addEventListener('touchend', function(e){ if(e.target===overlay) overlay.style.display='none'; }, { passive: false });
- // ensure Accept buttons inside work on touch
- setTimeout(function(){
-   overlay.querySelectorAll('button').forEach(function(b){
-     b.addEventListener('touchend', function(e){
-       e.preventDefault();
-       b.click();
-     }, { passive: false });
-   });
- }, 50);
+ overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.style.display='none'; });
 }
 
 function acceptTerms() {
@@ -393,9 +379,8 @@ document.addEventListener('DOMContentLoaded', function() {
  ['cart-paypal','cart-bank'].forEach(function(id) {
    var btn = document.getElementById(id);
    if (!btn) return;
-   function handlePayment(e) {
+   btn.addEventListener('click', function(e) {
      e.preventDefault();
-     e.stopPropagation();
      if (btn.classList.contains('disabled')) return;
      var dest = btn.getAttribute('href');
      if (!dest || dest === '#') return;
@@ -403,18 +388,8 @@ document.addEventListener('DOMContentLoaded', function() {
      saveCartOrder(method);
      closeCart();
      setTimeout(function(){ window.open(dest, '_blank', 'noopener'); }, 180);
-   }
-   btn.addEventListener('click', handlePayment);
-   btn.addEventListener('touchend', handlePayment, { passive: false });
+   });
  });
- // Also ensure cart overlay tap closes cart on mobile
- var overlay = document.getElementById('cart-overlay');
- if (overlay) {
-   overlay.addEventListener('touchend', function(e) {
-     e.preventDefault();
-     closeCart();
-   }, { passive: false });
- }
 });
 renderCart();
 
