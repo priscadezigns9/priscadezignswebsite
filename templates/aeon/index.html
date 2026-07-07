@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[Agency Name] — AI Agency</title>
+<meta name="description" content="Premium AI Agency. We build intelligent systems that transform businesses.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════
+   STELLAR — AI Agency | Cinematic WebGL Experience
+   Three.js · GSAP ScrollTrigger · Lenis · GLSL Shaders
+   Prisca Dezigns © 2026
+════════════════════════════════════════════════════════ */
+:root {
+  --bg:      #04040A;
+  --ink:     #08081A;
+  --gold:    #C8A96E;
+  --gold-hi: #F0D080;
+  --silver:  #A8B4C8;
+  --violet:  #6B5CE7;
+  --white:   #F2F2F0;
+  --muted:   rgba(242,242,240,0.38);
+  --dim:     rgba(242,242,240,0.12);
+  --border:  rgba(200,169,110,0.14);
+  --font-h:  'Syne', sans-serif;
+  --font-b:  'Inter', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { overflow-x: hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-b);
+  overflow-x: hidden;
+  cursor: none; /* custom cursor */
+}
+
+/* ── Custom cursor ─────────────────────────── */
+.cursor {
+  position: fixed; top: 0; left: 0; z-index: 9999;
+  width: 12px; height: 12px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: width .2s, height .2s, background .2s;
+  mix-blend-mode: difference;
+}
+.cursor-ring {
+  position: fixed; top: 0; left: 0; z-index: 9998;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(200,169,110,0.6);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: width .4s ease, height .4s ease, border-color .3s;
+}
+body:has(a:hover) .cursor { width: 6px; height: 6px; }
+body:has(a:hover) .cursor-ring { width: 64px; height: 64px; border-color: var(--gold); }
+
+/* ── WebGL canvas (full fixed background) ──── */
+#gl-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Scroll container ───────────────────────── */
+#scroll-root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── NAV ───────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(24px, 5vw, 80px);
+  height: 72px;
+}
+nav::after {
+  content: '';
+  position: absolute; bottom: 0; left: 5%; right: 5%;
+  height: 1px; background: var(--border);
+}
+.nav-logo {
+  font-family: var(--font-h); font-size: 1rem; font-weight: 800;
+  color: var(--gold); text-decoration: none; letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.nav-links {
+  display: flex; gap: 40px; list-style: none;
+}
+.nav-links a {
+  font-size: 0.68rem; font-weight: 500; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--muted);
+  text-decoration: none; transition: color .2s;
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-btn {
+  font-family: var(--font-h); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--bg); background: var(--gold);
+  padding: 10px 28px; border: none; cursor: pointer;
+  text-decoration: none;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: background .2s, color .2s;
+}
+.nav-btn:hover { background: var(--gold-hi); }
+
+/* ── SECTIONS — each is a full viewport scene ── */
+section {
+  position: relative;
+  min-height: 100svh;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  padding: clamp(80px, 12vw, 160px) clamp(24px, 6vw, 120px);
+  overflow: hidden;
+}
+
+/* ── HERO ─────────────────────────────────── */
+.hero {
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding-bottom: clamp(60px, 10vw, 120px);
+}
+.hero-eyebrow {
+  font-family: var(--font-h); font-size: 0.64rem; font-weight: 700;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 28px; opacity: 0;
+  display: flex; align-items: center; gap: 14px;
+}
+.hero-eyebrow::before {
+  content: ''; display: block;
+  width: 40px; height: 1px; background: var(--gold);
+}
+.hero-headline {
+  font-family: var(--font-h);
+  font-size: clamp(4rem, 10vw, 10rem);
+  font-weight: 800; line-height: 0.92; letter-spacing: -0.03em;
+  max-width: 900px; opacity: 0;
+}
+.hero-headline .outline {
+  -webkit-text-stroke: 1px rgba(200,169,110,0.5);
+  color: transparent;
+}
+.hero-headline .gold { color: var(--gold); }
+.hero-sub {
+  margin-top: 36px;
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  color: var(--muted); max-width: 460px;
+  line-height: 1.85; opacity: 0;
+}
+.hero-ctas {
+  margin-top: 52px;
+  display: flex; gap: 20px; align-items: center; opacity: 0;
+}
+.btn-primary {
+  font-family: var(--font-h); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--bg); background: var(--gold);
+  padding: 16px 40px; border: none; cursor: pointer;
+  text-decoration: none;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  transition: background .25s;
+}
+.btn-primary:hover { background: var(--gold-hi); }
+.btn-ghost {
+  font-family: var(--font-h); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gold); background: transparent;
+  padding: 15px 40px;
+  border: 1px solid rgba(200,169,110,0.4);
+  cursor: pointer; text-decoration: none;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  transition: border-color .25s, color .25s;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold-hi); }
+
+/* Scroll indicator */
+.scroll-cue {
+  position: absolute; bottom: 48px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  opacity: 0;
+}
+.scroll-cue span {
+  font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted);
+}
+.scroll-line {
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%,100% { opacity: 0.3; transform: scaleY(1); }
+  50%      { opacity: 1;   transform: scaleY(1.2); }
+}
+
+/* ── MANIFESTO — large centered type ──────── */
+.manifesto {
+  align-items: center; text-align: center;
+  background: transparent;
+}
+.manifesto-label {
+  font-family: var(--font-h); font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 48px;
+}
+.manifesto-text {
+  font-family: var(--font-h);
+  font-size: clamp(2rem, 5vw, 5.5rem);
+  font-weight: 800; line-height: 1.1; letter-spacing: -0.025em;
+  max-width: 1100px;
+}
+.manifesto-text .word {
+  display: inline-block;
+  opacity: 0; transform: translateY(60px);
+  transition: opacity .6s ease, transform .6s ease;
+  margin-right: 0.22em;
+}
+.manifesto-text .word.lit {
+  opacity: 1; transform: translateY(0);
+}
+.manifesto-text .accent { color: var(--gold); }
+.manifesto-text .dim    { color: var(--muted); }
+
+/* ── SERVICES ──────────────────────────────── */
+.services { background: transparent; }
+.services-header { margin-bottom: 80px; }
+.services-header .sec-num {
+  font-family: var(--font-h); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.24em; color: var(--gold); margin-bottom: 16px;
+}
+.services-header h2 {
+  font-family: var(--font-h);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 800; line-height: 0.96; letter-spacing: -0.03em;
+}
+.services-header h2 .outline {
+  -webkit-text-stroke: 1px rgba(200,169,110,0.45);
+  color: transparent;
+}
+
+.services-list {
+  display: flex; flex-direction: column; gap: 0;
+  border-top: 1px solid var(--border);
+}
+.svc-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 200px 80px;
+  align-items: center; gap: 32px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: padding-left .3s ease;
+  overflow: hidden;
+  position: relative;
+}
+.svc-row::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 0; background: rgba(200,169,110,0.04);
+  transition: width .4s ease;
+}
+.svc-row:hover::before { width: 100%; }
+.svc-row:hover { padding-left: 16px; }
+.svc-num {
+  font-family: var(--font-h); font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.1em; color: var(--gold); opacity: 0.6;
+}
+.svc-name {
+  font-family: var(--font-h); font-size: clamp(1.1rem, 2vw, 1.6rem);
+  font-weight: 700; letter-spacing: -0.01em;
+}
+.svc-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+.svc-arrow {
+  font-size: 1.2rem; color: var(--gold); opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity .3s, transform .3s;
+  text-align: right;
+}
+.svc-row:hover .svc-arrow { opacity: 1; transform: translateX(0); }
+
+/* ── WORK GRID ─────────────────────────────── */
+.work { background: transparent; }
+.work-header { margin-bottom: 72px; }
+.work-header h2 {
+  font-family: var(--font-h);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 800; line-height: 0.96; letter-spacing: -0.03em;
+}
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+.work-card {
+  position: relative; overflow: hidden;
+  background: var(--ink);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+.work-card.span-7 { grid-column: span 7; }
+.work-card.span-5 { grid-column: span 5; }
+.work-card.span-4 { grid-column: span 4; }
+.work-card.span-8 { grid-column: span 8; }
+.work-card.span-6 { grid-column: span 6; }
+
+.work-card-inner {
+  aspect-ratio: 16/10;
+  overflow: hidden; position: relative;
+}
+.work-card.tall .work-card-inner { aspect-ratio: 4/5; }
+.work-card-bg {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .8s ease;
+  filter: brightness(0.7) saturate(0.8);
+}
+.work-card:hover .work-card-bg { transform: scale(1.05); filter: brightness(0.9) saturate(1); }
+.work-card-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(4,4,10,0.9) 0%, transparent 60%);
+  padding: 28px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.work-card-label {
+  font-size: 0.6rem; font-weight: 500; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+}
+.work-card-title {
+  font-family: var(--font-h); font-size: 1.1rem; font-weight: 700;
+  letter-spacing: -0.01em; line-height: 1.2;
+}
+
+/* ── PROCESS / STORY ──────────────────────── */
+.process { background: transparent; }
+.process-steps {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 2px; margin-top: 80px;
+}
+.process-step {
+  padding: 48px 32px;
+  background: rgba(8,8,26,0.6);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  position: relative; overflow: hidden;
+}
+.process-step::before {
+  content: attr(data-num);
+  position: absolute; top: -20px; right: -10px;
+  font-family: var(--font-h); font-size: 8rem; font-weight: 800;
+  color: rgba(200,169,110,0.04); line-height: 1;
+  pointer-events: none; letter-spacing: -0.04em;
+}
+.step-num {
+  font-family: var(--font-h); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.22em; color: var(--gold); margin-bottom: 20px;
+}
+.step-title {
+  font-family: var(--font-h); font-size: 1.3rem; font-weight: 800;
+  letter-spacing: -0.02em; margin-bottom: 16px; line-height: 1.15;
+}
+.step-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.8; }
+
+/* ── STATS / PROOF ────────────────────────── */
+.stats {
+  min-height: 60vh;
+  display: flex; align-items: center;
+  background: transparent;
+}
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  width: 100%;
+  border: 1px solid var(--border);
+}
+.stat-cell {
+  padding: 60px 40px;
+  border-right: 1px solid var(--border);
+  text-align: center;
+  position: relative;
+}
+.stat-cell:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--font-h);
+  font-size: clamp(3rem, 5vw, 5.5rem);
+  font-weight: 800; line-height: 1; letter-spacing: -0.04em;
+  color: var(--gold); display: block;
+}
+.stat-unit {
+  font-family: var(--font-h); font-size: 1.5rem; font-weight: 800;
+  color: var(--gold);
+}
+.stat-label {
+  display: block; margin-top: 14px;
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* ── CTA FINALE ───────────────────────────── */
+.finale {
+  align-items: center; text-align: center;
+  background: transparent; min-height: 100svh;
+}
+.finale-pre {
+  font-family: var(--font-h); font-size: 0.64rem; font-weight: 700;
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 36px; opacity: 0;
+}
+.finale-h {
+  font-family: var(--font-h);
+  font-size: clamp(3rem, 9vw, 9rem);
+  font-weight: 800; line-height: 0.92; letter-spacing: -0.04em;
+  max-width: 1000px; opacity: 0;
+}
+.finale-h .outline {
+  -webkit-text-stroke: 1px rgba(200,169,110,0.4);
+  color: transparent;
+}
+.finale-h .gold { color: var(--gold); }
+.finale-actions {
+  margin-top: 60px; display: flex; gap: 20px;
+  justify-content: center; flex-wrap: wrap; opacity: 0;
+}
+
+/* ── FOOTER ────────────────────────────────── */
+footer {
+  position: relative; z-index: 1;
+  padding: clamp(40px, 6vw, 80px) clamp(24px, 6vw, 120px);
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 40px;
+}
+.footer-top {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; flex-wrap: wrap; gap: 32px;
+}
+.footer-brand {
+  font-family: var(--font-h); font-size: 1.2rem; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold);
+}
+.footer-tagline {
+  font-size: 0.78rem; color: var(--muted); margin-top: 8px; max-width: 280px;
+  line-height: 1.7;
+}
+.footer-cols { display: flex; gap: 60px; flex-wrap: wrap; }
+.footer-col h4 {
+  font-family: var(--font-h); font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 18px;
+}
+.footer-col a {
+  display: block; font-size: 0.78rem; color: var(--muted);
+  text-decoration: none; margin-bottom: 10px; transition: color .2s;
+}
+.footer-col a:hover { color: var(--white); }
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 24px; border-top: 1px solid var(--border);
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-copy { font-size: 0.66rem; color: var(--muted); }
+
+/* ── SECTION DIVIDER / LABEL ──────────────── */
+.sec-label {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--font-h); font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.26em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 20px;
+}
+.sec-label::before {
+  content: ''; display: block;
+  width: 32px; height: 1px; background: var(--gold);
+}
+
+/* ── LOADING SCREEN ──────────────────────── */
+#loader {
+  position: fixed; inset: 0; z-index: 9000;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 24px;
+}
+.loader-word {
+  font-family: var(--font-h); font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold);
+}
+.loader-bar-wrap {
+  width: clamp(200px, 40vw, 400px); height: 1px;
+  background: rgba(200,169,110,0.15);
+  overflow: hidden;
+}
+.loader-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--violet), var(--gold));
+  transition: width .05s linear;
+}
+.loader-pct {
+  font-family: var(--font-h); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.2em; color: var(--muted);
+}
+
+/* ── NOISE OVERLAY ──────────────────────── */
+.noise {
+  position: fixed; inset: 0; z-index: 2;
+  pointer-events: none; opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  animation: grainShift 0.5s steps(2) infinite;
+}
+@keyframes grainShift {
+  0%  { transform: translate(0, 0); }
+  25% { transform: translate(-2%, 1%); }
+  50% { transform: translate(1%, -1%); }
+  75% { transform: translate(-1%, 2%); }
+}
+
+/* ── MOBILE ──────────────────────────────── */
+@media (max-width: 900px) {
+  .svc-row { grid-template-columns: 40px 1fr; }
+  .svc-desc, .svc-arrow { display: none; }
+  .process-steps { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+}
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .work-card.span-7, .work-card.span-5,
+  .work-card.span-4, .work-card.span-8,
+  .work-card.span-6 { grid-column: span 12; }
+  .process-steps { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-cols { gap: 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loader">
+  <div class="loader-word">Initialising</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loaderBar"></div></div>
+  <div class="loader-pct" id="loaderPct">0%</div>
+</div>
+
+<!-- Film grain overlay -->
+<div class="noise" aria-hidden="true"></div>
+
+<!-- Custom cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- WebGL canvas -->
+<canvas id="gl-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">[Agency]</a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-btn">Start a Project</a>
+</nav>
+
+<!-- ════════════════════════════════════════════
+     SCROLL ROOT
+════════════════════════════════════════════ -->
+<div id="scroll-root">
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-eyebrow" id="heroEyebrow">Redefining What's Possible</div>
+  <h1 class="hero-headline" id="heroHead">
+    We Build<br>
+    <span class="outline">Intelligence</span><br>
+    <span class="gold">That Works</span>
+  </h1>
+  <p class="hero-sub" id="heroSub">
+    A premium AI agency crafting autonomous systems, intelligent products and transformative experiences for the world's most ambitious brands.
+  </p>
+  <div class="hero-ctas" id="heroCtas">
+    <a href="#work" class="btn-primary">View Our Work</a>
+    <a href="#contact" class="btn-ghost">Start a Project →</a>
+  </div>
+  <div class="scroll-cue" id="scrollCue">
+    <div class="scroll-line"></div>
+    <span>Scroll to explore</span>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto" id="manifesto">
+  <div class="manifesto-label">Our Philosophy</div>
+  <p class="manifesto-text" id="manifestoText">
+    <span class="word accent">Intelligence</span>
+    <span class="word dim">is not a</span>
+    <span class="word">feature.</span>
+    <span class="word dim">It's the</span>
+    <span class="word accent">foundation</span>
+    <span class="word dim">of everything</span>
+    <span class="word accent">exceptional</span>
+    <span class="word dim">built</span>
+    <span class="word dim">in this</span>
+    <span class="word accent">era.</span>
+  </p>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="services-header">
+    <div class="sec-num">01 — What We Do</div>
+    <h2>Services<br><span class="outline">Engineered</span></h2>
+  </div>
+  <div class="services-list">
+    <div class="svc-row">
+      <div class="svc-num">01</div>
+      <div class="svc-name">AI Automation Systems</div>
+      <div class="svc-desc">End-to-end intelligent workflows that remove human bottlenecks</div>
+      <div class="svc-arrow">→</div>
+    </div>
+    <div class="svc-row">
+      <div class="svc-num">02</div>
+      <div class="svc-name">Conversational AI</div>
+      <div class="svc-desc">Autonomous agents that handle customer interactions 24/7</div>
+      <div class="svc-arrow">→</div>
+    </div>
+    <div class="svc-row">
+      <div class="svc-num">03</div>
+      <div class="svc-name">Predictive Intelligence</div>
+      <div class="svc-desc">Data models that see opportunity before it becomes obvious</div>
+      <div class="svc-arrow">→</div>
+    </div>
+    <div class="svc-row">
+      <div class="svc-num">04</div>
+      <div class="svc-name">Digital Infrastructure</div>
+      <div class="svc-desc">Scalable architecture built for the next decade</div>
+      <div class="svc-arrow">→</div>
+    </div>
+    <div class="svc-row">
+      <div class="svc-num">05</div>
+      <div class="svc-name">Brand Intelligence</div>
+      <div class="svc-desc">AI-driven creative systems that produce at the speed of thought</div>
+      <div class="svc-arrow">→</div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="work" id="work">
+  <div class="work-header">
+    <div class="sec-label">02 — Selected Work</div>
+    <h2>Built<br><span style="color:var(--gold)">Different</span></h2>
+  </div>
+  <div class="work-grid">
+    <div class="work-card span-7">
+      <div class="work-card-inner">
+        <img class="work-card-bg" src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=1200&q=80" alt="Project">
+        <div class="work-card-overlay">
+          <div class="work-card-label">AI Platform · 2026</div>
+          <div class="work-card-title">[Client Name]<br>Autonomous Operations</div>
+        </div>
+      </div>
+    </div>
+    <div class="work-card span-5">
+      <div class="work-card-inner">
+        <img class="work-card-bg" src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80" alt="Project">
+        <div class="work-card-overlay">
+          <div class="work-card-label">Brand System · 2026</div>
+          <div class="work-card-title">[Client Name]<br>Identity Architecture</div>
+        </div>
+      </div>
+    </div>
+    <div class="work-card span-4">
+      <div class="work-card-inner">
+        <img class="work-card-bg" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80" alt="Project">
+        <div class="work-card-overlay">
+          <div class="work-card-label">Digital · 2025</div>
+          <div class="work-card-title">[Client]<br>Web Experience</div>
+        </div>
+      </div>
+    </div>
+    <div class="work-card span-8">
+      <div class="work-card-inner">
+        <img class="work-card-bg" src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1200&q=80" alt="Project">
+        <div class="work-card-overlay">
+          <div class="work-card-label">AI Agent · 2025</div>
+          <div class="work-card-title">[Client Name]<br>Conversational Intelligence</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process" id="process">
+  <div class="sec-label">03 — How We Work</div>
+  <h2 style="font-family:var(--font-h);font-size:clamp(2.5rem,5vw,5rem);font-weight:800;letter-spacing:-0.03em;line-height:0.96;margin-bottom:0;">
+    The<br><span style="color:var(--gold)">Method</span>
+  </h2>
+  <div class="process-steps">
+    <div class="process-step" data-num="1">
+      <div class="step-num">01 — Discover</div>
+      <div class="step-title">Deep<br>Diagnosis</div>
+      <div class="step-desc">We map your current systems, identify leverage points and define what intelligence actually means for your business.</div>
+    </div>
+    <div class="process-step" data-num="2">
+      <div class="step-num">02 — Architect</div>
+      <div class="step-title">System<br>Design</div>
+      <div class="step-desc">Our engineers design the full intelligence stack — data flows, model selection, integration layers and fallback logic.</div>
+    </div>
+    <div class="process-step" data-num="3">
+      <div class="step-num">03 — Build</div>
+      <div class="step-title">Precision<br>Build</div>
+      <div class="step-desc">We execute in focused sprints, shipping tested, production-ready systems — not prototypes.</div>
+    </div>
+    <div class="process-step" data-num="4">
+      <div class="step-num">04 — Evolve</div>
+      <div class="step-title">Continuous<br>Intelligence</div>
+      <div class="step-desc">Post-launch, your system learns and improves. We monitor, retrain and optimise so performance compounds over time.</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats" id="stats">
+  <div class="stats-grid">
+    <div class="stat-cell">
+      <span class="stat-num" data-target="200">0</span><span class="stat-unit">+</span>
+      <span class="stat-label">Systems Deployed</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-num" data-target="98">0</span><span class="stat-unit">%</span>
+      <span class="stat-label">Client Retention</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-num" data-target="40">0</span><span class="stat-unit">x</span>
+      <span class="stat-label">Avg. Efficiency Gain</span>
+    </div>
+    <div class="stat-cell">
+      <span class="stat-num" data-target="3">0</span><span class="stat-unit">yr</span>
+      <span class="stat-label">Enterprise Grade</span>
+    </div>
+  </div>
+</section>
+
+<!-- FINALE / CTA -->
+<section class="finale" id="contact">
+  <div class="finale-pre" id="finalePre">Ready when you are</div>
+  <h2 class="finale-h" id="finaleH">
+    Let's Build<br>
+    <span class="outline">Something</span><br>
+    <span class="gold">Extraordinary</span>
+  </h2>
+  <div class="finale-actions" id="finaleActions">
+    <a href="mailto:[your@email.com]" class="btn-primary">Start a Conversation</a>
+    <a href="#work" class="btn-ghost">See Our Work</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">[Agency Name]</div>
+      <div class="footer-tagline">We build intelligent systems for the world's most ambitious brands.</div>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="#">AI Automation</a>
+        <a href="#">Conversational AI</a>
+        <a href="#">Data Intelligence</a>
+        <a href="#">Infrastructure</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Work</a>
+        <a href="#">Process</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <a href="#">LinkedIn</a>
+        <a href="#">Instagram</a>
+        <a href="#">X / Twitter</a>
+        <a href="#">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 [Agency Name] · Built by <a href="https://priscadezigns.org" style="color:var(--gold);text-decoration:none;">Prisca Dezigns</a></span>
+    <span class="footer-copy">Privacy · Terms</span>
+  </div>
+</footer>
+
+</div><!-- /scroll-root -->
+
+<!-- ════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { EffectComposer }  from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass }      from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { ShaderPass }      from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/ShaderPass.js';
+import { OutputPass }      from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/OutputPass.js';
+
+// ══════════════════════════════════════════════════
+// LOADER
+// ══════════════════════════════════════════════════
+const loaderBar = document.getElementById('loaderBar');
+const loaderPct = document.getElementById('loaderPct');
+const loader    = document.getElementById('loader');
+
+let loadPct = 0;
+const fakeLoad = setInterval(() => {
+  loadPct += Math.random() * 12;
+  if (loadPct > 95) loadPct = 95;
+  loaderBar.style.width = loadPct + '%';
+  loaderPct.textContent = Math.round(loadPct) + '%';
+}, 80);
+
+// ══════════════════════════════════════════════════
+// CUSTOM CURSOR
+// ══════════════════════════════════════════════════
+const cursor     = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mouseX = 0, mouseY = 0;
+let ringX = 0, ringY = 0;
+
+window.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  cursor.style.left = mouseX + 'px';
+  cursor.style.top  = mouseY + 'px';
+});
+(function animCursor() {
+  ringX += (mouseX - ringX) * 0.1;
+  ringY += (mouseY - ringY) * 0.1;
+  cursorRing.style.left = ringX + 'px';
+  cursorRing.style.top  = ringY + 'px';
+  requestAnimationFrame(animCursor);
+})();
+
+// ══════════════════════════════════════════════════
+// LENIS — ultra smooth scroll
+// ══════════════════════════════════════════════════
+const lenis = new Lenis({
+  duration: 1.4,
+  easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  smoothWheel: true,
+  wheelMultiplier: 0.9,
+  touchMultiplier: 1.8,
+});
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add(time => lenis.raf(time * 1000));
+gsap.ticker.lagSmoothing(0);
+
+// ══════════════════════════════════════════════════
+// THREE.JS SETUP
+// ══════════════════════════════════════════════════
+const canvas   = document.getElementById('gl-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.toneMapping     = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0, 5);
+
+// ── Post-processing: Bloom + Output ─────────────
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+
+const bloom = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth, window.innerHeight),
+  0.9,   // strength
+  0.5,   // radius
+  0.72   // threshold
+);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+// ── Lights ─────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0x0a0a20, 2.0);
+scene.add(ambientLight);
+
+const pointA = new THREE.PointLight(0xC8A96E, 12, 20);
+pointA.position.set(4, 3, 3);
+scene.add(pointA);
+
+const pointB = new THREE.PointLight(0x6B5CE7, 8, 16);
+pointB.position.set(-4, -2, 2);
+scene.add(pointB);
+
+const pointC = new THREE.PointLight(0xA8B4C8, 4, 12);
+pointC.position.set(0, 4, -2);
+scene.add(pointC);
+
+// ══════════════════════════════════════════════════
+// GLSL SHADERS — metallic / iridescent material
+// ══════════════════════════════════════════════════
+const metallicVert = `
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  varying vec3 vWorldPos;
+  varying vec2 vUv;
+  uniform float uTime;
+  uniform float uDisplace;
+
+  // Simplex-like noise
+  vec3 mod289(vec3 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+  vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+  vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+  vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314 * r; }
+  float snoise(vec3 v) {
+    const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+    const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+    vec3 i  = floor(v + dot(v, C.yyy));
+    vec3 x0 = v - i + dot(i, C.xxx);
+    vec3 g  = step(x0.yzx, x0.xyz);
+    vec3 l  = 1.0 - g;
+    vec3 i1 = min(g.xyz, l.zxy);
+    vec3 i2 = max(g.xyz, l.zxy);
+    vec3 x1 = x0 - i1 + C.xxx;
+    vec3 x2 = x0 - i2 + C.yyy;
+    vec3 x3 = x0 - D.yyy;
+    i = mod289(i);
+    vec4 p = permute(permute(permute(
+      i.z + vec4(0.0, i1.z, i2.z, 1.0))
+      + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+      + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+    float n_ = 0.142857142857;
+    vec3 ns = n_ * D.wyz - D.xzx;
+    vec4 j  = p - 49.0 * floor(p * ns.z * ns.z);
+    vec4 x_ = floor(j * ns.z);
+    vec4 y_ = floor(j - 7.0 * x_);
+    vec4 x  = x_ * ns.x + ns.yyyy;
+    vec4 y  = y_ * ns.x + ns.yyyy;
+    vec4 h  = 1.0 - abs(x) - abs(y);
+    vec4 b0 = vec4(x.xy, y.xy);
+    vec4 b1 = vec4(x.zw, y.zw);
+    vec4 s0 = floor(b0)*2.0 + 1.0;
+    vec4 s1 = floor(b1)*2.0 + 1.0;
+    vec4 sh = -step(h, vec4(0.0));
+    vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+    vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+    vec3 p0 = vec3(a0.xy, h.x);
+    vec3 p1 = vec3(a0.zw, h.y);
+    vec3 p2 = vec3(a1.xy, h.z);
+    vec3 p3 = vec3(a1.zw, h.w);
+    vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+    p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+    vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+    m = m * m;
+    return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+  }
+
+  void main() {
+    vUv = uv;
+    vec3 pos = position;
+    float n = snoise(pos * 1.2 + uTime * 0.18);
+    pos += normal * n * uDisplace;
+    vec4 worldPos  = modelMatrix * vec4(pos, 1.0);
+    vec4 mvPos     = modelViewMatrix * vec4(pos, 1.0);
+    vWorldPos  = worldPos.xyz;
+    vNormal    = normalize(normalMatrix * normal);
+    vViewDir   = normalize(-mvPos.xyz);
+    gl_Position = projectionMatrix * mvPos;
+  }
+`;
+
+const metallicFrag = `
+  varying vec3 vNormal;
+  varying vec3 vViewDir;
+  varying vec3 vWorldPos;
+  varying vec2 vUv;
+  uniform float uTime;
+  uniform vec3  uColorA;
+  uniform vec3  uColorB;
+  uniform vec3  uColorC;
+  uniform float uMetallic;
+  uniform float uRoughness;
+
+  vec3 lightPos1 = vec3(4.0, 3.0, 3.0);
+  vec3 lightPos2 = vec3(-4.0, -2.0, 2.0);
+  vec3 lightCol1 = vec3(1.0, 0.86, 0.55);
+  vec3 lightCol2 = vec3(0.42, 0.36, 0.91);
+
+  void main() {
+    vec3 N = normalize(vNormal);
+    vec3 V = normalize(vViewDir);
+
+    // Fresnel
+    float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.5);
+
+    // Iridescent shift based on viewing angle
+    float ird = dot(N, V);
+    vec3 irdColor = mix(uColorA, uColorB, smoothstep(0.0, 1.0, ird));
+    irdColor = mix(irdColor, uColorC, smoothstep(0.3, 0.8, fresnel));
+
+    // Diffuse + specular from two lights
+    vec3 L1 = normalize(lightPos1 - vWorldPos);
+    vec3 L2 = normalize(lightPos2 - vWorldPos);
+    float diff1 = max(dot(N, L1), 0.0);
+    float diff2 = max(dot(N, L2), 0.0);
+
+    vec3 H1 = normalize(L1 + V);
+    vec3 H2 = normalize(L2 + V);
+    float spec1 = pow(max(dot(N, H1), 0.0), 64.0 / max(uRoughness, 0.01));
+    float spec2 = pow(max(dot(N, H2), 0.0), 32.0 / max(uRoughness, 0.01));
+
+    vec3 diffuse  = (diff1 * lightCol1 + diff2 * lightCol2) * 0.55;
+    vec3 specular = (spec1 * lightCol1 * 1.8 + spec2 * lightCol2 * 1.2) * uMetallic;
+
+    // Atmospheric rim glow
+    float rim = pow(1.0 - max(dot(N, V), 0.0), 4.0);
+    vec3 rimCol = mix(uColorB * 1.4, uColorA * 1.2, sin(uTime * 0.4 + vUv.x * 6.28) * 0.5 + 0.5);
+
+    vec3 col = irdColor * (diffuse + 0.08) + specular + rim * rimCol * 0.6;
+
+    // Subtle animated shimmer
+    float shimmer = sin(vUv.x * 40.0 + uTime * 1.5) * sin(vUv.y * 40.0 - uTime * 1.2) * 0.04;
+    col += shimmer * uColorA;
+
+    gl_FragColor = vec4(col, 0.92);
+  }
+`;
+
+// ── PARTICLE FIELD SHADERS ──────────────────────
+const particleVert = `
+  attribute float aSize;
+  attribute float aPhase;
+  attribute vec3  aVelocity;
+  uniform   float uTime;
+  uniform   float uScroll;
+  varying   float vAlpha;
+  varying   float vPhase;
+
+  void main() {
+    vPhase = aPhase;
+    vec3 pos = position;
+
+    // Drift
+    pos.x += sin(uTime * 0.3 + aPhase * 2.1) * 0.4;
+    pos.y += cos(uTime * 0.2 + aPhase * 1.7) * 0.3;
+    pos.z += sin(uTime * 0.25 + aPhase * 3.3) * 0.2;
+
+    // Scroll parallax
+    pos.y -= uScroll * 0.4 * (aPhase * 0.5 + 0.5);
+
+    vAlpha = 0.4 + 0.6 * sin(uTime * 0.8 + aPhase * 4.0) * 0.5 + 0.5;
+
+    vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+    gl_PointSize  = aSize * (300.0 / -mv.z);
+    gl_Position   = projectionMatrix * mv;
+  }
+`;
+const particleFrag = `
+  varying float vAlpha;
+  varying float vPhase;
+  uniform vec3  uColorA;
+  uniform vec3  uColorB;
+
+  void main() {
+    float d = distance(gl_PointCoord, vec2(0.5));
+    if (d > 0.5) discard;
+    float alpha = (1.0 - d * 2.0) * vAlpha * 0.7;
+    vec3 col = mix(uColorA, uColorB, vPhase);
+    gl_FragColor = vec4(col, alpha);
+  }
+`;
+
+// ══════════════════════════════════════════════════
+// SCENE OBJECTS
+// ══════════════════════════════════════════════════
+
+// ── Main organic form (hero centrepiece) ────────
+const heroGeo = new THREE.IcosahedronGeometry(1.8, 64);
+const heroMat = new THREE.ShaderMaterial({
+  vertexShader:   metallicVert,
+  fragmentShader: metallicFrag,
+  transparent: true,
+  uniforms: {
+    uTime:      { value: 0 },
+    uDisplace:  { value: 0.22 },
+    uColorA:    { value: new THREE.Color(0xC8A96E) },
+    uColorB:    { value: new THREE.Color(0x6B5CE7) },
+    uColorC:    { value: new THREE.Color(0xA8B4C8) },
+    uMetallic:  { value: 1.0 },
+    uRoughness: { value: 0.18 },
+  }
+});
+const heroMesh = new THREE.Mesh(heroGeo, heroMat);
+heroMesh.position.set(2.2, 0, -1);
+scene.add(heroMesh);
+
+// ── Secondary form — toroidal knot ──────────────
+const torusGeo = new THREE.TorusKnotGeometry(0.9, 0.28, 200, 32, 3, 5);
+const torusMat = new THREE.ShaderMaterial({
+  vertexShader:   metallicVert,
+  fragmentShader: metallicFrag,
+  transparent: true,
+  uniforms: {
+    uTime:      { value: 0 },
+    uDisplace:  { value: 0.08 },
+    uColorA:    { value: new THREE.Color(0x6B5CE7) },
+    uColorB:    { value: new THREE.Color(0xA8B4C8) },
+    uColorC:    { value: new THREE.Color(0xC8A96E) },
+    uMetallic:  { value: 0.9 },
+    uRoughness: { value: 0.25 },
+  }
+});
+const torusMesh = new THREE.Mesh(torusGeo, torusMat);
+torusMesh.position.set(-2.5, -1, -2);
+torusMesh.scale.setScalar(0.0);
+scene.add(torusMesh);
+
+// ── Third form — octahedron ──────────────────────
+const octaGeo = new THREE.OctahedronGeometry(1.2, 3);
+const octaMat = new THREE.ShaderMaterial({
+  vertexShader:   metallicVert,
+  fragmentShader: metallicFrag,
+  transparent: true,
+  wireframe: false,
+  uniforms: {
+    uTime:      { value: 0 },
+    uDisplace:  { value: 0.14 },
+    uColorA:    { value: new THREE.Color(0xA8B4C8) },
+    uColorB:    { value: new THREE.Color(0xC8A96E) },
+    uColorC:    { value: new THREE.Color(0x6B5CE7) },
+    uMetallic:  { value: 0.85 },
+    uRoughness: { value: 0.3 },
+  }
+});
+const octaMesh = new THREE.Mesh(octaGeo, octaMat);
+octaMesh.position.set(2.0, 1.5, -3);
+octaMesh.scale.setScalar(0.0);
+scene.add(octaMesh);
+
+// ── Particle field ───────────────────────────────
+const PARTICLE_COUNT = 2200;
+const pPositions = new Float32Array(PARTICLE_COUNT * 3);
+const pSizes     = new Float32Array(PARTICLE_COUNT);
+const pPhases    = new Float32Array(PARTICLE_COUNT);
+const pVelocity  = new Float32Array(PARTICLE_COUNT * 3);
+
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  const r = 8 + Math.random() * 6;
+  const theta = Math.random() * Math.PI * 2;
+  const phi   = Math.acos(2 * Math.random() - 1);
+  pPositions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
+  pPositions[i*3+1] = r * Math.sin(phi) * Math.sin(theta) * 0.6;
+  pPositions[i*3+2] = r * Math.cos(phi) * 0.4 - 4;
+  pSizes[i]    = 0.5 + Math.random() * 2.5;
+  pPhases[i]   = Math.random();
+  pVelocity[i*3]   = (Math.random() - 0.5) * 0.02;
+  pVelocity[i*3+1] = (Math.random() - 0.5) * 0.02;
+  pVelocity[i*3+2] = (Math.random() - 0.5) * 0.01;
+}
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+pGeo.setAttribute('aSize',    new THREE.BufferAttribute(pSizes, 1));
+pGeo.setAttribute('aPhase',   new THREE.BufferAttribute(pPhases, 1));
+pGeo.setAttribute('aVelocity',new THREE.BufferAttribute(pVelocity, 3));
+
+const pMat = new THREE.ShaderMaterial({
+  vertexShader:   particleVert,
+  fragmentShader: particleFrag,
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  uniforms: {
+    uTime:   { value: 0 },
+    uScroll: { value: 0 },
+    uColorA: { value: new THREE.Color(0xC8A96E) },
+    uColorB: { value: new THREE.Color(0x6B5CE7) },
+  }
+});
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+// ── Wireframe ring (services section) ───────────
+const ringGeo = new THREE.TorusGeometry(2.2, 0.01, 4, 120);
+const ringMat = new THREE.MeshBasicMaterial({ color: 0xC8A96E, transparent: true, opacity: 0.0 });
+const ring    = new THREE.Mesh(ringGeo, ringMat);
+ring.position.set(-3, 0, -2);
+scene.add(ring);
+
+// ══════════════════════════════════════════════════
+// SCROLL STATE
+// ══════════════════════════════════════════════════
+let scrollY  = 0;
+let scrollProg = 0; // 0–1 global
+let docH = 0;
+
+lenis.on('scroll', ({ scroll, limit }) => {
+  scrollY    = scroll;
+  scrollProg = scroll / limit;
+  pMat.uniforms.uScroll.value = scrollProg;
+});
+
+// ══════════════════════════════════════════════════
+// GSAP ScrollTrigger ANIMATIONS
+// ══════════════════════════════════════════════════
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero entrance (plays after loader)
+function startHeroAnim() {
+  const tl = gsap.timeline({ delay: 0.3 });
+  tl.to('#heroEyebrow', { opacity: 1, y: 0,   duration: 0.9, ease: 'power3.out' }, 0)
+    .to('#heroHead',    { opacity: 1, y: 0,   duration: 1.0, ease: 'power3.out' }, 0.15)
+    .to('#heroSub',     { opacity: 1, y: 0,   duration: 0.9, ease: 'power3.out' }, 0.35)
+    .to('#heroCtas',    { opacity: 1, y: 0,   duration: 0.8, ease: 'power3.out' }, 0.5)
+    .to('#scrollCue',   { opacity: 1,         duration: 0.8, ease: 'power2.out' }, 0.9);
+  gsap.set(['#heroEyebrow','#heroHead','#heroSub','#heroCtas'], { y: 40 });
+}
+
+// Manifesto — each word lights up as it scrolls into view
+ScrollTrigger.create({
+  trigger: '#manifesto',
+  start: 'top 80%', end: 'bottom 20%',
+  onUpdate: self => {
+    const words = document.querySelectorAll('.word');
+    const total = words.length;
+    words.forEach((w, i) => {
+      if (self.progress > i / total) w.classList.add('lit');
+      else w.classList.remove('lit');
+    });
+  }
+});
+
+// Services rows — stagger in
+gsap.from('.svc-row', {
+  scrollTrigger: { trigger: '.services-list', start: 'top 75%' },
+  opacity: 0, x: -40, stagger: 0.1, duration: 0.8, ease: 'power3.out'
+});
+
+// Work cards
+gsap.from('.work-card', {
+  scrollTrigger: { trigger: '.work-grid', start: 'top 80%' },
+  opacity: 0, y: 50, stagger: 0.12, duration: 0.9, ease: 'power3.out'
+});
+
+// Process steps
+gsap.from('.process-step', {
+  scrollTrigger: { trigger: '.process-steps', start: 'top 75%' },
+  opacity: 0, y: 60, stagger: 0.15, duration: 0.9, ease: 'power3.out'
+});
+
+// Stats counter
+document.querySelectorAll('.stat-num').forEach(el => {
+  const target = +el.dataset.target;
+  ScrollTrigger.create({
+    trigger: el,
+    start: 'top 85%',
+    once: true,
+    onEnter: () => {
+      gsap.to({ val: 0 }, {
+        val: target, duration: 2.2, ease: 'power2.out',
+        onUpdate: function() { el.textContent = Math.round(this.targets()[0].val); }
+      });
+    }
+  });
+});
+
+// Finale
+gsap.set(['#finalePre','#finaleH','#finaleActions'], { y: 50, opacity: 0 });
+ScrollTrigger.create({
+  trigger: '#contact', start: 'top 70%',
+  onEnter: () => {
+    gsap.to('#finalePre',     { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' });
+    gsap.to('#finaleH',       { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', delay: 0.15 });
+    gsap.to('#finaleActions', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.35 });
+  }
+});
+
+// ══════════════════════════════════════════════════
+// THREE.JS SCROLL-DRIVEN SCENE LOGIC
+// Mesh positions + bloom strength react to scroll
+// ══════════════════════════════════════════════════
+function updateScene(t, scroll) {
+  const s = scroll; // 0–1
+
+  // Hero mesh — big and centred at top, drifts out as you scroll
+  heroMesh.rotation.x = t * 0.09;
+  heroMesh.rotation.y = t * 0.13;
+  heroMesh.position.x = 2.2 - s * 3.5;
+  heroMesh.position.y = s * 1.5;
+  heroMesh.scale.setScalar(1.0 - s * 0.4);
+  heroMat.uniforms.uTime.value = t;
+
+  // Torus knot — emerges at services
+  const torusScale = Math.max(0, (s - 0.12) * 8);
+  torusMesh.scale.setScalar(Math.min(torusScale, 1.0));
+  torusMesh.rotation.x = t * 0.07;
+  torusMesh.rotation.z = t * 0.11;
+  torusMesh.position.x = -2.5 + s * 1.2;
+  torusMat.uniforms.uTime.value = t;
+
+  // Octahedron — emerges at process
+  const octaScale = Math.max(0, (s - 0.45) * 6);
+  octaMesh.scale.setScalar(Math.min(octaScale, 1.0));
+  octaMesh.rotation.y = t * 0.15;
+  octaMesh.rotation.x = t * 0.08;
+  octaMesh.position.x = 2.5 - s * 0.5;
+  octaMat.uniforms.uTime.value = t;
+
+  // Ring — orbits at work section
+  ring.rotation.z = t * 0.06;
+  ring.rotation.x = t * 0.04 + 0.5;
+  ringMat.opacity = Math.max(0, Math.min(1, (s - 0.22) * 6)) * 0.35;
+  ring.position.y = -s * 2;
+
+  // Camera gentle drift from mouse
+  camera.position.x += (mouseX / window.innerWidth  * 0.6 - camera.position.x) * 0.015;
+  camera.position.y += (-mouseY / window.innerHeight * 0.4 - 0.1 - camera.position.y) * 0.015;
+  camera.lookAt(0, 0, 0);
+
+  // Bloom breathes with scroll
+  bloom.strength = 0.7 + Math.sin(t * 0.3) * 0.15 + s * 0.4;
+  bloom.radius   = 0.4 + s * 0.15;
+
+  // Particles time
+  pMat.uniforms.uTime.value = t;
+}
+
+// ══════════════════════════════════════════════════
+// RESIZE
+// ══════════════════════════════════════════════════
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+  bloom.resolution.set(window.innerWidth, window.innerHeight);
+});
+
+// ══════════════════════════════════════════════════
+// RENDER LOOP
+// ══════════════════════════════════════════════════
+let t0 = null;
+let started = false;
+
+function loop(ts) {
+  requestAnimationFrame(loop);
+  if (!started) return;
+  if (!t0) t0 = ts;
+  const t = (ts - t0) * 0.001;
+  updateScene(t, scrollProg);
+  composer.render();
+}
+requestAnimationFrame(loop);
+
+// ══════════════════════════════════════════════════
+// FINISH LOADER → ENTER EXPERIENCE
+// ══════════════════════════════════════════════════
+setTimeout(() => {
+  clearInterval(fakeLoad);
+  loaderBar.style.width  = '100%';
+  loaderPct.textContent  = '100%';
+  setTimeout(() => {
+    gsap.to('#loader', {
+      opacity: 0, duration: 0.8, ease: 'power2.in',
+      onComplete: () => {
+        loader.style.display = 'none';
+        started = true;
+        startHeroAnim();
+        ScrollTrigger.refresh();
+      }
+    });
+  }, 300);
+}, 1800);
+
+</script>
+</body>
+</html>
