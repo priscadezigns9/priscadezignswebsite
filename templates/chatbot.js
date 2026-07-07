@@ -363,11 +363,15 @@ function nextJoke(){
 // ── INTAKE CONVERSATION STATE ──
 var intake={active:false,step:0,data:{}};
 var intakeSteps=[
-  {key:'name',   ask:"First — what's your name? 😊"},
-  {key:'biz',    ask:function(d){return "Nice to meet you, "+d.name+"! What's your business called? (Or describe what you do if you don't have a name yet)"}},
-  {key:'type',   ask:"What type of business is it? (e.g. coach, salon, restaurant, clothing brand, tech startup…)"},
-  {key:'goal',   ask:"And what's the main thing you're trying to achieve right now? More leads? A new website? Automating your customer service?"},
-  {key:'budget', ask:"Last one — do you have a rough budget in mind? No pressure either way, it just helps me point you to the right option 🙏"}
+  {key:'name',    ask:"First — what's your name? 😊"},
+  {key:'biz',     ask:function(d){return "Nice to meet you, "+d.name+"! What's your business called? (Or describe what you do if you don't have a name yet)"}},
+  {key:'type',    ask:"What type of business is it? (e.g. coach, salon, restaurant, clothing brand, tech startup…)"},
+  {key:'email',   ask:"What's the best email to reach you on? 📧"},
+  {key:'phone',   ask:"And a phone number or WhatsApp? (optional — skip if you prefer email)"},
+  {key:'website', ask:"Do you have an existing website or social media page? Drop the link here if so 🔗"},
+  {key:'goal',    ask:"What's the main thing you're trying to achieve right now? More leads? A new website? Automating your customer service?"},
+  {key:'pain',    ask:"What's the biggest challenge your business is facing right now? Be as specific as you like — this helps us tailor the right solution 🎯"},
+  {key:'budget',  ask:"Last one — do you have a rough budget in mind? No pressure either way, it just helps me point you to the right option 🙏"}
 ];
 
 function startIntake(){
@@ -424,10 +428,10 @@ function saveIntakeLead(d){
   var SB_URL='https://sazhdnqzaqpqcralmthh.supabase.co';
   var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
   var payload={
-    name: d.name||'—',
-    email: '(chatbot) '+(d.biz||'—'),
-    package: (d.goal||'—')+' | Budget: '+(d.budget||'—'),
-    brand: 'Prisca Dezigns (Chatbot)'
+    name: (d.name||'—')+' | Biz: '+(d.biz||'—'),
+    email: d.email||('(chatbot) '+(d.biz||'—')),
+    package: (d.type||'—')+' | Goal: '+(d.goal||'—')+' | Pain: '+(d.pain||'—')+' | Budget: '+(d.budget||'—'),
+    brand: 'Prisca Dezigns (Chatbot) | Phone: '+(d.phone||'—')+' | Web: '+(d.website||'—')
   };
   fetch(SB_URL+'/rest/v1/client_leads',{
     method:'POST',
@@ -460,10 +464,14 @@ function finishIntake(skipped){
   saveIntakeLead(d);
 
   var summary="Perfect, "+d.name+"! Here's what I've got:\n";
-  if(d.biz)  summary+="🏢 Business: "+d.biz+"\n";
-  if(d.type) summary+="📂 Type: "+d.type+"\n";
-  if(d.goal) summary+="🎯 Goal: "+d.goal+"\n";
-  if(d.budget) summary+="💳 Budget: "+d.budget+"\n";
+  if(d.biz)     summary+="🏢 Business: "+d.biz+"\n";
+  if(d.type)    summary+="📂 Type: "+d.type+"\n";
+  if(d.email)   summary+="📧 Email: "+d.email+"\n";
+  if(d.phone)   summary+="📱 Phone: "+d.phone+"\n";
+  if(d.website) summary+="🔗 Website: "+d.website+"\n";
+  if(d.goal)    summary+="🎯 Goal: "+d.goal+"\n";
+  if(d.pain)    summary+="⚠️ Challenge: "+d.pain+"\n";
+  if(d.budget)  summary+="💳 Budget: "+d.budget+"\n";
   summary+="\nI'm sending this straight to the team so we can come back to you with exactly the right recommendation. 🚀";
   addMsg(summary,'bot');
 
@@ -472,7 +480,11 @@ function finishIntake(skipped){
   msg+="👤 Name: "+(d.name||'—')+"\n";
   msg+="🏢 Business: "+(d.biz||'—')+"\n";
   msg+="📂 Type: "+(d.type||'—')+"\n";
+  msg+="📧 Email: "+(d.email||'—')+"\n";
+  msg+="📱 Phone: "+(d.phone||'—')+"\n";
+  msg+="🔗 Website: "+(d.website||'—')+"\n";
   msg+="🎯 Goal: "+(d.goal||'—')+"\n";
+  msg+="⚠️ Challenge: "+(d.pain||'—')+"\n";
   msg+="💳 Budget: "+(d.budget||'—')+"\n\n";
   msg+="Looking forward to hearing from you!";
 
