@@ -56,7 +56,7 @@ const STEPS={
     ]
   },
   about_history:{
-    bot:"Prisca Dezigns has been operating since 2019. What started as a freelance web design operation grew into a full-service digital agency covering websites, branding, e-commerce, and AI-powered customer service automation. Over the years we have served clients across Trinidad & Tobago and the wider Caribbean, delivering high-fidelity digital products with a focus on accuracy, speed, and results.",
+    bot:"Prisca Dezigns was founded in 2023 and began full operations in 2026. What started as a vision for a high-fidelity digital agency grew into a full-service operation covering websites, branding, e-commerce, and AI-powered customer service automation. We serve clients across Trinidad & Tobago and the wider Caribbean, delivering digital products with a focus on accuracy, speed, and results.",
     r:[
       {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
       {l:"\uD83D\uDCF1 Social media",s:"about_social"},
