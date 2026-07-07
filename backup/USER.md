@@ -16,6 +16,8 @@ who's in their life.
 - **Self-Perception:** Identifies as thinking differently than the majority. Does not engage in "aimless" activities (partying, TV). Highly strategic about life and time management. Prefers "visioning" over aimless action.
 - **Technical level:** AI-driven professional. Expert in ChatGPT, Claude AI, Meta Ads, GitHub, APIs, and Supabase. Background in app/web development and Adobe suite.
 - **Data Governance:** 6+ years in Payroll Administration handling highly confidential and sensitive data with 100% accuracy. Proven trustworthiness and discretion.
+- **Education:** Studied Analytical Chemistry at UWI. Left to pursue the entrepreneurial path after discovering web design and the power of AI in business.
+- **Agency Timeline:** Prisca Dezigns founded in 2023. Full operations began in 2026.
 - **Certifications:** Project Management, Web Design, Administrative Professional.
 - **Channel Preference:** Does not use Slack. Prefers direct updates in-app or via the Google Drive Feature Document.
 - **WhatsApp API Preference:** Prefers **360dialog** over Twilio for client implementations. 360dialog is prioritized for professional WhatsApp Business API integrations due to its specialized focus and feasibility for high-ticket AI automation projects. (Updated 2026-06-27).
@@ -44,7 +46,8 @@ who's in their life.
 - **Infrastructure:** Acquiring a UPS with battery backup to ensure 100% uptime for remote work (June 2026).
 - **Mission:** Evangelist at heart. Wants to share the Gospel but lacks time/energy due to work exhaustion.
 - **Design Vibe:** "High quality," clean lines, symbolic (e.g., the Mustard Tree).
-- **Naming Mandate:** The official name is **Prisca Dezigns**. The Web3/Blockchain pillar is **PRISCION** (P-R-I-S-C-I-O-N). The Web2 infrastructure/migration branch is **PRISCION**. The domain `procyon.com` is for technical infrastructure, but the brand signal is strictly **PRISCION** across both Web2 and Web3. Do not use "Procyon" as a brand name; it is deleted from the brand vocabulary.
+- **Evolve Mobility (driveevolve.com):** Electric vehicle (EV) dealership for the Caribbean. Sells Chinese EV brands — BYD, GAC, Leapmotor, Denza, Dongfeng. NOT luxury/supercar. Tagline: "Driving the Future of the Caribbean." Prisca Dezigns builds their landing pages via the evolve-showroom skill.
+- **TikTok (Prisca Dezigns):** @priscionai (temporary — user intends to change it when possible). The Web3/Blockchain pillar is **PRISCION** (P-R-I-S-C-I-O-N). The Web2 infrastructure/migration branch is **PRISCION**. The domain `procyon.com` is for technical infrastructure, but the brand signal is strictly **PRISCION** across both Web2 and Web3. Do not use "Procyon" as a brand name; it is deleted from the brand vocabulary.
 - **Brand Sharding (Jun 24 2026):** 
     - **Prisca Dezigns:** Your Web2 brand and parent legal entity. This is the primary focus for current business operations, agency work, and "The Growth Package."
     - **Orcinos:** Your SaaS and Software branch. High-fidelity tools, extensions, and AI infrastructure.
