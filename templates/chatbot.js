@@ -266,11 +266,11 @@ const STEPS={
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_all:{
-    bot:"All 24 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nAll templates · Live in 24hrs · Logo + content swapped · Contact us for pricing",
+    bot:"All 24 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nStandard — $149.99 setup · $19.99/mo\n⭐ Premium 3D (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\nAll live in 24hrs · Logo + content swapped in",
     r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   microstore_info:{
-    bot:"The Micro Store turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 Contact us for pricing",
+    bot:"The Micro Store turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 setup · $34.99/mo",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
       {l:"I'm ready — let's go",s:"talk"},
@@ -278,7 +278,7 @@ const STEPS={
     ]
   },
   templates_chatbot:{
-    bot:"The AI Chatbot add-on plugs a live AI agent into your template site. It answers your business FAQs 24/7 — services, pricing, hours, how to book — and captures leads while you sleep. Contact us for current pricing.",
+    bot:"The AI Chatbot add-on plugs a live AI agent into your template site. It answers your business FAQs 24/7 — services, pricing, hours, how to book — and captures leads while you sleep.\n\n❖ $399.99 one-time setup\n❖ $49.99/mo ongoing\n\nAdds on top of your template site fee.",
     r:[
       {l:"Add chatbot to my template",s:"talk"},
       {l:"Template only is fine",s:"microstore"},
@@ -286,7 +286,7 @@ const STEPS={
     ]
   },
   templates_included:{
-    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Hosted on your subdomain\n\nAdd-ons available: Copywriting | AI Chatbot | Micro Store\nContact us for current pricing.",
+    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Hosted on your subdomain\n\nPricing:\n❖ Standard templates — $149.99 setup · $19.99/mo\n❖ Premium 3D templates (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\n\nAdd-ons:\n❖ Copywriting — $49.99 one-time\n❖ AI Chatbot — $399.99 setup · $49.99/mo\n❖ Micro Store — $249.99 setup · $34.99/mo",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse templates",s:"microstore"},
       {l:"Add chatbot",s:"templates_chatbot"},
