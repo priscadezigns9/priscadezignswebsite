@@ -21,6 +21,7 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
  'photographer': ['photographer','film','reel','portfolio','folio','video','filmmaker','videographer'],
  'personal-brand':['personal brand','persona','opus','author','speaker','blogger','influencer','brand'],
  'ecommerce': ['ecommerce','online store','craft','luxe','glow','paws','optica','atelier','monsieur'],
+ 'creative': ['aeon','nexus','stellar','agency','creative','3d','gsap','webgl','artist','motion','brand','editorial','studio','monolith','noir','canvas','obsidian'],
  };
  var activeCat = 'all';
  var searchQ = '';
