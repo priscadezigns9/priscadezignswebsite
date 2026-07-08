@@ -29,9 +29,13 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
  function text(card){
  var n = card.querySelector('[data-search]');
  var u = card.querySelector('.t-use');
+ var nm = card.querySelector('.t-name');
+ var dt = card.getAttribute('data-type') || '';
  return ((n ? n.getAttribute('data-search') : '') + ' ' +
  (n ? n.textContent : '') + ' ' +
- (u ? u.textContent : '')).toLowerCase();
+ (u ? u.textContent : '') + ' ' +
+ (nm ? nm.textContent : '') + ' ' +
+ dt).toLowerCase();
  }
  function matchCat(card){
  if(activeCat === 'all') return true;
