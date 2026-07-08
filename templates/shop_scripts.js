@@ -203,6 +203,10 @@ function renderCart() {
    else { b.classList.add('disabled'); b.setAttribute('href','javascript:void(0)'); }
  });
  updateBadge();
+ // persist + cart page footer
+ sessionStorage.setItem('pd_cart', JSON.stringify({base:cart.base, addons:cart.addons}));
+ var _footer = document.getElementById('cart-footer-block');
+ if (_footer) _footer.style.display = cart.base ? '' : 'none';
 }
 function updateAddonCards() {
  ['copy','chatbot'].forEach(function(id) {
@@ -400,11 +404,38 @@ document.addEventListener('DOMContentLoaded', function() {
      if (!dest || dest === '#') return;
      var method = id === 'cart-paypal' ? 'PayPal' : 'Bank Transfer';
      saveCartOrder(method);
-     closeCart();
+     // on cart page just navigate, no drawer to close
+     if (document.getElementById('cart-drawer')) closeCart();
      setTimeout(function(){ window.open(dest, '_blank', 'noopener'); }, 180);
    });
  });
+
+ // ── Page detection ──
+ var isCartPage = window.location.pathname.indexOf('/templates/cart') > -1;
+ if (isCartPage) {
+   // read sessionStorage and render
+   var saved = sessionStorage.getItem('pd_cart');
+   if (saved) {
+     try {
+       var c = JSON.parse(saved);
+       cart.base = c.base || null;
+       cart.addons = c.addons || {copy:false,chatbot:false};
+     } catch(e) {}
+   }
+   // show/hide footer
+   var footer = document.getElementById('cart-footer-block');
+   if (footer) footer.style.display = cart.base ? '' : 'none';
+   renderCart();
+   // override removeBase to go back to shop
+   var _origRemove = window.removeBase;
+   window.removeBase = function() {
+     if (_origRemove) _origRemove();
+     sessionStorage.removeItem('pd_cart');
+     setTimeout(function(){ window.location.href='/templates/'; }, 400);
+   };
+ } else {
+   renderCart();
+ }
 });
-renderCart();
 
 
