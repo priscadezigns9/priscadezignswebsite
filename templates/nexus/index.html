@@ -243,6 +243,32 @@ nav{
   cursor:pointer;transition:all .2s;
 }
 .eco-arrow:hover{background:rgba(255,255,255,0.1);color:var(--text);}
+
+/* ── CUSTOM CURSOR ── */
+*, *::before, *::after { cursor: none !important; }
+#nx-cursor {
+  position: fixed; z-index: 99999; pointer-events: none;
+  width: 12px; height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width .15s ease, height .15s ease, background .15s ease, opacity .15s ease;
+  mix-blend-mode: difference;
+}
+#nx-cursor-ring {
+  position: fixed; z-index: 99998; pointer-events: none;
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width .3s ease, height .3s ease, transform .08s linear, border-color .2s;
+  opacity: 0.5;
+}
+body:has(a:hover) #nx-cursor,
+body:has(button:hover) #nx-cursor { width: 20px; height: 20px; opacity: 0.8; }
+body:has(a:hover) #nx-cursor-ring,
+body:has(button:hover) #nx-cursor-ring { width: 52px; height: 52px; opacity: 0.3; }
+
 .eco-track-wrap{overflow:hidden;}
 .eco-track{
   display:flex;gap:1px;background:var(--border);
@@ -578,5 +604,22 @@ function slideEco(dir){
   track.style.transform=`translateX(${ecoOffset}px)`;
 }
 </script>
+
+<div id="nx-cursor"></div>
+<div id="nx-cursor-ring"></div>
+<script>
+(function(){
+  const dot  = document.getElementById('nx-cursor');
+  const ring = document.getElementById('nx-cursor-ring');
+  let mx=0,my=0, rx=0,ry=0;
+  document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; dot.style.left=mx+'px'; dot.style.top=my+'px'; });
+  (function lerp(){
+    rx += (mx-rx)*0.12; ry += (my-ry)*0.12;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(lerp);
+  })();
+})();
+</script>
+
 </body>
 </html>
