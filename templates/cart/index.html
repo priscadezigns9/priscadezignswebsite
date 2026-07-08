@@ -7,142 +7,337 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/templates/shop_main.css?v=5">
 <style>
-  :root{--purple:#6600CC;--lilac:#9B4DFF;--ivory:#FAFAF8;--bg:#fff;--text:#0a0a0a;--muted:rgba(10,10,10,0.5);--font-h:'Syne',system-ui,sans-serif;--font-b:'Inter',system-ui,sans-serif;}
+  :root{
+    --purple:#6600CC;--lilac:#9B4DFF;--ivory:#FAFAF8;
+    --font-h:'Syne',system-ui,sans-serif;
+    --font-b:'Inter',system-ui,sans-serif;
+  }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--purple);min-height:100vh;font-family:var(--font-b);display:flex;flex-direction:column;}
-  .cp-header{display:flex;align-items:center;gap:12px;padding:20px 20px 0;}
+  body{background:var(--purple);min-height:100vh;font-family:var(--font-b);display:flex;flex-direction:column;color:#fff;}
+
+  /* ── Header ── */
+  .cp-header{display:flex;align-items:center;padding:20px 20px 0;position:relative;}
   .cp-back{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,0.75);font-size:13px;font-weight:600;text-decoration:none;font-family:var(--font-h);}
-  .cp-back svg{stroke:rgba(255,255,255,0.75);}
-  .cp-title{font-family:var(--font-h);font-size:20px;font-weight:800;color:#fff;margin-left:auto;margin-right:auto;padding-right:40px;}
-  .cp-body{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;}
-  .cp-empty{display:flex;flex-direction:column;align-items:center;gap:16px;padding:80px 20px;text-align:center;color:rgba(255,255,255,0.5);}
-  .cp-empty strong{font-size:16px;font-weight:700;color:rgba(255,255,255,0.8);}
-  .cp-empty span{font-size:13px;line-height:1.6;}
+  .cp-title{position:absolute;left:50%;transform:translateX(-50%);font-family:var(--font-h);font-size:20px;font-weight:800;}
+
+  /* ── Body ── */
+  .cp-body{flex:1;padding:24px 20px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;padding-bottom:40px;}
+
+  /* ── Empty state ── */
+  .cp-empty{display:flex;flex-direction:column;align-items:center;gap:16px;padding:80px 20px;text-align:center;}
+  .cp-empty strong{font-size:16px;font-weight:700;color:rgba(255,255,255,0.85);}
+  .cp-empty span{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;}
   .cp-empty a{margin-top:8px;display:inline-block;background:#fff;color:var(--purple);font-family:var(--font-h);font-weight:700;font-size:13px;padding:12px 28px;border-radius:100px;text-decoration:none;}
 
-  /* reuse cd- styles from shop_main.css — they load globally now */
-  .cd-section-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin:0 0 10px;}
-  .cp-footer{padding:20px;border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.15);}
+  /* ── Section label ── */
+  .sec-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:10px;}
+
+  /* ── Template card ── */
+  .tpl-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;}
+  .tpl-info{flex:1;min-width:0;}
+  .tpl-name{font-family:var(--font-h);font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tpl-sub{font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;}
+  .tpl-price{text-align:right;flex-shrink:0;}
+  .tpl-price-setup{font-family:var(--font-h);font-size:16px;font-weight:800;}
+  .tpl-price-mo{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;}
+  .tpl-remove{background:rgba(255,255,255,0.1);border:none;color:rgba(255,255,255,0.6);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .tpl-remove:hover{background:rgba(255,255,255,0.18);}
+
+  /* ── Add-ons ── */
+  .addon-row{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s;}
+  .addon-row.active{background:rgba(255,255,255,0.13);border-color:rgba(255,255,255,0.25);}
+  .addon-check{width:20px;height:20px;border-radius:6px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+  .addon-row.active .addon-check{background:#fff;border-color:#fff;}
+  .addon-check svg{display:none;}
+  .addon-row.active .addon-check svg{display:block;}
+  .addon-info{flex:1;min-width:0;}
+  .addon-name{font-weight:600;font-size:14px;}
+  .addon-desc{font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;line-height:1.5;}
+  .addon-price{text-align:right;flex-shrink:0;}
+  .addon-price-setup{font-weight:700;font-size:14px;}
+  .addon-price-mo{font-size:11px;color:rgba(255,255,255,0.45);margin-top:2px;}
+
+  /* ── Footer ── */
+  .cp-footer{padding:20px;border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.2);}
+  .totals-row{display:flex;justify-content:space-between;font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:6px;}
+  .totals-row.main{font-weight:700;font-size:17px;color:#fff;margin-bottom:16px;}
+
+  /* ── Terms steps ── */
+  .steps-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .step{display:flex;gap:12px;align-items:flex-start;}
+  .step-num{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .step-body{flex:1;}
+  .step-lbl{font-size:13px;font-weight:600;}
+  .step-desc{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;}
+  .step.locked{opacity:0.4;pointer-events:none;}
+  .step.locked.unlocked{opacity:1;pointer-events:auto;}
+
+  .read-btn{margin-top:8px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:var(--font-h);}
+  .read-btn.done{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);}
+
+  .agree-label{display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+  .agree-box{width:18px;height:18px;border-radius:5px;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:all .15s;}
+  .agree-box.checked{background:#fff;border-color:#fff;}
+  .agree-box svg{display:none;}
+  .agree-box.checked svg{display:block;}
+  .agree-text{font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;}
+
+  /* ── Checkout buttons ── */
+  .checkout-row{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+  .btn-paypal{display:flex;align-items:center;justify-content:center;gap:8px;background:#FFC439;color:#003087;font-family:var(--font-h);font-weight:700;font-size:14px;padding:14px;border-radius:12px;text-decoration:none;transition:opacity .2s;}
+  .btn-bank{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-family:var(--font-h);font-weight:700;font-size:14px;padding:14px;border-radius:12px;text-decoration:none;transition:opacity .2s;}
+  .btn-paypal.disabled,.btn-bank.disabled{opacity:0.35;pointer-events:none;}
 </style>
 </head>
 <body>
 
 <div class="cp-header">
-  <a class="cp-back" href="/templates/">
+  <a class="cp-back" href="/templates/" id="back-btn">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     Back
   </a>
   <span class="cp-title">Your Order</span>
 </div>
 
-<div class="cp-body">
-  <!-- Empty state -->
-  <div class="cd-empty" id="cart-empty-msg">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-    <strong>No template selected</strong>
-    <span>Go back and pick a template to get started.</span>
-    <a href="/templates/">Browse Templates</a>
-  </div>
-
-  <!-- Base template block -->
-  <div id="cart-base-block" style="display:none;">
-    <p class="cd-section-label">Selected Template</p>
-    <div class="cd-template-card">
-      <div class="cd-tc-info">
-        <div class="cd-tc-name" id="cb-name">—</div>
-        <div class="cd-tc-sub" id="cb-type-label">Website Template</div>
-      </div>
-      <div class="cd-tc-price">
-        <div class="cd-tc-setup" id="cb-setup-price">$149.99</div>
-        <div class="cd-tc-mo" id="cb-mo-price">setup</div>
-      </div>
-      <button class="cd-tc-remove" onclick="removeBase()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- Add-ons block -->
-  <div id="cart-addons-block" style="display:none;">
-    <p class="cd-section-label">Enhance Your Package</p>
-    <label class="cd-addon-row" id="addon-copy">
-      <div class="cd-addon-check-wrap">
-        <input type="checkbox" id="check-copy-input" class="cd-addon-input" onchange="toggleAddon('copy')">
-        <span class="cd-checkbox"><svg class="cd-check-icon" width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      </div>
-      <div class="cd-addon-info">
-        <div class="cd-addon-name">Copywriting</div>
-        <div class="cd-addon-desc">Professional copy — headers, descriptions &amp; CTAs written for you.</div>
-      </div>
-      <div class="cd-addon-price">
-        <div class="cd-addon-setup">+$49.99</div>
-        <div class="cd-addon-mo">one-time</div>
-      </div>
-    </label>
-    <label class="cd-addon-row" id="addon-chatbot">
-      <div class="cd-addon-check-wrap">
-        <input type="checkbox" id="check-chatbot-input" class="cd-addon-input" onchange="toggleAddon('chatbot')">
-        <span class="cd-checkbox"><svg class="cd-check-icon" width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      </div>
-      <div class="cd-addon-info">
-        <div class="cd-addon-name">AI Chatbot</div>
-        <div class="cd-addon-desc">Custom AI trained on your brand — captures leads &amp; answers questions 24/7.</div>
-      </div>
-      <div class="cd-addon-price">
-        <div class="cd-addon-setup">+$349.99</div>
-        <div class="cd-addon-mo">+$49.99/mo</div>
-      </div>
-    </label>
-  </div>
+<div class="cp-body" id="cp-body">
+  <!-- Rendered by JS -->
 </div>
 
-<!-- Footer: totals + checkout -->
-<div class="cp-footer" id="cart-footer-block" style="display:none;">
-  <div class="cd-totals" style="margin-bottom:16px;">
-    <div class="cd-total-row"><span>Setup Total</span><span id="cart-setup-total">$0.00</span></div>
-    <div class="cd-total-row cd-total-mo"><span>Monthly</span><span id="cart-mo-total">$0.00 / mo</span></div>
-  </div>
+<div class="cp-footer" id="cp-footer" style="display:none;">
+  <div class="totals-row"><span>Setup</span><span id="t-setup">$0.00</span></div>
+  <div class="totals-row"><span>Monthly</span><span id="t-mo">$0.00 / mo</span></div>
+  <div class="totals-row main"><span>Total Due Today</span><span id="t-total">$0.00</span></div>
 
-  <!-- Step 1: Read Terms -->
-  <div class="cd-agree-row" id="cd-agree-row">
-    <div class="cd-step" id="cd-step1">
-      <div class="cd-step-num">1</div>
-      <div class="cd-step-body">
-        <div class="cd-step-label">Service Agreement</div>
-        <div class="cd-step-desc">Read our Terms of Use before accepting.</div>
-        <button class="cd-read-btn" id="cd-read-btn" onclick="openTerms()">
+  <div class="steps-wrap">
+    <div class="step" id="step1">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-lbl">Service Agreement</div>
+        <div class="step-desc">Read our terms before proceeding.</div>
+        <button class="read-btn" id="read-btn" onclick="openTerms()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           Read Terms
         </button>
       </div>
     </div>
-    <div class="cd-step cd-step-locked" id="cd-step2">
-      <div class="cd-step-num">2</div>
-      <div class="cd-step-body">
-        <label class="cd-agree-label" id="cd-agree-label">
-          <input type="checkbox" id="cd-agree-chk" onchange="updateAgreement()" disabled>
-          <span class="cd-agree-box"><svg class="cd-agree-icon" width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <span class="cd-agree-text">I have read and agree to the Terms of Use &amp; service agreement</span>
+    <div class="step locked" id="step2">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <label class="agree-label" onclick="toggleAgree()">
+          <div class="agree-box" id="agree-box">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="agree-text">I have read and agree to the Terms of Use &amp; service agreement</span>
         </label>
       </div>
     </div>
   </div>
 
-  <!-- Checkout buttons -->
-  <div class="cd-checkout-row" style="margin-top:14px;">
-    <a id="cart-paypal" class="cd-btn-paypal disabled" href="#" target="_blank" rel="noopener">
+  <div class="checkout-row">
+    <a id="btn-paypal" class="btn-paypal disabled" href="#" target="_blank" rel="noopener">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828l-1.122 7.12h3.174l.522-3.308h1.976c4.358 0 7.332-2.103 8.228-5.93.381-1.628.157-2.95-.384-3.677z"/></svg>
       Pay via PayPal
     </a>
-    <a id="cart-bank" class="cd-btn-bank disabled" href="#" target="_blank" rel="noopener">
+    <a id="btn-bank" class="btn-bank disabled" href="#" target="_blank" rel="noopener">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
       Bank Transfer
     </a>
   </div>
 </div>
 
-<script src="/templates/shop_scripts.js?v=5"></script>
+<script>
+(function(){
+  /* ── Prices (mirror shop_scripts.js PRICES) ── */
+  var PRICES = {
+    website: { setup: 149.99, mo: 19.99, label: 'Template Website' },
+    premium: { setup: 299.99, mo: 19.99, label: 'Premium 3D Template Website' },
+    store:   { setup: 249.99, mo: 34.99, label: 'Micro Store' },
+    copy:    { setup: 49.99,  mo: 0 },
+    chatbot: { setup: 349.99, mo: 49.99 }
+  };
+
+  /* ── State ── */
+  var state = { name: null, type: null, copy: false, chatbot: false, agreed: false, termsRead: false };
+
+  /* ── Load from URL params (primary) then sessionStorage (fallback) ── */
+  (function loadCart(){
+    var p = new URLSearchParams(window.location.search);
+    if (p.get('n')) {
+      state.name = decodeURIComponent(p.get('n'));
+      state.type = p.get('t') || 'website';
+    } else {
+      try {
+        var s = JSON.parse(sessionStorage.getItem('pd_cart') || 'null');
+        if (s && s.base && s.base.name) {
+          state.name = s.base.name;
+          state.type = s.base.type || 'website';
+          state.copy = !!(s.addons && s.addons.copy);
+          state.chatbot = !!(s.addons && s.addons.chatbot);
+        }
+      } catch(e){}
+    }
+  })();
+
+  /* ── Render body ── */
+  function render() {
+    var body = document.getElementById('cp-body');
+    if (!state.name) {
+      body.innerHTML = '<div class="cp-empty">'
+        + '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>'
+        + '<strong>No template selected</strong>'
+        + '<span>Go back and pick a template to get started.</span>'
+        + '<a href="/templates/">Browse Templates</a></div>';
+      document.getElementById('cp-footer').style.display = 'none';
+      return;
+    }
+
+    var pr = PRICES[state.type] || PRICES.website;
+    var html = '';
+
+    /* Template card */
+    html += '<div>';
+    html += '<p class="sec-label">Selected Template</p>';
+    html += '<div class="tpl-card">';
+    html += '<div class="tpl-info"><div class="tpl-name">' + esc(state.name) + '</div>';
+    html += '<div class="tpl-sub">' + esc(pr.label) + '</div></div>';
+    html += '<div class="tpl-price"><div class="tpl-price-setup">$' + pr.setup.toFixed(2) + '</div>';
+    html += '<div class="tpl-price-mo">$' + pr.mo.toFixed(2) + '/mo</div></div>';
+    html += '<button class="tpl-remove" onclick="removeTemplate()" title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+    html += '</div></div>';
+
+    /* Add-ons */
+    html += '<div>';
+    html += '<p class="sec-label">Enhance Your Package</p>';
+
+    /* Copy addon */
+    html += '<div class="addon-row ' + (state.copy ? 'active' : '') + '" onclick="toggleAddon(\'copy\')" style="margin-bottom:10px;">';
+    html += '<div class="addon-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    html += '<div class="addon-info"><div class="addon-name">Copywriting</div><div class="addon-desc">Professional copy — headers, descriptions &amp; CTAs written for you.</div></div>';
+    html += '<div class="addon-price"><div class="addon-price-setup">+$49.99</div><div class="addon-price-mo">one-time</div></div>';
+    html += '</div>';
+
+    /* Chatbot addon */
+    html += '<div class="addon-row ' + (state.chatbot ? 'active' : '') + '" onclick="toggleAddon(\'chatbot\')">';
+    html += '<div class="addon-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    html += '<div class="addon-info"><div class="addon-name">AI Chatbot</div><div class="addon-desc">Custom AI trained on your brand — captures leads &amp; answers questions 24/7.</div></div>';
+    html += '<div class="addon-price"><div class="addon-price-setup">+$349.99</div><div class="addon-price-mo">+$49.99/mo</div></div>';
+    html += '</div>';
+
+    html += '</div>';
+    body.innerHTML = html;
+
+    updateTotals();
+    document.getElementById('cp-footer').style.display = '';
+    persist();
+  }
+
+  /* ── Totals ── */
+  function updateTotals() {
+    if (!state.name) return;
+    var pr = PRICES[state.type] || PRICES.website;
+    var setup = pr.setup;
+    var mo    = pr.mo;
+    if (state.copy)    setup += PRICES.copy.setup;
+    if (state.chatbot) { setup += PRICES.chatbot.setup; mo += PRICES.chatbot.mo; }
+
+    document.getElementById('t-setup').textContent = '$' + setup.toFixed(2);
+    document.getElementById('t-mo').textContent    = '$' + mo.toFixed(2) + ' / mo';
+    document.getElementById('t-total').textContent = '$' + setup.toFixed(2);
+    buildLinks(setup, mo);
+  }
+
+  /* ── WhatsApp links ── */
+  function buildLinks(totalSetup, totalMo) {
+    var pr = PRICES[state.type] || PRICES.website;
+    var name = state.name; var label = pr.label;
+
+    var ppLines = [
+      'Hi%21%20I%27d%20like%20to%20pay%20via%20PayPal%3A%0A',
+      '%F0%9F%9B%92%20' + encodeURIComponent(name) + '%20%E2%80%94%20' + encodeURIComponent(label)
+    ];
+    if (state.copy)    ppLines.push('%E2%9E%95%20Copywriting%20Add-On');
+    if (state.chatbot) ppLines.push('%E2%9E%95%20AI%20Chatbot%20Add-On');
+    ppLines.push('%0A%F0%9F%92%B3%20Total%3A%20%24' + totalSetup.toFixed(2));
+
+    var bkLines = [
+      'Hi%21%20I%27d%20like%20to%20place%20an%20order%20via%20bank%20transfer%3A%0A',
+      '%F0%9F%9B%92%20' + encodeURIComponent(name) + '%20%E2%80%94%20' + encodeURIComponent(label)
+    ];
+    if (state.copy)    bkLines.push('%E2%9E%95%20Copywriting%20Add-On');
+    if (state.chatbot) bkLines.push('%E2%9E%95%20AI%20Chatbot%20Add-On');
+    bkLines.push('%0A%F0%9F%92%B3%20Setup%20Total%3A%20%24' + totalSetup.toFixed(2));
+    bkLines.push('%F0%9F%93%85%20Monthly%3A%20%24' + totalMo.toFixed(2) + '%2Fmo');
+    bkLines.push('%0ACould%20you%20please%20send%20me%20your%20banking%20details%20so%20I%20can%20complete%20the%20transfer%3F');
+
+    var ppBtn = document.getElementById('btn-paypal');
+    var bkBtn = document.getElementById('btn-bank');
+    if (ppBtn) ppBtn.setAttribute('data-href', 'https://wa.me/18683424101?text=' + ppLines.join('%0A'));
+    if (bkBtn) bkBtn.setAttribute('data-href', 'https://wa.me/18683424101?text=' + bkLines.join('%0A'));
+  }
+
+  /* ── Terms ── */
+  window.openTerms = function() {
+    window.open('/templates/terms/', '_blank', 'noopener');
+    state.termsRead = true;
+    var btn = document.getElementById('read-btn');
+    var s2  = document.getElementById('step2');
+    if (btn) { btn.classList.add('done'); btn.textContent = 'Terms Read ✓'; }
+    if (s2)  { s2.classList.remove('locked'); s2.classList.add('unlocked'); }
+  };
+
+  window.toggleAgree = function() {
+    if (!state.termsRead) return;
+    state.agreed = !state.agreed;
+    var box = document.getElementById('agree-box');
+    if (box) box.classList.toggle('checked', state.agreed);
+    var pp = document.getElementById('btn-paypal');
+    var bk = document.getElementById('btn-bank');
+    if (state.agreed) {
+      if (pp) { pp.classList.remove('disabled'); pp.href = pp.getAttribute('data-href') || '#'; }
+      if (bk) { bk.classList.remove('disabled'); bk.href = bk.getAttribute('data-href') || '#'; }
+    } else {
+      if (pp) { pp.classList.add('disabled'); pp.href = '#'; }
+      if (bk) { bk.classList.add('disabled'); bk.href = '#'; }
+    }
+  };
+
+  /* ── Add-on toggle ── */
+  window.toggleAddon = function(which) {
+    state[which] = !state[which];
+    updateTotals();
+    /* re-render just the add-on rows without full re-render */
+    var copyRow    = document.querySelectorAll('.addon-row')[0];
+    var chatbotRow = document.querySelectorAll('.addon-row')[1];
+    if (copyRow)    copyRow.classList.toggle('active', state.copy);
+    if (chatbotRow) chatbotRow.classList.toggle('active', state.chatbot);
+    persist();
+  };
+
+  /* ── Remove ── */
+  window.removeTemplate = function() {
+    state.name = null; state.type = null;
+    state.copy = false; state.chatbot = false;
+    sessionStorage.removeItem('pd_cart');
+    render();
+    /* go back after short delay so user sees the empty state */
+    setTimeout(function(){ window.location.href = '/templates/'; }, 800);
+  };
+
+  /* ── Persist to sessionStorage ── */
+  function persist() {
+    sessionStorage.setItem('pd_cart', JSON.stringify({
+      base: state.name ? { name: state.name, type: state.type } : null,
+      addons: { copy: state.copy, chatbot: state.chatbot }
+    }));
+  }
+
+  /* ── Util ── */
+  function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  /* ── Boot ── */
+  render();
+})();
+</script>
 </body>
 </html>
