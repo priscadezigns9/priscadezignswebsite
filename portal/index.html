@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PORTAL.EXE — Enter the Digital Dream</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--green:#00ff41;--amber:#ffb700;--cyan:#00f5ff;--pink:#ff2d78;--purple:#9d00ff}
+  html{scroll-behavior:auto}
+  body{background:#000;color:#fff;font-family:'Courier New',monospace;overflow-x:hidden}
+  #loading{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.8s}
+  #loading.hide{opacity:0;pointer-events:none}
+  .load-txt{color:var(--green);font-size:1.1rem;letter-spacing:3px;animation:blink 0.6s infinite}
+  .load-bar{width:300px;height:2px;background:#111;margin-top:20px;overflow:hidden}
+  .load-fill{height:100%;background:var(--green);width:0;transition:width 2.5s linear}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+  #canvas-container{position:fixed;inset:0;z-index:0}
+  canvas{display:block}
+
+  #scroll-driver{position:relative;z-index:1;height:700vh;pointer-events:none}
+
+  /* HUD overlay */
+  #hud{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10;pointer-events:none}
+  .hud-corner{position:absolute;font-size:0.55rem;letter-spacing:2px;color:rgba(0,255,65,0.4);text-transform:uppercase}
+  .hud-tl{top:20px;left:24px}
+  .hud-tr{top:20px;right:24px;text-align:right}
+  .hud-bl{bottom:20px;left:24px}
+  .hud-br{bottom:20px;right:24px;text-align:right}
+  .hud-line{position:absolute;background:rgba(0,255,65,0.12)}
+  .hud-line.h{height:1px;left:0;right:0}
+  .hud-line.v{width:1px;top:0;bottom:0}
+  .hud-line.top{top:50px}
+  .hud-line.bottom{bottom:50px}
+  .hud-line.left{left:60px}
+  .hud-line.right{right:60px}
+
+  /* Scene labels */
+  .scene-label{position:fixed;z-index:20;opacity:0;transition:opacity 0.5s;pointer-events:none}
+  .scene-label.visible{opacity:1}
+  #label-0{bottom:80px;left:50%;transform:translateX(-50%);text-align:center}
+  #label-1{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  #label-2{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  #label-3{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  #label-4{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  .scene-label h2{font-size:clamp(1.8rem,5vw,4rem);letter-spacing:4px;text-transform:uppercase;font-weight:900;line-height:1.1}
+  .scene-label p{font-size:0.75rem;letter-spacing:3px;margin-top:10px;opacity:0.6;text-transform:uppercase}
+  .glitch{position:relative}
+  .glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0}
+  .glitch::before{color:var(--cyan);clip-path:polygon(0 0,100% 0,100% 35%,0 35%);animation:glitch1 3s infinite}
+  .glitch::after{color:var(--pink);clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);animation:glitch2 3s infinite}
+  @keyframes glitch1{0%,90%,100%{transform:translateX(0)}91%{transform:translateX(-4px)}93%{transform:translateX(4px)}95%{transform:translateX(-2px)}}
+  @keyframes glitch2{0%,90%,100%{transform:translateX(0)}91%{transform:translateX(4px)}93%{transform:translateX(-4px)}95%{transform:translateX(2px)}}
+
+  /* CRT scanlines */
+  #scanlines{position:fixed;inset:0;z-index:5;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);animation:scan 8s linear infinite}
+  @keyframes scan{0%{background-position:0 0}100%{background-position:0 100%}}
+
+  /* Vignette */
+  #vignette{position:fixed;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.85) 100%)}
+
+  /* Scroll hint */
+  #scroll-hint{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:30;text-align:center;opacity:1;transition:opacity 1s}
+  #scroll-hint.hide{opacity:0;pointer-events:none}
+  .scroll-arrow{width:20px;height:20px;border-right:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(45deg);margin:0 auto;animation:bounce 1.5s infinite}
+  .scroll-txt{font-size:0.6rem;letter-spacing:3px;color:var(--green);margin-bottom:8px;text-transform:uppercase}
+  @keyframes bounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(6px)}}
+
+  /* Easter egg cursor trail */
+  .spark{position:fixed;pointer-events:none;z-index:100;width:4px;height:4px;border-radius:50%;background:var(--cyan);animation:sparkfade 0.8s forwards}
+  @keyframes sparkfade{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0) translateY(-20px)}}
+
+  /* Scene 4 — enter button */
+  #enter-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:30;opacity:0;transition:opacity 0.5s;pointer-events:none}
+  #enter-btn.visible{opacity:1;pointer-events:all}
+  #enter-btn button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:'Courier New',monospace;font-size:0.75rem;letter-spacing:4px;padding:14px 40px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+  #enter-btn button::before{content:'';position:absolute;inset:0;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;z-index:-1}
+  #enter-btn button:hover{color:#000}
+  #enter-btn button:hover::before{transform:scaleX(1)}
+
+  /* Noise texture overlay */
+  #noise{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0.03;animation:noiseShift 0.1s steps(1) infinite}
+  @keyframes noiseShift{0%{transform:translate(0,0)}25%{transform:translate(-2px,1px)}50%{transform:translate(1px,-1px)}75%{transform:translate(2px,2px)}100%{transform:translate(-1px,0)}}
+</style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loading">
+  <div class="load-txt">INITIALIZING PORTAL.EXE</div>
+  <div class="load-bar"><div class="load-fill" id="load-fill"></div></div>
+  <div style="color:rgba(0,255,65,0.3);font-size:0.55rem;letter-spacing:2px;margin-top:16px" id="load-status">LOADING ASSETS...</div>
+</div>
+
+<!-- WebGL canvas -->
+<div id="canvas-container"><canvas id="c"></canvas></div>
+
+<!-- Overlays -->
+<div id="scanlines"></div>
+<div id="vignette"></div>
+<div id="noise"></div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-corner hud-tl">PORTAL.EXE v1.0<br><span id="hud-time"></span></div>
+  <div class="hud-corner hud-tr">DEPTH: <span id="hud-depth">00.00</span>%<br>REALITY: <span id="hud-reality">STABLE</span></div>
+  <div class="hud-corner hud-bl">LAT: 10.284 · LON: -61.459<br>SIGNAL: ████████░░</div>
+  <div class="hud-corner hud-br">PRISCA DEZIGNS<br>CREATIVE SYSTEMS</div>
+  <div class="hud-line h top"></div>
+  <div class="hud-line h bottom"></div>
+  <div class="hud-line v left"></div>
+  <div class="hud-line v right"></div>
+</div>
+
+<!-- Scene labels -->
+<div class="scene-label" id="label-0">
+  <div class="glitch" data-text="PORTAL.EXE" style="color:var(--green);font-size:clamp(2.5rem,8vw,6rem);letter-spacing:6px;font-weight:900">PORTAL.EXE</div>
+  <p style="color:var(--green)">Scroll to enter the machine</p>
+</div>
+<div class="scene-label" id="label-1">
+  <h2 class="glitch" data-text="JACK IN" style="color:var(--cyan)">JACK IN</h2>
+  <p style="color:var(--cyan)">The monitor awakens</p>
+</div>
+<div class="scene-label" id="label-2">
+  <h2 class="glitch" data-text="THE GRID" style="color:var(--amber)">THE GRID</h2>
+  <p style="color:var(--amber)">1000 miles of nothing. Beautiful.</p>
+</div>
+<div class="scene-label" id="label-3">
+  <h2 class="glitch" data-text="DEEP SPACE" style="color:var(--pink)">DEEP SPACE</h2>
+  <p style="color:var(--pink)">You weren't supposed to get this far</p>
+</div>
+<div class="scene-label" id="label-4">
+  <h2 class="glitch" data-text="YOU MADE IT" style="color:var(--purple)">YOU MADE IT</h2>
+  <p style="color:var(--purple)">Most people turn back at the keyboard</p>
+</div>
+
+<!-- Scroll spacer -->
+<div id="scroll-driver"></div>
+
+<!-- Scroll hint -->
+<div id="scroll-hint">
+  <div class="scroll-txt">Scroll to enter</div>
+  <div class="scroll-arrow"></div>
+</div>
+
+<!-- Enter button (final scene) -->
+<div id="enter-btn">
+  <button onclick="window.open('https://priscadezigns.org','_self')">ENTER THE STUDIO</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── Loader ──────────────────────────────────────────────────────────────────
+const loadStatuses = ['LOADING ASSETS...','CALIBRATING DEPTH...','WARMING UP CRT...','INJECTING NOSTALGIA...','REALITY CHECK... FAILED.','PROCEEDING ANYWAY.'];
+let loadIdx = 0;
+const loadStatus = document.getElementById('load-status');
+const loadFill = document.getElementById('load-fill');
+loadFill.style.width = '100%';
+const loadInterval = setInterval(() => {
+  loadIdx++;
+  if(loadIdx < loadStatuses.length) loadStatus.textContent = loadStatuses[loadIdx];
+  else { clearInterval(loadInterval); init(); }
+}, 420);
+
+// ─── Three.js scene ──────────────────────────────────────────────────────────
+let renderer, scene, camera, clock;
+let computer, screen, screenMesh;
+let particles, gridHelper;
+let stars, starField;
+let warpTunnel;
+let floatingObjects = [];
+let scene3Group, scene4Group;
+const scrollState = { progress: 0 };
+
+function init() {
+  // Hide loader
+  document.getElementById('loading').classList.add('hide');
+  document.getElementById('label-0').classList.add('visible');
+
+  clock = new THREE.Clock();
+
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, alpha: false });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.setClearColor(0x000000);
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x000000, 0.02);
+
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+  camera.position.set(0, 2, 8);
+  camera.lookAt(0, 0.5, 0);
+
+  buildLights();
+  buildComputer();
+  buildStarField();
+  buildGridWorld();
+  buildWarpTunnel();
+  buildFloatingObjects();
+  buildParticles();
+
+  setupScrollAnimation();
+  setupHUD();
+  setupCursorTrail();
+
+  window.addEventListener('resize', onResize);
+  requestAnimationFrame(animate);
+}
+
+function buildLights() {
+  const ambient = new THREE.AmbientLight(0x001100, 0.3);
+  scene.add(ambient);
+
+  const greenPoint = new THREE.PointLight(0x00ff41, 2, 20);
+  greenPoint.position.set(-3, 3, 3);
+  scene.add(greenPoint);
+
+  const cyanPoint = new THREE.PointLight(0x00f5ff, 1.5, 15);
+  cyanPoint.position.set(3, 2, -2);
+  scene.add(cyanPoint);
+
+  const screenLight = new THREE.PointLight(0x00ff41, 3, 8);
+  screenLight.position.set(0, 1, 1);
+  scene.add(screenLight);
+}
+
+function buildComputer() {
+  computer = new THREE.Group();
+
+  // Monitor body
+  const monitorGeo = new THREE.BoxGeometry(4, 3, 0.5);
+  const monitorMat = new THREE.MeshPhongMaterial({
+    color: 0x1a1a2e,
+    emissive: 0x050510,
+    shininess: 80,
+    specular: 0x333366
+  });
+  const monitor = new THREE.Mesh(monitorGeo, monitorMat);
+  computer.add(monitor);
+
+  // Bezel
+  const bezelGeo = new THREE.BoxGeometry(4.2, 3.2, 0.3);
+  const bezelMat = new THREE.MeshPhongMaterial({ color: 0x0d0d1a, shininess: 40 });
+  const bezel = new THREE.Mesh(bezelGeo, bezelMat);
+  bezel.position.z = -0.12;
+  computer.add(bezel);
+
+  // Screen
+  const screenGeo = new THREE.PlaneGeometry(3.4, 2.4);
+  const screenCanvas = document.createElement('canvas');
+  screenCanvas.width = 512; screenCanvas.height = 360;
+  const ctx = screenCanvas.getContext('2d');
+  drawScreenContent(ctx, screenCanvas.width, screenCanvas.height, 0);
+  const screenTex = new THREE.CanvasTexture(screenCanvas);
+
+  const screenMat = new THREE.MeshBasicMaterial({ map: screenTex });
+  screenMesh = new THREE.Mesh(screenGeo, screenMat);
+  screenMesh.position.z = 0.28;
+  screenMesh.userData = { ctx, canvas: screenCanvas, tex: screenTex };
+  computer.add(screenMesh);
+
+  // Screen glow plane
+  const glowGeo = new THREE.PlaneGeometry(3.6, 2.6);
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0x00ff41, transparent: true, opacity: 0.04 });
+  const glow = new THREE.Mesh(glowGeo, glowMat);
+  glow.position.z = 0.27;
+  computer.add(glow);
+
+  // Neck
+  const neckGeo = new THREE.BoxGeometry(0.8, 0.6, 0.4);
+  const neck = new THREE.Mesh(neckGeo, monitorMat);
+  neck.position.set(0, -1.9, 0);
+  computer.add(neck);
+
+  // Base
+  const baseGeo = new THREE.BoxGeometry(2.5, 0.15, 1.5);
+  const base = new THREE.Mesh(baseGeo, monitorMat);
+  base.position.set(0, -2.3, 0.3);
+  computer.add(base);
+
+  // Keyboard
+  const kbGeo = new THREE.BoxGeometry(3.2, 0.15, 1.2);
+  const kbMat = new THREE.MeshPhongMaterial({ color: 0x111122, shininess: 60 });
+  const kb = new THREE.Mesh(kbGeo, kbMat);
+  kb.position.set(0, -2.35, 2);
+  computer.add(kb);
+
+  // Keyboard keys
+  for(let r = 0; r < 4; r++) {
+    for(let c = 0; c < 12; c++) {
+      const keyGeo = new THREE.BoxGeometry(0.2, 0.06, 0.2);
+      const keyMat = new THREE.MeshPhongMaterial({ color: 0x1a1a3e });
+      const key = new THREE.Mesh(keyGeo, keyMat);
+      key.position.set(-1.3 + c * 0.24, -2.27, 1.5 + r * 0.25);
+      computer.add(key);
+    }
+  }
+
+  // Floppy drives
+  for(let i = 0; i < 2; i++) {
+    const driveGeo = new THREE.BoxGeometry(1.2, 0.25, 0.1);
+    const driveMat = new THREE.MeshPhongMaterial({ color: 0x0a0a1a });
+    const drive = new THREE.Mesh(driveGeo, driveMat);
+    drive.position.set(i === 0 ? -1 : 1, -0.8 + i * 0.4, 0.28);
+    computer.add(drive);
+    const slotGeo = new THREE.BoxGeometry(0.9, 0.04, 0.05);
+    const slotMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const slot = new THREE.Mesh(slotGeo, slotMat);
+    slot.position.set(i === 0 ? -1 : 1, -0.8 + i * 0.4, 0.32);
+    computer.add(slot);
+  }
+
+  // LED indicator
+  const ledGeo = new THREE.SphereGeometry(0.06, 8, 8);
+  const ledMat = new THREE.MeshBasicMaterial({ color: 0x00ff41 });
+  const led = new THREE.Mesh(ledGeo, ledMat);
+  led.position.set(1.7, -1.3, 0.28);
+  computer.add(led);
+  led.userData.isLed = true;
+
+  computer.position.set(0, 0, 0);
+  scene.add(computer);
+  screen = computer;
+}
+
+function drawScreenContent(ctx, w, h, time) {
+  ctx.fillStyle = '#000800';
+  ctx.fillRect(0, 0, w, h);
+
+  // Scanline effect on screen
+  for(let y = 0; y < h; y += 4) {
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, y, w, 2);
+  }
+
+  // Green phosphor text
+  ctx.fillStyle = '#00ff41';
+  ctx.font = 'bold 14px Courier New';
+  ctx.fillText('> PORTAL.EXE v1.0', 20, 30);
+
+  ctx.font = '11px Courier New';
+  ctx.fillStyle = '#00cc33';
+  const lines = [
+    'SYSTEM BOOT... OK',
+    'MEMORY: 640K (ENOUGH FOR ANYONE)',
+    'LOADING IMAGINATION.DLL',
+    'CALIBRATING DREAMS...',
+    '',
+    '> DO YOU WISH TO ENTER?',
+    '',
+    time % 1.2 < 0.6 ? '  [Y/N] _' : '  [Y/N]  ',
+    '',
+    '> WARNING: REALITY MAY DIFFER',
+    '> FROM PERCEIVED EXPERIENCE.',
+    '',
+    '> SCROLL DOWN TO PROCEED.',
+  ];
+  lines.forEach((line, i) => {
+    ctx.fillText(line, 20, 60 + i * 20);
+  });
+
+  // Blinking cursor
+  if(time % 1 < 0.5) {
+    ctx.fillStyle = '#00ff41';
+    ctx.fillRect(20, h - 30, 8, 14);
+  }
+
+  // Random noise pixels
+  for(let i = 0; i < 40; i++) {
+    ctx.fillStyle = `rgba(0,255,65,${Math.random() * 0.15})`;
+    ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
+  }
+}
+
+function buildStarField() {
+  const geo = new THREE.BufferGeometry();
+  const count = 3000;
+  const pos = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+  for(let i = 0; i < count; i++) {
+    pos[i*3] = (Math.random() - 0.5) * 300;
+    pos[i*3+1] = (Math.random() - 0.5) * 300;
+    pos[i*3+2] = (Math.random() - 0.5) * 300;
+    // Mix of green, cyan, white stars
+    const c = Math.random();
+    if(c < 0.3) { colors[i*3]=0; colors[i*3+1]=1; colors[i*3+2]=0.25; }
+    else if(c < 0.6) { colors[i*3]=0; colors[i*3+1]=0.96; colors[i*3+2]=1; }
+    else { colors[i*3]=1; colors[i*3+1]=1; colors[i*3+2]=1; }
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const mat = new THREE.PointsMaterial({ size: 0.3, vertexColors: true, transparent: true, opacity: 0 });
+  stars = new THREE.Points(geo, mat);
+  scene.add(stars);
+}
+
+function buildGridWorld() {
+  scene3Group = new THREE.Group();
+  scene3Group.visible = false;
+
+  // Infinite-looking grid
+  const gridSize = 200;
+  const gridDivs = 40;
+  const grid = new THREE.GridHelper(gridSize, gridDivs, 0x00f5ff, 0x003344);
+  grid.position.y = -8;
+  scene3Group.add(grid);
+
+  const grid2 = new THREE.GridHelper(gridSize, gridDivs, 0x9d00ff, 0x220033);
+  grid2.position.y = -8;
+  grid2.rotation.x = Math.PI / 2;
+  grid2.position.z = -100;
+  scene3Group.add(grid2);
+
+  // Sun on horizon
+  const sunGeo = new THREE.SphereGeometry(6, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
+  const sunMat = new THREE.MeshBasicMaterial({ color: 0xff2d78, side: THREE.FrontSide });
+  const sun = new THREE.Mesh(sunGeo, sunMat);
+  sun.position.set(0, -2, -80);
+  scene3Group.add(sun);
+
+  // Sun glow rings
+  for(let i = 0; i < 5; i++) {
+    const ringGeo = new THREE.RingGeometry(6 + i * 1.5, 6.2 + i * 1.5, 64);
+    const ringMat = new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(0.9 - i * 0.04, 1, 0.5), side: THREE.DoubleSide, transparent: true, opacity: 0.7 - i * 0.12 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.set(0, -2, -80);
+    ring.rotation.x = Math.PI / 2;
+    scene3Group.add(ring);
+  }
+
+  // Floating pyramids
+  for(let i = 0; i < 8; i++) {
+    const pyGeo = new THREE.ConeGeometry(0.5 + Math.random(), 1.5, 4);
+    const pyMat = new THREE.MeshPhongMaterial({ color: new THREE.Color().setHSL(0.75 + Math.random() * 0.2, 1, 0.5), emissive: new THREE.Color().setHSL(0.75, 1, 0.3), wireframe: Math.random() > 0.5 });
+    const py = new THREE.Mesh(pyGeo, pyMat);
+    py.position.set((Math.random() - 0.5) * 40, -4 + Math.random() * 8, -20 - Math.random() * 60);
+    py.rotation.set(Math.random(), Math.random(), Math.random());
+    py.userData.rotSpeed = (Math.random() - 0.5) * 0.02;
+    scene3Group.add(py);
+    floatingObjects.push(py);
+  }
+
+  scene.add(scene3Group);
+}
+
+function buildWarpTunnel() {
+  scene4Group = new THREE.Group();
+  scene4Group.visible = false;
+
+  // Tunnel made of rings
+  for(let i = 0; i < 60; i++) {
+    const ringGeo = new THREE.TorusGeometry(4 + Math.sin(i * 0.3) * 1.5, 0.05, 8, 64);
+    const hue = (i / 60 + 0.5) % 1;
+    const ringMat = new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(hue, 1, 0.6), transparent: true, opacity: 0.7 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.z = -i * 3;
+    ring.rotation.z = i * 0.15;
+    scene4Group.add(ring);
+  }
+
+  // Warp particles
+  const wpGeo = new THREE.BufferGeometry();
+  const wpCount = 800;
+  const wpPos = new Float32Array(wpCount * 3);
+  for(let i = 0; i < wpCount; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 2 + Math.random() * 3;
+    wpPos[i*3] = Math.cos(angle) * radius;
+    wpPos[i*3+1] = Math.sin(angle) * radius;
+    wpPos[i*3+2] = -Math.random() * 180;
+  }
+  wpGeo.setAttribute('position', new THREE.BufferAttribute(wpPos, 3));
+  const wpMat = new THREE.PointsMaterial({ size: 0.15, color: 0x00f5ff, transparent: true, opacity: 0.8 });
+  const wp = new THREE.Points(wpGeo, wpMat);
+  scene4Group.add(wp);
+
+  scene.add(scene4Group);
+}
+
+function buildFloatingObjects() {
+  // Floating floppy disks, gears, cubes scattered in mid-space
+  const shapes = [
+    () => new THREE.BoxGeometry(0.4, 0.4, 0.05), // floppy
+    () => new THREE.IcosahedronGeometry(0.3, 0),
+    () => new THREE.OctahedronGeometry(0.35, 0),
+    () => new THREE.TetrahedronGeometry(0.4, 0),
+    () => new THREE.TorusGeometry(0.3, 0.08, 8, 20),
+  ];
+
+  for(let i = 0; i < 20; i++) {
+    const geoFn = shapes[Math.floor(Math.random() * shapes.length)];
+    const colors = [0x00ff41, 0x00f5ff, 0xff2d78, 0x9d00ff, 0xffb700];
+    const col = colors[Math.floor(Math.random() * colors.length)];
+    const mat = new THREE.MeshPhongMaterial({ color: col, emissive: new THREE.Color(col).multiplyScalar(0.3), wireframe: Math.random() > 0.6, transparent: true, opacity: 0.8 });
+    const mesh = new THREE.Mesh(geoFn(), mat);
+    mesh.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10, -5 - Math.random() * 30);
+    mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    mesh.userData = { rotX: (Math.random() - 0.5) * 0.02, rotY: (Math.random() - 0.5) * 0.02, floatSpeed: 0.3 + Math.random() * 0.7, floatOffset: Math.random() * Math.PI * 2, baseY: mesh.position.y };
+    mesh.visible = false;
+    scene.add(mesh);
+    floatingObjects.push(mesh);
+  }
+}
+
+function buildParticles() {
+  const geo = new THREE.BufferGeometry();
+  const count = 500;
+  const pos = new Float32Array(count * 3);
+  for(let i = 0; i < count; i++) {
+    pos[i*3] = (Math.random() - 0.5) * 30;
+    pos[i*3+1] = (Math.random() - 0.5) * 20;
+    pos[i*3+2] = (Math.random() - 0.5) * 20;
+  }
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const mat = new THREE.PointsMaterial({ size: 0.05, color: 0x00ff41, transparent: true, opacity: 0 });
+  particles = new THREE.Points(geo, mat);
+  scene.add(particles);
+}
+
+// ─── Scroll Animation ─────────────────────────────────────────────────────────
+function setupScrollAnimation() {
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: '#scroll-driver',
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1.5,
+      onUpdate: (self) => {
+        scrollState.progress = self.progress;
+        updateSceneLabels(self.progress);
+        updateHUD(self.progress);
+      }
+    }
+  });
+
+  // === SCENE 0→1: Camera pulls back, computer floats in (0–0.15) ===
+  tl.to(camera.position, { z: 12, y: 2.5, duration: 0.15 }, 0)
+    .to(computer.rotation, { y: 0.3, x: -0.05, duration: 0.15 }, 0)
+    .to('#scroll-hint', { opacity: 0, duration: 0.05 }, 0.02);
+
+  // === SCENE 1: Zoom into screen (0.15–0.35) ===
+  tl.to(camera.position, { z: 2, y: 0.5, x: 0, duration: 0.2 }, 0.15)
+    .to(camera.rotation, { x: 0, duration: 0.2 }, 0.15)
+    .to(computer.rotation, { y: 0, x: 0, duration: 0.2 }, 0.15);
+
+  // === SCENE 2: Camera zooms THROUGH screen (0.35–0.55) ===
+  tl.to(camera.position, { z: -2, y: 0, x: 0, duration: 0.2 }, 0.35)
+    .to(scene.fog, { density: 0.005, duration: 0.2 }, 0.35);
+
+  // === SCENE 3: Grid world — camera pulls back and up (0.55–0.75) ===
+  tl.to(camera.position, { z: -10, y: 4, duration: 0.2 }, 0.55)
+    .to(camera.rotation, { x: -0.3, duration: 0.2 }, 0.55);
+
+  // === SCENE 4: Warp tunnel (0.75–1.0) ===
+  tl.to(camera.position, { z: -80, y: 0, duration: 0.25 }, 0.75)
+    .to(camera.rotation, { x: 0, duration: 0.25 }, 0.75);
+}
+
+function updateSceneLabels(p) {
+  const labels = [
+    { id: 'label-0', show: p < 0.08 },
+    { id: 'label-1', show: p >= 0.15 && p < 0.32 },
+    { id: 'label-2', show: p >= 0.55 && p < 0.72 },
+    { id: 'label-3', show: p >= 0.75 && p < 0.9 },
+    { id: 'label-4', show: p >= 0.92 },
+  ];
+  labels.forEach(l => {
+    const el = document.getElementById(l.id);
+    if(el) el.classList.toggle('visible', l.show);
+  });
+
+  // Show enter button at end
+  const enterBtn = document.getElementById('enter-btn');
+  enterBtn.classList.toggle('visible', p >= 0.95);
+
+  // Toggle scene visibility
+  if(scene3Group) scene3Group.visible = p >= 0.4;
+  if(scene4Group) scene4Group.visible = p >= 0.7;
+  if(computer) computer.visible = p < 0.55;
+
+  // Stars fade in mid-journey
+  if(stars) stars.material.opacity = p > 0.3 ? Math.min(1, (p - 0.3) * 3) : 0;
+
+  // Floating objects
+  floatingObjects.forEach(obj => {
+    if(obj.userData.floatSpeed !== undefined) {
+      obj.visible = p >= 0.35 && p < 0.75;
+    }
+  });
+
+  // Particles
+  if(particles) particles.material.opacity = p > 0.1 && p < 0.5 ? 0.3 : 0;
+
+  // Screen content based on progress
+  if(screenMesh && screenMesh.userData.ctx) {
+    const ctx = screenMesh.userData.ctx;
+    const canvas = screenMesh.userData.canvas;
+    if(p < 0.4) {
+      if(p > 0.25) {
+        // Glitching screen before entry
+        ctx.fillStyle = '#000800';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00ff41';
+        ctx.font = 'bold 22px Courier New';
+        ctx.fillText('> ENTERING...', 30, canvas.height / 2 - 10);
+        ctx.fillText('> STAND BY.', 30, canvas.height / 2 + 20);
+        for(let i = 0; i < 5; i++) {
+          ctx.fillStyle = `rgba(0,255,65,${Math.random() * 0.5})`;
+          ctx.fillRect(0, Math.random() * canvas.height, canvas.width, 2);
+        }
+      }
+      screenMesh.userData.tex.needsUpdate = true;
+    }
+  }
+}
+
+function updateHUD(p) {
+  document.getElementById('hud-depth').textContent = (p * 100).toFixed(2);
+  const realities = ['STABLE','NOMINAL','BENDING','WARPING','CRITICAL','VOID'];
+  const ri = Math.min(5, Math.floor(p * 6));
+  document.getElementById('hud-reality').textContent = realities[ri];
+  document.getElementById('hud-reality').style.color = p > 0.7 ? '#ff2d78' : p > 0.4 ? '#ffb700' : '#00ff41';
+}
+
+// ─── Animation loop ───────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+  const p = scrollState.progress;
+
+  // Animate screen texture
+  if(screenMesh && screenMesh.userData.ctx && p < 0.28) {
+    drawScreenContent(screenMesh.userData.ctx, screenMesh.userData.canvas.width, screenMesh.userData.canvas.height, t);
+    screenMesh.userData.tex.needsUpdate = true;
+  }
+
+  // Computer float / breathe
+  if(computer && computer.visible) {
+    computer.position.y = Math.sin(t * 0.5) * 0.08;
+    computer.rotation.z = Math.sin(t * 0.3) * 0.01;
+    // LED blink
+    const led = computer.children.find(c => c.userData.isLed);
+    if(led) led.material.opacity = t % 1 < 0.5 ? 1 : 0.2;
+  }
+
+  // Floating objects orbit + bob
+  floatingObjects.forEach(obj => {
+    if(!obj.visible) return;
+    obj.rotation.x += obj.userData.rotX || 0.01;
+    obj.rotation.y += obj.userData.rotY || 0.01;
+    obj.position.y = obj.userData.baseY + Math.sin(t * obj.userData.floatSpeed + obj.userData.floatOffset) * 0.5;
+  });
+
+  // Star rotation
+  if(stars) stars.rotation.y = t * 0.01;
+
+  // Grid world animation
+  if(scene3Group && scene3Group.visible) {
+    scene3Group.children.forEach(c => {
+      if(c.userData.rotSpeed) c.rotation.y += c.userData.rotSpeed;
+    });
+  }
+
+  // Warp tunnel spin
+  if(scene4Group && scene4Group.visible) {
+    scene4Group.children.forEach((c, i) => {
+      if(c.geometry && c.geometry.type === 'TorusGeometry') {
+        c.rotation.z += 0.01 * (i % 2 === 0 ? 1 : -1);
+      }
+    });
+    // Warp particle drift
+    const wpPos = scene4Group.children[scene4Group.children.length - 1];
+    if(wpPos && wpPos.geometry) {
+      wpPos.rotation.z += 0.002;
+    }
+  }
+
+  renderer.render(scene, camera);
+}
+
+// ─── HUD clock ────────────────────────────────────────────────────────────────
+function setupHUD() {
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById('hud-time').textContent =
+      now.toLocaleTimeString('en-US', { hour12: false });
+  }, 1000);
+}
+
+// ─── Cursor trail ─────────────────────────────────────────────────────────────
+function setupCursorTrail() {
+  let lastSpark = 0;
+  document.addEventListener('mousemove', e => {
+    const now = Date.now();
+    if(now - lastSpark < 60) return;
+    lastSpark = now;
+    const spark = document.createElement('div');
+    spark.className = 'spark';
+    const colors = ['#00ff41','#00f5ff','#ff2d78','#9d00ff','#ffb700'];
+    spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+    spark.style.left = e.clientX - 2 + 'px';
+    spark.style.top = e.clientY - 2 + 'px';
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 800);
+  });
+}
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+function onResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+</script>
+</body>
+</html>
