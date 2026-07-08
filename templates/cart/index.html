@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your Cart — Prisca Dezigns</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/templates/shop_main.css?v=4">
+<style>
+  :root{--purple:#6600CC;--lilac:#9B4DFF;--ivory:#FAFAF8;--bg:#fff;--text:#0a0a0a;--muted:rgba(10,10,10,0.5);--font-h:'Syne',system-ui,sans-serif;--font-b:'Inter',system-ui,sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--purple);min-height:100vh;font-family:var(--font-b);display:flex;flex-direction:column;}
+  .cp-header{display:flex;align-items:center;gap:12px;padding:20px 20px 0;}
+  .cp-back{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,0.75);font-size:13px;font-weight:600;text-decoration:none;font-family:var(--font-h);}
+  .cp-back svg{stroke:rgba(255,255,255,0.75);}
+  .cp-title{font-family:var(--font-h);font-size:20px;font-weight:800;color:#fff;margin-left:auto;margin-right:auto;padding-right:40px;}
+  .cp-body{flex:1;padding:20px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;}
+  .cp-empty{display:flex;flex-direction:column;align-items:center;gap:16px;padding:80px 20px;text-align:center;color:rgba(255,255,255,0.5);}
+  .cp-empty strong{font-size:16px;font-weight:700;color:rgba(255,255,255,0.8);}
+  .cp-empty span{font-size:13px;line-height:1.6;}
+  .cp-empty a{margin-top:8px;display:inline-block;background:#fff;color:var(--purple);font-family:var(--font-h);font-weight:700;font-size:13px;padding:12px 28px;border-radius:100px;text-decoration:none;}
+
+  /* reuse cd- styles from shop_main.css — they load globally now */
+  .cd-section-label{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin:0 0 10px;}
+  .cp-footer{padding:20px;border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.15);}
+</style>
+</head>
+<body>
+
+<div class="cp-header">
+  <a class="cp-back" href="/templates/">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back
+  </a>
+  <span class="cp-title">Your Order</span>
+</div>
+
+<div class="cp-body">
+  <!-- Empty state -->
+  <div class="cd-empty" id="cart-empty-msg">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <strong>No template selected</strong>
+    <span>Go back and pick a template to get started.</span>
+    <a href="/templates/">Browse Templates</a>
+  </div>
+
+  <!-- Base template block -->
+  <div id="cart-base-block" style="display:none;">
+    <p class="cd-section-label">Selected Template</p>
+    <div class="cd-template-card">
+      <div class="cd-tc-info">
+        <div class="cd-tc-name" id="cb-name">—</div>
+        <div class="cd-tc-sub" id="cb-type-label">Website Template</div>
+      </div>
+      <div class="cd-tc-price">
+        <div class="cd-tc-setup" id="cb-setup-price">$149.99</div>
+        <div class="cd-tc-mo" id="cb-mo-price">setup</div>
+      </div>
+      <button class="cd-tc-remove" onclick="removeBase()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Add-ons block -->
+  <div id="cart-addons-block" style="display:none;">
+    <p class="cd-section-label">Enhance Your Package</p>
+    <label class="cd-addon-row" id="addon-copy">
+      <div class="cd-addon-check-wrap">
+        <input type="checkbox" id="check-copy-input" class="cd-addon-input" onchange="toggleAddon('copy')">
+        <span class="cd-checkbox"><svg class="cd-check-icon" width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+      <div class="cd-addon-info">
+        <div class="cd-addon-name">Copywriting</div>
+        <div class="cd-addon-desc">Professional copy — headers, descriptions &amp; CTAs written for you.</div>
+      </div>
+      <div class="cd-addon-price">
+        <div class="cd-addon-setup">+$49.99</div>
+        <div class="cd-addon-mo">one-time</div>
+      </div>
+    </label>
+    <label class="cd-addon-row" id="addon-chatbot">
+      <div class="cd-addon-check-wrap">
+        <input type="checkbox" id="check-chatbot-input" class="cd-addon-input" onchange="toggleAddon('chatbot')">
+        <span class="cd-checkbox"><svg class="cd-check-icon" width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+      <div class="cd-addon-info">
+        <div class="cd-addon-name">AI Chatbot</div>
+        <div class="cd-addon-desc">Custom AI trained on your brand — captures leads &amp; answers questions 24/7.</div>
+      </div>
+      <div class="cd-addon-price">
+        <div class="cd-addon-setup">+$349.99</div>
+        <div class="cd-addon-mo">+$49.99/mo</div>
+      </div>
+    </label>
+  </div>
+</div>
+
+<!-- Footer: totals + checkout -->
+<div class="cp-footer" id="cart-footer-block" style="display:none;">
+  <div class="cd-totals" style="margin-bottom:16px;">
+    <div class="cd-total-row"><span>Setup Total</span><span id="cart-setup-total">$0.00</span></div>
+    <div class="cd-total-row cd-total-mo"><span>Monthly</span><span id="cart-mo-total">$0.00 / mo</span></div>
+  </div>
+
+  <!-- Step 1: Read Terms -->
+  <div class="cd-agree-row" id="cd-agree-row">
+    <div class="cd-step" id="cd-step1">
+      <div class="cd-step-num">1</div>
+      <div class="cd-step-body">
+        <div class="cd-step-label">Service Agreement</div>
+        <div class="cd-step-desc">Read our Terms of Use before accepting.</div>
+        <button class="cd-read-btn" id="cd-read-btn" onclick="openTerms()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Read Terms
+        </button>
+      </div>
+    </div>
+    <div class="cd-step cd-step-locked" id="cd-step2">
+      <div class="cd-step-num">2</div>
+      <div class="cd-step-body">
+        <label class="cd-agree-label" id="cd-agree-label">
+          <input type="checkbox" id="cd-agree-chk" onchange="updateAgreement()" disabled>
+          <span class="cd-agree-box"><svg class="cd-agree-icon" width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="cd-agree-text">I have read and agree to the Terms of Use &amp; service agreement</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout buttons -->
+  <div class="cd-checkout-row" style="margin-top:14px;">
+    <a id="cart-paypal" class="cd-btn-paypal disabled" href="#" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828l-1.122 7.12h3.174l.522-3.308h1.976c4.358 0 7.332-2.103 8.228-5.93.381-1.628.157-2.95-.384-3.677z"/></svg>
+      Pay via PayPal
+    </a>
+    <a id="cart-bank" class="cd-btn-bank disabled" href="#" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Bank Transfer
+    </a>
+  </div>
+</div>
+
+<script src="/templates/shop_scripts.js?v=4"></script>
+<script>
+// Cart page init — read from sessionStorage and render
+(function(){
+  var saved = sessionStorage.getItem('pd_cart');
+  if(saved){
+    try{
+      var c = JSON.parse(saved);
+      cart.base = c.base || null;
+      cart.addons = c.addons || {copy:false,chatbot:false};
+    }catch(e){}
+  }
+  renderCart();
+  // Show footer if cart has item
+  var footer = document.getElementById('cart-footer-block');
+  if(footer) footer.style.display = cart.base ? '' : 'none';
+})();
+
+// Override renderCart to also show/hide footer on this page
+var _origRender = renderCart;
+renderCart = function(){
+  _origRender();
+  var footer = document.getElementById('cart-footer-block');
+  if(footer) footer.style.display = cart.base ? '' : 'none';
+  // persist to sessionStorage
+  sessionStorage.setItem('pd_cart', JSON.stringify({base:cart.base, addons:cart.addons}));
+};
+
+// Override removeBase to redirect back after removal
+var _origRemove = removeBase;
+removeBase = function(){
+  _origRemove();
+  sessionStorage.removeItem('pd_cart');
+  setTimeout(function(){ window.location.href='/templates/'; }, 600);
+};
+</script>
+</body>
+</html>
