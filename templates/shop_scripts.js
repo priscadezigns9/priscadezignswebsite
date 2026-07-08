@@ -313,6 +313,13 @@ function acceptTerms() {
  var chk   = document.getElementById('cd-agree-chk');
  if (step2) step2.classList.add('unlocked');
  if (chk)   { chk.disabled = false; }
+ // Persist so navigating away and back doesn't reset state
+ try { sessionStorage.setItem('pd-terms-read', '1'); } catch(e) {}
+ // Scroll step 2 into view on mobile so user sees the unlocked checkbox
+ setTimeout(function() {
+   var agreeRow = document.getElementById('cd-agree-row');
+   if (agreeRow) agreeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+ }, 200);
 }
 function updateAgreement() {
  var chk = document.getElementById('cd-agree-chk');
@@ -395,6 +402,19 @@ function saveCartOrder(method) {
 
 // ── Payment button click handlers — close cart first, then navigate ──
 document.addEventListener('DOMContentLoaded', function() {
+ // Restore terms-read state if user navigated away and came back
+ try {
+   if (sessionStorage.getItem('pd-terms-read') === '1') {
+     var step1   = document.getElementById('cd-step1');
+     var readBtn = document.getElementById('cd-read-btn');
+     var step2   = document.getElementById('cd-step2');
+     var chk     = document.getElementById('cd-agree-chk');
+     if (step1)   step1.classList.add('done');
+     if (readBtn) { readBtn.classList.add('done'); readBtn.innerHTML = '\u2713 Terms Read'; }
+     if (step2)   step2.classList.add('unlocked');
+     if (chk)     { chk.disabled = false; }
+   }
+ } catch(e) {}
  ['cart-paypal','cart-bank'].forEach(function(id) {
    var btn = document.getElementById(id);
    if (!btn) return;
