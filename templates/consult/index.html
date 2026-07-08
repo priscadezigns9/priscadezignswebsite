@@ -67,7 +67,7 @@ header {
   text-decoration: none;
 }
 .logo-bubble {
-  /* Speech bubble — extracted Hazel May skew effect */
+  /* One-piece speech bubble using clip-path — no separate triangle element */
   background: var(--orange);
   color: var(--dark);
   font-family: var(--font-display);
@@ -75,23 +75,26 @@ header {
   font-size: clamp(1rem, 2.5vw, 1.3rem);
   letter-spacing: -0.5px;
   text-transform: uppercase;
-  padding: 6px 14px 4px;
-  position: relative;
+  /* Extra bottom padding = pointer height (12px) so text stays in rect area */
+  padding: 6px 14px 18px;
   line-height: 1;
   display: inline-block;
+  /* Clip-path: rectangle body + downward-left pointing tail
+     Coords in % of element box (including the 18px pointer padding at bottom).
+     0% top, ~76% = top of pointer zone (rect body), 100% = bottom tip.
+     Pointer sits at left 8%–22% range. */
+  clip-path: polygon(
+    0% 0%,         /* top-left */
+    100% 0%,       /* top-right */
+    100% 76%,      /* bottom-right of rectangle */
+    22% 76%,       /* pointer base right */
+    8%  100%,      /* pointer TIP */
+    8%  76%,       /* pointer base left */
+    0%  76%        /* bottom-left of rectangle */
+  );
 }
 .logo-bubble::after {
-  /* Triangle tail — zero-gap, flush to bottom-left of rectangle */
-  content: '';
-  position: absolute;
-  bottom: -14px;
-  left: 10px;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 14px 14px 0 0;
-  border-color: var(--orange) transparent transparent transparent;
-  margin-top: 0;
+  display: none; /* retired — shape now handled by clip-path */
 }
 
 nav {
