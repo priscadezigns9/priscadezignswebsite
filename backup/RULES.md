@@ -44,7 +44,7 @@ God Mode is a universal administrative layer for the Architect. It provides real
 
 ## Chatbot Sync Rule (CRITICAL — 2026-07-06)
 **ALL chatbots across priscadezigns.org must always reflect the same STEPS and flows.**
-- **NO PRICING in any Prisca Dezigns chatbot.** All package cards show name + description only. All price mentions replaced with WhatsApp CTA. Client template chatbots also never show pricing.
+- **Pricing in chatbots is ALLOWED.** Package cards can show name, description, and pricing. Client template chatbots follow the client's preference.
 - The master chatbot logic lives in `/chatbot.js` (root) — this is the single source of truth for the main site.
 - The template shop chatbot lives in `/templates/chatbot.js` — separate scope, do not cross-contaminate.
 - Any page with an **inline chatbot script** (like services/index.html) must be converted to load `/chatbot.js` externally.
