@@ -101,7 +101,7 @@ function addTemplate(name, type) {
  renderCart();
  updateAllButtons();
  // Mobile: save to sessionStorage and go to cart page
- if (window.innerWidth <= 700) {
+ if (window.innerWidth <= 1024 || ('ontouchstart' in window)) {
  sessionStorage.setItem('pd_cart', JSON.stringify({base: cart.base, addons: cart.addons}));
  window.location.href = '/templates/cart/?n=' + encodeURIComponent(name) + '&t=' + encodeURIComponent(type);
  return;
@@ -256,7 +256,7 @@ function updateTemplateBtn(name, inCart) {
  });
 }
 function openCart() {
- if (window.innerWidth <= 700) {
+ if (window.innerWidth <= 1024 || ('ontouchstart' in window)) {
  sessionStorage.setItem('pd_cart', JSON.stringify({base: cart.base, addons: cart.addons}));
  var _n = cart.base ? cart.base.name : ''; var _t = cart.base ? (cart.base.type || 'website') : 'website';
  window.location.href = '/templates/cart/?n=' + encodeURIComponent(_n) + '&t=' + encodeURIComponent(_t);
