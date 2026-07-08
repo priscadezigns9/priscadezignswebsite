@@ -459,4 +459,25 @@ document.addEventListener('DOMContentLoaded', function() {
  }
 });
 
+// Dynamic iframe scaling — fit 1440px iframe to actual card width
+function scaleIframes() {
+  document.querySelectorAll('.t-preview').forEach(function(preview) {
+    var wrap = preview.querySelector('.t-iframe-wrap');
+    var iframe = preview.querySelector('iframe');
+    if (!wrap || !iframe) return;
+    var w = preview.offsetWidth;
+    var h = preview.offsetHeight - 26; // subtract chrome bar
+    var scaleW = w / 1440;
+    var scaleH = h / 900;
+    var scale = Math.max(scaleW, scaleH);
+    iframe.style.transform = 'scale(' + scale + ')';
+    iframe.style.transformOrigin = 'top left';
+  });
+}
+scaleIframes();
+var _scaleTimer;
+window.addEventListener('resize', function() {
+  clearTimeout(_scaleTimer);
+  _scaleTimer = setTimeout(scaleIframes, 100);
+});
 
