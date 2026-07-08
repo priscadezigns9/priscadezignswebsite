@@ -103,7 +103,7 @@ function addTemplate(name, type) {
  // Mobile: save to sessionStorage and go to cart page
  if (window.innerWidth <= 700) {
  sessionStorage.setItem('pd_cart', JSON.stringify({base: cart.base, addons: cart.addons}));
- window.location.href = '/templates/cart/';
+ window.location.href = '/templates/cart/?n=' + encodeURIComponent(name) + '&t=' + encodeURIComponent(type);
  return;
  }
  openCart();
@@ -258,7 +258,8 @@ function updateTemplateBtn(name, inCart) {
 function openCart() {
  if (window.innerWidth <= 700) {
  sessionStorage.setItem('pd_cart', JSON.stringify({base: cart.base, addons: cart.addons}));
- window.location.href = '/templates/cart/';
+ var _n = cart.base ? cart.base.name : ''; var _t = cart.base ? (cart.base.type || 'website') : 'website';
+ window.location.href = '/templates/cart/?n=' + encodeURIComponent(_n) + '&t=' + encodeURIComponent(_t);
  return;
  }
  document.getElementById('cart-drawer').classList.add('open');
