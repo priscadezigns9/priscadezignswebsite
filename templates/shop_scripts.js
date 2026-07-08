@@ -99,6 +99,12 @@ function addTemplate(name, type) {
  cart.base = { name: name, type: type, setup: p.setup, mo: p.mo };
  renderCart();
  updateAllButtons();
+ // Mobile: save to sessionStorage and go to cart page
+ if (window.innerWidth <= 700) {
+ sessionStorage.setItem('pd_cart', JSON.stringify({base: cart.base, addons: cart.addons}));
+ window.location.href = '/templates/cart/';
+ return;
+ }
  openCart();
 }
 function removeBase() {
@@ -243,6 +249,11 @@ function updateTemplateBtn(name, inCart) {
  });
 }
 function openCart() {
+ if (window.innerWidth <= 700) {
+ sessionStorage.setItem('pd_cart', JSON.stringify({base: cart.base, addons: cart.addons}));
+ window.location.href = '/templates/cart/';
+ return;
+ }
  document.getElementById('cart-drawer').classList.add('open');
  document.getElementById('cart-overlay').classList.add('open');
 }
