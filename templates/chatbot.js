@@ -27,7 +27,8 @@ const PKGS={
     {name:"Template Site",desc:"Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
     {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
     {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $349.99 setup · $49.99/mo"},
-    {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs"}
+    {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs · $249.99 setup · $34.99/mo"},
+    {name:"⭐ Premium Template (3D)",desc:"Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation · $299.99 setup · $19.99/mo"}
   ]
 };
 
@@ -123,7 +124,7 @@ const STEPS={
     bot:"The Way Made Known (TWMK) is the faith foundation at the heart of Prisca Dezigns.\n\n❖ A Gospel-driven NGO\n❖ Committed to evidence-based, Bible-centred proclamation\n❖ The backbone of everything we build\n\nEvery product, every project, and every dollar earned is part of a mission that goes far beyond business.",
     r:[
       {l:"\uD83C\uDF0D Visit TWMK",url:"https://thewaymadeknown.com"},
-      {l:"\uD83E\uDD1D Support the mission",url:"https://paypal.me/priscadezigns9"},
+      {l:"\uD83E\uDD1D Support the mission",url:"https://www.paypal.com/paypalme/priscadezigns9"},
       {l:"\u2190 Back",s:"about"}
     ]
   },
