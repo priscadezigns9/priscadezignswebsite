@@ -239,15 +239,27 @@
             z-index: 1;
         }
 
+        #bg-video-wrap {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 60vh;
+            height: 60vh;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            border-radius: 50%;
+            overflow: hidden;
+            pointer-events: none;
+            will-change: opacity, transform;
+            opacity: 0.28;
+        }
         #bg-video {
-            position: absolute;
-            inset: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
             object-fit: cover;
-            opacity: 0.25;
+            opacity: 1;
             pointer-events: none;
+            display: block;
         }
 
         #scroll-indicator {
@@ -618,7 +630,7 @@
     <div id="page-wrapper">
         <div class="back-to-home" onclick="hidePackages()">← RETURN TO GLOBE</div>
         <section id="globe-section">
-            <video id="bg-video" autoplay muted loop playsinline><source src="https://assets.mixkit.co/videos/31562/31562-720.mp4" type="video/mp4"></video>
+            <div id="bg-video-wrap"><video id="bg-video" autoplay muted loop playsinline><source src="https://assets.mixkit.co/videos/31562/31562-720.mp4" type="video/mp4"></video></div>
             <div id="bg-logo-overlay"></div>
             <div id="ui-layer">
                 <header>
@@ -964,6 +976,14 @@
             const diff = index - currentIndex;
             isAnimating = true; currentIndex = index;
             gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * diff), duration: 0.8, ease: "power2.out", onComplete: () => { isAnimating = false; } });
+            // Pulse the bg video in sync with globe rotation
+            const vidWrap = document.getElementById('bg-video-wrap');
+            if (vidWrap) {
+                gsap.killTweensOf(vidWrap);
+                gsap.timeline()
+                    .to(vidWrap, { opacity: 0.06, scale: 0.88, xPercent: -50, yPercent: -50, duration: 0.25, ease: 'power2.in', transformOrigin: '50% 50%' })
+                    .to(vidWrap, { opacity: 0.28, scale: 1,    xPercent: -50, yPercent: -50, duration: 0.55, ease: 'power2.out', transformOrigin: '50% 50%' });
+            }
             updateUI(currentIndex);
         }
 
@@ -1130,6 +1150,8 @@
 
         function animate() { requestAnimationFrame(animate); globe.rotation.y += 0.0015; renderer.render(scene, camera); }
         animate();
+        // Set GSAP initial transform so xPercent/yPercent is tracked correctly
+        gsap.set('#bg-video-wrap', { xPercent: -50, yPercent: -50 });
         window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
         // Mobile Menu Logic
         const hamburger = document.getElementById('hamburger');
