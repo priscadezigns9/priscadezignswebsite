@@ -139,7 +139,7 @@ function renderCart() {
  document.getElementById('cart-setup-total').textContent = '$0.00';
  document.getElementById('cart-mo-total').textContent = '$0.00 / mo';
  var co = document.getElementById('cart-checkout');
- co.classList.add('disabled'); co.href = '#';
+ if (co) { co.classList.add('disabled'); co.href = '#'; }
  var chk = document.getElementById('cd-agree-chk');
  if (chk) { chk.checked = false; chk.disabled = true; }
  var step1 = document.getElementById('cd-step1');
@@ -219,8 +219,10 @@ function updateAddonCards() {
 function updateBadge() {
  var count = (cart.base ? 1 : 0) + (cart.addons.copy ? 1 : 0) + (cart.addons.chatbot ? 1 : 0);
  var badge = document.getElementById('cart-count');
+ if (badge) {
  if (count > 0) { badge.textContent = count; badge.classList.add('vis'); }
  else { badge.classList.remove('vis'); }
+ }
 }
 function updateAllButtons() {
  document.querySelectorAll('.t-add-btn').forEach(function(btn) {
