@@ -113,22 +113,33 @@
     <div class="step" id="step1">
       <div class="step-num">1</div>
       <div class="step-body">
-        <div class="step-lbl">Service Agreement</div>
-        <div class="step-desc">Read our Terms of Use &amp; Service Agreement before proceeding.</div>
+        <div class="step-lbl">Terms of Use</div>
+        <div class="step-desc">Read our Terms of Use before proceeding.</div>
         <button class="read-btn" id="read-btn" onclick="openTerms()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Read Terms &amp; Agreement
+          Read Terms of Use
         </button>
       </div>
     </div>
     <div class="step locked" id="step2">
       <div class="step-num">2</div>
       <div class="step-body">
+        <div class="step-lbl">Service Agreement</div>
+        <div class="step-desc">Read our Service Agreement before proceeding.</div>
+        <button class="read-btn" id="agree-btn" onclick="openAgreement()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Read Service Agreement
+        </button>
+      </div>
+    </div>
+    <div class="step locked" id="step3">
+      <div class="step-num">3</div>
+      <div class="step-body">
         <label class="agree-label" onclick="toggleAgree()">
           <div class="agree-box" id="agree-box">
             <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <span class="agree-text">I have read and agree to the <a href="/templates/terms/" target="_blank" style="color:rgba(255,255,255,0.9);text-decoration:underline;" onclick="openTerms()">Terms of Use</a> &amp; <a href="/templates/terms/" target="_blank" style="color:rgba(255,255,255,0.9);text-decoration:underline;" onclick="openTerms()">Service Agreement</a></span>
+          <span class="agree-text">I have read and agree to the <a href="/templates/terms/" target="_blank" style="color:rgba(255,255,255,0.9);text-decoration:underline;" onclick="openTerms()">Terms of Use</a> &amp; <a href="/templates/service-agreement/" target="_blank" style="color:rgba(255,255,255,0.9);text-decoration:underline;" onclick="openAgreement()">Service Agreement</a></span>
         </label>
       </div>
     </div>
@@ -158,7 +169,7 @@
   };
 
   /* ── State ── */
-  var state = { name: null, type: null, copy: false, chatbot: false, agreed: false, termsRead: false };
+  var state = { name: null, type: null, copy: false, chatbot: false, agreed: false, termsRead: false, agreementRead: false };
 
   /* ── Load from URL params (primary) then sessionStorage (fallback) ── */
   (function loadCart(){
@@ -286,9 +297,17 @@
     if (btn) { btn.classList.add('done'); btn.textContent = 'Terms Read ✓'; }
     if (s2)  { s2.classList.remove('locked'); s2.classList.add('unlocked'); }
   };
+  window.openAgreement = function() {
+    window.open('/templates/service-agreement/', '_blank', 'noopener');
+    state.agreementRead = true;
+    var btn = document.getElementById('agree-btn');
+    var s3  = document.getElementById('step3');
+    if (btn) { btn.classList.add('done'); btn.textContent = 'Agreement Read ✓'; }
+    if (s3)  { s3.classList.remove('locked'); s3.classList.add('unlocked'); }
+  };
 
   window.toggleAgree = function() {
-    if (!state.termsRead) return;
+    if (!state.termsRead || !state.agreementRead) return;
     state.agreed = !state.agreed;
     var box = document.getElementById('agree-box');
     if (box) box.classList.toggle('checked', state.agreed);
