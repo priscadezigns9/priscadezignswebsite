@@ -5,149 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PORTAL.EXE — Enter the Digital Dream</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  :root{--green:#00ff41;--amber:#ffb700;--cyan:#00f5ff;--pink:#ff2d78;--purple:#9d00ff}
-  html{scroll-behavior:auto}
-  body{background:#000;color:#fff;font-family:'Courier New',monospace;overflow-x:hidden}
-  #loading{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.8s}
-  #loading.hide{opacity:0;pointer-events:none}
-  .load-txt{color:var(--green);font-size:1.1rem;letter-spacing:3px;animation:blink 0.6s infinite}
-  .load-bar{width:300px;height:2px;background:#111;margin-top:20px;overflow:hidden}
-  .load-fill{height:100%;background:var(--green);width:0;transition:width 2.5s linear}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-
-  #canvas-container{position:fixed;inset:0;z-index:0}
-  canvas{display:block}
-
-  #scroll-driver{position:relative;z-index:1;height:700vh;pointer-events:none}
-
-  /* HUD overlay */
-  #hud{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10;pointer-events:none}
-  .hud-corner{position:absolute;font-size:0.55rem;letter-spacing:2px;color:rgba(0,255,65,0.4);text-transform:uppercase}
-  .hud-tl{top:20px;left:24px}
-  .hud-tr{top:20px;right:24px;text-align:right}
-  .hud-bl{bottom:20px;left:24px}
-  .hud-br{bottom:20px;right:24px;text-align:right}
-  .hud-line{position:absolute;background:rgba(0,255,65,0.12)}
-  .hud-line.h{height:1px;left:0;right:0}
-  .hud-line.v{width:1px;top:0;bottom:0}
-  .hud-line.top{top:50px}
-  .hud-line.bottom{bottom:50px}
-  .hud-line.left{left:60px}
-  .hud-line.right{right:60px}
-
-  /* Scene labels */
-  .scene-label{position:fixed;z-index:20;opacity:0;transition:opacity 0.5s;pointer-events:none}
-  .scene-label.visible{opacity:1}
-  #label-0{bottom:80px;left:50%;transform:translateX(-50%);text-align:center}
-  #label-1{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-  #label-2{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-  #label-3{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-  #label-4{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
-  .scene-label h2{font-size:clamp(1.8rem,5vw,4rem);letter-spacing:4px;text-transform:uppercase;font-weight:900;line-height:1.1}
-  .scene-label p{font-size:0.75rem;letter-spacing:3px;margin-top:10px;opacity:0.6;text-transform:uppercase}
-  .glitch{position:relative}
-  .glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0}
-  .glitch::before{color:var(--cyan);clip-path:polygon(0 0,100% 0,100% 35%,0 35%);animation:glitch1 3s infinite}
-  .glitch::after{color:var(--pink);clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%);animation:glitch2 3s infinite}
-  @keyframes glitch1{0%,90%,100%{transform:translateX(0)}91%{transform:translateX(-4px)}93%{transform:translateX(4px)}95%{transform:translateX(-2px)}}
-  @keyframes glitch2{0%,90%,100%{transform:translateX(0)}91%{transform:translateX(4px)}93%{transform:translateX(-4px)}95%{transform:translateX(2px)}}
-
-  /* CRT scanlines */
-  #scanlines{position:fixed;inset:0;z-index:5;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);animation:scan 8s linear infinite}
-  @keyframes scan{0%{background-position:0 0}100%{background-position:0 100%}}
-
-  /* Vignette */
-  #vignette{position:fixed;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.85) 100%)}
-
-  /* Scroll hint */
-  #scroll-hint{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:30;text-align:center;opacity:1;transition:opacity 1s}
-  #scroll-hint.hide{opacity:0;pointer-events:none}
-  .scroll-arrow{width:20px;height:20px;border-right:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(45deg);margin:0 auto;animation:bounce 1.5s infinite}
-  .scroll-txt{font-size:0.6rem;letter-spacing:3px;color:var(--green);margin-bottom:8px;text-transform:uppercase}
-  @keyframes bounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(6px)}}
-
-  /* Easter egg cursor trail */
-  .spark{position:fixed;pointer-events:none;z-index:100;width:4px;height:4px;border-radius:50%;background:var(--cyan);animation:sparkfade 0.8s forwards}
-  @keyframes sparkfade{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(0) translateY(-20px)}}
-
-  /* Scene 4 — enter button */
-  #enter-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:30;opacity:0;transition:opacity 0.5s;pointer-events:none}
-  #enter-btn.visible{opacity:1;pointer-events:all}
-  #enter-btn button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:'Courier New',monospace;font-size:0.75rem;letter-spacing:4px;padding:14px 40px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
-  #enter-btn button::before{content:'';position:absolute;inset:0;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;z-index:-1}
-  #enter-btn button:hover{color:#000}
-  #enter-btn button:hover::before{transform:scaleX(1)}
-
-  /* Noise texture overlay */
-  #noise{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0.03;animation:noiseShift 0.1s steps(1) infinite}
-  @keyframes noiseShift{0%{transform:translate(0,0)}25%{transform:translate(-2px,1px)}50%{transform:translate(1px,-1px)}75%{transform:translate(2px,2px)}100%{transform:translate(-1px,0)}}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--green:#00ff41;--amber:#ffb700;--cyan:#00f5ff;--pink:#ff2d78;--purple:#9d00ff}
+body{background:#000;color:#fff;font-family:'Courier New',monospace;overflow-x:hidden}
+#loading{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s}
+#loading.hide{opacity:0;pointer-events:none}
+.load-txt{color:var(--green);font-size:1rem;letter-spacing:3px}
+.load-bar{width:280px;height:1px;background:#111;margin-top:18px;overflow:hidden}
+.load-fill{height:100%;background:var(--green);width:0;transition:width 3s linear}
+#load-status{color:rgba(0,255,65,0.35);font-size:0.55rem;letter-spacing:2px;margin-top:12px}
+#c{display:block;position:fixed;inset:0;z-index:0}
+#scroll-driver{position:relative;z-index:1;height:700vh;pointer-events:none}
+#scanlines{position:fixed;inset:0;z-index:5;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.06) 3px,rgba(0,0,0,0.06) 4px)}
+#vignette{position:fixed;inset:0;z-index:4;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,0.92) 100%)}
+#hud{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10;pointer-events:none}
+.hud-corner{position:absolute;font-size:0.52rem;letter-spacing:1.5px;color:rgba(0,255,65,0.35);text-transform:uppercase;line-height:1.8}
+.hud-tl{top:22px;left:26px}.hud-tr{top:22px;right:26px;text-align:right}.hud-bl{bottom:22px;left:26px}.hud-br{bottom:22px;right:26px;text-align:right}
+.hud-line{position:absolute;background:rgba(0,255,65,0.08)}
+.hud-line.h{height:1px;left:0;right:0}.hud-line.v{width:1px;top:0;bottom:0}
+.hud-line.top{top:52px}.hud-line.bottom{bottom:52px}.hud-line.left{left:62px}.hud-line.right{right:62px}
+.scene-label{position:fixed;z-index:20;opacity:0;transition:opacity 0.6s;pointer-events:none;left:50%;transform:translateX(-50%)}
+.scene-label.visible{opacity:1}
+#label-0{bottom:90px;text-align:center}
+#label-1,#label-2,#label-3,#label-4{top:50%;transform:translate(-50%,-50%);text-align:center}
+.scene-label h2{font-size:clamp(2rem,5vw,4.5rem);letter-spacing:5px;text-transform:uppercase;font-weight:900;line-height:1}
+.scene-label p{font-size:0.65rem;letter-spacing:3px;margin-top:12px;opacity:0.5;text-transform:uppercase}
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;display:inline-block}
+.glitch::before{color:var(--cyan);clip-path:polygon(0 0,100% 0,100% 33%,0 33%);animation:g1 4s infinite}
+.glitch::after{color:var(--pink);clip-path:polygon(0 67%,100% 67%,100% 100%,0 100%);animation:g2 4s infinite}
+@keyframes g1{0%,88%,100%{transform:translate(0)}89%{transform:translate(-5px,0)}91%{transform:translate(5px,0)}93%{transform:translate(-2px,0)}}
+@keyframes g2{0%,88%,100%{transform:translate(0)}89%{transform:translate(5px,0)}91%{transform:translate(-5px,0)}93%{transform:translate(2px,0)}}
+#scroll-hint{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:30;text-align:center;transition:opacity 0.8s}
+#scroll-hint.hide{opacity:0;pointer-events:none}
+.s-arrow{width:18px;height:18px;border-right:1.5px solid var(--green);border-bottom:1.5px solid var(--green);transform:rotate(45deg);margin:0 auto;animation:ab 1.5s infinite}
+.s-txt{font-size:0.55rem;letter-spacing:3px;color:var(--green);margin-bottom:8px;text-transform:uppercase}
+@keyframes ab{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(7px)}}
+.spark{position:fixed;pointer-events:none;z-index:100;border-radius:50%;animation:sf 0.7s forwards}
+@keyframes sf{0%{opacity:1;transform:scale(1) translate(0,0)}100%{opacity:0;transform:scale(0) translate(var(--dx),var(--dy))}}
+#enter-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:30;opacity:0;transition:opacity 0.6s;pointer-events:none}
+#enter-btn.visible{opacity:1;pointer-events:all}
+#enter-btn button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:'Courier New',monospace;font-size:0.7rem;letter-spacing:4px;padding:14px 44px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;overflow:hidden;position:relative}
+#enter-btn button::before{content:'';position:absolute;inset:0;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;z-index:-1}
+#enter-btn button:hover{color:#000}
+#enter-btn button:hover::before{transform:scaleX(1)}
 </style>
 </head>
 <body>
 
-<!-- Loading screen -->
 <div id="loading">
   <div class="load-txt">INITIALIZING PORTAL.EXE</div>
   <div class="load-bar"><div class="load-fill" id="load-fill"></div></div>
-  <div style="color:rgba(0,255,65,0.3);font-size:0.55rem;letter-spacing:2px;margin-top:16px" id="load-status">LOADING ASSETS...</div>
+  <div id="load-status">LOADING ASSETS...</div>
 </div>
 
-<!-- WebGL canvas -->
-<div id="canvas-container"><canvas id="c"></canvas></div>
-
-<!-- Overlays -->
+<canvas id="c"></canvas>
 <div id="scanlines"></div>
 <div id="vignette"></div>
-<div id="noise"></div>
 
-<!-- HUD -->
 <div id="hud">
-  <div class="hud-corner hud-tl">PORTAL.EXE v1.0<br><span id="hud-time"></span></div>
+  <div class="hud-corner hud-tl">PORTAL.EXE v2.0<br><span id="hud-time"></span></div>
   <div class="hud-corner hud-tr">DEPTH: <span id="hud-depth">00.00</span>%<br>REALITY: <span id="hud-reality">STABLE</span></div>
-  <div class="hud-corner hud-bl">LAT: 10.284 · LON: -61.459<br>SIGNAL: ████████░░</div>
-  <div class="hud-corner hud-br">PRISCA DEZIGNS<br>CREATIVE SYSTEMS</div>
-  <div class="hud-line h top"></div>
-  <div class="hud-line h bottom"></div>
-  <div class="hud-line v left"></div>
-  <div class="hud-line v right"></div>
+  <div class="hud-corner hud-bl">PRISCA DEZIGNS<br>CREATIVE SYSTEMS</div>
+  <div class="hud-corner hud-br">SIGNAL: ████████░░<br>UPLINK: ACTIVE</div>
+  <div class="hud-line h top"></div><div class="hud-line h bottom"></div>
+  <div class="hud-line v left"></div><div class="hud-line v right"></div>
 </div>
 
-<!-- Scene labels -->
 <div class="scene-label" id="label-0">
-  <div class="glitch" data-text="PORTAL.EXE" style="color:var(--green);font-size:clamp(2.5rem,8vw,6rem);letter-spacing:6px;font-weight:900">PORTAL.EXE</div>
+  <div class="glitch" data-text="PORTAL.EXE" style="color:var(--green);font-size:clamp(3rem,9vw,7rem);letter-spacing:6px;font-weight:900">PORTAL.EXE</div>
   <p style="color:var(--green)">Scroll to enter the machine</p>
 </div>
-<div class="scene-label" id="label-1">
-  <h2 class="glitch" data-text="JACK IN" style="color:var(--cyan)">JACK IN</h2>
-  <p style="color:var(--cyan)">The monitor awakens</p>
-</div>
-<div class="scene-label" id="label-2">
-  <h2 class="glitch" data-text="THE GRID" style="color:var(--amber)">THE GRID</h2>
-  <p style="color:var(--amber)">1000 miles of nothing. Beautiful.</p>
-</div>
-<div class="scene-label" id="label-3">
-  <h2 class="glitch" data-text="DEEP SPACE" style="color:var(--pink)">DEEP SPACE</h2>
-  <p style="color:var(--pink)">You weren't supposed to get this far</p>
-</div>
-<div class="scene-label" id="label-4">
-  <h2 class="glitch" data-text="YOU MADE IT" style="color:var(--purple)">YOU MADE IT</h2>
-  <p style="color:var(--purple)">Most people turn back at the keyboard</p>
-</div>
+<div class="scene-label" id="label-1"><h2 class="glitch" data-text="JACK IN" style="color:var(--cyan)">JACK IN</h2><p style="color:var(--cyan)">The monitor awakens</p></div>
+<div class="scene-label" id="label-2"><h2 class="glitch" data-text="THE GRID" style="color:var(--amber)">THE GRID</h2><p style="color:var(--amber)">1000 miles of nothing. Beautiful.</p></div>
+<div class="scene-label" id="label-3"><h2 class="glitch" data-text="DEEP SPACE" style="color:var(--pink)">DEEP SPACE</h2><p style="color:var(--pink)">You weren't supposed to get this far</p></div>
+<div class="scene-label" id="label-4"><h2 class="glitch" data-text="YOU MADE IT" style="color:var(--purple)">YOU MADE IT</h2><p style="color:var(--purple)">Most people turn back at the keyboard</p></div>
 
-<!-- Scroll spacer -->
 <div id="scroll-driver"></div>
 
-<!-- Scroll hint -->
-<div id="scroll-hint">
-  <div class="scroll-txt">Scroll to enter</div>
-  <div class="scroll-arrow"></div>
-</div>
-
-<!-- Enter button (final scene) -->
-<div id="enter-btn">
-  <button onclick="window.open('https://priscadezigns.org','_self')">ENTER THE STUDIO</button>
-</div>
+<div id="scroll-hint"><div class="s-txt">Scroll to enter</div><div class="s-arrow"></div></div>
+<div id="enter-btn"><button onclick="location.href='https://priscadezigns.org'">ENTER THE STUDIO</button></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -155,531 +92,791 @@
 <script>
 gsap.registerPlugin(ScrollTrigger);
 
-// ─── Loader ──────────────────────────────────────────────────────────────────
-const loadStatuses = ['LOADING ASSETS...','CALIBRATING DEPTH...','WARMING UP CRT...','INJECTING NOSTALGIA...','REALITY CHECK... FAILED.','PROCEEDING ANYWAY.'];
-let loadIdx = 0;
-const loadStatus = document.getElementById('load-status');
-const loadFill = document.getElementById('load-fill');
-loadFill.style.width = '100%';
-const loadInterval = setInterval(() => {
-  loadIdx++;
-  if(loadIdx < loadStatuses.length) loadStatus.textContent = loadStatuses[loadIdx];
-  else { clearInterval(loadInterval); init(); }
-}, 420);
+// ─── Loader ───────────────────────────────────────────────────────────────────
+const loadMsgs = ['LOADING ASSETS...','CALIBRATING DEPTH...','WARMING UP CRT...','INJECTING NOSTALGIA...','REALITY CHECK... FAILED.','PROCEEDING ANYWAY.'];
+let li = 0;
+const lStatus = document.getElementById('load-status');
+document.getElementById('load-fill').style.width = '100%';
+const lInt = setInterval(() => { li++; if(li < loadMsgs.length) lStatus.textContent = loadMsgs[li]; else { clearInterval(lInt); init(); } }, 480);
 
-// ─── Three.js scene ──────────────────────────────────────────────────────────
+// ─── Globals ──────────────────────────────────────────────────────────────────
 let renderer, scene, camera, clock;
-let computer, screen, screenMesh;
-let particles, gridHelper;
-let stars, starField;
-let warpTunnel;
-let floatingObjects = [];
-let scene3Group, scene4Group;
-const scrollState = { progress: 0 };
+let computer, screenMesh, screenCtx, screenCanvas, screenTex;
+let deskMesh, deskLight;
+let envMap;
+let stars, scene3Group, scene4Group;
+let floatObjs = [];
+const S = { progress: 0 };
 
 function init() {
-  // Hide loader
   document.getElementById('loading').classList.add('hide');
   document.getElementById('label-0').classList.add('visible');
 
   clock = new THREE.Clock();
 
-  // Renderer
-  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, alpha: false });
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.physicallyCorrectLights = true;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
+  renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.setClearColor(0x000000);
 
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x000000, 0.02);
+  scene.fog = new THREE.Fog(0x000000, 20, 60);
 
-  camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
-  camera.position.set(0, 2, 8);
+  camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.01, 500);
+  camera.position.set(0, 1.8, 9);
   camera.lookAt(0, 0.5, 0);
 
+  buildEnvMap();
   buildLights();
+  buildDesk();
   buildComputer();
-  buildStarField();
+  buildStars();
   buildGridWorld();
   buildWarpTunnel();
-  buildFloatingObjects();
-  buildParticles();
+  buildFloaters();
 
-  setupScrollAnimation();
+  setupScroll();
   setupHUD();
-  setupCursorTrail();
+  setupCursor();
 
-  window.addEventListener('resize', onResize);
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
   requestAnimationFrame(animate);
 }
 
-function buildLights() {
-  const ambient = new THREE.AmbientLight(0x001100, 0.3);
-  scene.add(ambient);
+// ─── Environment map (fake IBL) ───────────────────────────────────────────────
+function buildEnvMap() {
+  // Create a procedural env map using a CubeCamera render target
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  pmrem.compileCubemapShader();
 
-  const greenPoint = new THREE.PointLight(0x00ff41, 2, 20);
-  greenPoint.position.set(-3, 3, 3);
-  scene.add(greenPoint);
+  // Build a simple colored env scene
+  const envScene = new THREE.Scene();
+  // Deep dark with green/cyan hints on sides
+  envScene.background = new THREE.Color(0x000000);
 
-  const cyanPoint = new THREE.PointLight(0x00f5ff, 1.5, 15);
-  cyanPoint.position.set(3, 2, -2);
-  scene.add(cyanPoint);
+  const envSphere = new THREE.Mesh(
+    new THREE.SphereGeometry(50, 32, 16),
+    new THREE.MeshBasicMaterial({ side: THREE.BackSide, color: 0x000811 })
+  );
+  envScene.add(envSphere);
 
-  const screenLight = new THREE.PointLight(0x00ff41, 3, 8);
-  screenLight.position.set(0, 1, 1);
-  scene.add(screenLight);
+  // Colored light patches on env sphere
+  const patches = [
+    { color: 0x003322, pos: new THREE.Vector3(-10, 5, -10) },
+    { color: 0x000820, pos: new THREE.Vector3(10, 3, 5) },
+    { color: 0x110022, pos: new THREE.Vector3(0, -5, 0) },
+  ];
+  patches.forEach(p => {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(4, 8, 8), new THREE.MeshBasicMaterial({ color: p.color }));
+    m.position.copy(p.pos);
+    envScene.add(m);
+  });
+
+  envMap = pmrem.fromScene(envScene).texture;
+  scene.environment = envMap;
 }
 
+// ─── Lights ───────────────────────────────────────────────────────────────────
+function buildLights() {
+  // Very dim ambient
+  scene.add(new THREE.AmbientLight(0x030308, 1));
+
+  // Key light — cool blue-white from upper left
+  const key = new THREE.DirectionalLight(0xaaccff, 1.5);
+  key.position.set(-4, 6, 4);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.near = 0.1;
+  key.shadow.camera.far = 30;
+  key.shadow.camera.left = -8;
+  key.shadow.camera.right = 8;
+  key.shadow.camera.top = 8;
+  key.shadow.camera.bottom = -4;
+  key.shadow.bias = -0.001;
+  scene.add(key);
+
+  // Rim light — green from behind
+  const rim = new THREE.DirectionalLight(0x00ff88, 0.6);
+  rim.position.set(3, 2, -6);
+  scene.add(rim);
+
+  // Screen glow — emissive green point in front of screen
+  deskLight = new THREE.PointLight(0x00ff41, 4, 6);
+  deskLight.position.set(0, 1.2, 1.5);
+  deskLight.castShadow = false;
+  scene.add(deskLight);
+
+  // Under-desk bounce — very subtle warm
+  const bounce = new THREE.PointLight(0x221100, 0.8, 5);
+  bounce.position.set(0, -2, 2);
+  scene.add(bounce);
+
+  // Side fill
+  const fill = new THREE.DirectionalLight(0x112233, 0.4);
+  fill.position.set(5, 1, 2);
+  scene.add(fill);
+}
+
+// ─── Desk ─────────────────────────────────────────────────────────────────────
+function buildDesk() {
+  // Desk surface
+  const deskGeo = new THREE.BoxGeometry(18, 0.06, 8);
+
+  // Procedural dark wood texture
+  const deskCanvas = document.createElement('canvas');
+  deskCanvas.width = 512; deskCanvas.height = 256;
+  const dc = deskCanvas.getContext('2d');
+  const grad = dc.createLinearGradient(0, 0, 512, 0);
+  grad.addColorStop(0, '#1a1008');
+  grad.addColorStop(0.3, '#221508');
+  grad.addColorStop(0.6, '#1c1206');
+  grad.addColorStop(1, '#180e05');
+  dc.fillStyle = grad;
+  dc.fillRect(0, 0, 512, 256);
+  // Wood grain lines
+  for(let i = 0; i < 40; i++) {
+    dc.strokeStyle = `rgba(${80+Math.random()*40},${50+Math.random()*20},${10+Math.random()*10},${0.3+Math.random()*0.3})`;
+    dc.lineWidth = 0.5 + Math.random();
+    dc.beginPath();
+    let x = Math.random() * 512;
+    dc.moveTo(x, 0);
+    for(let y = 0; y < 256; y += 8) {
+      x += (Math.random() - 0.5) * 4;
+      dc.lineTo(x, y);
+    }
+    dc.stroke();
+  }
+  const deskTex = new THREE.CanvasTexture(deskCanvas);
+  deskTex.wrapS = deskTex.wrapT = THREE.RepeatWrapping;
+  deskTex.repeat.set(4, 2);
+
+  const deskMat = new THREE.MeshStandardMaterial({
+    map: deskTex,
+    roughness: 0.35,
+    metalness: 0.05,
+    envMap,
+    envMapIntensity: 0.4
+  });
+  deskMesh = new THREE.Mesh(deskGeo, deskMat);
+  deskMesh.position.set(0, -2.1, 0.5);
+  deskMesh.receiveShadow = true;
+  scene.add(deskMesh);
+
+  // Desk edge highlight (thin strip of lighter wood at front)
+  const edgeGeo = new THREE.BoxGeometry(18, 0.08, 0.06);
+  const edgeMat = new THREE.MeshStandardMaterial({ color: 0x3a2810, roughness: 0.2, metalness: 0 });
+  const edge = new THREE.Mesh(edgeGeo, edgeMat);
+  edge.position.set(0, -2.07, 4.03);
+  scene.add(edge);
+
+  // Desk legs (subtle, dark)
+  const legMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.8, metalness: 0.5 });
+  [[-6, 3], [6, 3], [-6, -2], [6, -2]].forEach(([x, z]) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2, 0.1), legMat);
+    leg.position.set(x, -3.1, z);
+    leg.castShadow = true;
+    scene.add(leg);
+  });
+
+  // Screen glow on desk — a plane with additive blending
+  const glowPlaneGeo = new THREE.PlaneGeometry(4, 2);
+  const glowPlaneMat = new THREE.MeshBasicMaterial({
+    color: 0x00ff41, transparent: true, opacity: 0.04,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const glowPlane = new THREE.Mesh(glowPlaneGeo, glowPlaneMat);
+  glowPlane.rotation.x = -Math.PI / 2;
+  glowPlane.position.set(0, -2.07, 1.5);
+  scene.add(glowPlane);
+}
+
+// ─── Computer ─────────────────────────────────────────────────────────────────
 function buildComputer() {
   computer = new THREE.Group();
 
-  // Monitor body
-  const monitorGeo = new THREE.BoxGeometry(4, 3, 0.5);
-  const monitorMat = new THREE.MeshPhongMaterial({
-    color: 0x1a1a2e,
-    emissive: 0x050510,
-    shininess: 80,
-    specular: 0x333366
+  // --- Materials ---
+  // CRT plastic — off-white/cream aged plastic, PBR
+  const plasticCanvas = document.createElement('canvas');
+  plasticCanvas.width = 256; plasticCanvas.height = 256;
+  const pc = plasticCanvas.getContext('2d');
+  // Base cream color
+  pc.fillStyle = '#c8c0a8';
+  pc.fillRect(0, 0, 256, 256);
+  // Subtle noise/aging
+  for(let i = 0; i < 3000; i++) {
+    const v = Math.floor(Math.random() * 20) - 10;
+    pc.fillStyle = `rgba(${128+v},${120+v},${100+v},0.08)`;
+    pc.fillRect(Math.random()*256, Math.random()*256, 2, 2);
+  }
+  // Subtle gradient darker on edges
+  const pg = pc.createRadialGradient(128,128,20,128,128,160);
+  pg.addColorStop(0,'rgba(255,255,255,0.05)');
+  pg.addColorStop(1,'rgba(0,0,0,0.18)');
+  pc.fillStyle = pg;
+  pc.fillRect(0, 0, 256, 256);
+  const plasticTex = new THREE.CanvasTexture(plasticCanvas);
+
+  const plasticMat = new THREE.MeshStandardMaterial({
+    map: plasticTex,
+    roughness: 0.75,
+    metalness: 0.0,
+    envMap,
+    envMapIntensity: 0.3
   });
-  const monitor = new THREE.Mesh(monitorGeo, monitorMat);
+
+  // Dark plastic for back/side panels — slightly different shade
+  const darkPlasticMat = new THREE.MeshStandardMaterial({
+    color: 0x8a8272,
+    roughness: 0.82,
+    metalness: 0.0,
+    envMap,
+    envMapIntensity: 0.2
+  });
+
+  // Bezel — darker, slightly worn
+  const bezelMat = new THREE.MeshStandardMaterial({
+    color: 0x5a5040,
+    roughness: 0.9,
+    metalness: 0.0,
+    envMap,
+    envMapIntensity: 0.15
+  });
+
+  // Glass screen material
+  const glassMat = new THREE.MeshStandardMaterial({
+    color: 0x000000,
+    roughness: 0.0,
+    metalness: 0.1,
+    transparent: true,
+    opacity: 0.92,
+    envMap,
+    envMapIntensity: 1.5
+  });
+
+  // Shiny button plastic
+  const btnMat = new THREE.MeshStandardMaterial({
+    color: 0x9a9080,
+    roughness: 0.35,
+    metalness: 0.1,
+    envMap,
+    envMapIntensity: 0.8
+  });
+
+  // --- Monitor body (CRT shape — wider at back, narrower at front) ---
+  // Main housing
+  const monitorGeo = new THREE.BoxGeometry(4.4, 3.4, 3.2);
+  const monitor = new THREE.Mesh(monitorGeo, plasticMat);
+  monitor.castShadow = true;
+  monitor.receiveShadow = true;
   computer.add(monitor);
 
-  // Bezel
-  const bezelGeo = new THREE.BoxGeometry(4.2, 3.2, 0.3);
-  const bezelMat = new THREE.MeshPhongMaterial({ color: 0x0d0d1a, shininess: 40 });
-  const bezel = new THREE.Mesh(bezelGeo, bezelMat);
-  bezel.position.z = -0.12;
-  computer.add(bezel);
+  // Front face plate (slightly raised)
+  const frontGeo = new THREE.BoxGeometry(4.2, 3.2, 0.12);
+  const front = new THREE.Mesh(frontGeo, darkPlasticMat);
+  front.position.z = 1.65;
+  front.castShadow = true;
+  computer.add(front);
 
-  // Screen
-  const screenGeo = new THREE.PlaneGeometry(3.4, 2.4);
-  const screenCanvas = document.createElement('canvas');
-  screenCanvas.width = 512; screenCanvas.height = 360;
-  const ctx = screenCanvas.getContext('2d');
-  drawScreenContent(ctx, screenCanvas.width, screenCanvas.height, 0);
-  const screenTex = new THREE.CanvasTexture(screenCanvas);
+  // Bezel (sunken frame around screen)
+  const bezelOuter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.7, 0.08), bezelMat);
+  bezelOuter.position.z = 1.73;
+  computer.add(bezelOuter);
 
-  const screenMat = new THREE.MeshBasicMaterial({ map: screenTex });
-  screenMesh = new THREE.Mesh(screenGeo, screenMat);
-  screenMesh.position.z = 0.28;
-  screenMesh.userData = { ctx, canvas: screenCanvas, tex: screenTex };
+  // Screen recess (black area around the actual screen)
+  const recessGeo = new THREE.BoxGeometry(3.3, 2.44, 0.1);
+  const recessMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 1, metalness: 0 });
+  const recess = new THREE.Mesh(recessGeo, recessMat);
+  recess.position.z = 1.76;
+  computer.add(recess);
+
+  // === LIVE SCREEN ===
+  screenCanvas = document.createElement('canvas');
+  screenCanvas.width = 640; screenCanvas.height = 480;
+  screenCtx = screenCanvas.getContext('2d');
+  drawScreen(0);
+  screenTex = new THREE.CanvasTexture(screenCanvas);
+
+  const emissiveTex = screenTex; // same texture drives emission
+  const screenMat = new THREE.MeshStandardMaterial({
+    map: screenTex,
+    emissiveMap: emissiveTex,
+    emissive: new THREE.Color(0xffffff),
+    emissiveIntensity: 1.2,
+    roughness: 0.0,
+    metalness: 0.0
+  });
+  screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 2.32), screenMat);
+  screenMesh.position.z = 1.79;
   computer.add(screenMesh);
 
-  // Screen glow plane
-  const glowGeo = new THREE.PlaneGeometry(3.6, 2.6);
-  const glowMat = new THREE.MeshBasicMaterial({ color: 0x00ff41, transparent: true, opacity: 0.04 });
-  const glow = new THREE.Mesh(glowGeo, glowMat);
-  glow.position.z = 0.27;
-  computer.add(glow);
+  // Glass overlay on screen (reflective)
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 2.32), glassMat);
+  glass.position.z = 1.80;
+  computer.add(glass);
 
-  // Neck
-  const neckGeo = new THREE.BoxGeometry(0.8, 0.6, 0.4);
-  const neck = new THREE.Mesh(neckGeo, monitorMat);
-  neck.position.set(0, -1.9, 0);
+  // CRT curvature illusion — very subtle convex plane in front
+  const curveMat = new THREE.MeshStandardMaterial({
+    color: 0x001100,
+    transparent: true,
+    opacity: 0.06,
+    roughness: 0,
+    metalness: 0.3,
+    envMap,
+    envMapIntensity: 2,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  const curveGeo = new THREE.SphereGeometry(3.5, 32, 32, 0, Math.PI * 0.3, 0, Math.PI * 0.25);
+  const curveMesh = new THREE.Mesh(curveGeo, curveMat);
+  curveMesh.position.set(0, 0, 1.78);
+  curveMesh.rotation.y = Math.PI;
+  computer.add(curveMesh);
+
+  // --- Vents on top ---
+  for(let i = 0; i < 6; i++) {
+    const ventGeo = new THREE.BoxGeometry(0.08, 0.8, 0.04);
+    const ventMat = new THREE.MeshStandardMaterial({ color: 0x444030, roughness: 1 });
+    const vent = new THREE.Mesh(ventGeo, ventMat);
+    vent.position.set(-0.3 + i * 0.12, 1.7, 1.5);
+    computer.add(vent);
+  }
+
+  // --- Brand badge on front (embossed rectangle) ---
+  const badgeGeo = new THREE.BoxGeometry(0.8, 0.12, 0.015);
+  const badgeMat = new THREE.MeshStandardMaterial({ color: 0xaaa090, roughness: 0.4, metalness: 0.3, envMap, envMapIntensity: 1 });
+  const badge = new THREE.Mesh(badgeGeo, badgeMat);
+  badge.position.set(-1.0, -1.35, 1.73);
+  computer.add(badge);
+
+  // --- Power button ---
+  const pwrGeo = new THREE.CylinderGeometry(0.11, 0.11, 0.04, 16);
+  const pwrMat = new THREE.MeshStandardMaterial({ color: 0x888070, roughness: 0.3, metalness: 0.2, envMap, envMapIntensity: 0.8 });
+  const pwr = new THREE.Mesh(pwrGeo, pwrMat);
+  pwr.rotation.x = Math.PI / 2;
+  pwr.position.set(1.65, -1.35, 1.73);
+  computer.add(pwr);
+
+  // Power LED
+  const ledGeo = new THREE.SphereGeometry(0.04, 8, 8);
+  const ledMat = new THREE.MeshStandardMaterial({ color: 0x00ff41, emissive: 0x00ff41, emissiveIntensity: 3, roughness: 0 });
+  const led = new THREE.Mesh(ledGeo, ledMat);
+  led.position.set(1.9, -1.35, 1.73);
+  led.userData.isLed = true;
+  computer.add(led);
+
+  // --- Disk drives (2) ---
+  for(let i = 0; i < 2; i++) {
+    const driveGeo = new THREE.BoxGeometry(1.6, 0.22, 0.06);
+    const driveMat2 = new THREE.MeshStandardMaterial({ color: 0x6a6050, roughness: 0.7, metalness: 0.1, envMap, envMapIntensity: 0.3 });
+    const drive = new THREE.Mesh(driveGeo, driveMat2);
+    drive.position.set(0.6, 0.5 - i * 0.35, 1.73);
+    computer.add(drive);
+    // Slot
+    const slot = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.04, 0.04), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 1 }));
+    slot.position.set(0.6, 0.5 - i * 0.35, 1.77);
+    computer.add(slot);
+    // Eject button
+    const ejGeo = new THREE.BoxGeometry(0.1, 0.08, 0.02);
+    const ej = new THREE.Mesh(ejGeo, btnMat);
+    ej.position.set(1.46, 0.5 - i * 0.35, 1.78);
+    computer.add(ej);
+  }
+
+  // --- Neck / stand (the chunky CRT connector) ---
+  const neckGeo = new THREE.BoxGeometry(1.4, 0.5, 0.6);
+  const neck = new THREE.Mesh(neckGeo, plasticMat);
+  neck.position.set(0, -1.95, 0.2);
+  neck.castShadow = true;
   computer.add(neck);
 
-  // Base
-  const baseGeo = new THREE.BoxGeometry(2.5, 0.15, 1.5);
-  const base = new THREE.Mesh(baseGeo, monitorMat);
-  base.position.set(0, -2.3, 0.3);
+  // Tilt adjuster ring
+  const tiltGeo = new THREE.TorusGeometry(0.3, 0.06, 8, 24);
+  const tiltMat = new THREE.MeshStandardMaterial({ color: 0x888070, roughness: 0.5, metalness: 0.2, envMap, envMapIntensity: 0.5 });
+  const tilt = new THREE.Mesh(tiltGeo, tiltMat);
+  tilt.rotation.x = Math.PI / 2;
+  tilt.position.set(0, -1.75, 0);
+  computer.add(tilt);
+
+  // --- Base ---
+  const baseGeo = new THREE.BoxGeometry(3.2, 0.18, 2.2);
+  const base = new THREE.Mesh(baseGeo, plasticMat);
+  base.position.set(0, -2.27, 0.5);
+  base.castShadow = true;
+  base.receiveShadow = true;
   computer.add(base);
 
-  // Keyboard
-  const kbGeo = new THREE.BoxGeometry(3.2, 0.15, 1.2);
-  const kbMat = new THREE.MeshPhongMaterial({ color: 0x111122, shininess: 60 });
-  const kb = new THREE.Mesh(kbGeo, kbMat);
-  kb.position.set(0, -2.35, 2);
-  computer.add(kb);
+  // Base rim (slightly beveled feel)
+  const baseRimGeo = new THREE.BoxGeometry(3.4, 0.04, 2.4);
+  const baseRim = new THREE.Mesh(baseRimGeo, darkPlasticMat);
+  baseRim.position.set(0, -2.37, 0.5);
+  computer.add(baseRim);
 
-  // Keyboard keys
-  for(let r = 0; r < 4; r++) {
-    for(let c = 0; c < 12; c++) {
-      const keyGeo = new THREE.BoxGeometry(0.2, 0.06, 0.2);
-      const keyMat = new THREE.MeshPhongMaterial({ color: 0x1a1a3e });
-      const key = new THREE.Mesh(keyGeo, keyMat);
-      key.position.set(-1.3 + c * 0.24, -2.27, 1.5 + r * 0.25);
-      computer.add(key);
+  // --- Keyboard ---
+  const kbGeo = new THREE.BoxGeometry(3.8, 0.18, 1.6);
+  // Keyboard texture
+  const kbCanvas = document.createElement('canvas');
+  kbCanvas.width = 256; kbCanvas.height = 128;
+  const kc = kbCanvas.getContext('2d');
+  kc.fillStyle = '#bbb8a8';
+  kc.fillRect(0, 0, 256, 128);
+  // Key grid impression
+  for(let r = 0; r < 5; r++) {
+    for(let col = 0; col < 14; col++) {
+      kc.fillStyle = 'rgba(0,0,0,0.15)';
+      kc.fillRect(8 + col * 17, 10 + r * 22, 14, 18);
+      kc.fillStyle = 'rgba(255,255,255,0.25)';
+      kc.fillRect(9 + col * 17, 11 + r * 22, 13, 2);
     }
   }
+  const kbTex = new THREE.CanvasTexture(kbCanvas);
+  const kbMat = new THREE.MeshStandardMaterial({ map: kbTex, roughness: 0.85, metalness: 0, envMap, envMapIntensity: 0.2 });
+  const kb = new THREE.Mesh(kbGeo, kbMat);
+  kb.position.set(0, -2.26, 2.8);
+  kb.castShadow = true;
+  kb.receiveShadow = true;
+  computer.add(kb);
 
-  // Floppy drives
-  for(let i = 0; i < 2; i++) {
-    const driveGeo = new THREE.BoxGeometry(1.2, 0.25, 0.1);
-    const driveMat = new THREE.MeshPhongMaterial({ color: 0x0a0a1a });
-    const drive = new THREE.Mesh(driveGeo, driveMat);
-    drive.position.set(i === 0 ? -1 : 1, -0.8 + i * 0.4, 0.28);
-    computer.add(drive);
-    const slotGeo = new THREE.BoxGeometry(0.9, 0.04, 0.05);
-    const slotMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    const slot = new THREE.Mesh(slotGeo, slotMat);
-    slot.position.set(i === 0 ? -1 : 1, -0.8 + i * 0.4, 0.32);
-    computer.add(slot);
+  // KB cable
+  const curvePts = [];
+  for(let i = 0; i <= 20; i++) {
+    const t = i / 20;
+    curvePts.push(new THREE.Vector3(
+      -1.8 + Math.sin(t * Math.PI) * 0.5,
+      -2.2 + Math.sin(t * Math.PI * 2) * 0.15,
+      1.5 + t * 0.8
+    ));
   }
+  const cableCurve = new THREE.CatmullRomCurve3(curvePts);
+  const cableGeo = new THREE.TubeGeometry(cableCurve, 20, 0.025, 6, false);
+  const cableMat = new THREE.MeshStandardMaterial({ color: 0x555040, roughness: 0.9, metalness: 0 });
+  computer.add(new THREE.Mesh(cableGeo, cableMat));
 
-  // LED indicator
-  const ledGeo = new THREE.SphereGeometry(0.06, 8, 8);
-  const ledMat = new THREE.MeshBasicMaterial({ color: 0x00ff41 });
-  const led = new THREE.Mesh(ledGeo, ledMat);
-  led.position.set(1.7, -1.3, 0.28);
-  computer.add(led);
-  led.userData.isLed = true;
+  // Mouse
+  const mouseGeo = new THREE.SphereGeometry(0.2, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.6);
+  const mouseMat = new THREE.MeshStandardMaterial({ color: 0xc0b8a0, roughness: 0.7, metalness: 0, envMap, envMapIntensity: 0.3 });
+  const mouse = new THREE.Mesh(mouseGeo, mouseMat);
+  mouse.rotation.x = Math.PI;
+  mouse.position.set(2.4, -2.18, 2.5);
+  mouse.castShadow = true;
+  computer.add(mouse);
 
-  computer.position.set(0, 0, 0);
+  // Mouse button seam
+  const seamGeo = new THREE.BoxGeometry(0.02, 0.25, 0.3);
+  const seamMat = new THREE.MeshStandardMaterial({ color: 0x333322, roughness: 1 });
+  const seam = new THREE.Mesh(seamGeo, seamMat);
+  seam.position.set(2.4, -2.05, 2.38);
+  computer.add(seam);
+
+  // Mouse cable
+  const mCurvePts = [];
+  for(let i = 0; i <= 15; i++) {
+    const t = i / 15;
+    mCurvePts.push(new THREE.Vector3(
+      2.4 - t * 3.5,
+      -2.18 + Math.sin(t * Math.PI) * 0.1,
+      2.5 - t * 1.2
+    ));
+  }
+  const mCable = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(mCurvePts), 15, 0.02, 6, false);
+  computer.add(new THREE.Mesh(mCable, cableMat));
+
+  computer.position.set(0, 0.15, 0);
   scene.add(computer);
-  screen = computer;
 }
 
-function drawScreenContent(ctx, w, h, time) {
-  ctx.fillStyle = '#000800';
-  ctx.fillRect(0, 0, w, h);
+// ─── Screen drawing ───────────────────────────────────────────────────────────
+function drawScreen(t) {
+  const w = screenCanvas.width, h = screenCanvas.height;
+  // Deep green-black phosphor background
+  screenCtx.fillStyle = '#010a01';
+  screenCtx.fillRect(0, 0, w, h);
 
-  // Scanline effect on screen
-  for(let y = 0; y < h; y += 4) {
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.fillRect(0, y, w, 2);
+  // Scanlines
+  for(let y = 0; y < h; y += 3) {
+    screenCtx.fillStyle = 'rgba(0,0,0,0.22)';
+    screenCtx.fillRect(0, y, w, 1);
   }
 
-  // Green phosphor text
-  ctx.fillStyle = '#00ff41';
-  ctx.font = 'bold 14px Courier New';
-  ctx.fillText('> PORTAL.EXE v1.0', 20, 30);
+  // Screen vignette
+  const sg = screenCtx.createRadialGradient(w/2, h/2, 60, w/2, h/2, 300);
+  sg.addColorStop(0, 'transparent');
+  sg.addColorStop(1, 'rgba(0,0,0,0.55)');
+  screenCtx.fillStyle = sg;
+  screenCtx.fillRect(0, 0, w, h);
 
-  ctx.font = '11px Courier New';
-  ctx.fillStyle = '#00cc33';
+  // Text content
+  screenCtx.font = 'bold 16px Courier New';
+  screenCtx.fillStyle = '#00e836';
+  screenCtx.fillText('C:\\> PORTAL.EXE', 30, 45);
+
+  screenCtx.font = '13px Courier New';
+  screenCtx.fillStyle = '#00c22a';
+
   const lines = [
-    'SYSTEM BOOT... OK',
-    'MEMORY: 640K (ENOUGH FOR ANYONE)',
-    'LOADING IMAGINATION.DLL',
-    'CALIBRATING DREAMS...',
-    '',
-    '> DO YOU WISH TO ENTER?',
-    '',
-    time % 1.2 < 0.6 ? '  [Y/N] _' : '  [Y/N]  ',
-    '',
-    '> WARNING: REALITY MAY DIFFER',
-    '> FROM PERCEIVED EXPERIENCE.',
-    '',
-    '> SCROLL DOWN TO PROCEED.',
+    { t: 'PRISCA DEZIGNS CREATIVE OS v2.0', y: 80 },
+    { t: 'COPYRIGHT 1987–2026 · ALL DIMENSIONS', y: 98 },
+    { t: '', y: 116 },
+    { t: 'MEMORY: 640K CONVENTIONAL', y: 134 },
+    { t: 'EXTENDED: UNDEFINED (TOO MUCH)', y: 152 },
+    { t: '', y: 170 },
+    { t: 'LOADING IMAGINATION.DLL ......... OK', y: 188 },
+    { t: 'LOADING NOSTALGIA.SYS ........... OK', y: 206 },
+    { t: 'LOADING REALITY.EXE ............. ' + (t%2<1?'FAILED':'FAILED'), y: 224 },
+    { t: 'PROCEEDING ANYWAY.', y: 242 },
+    { t: '', y: 260 },
+    { t: 'WARNING: ENTERING THIS SYSTEM', y: 278 },
+    { t: 'MAY ALTER YOUR PERCEPTION OF', y: 296 },
+    { t: 'WHAT IS POSSIBLE ON THE WEB.', y: 314 },
+    { t: '', y: 332 },
+    { t: 'ARE YOU SURE? [Y/N]', y: 350 },
+    { t: t%1.2<0.6 ? 'C:\\> _' : 'C:\\> ', y: 390 },
   ];
-  lines.forEach((line, i) => {
-    ctx.fillText(line, 20, 60 + i * 20);
+
+  lines.forEach(l => {
+    // Slight horizontal jitter on random lines for phosphor feel
+    const jitter = Math.random() < 0.03 ? (Math.random()-0.5)*2 : 0;
+    screenCtx.fillText(l.t, 30 + jitter, l.y);
   });
 
-  // Blinking cursor
-  if(time % 1 < 0.5) {
-    ctx.fillStyle = '#00ff41';
-    ctx.fillRect(20, h - 30, 8, 14);
+  // Horizontal glitch lines occasionally
+  if(Math.random() < 0.04) {
+    const gy = Math.random() * h;
+    screenCtx.fillStyle = `rgba(0,255,65,${Math.random()*0.15})`;
+    screenCtx.fillRect(0, gy, w, 1 + Math.random() * 3);
   }
 
-  // Random noise pixels
-  for(let i = 0; i < 40; i++) {
-    ctx.fillStyle = `rgba(0,255,65,${Math.random() * 0.15})`;
-    ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
-  }
+  // Phosphor glow bloom simulation (soft green overlay)
+  const bloom = screenCtx.createRadialGradient(w/2, h/2, 50, w/2, h/2, 280);
+  bloom.addColorStop(0, 'rgba(0,255,65,0.03)');
+  bloom.addColorStop(1, 'transparent');
+  screenCtx.fillStyle = bloom;
+  screenCtx.fillRect(0, 0, w, h);
 }
 
-function buildStarField() {
+// ─── Stars ────────────────────────────────────────────────────────────────────
+function buildStars() {
   const geo = new THREE.BufferGeometry();
-  const count = 3000;
-  const pos = new Float32Array(count * 3);
-  const colors = new Float32Array(count * 3);
-  for(let i = 0; i < count; i++) {
-    pos[i*3] = (Math.random() - 0.5) * 300;
-    pos[i*3+1] = (Math.random() - 0.5) * 300;
-    pos[i*3+2] = (Math.random() - 0.5) * 300;
-    // Mix of green, cyan, white stars
-    const c = Math.random();
-    if(c < 0.3) { colors[i*3]=0; colors[i*3+1]=1; colors[i*3+2]=0.25; }
-    else if(c < 0.6) { colors[i*3]=0; colors[i*3+1]=0.96; colors[i*3+2]=1; }
-    else { colors[i*3]=1; colors[i*3+1]=1; colors[i*3+2]=1; }
+  const n = 4000, pos = new Float32Array(n*3), cols = new Float32Array(n*3);
+  for(let i=0;i<n;i++){
+    pos[i*3]=(Math.random()-.5)*400;
+    pos[i*3+1]=(Math.random()-.5)*400;
+    pos[i*3+2]=(Math.random()-.5)*400;
+    const c=Math.random();
+    if(c<0.3){cols[i*3]=0;cols[i*3+1]=1;cols[i*3+2]=0.25;}
+    else if(c<0.6){cols[i*3]=0;cols[i*3+1]=0.96;cols[i*3+2]=1;}
+    else{cols[i*3]=1;cols[i*3+1]=1;cols[i*3+2]=1;}
   }
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  const mat = new THREE.PointsMaterial({ size: 0.3, vertexColors: true, transparent: true, opacity: 0 });
-  stars = new THREE.Points(geo, mat);
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(cols,3));
+  stars=new THREE.Points(geo,new THREE.PointsMaterial({size:0.4,vertexColors:true,transparent:true,opacity:0}));
   scene.add(stars);
 }
 
+// ─── Grid World ───────────────────────────────────────────────────────────────
 function buildGridWorld() {
   scene3Group = new THREE.Group();
   scene3Group.visible = false;
 
-  // Infinite-looking grid
-  const gridSize = 200;
-  const gridDivs = 40;
-  const grid = new THREE.GridHelper(gridSize, gridDivs, 0x00f5ff, 0x003344);
-  grid.position.y = -8;
-  scene3Group.add(grid);
+  scene3Group.add(new THREE.GridHelper(200, 40, 0x00f5ff, 0x003344));
+  const g2 = new THREE.GridHelper(200, 40, 0x9d00ff, 0x220033);
+  g2.position.y = 0; g2.rotation.x = Math.PI/2; g2.position.z = -100;
+  scene3Group.add(g2);
 
-  const grid2 = new THREE.GridHelper(gridSize, gridDivs, 0x9d00ff, 0x220033);
-  grid2.position.y = -8;
-  grid2.rotation.x = Math.PI / 2;
-  grid2.position.z = -100;
-  scene3Group.add(grid2);
-
-  // Sun on horizon
-  const sunGeo = new THREE.SphereGeometry(6, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-  const sunMat = new THREE.MeshBasicMaterial({ color: 0xff2d78, side: THREE.FrontSide });
+  // Retro sun
+  const sunGeo = new THREE.SphereGeometry(7, 32, 16, 0, Math.PI*2, 0, Math.PI/2);
+  const sunMat = new THREE.MeshBasicMaterial({ color: 0xff2d78 });
   const sun = new THREE.Mesh(sunGeo, sunMat);
-  sun.position.set(0, -2, -80);
+  sun.position.set(0, -3, -90);
   scene3Group.add(sun);
 
-  // Sun glow rings
-  for(let i = 0; i < 5; i++) {
-    const ringGeo = new THREE.RingGeometry(6 + i * 1.5, 6.2 + i * 1.5, 64);
-    const ringMat = new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(0.9 - i * 0.04, 1, 0.5), side: THREE.DoubleSide, transparent: true, opacity: 0.7 - i * 0.12 });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.position.set(0, -2, -80);
-    ring.rotation.x = Math.PI / 2;
-    scene3Group.add(ring);
+  for(let i=0;i<6;i++){
+    const r = new THREE.Mesh(
+      new THREE.RingGeometry(7+i*2,7.3+i*2,64),
+      new THREE.MeshBasicMaterial({color:new THREE.Color().setHSL(0.9-i*.05,1,.5),side:THREE.DoubleSide,transparent:true,opacity:.8-i*.12})
+    );
+    r.position.set(0,-3,-90); r.rotation.x=Math.PI/2;
+    scene3Group.add(r);
   }
 
-  // Floating pyramids
-  for(let i = 0; i < 8; i++) {
-    const pyGeo = new THREE.ConeGeometry(0.5 + Math.random(), 1.5, 4);
-    const pyMat = new THREE.MeshPhongMaterial({ color: new THREE.Color().setHSL(0.75 + Math.random() * 0.2, 1, 0.5), emissive: new THREE.Color().setHSL(0.75, 1, 0.3), wireframe: Math.random() > 0.5 });
-    const py = new THREE.Mesh(pyGeo, pyMat);
-    py.position.set((Math.random() - 0.5) * 40, -4 + Math.random() * 8, -20 - Math.random() * 60);
-    py.rotation.set(Math.random(), Math.random(), Math.random());
-    py.userData.rotSpeed = (Math.random() - 0.5) * 0.02;
-    scene3Group.add(py);
-    floatingObjects.push(py);
+  // Floating geo
+  for(let i=0;i<10;i++){
+    const geos=[new THREE.ConeGeometry(.6,2,4),new THREE.OctahedronGeometry(.5),new THREE.IcosahedronGeometry(.5)];
+    const m=new THREE.Mesh(geos[i%3],new THREE.MeshStandardMaterial({
+      color:new THREE.Color().setHSL(.7+Math.random()*.2,1,.5),
+      emissive:new THREE.Color().setHSL(.7+Math.random()*.2,1,.3),
+      emissiveIntensity:.8,
+      roughness:.2,metalness:.1,
+      wireframe:Math.random()>.5
+    }));
+    m.position.set((Math.random()-.5)*50,-5+Math.random()*10,-20-Math.random()*70);
+    m.rotation.set(Math.random(),Math.random(),Math.random());
+    m.userData={rs:(Math.random()-.5)*.025,fs:.4+Math.random()*.8,fo:Math.random()*Math.PI*2,by:m.position.y};
+    scene3Group.add(m);
+    floatObjs.push(m);
   }
 
+  scene3Group.position.y = -6;
   scene.add(scene3Group);
 }
 
+// ─── Warp Tunnel ──────────────────────────────────────────────────────────────
 function buildWarpTunnel() {
   scene4Group = new THREE.Group();
   scene4Group.visible = false;
 
-  // Tunnel made of rings
-  for(let i = 0; i < 60; i++) {
-    const ringGeo = new THREE.TorusGeometry(4 + Math.sin(i * 0.3) * 1.5, 0.05, 8, 64);
-    const hue = (i / 60 + 0.5) % 1;
-    const ringMat = new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(hue, 1, 0.6), transparent: true, opacity: 0.7 });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.position.z = -i * 3;
-    ring.rotation.z = i * 0.15;
-    scene4Group.add(ring);
+  for(let i=0;i<80;i++){
+    const r=new THREE.Mesh(
+      new THREE.TorusGeometry(4+Math.sin(i*.25)*1.8,.04,8,80),
+      new THREE.MeshBasicMaterial({color:new THREE.Color().setHSL((i/80+.5)%1,1,.65),transparent:true,opacity:.8})
+    );
+    r.position.z=-i*3.5;
+    r.rotation.z=i*.1;
+    scene4Group.add(r);
   }
 
-  // Warp particles
-  const wpGeo = new THREE.BufferGeometry();
-  const wpCount = 800;
-  const wpPos = new Float32Array(wpCount * 3);
-  for(let i = 0; i < wpCount; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const radius = 2 + Math.random() * 3;
-    wpPos[i*3] = Math.cos(angle) * radius;
-    wpPos[i*3+1] = Math.sin(angle) * radius;
-    wpPos[i*3+2] = -Math.random() * 180;
+  const wpGeo=new THREE.BufferGeometry();
+  const wn=1000,wp=new Float32Array(wn*3);
+  for(let i=0;i<wn;i++){
+    const a=Math.random()*Math.PI*2,rad=2+Math.random()*3.5;
+    wp[i*3]=Math.cos(a)*rad; wp[i*3+1]=Math.sin(a)*rad; wp[i*3+2]=-Math.random()*280;
   }
-  wpGeo.setAttribute('position', new THREE.BufferAttribute(wpPos, 3));
-  const wpMat = new THREE.PointsMaterial({ size: 0.15, color: 0x00f5ff, transparent: true, opacity: 0.8 });
-  const wp = new THREE.Points(wpGeo, wpMat);
-  scene4Group.add(wp);
+  wpGeo.setAttribute('position',new THREE.BufferAttribute(wp,3));
+  scene4Group.add(new THREE.Points(wpGeo,new THREE.PointsMaterial({size:.12,color:0x00f5ff,transparent:true,opacity:.9})));
 
   scene.add(scene4Group);
 }
 
-function buildFloatingObjects() {
-  // Floating floppy disks, gears, cubes scattered in mid-space
-  const shapes = [
-    () => new THREE.BoxGeometry(0.4, 0.4, 0.05), // floppy
-    () => new THREE.IcosahedronGeometry(0.3, 0),
-    () => new THREE.OctahedronGeometry(0.35, 0),
-    () => new THREE.TetrahedronGeometry(0.4, 0),
-    () => new THREE.TorusGeometry(0.3, 0.08, 8, 20),
+// ─── Floating objects (between scenes) ───────────────────────────────────────
+function buildFloaters() {
+  const geos=[
+    ()=>new THREE.BoxGeometry(.4,.4,.05),
+    ()=>new THREE.IcosahedronGeometry(.3,0),
+    ()=>new THREE.OctahedronGeometry(.35,0),
+    ()=>new THREE.TorusGeometry(.3,.08,8,20),
+    ()=>new THREE.TetrahedronGeometry(.4,0)
   ];
-
-  for(let i = 0; i < 20; i++) {
-    const geoFn = shapes[Math.floor(Math.random() * shapes.length)];
-    const colors = [0x00ff41, 0x00f5ff, 0xff2d78, 0x9d00ff, 0xffb700];
-    const col = colors[Math.floor(Math.random() * colors.length)];
-    const mat = new THREE.MeshPhongMaterial({ color: col, emissive: new THREE.Color(col).multiplyScalar(0.3), wireframe: Math.random() > 0.6, transparent: true, opacity: 0.8 });
-    const mesh = new THREE.Mesh(geoFn(), mat);
-    mesh.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10, -5 - Math.random() * 30);
-    mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-    mesh.userData = { rotX: (Math.random() - 0.5) * 0.02, rotY: (Math.random() - 0.5) * 0.02, floatSpeed: 0.3 + Math.random() * 0.7, floatOffset: Math.random() * Math.PI * 2, baseY: mesh.position.y };
-    mesh.visible = false;
-    scene.add(mesh);
-    floatingObjects.push(mesh);
+  const palette=[0x00ff41,0x00f5ff,0xff2d78,0x9d00ff,0xffb700];
+  for(let i=0;i<18;i++){
+    const col=palette[i%palette.length];
+    const m=new THREE.Mesh(geos[i%geos.length](),new THREE.MeshStandardMaterial({
+      color:col,emissive:new THREE.Color(col),emissiveIntensity:.4,
+      roughness:.3,metalness:.1,wireframe:i%3===0,
+      transparent:true,opacity:.85,envMap,envMapIntensity:.5
+    }));
+    m.position.set((Math.random()-.5)*22,(Math.random()-.5)*12,-6-Math.random()*28);
+    m.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
+    m.userData={rx:(Math.random()-.5)*.025,ry:(Math.random()-.5)*.025,fs:.4+Math.random()*.8,fo:Math.random()*Math.PI*2,by:m.position.y};
+    m.visible=false;
+    scene.add(m);
+    floatObjs.push(m);
   }
 }
 
-function buildParticles() {
-  const geo = new THREE.BufferGeometry();
-  const count = 500;
-  const pos = new Float32Array(count * 3);
-  for(let i = 0; i < count; i++) {
-    pos[i*3] = (Math.random() - 0.5) * 30;
-    pos[i*3+1] = (Math.random() - 0.5) * 20;
-    pos[i*3+2] = (Math.random() - 0.5) * 20;
-  }
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const mat = new THREE.PointsMaterial({ size: 0.05, color: 0x00ff41, transparent: true, opacity: 0 });
-  particles = new THREE.Points(geo, mat);
-  scene.add(particles);
-}
-
-// ─── Scroll Animation ─────────────────────────────────────────────────────────
-function setupScrollAnimation() {
+// ─── Scroll ───────────────────────────────────────────────────────────────────
+function setupScroll() {
   const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '#scroll-driver',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 1.5,
-      onUpdate: (self) => {
-        scrollState.progress = self.progress;
-        updateSceneLabels(self.progress);
-        updateHUD(self.progress);
-      }
+    scrollTrigger:{
+      trigger:'#scroll-driver',start:'top top',end:'bottom bottom',
+      scrub:1.8,
+      onUpdate:self=>{ S.progress=self.progress; syncScene(self.progress); }
     }
   });
 
-  // === SCENE 0→1: Camera pulls back, computer floats in (0–0.15) ===
-  tl.to(camera.position, { z: 12, y: 2.5, duration: 0.15 }, 0)
-    .to(computer.rotation, { y: 0.3, x: -0.05, duration: 0.15 }, 0)
-    .to('#scroll-hint', { opacity: 0, duration: 0.05 }, 0.02);
-
-  // === SCENE 1: Zoom into screen (0.15–0.35) ===
-  tl.to(camera.position, { z: 2, y: 0.5, x: 0, duration: 0.2 }, 0.15)
-    .to(camera.rotation, { x: 0, duration: 0.2 }, 0.15)
-    .to(computer.rotation, { y: 0, x: 0, duration: 0.2 }, 0.15);
-
-  // === SCENE 2: Camera zooms THROUGH screen (0.35–0.55) ===
-  tl.to(camera.position, { z: -2, y: 0, x: 0, duration: 0.2 }, 0.35)
-    .to(scene.fog, { density: 0.005, duration: 0.2 }, 0.35);
-
-  // === SCENE 3: Grid world — camera pulls back and up (0.55–0.75) ===
-  tl.to(camera.position, { z: -10, y: 4, duration: 0.2 }, 0.55)
-    .to(camera.rotation, { x: -0.3, duration: 0.2 }, 0.55);
-
-  // === SCENE 4: Warp tunnel (0.75–1.0) ===
-  tl.to(camera.position, { z: -80, y: 0, duration: 0.25 }, 0.75)
-    .to(camera.rotation, { x: 0, duration: 0.25 }, 0.75);
+  tl.to(camera.position,{z:12,y:2.2,duration:.15},0)
+    .to(computer.rotation,{y:.25,x:-.04,duration:.15},0)
+    .to('#scroll-hint',{opacity:0,duration:.05},.02)
+    .to(camera.position,{z:2.5,y:.8,x:0,duration:.2},.15)
+    .to(computer.rotation,{y:0,x:0,duration:.2},.15)
+    .to(camera.position,{z:-1.5,y:.2,duration:.2},.35)
+    .to(camera.position,{z:-12,y:5,duration:.2},.55)
+    .to(camera.rotation,{x:-.25,duration:.2},.55)
+    .to(camera.position,{z:-90,y:0,duration:.25},.75)
+    .to(camera.rotation,{x:0,duration:.25},.75);
 }
 
-function updateSceneLabels(p) {
-  const labels = [
-    { id: 'label-0', show: p < 0.08 },
-    { id: 'label-1', show: p >= 0.15 && p < 0.32 },
-    { id: 'label-2', show: p >= 0.55 && p < 0.72 },
-    { id: 'label-3', show: p >= 0.75 && p < 0.9 },
-    { id: 'label-4', show: p >= 0.92 },
-  ];
-  labels.forEach(l => {
-    const el = document.getElementById(l.id);
-    if(el) el.classList.toggle('visible', l.show);
+function syncScene(p) {
+  // Labels
+  [['label-0',p<.08],['label-1',p>=.15&&p<.32],['label-2',p>=.55&&p<.72],
+   ['label-3',p>=.75&&p<.9],['label-4',p>=.92]].forEach(([id,show])=>{
+    document.getElementById(id).classList.toggle('visible',show);
   });
+  document.getElementById('enter-btn').classList.toggle('visible',p>=.95);
 
-  // Show enter button at end
-  const enterBtn = document.getElementById('enter-btn');
-  enterBtn.classList.toggle('visible', p >= 0.95);
+  // Object visibility
+  if(computer) computer.visible = p < .55;
+  if(deskMesh) deskMesh.visible = p < .55;
+  if(scene3Group) scene3Group.visible = p >= .42;
+  if(scene4Group) scene4Group.visible = p >= .72;
+  if(stars) stars.material.opacity = p > .28 ? Math.min(1,(p-.28)*3) : 0;
 
-  // Toggle scene visibility
-  if(scene3Group) scene3Group.visible = p >= 0.4;
-  if(scene4Group) scene4Group.visible = p >= 0.7;
-  if(computer) computer.visible = p < 0.55;
+  floatObjs.forEach(o=>{ if(o.userData.by!==undefined) o.visible = p>=.3&&p<.72; });
 
-  // Stars fade in mid-journey
-  if(stars) stars.material.opacity = p > 0.3 ? Math.min(1, (p - 0.3) * 3) : 0;
+  // Screen glow intensity
+  if(deskLight) deskLight.intensity = p < .5 ? 4*(1-p*2) : 0;
 
-  // Floating objects
-  floatingObjects.forEach(obj => {
-    if(obj.userData.floatSpeed !== undefined) {
-      obj.visible = p >= 0.35 && p < 0.75;
-    }
-  });
-
-  // Particles
-  if(particles) particles.material.opacity = p > 0.1 && p < 0.5 ? 0.3 : 0;
-
-  // Screen content based on progress
-  if(screenMesh && screenMesh.userData.ctx) {
-    const ctx = screenMesh.userData.ctx;
-    const canvas = screenMesh.userData.canvas;
-    if(p < 0.4) {
-      if(p > 0.25) {
-        // Glitching screen before entry
-        ctx.fillStyle = '#000800';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#00ff41';
-        ctx.font = 'bold 22px Courier New';
-        ctx.fillText('> ENTERING...', 30, canvas.height / 2 - 10);
-        ctx.fillText('> STAND BY.', 30, canvas.height / 2 + 20);
-        for(let i = 0; i < 5; i++) {
-          ctx.fillStyle = `rgba(0,255,65,${Math.random() * 0.5})`;
-          ctx.fillRect(0, Math.random() * canvas.height, canvas.width, 2);
-        }
-      }
-      screenMesh.userData.tex.needsUpdate = true;
-    }
-  }
+  // HUD
+  document.getElementById('hud-depth').textContent=(p*100).toFixed(2);
+  const rs=['STABLE','NOMINAL','BENDING','WARPING','CRITICAL','VOID'];
+  const ri=Math.min(5,Math.floor(p*6));
+  const rEl=document.getElementById('hud-reality');
+  rEl.textContent=rs[ri];
+  rEl.style.color=p>.7?'#ff2d78':p>.4?'#ffb700':'#00ff41';
 }
 
-function updateHUD(p) {
-  document.getElementById('hud-depth').textContent = (p * 100).toFixed(2);
-  const realities = ['STABLE','NOMINAL','BENDING','WARPING','CRITICAL','VOID'];
-  const ri = Math.min(5, Math.floor(p * 6));
-  document.getElementById('hud-reality').textContent = realities[ri];
-  document.getElementById('hud-reality').style.color = p > 0.7 ? '#ff2d78' : p > 0.4 ? '#ffb700' : '#00ff41';
-}
-
-// ─── Animation loop ───────────────────────────────────────────────────────────
+// ─── Animate ──────────────────────────────────────────────────────────────────
 function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
-  const p = scrollState.progress;
+  const p = S.progress;
 
-  // Animate screen texture
-  if(screenMesh && screenMesh.userData.ctx && p < 0.28) {
-    drawScreenContent(screenMesh.userData.ctx, screenMesh.userData.canvas.width, screenMesh.userData.canvas.height, t);
-    screenMesh.userData.tex.needsUpdate = true;
+  // Screen update
+  if(screenMesh && p < .42) {
+    drawScreen(t);
+    screenTex.needsUpdate = true;
   }
 
-  // Computer float / breathe
+  // Computer breathing
   if(computer && computer.visible) {
-    computer.position.y = Math.sin(t * 0.5) * 0.08;
-    computer.rotation.z = Math.sin(t * 0.3) * 0.01;
-    // LED blink
-    const led = computer.children.find(c => c.userData.isLed);
-    if(led) led.material.opacity = t % 1 < 0.5 ? 1 : 0.2;
+    computer.position.y = .15 + Math.sin(t*.6)*.05;
+    computer.rotation.z = Math.sin(t*.35)*.008;
+    const led = computer.children.find(c=>c.userData.isLed);
+    if(led) { led.material.emissiveIntensity = t%1<.5?3:.4; }
   }
 
-  // Floating objects orbit + bob
-  floatingObjects.forEach(obj => {
-    if(!obj.visible) return;
-    obj.rotation.x += obj.userData.rotX || 0.01;
-    obj.rotation.y += obj.userData.rotY || 0.01;
-    obj.position.y = obj.userData.baseY + Math.sin(t * obj.userData.floatSpeed + obj.userData.floatOffset) * 0.5;
+  // Float objects
+  floatObjs.forEach(o=>{
+    if(!o.visible) return;
+    o.rotation.x += o.userData.rx||.01;
+    o.rotation.y += o.userData.ry||.01;
+    o.position.y = o.userData.by + Math.sin(t*o.userData.fs+o.userData.fo)*.4;
   });
 
-  // Star rotation
-  if(stars) stars.rotation.y = t * 0.01;
+  // Stars slow rotation
+  if(stars) stars.rotation.y = t*.008;
 
-  // Grid world animation
+  // Grid world
   if(scene3Group && scene3Group.visible) {
-    scene3Group.children.forEach(c => {
-      if(c.userData.rotSpeed) c.rotation.y += c.userData.rotSpeed;
-    });
+    scene3Group.children.forEach(c=>{ if(c.userData.rs) c.rotation.y+=c.userData.rs; });
   }
 
-  // Warp tunnel spin
+  // Tunnel spin
   if(scene4Group && scene4Group.visible) {
-    scene4Group.children.forEach((c, i) => {
-      if(c.geometry && c.geometry.type === 'TorusGeometry') {
-        c.rotation.z += 0.01 * (i % 2 === 0 ? 1 : -1);
-      }
+    scene4Group.children.forEach((c,i)=>{
+      if(c.geometry && c.geometry.type==='TorusGeometry')
+        c.rotation.z += .012*(i%2?1:-1);
     });
-    // Warp particle drift
-    const wpPos = scene4Group.children[scene4Group.children.length - 1];
-    if(wpPos && wpPos.geometry) {
-      wpPos.rotation.z += 0.002;
-    }
+    scene4Group.children[scene4Group.children.length-1].rotation.z+=.003;
   }
 
   renderer.render(scene, camera);
@@ -687,36 +884,24 @@ function animate() {
 
 // ─── HUD clock ────────────────────────────────────────────────────────────────
 function setupHUD() {
-  setInterval(() => {
-    const now = new Date();
-    document.getElementById('hud-time').textContent =
-      now.toLocaleTimeString('en-US', { hour12: false });
-  }, 1000);
+  setInterval(()=>{
+    document.getElementById('hud-time').textContent = new Date().toLocaleTimeString('en-US',{hour12:false});
+  },1000);
 }
 
-// ─── Cursor trail ─────────────────────────────────────────────────────────────
-function setupCursorTrail() {
-  let lastSpark = 0;
-  document.addEventListener('mousemove', e => {
-    const now = Date.now();
-    if(now - lastSpark < 60) return;
-    lastSpark = now;
-    const spark = document.createElement('div');
-    spark.className = 'spark';
-    const colors = ['#00ff41','#00f5ff','#ff2d78','#9d00ff','#ffb700'];
-    spark.style.background = colors[Math.floor(Math.random() * colors.length)];
-    spark.style.left = e.clientX - 2 + 'px';
-    spark.style.top = e.clientY - 2 + 'px';
-    document.body.appendChild(spark);
-    setTimeout(() => spark.remove(), 800);
+// ─── Cursor sparks ────────────────────────────────────────────────────────────
+function setupCursor() {
+  let last=0;
+  document.addEventListener('mousemove',e=>{
+    const now=Date.now(); if(now-last<55) return; last=now;
+    const s=document.createElement('div');
+    s.className='spark';
+    const palette=['#00ff41','#00f5ff','#ff2d78','#9d00ff','#ffb700'];
+    const sz=3+Math.random()*5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-sz/2}px;top:${e.clientY-sz/2}px;background:${palette[Math.floor(Math.random()*5)]};--dx:${(Math.random()-.5)*30}px;--dy:${-10-Math.random()*20}px`;
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),700);
   });
-}
-
-// ─── Resize ───────────────────────────────────────────────────────────────────
-function onResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
 }
 </script>
 </body>
