@@ -25,7 +25,7 @@ const PKGS={
     {name:"Maintenance",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
   ],
   templates:[
-    {name:"Template Site",desc:"Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
+    {name:"Template Site",desc:"Choose any of our 40 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
     {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
     {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $349.99 setup · $49.99/mo"},
     {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs · $249.99 setup · $34.99/mo"},
@@ -216,7 +216,7 @@ const STEPS={
 
   /* ── TEMPLATE BRANCH ── */
   pkg_templates:{
-    bot:"24 ready-made templates. Pick a design, send your content, go live in 24 hours. No tech needed.",
+    bot:"40 ready-made templates. Pick a design, send your content, go live in 24 hours. No tech needed.",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse all templates",s:"microstore"},
       {l:"What's included?",s:"templates_included"},
@@ -227,7 +227,7 @@ const STEPS={
     ]
   },
   microstore:{
-    bot:"24 live templates — pick your niche to find the best match:",
+    bot:"40 live templates — pick your niche to find the best match:",
     r:[
       {l:"\uD83D\uDCF8 Portfolio & Creative",s:"ms_portfolio"},
       {l:"\uD83C\uDFC6 Coach & Consultant",s:"ms_coach"},
@@ -268,11 +268,11 @@ const STEPS={
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_all:{
-    bot:"All 24 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nStandard — $149.99 setup · $19.99/mo\n⭐ Premium 3D (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\nAll live in 24hrs · Logo + content swapped in",
+    bot:"All 40 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nStandard — $149.99 setup · $19.99/mo\n⭐ Premium 3D (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\nAll live in 24hrs · Logo + content swapped in",
     r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   microstore_info:{
-    bot:"The Micro Store turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 setup · $34.99/mo",
+    bot:"The Micro Store turns any of our 40 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 setup · $34.99/mo",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
       {l:"I'm ready — let's go",s:"talk"},
@@ -678,9 +678,26 @@ window.toggleVoice=function(){
 };
 function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
-  var clean=txt.replace(/[\u{1F000}-\u{1FFFF}]|[\u2600-\u27BF]/gu,'').replace(/<br>/g,' ').trim();
+  var clean=txt.replace(/<br>/g,', ').replace(/[^\x00-\x7F]/g,'').replace(/\s+/g,' ').trim();
   var u=new SpeechSynthesisUtterance(clean);
-  u.rate=0.95;u.pitch=1.05;u.volume=1;
+  u.rate=0.88; u.pitch=1.0; u.volume=1;
+  // Pick the most natural-sounding female English voice available
+  var voices=window.speechSynthesis.getVoices();
+  var preferred=['Google UK English Female','Google US English','Samantha','Karen','Moira','Tessa','Fiona','Victoria','Veena','Microsoft Zira','Microsoft Aria'];
+  var picked=null;
+  for(var i=0;i<preferred.length;i++){
+    for(var j=0;j<voices.length;j++){
+      if(voices[j].name===preferred[i]){picked=voices[j];break;}
+    }
+    if(picked)break;
+  }
+  // Fallback: first English female or first English voice
+  if(!picked){
+    for(var j=0;j<voices.length;j++){
+      if(voices[j].lang&&voices[j].lang.startsWith('en')){picked=voices[j];break;}
+    }
+  }
+  if(picked)u.voice=picked;
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(u);
 }
@@ -718,7 +735,7 @@ var AI_KB=[
    r:"We build everything from one-page sites to full 15+ page brand networks \u2014 all high-fidelity, mobile-first, and live in days not weeks. Looking for something custom or a fast-launch template?",
    follow:'pkg_menu'},
   {k:['template','shop','ready-made','pre-made','quick','24 hour'],
-   r:"Our Template Shop has 24+ ready-made designs across every industry \u2014 pick one, we swap your logo and content, and it\u2019s live within 24 hours. Starting at $699.",
+   r:"Our Template Shop has 40+ ready-made designs across every industry \u2014 pick one, we swap your logo and content, and it\u2019s live within 24 hours. Starting at $699.",
    follow:'templates_menu'},
   {k:['whatsapp','automation','automate','chatbot','bot','ai ','artificial intelligence','auto reply','respond automatically'],
    r:"Our AI automation connects your WhatsApp, email, and even your phone line to a 24/7 AI that qualifies leads and responds instantly \u2014 so you never miss a sale while you sleep. We have 4 tiers depending on how much you want to automate.",
@@ -743,7 +760,7 @@ var AI_KB=[
    r:"Technical SEO is baked into every build \u2014 meta tags, structured data, sitemap, mobile speed. Growth and Trusted packages also include ongoing content SEO.",
    follow:'pkg_menu'},
   {k:['portfolio','example','your work','showcase','past client','sample','demo'],
-   r:"You\u2019re looking at it \u2014 this site is a live example of our work. We also have 24+ template previews in the shop.",
+   r:"You\u2019re looking at it \u2014 this site is a live example of our work. We also have 40+ template previews in the shop.",
    follow:'templates_menu'},
   {k:['hello','hi ','hey ','good morning','good afternoon','good evening','hola'],
    r:"Hey! Welcome to Prisca Dezigns \u2014 we build websites, AI automation, and digital brands. What can I help you with today?"},
