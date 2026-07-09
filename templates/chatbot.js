@@ -320,7 +320,18 @@ window.toggleVoice=function(){
 };
 function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
-  var clean=txt.replace(/\n/g,', ').replace(/[^\x00-\x7F]/g,'').replace(/\s+/g,' ').trim();
+  var clean = txt.replace(/<br\s*\/?>\s*/gi, '\n').replace(/<[^>]+>/g, '');
+  clean = clean
+    .replace(/[\u2756\u2714\u2022\u25CF\u25A0\u2B50\u26A1\u2734\u2735\u10102\u2756\u2757\u274C\u274E\u2705\u2611\u2612\u261E\u261A\u261B\u261C\u27A1]/g, '.\n')
+    .replace(/\s*[\u2014\u2013]\s*/g, '. ')
+    .replace(/\s*\|\s*/g, ', ')
+    .replace(/\n+/g, '. ')
+    .replace(/\.{2,}/g, '.')
+    .replace(/\.\s*\./g, '.')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/[^\x00-\x7F]/g, '')
+    .trim();
+  if(clean && !/[.!?]$/.test(clean)) clean += '.';
   var u=new SpeechSynthesisUtterance(clean);
   u.rate=0.88; u.pitch=1.0; u.volume=1;
   var voices=window.speechSynthesis.getVoices();
