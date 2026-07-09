@@ -39,8 +39,7 @@ const STEPS={
       {l:"\uD83C\uDFC7 I need a custom website",s:"need_website"},
       {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
       {l:"\uD83E\uDD16 I need AI automation",s:"automation"},
-      {l:"\uD83D\uDCE6 See agency packages",s:"pkg_menu"},
-      {l:"\u260E\uFE0F Contact Help Desk",s:"contact_help"}
+      {l:"\uD83D\uDCE6 See agency packages",s:"pkg_menu"}
     ]
   },
   need_website:{
@@ -371,7 +370,7 @@ function addMsg(txt,type){
 // ── CLAUDE AI BRAIN ──────────────────────────────────────────────────────
 var chatHistory = [];
 
-var SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for the Prisca Dezigns Template Shop, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in websites, AI automation, and brand architecture. Founded in Trinidad & Tobago. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nTEMPLATE SHOP:\n- 40+ ready-made templates across all industries\n- Standard: $149.99 USD setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 USD setup + $19.99/mo\n- Live in 24 hours. Logo, colours, and content swapped in.\n- Add-ons: Copywriting $49.99 | AI Chatbot $349.99 setup + $49.99/mo | Micro Store $249.99 setup + $34.99/mo\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n\nAI PACKAGES:\n- Tier 1 AI Chatbot: $1,499 setup + $149/mo\n- Tier 2 WhatsApp AI: $2,499 setup + $299/mo\n- Tier 3 Email AI: $3,999 setup + $449/mo\n- Tier 4 Voice Agent: $8,000 setup + $600/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp\n- Never be robotic. Sound like a real, warm, intelligent person.";
+var SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for the Prisca Dezigns Template Shop, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in websites, AI automation, and brand architecture. Founded in Trinidad & Tobago. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nTEMPLATE SHOP:\n- 40+ ready-made templates across all industries\n- Standard: $149.99 USD setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 USD setup + $19.99/mo\n- Live in 24 hours. Logo, colours, and content swapped in.\n- Add-ons: Copywriting $49.99 | AI Chatbot $349.99 setup + $49.99/mo | Micro Store $249.99 setup + $34.99/mo\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n\nAI PACKAGES:\n- Tier 1 AI Chatbot: $1,500 setup + $150/mo\n- Tier 2 WhatsApp AI: $3,500 setup + $400/mo\n- Tier 3 Email AI: $6,000 setup + $700/mo\n- Tier 4 Voice Agent: $8,000 USD setup + $900/mo setup + $900/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp\n- Never be robotic. Sound like a real, warm, intelligent person.";
 
 window.chatSend = function(){
   var inp = document.getElementById('chat-inp');
@@ -439,7 +438,7 @@ function smartFallback(history, cb){
   else if(/store|shop|sell|product|ecommerce|e-commerce/.test(s))
     replies = ["The Micro Store add-on turns any template into a full product shop — up to 12 products with WhatsApp order buttons, live in 72–96 hours. It's $249.99 setup + $34.99/mo. How many products are you planning to list?"];
   else if(/ai|chatbot|automation|whatsapp|bot|automat/.test(s))
-    replies = ["Our AI Chatbot add-on gives your template site a 24/7 AI that answers questions, qualifies leads, and captures contact info while you sleep — $349.99 setup + $49.99/mo. Want the full AI package breakdown?"];
+    replies = ["Our AI packages start at $1,500 USD setup + $50/mo — that gets you a 24/7 AI chatbot on your site that captures leads and answers questions automatically. Want the full tier breakdown?"];
   else if(/custom|bespoke|one.day|1.day/.test(s))
     replies = ["The 1-Day Custom Site is a full custom design — not a template — built and live in 24 hours for $299.99 flat. No monthly fee until you add a maintenance plan. Is that the kind of experience you're looking for?"];
   else if(/seo|rank|google|search|traffic/.test(s))
@@ -465,13 +464,5 @@ function smartFallback(history, cb){
 
 if(window.location.pathname.includes('/services')){
   setTimeout(function(){if(!open)toggleChat();},8000);
-  contact_help:{
-    bot:"Need immediate assistance? You can reach our Help Desk directly:\n\n🌐 GLOBAL HELP DESK: +1 (302) 469-7276\n💬 WHATSAPP DIRECT: +1 (868) 342-4101\n\nWe are available to answer your questions about packages, pricing, or custom builds.",
-    r:[
-      {l:"📞 Call Help Desk",url:"tel:+13024697276"},
-      {l:"💬 Message WhatsApp",url:"https://wa.me/18683424101"},
-      {l:"← Back to start",s:"start"}
-    ]
-  },
 }
 })();
