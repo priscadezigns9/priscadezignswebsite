@@ -113,45 +113,22 @@
     <div class="step" id="step1">
       <div class="step-num">1</div>
       <div class="step-body">
-        <div class="step-lbl">Terms of Use</div>
-        <div class="step-desc">Read our Terms of Use before proceeding.</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-          <a href="/templates/terms/" target="_blank" rel="noopener" class="read-btn" style="text-decoration:none;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            Open Terms
-          </a>
-          <button class="read-btn" id="read-btn" onclick="markTermsRead()">
-            <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            I&apos;ve Read It
-          </button>
-        </div>
+        <div class="step-lbl">Service Agreement</div>
+        <div class="step-desc">Read our terms before proceeding.</div>
+        <button class="read-btn" id="read-btn" onclick="openTerms()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Read Terms
+        </button>
       </div>
     </div>
     <div class="step locked" id="step2">
       <div class="step-num">2</div>
       <div class="step-body">
-        <div class="step-lbl">Service Agreement</div>
-        <div class="step-desc">Read our Service Agreement before proceeding.</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-          <a href="/templates/service-agreement/" target="_blank" rel="noopener" class="read-btn" style="text-decoration:none;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            Open Agreement
-          </a>
-          <button class="read-btn" id="agree-btn" onclick="markAgreementRead()">
-            <svg width="13" height="13" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            I&apos;ve Read It
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="step locked" id="step3">
-      <div class="step-num">3</div>
-      <div class="step-body">
         <label class="agree-label" onclick="toggleAgree()">
           <div class="agree-box" id="agree-box">
             <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <span class="agree-text">I have read and agree to the <a href="/templates/terms/" target="_blank" style="color:rgba(255,255,255,0.9);text-decoration:underline;" onclick="openTerms()">Terms of Use</a> &amp; <a href="/templates/service-agreement/" target="_blank" style="color:rgba(255,255,255,0.9);text-decoration:underline;" onclick="openAgreement()">Service Agreement</a></span>
+          <span class="agree-text">I have read and agree to the Terms of Use &amp; service agreement</span>
         </label>
       </div>
     </div>
@@ -177,11 +154,12 @@
     premium: { setup: 299.99, mo: 19.99, label: 'Premium 3D Template Website' },
     store:   { setup: 249.99, mo: 34.99, label: 'Micro Store' },
     copy:    { setup: 49.99,  mo: 0 },
-    chatbot: { setup: 349.99, mo: 49.99 }
+    chatbot: { setup: 349.99, mo: 49.99 },
+    voice:   { setup: 500.00, mo: 50.00 }
   };
 
   /* ── State ── */
-  var state = { name: null, type: null, copy: false, chatbot: false, agreed: false, termsRead: false, agreementRead: false };
+  var state = { name: null, type: null, copy: false, chatbot: false, voice: false, agreed: false, termsRead: false };
 
   /* ── Load from URL params (primary) then sessionStorage (fallback) ── */
   (function loadCart(){
@@ -197,6 +175,7 @@
           state.type = s.base.type || 'website';
           state.copy = !!(s.addons && s.addons.copy);
           state.chatbot = !!(s.addons && s.addons.chatbot);
+          state.voice = !!(s.addons && s.addons.voice);
         }
       } catch(e){}
     }
@@ -247,6 +226,13 @@
     html += '<div class="addon-price"><div class="addon-price-setup">+$349.99</div><div class="addon-price-mo">+$49.99/mo</div></div>';
     html += '</div>';
 
+    
+    /* Voice addon */
+    html += '<div class="addon-row ' + (state.voice ? 'active' : '') + '" onclick="toggleAddon(\'voice\')">';
+    html += '<div class="addon-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    html += '<div class="addon-info"><div class="addon-name">Voice Intelligence</div><div class="addon-desc">Enable your AI to listen to voice notes and respond with audio.</div></div>';
+    html += '<div class="addon-price"><div class="addon-price-setup">+$500.00</div><div class="addon-price-mo">+$50.00/mo</div></div>';
+    html += '</div>';
     html += '</div>';
     body.innerHTML = html;
 
@@ -263,6 +249,7 @@
     var mo    = pr.mo;
     if (state.copy)    setup += PRICES.copy.setup;
     if (state.chatbot) { setup += PRICES.chatbot.setup; mo += PRICES.chatbot.mo; }
+    if (state.voice) { setup += PRICES.voice.setup; mo += PRICES.voice.mo; }
 
     document.getElementById('t-setup').textContent = '$' + setup.toFixed(2);
     document.getElementById('t-mo').textContent    = '$' + mo.toFixed(2) + ' / mo';
@@ -281,6 +268,7 @@
     ];
     if (state.copy)    ppLines.push('%E2%9E%95%20Copywriting%20Add-On');
     if (state.chatbot) ppLines.push('%E2%9E%95%20AI%20Chatbot%20Add-On');
+    if (state.voice) ppLines.push('%E2%9E%95%20Voice/Audio%20Intelligence');
     ppLines.push('%0A%F0%9F%92%B3%20Setup%20Total%3A%20%24' + totalSetup.toFixed(2));
     ppLines.push('%F0%9F%93%85%20Monthly%3A%20%24' + totalMo.toFixed(2) + '%2Fmo');
 
@@ -290,6 +278,7 @@
     ];
     if (state.copy)    bkLines.push('%E2%9E%95%20Copywriting%20Add-On');
     if (state.chatbot) bkLines.push('%E2%9E%95%20AI%20Chatbot%20Add-On');
+    if (state.voice) bkLines.push('%E2%9E%95%20Voice/Audio%20Intelligence');
     bkLines.push('%0A%F0%9F%92%B3%20Setup%20Total%3A%20%24' + totalSetup.toFixed(2));
     bkLines.push('%F0%9F%93%85%20Monthly%3A%20%24' + totalMo.toFixed(2) + '%2Fmo');
     bkLines.push('%0ACould%20you%20please%20send%20me%20your%20banking%20details%20so%20I%20can%20complete%20the%20transfer%3F');
@@ -301,29 +290,17 @@
   }
 
   /* ── Terms ── */
-  window.markTermsRead = function() {
+  window.openTerms = function() {
+    window.open('/templates/terms/', '_blank', 'noopener');
     state.termsRead = true;
     var btn = document.getElementById('read-btn');
     var s2  = document.getElementById('step2');
     if (btn) { btn.classList.add('done'); btn.textContent = 'Terms Read ✓'; }
     if (s2)  { s2.classList.remove('locked'); s2.classList.add('unlocked'); }
   };
-  window.openTerms = function() {
-    window.open('/templates/terms/', '_blank', 'noopener');
-  };
-  window.markAgreementRead = function() {
-    state.agreementRead = true;
-    var btn = document.getElementById('agree-btn');
-    var s3  = document.getElementById('step3');
-    if (btn) { btn.classList.add('done'); btn.textContent = 'Agreement Read ✓'; }
-    if (s3)  { s3.classList.remove('locked'); s3.classList.add('unlocked'); }
-  };
-  window.openAgreement = function() {
-    window.open('/templates/service-agreement/', '_blank', 'noopener');
-  };
 
   window.toggleAgree = function() {
-    if (!state.termsRead || !state.agreementRead) return;
+    if (!state.termsRead) return;
     state.agreed = !state.agreed;
     var box = document.getElementById('agree-box');
     if (box) box.classList.toggle('checked', state.agreed);
@@ -345,8 +322,10 @@
     /* re-render just the add-on rows without full re-render */
     var copyRow    = document.querySelectorAll('.addon-row')[0];
     var chatbotRow = document.querySelectorAll('.addon-row')[1];
+    var voiceRow   = document.querySelectorAll('.addon-row')[2];
     if (copyRow)    copyRow.classList.toggle('active', state.copy);
     if (chatbotRow) chatbotRow.classList.toggle('active', state.chatbot);
+    if (voiceRow)   voiceRow.classList.toggle('active', state.voice);
     persist();
   };
 
@@ -364,7 +343,7 @@
   function persist() {
     sessionStorage.setItem('pd_cart', JSON.stringify({
       base: state.name ? { name: state.name, type: state.type } : null,
-      addons: { copy: state.copy, chatbot: state.chatbot }
+      addons: { copy: state.copy, chatbot: state.chatbot, voice: state.voice }
     }));
   }
 
