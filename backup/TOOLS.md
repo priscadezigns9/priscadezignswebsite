@@ -81,8 +81,7 @@ Full pipeline + AI stack for Prisca Dezigns client service tiers.
 - Credential: `improvmx-api`
 - Account email: `priscillanarine@gmail.com`
 - Auth: Basic — `api:KEY` base64 encoded = `YXBpOnNrX2YyZTZmNDg2Mzc4NzRlODhhOGMyODU1MjgyNTc3MjRj`
-- Status: `priscadezigns.org` registered under a different ImprovMX account — needs DNS claim
-- Pending: create `hello@priscadezigns.org` → `priscillanarine@gmail.com` once domain is claimed
+- Status: `hello@priscadezigns.org` → `priscadezigns9@gmail.com` (ACTIVE)
 
 ## Gmail Send — Critical Rule (2026-07-04)
 **NEVER use `--body "$(cat file)"` — shell substitution does NOT expand inside the gog tool.**
