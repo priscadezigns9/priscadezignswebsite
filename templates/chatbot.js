@@ -367,96 +367,19 @@ function addMsg(txt,type){
   }
 }
 
-// ── CLAUDE AI BRAIN ──────────────────────────────────────────────────────
-var chatHistory = [];
-
-var SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for the Prisca Dezigns Template Shop, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in websites, AI automation, and brand architecture. Founded in Trinidad & Tobago. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nTEMPLATE SHOP:\n- 40+ ready-made templates across all industries\n- Standard: $149.99 USD setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 USD setup + $19.99/mo\n- Live in 24 hours. Logo, colours, and content swapped in.\n- Add-ons: Copywriting $49.99 | AI Chatbot $349.99 setup + $49.99/mo | Micro Store $249.99 setup + $34.99/mo\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n\nAI PACKAGES:\n- Tier 1 AI Chatbot: $1,500 setup + $150/mo\n- Tier 2 WhatsApp AI: $3,500 setup + $400/mo\n- Tier 3 Email AI: $6,000 setup + $700/mo\n- Tier 4 Voice Agent: $8,000 USD setup + $900/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp\n- Never be robotic. Sound like a real, warm, intelligent person.";
-
-window.chatSend = function(){
-  var inp = document.getElementById('chat-inp');
-  var t = inp.value.trim(); if(!t) return; inp.value='';
-  addMsg(t, 'usr');
-  if(intake.active){advanceIntake(t);return;}
-  chatHistory.push({role:'user', content:t});
-  var q = document.getElementById('chat-qr'); q.innerHTML='';
-  askClaude(chatHistory, function(reply){
-    chatHistory.push({role:'assistant', content:reply});
-    addMsg(reply, 'bot');
-    setTimeout(function(){
-      var lower = reply.toLowerCase();
-      if(/whatsapp|team|reach out|connect|book|schedule|contact/.test(lower)){
-        var a = document.createElement('a');
-        a.href = WA+'?text='+encodeURIComponent('Hi, I was chatting on the template shop and need help.');
-        a.target='_blank'; a.rel='noopener';
-        a.className='qrb wa'; a.innerHTML = WA_SVG+' Chat with the team';
-        q.appendChild(a);
-      }
-      setBack(hist.length>0);
-    }, 300);
-  });
+window.chatSend=function(){
+  var i=document.getElementById('chat-inp');
+  var t=i.value.trim();if(!t)return;i.value='';
+  addMsg(t,'usr');
+  setTimeout(function(){
+    addMsg("Got it! Tap below for the fastest response \uD83D\uDC47",'bot');
+    var q=document.getElementById('chat-qr');q.innerHTML='';
+    var a=document.createElement('a');
+    a.href=WA+'?text='+encodeURIComponent(t);a.target='_blank';a.rel='noopener';
+    a.className='qrb wa';a.innerHTML=WA_SVG+' WhatsApp Us';
+    q.appendChild(a);setBack(true);
+  },650);
 };
-
-function askClaude(history, cb){
-  // Groq Llama 3.3 via Supabase Edge Function proxy
-  var payload = JSON.stringify({
-    system: SYSTEM_PROMPT,
-    messages: history,
-    max_tokens: 300
-  });
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy', true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.timeout = 10000;
-  xhr.onload = function(){
-    try {
-      var data = JSON.parse(xhr.responseText);
-      if(data.reply){cb(data.reply); return;}
-    } catch(e){}
-    smartFallback(history, cb);
-  };
-  xhr.onerror = xhr.ontimeout = function(){ smartFallback(history, cb); };
-  xhr.send(payload);
-}
-
-function smartFallback(history, cb){
-  var last = (history[history.length-1]||{}).content||'';
-  var s = last.toLowerCase();
-  var replies = [];
-
-  if(/hello|hi\b|hey\b|good (morning|afternoon|evening)/.test(s))
-    replies = ["Hey! Welcome to the Prisca Dezigns Template Shop. We have 40+ professional templates — pick one and you're live in 24 hours. What kind of business is the site for?"];
-  else if(/price|cost|how much|pricing|fee/.test(s))
-    replies = ["Standard templates are $149.99 USD setup + $19.99/mo — that includes your logo, branding, and content all swapped in. Premium 3D templates (Aeon, Nexus, Stellar) are $299.99 setup. What type of business are you building for?"];
-  else if(/template|design|choose|pick|which/.test(s))
-    replies = ["We have 40+ templates across every industry — from consultants and coaches to restaurants and retail. Some fan favourites are Luxe, Velocity, Noir, and Atelier. What's your business niche?"];
-  else if(/how long|when|24|turnaround|quick|fast|time/.test(s))
-    replies = ["Template sites go live in 24 hours flat. You send your content — logo, photos, copy — and the team handles the rest. Custom sites take 3–7 days. Do you have your content ready?"];
-  else if(/store|shop|sell|product|ecommerce|e-commerce/.test(s))
-    replies = ["The Micro Store add-on turns any template into a full product shop — up to 12 products with WhatsApp order buttons, live in 72–96 hours. It's $249.99 setup + $34.99/mo. How many products are you planning to list?"];
-  else if(/ai|chatbot|automation|whatsapp|bot|automat/.test(s))
-    replies = ["Our AI packages start at $1,500 USD setup + $50/mo — that gets you a 24/7 AI chatbot on your site that captures leads and answers questions automatically. Want the full tier breakdown?"];
-  else if(/custom|bespoke|one.day|1.day/.test(s))
-    replies = ["The 1-Day Custom Site is a full custom design — not a template — built and live in 24 hours for $299.99 flat. No monthly fee until you add a maintenance plan. Is that the kind of experience you're looking for?"];
-  else if(/seo|rank|google|search|traffic/.test(s))
-    replies = ["Every template includes technical SEO baked in — meta tags, schema markup, sitemap, mobile speed optimisation. Growth and enterprise packages add monthly content SEO. What industry are you trying to rank in?"];
-  else if(/maintenance|monthly|subscription|support/.test(s))
-    replies = ["Every project includes 1 month free maintenance. After that, the plan covers updates, uptime monitoring, backups, and priority support. Would you like the full maintenance pricing?"];
-  else if(/portfolio|example|demo|your work|show me/.test(s))
-    replies = ["You're actually looking at a live example right now — this page itself is built by Prisca Dezigns. The template previews in the shop are all live demos too. Which industry is closest to yours?"];
-  else if(/location|where|trinidad|tobago|caribbean|local/.test(s))
-    replies = ["We're based in Trinidad & Tobago and work with clients across the Caribbean and internationally — everything is done remotely and online. What's your business based?"];
-  else if(/thank|thanks|appreciate|great|perfect|awesome/.test(s))
-    replies = ["Anytime! Feel free to browse the templates or come back when you're ready to get started. The team is also on WhatsApp if you want a faster conversation."];
-  else if(/yes|yeah|sure|ok\b|okay|sounds good|let.s go/.test(s))
-    replies = ["Great! The fastest next step is to pick a template from the shop above — or if you want a recommendation based on your industry, just tell me what business you're in."];
-  else
-    replies = ["Good question — I want to make sure I give you the right answer. Could you tell me a bit more about your business and what you're trying to build? That way I can point you to the perfect option."];
-
-  // Add natural variation
-  var r = replies[Math.floor(Math.random()*replies.length)];
-  cb(r);
-}
-
 
 if(window.location.pathname.includes('/services')){
   setTimeout(function(){if(!open)toggleChat();},8000);
