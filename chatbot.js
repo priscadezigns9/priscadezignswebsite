@@ -729,17 +729,20 @@ function speak(txt){
 }
 
 // ── Typing dots then message ────────────────────────────────────────────────
-function addMsg(txt,type){
+function addMsg(txt,type,elemId){
   var m=document.getElementById('chat-msgs');
   if(type==='bot'){
     // Show typing dots first
     var dots=document.createElement('div');
     dots.className='cmsg typing';
     dots.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+    if(elemId) dots.id=elemId;
     m.appendChild(dots);m.scrollTop=m.scrollHeight;
+    if(txt==='...') return; // AI brain will replace this element directly
     setTimeout(function(){
       if(dots.parentNode)dots.parentNode.removeChild(dots);
       var d=document.createElement('div');d.className='cmsg bot';
+      if(elemId) d.id=elemId+'-done';
       var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       d.innerHTML=safe.replace(/\n/g,'<br>');
       m.appendChild(d);m.scrollTop=m.scrollHeight;
@@ -750,6 +753,17 @@ function addMsg(txt,type){
     d.textContent=txt;
     m.appendChild(d);m.scrollTop=m.scrollHeight;
   }
+}
+
+function replaceTypingWithReply(elemId, txt) {
+  var m = document.getElementById('chat-msgs');
+  var dots = document.getElementById(elemId);
+  if(dots && dots.parentNode) dots.parentNode.removeChild(dots);
+  var d = document.createElement('div'); d.className = 'cmsg bot';
+  var safe = txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  d.innerHTML = safe.replace(/\n/g,'<br>');
+  m.appendChild(d); m.scrollTop = m.scrollHeight;
+  speak(txt);
 }
 
 // ── CONVERSATIONAL AI ENGINE ──────────────────────────────────────────────
@@ -926,6 +940,30 @@ function handleIntent(t, intent){
   }
 }
 
+// ── AI BRAIN (Groq Llama 3.3 via Supabase) ──────────────────
+var AI_PROXY = "https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy";
+var AI_SYSTEM = "You are the AI assistant for Prisca Dezigns, a premium web design and AI automation agency in Trinidad & Tobago. Your job is to qualify leads, answer questions, and guide visitors toward booking a consultation.\n\nPACKAGES & PRICING:\n- Template Site: $149.99 USD setup + $19.99 USD/mo (live in 24hrs)\n- Template + Copy: $199.99 USD setup + $19.99 USD/mo\n- Template + Chatbot: $249.99 USD setup + $49.99 USD/mo\n- Template + Full Package: $299.99 USD setup + $49.99 USD/mo\n- Premium 3D Templates (Aeon, Nexus, Stellar): $299.99 USD setup + $19.99/mo\n- AI Chatbot Add-on: $349.99 USD setup + $49.99 USD/mo\n- Micro Store Add-on: $249.99 USD setup + $34.99 USD/mo\n\nAI AUTOMATION:\n- Tier 1 — Website AI Chatbot: $1,500 USD setup + $150 USD/mo\n- Tier 2 — + WhatsApp AI: $3,500 USD setup + $400 USD/mo\n- Tier 3 — + Email AI: $6,000 USD setup + $700 USD/mo\n- Tier 4 — Voice Agent: $8,000 USD setup + $900 USD/mo\n\nMaintenance: $97 USD/mo\n\nRULES:\n- Warm, concise, conversational — 2-4 sentences max\n- Always end with a follow-up question\n- Never invent prices\n- If ready to buy, share WhatsApp: https://wa.me/18683424101\n- Never sound robotic";
+var aiHistory = [];
+
+function callAIBrain(userMsg, onReply) {
+  aiHistory.push({role:"user", content: userMsg});
+  fetch(AI_PROXY, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({system: AI_SYSTEM, messages: aiHistory, max_tokens: 250})
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var reply = d.reply || "Give me a second — could you rephrase that?";
+    aiHistory.push({role:"assistant", content: reply});
+    onReply(reply);
+  })
+  .catch(function(){
+    onReply("Something went sideways on my end. Reach us directly on WhatsApp: +1 (868) 342-4101");
+  });
+}
+// ────────────────────────────────────────────────────────────
+
 function runConversation(input){
   conv.msgCount++;
   var intent = detectIntent(input);
@@ -948,6 +986,20 @@ window.chatSend=function(){
   var t=i.value.trim();if(!t)return;i.value='';
   addMsg(t,'usr');
   if(intake.active){advanceIntake(t);return;}
+
+  // Check intent first — if default/unknown, use AI Brain
+  var intent = detectIntent(t);
+  var isDefault = (intent === 'default' || intent === 'offtopic');
+
+  if(isDefault){
+    var typingId = 'ai-typing-'+Date.now();
+    addMsg('...', 'bot', typingId);
+    callAIBrain(t, function(reply){
+      replaceTypingWithReply(typingId, reply);
+    });
+    return;
+  }
+
   setTimeout(function(){
     var result=runConversation(t);
     addMsg(result.r,'bot');
