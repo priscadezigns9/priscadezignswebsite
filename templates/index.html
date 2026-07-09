@@ -4,9 +4,108 @@
     grid-template-columns: 1fr !important;
   }
 }
-</style><style>
-/* Chatbot light theme — scoped to chatbot elements */
-#pd-chat-bubble,#pd-chat-window{
+</style>
+<style>
+/* ── Chatbot — master styles (synced from main site) ── */
+
+        /* ── Chatbot Bubble ── */
+        #pd-chat-bubble {
+            position:fixed; bottom:28px; right:28px; z-index:9999;
+            width:64px; height:64px; border-radius:50%;
+            background:var(--purple); border:2px solid var(--lilac);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; box-shadow:0 8px 32px rgba(48,25,52,0.30);
+            transition:transform 0.2s, box-shadow 0.2s;
+        }
+        #pd-chat-bubble:hover { transform:scale(1.08); box-shadow:0 12px 40px rgba(48,25,52,0.40); }
+        #pd-chat-bubble svg { width:28px; height:28px; fill:var(--lilac); }
+        #pd-chat-bubble .chat-x { display:none; font-size:1.6rem; color:var(--lilac); font-weight:700; line-height:1; }
+        #pd-chat-bubble.open svg { display:none; }
+        #pd-chat-bubble.open .chat-x { display:block; }
+        /* ── Chat Window ── */
+        #pd-chat-window {
+            position:fixed; bottom:108px; right:28px; z-index:9998;
+            width:480px;
+            background:var(--ivory);
+            border:1px solid rgba(48,25,52,0.12);
+            box-shadow:0 28px 70px rgba(48,25,52,0.22);
+            display:flex; flex-direction:column;
+            opacity:0; pointer-events:none;
+            transform:translateY(18px);
+            transition:opacity 0.28s, transform 0.28s;
+            max-height:720px;
+            border-radius:4px;
+        }
+        #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0); }
+        /* ── Header ── */
+        .chat-hdr { background:var(--purple); padding:20px 22px; display:flex; align-items:center; gap:14px; flex-shrink:0; }
+        .chat-avatar { width:44px; height:44px; border-radius:50%; background:var(--lilac); display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:900; color:var(--purple); font-family:var(--font-heading); flex-shrink:0; }
+        .chat-hdr-name { font-size:0.95rem; font-weight:700; letter-spacing:0.08em; color:var(--ivory); }
+        .chat-hdr-status { font-size:0.72rem; color:var(--lilac); display:flex; align-items:center; gap:6px; margin-top:3px; }
+        .chat-hdr-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+        /* Voice toggle button */
+        #chat-voice-toggle {
+            background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+            color:var(--lilac); border-radius:100px;
+            font-size:0.62rem; font-weight:700; letter-spacing:0.1em;
+            padding:5px 10px; cursor:pointer; display:flex; align-items:center; gap:5px;
+            transition:background 0.2s; white-space:nowrap;
+        }
+        #chat-voice-toggle:hover { background:rgba(255,255,255,0.22); }
+        #chat-voice-toggle.voice-on { background:rgba(74,222,128,0.2); border-color:#4ade80; color:#4ade80; }
+        .chat-sdot { width:7px; height:7px; border-radius:50%; background:#4ade80; animation:pgr 2s infinite; }
+        @keyframes pgr { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+        /* ── Back bar ── */
+        #chat-back-bar { display:none; align-items:center; gap:8px; padding:10px 18px; border-bottom:1px solid rgba(48,25,52,0.08); background:rgba(200,162,200,0.07); cursor:pointer; flex-shrink:0; }
+        #chat-back-bar.vis { display:flex; }
+        #chat-back-bar span { font-size:0.72rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--purple); opacity:0.6; }
+        #chat-back-bar:hover span { opacity:1; }
+        /* ── Messages ── */
+        .chat-msgs { flex:1; overflow-y:auto; padding:18px 16px; display:flex; flex-direction:column; gap:14px; min-height:160px; max-height:420px; }
+        .chat-msgs::-webkit-scrollbar { width:3px; }
+        .chat-msgs::-webkit-scrollbar-thumb { background:var(--lilac); border-radius:3px; }
+        .cmsg { max-width:85%; font-size:0.95rem; line-height:1.65; padding:13px 17px; animation:cfUp 0.22s ease; }
+        @keyframes cfUp { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+        .cmsg.bot { background:var(--purple); color:var(--ivory); align-self:flex-start; border-radius:0 14px 14px 14px; }
+        .cmsg.usr { background:var(--lilac); color:var(--purple); align-self:flex-end; border-radius:14px 0 14px 14px; font-weight:600; }
+        /* Typing dots */
+        .cmsg.typing { background:var(--purple); align-self:flex-start; border-radius:0 14px 14px 14px; padding:16px 20px; }
+        .typing-dots { display:flex; gap:5px; }
+        .typing-dots span { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.5); animation:tdot 1.2s infinite; }
+        .typing-dots span:nth-child(2){animation-delay:0.2s;}
+        .typing-dots span:nth-child(3){animation-delay:0.4s;}
+        @keyframes tdot{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+        /* ── Package cards ── */
+        .cpkg-grid { display:flex; flex-direction:column; gap:8px; width:100%; align-self:stretch; }
+        .cpkg-card { background:#fff; border:1px solid rgba(48,25,52,0.1); padding:13px 15px; cursor:pointer; transition:border-color 0.2s,background 0.2s; border-radius:4px; }
+        .cpkg-card:hover { border-color:var(--lilac); background:rgba(200,162,200,0.05); }
+        .cpkg-name { font-size:0.9rem; font-weight:900; color:var(--purple); letter-spacing:0.05em; }
+        .cpkg-price { font-size:0.78rem; font-weight:700; color:var(--lilac); margin-top:3px; }
+        .cpkg-desc { font-size:0.76rem; color:var(--purple); opacity:0.5; margin-top:5px; line-height:1.5; }
+        /* ── Quick replies ── */
+        .chat-qr { padding:10px 14px 12px; display:flex; flex-wrap:wrap; gap:8px; flex-shrink:0; }
+        .qrb { font-size:0.78rem; font-weight:700; letter-spacing:0.05em; padding:9px 16px; border:1px solid rgba(48,25,52,0.22); background:transparent; cursor:pointer; color:var(--purple); border-radius:100px; transition:background 0.2s,color 0.2s,border-color 0.2s; font-family:var(--font-body); }
+        .qrb:hover { background:var(--purple); color:var(--ivory); border-color:var(--purple); }
+        .qrb.wa { background:var(--lilac); color:var(--purple); border-color:var(--lilac); display:inline-flex; align-items:center; gap:7px; text-decoration:none; }
+        .qrb.wa:hover { background:var(--purple); color:var(--ivory); border-color:var(--purple); }
+        /* ── Input row ── */
+        .chat-inp-row { display:flex; border-top:1px solid rgba(48,25,52,0.1); flex-shrink:0; align-items: center; }
+        #chat-inp { flex:1; border:none; background:transparent; padding:16px 16px; font-size:0.95rem; font-family:var(--font-body); color:var(--purple); outline:none; }
+        #chat-inp::placeholder { color:rgba(48,25,52,0.35); }
+        #chat-mic { background: transparent; border: none; cursor: pointer; padding: 0 10px; color: var(--purple); opacity: 0.5; transition: opacity 0.2s, color 0.2s; display: flex; align-items: center; }
+        #chat-mic:hover { opacity: 1; color: var(--lilac); }
+        #chat-mic.recording { color: #ff4d4d; opacity: 1; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        #chat-snd { background:var(--purple); border:none; cursor:pointer; padding:16px 20px; color:var(--lilac); font-size:1.2rem; transition:background 0.2s; height: 100%; }
+        #chat-snd:hover { background:var(--lilac); color:var(--purple); }
+        @media(max-width:520px){
+            #pd-chat-window{width:calc(100vw - 16px);right:8px;bottom:96px;max-height:80vh;}
+            .cmsg{font-size:0.92rem;}
+            #chat-inp{font-size:0.92rem;}
+        }
+    
+/* Light theme override for shop */
+#pd-chat-bubble, #pd-chat-window {
   --ivory:#ffffff;
   --bg:#ffffff;
   --surface:#f7f7f5;
@@ -153,7 +252,7 @@ All payments are confirmed in writing before work begins. Setup fees are due upf
 </div></div><div class="faq-item"><button class="faq-q" aria-expanded="false">
 Do I own the template once I pay?
 <span class="faq-icon">+</span></button><div class="faq-a">
-No — and that's standard across all professional template services (Squarespace, Wix, and every agency). The template design, code, layout, and visual structure are the <strong>intellectual property of Prisca Dezigns</strong> and remain so at all times — whether you're on a subdomain or your own custom domain. What you own is your <strong>content</strong>: your photos, your logo, your business name, and your written copy. You receive a licence to use your customised version while your subscription is active. Full details are in our <a href="/templates/terms/" style="color:var(--purple)">Terms of Use →</a></div></div></div></div><footer><video class="footer-video" autoplay muted loop playsinline><source src="https://assets.mixkit.co/videos/47738/47738-720.mp4" type="video/mp4"></video><div class="footer-video-overlay"></div><a href="https://priscadezigns.org" class="f-logo"><img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="Prisca Dezigns"></a><div class="f-links"><a href="#templates">Templates</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="/templates/terms/">Terms of Use</a><a href="/templates/privacy/">Privacy Policy</a><a href="https://priscadezigns.org">Main Site</a></div><span class="f-copy">© 2026 Prisca Dezigns · Trinidad & Tobago</span></footer><link rel="stylesheet" href="/templates/chatbot_styles.css?v=9"><div id="pd-chat-bubble" onclick="toggleChat()">
+No — and that's standard across all professional template services (Squarespace, Wix, and every agency). The template design, code, layout, and visual structure are the <strong>intellectual property of Prisca Dezigns</strong> and remain so at all times — whether you're on a subdomain or your own custom domain. What you own is your <strong>content</strong>: your photos, your logo, your business name, and your written copy. You receive a licence to use your customised version while your subscription is active. Full details are in our <a href="/templates/terms/" style="color:var(--purple)">Terms of Use →</a></div></div></div></div><footer><video class="footer-video" autoplay muted loop playsinline><source src="https://assets.mixkit.co/videos/47738/47738-720.mp4" type="video/mp4"></video><div class="footer-video-overlay"></div><a href="https://priscadezigns.org" class="f-logo"><img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="Prisca Dezigns"></a><div class="f-links"><a href="#templates">Templates</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="/templates/terms/">Terms of Use</a><a href="/templates/privacy/">Privacy Policy</a><a href="https://priscadezigns.org">Main Site</a></div><span class="f-copy">© 2026 Prisca Dezigns · Trinidad & Tobago</span></footer><div id="pd-chat-bubble" onclick="toggleChat()">
         <svg viewBox="0 0 24 24"><path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
         <span class="chat-x">✕</span>
     </div>
@@ -181,7 +280,7 @@ No — and that's standard across all professional template services (Squarespac
             <input type="text" id="chat-inp" placeholder="Type a message…" onkeydown="if(event.key==='Enter')chatSend()" />
             <button id="chat-snd" onclick="chatSend()">➤</button>
         </div>
-    </div><script src="/templates/chatbot.js?v=10"></script><div id="cart-overlay" onclick="closeCart()"></div><div id="cart-drawer"><div class="cd-hdr"><span class="cd-title">Your Order</span><button class="cd-close" onclick="closeCart()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="cd-body"><div class="cd-empty" id="cart-empty-msg"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><strong>No template selected</strong><span>Pick a template above and tap Add to Cart</span></div><div id="cart-base-block"><p class="cd-section-label">Selected Template</p><div class="cd-template-card"><div class="cd-tc-info"><div class="cd-tc-name" id="cb-name">—</div><div class="cd-tc-sub" id="cb-type-label">Website Template</div></div><div class="cd-tc-price"><div class="cd-tc-setup" id="cb-setup-price">$149.99</div><div class="cd-tc-mo" id="cb-mo-price">setup</div></div><button class="cd-tc-remove" onclick="removeBase()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div><div id="cart-addons-block"><p class="cd-section-label">Enhance Your Package</p><label class="cd-addon-row" id="addon-copy"><div class="cd-addon-check-wrap"><input type="checkbox" id="check-copy-input" class="cd-addon-input" onchange="toggleAddon('copy')"><span class="cd-checkbox"><svg class="cd-check-icon" width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="cd-addon-info"><div class="cd-addon-name">Copywriting</div><div class="cd-addon-desc">Professional copy — headers, descriptions &amp; CTAs written for you.</div></div><div class="cd-addon-price"><div class="cd-addon-setup">+$49.99</div><div class="cd-addon-mo">one-time</div></div></label><label class="cd-addon-row" id="addon-chatbot"><div class="cd-addon-check-wrap"><input type="checkbox" id="check-chatbot-input" class="cd-addon-input" onchange="toggleAddon('chatbot')"><span class="cd-checkbox"><svg class="cd-check-icon" width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="cd-addon-info"><div class="cd-addon-name">AI Chatbot</div><div class="cd-addon-desc">Custom AI trained on your brand — captures leads &amp; answers questions 24/7.</div></div><div class="cd-addon-price"><div class="cd-addon-setup">+$349.99</div><div class="cd-addon-mo">+$49.99/mo</div></div></label></div></div><div class="cd-footer"><div class="cd-totals"><div class="cd-total-row"><span>Setup Total</span><span id="cart-setup-total">$0.00</span></div><div class="cd-total-row cd-total-mo"><span>Monthly</span><span id="cart-mo-total">$0.00 / mo</span></div></div><div class="cd-agree-row" id="cd-agree-row"><div class="cd-step" id="cd-step1"><div class="cd-step-num">1</div><div class="cd-step-body"><div class="cd-step-label">Service Agreement</div><div class="cd-step-desc">Read our Terms of Use before accepting.</div><button class="cd-read-btn" id="cd-read-btn" onclick="openTerms()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Read Terms</button></div></div><div class="cd-step cd-step-locked" id="cd-step2"><div class="cd-step-num">2</div><div class="cd-step-body"><label class="cd-agree-label" id="cd-agree-label"><input type="checkbox" id="cd-agree-chk" onchange="updateAgreement()" disabled><span class="cd-agree-box"><svg class="cd-agree-icon" width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="cd-agree-text">I have read and agree to the Terms of Use &amp; service agreement</span></label></div></div></div><div class="cd-checkout-row"><a id="cart-paypal" class="cd-btn-paypal disabled" href="#" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828l-1.122 7.12h3.174l.522-3.308h1.976c4.358 0 7.332-2.103 8.228-5.93.381-1.628.157-2.95-.384-3.677z"/></svg> Pay via PayPal</a><a id="cart-bank" class="cd-btn-bank disabled" href="#" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> Bank Transfer</a></div><button class="cd-btn-continue" onclick="closeCart()">← Continue Shopping</button></div></div><script src="/templates/shop_scripts.js?v=8"></script><style>
+    </div><script src="/templates/chatbot.js?v=conv5"></script><div id="cart-overlay" onclick="closeCart()"></div><div id="cart-drawer"><div class="cd-hdr"><span class="cd-title">Your Order</span><button class="cd-close" onclick="closeCart()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div class="cd-body"><div class="cd-empty" id="cart-empty-msg"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><strong>No template selected</strong><span>Pick a template above and tap Add to Cart</span></div><div id="cart-base-block"><p class="cd-section-label">Selected Template</p><div class="cd-template-card"><div class="cd-tc-info"><div class="cd-tc-name" id="cb-name">—</div><div class="cd-tc-sub" id="cb-type-label">Website Template</div></div><div class="cd-tc-price"><div class="cd-tc-setup" id="cb-setup-price">$149.99</div><div class="cd-tc-mo" id="cb-mo-price">setup</div></div><button class="cd-tc-remove" onclick="removeBase()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div><div id="cart-addons-block"><p class="cd-section-label">Enhance Your Package</p><label class="cd-addon-row" id="addon-copy"><div class="cd-addon-check-wrap"><input type="checkbox" id="check-copy-input" class="cd-addon-input" onchange="toggleAddon('copy')"><span class="cd-checkbox"><svg class="cd-check-icon" width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="cd-addon-info"><div class="cd-addon-name">Copywriting</div><div class="cd-addon-desc">Professional copy — headers, descriptions &amp; CTAs written for you.</div></div><div class="cd-addon-price"><div class="cd-addon-setup">+$49.99</div><div class="cd-addon-mo">one-time</div></div></label><label class="cd-addon-row" id="addon-chatbot"><div class="cd-addon-check-wrap"><input type="checkbox" id="check-chatbot-input" class="cd-addon-input" onchange="toggleAddon('chatbot')"><span class="cd-checkbox"><svg class="cd-check-icon" width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="cd-addon-info"><div class="cd-addon-name">AI Chatbot</div><div class="cd-addon-desc">Custom AI trained on your brand — captures leads &amp; answers questions 24/7.</div></div><div class="cd-addon-price"><div class="cd-addon-setup">+$349.99</div><div class="cd-addon-mo">+$49.99/mo</div></div></label></div></div><div class="cd-footer"><div class="cd-totals"><div class="cd-total-row"><span>Setup Total</span><span id="cart-setup-total">$0.00</span></div><div class="cd-total-row cd-total-mo"><span>Monthly</span><span id="cart-mo-total">$0.00 / mo</span></div></div><div class="cd-agree-row" id="cd-agree-row"><div class="cd-step" id="cd-step1"><div class="cd-step-num">1</div><div class="cd-step-body"><div class="cd-step-label">Service Agreement</div><div class="cd-step-desc">Read our Terms of Use before accepting.</div><button class="cd-read-btn" id="cd-read-btn" onclick="openTerms()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Read Terms</button></div></div><div class="cd-step cd-step-locked" id="cd-step2"><div class="cd-step-num">2</div><div class="cd-step-body"><label class="cd-agree-label" id="cd-agree-label"><input type="checkbox" id="cd-agree-chk" onchange="updateAgreement()" disabled><span class="cd-agree-box"><svg class="cd-agree-icon" width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="cd-agree-text">I have read and agree to the Terms of Use &amp; service agreement</span></label></div></div></div><div class="cd-checkout-row"><a id="cart-paypal" class="cd-btn-paypal disabled" href="#" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.59 3.025-2.566 6.082-8.558 6.082H9.828l-1.122 7.12h3.174l.522-3.308h1.976c4.358 0 7.332-2.103 8.228-5.93.381-1.628.157-2.95-.384-3.677z"/></svg> Pay via PayPal</a><a id="cart-bank" class="cd-btn-bank disabled" href="#" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> Bank Transfer</a></div><button class="cd-btn-continue" onclick="closeCart()">← Continue Shopping</button></div></div><script src="/templates/shop_scripts.js?v=8"></script><style>
 .t-iframe-wrap{pointer-events:all!important;}.t-iframe-placeholder{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(102,0,204,0.12) 0%,rgba(20,10,30,0.95) 100%);cursor:pointer;transition:background 0.2s;z-index:1;pointer-events:all;}
 .t-iframe-placeholder:hover{background:rgba(102,0,204,0.14);}
 .t-ph-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(180,140,255,0.6);pointer-events:none;transition:opacity 0.3s;}
