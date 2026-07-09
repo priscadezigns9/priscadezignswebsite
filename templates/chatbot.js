@@ -370,7 +370,7 @@ function addMsg(txt,type){
 // ── CLAUDE AI BRAIN ──────────────────────────────────────────────────────
 var chatHistory = [];
 
-var SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for the Prisca Dezigns Template Shop, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in websites, AI automation, and brand architecture. Founded in Trinidad & Tobago. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nTEMPLATE SHOP:\n- 40+ ready-made templates across all industries\n- Standard: $149.99 USD setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 USD setup + $19.99/mo\n- Live in 24 hours. Logo, colours, and content swapped in.\n- Add-ons: Copywriting $49.99 | AI Chatbot $349.99 setup + $49.99/mo | Micro Store $249.99 setup + $34.99/mo\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n\nAI PACKAGES:\n- Tier 1 AI Chatbot: $1,500 setup + $150/mo\n- Tier 2 WhatsApp AI: $3,500 setup + $400/mo\n- Tier 3 Email AI: $6,000 setup + $700/mo\n- Tier 4 Voice Agent: $8,000 USD setup + $900/mo setup + $900/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp\n- Never be robotic. Sound like a real, warm, intelligent person.";
+var SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for the Prisca Dezigns Template Shop, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in websites, AI automation, and brand architecture. Founded in Trinidad & Tobago. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nTEMPLATE SHOP:\n- 40+ ready-made templates across all industries\n- Standard: $149.99 USD setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 USD setup + $19.99/mo\n- Live in 24 hours. Logo, colours, and content swapped in.\n- Add-ons: Copywriting $49.99 | AI Chatbot $349.99 setup + $49.99/mo | Micro Store $249.99 setup + $34.99/mo\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n\nAI PACKAGES:\n- Tier 1 AI Chatbot: $1,500 setup + $150/mo\n- Tier 2 WhatsApp AI: $3,500 setup + $400/mo\n- Tier 3 Email AI: $6,000 setup + $700/mo\n- Tier 4 Voice Agent: $8,000 USD setup + $900/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp\n- Never be robotic. Sound like a real, warm, intelligent person.";
 
 window.chatSend = function(){
   var inp = document.getElementById('chat-inp');
@@ -397,24 +397,20 @@ window.chatSend = function(){
 };
 
 function askClaude(history, cb){
-  // Try live Claude API first (proxy endpoint)
+  // Groq Llama 3.3 via Supabase Edge Function proxy
   var payload = JSON.stringify({
-    model: 'claude-3-5-haiku-20241022',
-    max_tokens: 300,
     system: SYSTEM_PROMPT,
-    messages: history
+    messages: history,
+    max_tokens: 300
   });
   var xhr = new XMLHttpRequest();
-  // Supabase Edge Function proxy (key stays server-side)
   xhr.open('POST', 'https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy', true);
   xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.setRequestHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
-  xhr.timeout = 8000;
+  xhr.timeout = 10000;
   xhr.onload = function(){
     try {
       var data = JSON.parse(xhr.responseText);
       if(data.reply){cb(data.reply); return;}
-      // Proxy not deployed yet — fall through to smart local brain
     } catch(e){}
     smartFallback(history, cb);
   };
