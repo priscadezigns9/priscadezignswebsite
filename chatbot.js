@@ -5,14 +5,14 @@ const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor
 const PKGS={
   standard:[
     {name:"Starter",desc:"1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance"},
-    {name:"Growth",desc:"Manage 1 Brand Page · Full Branding & App/Web Lead Strategisture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
-    {name:"Trusted",desc:"Full Website Lead Strategisture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
-    {name:"Custom",desc:"Tailored Digital Lead Strategisture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support"}
+    {name:"Growth",desc:"Manage 1 Brand Page · Full Branding & App/Web Design · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
+    {name:"Trusted",desc:"Full Website Development (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
+    {name:"Custom",desc:"Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Support"}
   ],
   ecommerce:[
     {name:"E-Starter",desc:"1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance"},
-    {name:"E-Growth",desc:"2-5 Page Store Lead Strategisture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
-    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network Lead Strategisture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"},
+    {name:"E-Growth",desc:"2-5 Page Store · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
+    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"},
     {name:"E-Commerce Maintenance",desc:"E-Commerce Store Uptime & Security Monitoring · Monthly Product & Content Updates · High-Fidelity Technical Backups · Priority Support · $199.99/mo"}
   ],
   ai:[
@@ -25,7 +25,6 @@ const PKGS={
     {name:"Maintenance",price:"$97/mo",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · Backups · Support"}
   ],
   templates:[
-    {name:"Voice/Audio Intelligence (Add-On)",desc:"Enable your AI to listen to voice notes and respond with a professional voice. Available for Templates, Tier 1, and Tier 2. +$500 setup · +$50/mo"},
     {name:"Template Site",price:"$149.99 + $19.99/mo",desc:"Choose from 40 templates · Logo & colours swapped in · Live in 24hrs"},
     {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
     {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $349.99 setup · $49.99/mo"},
@@ -33,7 +32,6 @@ const PKGS={
     {name:"⭐ Premium Template (3D)",desc:"Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation · $299.99 setup · $19.99/mo"}
   ]
 };
-
 const STEPS={
   start:{
     bot:"Hey \uD83D\uDC4B Welcome to Prisca Dezigns. What can I help you with today?",
