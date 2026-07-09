@@ -678,26 +678,52 @@ window.toggleVoice=function(){
 };
 function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
-  var clean=txt.replace(/<br>/g,', ').replace(/[^\x00-\x7F]/g,'').replace(/\s+/g,' ').trim();
-  var u=new SpeechSynthesisUtterance(clean);
-  u.rate=0.88; u.pitch=1.0; u.volume=1;
-  // Pick the most natural-sounding female English voice available
-  var voices=window.speechSynthesis.getVoices();
-  var preferred=['Google UK English Female','Google US English','Samantha','Karen','Moira','Tessa','Fiona','Victoria','Veena','Microsoft Zira','Microsoft Aria'];
-  var picked=null;
+
+  // 1. Strip HTML tags
+  var clean = txt.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
+
+  // 2. Convert bullet/symbol lines into natural spoken pauses
+  //    Each bullet point becomes: ". " (period + space) so TTS pauses fully
+  clean = clean
+    // Unicode bullet symbols followed by text → ". " prefix for a full pause
+    .replace(/[\u2756\u2714\u2756\u2022\u25CF\u25A0\u2B50\u26A1\u2734\u2735\u10102\uD83D\uDECD\uFE0F❖•·▸▷◆◇★☆✦✸✔]/g, '.\n')
+    // Em dash / long dash used as separator → pause
+    .replace(/\s*[—–]\s*/g, '. ')
+    // Pipe separator → pause
+    .replace(/\s*\|\s*/g, ', ')
+    // Newline followed by more text → ". " (period ensures TTS pause)
+    .replace(/\n+/g, '. ')
+    // Avoid double periods
+    .replace(/\.{2,}/g, '.')
+    .replace(/\.\s*\./g, '.')
+    // Collapse excess spaces
+    .replace(/\s{2,}/g, ' ')
+    // Strip any remaining non-ASCII (emoji etc.)
+    .replace(/[^\x00-\x7F]/g, '')
+    .trim();
+
+  // 3. If sentence doesn't end with punctuation, add a period
+  if(clean && !/[.!?]$/.test(clean)) clean += '.';
+
+  var u = new SpeechSynthesisUtterance(clean);
+  u.rate = 0.88; u.pitch = 1.0; u.volume = 1;
+
+  // 4. Pick the most natural-sounding voice available
+  var voices = window.speechSynthesis.getVoices();
+  var preferred = ['Google UK English Female','Google US English','Samantha','Karen','Moira','Tessa','Fiona','Victoria','Veena','Microsoft Zira','Microsoft Aria'];
+  var picked = null;
   for(var i=0;i<preferred.length;i++){
     for(var j=0;j<voices.length;j++){
       if(voices[j].name===preferred[i]){picked=voices[j];break;}
     }
     if(picked)break;
   }
-  // Fallback: first English female or first English voice
   if(!picked){
     for(var j=0;j<voices.length;j++){
       if(voices[j].lang&&voices[j].lang.startsWith('en')){picked=voices[j];break;}
     }
   }
-  if(picked)u.voice=picked;
+  if(picked) u.voice = picked;
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(u);
 }
