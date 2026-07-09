@@ -44,6 +44,7 @@ const STEPS={
       {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
       {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"},
       {l:"\uD83D\uDCBC Tell us about your business",s:"talk"},
+      {l:"\u260E\uFE0F Contact Help Desk",s:"contact_help"},
       {l:"\uD83D\uDE04 Tell me a joke",s:"joke"}
     ]
   },
@@ -975,5 +976,13 @@ window.chatSend=function(){
 
 if(window.location.pathname.includes('/services')){
   setTimeout(function(){if(!open)toggleChat();},8000);
+  contact_help:{
+    bot:"Need immediate assistance? You can reach our Help Desk directly:\n\n🌐 GLOBAL HELP DESK: +1 (302) 469-7276\n💬 WHATSAPP DIRECT: +1 (868) 342-4101\n\nWe are available to answer your questions about packages, pricing, or custom builds.",
+    r:[
+      {l:"📞 Call Help Desk",url:"tel:+13024697276"},
+      {l:"💬 Message WhatsApp",url:"https://wa.me/18683424101"},
+      {l:"← Back to start",s:"start"}
+    ]
+  },
 }
 })();
