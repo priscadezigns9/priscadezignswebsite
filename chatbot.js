@@ -1026,6 +1026,75 @@ window.chatSend=function(){
   },700);
 };
 
+var mediaRecorder;
+var audioChunks = [];
+var isRecording = false;
+
+window.toggleMic = function() {
+  if (!isRecording) {
+    startRecording();
+  } else {
+    stopRecording();
+  }
+};
+
+function startRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    addMsg("Your browser doesn't support audio recording.", 'bot');
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.start();
+      isRecording = true;
+      audioChunks = [];
+      
+      var micBtn = document.getElementById('chat-mic');
+      micBtn.classList.add('recording');
+      document.getElementById('chat-inp').placeholder = "Recording voice note...";
+
+      mediaRecorder.addEventListener("dataavailable", function(event) {
+        audioChunks.push(event.data);
+      });
+
+      mediaRecorder.addEventListener("stop", function() {
+        var audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        handleVoiceNote(audioBlob);
+        
+        var tracks = stream.getTracks();
+        tracks.forEach(function(track) { track.stop(); });
+      });
+    })
+    .catch(function(err) {
+      addMsg("Microphone access denied or not available.", 'bot');
+    });
+}
+
+function stopRecording() {
+  if (mediaRecorder && isRecording) {
+    mediaRecorder.stop();
+    isRecording = false;
+    var micBtn = document.getElementById('chat-mic');
+    micBtn.classList.remove('recording');
+    document.getElementById('chat-inp').placeholder = "Type a message...";
+  }
+}
+
+function handleVoiceNote(blob) {
+  addMsg("🎤 Voice note sent.", 'usr');
+  var typingId = 'ai-typing-'+Date.now();
+  addMsg('...', 'bot', typingId);
+  
+  setTimeout(function(){
+    replaceTypingWithReply(typingId, "I've received your voice note! I'm processing the audio now. For full real-time voice conversations, we can also pivot to WhatsApp or deploy a Tier 4 Voice Agent.");
+    var q=document.getElementById('chat-qr');
+    addQR('WhatsApp the team', 'talk');
+    addQR('Tell me more about Voice', 'ai_menu');
+  }, 1500);
+}
+
 if(window.location.pathname.includes('/services')){
   setTimeout(function(){if(!open)toggleChat();},8000);
 }
