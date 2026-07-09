@@ -39,7 +39,8 @@ const STEPS={
       {l:"\uD83C\uDFC7 I need a custom website",s:"need_website"},
       {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
       {l:"\uD83E\uDD16 I need AI automation",s:"automation"},
-      {l:"\uD83D\uDCE6 See agency packages",s:"pkg_menu"}
+      {l:"\uD83D\uDCE6 See agency packages",s:"pkg_menu"},
+      {l:"\u260E\uFE0F Contact Help Desk",s:"contact_help"}
     ]
   },
   need_website:{
@@ -464,5 +465,13 @@ function smartFallback(history, cb){
 
 if(window.location.pathname.includes('/services')){
   setTimeout(function(){if(!open)toggleChat();},8000);
+  contact_help:{
+    bot:"Need immediate assistance? You can reach our Help Desk directly:\n\n🌐 GLOBAL HELP DESK: +1 (302) 469-7276\n💬 WHATSAPP DIRECT: +1 (868) 342-4101\n\nWe are available to answer your questions about packages, pricing, or custom builds.",
+    r:[
+      {l:"📞 Call Help Desk",url:"tel:+13024697276"},
+      {l:"💬 Message WhatsApp",url:"https://wa.me/18683424101"},
+      {l:"← Back to start",s:"start"}
+    ]
+  },
 }
 })();
