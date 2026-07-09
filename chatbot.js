@@ -726,82 +726,225 @@ function addMsg(txt,type){
   }
 }
 
-// --- AI FREE-TEXT BRAIN ---------------------------------------------------
-var AI_KB=[
-  {k:['price','cost','how much','pricing','fee','charge','rate'],
-   r:"Great question! Our packages start at $699 for a template site, $1,499 for a full custom website, and AI automation from $1,499. Every project is scoped to your exact needs \u2014 the best move is a quick chat with the team.",
-   follow:'talk'},
-  {k:['website','web','site','page','landing','build','create','design'],
-   r:"We build everything from one-page sites to full 15+ page brand networks \u2014 all high-fidelity, mobile-first, and live in days not weeks. Looking for something custom or a fast-launch template?",
-   follow:'pkg_menu'},
-  {k:['template','shop','ready-made','pre-made','quick','24 hour'],
-   r:"Our Template Shop has 40+ ready-made designs across every industry \u2014 pick one, we swap your logo and content, and it\u2019s live within 24 hours. Starting at $699.",
-   follow:'templates_menu'},
-  {k:['whatsapp','automation','automate','chatbot','bot','ai ','artificial intelligence','auto reply','respond automatically'],
-   r:"Our AI automation connects your WhatsApp, email, and even your phone line to a 24/7 AI that qualifies leads and responds instantly \u2014 so you never miss a sale while you sleep. We have 4 tiers depending on how much you want to automate.",
-   follow:'ai_menu'},
-  {k:['social','instagram','facebook','tiktok','content','branding','brand','logo'],
-   r:"Brand identity and social strategy is a big part of what we do \u2014 logos, colour systems, content creation. It all lives inside our Growth and Trusted packages.",
-   follow:'pkg_menu'},
-  {k:['ecommerce','e-commerce','online store','sell online','product','payment'],
-   r:"We build full e-commerce stores with payment gateways, inventory logic, and product SEO \u2014 from small 10-product shops to 50+ product networks.",
-   follow:'ecomm_menu'},
-  {k:['how long','turnaround','deadline','delivery','when will'],
-   r:"Template sites go live in 24 hours. Custom websites take 3\u20137 days. AI automation setups take 5\u201310 days including training and testing. Every project includes 30-day support."},
-  {k:['location','where','trinidad','tobago','caribbean','remote','local'],
-   r:"We\u2019re based in Trinidad & Tobago and work with clients across the Caribbean and internationally \u2014 fully remote, 100% online."},
-  {k:['contact','reach','talk','speak','call','email','meet','human','person'],
-   r:"Absolutely \u2014 the team is right here. Message us on WhatsApp or fill out the intake form and we\u2019ll reply within a few hours.",
-   follow:'talk'},
-  {k:['maintenance','support','ongoing','monthly','retainer'],
-   r:"Every package includes 1 month free maintenance. After that our Maintenance Plan covers daily monitoring, monthly updates, backups and priority support at a flat monthly rate.",
-   follow:'cont_menu'},
-  {k:['seo','google','search','rank','traffic','organic'],
-   r:"Technical SEO is baked into every build \u2014 meta tags, structured data, sitemap, mobile speed. Growth and Trusted packages also include ongoing content SEO.",
-   follow:'pkg_menu'},
-  {k:['portfolio','example','your work','showcase','past client','sample','demo'],
-   r:"You\u2019re looking at it \u2014 this site is a live example of our work. We also have 40+ template previews in the shop.",
-   follow:'templates_menu'},
-  {k:['hello','hi ','hey ','good morning','good afternoon','good evening','hola'],
-   r:"Hey! Welcome to Prisca Dezigns \u2014 we build websites, AI automation, and digital brands. What can I help you with today?"},
-  {k:['thanks','thank you','appreciate','great job','awesome','perfect'],
-   r:"Anytime! I\u2019m right here if you have more questions \u2014 or reach the team directly on WhatsApp.",
-   follow:'talk'},
-  {k:['who are you','about you','company','team','founder','priscilla','prisca dezigns'],
-   r:"Prisca Dezigns is a digital agency founded by Priscilla Narine, based in Trinidad & Tobago. We specialize in high-fidelity websites, AI automation, and brand architecture for businesses ready to operate at the highest level."},
-  {k:['weather','food','movie','music','sport','football','joke','random'],
-   r:"Ha \u2014 love the curiosity! I\u2019m locked in on websites and AI automation, but I\u2019m genuinely good at it \ud83d\ude04. What does your business actually need right now?"}
-];
-function aiBrain(input){
-  var t=input.toLowerCase();
-  for(var i=0;i<AI_KB.length;i++){
-    var e=AI_KB[i];
-    for(var j=0;j<e.k.length;j++){if(t.indexOf(e.k[j])>-1)return e;}
-  }
-  return {r:"That\u2019s an interesting one! I\u2019m best at helping with websites, AI automation, branding, and digital strategy. Want me to point you in the right direction?",follow:'start'};
+// ── CONVERSATIONAL AI ENGINE ──────────────────────────────────────────────
+// Stateful conversation: remembers context, asks follow-ups, qualifies lead
+
+var conv = {
+  state: 'idle',      // idle | asked_goal | asked_budget | asked_name | asked_business | asked_type | closing
+  name: null,
+  business: null,
+  goal: null,
+  budget: null,
+  msgCount: 0
+};
+
+// Detect intent from raw input
+function detectIntent(t){
+  var s = t.toLowerCase();
+  if(/price|cost|how much|fee|charge|rate|pricing/.test(s)) return 'price';
+  if(/template|shop|ready.made|quick site|fast site/.test(s)) return 'template';
+  if(/whatsapp|automation|automate|chatbot|bot|ai agent|auto.reply|respond automatically/.test(s)) return 'automation';
+  if(/website|web site|site|build|create|design|page|landing/.test(s)) return 'website';
+  if(/social|instagram|facebook|tiktok|branding|brand|logo/.test(s)) return 'branding';
+  if(/ecommerce|e-commerce|online store|sell online|products|shop online/.test(s)) return 'ecommerce';
+  if(/seo|google|rank|traffic|search engine/.test(s)) return 'seo';
+  if(/how long|turnaround|deadline|how fast|when will/.test(s)) return 'timeline';
+  if(/maintenance|support|monthly|retainer|after/.test(s)) return 'maintenance';
+  if(/email|inbox|email automation/.test(s)) return 'email';
+  if(/voice|phone|call|voice agent/.test(s)) return 'voice';
+  if(/location|where are you|trinidad|tobago|caribbean/.test(s)) return 'location';
+  if(/portfolio|example|your work|demo|past work|show me/.test(s)) return 'portfolio';
+  if(/who are you|about you|about prisca|tell me about/.test(s)) return 'about';
+  if(/hello|hi |hey |good morning|good afternoon|good evening|greetings/.test(s)) return 'greet';
+  if(/thank|thanks|appreciate|great|awesome|perfect|nice one/.test(s)) return 'thanks';
+  if(/yes|yeah|yep|sure|ok|okay|sounds good|let.s go|go ahead|please/.test(s)) return 'yes';
+  if(/no |nope|not really|not right now|maybe later/.test(s)) return 'no';
+  if(/\$|budget|afford|spend|invest|how much can/.test(s)) return 'budget_mention';
+  if(/weather|food|movie|sport|football|joke|random|funny/.test(s)) return 'offtopic';
+  return 'unknown';
 }
-var MENU_LABELS={talk:'Talk to the team',pkg_menu:'See packages',templates_menu:'Browse templates',ai_menu:'AI packages',ecomm_menu:'E-commerce packages',cont_menu:'Maintenance plan',start:'See what we offer'};
+
+// Friendly follow-up question based on what we already know
+function nextFollowUp(){
+  if(!conv.name)
+    return {r:"I\u2019d love to help with that \u2014 what\u2019s your name?", state:'asked_name'};
+  if(!conv.business)
+    return {r:"Nice to meet you, "+conv.name+"! What kind of business do you run?", state:'asked_business'};
+  if(!conv.goal)
+    return {r:"Got it. And what\u2019s the main thing you\u2019re trying to fix right now \u2014 more leads, a better online presence, or automating your customer service?", state:'asked_goal'};
+  if(!conv.budget)
+    return {r:"Last thing \u2014 do you have a rough budget in mind? Doesn\u2019t have to be exact. Just helps me point you in the right direction.", state:'asked_budget'};
+  // All info collected — push to consultation
+  return {r:"Perfect. Based on what you\u2019ve told me, I\u2019d recommend a quick consultation so the team can put together the right package for "+conv.business+". Want me to set that up?", state:'closing', follow:'talk'};
+}
+
+function handleConvState(t, intent){
+  var s = t.toLowerCase();
+
+  // Collect name
+  if(conv.state === 'asked_name'){
+    // Extract a clean name from the input
+    var cleaned = t.replace(/^(i.?m|my name is|call me|it.?s|i am)\s*/i,'').trim();
+    conv.name = cleaned.split(' ')[0];
+    conv.name = conv.name.charAt(0).toUpperCase() + conv.name.slice(1);
+    conv.state = 'idle';
+    return nextFollowUp();
+  }
+
+  // Collect business type
+  if(conv.state === 'asked_business'){
+    conv.business = t.trim();
+    conv.state = 'idle';
+    return nextFollowUp();
+  }
+
+  // Collect goal
+  if(conv.state === 'asked_goal'){
+    conv.goal = t.trim();
+    conv.state = 'idle';
+    return nextFollowUp();
+  }
+
+  // Collect budget
+  if(conv.state === 'asked_budget'){
+    conv.budget = t.trim();
+    conv.state = 'idle';
+    return nextFollowUp();
+  }
+
+  // Closing — user said yes to consultation
+  if(conv.state === 'closing' && (intent === 'yes' || /consult|book|set|schedule|talk/.test(s))){
+    conv.state = 'idle';
+    return {r:"Great! The team will reach out within a few hours. You can also message directly on WhatsApp for the fastest response.", follow:'talk'};
+  }
+
+  return null; // Not in a conv state — route to intent handler
+}
+
+function handleIntent(t, intent){
+  var name = conv.name ? conv.name : null;
+  var greet = name ? ("Hey "+name+"! ") : "";
+
+  switch(intent){
+
+    case 'greet':
+      if(conv.msgCount === 0)
+        return {r:"Hey! Welcome to Prisca Dezigns \u2014 we build websites, AI automation, and digital brands for businesses ready to grow. What can I help you with?", state:'asked_name'};
+      return nextFollowUp();
+
+    case 'website':
+      return {r:greet+"We build everything from single-page sites to 15+ page brand networks \u2014 high-fidelity, mobile-first, no templates unless you want one.\n\nWhat kind of business is the site for?", state:'asked_business'};
+
+    case 'template':
+      return {r:greet+"Our Template Shop has 40+ designs across every industry. You pick one, we swap your branding and content, and it\u2019s live in 24 hours.\n\nStandard templates: $149.99 setup + $19.99/mo\nPremium 3D: $299.99 setup + $19.99/mo\n\nWhat industry is your business in?", state:'asked_business'};
+
+    case 'automation':
+      return {r:greet+"Our AI automation connects your WhatsApp, email, or phone to a 24/7 AI that responds, qualifies leads, and alerts you only when someone is ready to pay.\n\nWe have 4 tiers:\n\u2756 Tier 1 \u2014 Website chatbot ($1,499 setup)\n\u2756 Tier 2 \u2014 +WhatsApp AI ($2,499 setup)\n\u2756 Tier 3 \u2014 +Email AI ($3,999 setup)\n\u2756 Tier 4 \u2014 +Voice Agent ($8,000 setup)\n\nWhich sounds closest to what you need?"};
+
+    case 'branding':
+      return {r:greet+"Branding is baked into every package \u2014 logo, colour system, domain, social setup. We don\u2019t just build sites, we architect the full brand.\n\nAre you starting from scratch or refreshing an existing brand?"};
+
+    case 'ecommerce':
+      return {r:greet+"We build full e-commerce stores with payment gateways, product SEO, and inventory logic. From 10-product shops to 50+ product networks.\n\nHow many products are you planning to sell?"};
+
+    case 'price':
+      return {r:greet+"Here\u2019s the quick breakdown:\n\n\u2756 Template site \u2014 $149.99 setup + $19.99/mo\n\u2756 Custom website \u2014 from $1,499\n\u2756 AI chatbot \u2014 $1,499 setup + $149/mo\n\u2756 WhatsApp AI \u2014 $2,499 setup + $299/mo\n\u2756 Full AI suite \u2014 from $3,999\n\nEvery project is scoped to your exact needs though. What\u2019s your business?"+(conv.business?'':" (helps me narrow it down)")};
+
+    case 'timeline':
+      return {r:greet+"Template sites: live in 24 hours. Custom websites: 3\u20137 days. AI automation setups: 5\u201310 days including training and testing. Every project comes with 30-day support after launch."};
+
+    case 'maintenance':
+      return {r:greet+"Every package includes 1 month free maintenance. After that, our Maintenance Plan covers daily uptime monitoring, monthly content updates, technical backups, and priority support at a flat monthly rate.\n\nWant me to share the pricing?"};
+
+    case 'seo':
+      return {r:greet+"Technical SEO is built into every project \u2014 meta tags, schema markup, sitemap, mobile speed optimisation. Our Growth and Trusted packages also include monthly content SEO.\n\nAre you trying to rank for a specific niche?"};
+
+    case 'email':
+      return {r:greet+"Email automation is part of our Tier 3 package \u2014 the AI reads every email, responds intelligently, qualifies leads, and sends follow-up sequences. Zero manual inbox checking.\n\nHow many emails does your business get per day roughly?"};
+
+    case 'voice':
+      return {r:greet+"Our Tier 4 Voice Agent answers inbound calls 24/7, gives pricing and service info, and routes hot leads directly to your team. No more missed calls, no more manual phone handling.\n\nThis is perfect for businesses that get a lot of inbound calls \u2014 is that the case for you?"};
+
+    case 'location':
+      return {r:"We\u2019re based in Trinidad & Tobago and work with clients across the Caribbean and internationally. Fully remote, 100% online. No physical meeting needed to get started."};
+
+    case 'portfolio':
+      return {r:greet+"You\u2019re looking at it \u2014 this site is a live example of our work. Our Template Shop also has 40+ live previews you can click through.\n\nWant me to point you to a template that matches your industry?"};
+
+    case 'about':
+      return {r:"Prisca Dezigns is a digital agency founded by Priscilla Narine, based in Trinidad & Tobago. We specialise in high-fidelity websites, AI automation, and brand architecture \u2014 built to professional standard, no DIY builders.\n\nWhat can I help you with today?"};
+
+    case 'thanks':
+      return {r:(name?"Anytime, "+name+"!":"Anytime!") + " If you ever want to move forward or have more questions, I\u2019m right here. The team is also on WhatsApp if you prefer.", follow:'talk'};
+
+    case 'yes':
+      if(conv.state === 'closing')
+        return {r:"The team will be in touch within a few hours. You can also reach us directly on WhatsApp for the fastest response.", follow:'talk'};
+      return nextFollowUp();
+
+    case 'no':
+      return {r:"No worries! Feel free to browse around or come back when the time is right. I\u2019m here if you have any questions."};
+
+    case 'budget_mention':
+      conv.budget = t;
+      return nextFollowUp();
+
+    case 'offtopic':
+      return {r:"Ha \u2014 I like the energy! I\u2019m locked in on websites and AI automation though \ud83d\ude04. What does your business actually need right now?"};
+
+    default:
+      // Unknown — ask a clarifying question naturally
+      if(!conv.name) return {r:"Interesting! I\u2019m here to help with websites, AI automation, and branding. What\u2019s your name, by the way?", state:'asked_name'};
+      if(!conv.business) return {r:"I\u2019d love to help with that, "+conv.name+". What kind of business do you run?", state:'asked_business'};
+      return {r:"Got it! To make sure I point you in the right direction \u2014 are you looking for a website, AI automation, or something else?", follow:'start'};
+  }
+}
+
+function runConversation(input){
+  conv.msgCount++;
+  var intent = detectIntent(input);
+
+  // First try stateful context (e.g. collecting name, business, goal)
+  var stateResult = handleConvState(input, intent);
+  if(stateResult){
+    if(stateResult.state) conv.state = stateResult.state;
+    return stateResult;
+  }
+
+  // Otherwise handle by intent
+  var result = handleIntent(input, intent);
+  if(result && result.state) conv.state = result.state;
+  return result;
+}
+
 window.chatSend=function(){
   var i=document.getElementById('chat-inp');
   var t=i.value.trim();if(!t)return;i.value='';
   addMsg(t,'usr');
   if(intake.active){advanceIntake(t);return;}
   setTimeout(function(){
-    var result=aiBrain(t);
+    var result=runConversation(t);
     addMsg(result.r,'bot');
     var q=document.getElementById('chat-qr');q.innerHTML='';
     setTimeout(function(){
-      if(result.follow){
+      // Only show action button when truly needed (talk / browse)
+      if(result.follow==='talk'){
+        var wa=document.createElement('a');
+        wa.href=WA+'?text='+encodeURIComponent('Hi, I came from the website and need help.');
+        wa.target='_blank';wa.rel='noopener';
+        wa.className='qrb wa';wa.innerHTML=WA_SVG+' WhatsApp the team';
+        q.appendChild(wa);
+      } else if(result.follow==='start'){
+        addQR('Browse services','start');
+      } else if(result.follow){
         var b=document.createElement('button');b.className='qrb';
-        b.textContent=MENU_LABELS[result.follow]||'See options';
+        var lbl={templates_menu:'Browse templates',ai_menu:'AI packages',pkg_menu:'See packages',cont_menu:'Maintenance plan',ecomm_menu:'E-commerce'};
+        b.textContent=lbl[result.follow]||'See options';
         b.onclick=function(){go(result.follow,null);};q.appendChild(b);
-      } else {addQR('See what we offer','start');}
-      var wa=document.createElement('a');
-      wa.href=WA+'?text='+encodeURIComponent(t);wa.target='_blank';wa.rel='noopener';
-      wa.className='qrb wa';wa.innerHTML=WA_SVG+' WhatsApp Us';
-      q.appendChild(wa);setBack(true);
+      }
+      setBack(hist.length>0);
     },300);
-  },650);
+  },700);
 };
 
 if(window.location.pathname.includes('/services')){
