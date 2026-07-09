@@ -350,7 +350,7 @@ const JOKES=[
   "A client once told me to make the logo bigger. The logo was already the entire homepage. 🔍",
   "Why did the developer go broke? Because he used up all his cache. 💸",
   "I told my client the website needed breathing room. They asked if it had asthma. 🫁",
-  "Why did the AI get promoted? It had a neural network... and excellent people skills. 🤖",
+  "Why did the AI get promoted? It had a automated network... and excellent people skills. 🤖",
   "A client asked for a 'simple' website. Six revisions later we had an animated 3D solar system. 🪐",
   "Why do programmers prefer dark mode? Because light attracts bugs. 🐛",
   "My client wanted the site to feel 'alive'. I added a heartbeat animation. They wanted plants. 🌿"
