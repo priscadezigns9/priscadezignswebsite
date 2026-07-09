@@ -80,15 +80,14 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
 
 var cart = {
  base: null, 
- addons: { copy: false, chatbot: false, voice: false }
+ addons: { copy: false, chatbot: false }
 };
 var PRICES = {
  website: { setup: 149.99, mo: 19.99, label: 'Template Website' },
  premium: { setup: 299.99, mo: 19.99, label: 'Premium 3D Template Website' },
  store: { setup: 249.99, mo: 34.99, label: 'Micro Store' },
  copy: { setup: 49.99, mo: 0, moNote: '$4.99 per update' },
- chatbot: { setup: 349.99, mo: 49.99 },
- voice: { setup: 500.00, mo: 50.00 }
+ chatbot: { setup: 349.99, mo: 49.99 }
 };
 function addTemplate(name, type) {
  type = type || 'website';
@@ -97,7 +96,7 @@ function addTemplate(name, type) {
  openCart(); return;
  }
  cart.addons.copy = false;
- cart.addons.chatbot = false; cart.addons.voice = false;
+ cart.addons.chatbot = false;
  cart.base = { name: name, type: type, setup: p.setup, mo: p.mo };
  renderCart();
  updateAllButtons();
@@ -113,7 +112,7 @@ function removeBase() {
  var oldName = cart.base ? cart.base.name : null;
  cart.base = null;
  cart.addons.copy = false;
- cart.addons.chatbot = false; cart.addons.voice = false;
+ cart.addons.chatbot = false;
  renderCart();
  updateAllButtons();
  if (oldName) updateTemplateBtn(oldName, false);
@@ -163,7 +162,6 @@ function renderCart() {
  var totalMo = cart.base.mo;
  if (cart.addons.copy) { totalSetup += PRICES.copy.setup; totalMo += PRICES.copy.mo; }
  if (cart.addons.chatbot) { totalSetup += PRICES.chatbot.setup; totalMo += PRICES.chatbot.mo; }
- if (cart.addons.voice) { totalSetup += PRICES.voice.setup; totalMo += PRICES.voice.mo; }
  document.getElementById('cart-setup-total').textContent = '$' + totalSetup.toFixed(2);
  document.getElementById('cart-mo-total').textContent = '$' + totalMo.toFixed(2) + ' / mo';
  var lines = [];
@@ -375,8 +373,8 @@ function saveCartOrder(method) {
   if (cart.addons.copy)    addons.push('Copywriting Add-On');
   if (cart.addons.chatbot) addons.push('AI Chatbot Add-On');
   var p = PRICES[cart.base.type] || {};
-  var totalSetup = cart.base.setup + (cart.addons.copy ? PRICES.copy.setup : 0) + (cart.addons.chatbot ? PRICES.chatbot.setup : 0) + (cart.addons.voice ? PRICES.voice.setup : 0);
-  var totalMo    = cart.base.mo   + (cart.addons.copy ? PRICES.copy.mo    : 0) + (cart.addons.chatbot ? PRICES.chatbot.mo    : 0) + (cart.addons.voice ? PRICES.voice.mo : 0);
+  var totalSetup = cart.base.setup + (cart.addons.copy ? PRICES.copy.setup : 0) + (cart.addons.chatbot ? PRICES.chatbot.setup : 0);
+  var totalMo    = cart.base.mo   + (cart.addons.copy ? PRICES.copy.mo    : 0) + (cart.addons.chatbot ? PRICES.chatbot.mo    : 0);
   var payload = {
     name:    'Shop Order — ' + cart.base.name,
     email:   '(shop) payment method: ' + method,
