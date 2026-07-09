@@ -23,7 +23,7 @@ const PKGS={
     {name:"Maintenance",price:"$97/mo",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
   ],
   templates:[
-    {name:"Tier 01 — Template Only",price:"$149.99 USD setup · $19.99 USD/mo",desc:"Choose any of our 23 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
+    {name:"Tier 01 — Template Only",price:"$149.99 USD setup · $19.99 USD/mo",desc:"Choose any of our 40 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
     {name:"Tier 02 — Template + Copy",price:"$199.99 USD setup · $19.99 USD/mo",desc:"Everything in Tier 01 · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
     {name:"Tier 03 — Template + Chatbot",price:"$249.99 USD setup · $49.99 USD/mo",desc:"Everything in Tier 01 · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $49.99 one-time bot setup included"},
     {name:"Tier 04 — Micro Store",price:"$249.99 USD setup · $29.99 USD/mo",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs"}
@@ -103,7 +103,7 @@ const STEPS={
     ]
   },
   pkg_templates:{
-    bot:"23 ready-made templates. Pick a design, send your content, go live in 24 hours. From $149.99 USD setup + $19.99 USD/mo. No tech needed.",
+    bot:"40 ready-made templates. Pick a design, send your content, go live in 24 hours. From $149.99 USD setup + $19.99 USD/mo. No tech needed.",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse all 22 templates",s:"microstore"},
       {l:"What's included?",s:"templates_included"},
@@ -115,7 +115,7 @@ const STEPS={
   },
 
   microstore:{
-    bot:"23 live templates - pick your niche to find the best match:",
+    bot:"40 live templates - pick your niche to find the best match:",
     r:[
       {l:"\uD83D\uDCF8 Portfolio & Creative",s:"ms_portfolio"},
       {l:"\uD83C\uDFC6 Coach & Consultant",s:"ms_coach"},
@@ -156,11 +156,11 @@ const STEPS={
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   ms_all:{
-    bot:"All 23 templates:\n\nFolio | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nAll templates: $149.99 USD setup · $19.99 USD/mo · Live in 24hrs · Logo + content swapped\nMicro Store upgrade: $249.99 USD setup · $29.99 USD/mo",
+    bot:"All 40 templates:\n\nFolio | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nAll templates: $149.99 USD setup · $19.99 USD/mo · Live in 24hrs · Logo + content swapped\nMicro Store upgrade: $249.99 USD setup · $29.99 USD/mo",
     r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready - let's go",s:"talk"}]
   },
   microstore_info:{
-    bot:"The Micro Store (Tier 04) turns any of our 23 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 USD setup · $29.99 USD/mo",
+    bot:"The Micro Store (Tier 04) turns any of our 40 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 USD setup · $29.99 USD/mo",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
       {l:"I'm ready - let's go",s:"talk"},
@@ -320,8 +320,20 @@ window.toggleVoice=function(){
 };
 function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
-  var clean=txt.replace(/\n/g,' ').trim();
-  var u=new SpeechSynthesisUtterance(clean);u.rate=0.95;u.pitch=1.05;u.volume=1;
+  var clean=txt.replace(/\n/g,', ').replace(/[^\x00-\x7F]/g,'').replace(/\s+/g,' ').trim();
+  var u=new SpeechSynthesisUtterance(clean);
+  u.rate=0.88; u.pitch=1.0; u.volume=1;
+  var voices=window.speechSynthesis.getVoices();
+  var preferred=['Google UK English Female','Google US English','Samantha','Karen','Moira','Tessa','Fiona','Victoria','Veena','Microsoft Zira','Microsoft Aria'];
+  var picked=null;
+  for(var i=0;i<preferred.length;i++){
+    for(var j=0;j<voices.length;j++){
+      if(voices[j].name===preferred[i]){picked=voices[j];break;}
+    }
+    if(picked)break;
+  }
+  if(!picked){for(var j=0;j<voices.length;j++){if(voices[j].lang&&voices[j].lang.startsWith('en')){picked=voices[j];break;}}}
+  if(picked)u.voice=picked;
   window.speechSynthesis.cancel();window.speechSynthesis.speak(u);
 }
 function addMsg(txt,type){
