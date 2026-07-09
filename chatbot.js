@@ -5,14 +5,14 @@ const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor
 const PKGS={
   standard:[
     {name:"Starter",desc:"1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance"},
-    {name:"Growth",desc:"Manage 1 Brand Page · Full Branding & App/Web Design · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
-    {name:"Trusted",desc:"Full Website Development (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
-    {name:"Custom",desc:"Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Support"}
+    {name:"Growth",desc:"Manage 1 Brand Page · Full Branding & App/Web Architecture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
+    {name:"Trusted",desc:"Full Website Architecture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
+    {name:"Custom",desc:"Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support"}
   ],
   ecommerce:[
     {name:"E-Starter",desc:"1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance"},
-    {name:"E-Growth",desc:"2-5 Page Store · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
-    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"},
+    {name:"E-Growth",desc:"2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
+    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"},
     {name:"E-Commerce Maintenance",desc:"E-Commerce Store Uptime & Security Monitoring · Monthly Product & Content Updates · High-Fidelity Technical Backups · Priority Support · $199.99/mo"}
   ],
   ai:[
@@ -22,16 +22,17 @@ const PKGS={
     {name:"AI Tier 4",price:"$8,000 + $900/mo",desc:"Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · 1 Month Free Maintenance"}
   ],
   continuity:[
-    {name:"Maintenance",price:"$97/mo",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · Backups · Support"}
+    {name:"Maintenance",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
   ],
   templates:[
-    {name:"Template Site",price:"$149.99 + $19.99/mo",desc:"Choose from 40 templates · Logo & colours swapped in · Live in 24hrs"},
+    {name:"Template Site",desc:"Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
     {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
     {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $349.99 setup · $49.99/mo"},
     {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs · $249.99 setup · $34.99/mo"},
     {name:"⭐ Premium Template (3D)",desc:"Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation · $299.99 setup · $19.99/mo"}
   ]
 };
+
 const STEPS={
   start:{
     bot:"Hey \uD83D\uDC4B Welcome to Prisca Dezigns. What can I help you with today?",
@@ -57,7 +58,7 @@ const STEPS={
 
   /* ── ABOUT BRANCH ── */
   about:{
-    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago.\n\n❖ Websites — custom builds, template sites, e-commerce stores\n❖ AI & Automation — chatbots, WhatsApp automation, lead capture\n❖ Brand Lead Strategisture — logo, domain, social setup, copywriting\n\nEvery project is built to a professional standard.\nWe do it all for you — no drag-and-drop builders, no DIY.",
+    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago.\n\n❖ Websites — custom builds, template sites, e-commerce stores\n❖ AI & Automation — chatbots, WhatsApp automation, lead capture\n❖ Brand Architecture — logo, domain, social setup, copywriting\n\nEvery project is built to a professional standard.\nWe do it all for you — no drag-and-drop builders, no DIY.",
     r:[
       {l:"\uD83D\uDCC5 How long have you been operating?",s:"about_history"},
       {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
@@ -88,7 +89,7 @@ const STEPS={
     ]
   },
   about_services:{
-    bot:"We specialise in three areas:\n\n\u2756 Website Design & Development — custom builds, template sites, e-commerce stores\n\u2756 AI & Automation — chatbots, WhatsApp automation, lead capture, CRM setup\n\u2756 Brand Lead Strategisture — logo, domain, social setup, copywriting, SEO\n\nEverything is done for you. You provide the content, we handle the rest.",
+    bot:"We specialise in three areas:\n\n\u2756 Website Design & Development — custom builds, template sites, e-commerce stores\n\u2756 AI & Automation — chatbots, WhatsApp automation, lead capture, CRM setup\n\u2756 Brand Architecture — logo, domain, social setup, copywriting, SEO\n\nEverything is done for you. You provide the content, we handle the rest.",
     r:[
       {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
       {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
@@ -215,7 +216,7 @@ const STEPS={
 
   /* ── TEMPLATE BRANCH ── */
   pkg_templates:{
-    bot:"40 ready-made templates. Pick a design, send your content, go live in 24 hours. No tech needed.",
+    bot:"24 ready-made templates. Pick a design, send your content, go live in 24 hours. No tech needed.",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Browse all templates",s:"microstore"},
       {l:"What's included?",s:"templates_included"},
@@ -226,7 +227,7 @@ const STEPS={
     ]
   },
   microstore:{
-    bot:"40 live templates — pick your niche to find the best match:",
+    bot:"24 live templates — pick your niche to find the best match:",
     r:[
       {l:"\uD83D\uDCF8 Portfolio & Creative",s:"ms_portfolio"},
       {l:"\uD83C\uDFC6 Coach & Consultant",s:"ms_coach"},
@@ -267,11 +268,11 @@ const STEPS={
     r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   ms_all:{
-    bot:"All 40 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nStandard — $149.99 setup · $19.99/mo\n⭐ Premium 3D (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\nAll live in 24hrs · Logo + content swapped in",
+    bot:"All 24 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nStandard — $149.99 setup · $19.99/mo\n⭐ Premium 3D (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\nAll live in 24hrs · Logo + content swapped in",
     r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
   },
   microstore_info:{
-    bot:"The Micro Store turns any of our 40 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 setup · $34.99/mo",
+    bot:"The Micro Store turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 setup · $34.99/mo",
     r:[
       {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
       {l:"I'm ready — let's go",s:"talk"},
@@ -349,7 +350,7 @@ const JOKES=[
   "A client once told me to make the logo bigger. The logo was already the entire homepage. 🔍",
   "Why did the developer go broke? Because he used up all his cache. 💸",
   "I told my client the website needed breathing room. They asked if it had asthma. 🫁",
-  "Why did the AI get promoted? It had a automated network... and excellent people skills. 🤖",
+  "Why did the AI get promoted? It had a neural network... and excellent people skills. 🤖",
   "A client asked for a 'simple' website. Six revisions later we had an animated 3D solar system. 🪐",
   "Why do programmers prefer dark mode? Because light attracts bugs. 🐛",
   "My client wanted the site to feel 'alive'. I added a heartbeat animation. They wanted plants. 🌿"
@@ -651,447 +652,38 @@ function renderPkgs(list){
   m.appendChild(g);m.scrollTop=m.scrollHeight;
 }
 
-// ── Voice readout ──────────────────────────────────────────────────────────
-var voiceOn=false;
-window.toggleVoice=function(){
-  voiceOn=!voiceOn;
-  var btn=document.getElementById('chat-voice-toggle');
-  if(btn){
-    btn.textContent='';
-    var icon=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    icon.setAttribute('width','12');icon.setAttribute('height','12');
-    icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('fill','currentColor');
-    var path=document.createElementNS('http://www.w3.org/2000/svg','path');
-    if(voiceOn){
-      path.setAttribute('d','M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM16.5 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
-    } else {
-      path.setAttribute('d','M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z');
-    }
-    icon.appendChild(path);
-    btn.appendChild(icon);
-    var txt=document.createTextNode(voiceOn?' VOICE ON':' VOICE OFF');
-    btn.appendChild(txt);
-    btn.classList.toggle('voice-on',voiceOn);
-  }
-  if(!voiceOn && window.speechSynthesis){window.speechSynthesis.cancel();}
-};
-function speak(txt){
-  if(!voiceOn||!window.speechSynthesis)return;
-
-  // 1. Strip HTML tags
-  var clean = txt.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '');
-
-  // 2. Convert bullet/symbol lines into natural spoken pauses
-  //    Each bullet point becomes: ". " (period + space) so TTS pauses fully
-  clean = clean
-    // Unicode bullet symbols followed by text → ". " prefix for a full pause
-    .replace(/[\u2756\u2714\u2756\u2022\u25CF\u25A0\u2B50\u26A1\u2734\u2735\u10102\uD83D\uDECD\uFE0F❖•·▸▷◆◇★☆✦✸✔]/g, '.\n')
-    // Em dash / long dash used as separator → pause
-    .replace(/\s*[—–]\s*/g, '. ')
-    // Pipe separator → pause
-    .replace(/\s*\|\s*/g, ', ')
-    // Newline followed by more text → ". " (period ensures TTS pause)
-    .replace(/\n+/g, '. ')
-    // Avoid double periods
-    .replace(/\.{2,}/g, '.')
-    .replace(/\.\s*\./g, '.')
-    // Collapse excess spaces
-    .replace(/\s{2,}/g, ' ')
-    // Strip any remaining non-ASCII (emoji etc.)
-    .replace(/[^\x00-\x7F]/g, '')
-    .trim();
-
-  // 3. If sentence doesn't end with punctuation, add a period
-  if(clean && !/[.!?]$/.test(clean)) clean += '.';
-
-  var u = new SpeechSynthesisUtterance(clean);
-  u.rate = 0.88; u.pitch = 1.0; u.volume = 1;
-
-  // 4. Pick the most natural-sounding voice available
-  var voices = window.speechSynthesis.getVoices();
-  var preferred = ['Google UK English Female','Google US English','Samantha','Karen','Moira','Tessa','Fiona','Victoria','Veena','Microsoft Zira','Microsoft Aria'];
-  var picked = null;
-  for(var i=0;i<preferred.length;i++){
-    for(var j=0;j<voices.length;j++){
-      if(voices[j].name===preferred[i]){picked=voices[j];break;}
-    }
-    if(picked)break;
-  }
-  if(!picked){
-    for(var j=0;j<voices.length;j++){
-      if(voices[j].lang&&voices[j].lang.startsWith('en')){picked=voices[j];break;}
-    }
-  }
-  if(picked) u.voice = picked;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
-}
-
-// ── Typing dots then message ────────────────────────────────────────────────
-function addMsg(txt,type,elemId){
+function addMsg(txt,type){
   var m=document.getElementById('chat-msgs');
+  var d=document.createElement('div');d.className='cmsg '+type;
+  // render newlines as <br> for bot messages; escape HTML first for safety
   if(type==='bot'){
-    // Show typing dots first
-    var dots=document.createElement('div');
-    dots.className='cmsg typing';
-    dots.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
-    if(elemId) dots.id=elemId;
-    m.appendChild(dots);m.scrollTop=m.scrollHeight;
-    if(txt==='...') return; // AI brain will replace this element directly
-    setTimeout(function(){
-      if(dots.parentNode)dots.parentNode.removeChild(dots);
-      var d=document.createElement('div');d.className='cmsg bot';
-      if(elemId) d.id=elemId+'-done';
-      var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      d.innerHTML=safe.replace(/\n/g,'<br>');
-      m.appendChild(d);m.scrollTop=m.scrollHeight;
-      speak(txt);
-    },480);
+    var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    d.innerHTML=safe.replace(/\n/g,'<br>');
   } else {
-    var d=document.createElement('div');d.className='cmsg usr';
     d.textContent=txt;
-    m.appendChild(d);m.scrollTop=m.scrollHeight;
   }
-}
-
-function replaceTypingWithReply(elemId, txt) {
-  var m = document.getElementById('chat-msgs');
-  var dots = document.getElementById(elemId);
-  if(dots && dots.parentNode) dots.parentNode.removeChild(dots);
-  var d = document.createElement('div'); d.className = 'cmsg bot';
-  var safe = txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  d.innerHTML = safe.replace(/\n/g,'<br>');
-  m.appendChild(d); m.scrollTop = m.scrollHeight;
-  speak(txt);
-}
-
-// ── CONVERSATIONAL AI ENGINE ──────────────────────────────────────────────
-// Stateful conversation: remembers context, asks follow-ups, qualifies lead
-
-var conv = {
-  state: 'idle',      // idle | asked_goal | asked_budget | asked_name | asked_business | asked_type | closing
-  name: null,
-  business: null,
-  goal: null,
-  budget: null,
-  msgCount: 0
-};
-
-// Detect intent from raw input
-function detectIntent(t){
-  var s = t.toLowerCase();
-  if(/price|cost|how much|fee|charge|rate|pricing/.test(s)) return 'price';
-  if(/template|shop|ready.made|quick site|fast site/.test(s)) return 'template';
-  if(/whatsapp|automation|automate|chatbot|bot|ai agent|auto.reply|respond automatically/.test(s)) return 'automation';
-  if(/website|web site|site|build|create|design|page|landing/.test(s)) return 'website';
-  if(/social|instagram|facebook|tiktok|branding|brand|logo/.test(s)) return 'branding';
-  if(/ecommerce|e-commerce|online store|sell online|products|shop online/.test(s)) return 'ecommerce';
-  if(/seo|google|rank|traffic|search engine/.test(s)) return 'seo';
-  if(/how long|turnaround|deadline|how fast|when will/.test(s)) return 'timeline';
-  if(/maintenance|support|monthly|retainer|after/.test(s)) return 'maintenance';
-  if(/email|inbox|email automation/.test(s)) return 'email';
-  if(/voice|phone|call|voice agent/.test(s)) return 'voice';
-  if(/location|where are you|trinidad|tobago|caribbean/.test(s)) return 'location';
-  if(/portfolio|example|your work|demo|past work|show me/.test(s)) return 'portfolio';
-  if(/who are you|about you|about prisca|tell me about/.test(s)) return 'about';
-  if(/hello|\bhi\b|\bhey\b|good morning|good afternoon|good evening|greetings/.test(s)) return 'greet';
-  if(/thank|thanks|appreciate|great|awesome|perfect|nice one/.test(s)) return 'thanks';
-  if(/\byes\b|yeah|yep|\bsure\b|\bok\b|okay|sounds good|let.s go|go ahead|please/.test(s)) return 'yes';
-  if(/no |nope|not really|not right now|maybe later/.test(s)) return 'no';
-  if(/\$|budget|afford|spend|invest|how much can/.test(s)) return 'budget_mention';
-  if(/weather|food|movie|sport|football|joke|random|funny/.test(s)) return 'offtopic';
-  return 'unknown';
-}
-
-// Friendly follow-up question based on what we already know
-function nextFollowUp(){
-  if(!conv.name)
-    return {r:"I\u2019d love to help with that \u2014 what\u2019s your name?", state:'asked_name'};
-  if(!conv.business)
-    return {r:"Nice to meet you, "+conv.name+"! What kind of business do you run?", state:'asked_business'};
-  if(!conv.goal)
-    return {r:"Got it. And what\u2019s the main thing you\u2019re trying to fix right now \u2014 more leads, a better online presence, or automating your customer service?", state:'asked_goal'};
-  if(!conv.budget)
-    return {r:"Last thing \u2014 do you have a rough budget in mind? Doesn\u2019t have to be exact. Just helps me point you in the right direction.", state:'asked_budget'};
-  // All info collected — push to consultation
-  return {r:"Perfect. Based on what you\u2019ve told me, I\u2019d recommend a quick consultation so the team can put together the right package for "+conv.business+". Want me to set that up?", state:'closing', follow:'talk'};
-}
-
-function handleConvState(t, intent){
-  var s = t.toLowerCase();
-
-  // Collect name
-  if(conv.state === 'asked_name'){
-    // Extract a clean name from the input
-    var cleaned = t.replace(/^(i.?m|my name is|call me|it.?s|i am)\s*/i,'').trim();
-    conv.name = cleaned.split(' ')[0];
-    conv.name = conv.name.charAt(0).toUpperCase() + conv.name.slice(1);
-    conv.state = 'idle';
-    return nextFollowUp();
-  }
-
-  // Collect business type
-  if(conv.state === 'asked_business'){
-    conv.business = t.trim();
-    conv.state = 'idle';
-    return nextFollowUp();
-  }
-
-  // Collect goal
-  if(conv.state === 'asked_goal'){
-    conv.goal = t.trim();
-    conv.state = 'idle';
-    return nextFollowUp();
-  }
-
-  // Collect budget
-  if(conv.state === 'asked_budget'){
-    conv.budget = t.trim();
-    conv.state = 'idle';
-    return nextFollowUp();
-  }
-
-  // Closing — user said yes to consultation
-  if(conv.state === 'closing' && (intent === 'yes' || /consult|book|set|schedule|talk/.test(s))){
-    conv.state = 'idle';
-    return {r:"Great! The team will reach out within a few hours. You can also message directly on WhatsApp for the fastest response.", follow:'talk'};
-  }
-
-  return null; // Not in a conv state — route to intent handler
-}
-
-function handleIntent(t, intent){
-  var name = conv.name ? conv.name : null;
-  var greet = name ? ("Hey "+name+"! ") : "";
-
-  switch(intent){
-
-    case 'greet':
-      if(conv.msgCount === 0)
-        return {r:"Hey! Welcome to Prisca Dezigns \u2014 we build websites, AI automation, and digital brands for businesses ready to grow. What can I help you with?", state:'asked_name'};
-      return nextFollowUp();
-
-    case 'website':
-      return {r:greet+"We build everything from single-page sites to 15+ page brand networks \u2014 high-fidelity, mobile-first, no templates unless you want one.\n\nWhat kind of business is the site for?", state:'asked_business'};
-
-    case 'template':
-      return {r:greet+"Our Template Shop has 40+ designs across every industry. You pick one, we swap your branding and content, and it\u2019s live in 24 hours.\n\n\u2756 Standard — $149.99 setup + $19.99/mo\n\u2756 Premium 3D (Aeon, Nexus, Stellar) — $299.99 setup + $19.99/mo\n\nAdd-ons you can stack on:\n\u2713 Professional Copywriting — $49.99 one-time\n\u2713 AI Chatbot — $349.99 setup + $49.99/mo\n\u2713 Micro Store — $249.99 setup + $34.99/mo\n\nWhat industry is your business in?", state:'asked_business'};
-
-    case 'automation':
-      return {r:greet+"Our AI automation connects your WhatsApp, email, or phone to a 24/7 AI that responds, qualifies leads, and alerts you only when someone is ready to pay.\n\nWe have 4 tiers:\n\u2756 Tier 1 \u2014 Website chatbot ($1,500 setup · $150/mo)\n\u2756 Tier 2 \u2014 +WhatsApp AI ($3,500 setup · $400/mo)\n\u2756 Tier 3 \u2014 +Email AI ($6,000 setup · $700/mo)\n\u2756 Tier 4 \u2014 +Voice Agent ($8,000 setup)\n\nWhich sounds closest to what you need?"};
-
-    case 'branding':
-      return {r:greet+"Branding is baked into every package \u2014 logo, colour system, domain, social setup. We don\u2019t just build sites, we design the full brand.\n\nAre you starting from scratch or refreshing an existing brand?"};
-
-    case 'ecommerce':
-      return {r:greet+"We build full e-commerce stores with payment gateways, product SEO, and inventory logic. From 10-product shops to 50+ product networks.\n\nHow many products are you planning to sell?"};
-
-    case 'price':
-      return {r:greet+"Here\u2019s the full breakdown:\n\n\u276e WEBSITES\n\u2756 Starter \u2014 $297 (1-page, full brand setup)\n\u2756 Growth \u2014 $597 (branding, copywriting, SEO)\n\u2756 Trusted \u2014 $1,200 (10-15 pages, full automation)\n\u2756 Custom \u2014 Bespoke\n\n\u276e E-COMMERCE\n\u2756 E-Starter \u2014 $497 \u00b7 E-Growth \u2014 $1,497 \u00b7 E-Trusted \u2014 $2,500\n\n\u276e TEMPLATES (live in 24hrs)\n\u2756 Standard \u2014 $149.99 setup + $19.99/mo\n\u2756 Premium 3D \u2014 $299.99 setup + $19.99/mo\n\u2756 Add-ons: Copywriting $49.99 \u00b7 Chatbot $349.99 setup \u00b7 Micro Store $249.99 setup\n\n\u276e AI AUTOMATION\n\u2756 Tier 1 (Chatbot) \u2014 $1,500 + $150/mo\n\u2756 Tier 2 (+WhatsApp) \u2014 $3,500 + $400/mo\n\u2756 Tier 3 (+Email) \u2014 $6,000 + $700/mo\n\u2756 Tier 4 (Voice) \u2014 $8,000 + $900/mo\n\n\u276e MAINTENANCE\n\u2756 Standard \u2014 $97/mo \u00b7 E-Commerce \u2014 $199.99/mo\n\nWhat kind of business are you running? I\u2019ll point you to the right fit."+(conv.business?'':" (helps me narrow it down)")};
-
-    case 'timeline':
-      return {r:greet+"Template sites: live in 24 hours. Custom websites: 3\u20137 days. AI automation setups: 5\u201310 days including training and testing. Every project comes with 30-day support after launch."};
-
-    case 'maintenance':
-      return {r:greet+"Every package includes 1 month free maintenance. After that, our Maintenance Plan covers daily uptime monitoring, monthly content updates, technical backups, and priority support at a flat monthly rate.\n\nWant me to share the pricing?"};
-
-    case 'seo':
-      return {r:greet+"Technical SEO is built into every project \u2014 meta tags, schema markup, sitemap, mobile speed optimisation. Our Growth and Trusted packages also include monthly content SEO.\n\nAre you trying to rank for a specific niche?"};
-
-    case 'email':
-      return {r:greet+"Email automation is part of our Tier 3 package \u2014 the AI reads every email, responds intelligently, qualifies leads, and sends follow-up sequences. Zero manual inbox checking.\n\nHow many emails does your business get per day roughly?"};
-
-    case 'voice':
-      return {r:greet+"Our Tier 4 Voice Agent answers inbound calls 24/7, gives pricing and service info, and routes hot leads directly to your team. No more missed calls, no more manual phone handling.\n\nThis is perfect for businesses that get a lot of inbound calls \u2014 is that the case for you?"};
-
-    case 'location':
-      return {r:"We\u2019re based in Trinidad & Tobago and work with clients across the Caribbean and internationally. Fully remote, 100% online. No physical meeting needed to get started."};
-
-    case 'portfolio':
-      return {r:greet+"You\u2019re looking at it \u2014 this site is a live example of our work. Our Template Shop also has 40+ live previews you can click through.\n\nWant me to point you to a template that matches your industry?"};
-
-    case 'about':
-      return {r:"Prisca Dezigns is a digital agency founded by Priscilla Narine, based in Trinidad & Tobago. We specialise in high-fidelity websites, AI automation, and high-fidelity branding \u2014 built to professional standard, no DIY builders.\n\nWhat can I help you with today?"};
-
-    case 'thanks':
-      return {r:(name?"Anytime, "+name+"!":"Anytime!") + " If you ever want to move forward or have more questions, I\u2019m right here. The team is also on WhatsApp if you prefer.", follow:'talk'};
-
-    case 'yes':
-      if(conv.state === 'closing')
-        return {r:"The team will be in touch within a few hours. You can also reach us directly on WhatsApp for the fastest response.", follow:'talk'};
-      return nextFollowUp();
-
-    case 'no':
-      return {r:"No worries! Feel free to browse around or come back when the time is right. I\u2019m here if you have any questions."};
-
-    case 'budget_mention':
-      conv.budget = t;
-      return nextFollowUp();
-
-    case 'offtopic':
-      return {r:"Ha \u2014 I like the energy! I\u2019m locked in on websites and AI automation though \ud83d\ude04. What does your business actually need right now?"};
-
-    default:
-      // Unknown — ask a clarifying question naturally
-      if(!conv.name) return {r:"Interesting! I\u2019m here to help with websites, AI automation, and branding. What\u2019s your name, by the way?", state:'asked_name'};
-      if(!conv.business) return {r:"I\u2019d love to help with that, "+conv.name+". What kind of business do you run?", state:'asked_business'};
-      return {r:"Got it! To make sure I point you in the right direction \u2014 are you looking for a website, AI automation, or something else?", follow:'start'};
-  }
-}
-
-// ── AI BRAIN (Groq Llama 3.3 via Supabase) ──────────────────
-var AI_PROXY = "https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy";
-var AI_SYSTEM = "You are the AI assistant for Prisca Dezigns, a premium web design and AI automation agency in Trinidad & Tobago. Your job is to qualify leads, answer questions, and guide visitors toward booking a consultation.\n\nSTANDARD BRAND PACKAGES (one-time setup):\n- Starter: $297 — 1-page website, full brand setup (logo, domain, favicon), social media integration, technical SEO & SSL, 1 month free maintenance\n- Growth: $597 — 1 brand page management, full branding & app/web designure, content creation & copywriting, advanced SEO & analytics, 1 month free maintenance\n- Trusted: $1,200 — full business automation, 10-15 pages of high-fidelity content, premium brand scaling & PR logic, 24/7 priority tech support, 1 month free maintenance\n- Custom: Bespoke pricing — tailored digital designure, custom API & tool integration, unique brand identity, scalable infrastructure\n\nE-COMMERCE PACKAGES (one-time setup):\n- E-Starter: $497 — 1-page online shop, store branding & domain, integrated social shop, payment gateway, 1 month free maintenance\n- E-Growth: $1,497 — 2-5 page store, 10+ products, deep copywriting & product SEO, automated fulfillment sync, 1 month free maintenance\n- E-Trusted: $2,500 — elite store (50+ products), 15+ page network designure, advanced inventory & CRM automation, on-chain inventory logic, 1 month free maintenance\n\nTEMPLATE SHOP:\n- Standard template: $149.99 setup + $19.99/mo (live in 24hrs, branding + content swapped in)\n- Premium 3D template (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n- Add-ons you can stack on any template:\n  + Professional Copywriting: $49.99 one-time\n  + AI Chatbot: $349.99 setup + $49.99/mo (24/7 automated replies)\n  + Voice/Audio Intelligence: +$500 setup + $50/mo (Bot can listen to voice notes and reply with voice)\n  + Micro Store: $249.99 setup + $34.99/mo (sell products online)\n\nAI AUTOMATION PACKAGES:\n- Tier 1 — Website AI Chatbot: $1,500 setup + $150/mo (website chatbot, lead notifications, mobile-ready) [Voice Add-on available: +$500 setup + $50/mo]\n- Tier 2 — + WhatsApp AI: $3,500 setup + $400/mo (everything in Tier 1 + WhatsApp 24/7 automation) [Voice Add-on available: +$500 setup + $50/mo]\n- Tier 3 — + Email AI: $6,000 setup + $700/mo (everything in Tier 2 + full email inbox automation)\n- Tier 4 — Voice Agent: $8,000 setup + $900/mo (everything in Tier 3 + AI voice agent answers all inbound calls 24/7)\n\nMAINTENANCE PLANS (monthly):\n- Standard Maintenance: $97/mo (uptime monitoring, monthly content updates, technical backups, priority support)\n- E-Commerce Maintenance: $199.99/mo (store uptime, monthly product & content updates, payment gateway monitoring, priority support)\n\nRULES:\n- Warm, concise, conversational — 2-4 sentences max per reply\n- Always end with a follow-up question to qualify the lead\n- Never make up prices not listed above\n- If asked about something outside your knowledge, offer to connect them via WhatsApp: +1 (868) 342-4101\n- Never sound robotic — speak like a real, intelligent person\n- If they seem ready to buy, give them the WhatsApp link: https://wa.me/18683424101";
-var aiHistory = [];
-
-function callAIBrain(userMsg, onReply) {
-  aiHistory.push({role:"user", content: userMsg});
-  fetch(AI_PROXY, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({system: AI_SYSTEM, messages: aiHistory, max_tokens: 250})
-  })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var reply = d.reply || "Give me a second — could you rephrase that?";
-    aiHistory.push({role:"assistant", content: reply});
-    onReply(reply);
-  })
-  .catch(function(){
-    onReply("Something went sideways on my end. Reach us directly on WhatsApp: +1 (868) 342-4101");
-  });
-}
-// ────────────────────────────────────────────────────────────
-
-function runConversation(input){
-  conv.msgCount++;
-  var intent = detectIntent(input);
-
-  // First try stateful context (e.g. collecting name, business, goal)
-  var stateResult = handleConvState(input, intent);
-  if(stateResult){
-    if(stateResult.state) conv.state = stateResult.state;
-    return stateResult;
-  }
-
-  // Otherwise handle by intent
-  var result = handleIntent(input, intent);
-  if(result && result.state) conv.state = result.state;
-  return result;
+  m.appendChild(d);m.scrollTop=m.scrollHeight;
 }
 
 window.chatSend=function(){
   var i=document.getElementById('chat-inp');
   var t=i.value.trim();if(!t)return;i.value='';
   addMsg(t,'usr');
-  if(intake.active){advanceIntake(t);return;}
-
-  // Check intent first — if default/unknown, use AI Brain
-  var intent = detectIntent(t);
-  var isDefault = (intent === 'default' || intent === 'offtopic' || intent === 'unknown');
-
-  if(isDefault){
-    var typingId = 'ai-typing-'+Date.now();
-    addMsg('...', 'bot', typingId);
-    callAIBrain(t, function(reply){
-      replaceTypingWithReply(typingId, reply);
-    });
+  // If intake conversation is active, route the answer through it
+  if(intake.active){
+    advanceIntake(t);
     return;
   }
-
+  // Otherwise generic fallback — forward text to WhatsApp
   setTimeout(function(){
-    var result=runConversation(t);
-    addMsg(result.r,'bot');
+    addMsg("Got it! Tap below and we'll pick this up on WhatsApp \uD83D\uDC47",'bot');
     var q=document.getElementById('chat-qr');q.innerHTML='';
-    setTimeout(function(){
-      // Only show action button when truly needed (talk / browse)
-      if(result.follow==='talk'){
-        var wa=document.createElement('a');
-        wa.href=WA+'?text='+encodeURIComponent('Hi, I came from the website and need help.');
-        wa.target='_blank';wa.rel='noopener';
-        wa.className='qrb wa';wa.innerHTML=WA_SVG+' WhatsApp the team';
-        q.appendChild(wa);
-      } else if(result.follow==='start'){
-        addQR('Browse services','start');
-      } else if(result.follow){
-        var b=document.createElement('button');b.className='qrb';
-        var lbl={templates_menu:'Browse templates',ai_menu:'AI packages',pkg_menu:'See packages',cont_menu:'Maintenance plan',ecomm_menu:'E-commerce'};
-        b.textContent=lbl[result.follow]||'See options';
-        b.onclick=function(){go(result.follow,null);};q.appendChild(b);
-      }
-      setBack(hist.length>0);
-    },300);
-  },700);
+    var a=document.createElement('a');
+    a.href=WA+'?text='+encodeURIComponent(t);a.target='_blank';a.rel='noopener';
+    a.className='qrb wa';a.innerHTML=WA_SVG+' WhatsApp Us';
+    q.appendChild(a);setBack(true);
+  },650);
 };
-
-var mediaRecorder;
-var audioChunks = [];
-var isRecording = false;
-
-window.toggleMic = function() {
-  if (!isRecording) {
-    startRecording();
-  } else {
-    stopRecording();
-  }
-};
-
-function startRecording() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    addMsg("Your browser doesn't support audio recording.", 'bot');
-    return;
-  }
-
-  navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(function(stream) {
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.start();
-      isRecording = true;
-      audioChunks = [];
-      
-      var micBtn = document.getElementById('chat-mic');
-      micBtn.classList.add('recording');
-      document.getElementById('chat-inp').placeholder = "Recording voice note...";
-
-      mediaRecorder.addEventListener("dataavailable", function(event) {
-        audioChunks.push(event.data);
-      });
-
-      mediaRecorder.addEventListener("stop", function() {
-        var audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        handleVoiceNote(audioBlob);
-        
-        var tracks = stream.getTracks();
-        tracks.forEach(function(track) { track.stop(); });
-      });
-    })
-    .catch(function(err) {
-      addMsg("Microphone access denied or not available.", 'bot');
-    });
-}
-
-function stopRecording() {
-  if (mediaRecorder && isRecording) {
-    mediaRecorder.stop();
-    isRecording = false;
-    var micBtn = document.getElementById('chat-mic');
-    micBtn.classList.remove('recording');
-    document.getElementById('chat-inp').placeholder = "Type a message...";
-  }
-}
-
-function handleVoiceNote(blob) {
-  addMsg("🎤 Voice note sent.", 'usr');
-  var typingId = 'ai-typing-'+Date.now();
-  addMsg('...', 'bot', typingId);
-  
-  setTimeout(function(){
-    replaceTypingWithReply(typingId, "I've received your voice note! I'm processing the audio now. For full real-time voice conversations, we can also pivot to WhatsApp or deploy a Tier 4 Voice Agent.");
-    var q=document.getElementById('chat-qr');
-    addQR('WhatsApp the team', 'talk');
-    addQR('Tell me more about Voice', 'ai_menu');
-  }, 1500);
-}
 
 if(window.location.pathname.includes('/services')){
   setTimeout(function(){if(!open)toggleChat();},8000);
