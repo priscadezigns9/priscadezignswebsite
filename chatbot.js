@@ -989,7 +989,7 @@ window.chatSend=function(){
 
   // Check intent first — if default/unknown, use AI Brain
   var intent = detectIntent(t);
-  var isDefault = (intent === 'default' || intent === 'offtopic');
+  var isDefault = (intent === 'default' || intent === 'offtopic' || intent === 'unknown');
 
   if(isDefault){
     var typingId = 'ai-typing-'+Date.now();
