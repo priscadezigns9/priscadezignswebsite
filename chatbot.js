@@ -44,7 +44,6 @@ const STEPS={
       {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
       {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"},
       {l:"\uD83D\uDCBC Tell us about your business",s:"talk"},
-      {l:"\u260E\uFE0F Contact Help Desk",s:"contact_help"},
       {l:"\uD83D\uDE04 Tell me a joke",s:"joke"}
     ]
   },
@@ -866,7 +865,7 @@ function handleIntent(t, intent){
       return {r:greet+"Our Template Shop has 40+ designs across every industry. You pick one, we swap your branding and content, and it\u2019s live in 24 hours.\n\nStandard templates: $149.99 setup + $19.99/mo\nPremium 3D: $299.99 setup + $19.99/mo\n\nWhat industry is your business in?", state:'asked_business'};
 
     case 'automation':
-      return {r:greet+"Our AI automation connects your WhatsApp, email, or phone to a 24/7 AI that responds, qualifies leads, and alerts you only when someone is ready to pay.\n\nWe have 4 tiers:\n\u2756 Tier 1 \u2014 Website chatbot ($1,499 setup)\n\u2756 Tier 2 \u2014 +WhatsApp AI ($2,499 setup)\n\u2756 Tier 3 \u2014 +Email AI ($3,999 setup)\n\u2756 Tier 4 \u2014 +Voice Agent ($8,000 setup)\n\nWhich sounds closest to what you need?"};
+      return {r:greet+"Our AI automation connects your WhatsApp, email, or phone to a 24/7 AI that responds, qualifies leads, and alerts you only when someone is ready to pay.\n\nWe have 4 tiers:\n\u2756 Tier 1 \u2014 Website chatbot ($1,500 setup · $150/mo)\n\u2756 Tier 2 \u2014 +WhatsApp AI ($3,500 setup · $400/mo)\n\u2756 Tier 3 \u2014 +Email AI ($6,000 setup · $700/mo)\n\u2756 Tier 4 \u2014 +Voice Agent ($8,000 setup)\n\nWhich sounds closest to what you need?"};
 
     case 'branding':
       return {r:greet+"Branding is baked into every package \u2014 logo, colour system, domain, social setup. We don\u2019t just build sites, we architect the full brand.\n\nAre you starting from scratch or refreshing an existing brand?"};
@@ -875,7 +874,7 @@ function handleIntent(t, intent){
       return {r:greet+"We build full e-commerce stores with payment gateways, product SEO, and inventory logic. From 10-product shops to 50+ product networks.\n\nHow many products are you planning to sell?"};
 
     case 'price':
-      return {r:greet+"Here\u2019s the quick breakdown:\n\n\u2756 Template site \u2014 $149.99 setup + $19.99/mo\n\u2756 Custom website \u2014 from $1,499\n\u2756 AI chatbot \u2014 $1,499 setup + $149/mo\n\u2756 WhatsApp AI \u2014 $2,499 setup + $299/mo\n\u2756 Full AI suite \u2014 from $3,999\n\nEvery project is scoped to your exact needs though. What\u2019s your business?"+(conv.business?'':" (helps me narrow it down)")};
+      return {r:greet+"Here’s the quick breakdown:\n\n❖ Template site — $149.99 setup + $19.99/mo\n❖ AI Tier 1 (chatbot) — $1,500 setup + $150/mo\n❖ AI Tier 2 (+WhatsApp) — $3,500 setup + $400/mo\n❖ AI Tier 3 (+Email) — $6,000 setup + $700/mo\n❖ AI Tier 4 (Voice) — $8,000 setup + $900/mo\n\nEvery project is scoped to your exact needs. What’s your business?"+(conv.business?'':" (helps me narrow it down)")};
 
     case 'timeline':
       return {r:greet+"Template sites: live in 24 hours. Custom websites: 3\u20137 days. AI automation setups: 5\u201310 days including training and testing. Every project comes with 30-day support after launch."};
@@ -976,13 +975,5 @@ window.chatSend=function(){
 
 if(window.location.pathname.includes('/services')){
   setTimeout(function(){if(!open)toggleChat();},8000);
-  contact_help:{
-    bot:"Need immediate assistance? You can reach our Help Desk directly:\n\n🌐 GLOBAL HELP DESK: +1 (302) 469-7276\n💬 WHATSAPP DIRECT: +1 (868) 342-4101\n\nWe are available to answer your questions about packages, pricing, or custom builds.",
-    r:[
-      {l:"📞 Call Help Desk",url:"tel:+13024697276"},
-      {l:"💬 Message WhatsApp",url:"https://wa.me/18683424101"},
-      {l:"← Back to start",s:"start"}
-    ]
-  },
 }
 })();
