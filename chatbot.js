@@ -652,17 +652,61 @@ function renderPkgs(list){
   m.appendChild(g);m.scrollTop=m.scrollHeight;
 }
 
+// ── Voice readout ──────────────────────────────────────────────────────────
+var voiceOn=false;
+window.toggleVoice=function(){
+  voiceOn=!voiceOn;
+  var btn=document.getElementById('chat-voice-toggle');
+  if(btn){
+    btn.textContent='';
+    var icon=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    icon.setAttribute('width','12');icon.setAttribute('height','12');
+    icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('fill','currentColor');
+    var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    if(voiceOn){
+      path.setAttribute('d','M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM16.5 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z');
+    } else {
+      path.setAttribute('d','M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z');
+    }
+    icon.appendChild(path);
+    btn.appendChild(icon);
+    var txt=document.createTextNode(voiceOn?' VOICE ON':' VOICE OFF');
+    btn.appendChild(txt);
+    btn.classList.toggle('voice-on',voiceOn);
+  }
+  if(!voiceOn && window.speechSynthesis){window.speechSynthesis.cancel();}
+};
+function speak(txt){
+  if(!voiceOn||!window.speechSynthesis)return;
+  var clean=txt.replace(/[\u{1F000}-\u{1FFFF}]|[\u2600-\u27BF]/gu,'').replace(/<br>/g,' ').trim();
+  var u=new SpeechSynthesisUtterance(clean);
+  u.rate=0.95;u.pitch=1.05;u.volume=1;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+// ── Typing dots then message ────────────────────────────────────────────────
 function addMsg(txt,type){
   var m=document.getElementById('chat-msgs');
-  var d=document.createElement('div');d.className='cmsg '+type;
-  // render newlines as <br> for bot messages; escape HTML first for safety
   if(type==='bot'){
-    var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    d.innerHTML=safe.replace(/\n/g,'<br>');
+    // Show typing dots first
+    var dots=document.createElement('div');
+    dots.className='cmsg typing';
+    dots.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+    m.appendChild(dots);m.scrollTop=m.scrollHeight;
+    setTimeout(function(){
+      if(dots.parentNode)dots.parentNode.removeChild(dots);
+      var d=document.createElement('div');d.className='cmsg bot';
+      var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      d.innerHTML=safe.replace(/\n/g,'<br>');
+      m.appendChild(d);m.scrollTop=m.scrollHeight;
+      speak(txt);
+    },480);
   } else {
+    var d=document.createElement('div');d.className='cmsg usr';
     d.textContent=txt;
+    m.appendChild(d);m.scrollTop=m.scrollHeight;
   }
-  m.appendChild(d);m.scrollTop=m.scrollHeight;
 }
 
 // --- AI FREE-TEXT BRAIN ---------------------------------------------------
