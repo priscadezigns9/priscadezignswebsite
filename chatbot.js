@@ -5,14 +5,14 @@ const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor
 const PKGS={
   standard:[
     {name:"Starter",desc:"1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance"},
-    {name:"Growth",desc:"Manage 1 Brand Page · Full Branding & App/Web Architecture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
-    {name:"Trusted",desc:"Full Website Architecture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
-    {name:"Custom",desc:"Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support"}
+    {name:"Growth",desc:"Manage 1 Brand Page · Full Branding & App/Web Lead Strategisture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
+    {name:"Trusted",desc:"Full Website Lead Strategisture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
+    {name:"Custom",desc:"Tailored Digital Lead Strategisture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support"}
   ],
   ecommerce:[
     {name:"E-Starter",desc:"1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance"},
-    {name:"E-Growth",desc:"2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
-    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"},
+    {name:"E-Growth",desc:"2-5 Page Store Lead Strategisture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
+    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network Lead Strategisture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"},
     {name:"E-Commerce Maintenance",desc:"E-Commerce Store Uptime & Security Monitoring · Monthly Product & Content Updates · High-Fidelity Technical Backups · Priority Support · $199.99/mo"}
   ],
   ai:[
@@ -58,7 +58,7 @@ const STEPS={
 
   /* ── ABOUT BRANCH ── */
   about:{
-    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago.\n\n❖ Websites — custom builds, template sites, e-commerce stores\n❖ AI & Automation — chatbots, WhatsApp automation, lead capture\n❖ Brand Architecture — logo, domain, social setup, copywriting\n\nEvery project is built to a professional standard.\nWe do it all for you — no drag-and-drop builders, no DIY.",
+    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago.\n\n❖ Websites — custom builds, template sites, e-commerce stores\n❖ AI & Automation — chatbots, WhatsApp automation, lead capture\n❖ Brand Lead Strategisture — logo, domain, social setup, copywriting\n\nEvery project is built to a professional standard.\nWe do it all for you — no drag-and-drop builders, no DIY.",
     r:[
       {l:"\uD83D\uDCC5 How long have you been operating?",s:"about_history"},
       {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
@@ -89,7 +89,7 @@ const STEPS={
     ]
   },
   about_services:{
-    bot:"We specialise in three areas:\n\n\u2756 Website Design & Development — custom builds, template sites, e-commerce stores\n\u2756 AI & Automation — chatbots, WhatsApp automation, lead capture, CRM setup\n\u2756 Brand Architecture — logo, domain, social setup, copywriting, SEO\n\nEverything is done for you. You provide the content, we handle the rest.",
+    bot:"We specialise in three areas:\n\n\u2756 Website Design & Development — custom builds, template sites, e-commerce stores\n\u2756 AI & Automation — chatbots, WhatsApp automation, lead capture, CRM setup\n\u2756 Brand Lead Strategisture — logo, domain, social setup, copywriting, SEO\n\nEverything is done for you. You provide the content, we handle the rest.",
     r:[
       {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
       {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
@@ -882,7 +882,7 @@ function handleIntent(t, intent){
       return {r:greet+"Our AI automation connects your WhatsApp, email, or phone to a 24/7 AI that responds, qualifies leads, and alerts you only when someone is ready to pay.\n\nWe have 4 tiers:\n\u2756 Tier 1 \u2014 Website chatbot ($1,500 setup · $150/mo)\n\u2756 Tier 2 \u2014 +WhatsApp AI ($3,500 setup · $400/mo)\n\u2756 Tier 3 \u2014 +Email AI ($6,000 setup · $700/mo)\n\u2756 Tier 4 \u2014 +Voice Agent ($8,000 setup)\n\nWhich sounds closest to what you need?"};
 
     case 'branding':
-      return {r:greet+"Branding is baked into every package \u2014 logo, colour system, domain, social setup. We don\u2019t just build sites, we architect the full brand.\n\nAre you starting from scratch or refreshing an existing brand?"};
+      return {r:greet+"Branding is baked into every package \u2014 logo, colour system, domain, social setup. We don\u2019t just build sites, we design the full brand.\n\nAre you starting from scratch or refreshing an existing brand?"};
 
     case 'ecommerce':
       return {r:greet+"We build full e-commerce stores with payment gateways, product SEO, and inventory logic. From 10-product shops to 50+ product networks.\n\nHow many products are you planning to sell?"};
@@ -912,7 +912,7 @@ function handleIntent(t, intent){
       return {r:greet+"You\u2019re looking at it \u2014 this site is a live example of our work. Our Template Shop also has 40+ live previews you can click through.\n\nWant me to point you to a template that matches your industry?"};
 
     case 'about':
-      return {r:"Prisca Dezigns is a digital agency founded by Priscilla Narine, based in Trinidad & Tobago. We specialise in high-fidelity websites, AI automation, and brand architecture \u2014 built to professional standard, no DIY builders.\n\nWhat can I help you with today?"};
+      return {r:"Prisca Dezigns is a digital agency founded by Priscilla Narine, based in Trinidad & Tobago. We specialise in high-fidelity websites, AI automation, and high-fidelity branding \u2014 built to professional standard, no DIY builders.\n\nWhat can I help you with today?"};
 
     case 'thanks':
       return {r:(name?"Anytime, "+name+"!":"Anytime!") + " If you ever want to move forward or have more questions, I\u2019m right here. The team is also on WhatsApp if you prefer.", follow:'talk'};
@@ -942,7 +942,7 @@ function handleIntent(t, intent){
 
 // ── AI BRAIN (Groq Llama 3.3 via Supabase) ──────────────────
 var AI_PROXY = "https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy";
-var AI_SYSTEM = "You are the AI assistant for Prisca Dezigns, a premium web design and AI automation agency in Trinidad & Tobago. Your job is to qualify leads, answer questions, and guide visitors toward booking a consultation.\n\nSTANDARD BRAND PACKAGES (one-time setup):\n- Starter: $297 — 1-page website, full brand setup (logo, domain, favicon), social media integration, technical SEO & SSL, 1 month free maintenance\n- Growth: $597 — 1 brand page management, full branding & app/web architecture, content creation & copywriting, advanced SEO & analytics, 1 month free maintenance\n- Trusted: $1,200 — full business automation, 10-15 pages of high-fidelity content, premium brand scaling & PR logic, 24/7 priority tech support, 1 month free maintenance\n- Custom: Bespoke pricing — tailored digital architecture, custom API & tool integration, unique brand identity, scalable infrastructure\n\nE-COMMERCE PACKAGES (one-time setup):\n- E-Starter: $497 — 1-page online shop, store branding & domain, integrated social shop, payment gateway, 1 month free maintenance\n- E-Growth: $1,497 — 2-5 page store, 10+ products, deep copywriting & product SEO, automated fulfillment sync, 1 month free maintenance\n- E-Trusted: $2,500 — elite store (50+ products), 15+ page network architecture, advanced inventory & CRM automation, on-chain inventory logic, 1 month free maintenance\n\nTEMPLATE SHOP:\n- Standard template: $149.99 setup + $19.99/mo (live in 24hrs, branding + content swapped in)\n- Premium 3D template (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n- Add-ons you can stack on any template:\n  + Professional Copywriting: $49.99 one-time\n  + AI Chatbot: $349.99 setup + $49.99/mo (24/7 automated replies)\n  + Micro Store: $249.99 setup + $34.99/mo (sell products online)\n\nAI AUTOMATION PACKAGES:\n- Tier 1 — Website AI Chatbot: $1,500 setup + $150/mo (website chatbot, lead notifications, mobile-ready)\n- Tier 2 — + WhatsApp AI: $3,500 setup + $400/mo (everything in Tier 1 + WhatsApp 24/7 automation)\n- Tier 3 — + Email AI: $6,000 setup + $700/mo (everything in Tier 2 + full email inbox automation)\n- Tier 4 — Voice Agent: $8,000 setup + $900/mo (everything in Tier 3 + AI voice agent answers all inbound calls 24/7)\n\nMAINTENANCE PLANS (monthly):\n- Standard Maintenance: $97/mo (uptime monitoring, monthly content updates, technical backups, priority support)\n- E-Commerce Maintenance: $199.99/mo (store uptime, monthly product & content updates, payment gateway monitoring, priority support)\n\nRULES:\n- Warm, concise, conversational — 2-4 sentences max per reply\n- Always end with a follow-up question to qualify the lead\n- Never make up prices not listed above\n- If asked about something outside your knowledge, offer to connect them via WhatsApp: +1 (868) 342-4101\n- Never sound robotic — speak like a real, intelligent person\n- If they seem ready to buy, give them the WhatsApp link: https://wa.me/18683424101";
+var AI_SYSTEM = "You are the AI assistant for Prisca Dezigns, a premium web design and AI automation agency in Trinidad & Tobago. Your job is to qualify leads, answer questions, and guide visitors toward booking a consultation.\n\nSTANDARD BRAND PACKAGES (one-time setup):\n- Starter: $297 — 1-page website, full brand setup (logo, domain, favicon), social media integration, technical SEO & SSL, 1 month free maintenance\n- Growth: $597 — 1 brand page management, full branding & app/web designure, content creation & copywriting, advanced SEO & analytics, 1 month free maintenance\n- Trusted: $1,200 — full business automation, 10-15 pages of high-fidelity content, premium brand scaling & PR logic, 24/7 priority tech support, 1 month free maintenance\n- Custom: Bespoke pricing — tailored digital designure, custom API & tool integration, unique brand identity, scalable infrastructure\n\nE-COMMERCE PACKAGES (one-time setup):\n- E-Starter: $497 — 1-page online shop, store branding & domain, integrated social shop, payment gateway, 1 month free maintenance\n- E-Growth: $1,497 — 2-5 page store, 10+ products, deep copywriting & product SEO, automated fulfillment sync, 1 month free maintenance\n- E-Trusted: $2,500 — elite store (50+ products), 15+ page network designure, advanced inventory & CRM automation, on-chain inventory logic, 1 month free maintenance\n\nTEMPLATE SHOP:\n- Standard template: $149.99 setup + $19.99/mo (live in 24hrs, branding + content swapped in)\n- Premium 3D template (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n- Add-ons you can stack on any template:\n  + Professional Copywriting: $49.99 one-time\n  + AI Chatbot: $349.99 setup + $49.99/mo (24/7 automated replies)\n  + Micro Store: $249.99 setup + $34.99/mo (sell products online)\n\nAI AUTOMATION PACKAGES:\n- Tier 1 — Website AI Chatbot: $1,500 setup + $150/mo (website chatbot, lead notifications, mobile-ready)\n- Tier 2 — + WhatsApp AI: $3,500 setup + $400/mo (everything in Tier 1 + WhatsApp 24/7 automation)\n- Tier 3 — + Email AI: $6,000 setup + $700/mo (everything in Tier 2 + full email inbox automation)\n- Tier 4 — Voice Agent: $8,000 setup + $900/mo (everything in Tier 3 + AI voice agent answers all inbound calls 24/7)\n\nMAINTENANCE PLANS (monthly):\n- Standard Maintenance: $97/mo (uptime monitoring, monthly content updates, technical backups, priority support)\n- E-Commerce Maintenance: $199.99/mo (store uptime, monthly product & content updates, payment gateway monitoring, priority support)\n\nRULES:\n- Warm, concise, conversational — 2-4 sentences max per reply\n- Always end with a follow-up question to qualify the lead\n- Never make up prices not listed above\n- If asked about something outside your knowledge, offer to connect them via WhatsApp: +1 (868) 342-4101\n- Never sound robotic — speak like a real, intelligent person\n- If they seem ready to buy, give them the WhatsApp link: https://wa.me/18683424101";
 var aiHistory = [];
 
 function callAIBrain(userMsg, onReply) {
