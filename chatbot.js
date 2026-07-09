@@ -755,9 +755,9 @@ function detectIntent(t){
   if(/location|where are you|trinidad|tobago|caribbean/.test(s)) return 'location';
   if(/portfolio|example|your work|demo|past work|show me/.test(s)) return 'portfolio';
   if(/who are you|about you|about prisca|tell me about/.test(s)) return 'about';
-  if(/hello|hi |hey |good morning|good afternoon|good evening|greetings/.test(s)) return 'greet';
+  if(/hello|\bhi\b|\bhey\b|good morning|good afternoon|good evening|greetings/.test(s)) return 'greet';
   if(/thank|thanks|appreciate|great|awesome|perfect|nice one/.test(s)) return 'thanks';
-  if(/yes|yeah|yep|sure|ok|okay|sounds good|let.s go|go ahead|please/.test(s)) return 'yes';
+  if(/\byes\b|yeah|yep|\bsure\b|\bok\b|okay|sounds good|let.s go|go ahead|please/.test(s)) return 'yes';
   if(/no |nope|not really|not right now|maybe later/.test(s)) return 'no';
   if(/\$|budget|afford|spend|invest|how much can/.test(s)) return 'budget_mention';
   if(/weather|food|movie|sport|football|joke|random|funny/.test(s)) return 'offtopic';
