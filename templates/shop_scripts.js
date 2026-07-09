@@ -20,8 +20,7 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
  'pet': ['pet','animals','veterinary','grooming','paws','dog','cat'],
  'photographer': ['photographer','film','reel','portfolio','folio','video','filmmaker','videographer'],
  'personal-brand':['personal brand','persona','opus','author','speaker','blogger','influencer','brand'],
- 'ecommerce': ['ecommerce','online store','store','soleil','cadence','stellar','glow','monsieur','terra','vivid','craft','luxe','paws','optica','atelier'],
- 'microstore': ['soleil','cadence','stellar','glow','monsieur','terra','vivid'],
+ 'ecommerce': ['ecommerce','online store','craft','luxe','glow','paws','optica','atelier','monsieur'],
  'creative': ['aeon','nexus','stellar','agency','creative','3d','gsap','webgl','artist','motion','brand','editorial','studio','monolith','noir','canvas','obsidian'],
  };
  var activeCat = 'all';
@@ -29,13 +28,9 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
  function text(card){
  var n = card.querySelector('[data-search]');
  var u = card.querySelector('.t-use');
- var nm = card.querySelector('.t-name');
- var dt = card.getAttribute('data-type') || '';
  return ((n ? n.getAttribute('data-search') : '') + ' ' +
  (n ? n.textContent : '') + ' ' +
- (u ? u.textContent : '') + ' ' +
- (nm ? nm.textContent : '') + ' ' +
- dt).toLowerCase();
+ (u ? u.textContent : '')).toLowerCase();
  }
  function matchCat(card){
  if(activeCat === 'all') return true;
@@ -85,14 +80,15 @@ document.querySelectorAll(".faq-q").forEach(function(btn){btn.addEventListener("
 
 var cart = {
  base: null, 
- addons: { copy: false, chatbot: false }
+ addons: { copy: false, chatbot: false, voice: false }
 };
 var PRICES = {
  website: { setup: 149.99, mo: 19.99, label: 'Template Website' },
  premium: { setup: 299.99, mo: 19.99, label: 'Premium 3D Template Website' },
  store: { setup: 249.99, mo: 34.99, label: 'Micro Store' },
  copy: { setup: 49.99, mo: 0, moNote: '$4.99 per update' },
- chatbot: { setup: 349.99, mo: 49.99 }
+ chatbot: { setup: 349.99, mo: 49.99 },
+ voice: { setup: 500.00, mo: 50.00 }
 };
 function addTemplate(name, type) {
  type = type || 'website';
@@ -101,7 +97,7 @@ function addTemplate(name, type) {
  openCart(); return;
  }
  cart.addons.copy = false;
- cart.addons.chatbot = false;
+ cart.addons.chatbot = false; cart.addons.voice = false;
  cart.base = { name: name, type: type, setup: p.setup, mo: p.mo };
  renderCart();
  updateAllButtons();
@@ -117,7 +113,7 @@ function removeBase() {
  var oldName = cart.base ? cart.base.name : null;
  cart.base = null;
  cart.addons.copy = false;
- cart.addons.chatbot = false;
+ cart.addons.chatbot = false; cart.addons.voice = false;
  renderCart();
  updateAllButtons();
  if (oldName) updateTemplateBtn(oldName, false);
@@ -167,6 +163,7 @@ function renderCart() {
  var totalMo = cart.base.mo;
  if (cart.addons.copy) { totalSetup += PRICES.copy.setup; totalMo += PRICES.copy.mo; }
  if (cart.addons.chatbot) { totalSetup += PRICES.chatbot.setup; totalMo += PRICES.chatbot.mo; }
+ if (cart.addons.voice) { totalSetup += PRICES.voice.setup; totalMo += PRICES.voice.mo; }
  document.getElementById('cart-setup-total').textContent = '$' + totalSetup.toFixed(2);
  document.getElementById('cart-mo-total').textContent = '$' + totalMo.toFixed(2) + ' / mo';
  var lines = [];
@@ -318,13 +315,6 @@ function acceptTerms() {
  var chk   = document.getElementById('cd-agree-chk');
  if (step2) step2.classList.add('unlocked');
  if (chk)   { chk.disabled = false; }
- // Persist so navigating away and back doesn't reset state
- try { sessionStorage.setItem('pd-terms-read', '1'); } catch(e) {}
- // Scroll step 2 into view on mobile so user sees the unlocked checkbox
- setTimeout(function() {
-   var agreeRow = document.getElementById('cd-agree-row');
-   if (agreeRow) agreeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
- }, 200);
 }
 function updateAgreement() {
  var chk = document.getElementById('cd-agree-chk');
@@ -385,8 +375,8 @@ function saveCartOrder(method) {
   if (cart.addons.copy)    addons.push('Copywriting Add-On');
   if (cart.addons.chatbot) addons.push('AI Chatbot Add-On');
   var p = PRICES[cart.base.type] || {};
-  var totalSetup = cart.base.setup + (cart.addons.copy ? PRICES.copy.setup : 0) + (cart.addons.chatbot ? PRICES.chatbot.setup : 0);
-  var totalMo    = cart.base.mo   + (cart.addons.copy ? PRICES.copy.mo    : 0) + (cart.addons.chatbot ? PRICES.chatbot.mo    : 0);
+  var totalSetup = cart.base.setup + (cart.addons.copy ? PRICES.copy.setup : 0) + (cart.addons.chatbot ? PRICES.chatbot.setup : 0) + (cart.addons.voice ? PRICES.voice.setup : 0);
+  var totalMo    = cart.base.mo   + (cart.addons.copy ? PRICES.copy.mo    : 0) + (cart.addons.chatbot ? PRICES.chatbot.mo    : 0) + (cart.addons.voice ? PRICES.voice.mo : 0);
   var payload = {
     name:    'Shop Order — ' + cart.base.name,
     email:   '(shop) payment method: ' + method,
@@ -407,19 +397,6 @@ function saveCartOrder(method) {
 
 // ── Payment button click handlers — close cart first, then navigate ──
 document.addEventListener('DOMContentLoaded', function() {
- // Restore terms-read state if user navigated away and came back
- try {
-   if (sessionStorage.getItem('pd-terms-read') === '1') {
-     var step1   = document.getElementById('cd-step1');
-     var readBtn = document.getElementById('cd-read-btn');
-     var step2   = document.getElementById('cd-step2');
-     var chk     = document.getElementById('cd-agree-chk');
-     if (step1)   step1.classList.add('done');
-     if (readBtn) { readBtn.classList.add('done'); readBtn.innerHTML = '\u2713 Terms Read'; }
-     if (step2)   step2.classList.add('unlocked');
-     if (chk)     { chk.disabled = false; }
-   }
- } catch(e) {}
  ['cart-paypal','cart-bank'].forEach(function(id) {
    var btn = document.getElementById(id);
    if (!btn) return;
@@ -464,25 +441,4 @@ document.addEventListener('DOMContentLoaded', function() {
  }
 });
 
-// Dynamic iframe scaling — fit 1440px iframe to actual card width
-function scaleIframes() {
-  document.querySelectorAll('.t-preview').forEach(function(preview) {
-    var wrap = preview.querySelector('.t-iframe-wrap');
-    var iframe = preview.querySelector('iframe');
-    if (!wrap || !iframe) return;
-    var w = preview.offsetWidth;
-    var h = preview.offsetHeight - 26; // subtract chrome bar
-    var scaleW = w / 1440;
-    var scaleH = h / 900;
-    var scale = Math.max(scaleW, scaleH);
-    iframe.style.transform = 'scale(' + scale + ')';
-    iframe.style.transformOrigin = 'top left';
-  });
-}
-scaleIframes();
-var _scaleTimer;
-window.addEventListener('resize', function() {
-  clearTimeout(_scaleTimer);
-  _scaleTimer = setTimeout(scaleIframes, 100);
-});
 
