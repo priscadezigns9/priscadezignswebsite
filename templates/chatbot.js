@@ -17,8 +17,9 @@ const PKGS={
   ],
   ai:[
     {name:"AI Tier 1",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · AI Training & Configuration · Monthly Performance Report · 1 Month Free Maintenance"},
-    {name:"AI Tier 2",desc:"Everything in Tier 1 · Multi-Channel Automation · Advanced Workflow Automation · 1 Month Free Maintenance"},
-    {name:"AI Tier 3",desc:"Full Enterprise AI Deployment · Enterprise-Grade Infrastructure · Full Business Intelligence Automation · Direct Consultation & Support · 1 Month Free Maintenance"}
+    {name:"AI Tier 2",desc:"Everything in Tier 1 · WhatsApp AI Automation (24/7) · Automatic Lead Qualification & Routing · Sales Team Alerts for Hot Leads Only · 1 Month Free Maintenance"},
+    {name:"AI Tier 3",desc:"Everything in Tier 1 & 2 · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Every Email · Automated Follow-Up Sequences · Direct Consultation & Support · 1 Month Free Maintenance"},
+    {name:"AI Tier 4",desc:"Everything in Tiers 1, 2 & 3 · AI Voice Agent trained on your business · Answers inbound calls 24/7 automatically · Gives pricing & service info by voice · Qualifies callers & routes hot leads · 1 Month Free Maintenance"}
   ],
   continuity:[
     {name:"Maintenance",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
