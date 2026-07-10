@@ -91,314 +91,206 @@ const PKGS={
   ]
 };
 
-const STEPS={
-  start:{
-    bot:"Hey \uD83D\uDC4B Welcome to Prisca Dezigns. What can I help you with today?",
-    r:[
-      {l:"\uD83C\uDFA8 I want a template site",s:"pkg_templates"},
-      {l:"\uD83C\uDFC7 I need a custom website",s:"need_website"},
-      {l:"\uD83E\uDD16 I need AI automation",s:"automation"},
-      {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
-      {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
-      {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"},
-      {l:"\uD83D\uDCBC Tell us about your business",s:"talk"},
-      {l:"\uD83D\uDE04 Tell me a joke",s:"joke"}
-    ]
-  },
+const STEPS = {
+            start:{
+                bot:"Hey 👋 What brings you here today?",
+                r:[{l:"🎨 I want a template site",s:"pkg_templates"},{l:"🏗️ I need a custom website",s:"need_website"},{l:"📈 I need more leads",s:"more_leads"},{l:"🤖 I need AI automation",s:"automation"},{l:"📦 See agency packages",s:"pkg_menu"}]
+            },
+            need_website:{
+                bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
+                r:[{l:"⚡ Need it in 24hrs — $200",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
+            },
+            no_website:{
+                bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",
+                r:[],pkg:"standard"
+            },
+            bad_website:{
+                bot:"A website that doesn't convert is just an expensive business card. Here's what a full rebuild looks like:",
+                r:[],pkg:"standard"
+            },
+            more_leads:{
+                bot:"Most businesses don't have a lead problem — they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
+                r:[{l:"No one responds fast enough",s:"slow_response"},{l:"Hard to tell who's serious",s:"filter_leads"},{l:"No system at all",s:"no_system"},{l:"See AI packages",s:"pkg_ai"}]
+            },
+            slow_response:{
+                bot:"78% of leads buy from the first business that responds. Our AI responds instantly — 24/7, even at 2am on a Sunday.",
+                r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+            },
+            filter_leads:{
+                bot:"Our lead filter qualifies every enquiry the second it lands — budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
+                r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+            },
+            no_system:{
+                bot:"We build the whole system from scratch — AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
+                r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+            },
+            how_it_works:{
+                bot:"We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up with everyone else automatically. Setup takes 2–4 weeks.",
+                r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+            },
+            automation:{
+                bot:"We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up — all day, every day. What are you trying to automate?",
+                r:[{l:"Customer service / enquiries",s:"how_it_works"},{l:"WhatsApp automation",s:"whatsapp_auto"},{l:"Full business automation",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+            },
+            whatsapp_auto:{
+                bot:"We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
+                r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+            },
+            pkg_menu:{
+                bot:"Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
+                r:[{l:"⚡ 1-Day Website — $200",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
+            },
+            pkg_templates:{
+                bot:"The Template Shop is a separate service from our agency packages — faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
+                r:[{l:"Browse all templates",s:"templates_browse"},{l:"What's included?",s:"templates_included"},{l:"Template + Chatbot option",s:"templates_chatbot"},{l:"Talk to someone",s:"talk"}]
+            },
+            templates_chatbot:{
+                bot:"You're in the right place! 🎉 The chatbot add-on is $49.99 one-time setup + $10/mo added to hosting ($29.99/mo total). It answers your business FAQs 24/7 — hours, pricing, location, services, how to book. Nothing outside your business.",
+                wa:true,
+                r:[{l:"Template only is fine",s:"templates_browse"},{l:"Back to templates",s:"pkg_templates"}]
+            },
+            templates_browse:{
+                bot:"Our Template Shop has 17 live designs — pick one, send your photos and logo, and go live in 24 hours.",
+                r:[{l:"🎨 Open Template Shop →",s:"templates_browse"}],url:"https://priscadezigns.org/templates/"
+            },
+            templates_included:{
+                bot:"Every template includes: ✦ Your logo & colours ✦ Photos & content swapped in ✦ Mobile-optimised ✦ Live in 24 hours ✦ $149.99 setup · $19.99/mo hosting. Add chatbot for $50 (+$10/mo). Add copywriting for $4.99/update.",
+                r:[{l:"Browse templates",s:"templates_browse"},{l:"Add chatbot — $49.99",s:"templates_chatbot"},{l:"I'm ready — let's go",s:"talk"}]
+            },
+            pkg_oneday:{
+                bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $200. Then $50/mo to keep it live, optimised, and secure.",
+                r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
+            },
+            oneday_included:{
+                bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $200 flat. $50/mo maintenance.",
+                r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
+            },
+            pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
+            pkg_ecommerce:{bot:"Here are our E-Commerce Packages:",r:[],pkg:"ecommerce"},
+            pkg_ai:{bot:"Here are our AI Consultancy Packages:",r:[],pkg:"ai"},
+            pkg_continuity:{bot:"Our System Continuity Package:",r:[],pkg:"continuity"},
+            talk:{bot:"Tap below to start a WhatsApp conversation with us directly. We'll get back to you fast.",r:[],wa:true}
+        };
 
-  joke:{
-    bot:"__joke__",
-    r:[
-      {l:"\uD83D\uDE02 Another one",s:"joke"},
-      {l:"\u2190 Back to start",s:"start"}
-    ]
-  },
+        let open=false, started=false, hist=[];
 
-  /* ── ABOUT BRANCH ── */
-  about:{
-    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago.\n\n❖ Websites — custom builds, template sites, e-commerce stores\n❖ AI & Automation — chatbots, WhatsApp automation, lead capture\n❖ Brand Architecture — logo, domain, social setup, copywriting\n\nEvery project is built to a professional standard.\nWe do it all for you — no drag-and-drop builders, no DIY.",
-    r:[
-      {l:"\uD83D\uDCC5 How long have you been operating?",s:"about_history"},
-      {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
-      {l:"\uD83D\uDC69\u200D\uD83D\uDCBB Who is behind it?",s:"about_founder"},
-      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
-      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
-      {l:"\u2764\uFE0F The Way Made Known (TWMK)",s:"about_twmk"},
-      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
-      {l:"\u2190 Back to start",s:"start"}
-    ]
-  },
-  about_history:{
-    bot:"Prisca Dezigns was founded in 2023 and began full operations in 2026.\n\nWhat started as a vision grew into a full-service operation covering:\n\n❖ Websites & branding\n❖ E-commerce stores\n❖ AI-powered customer service automation\n\nServing clients across Trinidad & Tobago and the wider Caribbean — with a focus on accuracy, speed, and results.",
-    r:[
-      {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
-      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_founder:{
-    bot:"Prisca Dezigns is led by Priscilla Narine.\n\n❖ Studied Analytical Chemistry at UWI\n❖ Discovered web design and the power of AI in business\n❖ Left the traditional path to build Prisca Dezigns\n\nHer mission: give businesses access to the same calibre of digital infrastructure that large companies use — without the agency price tag or the technical headache.",
-    r:[
-      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
-      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
-      {l:"\u2764\uFE0F The Way Made Known",s:"about_twmk"},
-      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_services:{
-    bot:"We specialise in three areas:\n\n\u2756 Website Design & Development — custom builds, template sites, e-commerce stores\n\u2756 AI & Automation — chatbots, WhatsApp automation, lead capture, CRM setup\n\u2756 Brand Architecture — logo, domain, social setup, copywriting, SEO\n\nEverything is done for you. You provide the content, we handle the rest.",
-    r:[
-      {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
-      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
-      {l:"\u2764\uFE0F The Way Made Known",s:"about_twmk"},
-      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
-      {l:"Talk to someone",s:"talk"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_social:{
-    bot:"Find us and follow along across all platforms \uD83D\uDC47",
-    r:[
-      {l:"\uD83D\uDCF8 Instagram",url:"https://www.instagram.com/priscadezigns"},
-      {l:"\uD83E\uDDF5 Threads",url:"https://www.threads.net/@priscadezigns"},
-      {l:"\uD83C\uDFB5 TikTok",url:"https://www.tiktok.com/@priscionai"},
-      {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_brands:{
-    bot:"Prisca Dezigns operates a network of specialised brand pages. Tap any to visit \uD83D\uDC47",
-    r:[
-      {l:"\uD83E\uDDF5 SeamRite Designs \u00B7 NehNeh",url:"/seamritedesigns/"},
-      {l:"\uD83C\uDFCE\uFE0F The Autodrome",url:"/theautodrome/"},
-      {l:"\u26A1 Dreaming Anime",url:"https://dreaminganime.com"},
-      {l:"\u26A1\uFE0F Evolve Mobility",url:"https://driveevolve.com"},
-      {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
-      {l:"\uD83D\uDECD\uFE0F Template Shop",url:"https://priscadezigns.org/templates/"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_twmk:{
-    bot:"The Way Made Known (TWMK) is the faith foundation at the heart of Prisca Dezigns.\n\n❖ A Gospel-driven NGO\n❖ Committed to evidence-based, Bible-centred proclamation\n❖ The backbone of everything we build\n\nEvery product, every project, and every dollar earned is part of a mission that goes far beyond business.",
-    r:[
-      {l:"\uD83C\uDF0D Visit TWMK",url:"https://thewaymadeknown.com"},
-      {l:"\uD83E\uDD1D Support the mission",url:"https://www.paypal.com/paypalme/priscadezigns9"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_email:{
-    bot:"Prefer email? Tap below to send us a message directly. We typically respond within 24 hours on business days. \uD83D\uDCE7",
-    r:[
-      {l:"\uD83D\uDCE7 Email us now",url:"mailto:hello@priscadezigns.org"},
-      {l:"\uD83D\uDCAC WhatsApp instead",s:"talk"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_location:{
-    bot:"We are based in San Fernando, Trinidad & Tobago.\n\n❖ Serving clients across the Caribbean and internationally\n❖ All work done remotely — no in-person meetings required\n❖ Communication via WhatsApp, email, and video call",
-    r:[
-      {l:"Talk to someone",s:"talk"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
+        window.toggleChat = function(){
+            open=!open;
+            document.getElementById('pd-chat-bubble').classList.toggle('open',open);
+            document.getElementById('pd-chat-window').classList.toggle('open',open);
+            if(open && !started){ started=true; setTimeout(()=>go('start',null),380); }
+        };
 
-  /* ── WEBSITE BRANCH ── */
-  need_website:{
-    bot:"Our custom websites are built from scratch.\n\n❖ Fully tailored to your brand\n❖ SEO, GEO & AEO optimised\n❖ Mobile-first and fast-loading\n❖ Delivered fast\n\nWhat do you need?",
-    r:[
-      {l:"\u26A1 Need it in 24hrs",s:"pkg_oneday"},
-      {l:"I need a full custom build",s:"pkg_standard"},
-      {l:"Mine isn't converting",s:"bad_website"},
-      {l:"\uD83C\uDFA8 Show me templates instead",s:"pkg_templates"}
-    ]
-  },
-  no_website:{bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",r:[],pkg:"standard"},
-  bad_website:{bot:"A website that doesn't convert is just an expensive business card. Here's what a full rebuild looks like:",r:[],pkg:"standard"},
+        // Handle url-type steps — open external link
+        function handleUrlStep(step){
+            if(step && step.url){
+                window.open(step.url, '_blank');
+            }
+        }
 
-  /* ── LEADS BRANCH ── */
-  more_leads:{
-    bot:"Most businesses don't have a lead problem — they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
-    r:[
-      {l:"No one responds fast enough",s:"slow_response"},
-      {l:"Hard to tell who's serious",s:"filter_leads"},
-      {l:"No system at all",s:"no_system"},
-      {l:"See AI packages",s:"pkg_ai"}
-    ]
-  },
-  slow_response:{
-    bot:"78% of leads buy from the first business that responds.\n\n❖ Our AI responds instantly — 24/7\n❖ Even at 2am on a Sunday\n❖ No missed messages, no missed sales",
-    r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
-  filter_leads:{
-    bot:"Our lead filter qualifies every enquiry the second it lands.\n\n❖ Checks budget, timeline & intent\n❖ Only serious buyers reach you\n❖ The rest are nurtured automatically",
-    r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
-  no_system:{
-    bot:"We build the whole system from scratch.\n\n❖ AI chatbot\n❖ WhatsApp automation\n❖ Lead capture\n❖ CRM setup\n\nYou walk away with a machine that works while you sleep.",
-    r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
-  how_it_works:{
-    bot:"We connect an AI agent to your WhatsApp, website, or email.\n\n❖ Greets every lead instantly\n❖ Asks qualifying questions\n❖ Routes serious buyers directly to you\n❖ Follows up automatically\n❖ Setup takes 2–4 weeks",
-    r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
+        window.chatBack = function(){
+            if(!hist.length) return;
+            const p=hist.pop();
+            const m=document.getElementById('chat-msgs');
+            const q=document.getElementById('chat-qr');
+            m.innerHTML=p.m; q.innerHTML=p.q;
+            m.scrollTop=m.scrollHeight;
+            q.querySelectorAll('.qrb[data-s]').forEach(b=>{ b.onclick=()=>go(b.dataset.s,b.textContent); });
+            setBack(p.bv);
+        };
 
-  /* ── AUTOMATION BRANCH ── */
-  automation:{
-    bot:"We build AI systems that replace a full-time customer service rep.\n\n❖ Respond to every enquiry instantly\n❖ Qualify leads automatically\n❖ Follow up all day, every day — even at 2am\n\nWhat are you trying to automate?",
-    r:[
-      {l:"Customer service / enquiries",s:"how_it_works"},
-      {l:"WhatsApp automation",s:"whatsapp_auto"},
-      {l:"Full business automation",s:"pkg_ai"},
-      {l:"Talk to someone",s:"talk"}
-    ]
-  },
-  whatsapp_auto:{
-    bot:"We integrate an AI agent directly into your WhatsApp Business.\n\n❖ Responds to every message instantly\n❖ Qualifies the lead with smart questions\n❖ Alerts you only when someone is ready to pay\n❖ Works 24/7 — no staff needed",
-    r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
+        function setBack(v){ document.getElementById('chat-back-bar').classList.toggle('vis',v); }
 
-  /* ── PACKAGES MENU ── */
-  pkg_menu:{
-    bot:"Our full service range — from template sites to enterprise AI. What fits your stage?",
-    r:[
-      {l:"\u26A1 1-Day Website",s:"pkg_oneday"},
-      {l:"\uD83C\uDFA8 Template Sites",s:"pkg_templates"},
-      {l:"\uD83C\uDF10 Custom Website Packages",s:"pkg_standard"},
-      {l:"\uD83D\uDED2 E-Commerce Packages",s:"pkg_ecommerce"},
-      {l:"\uD83E\uDD16 AI Consultancy",s:"pkg_ai"},
-      {l:"\uD83D\uDD27 Maintenance",s:"pkg_continuity"},
-      {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"}
-    ]
-  },
+        function push(){
+            const m=document.getElementById('chat-msgs');
+            const q=document.getElementById('chat-qr');
+            hist.push({m:m.innerHTML,q:q.innerHTML,bv:document.getElementById('chat-back-bar').classList.contains('vis')});
+        }
 
-  /* ── TEMPLATE BRANCH ── */
-  pkg_templates:{
-    bot:"24 ready-made templates. Pick a design, send your content, go live in 24 hours. No tech needed.",
-    r:[
-      {l:"\uD83D\uDDFA\uFE0F Browse all templates",s:"microstore"},
-      {l:"What's included?",s:"templates_included"},
-      {l:"\uD83D\uDECD\uFE0F Micro Store option",s:"microstore_info"},
-      {l:"\uD83E\uDD16 Template + Chatbot option",s:"templates_chatbot"},
-      {l:"Do I own the template?",s:"template_ip"},
-      {l:"Talk to someone",s:"talk"}
-    ]
-  },
-  microstore:{
-    bot:"24 live templates — pick your niche to find the best match:",
-    r:[
-      {l:"\uD83D\uDCF8 Portfolio & Creative",s:"ms_portfolio"},
-      {l:"\uD83C\uDFC6 Coach & Consultant",s:"ms_coach"},
-      {l:"\uD83D\uDED2 Store & E-Commerce",s:"ms_store"},
-      {l:"\uD83D\uDCAA Fitness & Wellness",s:"ms_wellness"},
-      {l:"\u2728 Beauty & Skincare",s:"ms_beauty"},
-      {l:"\uD83D\uDE80 Tech & Startup",s:"ms_tech"},
-      {l:"\uD83C\uDF0D Lifestyle & Travel",s:"ms_lifestyle"},
-      {l:"\uD83D\uDCCB Show all 24",s:"ms_all"}
-    ]
-  },
-  ms_portfolio:{
-    bot:"Best for creatives who showcase their work:\n\n\u2756 Folio — Photographer | Artist | Portfolio\n\u2756 Folio II — Minimal 3-Column Portfolio\n\u2756 Studio — Creative Studio | Tech Brand\n\u2756 Craft — Handmade | Maker | Artisan\n\u2756 Marquee — Video | Content Creator\n\u2756 Noir — Fashion Editorial | Dark Luxury",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_coach:{
-    bot:"Best for professionals who sell their expertise:\n\n\u2756 Persona — Personal Brand | Coach | Influencer\n\u2756 Consult — Consultant | Doctor | Lawyer\n\u2756 Summit — Author | Speaker | Mentor\n\u2756 Obvious — Minimalist Personal Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_store:{
-    bot:"Best for businesses selling products online:\n\n\u2756 Luxe — Luxury Fashion | Boutique Store\n\u2756 Glow — Skincare | Beauty Product Shop\n\u2756 Paws — Pet | Vet | Animal Care Store\n\u2756 Optica — Luxury Product Catalogue\n\u2756 Atelier — Jewelry | Artisan | Handcraft Store\n\u2756 Monsieur — Clothing | Apparel | Fashion Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_wellness:{
-    bot:"Best for fitness pros and wellness brands:\n\n\u2756 Velocity — Fitness Coach | Trainer | Athlete\n\u2756 Momentum — Motivator | Gym | Sports Brand\n\u2756 Serene — Yoga | Meditation | Spa | Holistic\n\u2756 Aura — Holistic Health | Wellness Coach",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_beauty:{
-    bot:"Best for beauty, skincare and spa businesses:\n\n\u2756 Aura — Beauty | Skincare | Wellness Spa\n\u2756 Glow — Skincare | Beauty Product Store\n\u2756 Serene — Spa | Wellness | Holistic Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_tech:{
-    bot:"Best for tech brands, SaaS and startups:\n\n\u2756 Launch — SaaS | App Launch | Startup Brand\n\u2756 Volt — Tech Builder | Developer | SaaS\n\u2756 Studio — Creative Studio | Tech Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_lifestyle:{
-    bot:"Best for travel, adventure and lifestyle brands:\n\n\u2756 Horizon — Travel Photographer | Tourism\n\u2756 Obvious — Minimalist Lifestyle Brand\n\u2756 Folio — Adventure | Documentary Portfolio\n\u2756 Monsieur — Fashion Brand | Editorial Drops",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_all:{
-    bot:"All 24 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nStandard — $149.99 setup · $19.99/mo\n⭐ Premium 3D (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\nAll live in 24hrs · Logo + content swapped in",
-    r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  microstore_info:{
-    bot:"The Micro Store turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 setup · $34.99/mo",
-    r:[
-      {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
-      {l:"I'm ready — let's go",s:"talk"},
-      {l:"\u2190 Back to templates",s:"pkg_templates"}
-    ]
-  },
-  templates_chatbot:{
-    bot:"The AI Chatbot add-on plugs a live AI agent into your template site. It answers your business FAQs 24/7 — services, pricing, hours, how to book — and captures leads while you sleep.\n\n❖ $349.99 one-time setup\n❖ $49.99/mo ongoing\n\nAdds on top of your template site fee.",
-    r:[
-      {l:"Add chatbot to my template",s:"talk"},
-      {l:"Template only is fine",s:"microstore"},
-      {l:"\u2190 Back to templates",s:"pkg_templates"}
-    ]
-  },
-  templates_included:{
-    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Hosted on your subdomain\n\nPricing:\n❖ Standard templates — $149.99 setup · $19.99/mo\n❖ Premium 3D templates (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\n\nAdd-ons:\n❖ Copywriting — $49.99 one-time\n❖ AI Chatbot — $349.99 setup · $49.99/mo\n❖ Micro Store — $249.99 setup · $34.99/mo",
-    r:[
-      {l:"\uD83D\uDDFA\uFE0F Browse templates",s:"microstore"},
-      {l:"Add chatbot",s:"templates_chatbot"},
-      {l:"\uD83D\uDECD\uFE0F Micro Store option",s:"microstore_info"},
-      {l:"I'm ready — let's go",s:"talk"}
-    ]
-  },
-  template_ip:{
-    bot:"Here's how ownership works:\n\n❖ Design, layout, code & structure — owned by Prisca Dezigns\n❖ Your content (photos, logo, text, business name) — yours completely\n❖ You receive a licence to use your customised version\n❖ Licence remains active while your subscription is active",
-    r:[{l:"\u2190 Back to templates",s:"pkg_templates"},{l:"Talk to someone",s:"talk"}]
-  },
+        function go(key, userTxt){
+            push();
+            if(userTxt) addMsg(userTxt,'usr');
+            const q=document.getElementById('chat-qr');
+            q.innerHTML='';
+            const s=STEPS[key]||STEPS.start;
+            setTimeout(()=>{
+                addMsg(s.bot,'bot');
+                setBack(hist.length>0);
+                if(s.wa){
+                    const a=document.createElement('a');
+                    a.href=WA; a.target='_blank'; a.rel='noopener';
+                    a.className='qrb wa'; a.innerHTML=WA_SVG+' Chat on WhatsApp';
+                    q.appendChild(a);
+                    addQR('← All packages','pkg_menu');
+                    return;
+                }
+                if(s.pkg){
+                    renderPkgs(PKGS[s.pkg]);
+                    addQR('← All packages','pkg_menu');
+                    addQR('Talk to someone','talk');
+                    return;
+                }
+                if(s.url){
+                    window.open(s.url,'_blank');
+                    s.r.forEach(r=>addQR(r.l,r.s));
+                    return;
+                }
+                s.r.forEach(r=>addQR(r.l,r.s));
+            },420);
+        }
 
-  /* ── PACKAGE STEPS ── */
-  pkg_oneday:{
-    bot:"The 1-Day Website is a fully custom site built to your brand and live within 24 hours. One flat fee. Hosting included after.",
-    r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
-  },
-  oneday_included:{
-    bot:"Your 1-Day Site includes:\n\n\u2756 Full custom design (not a template)\n\u2756 Mobile-first, fast-loading\n\u2756 SEO, GEO & AEO optimised\n\u2756 WhatsApp & contact integration\n\u2756 Live in 24 hours\n\nOne flat fee. Maintenance included after.",
-    r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
-  },
-  pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
-  pkg_ecommerce:{bot:"Here are our E-Commerce Packages:",r:[],pkg:"ecommerce"},
-  pkg_ai:{bot:"Here are our AI Consultancy Packages:",r:[],pkg:"ai"},
-  pkg_continuity:{bot:"Our System Continuity Package keeps your site fast, secure, and up to date:",r:[],pkg:"continuity"},
-  pkg_tpl_tiers:{bot:"Our Template Tiers:",r:[],pkg:"templates"},
+        function addQR(label,step){
+            const q=document.getElementById('chat-qr');
+            const b=document.createElement('button');
+            b.className='qrb'; b.textContent=label; b.dataset.s=step;
+            b.onclick=()=>go(step,label);
+            q.appendChild(b);
+        }
 
-  brand_scan:{
-    bot:"Enter your domain and we'll run a real-time diagnostic on your digital identity and brand footprint.",
-    r:[],scan:true
-  },
+        function renderPkgs(list){
+            const m=document.getElementById('chat-msgs');
+            const g=document.createElement('div'); g.className='cpkg-grid';
+            list.forEach(p=>{
+                const c=document.createElement('div'); c.className='cpkg-card';
+                c.innerHTML='<div class="cpkg-name">'+p.name+'</div><div class="cpkg-price">'+p.price+'</div><div class="cpkg-desc">'+p.desc+'</div>';
+                c.onclick=()=>go('talk','I\'m interested in '+p.name);
+                g.appendChild(c);
+            });
+            m.appendChild(g); m.scrollTop=m.scrollHeight;
+        }
 
-  /* ── TALK / CONTACT ── */
-  talk:{
-    bot:"Let's make sure you get the right recommendation. I'll ask you a few quick questions about your business — won't take long! 😄",
-    r:[],intake:true
-  },
+        function addMsg(txt,type){
+            const m=document.getElementById('chat-msgs');
+            const d=document.createElement('div'); d.className='cmsg '+type; d.textContent=txt;
+            m.appendChild(d); m.scrollTop=m.scrollHeight;
+        }
 
-  /* ── FAQ / MISC ── */
-  faq_turnaround:{
-    bot:"Here are our delivery timelines:\n\n❖ Template sites — live in 24 hours\n❖ Custom websites — 3–7 business days\n❖ E-commerce stores — 3–5 business days\n❖ AI automation systems — 2–4 weeks\n\nAll timelines start from when you send your content.",
-    r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
-  },
-  faq_payment:{
-    bot:"We accept the following payment methods:\n\n❖ PayPal\n❖ Bank transfer\n\nFor template orders — pay directly through our template shop.\nFor custom projects — we send a quote via WhatsApp first.",
-    r:[{l:"Open template shop",url:"https://priscadezigns.org/templates/"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
-  },
-  faq_hosting:{
-    bot:"Yes — all our sites are hosted by us.\n\n❖ Template sites: hosted on yourbrand.priscadezigns.org\n❖ Or your own custom domain\n❖ Hosting included in the monthly fee\n❖ No technical setup required on your end",
-    r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
-  }
-};
+        window.chatSend=function(){
+            const i=document.getElementById('chat-inp');
+            const t=i.value.trim(); if(!t) return;
+            i.value=''; addMsg(t,'usr');
+            setTimeout(()=>{
+                addMsg("Got it! Tap below for the fastest response 👇",'bot');
+                const q=document.getElementById('chat-qr'); q.innerHTML='';
+                const a=document.createElement('a');
+                a.href=WA+'?text='+encodeURIComponent(t);
+                a.target='_blank'; a.rel='noopener';
+                a.className='qrb wa'; a.innerHTML=WA_SVG+' WhatsApp Us';
+                q.appendChild(a); setBack(true);
+            },650);
+        };
+
+        if(window.location.pathname.includes('/services')){
+            setTimeout(()=>{ if(!open) toggleChat(); },8000);
+        }
+    })();
+    </script>
+    <script>
+        // Auto-open package section if arriving from "Get Started Today" on services page
+        (function(){
+            if(localStorage.getItem('pd_open_packages') === '1'){
+                localStorage.removeItem('pd_open_packages');
+                window.addEventListener('load', function(){;
 
 // ── JOKES ──
 const JOKES=[
