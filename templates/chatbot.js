@@ -59,7 +59,6 @@ function stopMic(){
   recognition.stop();
 }
 
-
 const PKGS={
   standard:[
     {name:"Starter",desc:"1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance"},
@@ -92,558 +91,190 @@ const PKGS={
 };
 
 const STEPS = {
-            start:{
-                bot:"Hey 👋 What brings you here today?",
-                r:[{l:"🎨 I want a template site",s:"pkg_templates"},{l:"🏗️ I need a custom website",s:"need_website"},{l:"📈 I need more leads",s:"more_leads"},{l:"🤖 I need AI automation",s:"automation"},{l:"📦 See agency packages",s:"pkg_menu"}]
-            },
-            need_website:{
-                bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
-                r:[{l:"⚡ Need it in 24hrs — $200",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
-            },
-            no_website:{
-                bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",
-                r:[],pkg:"standard"
-            },
-            bad_website:{
-                bot:"A website that doesn't convert is just an expensive business card. Here's what a full rebuild looks like:",
-                r:[],pkg:"standard"
-            },
-            more_leads:{
-                bot:"Most businesses don't have a lead problem — they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
-                r:[{l:"No one responds fast enough",s:"slow_response"},{l:"Hard to tell who's serious",s:"filter_leads"},{l:"No system at all",s:"no_system"},{l:"See AI packages",s:"pkg_ai"}]
-            },
-            slow_response:{
-                bot:"78% of leads buy from the first business that responds. Our AI responds instantly — 24/7, even at 2am on a Sunday.",
-                r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-            },
-            filter_leads:{
-                bot:"Our lead filter qualifies every enquiry the second it lands — budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
-                r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-            },
-            no_system:{
-                bot:"We build the whole system from scratch — AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
-                r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-            },
-            how_it_works:{
-                bot:"We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up with everyone else automatically. Setup takes 2–4 weeks.",
-                r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-            },
-            automation:{
-                bot:"We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up — all day, every day. What are you trying to automate?",
-                r:[{l:"Customer service / enquiries",s:"how_it_works"},{l:"WhatsApp automation",s:"whatsapp_auto"},{l:"Full business automation",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-            },
-            whatsapp_auto:{
-                bot:"We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
-                r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-            },
-            pkg_menu:{
-                bot:"Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
-                r:[{l:"⚡ 1-Day Website — $200",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
-            },
-            pkg_templates:{
-                bot:"The Template Shop is a separate service from our agency packages — faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
-                r:[{l:"Browse all templates",s:"templates_browse"},{l:"What's included?",s:"templates_included"},{l:"Template + Chatbot option",s:"templates_chatbot"},{l:"Talk to someone",s:"talk"}]
-            },
-            templates_chatbot:{
-                bot:"You're in the right place! 🎉 The chatbot add-on is $49.99 one-time setup + $10/mo added to hosting ($29.99/mo total). It answers your business FAQs 24/7 — hours, pricing, location, services, how to book. Nothing outside your business.",
-                wa:true,
-                r:[{l:"Template only is fine",s:"templates_browse"},{l:"Back to templates",s:"pkg_templates"}]
-            },
-            templates_browse:{
-                bot:"Our Template Shop has 17 live designs — pick one, send your photos and logo, and go live in 24 hours.",
-                r:[{l:"🎨 Open Template Shop →",s:"templates_browse"}],url:"https://priscadezigns.org/templates/"
-            },
-            templates_included:{
-                bot:"Every template includes: ✦ Your logo & colours ✦ Photos & content swapped in ✦ Mobile-optimised ✦ Live in 24 hours ✦ $149.99 setup · $19.99/mo hosting. Add chatbot for $50 (+$10/mo). Add copywriting for $4.99/update.",
-                r:[{l:"Browse templates",s:"templates_browse"},{l:"Add chatbot — $49.99",s:"templates_chatbot"},{l:"I'm ready — let's go",s:"talk"}]
-            },
-            pkg_oneday:{
-                bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $200. Then $50/mo to keep it live, optimised, and secure.",
-                r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
-            },
-            oneday_included:{
-                bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $200 flat. $50/mo maintenance.",
-                r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
-            },
-            pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
-            pkg_ecommerce:{bot:"Here are our E-Commerce Packages:",r:[],pkg:"ecommerce"},
-            pkg_ai:{bot:"Here are our AI Consultancy Packages:",r:[],pkg:"ai"},
-            pkg_continuity:{bot:"Our System Continuity Package:",r:[],pkg:"continuity"},
-            talk:{bot:"Tap below to start a WhatsApp conversation with us directly. We'll get back to you fast.",r:[],wa:true}
-        };
-
-        let open=false, started=false, hist=[];
-
-        window.toggleChat = function(){
-            open=!open;
-            document.getElementById('pd-chat-bubble').classList.toggle('open',open);
-            document.getElementById('pd-chat-window').classList.toggle('open',open);
-            if(open && !started){ started=true; setTimeout(()=>go('start',null),380); }
-        };
-
-        // Handle url-type steps — open external link
-        function handleUrlStep(step){
-            if(step && step.url){
-                window.open(step.url, '_blank');
-            }
-        }
-
-        window.chatBack = function(){
-            if(!hist.length) return;
-            const p=hist.pop();
-            const m=document.getElementById('chat-msgs');
-            const q=document.getElementById('chat-qr');
-            m.innerHTML=p.m; q.innerHTML=p.q;
-            m.scrollTop=m.scrollHeight;
-            q.querySelectorAll('.qrb[data-s]').forEach(b=>{ b.onclick=()=>go(b.dataset.s,b.textContent); });
-            setBack(p.bv);
-        };
-
-        function setBack(v){ document.getElementById('chat-back-bar').classList.toggle('vis',v); }
-
-        function push(){
-            const m=document.getElementById('chat-msgs');
-            const q=document.getElementById('chat-qr');
-            hist.push({m:m.innerHTML,q:q.innerHTML,bv:document.getElementById('chat-back-bar').classList.contains('vis')});
-        }
-
-        function go(key, userTxt){
-            push();
-            if(userTxt) addMsg(userTxt,'usr');
-            const q=document.getElementById('chat-qr');
-            q.innerHTML='';
-            const s=STEPS[key]||STEPS.start;
-            setTimeout(()=>{
-                addMsg(s.bot,'bot');
-                setBack(hist.length>0);
-                if(s.wa){
-                    const a=document.createElement('a');
-                    a.href=WA; a.target='_blank'; a.rel='noopener';
-                    a.className='qrb wa'; a.innerHTML=WA_SVG+' Chat on WhatsApp';
-                    q.appendChild(a);
-                    addQR('← All packages','pkg_menu');
-                    return;
-                }
-                if(s.pkg){
-                    renderPkgs(PKGS[s.pkg]);
-                    addQR('← All packages','pkg_menu');
-                    addQR('Talk to someone','talk');
-                    return;
-                }
-                if(s.url){
-                    window.open(s.url,'_blank');
-                    s.r.forEach(r=>addQR(r.l,r.s));
-                    return;
-                }
-                s.r.forEach(r=>addQR(r.l,r.s));
-            },420);
-        }
-
-        function addQR(label,step){
-            const q=document.getElementById('chat-qr');
-            const b=document.createElement('button');
-            b.className='qrb'; b.textContent=label; b.dataset.s=step;
-            b.onclick=()=>go(step,label);
-            q.appendChild(b);
-        }
-
-        function renderPkgs(list){
-            const m=document.getElementById('chat-msgs');
-            const g=document.createElement('div'); g.className='cpkg-grid';
-            list.forEach(p=>{
-                const c=document.createElement('div'); c.className='cpkg-card';
-                c.innerHTML='<div class="cpkg-name">'+p.name+'</div><div class="cpkg-price">'+p.price+'</div><div class="cpkg-desc">'+p.desc+'</div>';
-                c.onclick=()=>go('talk','I\'m interested in '+p.name);
-                g.appendChild(c);
-            });
-            m.appendChild(g); m.scrollTop=m.scrollHeight;
-        }
-
-        function addMsg(txt,type){
-            const m=document.getElementById('chat-msgs');
-            const d=document.createElement('div'); d.className='cmsg '+type; d.textContent=txt;
-            m.appendChild(d); m.scrollTop=m.scrollHeight;
-        }
-
-        window.chatSend=function(){
-            const i=document.getElementById('chat-inp');
-            const t=i.value.trim(); if(!t) return;
-            i.value=''; addMsg(t,'usr');
-            setTimeout(()=>{
-                addMsg("Got it! Tap below for the fastest response 👇",'bot');
-                const q=document.getElementById('chat-qr'); q.innerHTML='';
-                const a=document.createElement('a');
-                a.href=WA+'?text='+encodeURIComponent(t);
-                a.target='_blank'; a.rel='noopener';
-                a.className='qrb wa'; a.innerHTML=WA_SVG+' WhatsApp Us';
-                q.appendChild(a); setBack(true);
-            },650);
-        };
-
-        if(window.location.pathname.includes('/services')){
-            setTimeout(()=>{ if(!open) toggleChat(); },8000);
-        }
-    })();
-    </script>
-    <script>
-        // Auto-open package section if arriving from "Get Started Today" on services page
-        (function(){
-            if(localStorage.getItem('pd_open_packages') === '1'){
-                localStorage.removeItem('pd_open_packages');
-                window.addEventListener('load', function(){;
-
-// ── JOKES ──
-const JOKES=[
-  "Why did the website go to therapy? It had too many unresolved issues. 😅",
-  "My client said 'make it pop'. I added confetti. They meant the colours. We don't talk about that project. 🎊",
-  "Why don't web designers go outside? Because they get too many requests. 🌐",
-  "A client once told me to make the logo bigger. The logo was already the entire homepage. 🔍",
-  "Why did the developer go broke? Because he used up all his cache. 💸",
-  "I told my client the website needed breathing room. They asked if it had asthma. 🫁",
-  "Why did the AI get promoted? It had a neural network... and excellent people skills. 🤖",
-  "A client asked for a 'simple' website. Six revisions later we had an animated 3D solar system. 🪐",
-  "Why do programmers prefer dark mode? Because light attracts bugs. 🐛",
-  "My client wanted the site to feel 'alive'. I added a heartbeat animation. They wanted plants. 🌿"
-];
-var jokeIdx = Math.floor(Math.random()*JOKES.length);
-function nextJoke(){
-  var j=JOKES[jokeIdx%JOKES.length];
-  jokeIdx++;
-  return j;
-}
-
-// ── INTAKE CONVERSATION STATE ──
-var intake={active:false,step:0,data:{}};
-var intakeSteps=[
-  {key:'name',    ask:"First — what's your name? 😊"},
-  {key:'biz',     ask:function(d){return "Nice to meet you, "+d.name+"! What's your business called? (Or describe what you do if you don't have a name yet)"}},
-  {key:'type',    ask:"What type of business is it? (e.g. coach, salon, restaurant, clothing brand, tech startup…)"},
-  {key:'email',   ask:"What's the best email to reach you on? 📧"},
-  {key:'phone',   ask:"And a phone number or WhatsApp? (optional — skip if you prefer email)"},
-  {key:'website', ask:"Do you have an existing website or social media page? Drop the link here if so 🔗"},
-  {key:'goal',    ask:"What's the main thing you're trying to achieve right now? More leads? A new website? Automating your customer service?"},
-  {key:'pain',    ask:"What's the biggest challenge your business is facing right now? Be as specific as you like — this helps us tailor the right solution 🎯"},
-  {key:'budget',  ask:"Last one — do you have a rough budget in mind? No pressure either way, it just helps me point you to the right option 🙏"}
-];
-
-function startIntake(){
-  intake.active=true;
-  intake.step=0;
-  intake.data={};
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  // show first question after short delay
-  setTimeout(function(){
-    addMsg(intakeSteps[0].ask,'bot');
-    showIntakeInput();
-  },420);
-}
-
-function showIntakeInput(){
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  // add a skip button
-  var skip=document.createElement('button');
-  skip.className='qrb';
-  skip.textContent='Skip — just take me to WhatsApp';
-  skip.onclick=function(){ intake.active=false; finishIntake(true); };
-  q.appendChild(skip);
-  // focus the text input
-  var inp=document.getElementById('chat-inp');
-  if(inp) setTimeout(function(){ inp.focus(); },100);
-}
-
-function advanceIntake(userText){
-  var currentStep=intakeSteps[intake.step];
-  intake.data[currentStep.key]=userText;
-  intake.step++;
-
-  // Occasionally drop a joke between questions
-  if(intake.step===2 || intake.step===4){
-    setTimeout(function(){ addMsg(nextJoke(),'bot'); },300);
-  }
-
-  if(intake.step < intakeSteps.length){
-    var nextQ=intakeSteps[intake.step].ask;
-    if(typeof nextQ==='function') nextQ=nextQ(intake.data);
-    setTimeout(function(){
-      addMsg(nextQ,'bot');
-      showIntakeInput();
-    },intake.step===2||intake.step===4?900:500);
-  } else {
-    // All questions answered — build summary and WhatsApp link
-    setTimeout(function(){ finishIntake(false); },500);
-  }
-}
-
-function saveIntakeLead(d){
-  var SB_URL='https://sazhdnqzaqpqcralmthh.supabase.co';
-  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
-  var payload={
-    name: (d.name||'—')+' | Biz: '+(d.biz||'—'),
-    email: d.email||('(chatbot) '+(d.biz||'—')),
-    package: (d.type||'—')+' | Goal: '+(d.goal||'—')+' | Pain: '+(d.pain||'—')+' | Budget: '+(d.budget||'—'),
-    brand: 'Prisca Dezigns (Chatbot) | Phone: '+(d.phone||'—')+' | Web: '+(d.website||'—')
-  };
-  fetch(SB_URL+'/rest/v1/client_leads',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'apikey':SB_KEY,
-      'Authorization':'Bearer '+SB_KEY,
-      'Prefer':'return=minimal'
+    start:{
+        bot:"Hey 👋 What brings you here today?",
+        r:[{l:"🎨 I want a template site",s:"pkg_templates"},{l:"🏗️ I need a custom website",s:"need_website"},{l:"📈 I need more leads",s:"more_leads"},{l:"🤖 I need AI automation",s:"automation"},{l:"📦 See agency packages",s:"pkg_menu"}]
     },
-    body:JSON.stringify(payload)
-  }).catch(function(){});
-}
-
-function finishIntake(skipped){
-  intake.active=false;
-  var d=intake.data;
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-
-  if(skipped || !d.name){
-    addMsg("No worries — tap below and we'll pick up the conversation on WhatsApp 👇",'bot');
-    var a=document.createElement('a');
-    a.href=WA;a.target='_blank';a.rel='noopener';
-    a.className='qrb wa';a.innerHTML=WA_SVG+' Chat on WhatsApp';
-    q.appendChild(a);
-    addQR('← Start over','start');
-    return;
-  }
-
-  saveIntakeLead(d);
-
-  var summary="Perfect, "+d.name+"! Here's what I've got:\n";
-  if(d.biz)     summary+="🏢 Business: "+d.biz+"\n";
-  if(d.type)    summary+="📂 Type: "+d.type+"\n";
-  if(d.email)   summary+="📧 Email: "+d.email+"\n";
-  if(d.phone)   summary+="📱 Phone: "+d.phone+"\n";
-  if(d.website) summary+="🔗 Website: "+d.website+"\n";
-  if(d.goal)    summary+="🎯 Goal: "+d.goal+"\n";
-  if(d.pain)    summary+="⚠️ Challenge: "+d.pain+"\n";
-  if(d.budget)  summary+="💳 Budget: "+d.budget+"\n";
-  summary+="\nI'm sending this straight to the team so we can come back to you with exactly the right recommendation. 🚀";
-  addMsg(summary,'bot');
-
-  // Build WhatsApp pre-fill
-  var msg="Hi! I just came from your website chatbot.\n\n";
-  msg+="👤 Name: "+(d.name||'—')+"\n";
-  msg+="🏢 Business: "+(d.biz||'—')+"\n";
-  msg+="📂 Type: "+(d.type||'—')+"\n";
-  msg+="📧 Email: "+(d.email||'—')+"\n";
-  msg+="📱 Phone: "+(d.phone||'—')+"\n";
-  msg+="🔗 Website: "+(d.website||'—')+"\n";
-  msg+="🎯 Goal: "+(d.goal||'—')+"\n";
-  msg+="⚠️ Challenge: "+(d.pain||'—')+"\n";
-  msg+="💳 Budget: "+(d.budget||'—')+"\n\n";
-  msg+="Looking forward to hearing from you!";
-
-  setTimeout(function(){
-    addMsg(nextJoke(),'bot');
-    var a=document.createElement('a');
-    a.href=WA+'?text='+encodeURIComponent(msg);
-    a.target='_blank';a.rel='noopener';
-    a.className='qrb wa';
-    a.innerHTML=WA_SVG+' Send to WhatsApp';
-    q.appendChild(a);
-    addQR('← Start over','start');
-  },700);
-
-  // Rating prompt — appears after WhatsApp button
-  setTimeout(function(){
-    addMsg('One last thing — how was your experience with our chatbot today? 😊','bot');
-    showRating(d.name);
-  },1800);
-}
-
-function showRating(clientName){
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  var labels=[['⭐','Poor'],['⭐⭐','Fair'],['⭐⭐⭐','Good'],['⭐⭐⭐⭐','Great'],['⭐⭐⭐⭐⭐','Excellent']];
-  labels.forEach(function(pair,i){
-    var b=document.createElement('button');
-    b.className='qrb';
-    b.textContent=pair[0]+' '+pair[1];
-    (function(score){
-      b.onclick=function(){ submitRating(score,clientName); };
-    })(i+1);
-    q.appendChild(b);
-  });
-}
-
-function submitRating(score,clientName){
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  var response=score>=4
-    ? 'Thank you so much, '+clientName+'! We really appreciate that. 🙏 We\'ll be in touch soon!'
-    : score===3
-    ? 'Thanks for the feedback, '+clientName+'! We\'re always looking to improve. 🙏'
-    : 'Thanks for being honest, '+clientName+'. We\'ll use this to do better. 🙏';
-  addMsg(response,'bot');
-  var SB_URL='https://sazhdnqzaqpqcralmthh.supabase.co';
-  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
-  fetch(SB_URL+'/rest/v1/client_leads',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-    body:JSON.stringify({
-      name:(clientName||'Unknown')+' — Rating',
-      email:'(rating)',
-      package:score+'/5 stars',
-      brand:'Prisca Dezigns (Chatbot Rating)'
-    })
-  }).catch(function(){});
-  setTimeout(function(){ addQR('← Start over','start'); },600);
-}
-
-let open=false,started=false,hist=[];
-
-window.toggleChat=function(){
-  open=!open;
-  document.getElementById('pd-chat-bubble').classList.toggle('open',open);
-  document.getElementById('pd-chat-window').classList.toggle('open',open);
-  if(open&&!started){started=true;setTimeout(function(){go('start',null);},380);}
+    need_website:{
+        bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
+        r:[{l:"⚡ Need it in 24hrs — $200",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
+    },
+    no_website:{
+        bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",
+        r:[],pkg:"standard"
+    },
+    bad_website:{
+        bot:"A website that doesn't convert is just an expensive business card. Here's what a full rebuild looks like:",
+        r:[],pkg:"standard"
+    },
+    more_leads:{
+        bot:"Most businesses don't have a lead problem — they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
+        r:[{l:"No one responds fast enough",s:"slow_response"},{l:"Hard to tell who's serious",s:"filter_leads"},{l:"No system at all",s:"no_system"},{l:"See AI packages",s:"pkg_ai"}]
+    },
+    slow_response:{
+        bot:"78% of leads buy from the first business that responds. Our AI responds instantly — 24/7, even at 2am on a Sunday.",
+        r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    filter_leads:{
+        bot:"Our lead filter qualifies every enquiry the second it lands — budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
+        r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    no_system:{
+        bot:"We build the whole system from scratch — AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    how_it_works:{
+        bot:"We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up with everyone else automatically. Setup takes 2–4 weeks.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    automation:{
+        bot:"We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up — all day, every day. What are you trying to automate?",
+        r:[{l:"Customer service / enquiries",s:"how_it_works"},{l:"WhatsApp automation",s:"whatsapp_auto"},{l:"Full business automation",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    whatsapp_auto:{
+        bot:"We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    pkg_menu:{
+        bot:"Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
+        r:[{l:"⚡ 1-Day Website — $200",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
+    },
+    pkg_templates:{
+        bot:"The Template Shop is a separate service from our agency packages — faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
+        r:[{l:"Browse all templates",s:"templates_browse"},{l:"What's included?",s:"templates_included"},{l:"Template + Chatbot option",s:"templates_chatbot"},{l:"Talk to someone",s:"talk"}]
+    },
+    templates_chatbot:{
+        bot:"You're in the right place! 🎉 The chatbot add-on is $49.99 one-time setup + $10/mo added to hosting ($29.99/mo total). It answers your business FAQs 24/7 — hours, pricing, location, services, how to book. Nothing outside your business.",
+        wa:true,
+        r:[{l:"Template only is fine",s:"templates_browse"},{l:"Back to templates",s:"pkg_templates"}]
+    },
+    templates_browse:{
+        bot:"Our Template Shop has 17 live designs — pick one, send your photos and logo, and go live in 24 hours.",
+        r:[{l:"🎨 Open Template Shop →",s:"templates_browse"}],url:"https://priscadezigns.org/templates/"
+    },
+    templates_included:{
+        bot:"Every template includes: ✦ Your logo & colours ✦ Photos & content swapped in ✦ Mobile-optimised ✦ Live in 24 hours ✦ $149.99 setup · $19.99/mo hosting. Add chatbot for $50 (+$10/mo). Add copywriting for $4.99/update.",
+        r:[{l:"Browse templates",s:"templates_browse"},{l:"Add chatbot — $49.99",s:"templates_chatbot"},{l:"I'm ready — let's go",s:"talk"}]
+    },
+    pkg_oneday:{
+        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $200. Then $50/mo to keep it live, optimised, and secure.",
+        r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
+    },
+    oneday_included:{
+        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $200 flat. $50/mo maintenance.",
+        r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
+    },
+    pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
+    pkg_ecommerce:{bot:"Here are our E-Commerce Packages:",r:[],pkg:"ecommerce"},
+    pkg_ai:{bot:"Here are our AI Consultancy Packages:",r:[],pkg:"ai"},
+    pkg_continuity:{bot:"Our System Continuity Package:",r:[],pkg:"continuity"},
+    talk:{bot:"Tap below to start a WhatsApp conversation with us directly. We'll get back to you fast.",r:[],wa:true}
 };
 
-window.chatBack=function(){
-  if(!hist.length)return;
-  var p=hist.pop();
-  var m=document.getElementById('chat-msgs');
-  var q=document.getElementById('chat-qr');
-  m.innerHTML=p.m;q.innerHTML=p.q;
-  m.scrollTop=m.scrollHeight;
-  q.querySelectorAll('.qrb[data-s]').forEach(function(b){b.onclick=function(){go(b.dataset.s,b.textContent);};});
-  setBack(p.bv);
+let open=false, started=false, hist=[];
+
+window.toggleChat = function(){
+    open=!open;
+    document.getElementById('pd-chat-bubble').classList.toggle('open',open);
+    document.getElementById('pd-chat-window').classList.toggle('open',open);
+    if(open && !started){ started=true; setTimeout(()=>go('start',null),380); }
 };
 
-function setBack(v){document.getElementById('chat-back-bar').classList.toggle('vis',v);}
+window.chatBack = function(){
+    if(!hist.length) return;
+    const p=hist.pop();
+    const m=document.getElementById('chat-msgs');
+    const q=document.getElementById('chat-qr');
+    m.innerHTML=p.m; q.innerHTML=p.q;
+    m.scrollTop=m.scrollHeight;
+    q.querySelectorAll('.qrb[data-s]').forEach(b=>{ b.onclick=()=>go(b.dataset.s,b.textContent); });
+    setBack(p.bv);
+};
+
+function setBack(v){ document.getElementById('chat-back-bar').classList.toggle('vis',v); }
 
 function push(){
-  var m=document.getElementById('chat-msgs');
-  var q=document.getElementById('chat-qr');
-  hist.push({m:m.innerHTML,q:q.innerHTML,bv:document.getElementById('chat-back-bar').classList.contains('vis')});
+    const m=document.getElementById('chat-msgs');
+    const q=document.getElementById('chat-qr');
+    hist.push({m:m.innerHTML,q:q.innerHTML,bv:document.getElementById('chat-back-bar').classList.contains('vis')});
 }
 
-function go(key,userTxt){
-  push();
-  if(userTxt)addMsg(userTxt,'usr');
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  var s=STEPS[key]||STEPS.start;
-  setTimeout(function(){
-    addMsg(s.bot==='__joke__'?nextJoke():s.bot,'bot');
-    setBack(hist.length>0);
-    if(s.scan){
-      var isHome=window.location.pathname==='/'||window.location.pathname.endsWith('index.html')||window.location.pathname==='';
-      if(isHome){
-        toggleChat();
-        var inp=document.getElementById('domain-input');
-        if(inp){inp.focus();inp.scrollIntoView({behavior:'smooth',block:'center'});}
-      } else {
-        addMsg("Head to our homepage to run a live Brand Scan \uD83D\uDC47",'bot');
-        var a=document.createElement('a');
-        a.href='https://priscadezigns.org';a.target='_blank';a.rel='noopener';
-        a.className='qrb wa';a.style.textDecoration='none';
-        a.innerHTML='\uD83D\uDD0D Run Brand Scan';
-        q.appendChild(a);
-        addQR('\u2190 Back','start');
-      }
-      return;
-    }
-    if(s.wa){
-      var a=document.createElement('a');
-      a.href=WA;a.target='_blank';a.rel='noopener';
-      a.className='qrb wa';a.innerHTML=WA_SVG+' Chat on WhatsApp';
-      q.appendChild(a);
-      addQR('\u2190 All packages','pkg_menu');
-      return;
-    }
-    if(s.intake){
-      startIntake();
-      return;
-    }
-    if(s.pkg){
-      renderPkgs(PKGS[s.pkg]);
-      addQR('\u2190 All packages','pkg_menu');
-      addQR('Talk to someone','talk');
-      return;
-    }
-    s.r.forEach(function(r){
-      if(r.url){
-        var a=document.createElement('a');
-        a.href=r.url;a.target='_blank';a.rel='noopener';
-        a.className='qrb';a.textContent=r.l;a.style.textDecoration='none';
-        q.appendChild(a);
-      } else {
-        addQR(r.l,r.s);
-      }
-    });
-  },420);
+function go(key, userTxt){
+    push();
+    if(userTxt) addMsg(userTxt,'usr');
+    const q=document.getElementById('chat-qr');
+    q.innerHTML='';
+    const s=STEPS[key]||STEPS.start;
+    setTimeout(()=>{
+        var botTxt = s.bot;
+        addMsg(botTxt,'bot');
+        speak(botTxt);
+        setBack(hist.length>0);
+        if(s.wa){
+            const a=document.createElement('a');
+            a.href=WA; a.target='_blank'; a.rel='noopener';
+            a.className='qrb wa'; a.innerHTML=WA_SVG+' Chat on WhatsApp';
+            q.appendChild(a);
+            addQR('← All packages','pkg_menu');
+            return;
+        }
+        if(s.pkg){
+            renderPkgs(PKGS[s.pkg]);
+            addQR('← All packages','pkg_menu');
+            addQR('Talk to someone','talk');
+            return;
+        }
+        if(s.url){
+            window.open(s.url,'_blank');
+            if(s.r) s.r.forEach(r=>addQR(r.l,r.s));
+            return;
+        }
+        if(s.r) s.r.forEach(r=>addQR(r.l,r.s));
+    },420);
 }
 
 function addQR(label,step){
-  var q=document.getElementById('chat-qr');
-  var b=document.createElement('button');
-  b.className='qrb';b.textContent=label;b.dataset.s=step;
-  b.onclick=function(){go(step,label);};
-  q.appendChild(b);
+    const q=document.getElementById('chat-qr');
+    const b=document.createElement('button');
+    b.className='qrb'; b.textContent=label; b.dataset.s=step;
+    b.onclick=()=>go(step,label);
+    q.appendChild(b);
 }
 
 function renderPkgs(list){
-  var m=document.getElementById('chat-msgs');
-  var g=document.createElement('div');g.className='cpkg-grid';
-  list.forEach(function(p){
-    var c=document.createElement('div');c.className='cpkg-card';
-    c.innerHTML='<div class="cpkg-name">'+p.name+'</div><div class="cpkg-desc">'+p.desc+'</div>';
-    c.onclick=function(){go('talk','I am interested in '+p.name);};
-    g.appendChild(c);
-  });
-  m.appendChild(g);m.scrollTop=m.scrollHeight;
+    const m=document.getElementById('chat-msgs');
+    const g=document.createElement('div'); g.className='cpkg-grid';
+    list.forEach(p=>{
+        const c=document.createElement('div'); c.className='cpkg-card';
+        c.innerHTML='<div class="cpkg-name">'+p.name+'</div>'+(p.price?'<div class="cpkg-price">'+p.price+'</div>':'')+'<div class="cpkg-desc">'+p.desc+'</div>';
+        c.onclick=()=>go('talk','I\'m interested in '+p.name);
+        g.appendChild(c);
+    });
+    m.appendChild(g); m.scrollTop=m.scrollHeight;
 }
 
 function addMsg(txt,type){
-  var m=document.getElementById('chat-msgs');
-  if(type==='bot'){
-    var dots=document.createElement('div');dots.className='cmsg typing';
-    dots.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
-    m.appendChild(dots);m.scrollTop=m.scrollHeight;
-    setTimeout(function(){
-      if(dots.parentNode)dots.parentNode.removeChild(dots);
-      var d=document.createElement('div');d.className='cmsg bot';
-      var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      d.innerHTML=safe.replace(/\n/g,'<br>');
-      m.appendChild(d);m.scrollTop=m.scrollHeight;
-      if(typeof speak==='function') speak(txt);
-    },600);
-  } else {
-    var d=document.createElement('div');d.className='cmsg usr';
-    d.textContent=txt;
-    m.appendChild(d);m.scrollTop=m.scrollHeight;
-  }
+    const m=document.getElementById('chat-msgs');
+    const d=document.createElement('div'); d.className='cmsg '+type; d.textContent=txt;
+    m.appendChild(d); m.scrollTop=m.scrollHeight;
 }
 
 window.chatSend=function(){
-  var i=document.getElementById('chat-inp');
-  var t=i.value.trim();if(!t)return;i.value='';
-  addMsg(t,'usr');
-  // If intake conversation is active, route the answer through it
-  if(intake.active){
-    advanceIntake(t);
-    return;
-  }
-  // Otherwise generic fallback — forward text to WhatsApp
-  setTimeout(function(){
-    addMsg("Got it! Tap below and we'll pick this up on WhatsApp \uD83D\uDC47",'bot');
-    var q=document.getElementById('chat-qr');q.innerHTML='';
-    var a=document.createElement('a');
-    a.href=WA+'?text='+encodeURIComponent(t);a.target='_blank';a.rel='noopener';
-    a.className='qrb wa';a.innerHTML=WA_SVG+' WhatsApp Us';
-    q.appendChild(a);setBack(true);
-  },650);
+    const i=document.getElementById('chat-inp');
+    const t=i.value.trim(); if(!t) return;
+    i.value=''; addMsg(t,'usr');
+    setTimeout(()=>{
+        addMsg("Got it! Tap below for the fastest response 👇",'bot');
+        const q=document.getElementById('chat-qr'); q.innerHTML='';
+        const a=document.createElement('a');
+        a.href=WA+'?text='+encodeURIComponent(t);
+        a.target='_blank'; a.rel='noopener';
+        a.className='qrb wa'; a.innerHTML=WA_SVG+' WhatsApp Us';
+        q.appendChild(a); setBack(true);
+    },650);
 };
 
 if(window.location.pathname.includes('/services')){
-  setTimeout(function(){if(!open)toggleChat();},8000);
+    setTimeout(()=>{ if(!open) toggleChat(); },8000);
 }
 })();
