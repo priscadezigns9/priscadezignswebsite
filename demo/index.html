@@ -3,1159 +3,1121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prisca Dezigns | Visual Experience Demo</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<title>Prisca Dezigns — AI Agency</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,700;0,900;1,100;1,300&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 <style>
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#04030a;
+  --white:#f2f0eb;
+  --gold:#b8962e;
+  --gold-bright:#e8c84a;
+  --gold-glow:rgba(184,150,46,0.18);
+  --purple:#180d35;
+  --blue:#0a0f2e;
+  --cyan:#00c8ff;
+  --red:#ff2d55;
+  --fs-hero:clamp(64px,11vw,160px);
+  --fs-xl:clamp(40px,6vw,96px);
+  --fs-lg:clamp(28px,4vw,56px);
+  --fs-md:clamp(16px,2vw,22px);
+  --fs-sm:13px;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --ease-in:cubic-bezier(0.7,0,0.84,0);
+}
+html{scroll-behavior:auto;overflow-x:hidden}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:none;
+}
 
-  :root {
-    --black: #020204;
-    --white: #f8f8f0;
-    --gold: #c9a84c;
-    --gold-light: #e8c96a;
-    --purple: #2d1b51;
-    --cyan: #00d4ff;
-    --red: #e63946;
-  }
+/* SCROLLBAR */
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--gold)}
 
-  html { scroll-behavior: smooth; }
+/* CURSOR */
+#cur{position:fixed;z-index:99999;pointer-events:none;mix-blend-mode:exclusion}
+#cur-dot{width:8px;height:8px;background:var(--white);border-radius:50%;transform:translate(-50%,-50%)}
+#cur-ring{
+  position:fixed;z-index:99998;pointer-events:none;
+  width:48px;height:48px;border-radius:50%;
+  border:1px solid rgba(184,150,46,0.4);
+  transform:translate(-50%,-50%);
+  transition:width .4s var(--ease-out),height .4s var(--ease-out),border-color .4s,opacity .4s;
+}
+body:has(a:hover) #cur-ring,body:has(button:hover) #cur-ring{width:80px;height:80px;border-color:var(--gold)}
 
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'Inter', sans-serif;
-    overflow-x: hidden;
-  }
+/* LOADER */
+#loader{
+  position:fixed;inset:0;z-index:100000;
+  background:var(--black);
+  display:grid;place-items:center;
+  overflow:hidden;
+}
+.l-inner{display:flex;flex-direction:column;align-items:center;gap:32px;width:340px}
+.l-logo{
+  font-family:'Playfair Display',serif;
+  font-size:14px;letter-spacing:.6em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);
+  font-style:italic;
+}
+.l-counter{
+  font-size:clamp(72px,12vw,140px);
+  font-weight:100;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  color:var(--white);
+  letter-spacing:-.04em;
+}
+.l-bar-wrap{width:100%;height:1px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.l-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-bright));transition:width .1s linear}
+.l-status{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:rgba(255,255,255,.2)}
+.l-panels{position:absolute;inset:0;pointer-events:none}
+.l-panel{
+  position:absolute;background:var(--black);
+  transform-origin:bottom;
+}
 
-  /* ── CURSOR ── */
-  .cursor {
-    position: fixed;
-    width: 12px; height: 12px;
-    background: var(--gold);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-    mix-blend-mode: difference;
-  }
-  .cursor-ring {
-    position: fixed;
-    width: 40px; height: 40px;
-    border: 1px solid rgba(201,168,76,0.5);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate(-50%, -50%);
-    transition: transform 0.15s ease-out, width 0.3s, height 0.3s;
-  }
+/* NAV */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:28px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  mix-blend-mode:difference;
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:16px;letter-spacing:.3em;text-transform:uppercase;
+  font-style:italic;
+  color:var(--white);
+}
+.nav-right{display:flex;align-items:center;gap:48px}
+.nav-links{display:flex;gap:40px;list-style:none}
+.nav-links a{
+  font-size:11px;letter-spacing:.25em;text-transform:uppercase;
+  color:rgba(255,255,255,.5);text-decoration:none;
+  transition:color .3s;
+}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{
+  font-size:11px;letter-spacing:.25em;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.3);
+  padding:10px 24px;color:var(--white);text-decoration:none;
+  transition:background .3s,border-color .3s;
+}
+.nav-cta:hover{background:var(--white);color:var(--black)}
 
-  /* ── LOADER ── */
-  #loader {
-    position: fixed;
-    inset: 0;
-    background: var(--black);
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-  }
-  .loader-bar-wrap {
-    width: 200px;
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    overflow: hidden;
-  }
-  .loader-bar {
-    height: 100%;
-    width: 0%;
-    background: var(--gold);
-  }
-  .loader-text {
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
-  }
-  .loader-brand {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    letter-spacing: 0.15em;
-    color: var(--white);
-  }
+/* ═══ HERO ═══ */
+#hero{position:relative;height:100vh;display:flex;align-items:flex-end;padding:0 48px 80px;overflow:hidden}
+#hero-canvas{position:absolute;inset:0;z-index:0}
+.hero-noise{
+  position:absolute;inset:0;z-index:1;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size:200px;
+}
+.hero-inner{position:relative;z-index:2;width:100%}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:12px;
+  font-size:11px;letter-spacing:.4em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:24px;opacity:0;
+}
+.hero-tag::before{content:'';width:32px;height:1px;background:var(--gold)}
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:var(--fs-hero);
+  font-weight:900;line-height:.92;
+  letter-spacing:-.03em;
+  margin-bottom:48px;
+}
+.ht-line{overflow:hidden;display:block}
+.ht-word{display:inline-block;transform:translateY(110%);opacity:0}
+.ht-italic{font-style:italic;color:var(--gold)}
+.hero-meta{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  width:100%;opacity:0;transform:translateY(20px);
+}
+.hero-desc{
+  max-width:380px;
+  font-size:15px;font-weight:200;line-height:1.7;
+  color:rgba(255,255,255,.5);
+}
+.hero-scroll{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.hero-scroll span{font-size:9px;letter-spacing:.5em;text-transform:uppercase;color:rgba(255,255,255,.25)}
+.hero-scroll-line{
+  width:1px;height:80px;
+  background:linear-gradient(to bottom,rgba(184,150,46,.6),transparent);
+  animation:pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.3;transform:scaleY(.8)}50%{opacity:1;transform:scaleY(1)}}
 
-  /* ── NAV ── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 28px 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    mix-blend-mode: difference;
-  }
-  .nav-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    letter-spacing: 0.2em;
-    color: var(--white);
-    text-transform: uppercase;
-  }
-  .nav-links {
-    display: flex;
-    gap: 40px;
-    list-style: none;
-  }
-  .nav-links a {
-    color: rgba(255,255,255,0.6);
-    text-decoration: none;
-    font-size: 12px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    transition: color 0.3s;
-  }
-  .nav-links a:hover { color: var(--white); }
+/* GRAIN OVERLAY */
+.grain{
+  position:fixed;inset:0;z-index:9990;pointer-events:none;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:300px;animation:grain 8s steps(10) infinite;
+}
+@keyframes grain{0%,100%{transform:translate(0,0)}10%{transform:translate(-2%,-1%)}20%{transform:translate(1%,2%)}30%{transform:translate(-1%,1%)}40%{transform:translate(2%,-2%)}50%{transform:translate(-1%,2%)}60%{transform:translate(1%,-1%)}70%{transform:translate(-2%,1%)}80%{transform:translate(2%,2%)}90%{transform:translate(-1%,-2%)}}
 
-  /* ── HERO ── */
-  #hero {
-    position: relative;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  #three-canvas {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-  }
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-  }
-  .hero-eyebrow {
-    font-size: 11px;
-    letter-spacing: 0.5em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 24px;
-    opacity: 0;
-  }
-  .hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(60px, 10vw, 140px);
-    line-height: 0.9;
-    font-weight: 900;
-    overflow: hidden;
-  }
-  .hero-title .line {
-    display: block;
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  .hero-title .line.italic {
-    font-style: italic;
-    color: var(--gold);
-  }
-  .hero-subtitle {
-    margin-top: 32px;
-    font-size: 14px;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: rgba(255,255,255,0.5);
-    opacity: 0;
-  }
-  .hero-cta {
-    margin-top: 48px;
-    display: inline-block;
-    padding: 16px 48px;
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    text-decoration: none;
-    font-size: 12px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    opacity: 0;
-    transition: background 0.4s, color 0.4s;
-  }
-  .hero-cta:hover { background: var(--gold); color: var(--black); }
-  .scroll-indicator {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    opacity: 0;
-    z-index: 2;
-  }
-  .scroll-indicator span {
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-  }
-  .scroll-line {
-    width: 1px;
-    height: 60px;
-    background: linear-gradient(to bottom, var(--gold), transparent);
-    animation: scrollPulse 2s ease-in-out infinite;
-  }
-  @keyframes scrollPulse {
-    0%, 100% { opacity: 0.3; transform: scaleY(1); }
-    50% { opacity: 1; transform: scaleY(1.2); }
-  }
+/* ═══ MARQUEE ═══ */
+.marquee-wrap{
+  padding:20px 0;overflow:hidden;
+  border-top:1px solid rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.marquee-inner{display:flex;gap:0;white-space:nowrap}
+.marquee-track{
+  display:flex;gap:0;flex-shrink:0;
+  animation:scroll-left 30s linear infinite;
+}
+@keyframes scroll-left{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.m-item{
+  display:flex;align-items:center;gap:0;
+  padding:0 40px;
+  font-size:10px;letter-spacing:.4em;text-transform:uppercase;
+  color:rgba(255,255,255,.15);
+  border-right:1px solid rgba(255,255,255,.06);
+}
+.m-item.accent{color:var(--gold)}
+.m-item:last-child{border-right:none}
 
-  /* ── SECTION BASE ── */
-  section { position: relative; }
+/* ═══ INTRO SPLIT ═══ */
+#intro{
+  min-height:100vh;display:grid;grid-template-columns:1fr 1fr;
+  border-top:1px solid rgba(255,255,255,.04);
+}
+.intro-left{
+  padding:120px 48px;
+  border-right:1px solid rgba(255,255,255,.04);
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.intro-label{font-size:10px;letter-spacing:.5em;text-transform:uppercase;color:rgba(255,255,255,.2)}
+.intro-heading{
+  font-family:'Playfair Display',serif;
+  font-size:var(--fs-xl);font-weight:900;line-height:1.05;
+  letter-spacing:-.03em;margin-top:40px;
+}
+.intro-heading em{font-style:italic;color:var(--gold)}
+.intro-right{
+  padding:120px 48px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  gap:60px;
+}
+.intro-para{
+  font-size:17px;font-weight:200;line-height:1.8;
+  color:rgba(255,255,255,.5);
+}
+.intro-stats{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.i-stat-num{
+  font-family:'Playfair Display',serif;
+  font-size:56px;font-weight:900;
+  color:var(--gold);line-height:1;
+  display:block;
+}
+.i-stat-label{
+  margin-top:8px;font-size:10px;
+  letter-spacing:.3em;text-transform:uppercase;
+  color:rgba(255,255,255,.2);
+}
+.clip-text{overflow:hidden}
+.clip-inner{transform:translateY(100%);opacity:0}
 
-  /* ── MARQUEE ── */
-  .marquee-section {
-    padding: 40px 0;
-    overflow: hidden;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    background: rgba(201,168,76,0.03);
-  }
-  .marquee-track {
-    display: flex;
-    gap: 80px;
-    white-space: nowrap;
-    animation: marquee 20s linear infinite;
-  }
-  .marquee-track span {
-    font-size: 12px;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.2);
-    flex-shrink: 0;
-  }
-  .marquee-track span.gold { color: var(--gold); }
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
+/* ═══ FULLSCREEN PANELS ═══ */
+.panel-section{height:500vh;position:relative}
+.panel-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+.panel{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:80px 48px;
+  clip-path:inset(0 100% 0 0);
+}
+.panel-num{
+  position:absolute;top:48px;right:48px;
+  font-size:180px;font-weight:900;
+  color:rgba(255,255,255,.03);
+  font-family:'Playfair Display',serif;
+  line-height:1;letter-spacing:-.05em;
+}
+.panel-tag{
+  font-size:10px;letter-spacing:.5em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;
+}
+.panel-title{
+  font-family:'Playfair Display',serif;
+  font-size:var(--fs-lg);font-weight:900;line-height:1.1;
+  margin-bottom:24px;
+}
+.panel-body{
+  font-size:16px;font-weight:200;line-height:1.8;
+  color:rgba(255,255,255,.5);max-width:560px;
+}
+.panel-line{width:0;height:1px;background:var(--gold);margin-bottom:32px}
+.p1{background:linear-gradient(160deg,#0d0820 0%,#04030a 60%)}
+.p2{background:linear-gradient(160deg,#08101a 0%,#04030a 60%)}
+.p3{background:linear-gradient(160deg,#0d0d00 0%,#04030a 60%)}
+.p4{background:linear-gradient(160deg,#12040a 0%,#04030a 60%)}
+.p5{background:linear-gradient(160deg,#040d12 0%,#04030a 60%)}
 
-  /* ── PARALLAX STORY ── */
-  .story-section {
-    min-height: 300vh;
-    position: relative;
-  }
-  .story-sticky {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-  .story-bg {
-    position: absolute;
-    inset: -20%;
-    background: radial-gradient(ellipse at 50% 50%, rgba(45,27,81,0.8) 0%, transparent 70%);
-    z-index: 0;
-  }
-  .story-panels {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    max-width: 1200px;
-    padding: 0 60px;
-  }
-  .story-panel {
-    position: absolute;
-    top: 50%;
-    left: 60px;
-    right: 60px;
-    transform: translateY(-50%);
-    opacity: 0;
-  }
-  .story-panel.active { position: relative; transform: none; top: auto; }
-  .story-number {
-    font-size: 120px;
-    font-weight: 900;
-    color: rgba(255,255,255,0.03);
-    line-height: 1;
-    font-family: 'Playfair Display', serif;
-    position: absolute;
-    top: -40px;
-    left: -20px;
-    z-index: -1;
-  }
-  .story-tag {
-    font-size: 11px;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 16px;
-  }
-  .story-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(40px, 6vw, 80px);
-    line-height: 1.05;
-    font-weight: 900;
-    margin-bottom: 24px;
-  }
-  .story-body {
-    font-size: 16px;
-    font-weight: 300;
-    line-height: 1.8;
-    color: rgba(255,255,255,0.6);
-    max-width: 600px;
-  }
-  .story-progress {
-    position: absolute;
-    right: 60px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    z-index: 3;
-  }
-  .progress-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    transition: background 0.4s, transform 0.4s;
-  }
-  .progress-dot.active {
-    background: var(--gold);
-    transform: scale(1.5);
-  }
+/* ═══ HORIZONTAL SERVICES ═══ */
+.h-section{height:600vh;position:relative}
+.h-sticky{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.h-header{
+  padding:0 48px 48px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  position:relative;z-index:2;
+}
+.h-title{
+  font-family:'Playfair Display',serif;
+  font-size:var(--fs-xl);font-weight:900;line-height:1;
+  letter-spacing:-.03em;
+}
+.h-title em{font-style:italic;color:var(--gold)}
+.h-counter{
+  font-size:11px;letter-spacing:.3em;
+  color:rgba(255,255,255,.25);
+}
+.h-track-wrap{overflow:hidden;padding:0 0 48px}
+.h-track{
+  display:flex;gap:2px;
+  width:calc(400px * 5 + 2px * 4 + 96px);
+  padding:0 48px;
+  will-change:transform;
+}
+.h-card{
+  width:380px;flex-shrink:0;
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.05);
+  padding:48px 40px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  position:relative;overflow:hidden;
+  transition:border-color .4s,background .4s;
+  height:320px;
+}
+.h-card:hover{border-color:rgba(184,150,46,.3);background:rgba(184,150,46,.04)}
+.h-card-glow{
+  position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  filter:blur(60px);opacity:0;
+  transition:opacity .6s;
+  pointer-events:none;
+}
+.h-card:hover .h-card-glow{opacity:1}
+.h-card-top{display:flex;align-items:flex-start;justify-content:space-between}
+.h-card-num{
+  font-size:11px;letter-spacing:.3em;
+  color:rgba(255,255,255,.2);
+}
+.h-card-icon{font-size:32px;line-height:1}
+.h-card-title{
+  font-family:'Playfair Display',serif;
+  font-size:28px;font-weight:900;line-height:1.1;
+  margin-bottom:16px;
+}
+.h-card-desc{
+  font-size:14px;font-weight:200;line-height:1.7;
+  color:rgba(255,255,255,.4);
+}
+.h-card-arrow{
+  font-size:20px;color:var(--gold);
+  transition:transform .3s var(--ease-out);
+}
+.h-card:hover .h-card-arrow{transform:translate(6px,-6px)}
 
-  /* ── HORIZONTAL SCROLL ── */
-  .hscroll-section {
-    height: 500vh;
-    position: relative;
-  }
-  .hscroll-sticky {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow: hidden;
-  }
-  .hscroll-track {
-    display: flex;
-    height: 100%;
-    width: 500vw;
-  }
-  .hscroll-card {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    position: relative;
-    overflow: hidden;
-  }
-  .hscroll-card:nth-child(1) { background: linear-gradient(135deg, #020204 0%, #0d0520 100%); }
-  .hscroll-card:nth-child(2) { background: linear-gradient(135deg, #0d0520 0%, #1a0a30 100%); }
-  .hscroll-card:nth-child(3) { background: linear-gradient(135deg, #1a0a30 0%, #0a1a2e 100%); }
-  .hscroll-card:nth-child(4) { background: linear-gradient(135deg, #0a1a2e 0%, #001a10 100%); }
-  .hscroll-card:nth-child(5) { background: linear-gradient(135deg, #001a10 0%, #020204 100%); }
+/* ═══ PARALLAX FEATURE ═══ */
+#feature{
+  display:grid;grid-template-columns:1fr 1fr;
+  min-height:100vh;
+  border-top:1px solid rgba(255,255,255,.04);
+  overflow:hidden;
+}
+.feat-left{
+  padding:120px 48px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;
+}
+.feat-left::after{
+  content:'';position:absolute;right:0;top:0;bottom:0;width:1px;
+  background:linear-gradient(to bottom,transparent,rgba(255,255,255,.08),transparent);
+}
+.feat-tag{font-size:10px;letter-spacing:.5em;text-transform:uppercase;color:var(--gold);margin-bottom:24px}
+.feat-heading{
+  font-family:'Playfair Display',serif;
+  font-size:var(--fs-lg);font-weight:900;line-height:1.05;
+  letter-spacing:-.03em;margin-bottom:40px;
+}
+.feat-heading em{font-style:italic;color:var(--gold)}
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:0}
+.feat-list li{
+  padding:20px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;gap:20px;
+  font-size:14px;font-weight:200;color:rgba(255,255,255,.5);
+  transition:color .3s,padding-left .3s;
+  cursor:default;
+}
+.feat-list li:hover{color:var(--white);padding-left:8px}
+.feat-list li::before{content:'—';color:var(--gold);flex-shrink:0}
+.feat-right{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--purple),var(--black));
+}
+.feat-visual{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+}
+.feat-circle{
+  position:absolute;border-radius:50%;border:1px solid rgba(184,150,46,.1);
+}
+.feat-circle:nth-child(1){width:200px;height:200px;animation:spin 20s linear infinite}
+.feat-circle:nth-child(2){width:350px;height:350px;animation:spin 30s linear infinite reverse}
+.feat-circle:nth-child(3){width:500px;height:500px;animation:spin 45s linear infinite;border-style:dashed}
+.feat-circle:nth-child(4){width:650px;height:650px;animation:spin 60s linear infinite reverse;opacity:.5}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.feat-center-text{
+  font-family:'Playfair Display',serif;
+  font-size:80px;font-weight:900;font-style:italic;
+  color:rgba(255,255,255,.04);
+  text-align:center;line-height:1;
+  position:relative;z-index:1;
+  user-select:none;
+}
+.feat-badge{
+  position:absolute;
+  background:rgba(184,150,46,.1);
+  border:1px solid rgba(184,150,46,.2);
+  padding:12px 20px;border-radius:2px;
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);
+  backdrop-filter:blur(10px);
+}
+.feat-badge:nth-of-type(2){top:25%;left:10%}
+.feat-badge:nth-of-type(3){bottom:30%;right:8%}
+.feat-badge:nth-of-type(4){top:55%;left:5%}
 
-  .card-inner {
-    text-align: center;
-    z-index: 2;
-    padding: 40px;
-  }
-  .card-icon {
-    font-size: 64px;
-    margin-bottom: 32px;
-    display: block;
-  }
-  .card-num {
-    font-size: 11px;
-    letter-spacing: 0.5em;
-    color: var(--gold);
-    margin-bottom: 16px;
-    text-transform: uppercase;
-  }
-  .card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(32px, 5vw, 64px);
-    font-weight: 900;
-    margin-bottom: 20px;
-    line-height: 1.1;
-  }
-  .card-desc {
-    font-size: 15px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.55);
-    max-width: 480px;
-    margin: 0 auto;
-    line-height: 1.7;
-  }
-  .card-bg-shape {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.15;
-    pointer-events: none;
-  }
+/* ═══ TESTIMONIAL / QUOTE ═══ */
+#quote{
+  padding:160px 48px;
+  display:flex;flex-direction:column;align-items:center;
+  border-top:1px solid rgba(255,255,255,.04);
+  text-align:center;position:relative;overflow:hidden;
+}
+.quote-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:600px;height:400px;
+  background:radial-gradient(ellipse,rgba(184,150,46,.07) 0%,transparent 70%);
+  pointer-events:none;
+}
+.quote-mark{
+  font-family:'Playfair Display',serif;
+  font-size:120px;font-weight:900;font-style:italic;
+  color:var(--gold);opacity:.15;line-height:.6;
+  margin-bottom:-20px;
+}
+.quote-text{
+  font-family:'Playfair Display',serif;
+  font-size:var(--fs-md);font-weight:900;font-style:italic;
+  line-height:1.5;max-width:900px;
+  margin-bottom:48px;
+}
+.quote-text em{color:var(--gold);font-style:normal}
+.quote-source{
+  font-size:11px;letter-spacing:.4em;text-transform:uppercase;
+  color:rgba(255,255,255,.25);
+}
 
-  /* ── STATS COUNTER ── */
-  .stats-section {
-    padding: 160px 60px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
-    border-top: 1px solid rgba(255,255,255,0.05);
-  }
-  .stat-item { text-align: center; }
-  .stat-number {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(48px, 6vw, 80px);
-    font-weight: 900;
-    color: var(--gold);
-    line-height: 1;
-    display: block;
-  }
-  .stat-label {
-    margin-top: 12px;
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-  }
+/* ═══ GRID REVEAL ═══ */
+#grid{padding:0 0 160px;border-top:1px solid rgba(255,255,255,.04)}
+.grid-header{
+  padding:120px 48px 80px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+}
+.grid-heading{
+  font-family:'Playfair Display',serif;
+  font-size:var(--fs-xl);font-weight:900;line-height:1;
+  letter-spacing:-.03em;
+}
+.grid-heading em{font-style:italic;color:var(--gold)}
+.grid-sub{
+  font-size:14px;font-weight:200;color:rgba(255,255,255,.3);
+  max-width:280px;text-align:right;line-height:1.6;
+}
+.grid-items{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  grid-template-rows:auto auto;
+  gap:1px;
+  background:rgba(255,255,255,.04);
+  margin:0 48px;
+}
+.g-item{
+  background:var(--black);
+  aspect-ratio:4/3;position:relative;overflow:hidden;
+  cursor:pointer;
+}
+.g-item:nth-child(1){grid-column:span 2}
+.g-item:nth-child(4){grid-column:span 2}
+.g-bg{
+  position:absolute;inset:0;
+  transition:transform .8s var(--ease-out);
+}
+.g-item:hover .g-bg{transform:scale(1.06)}
+.g-item:nth-child(1) .g-bg{background:linear-gradient(135deg,#180d35,#0a0a20)}
+.g-item:nth-child(2) .g-bg{background:linear-gradient(135deg,#0a1820,#04030a)}
+.g-item:nth-child(3) .g-bg{background:linear-gradient(135deg,#1a1000,#04030a)}
+.g-item:nth-child(4) .g-bg{background:linear-gradient(135deg,#0a1510,#04030a)}
+.g-item:nth-child(5) .g-bg{background:linear-gradient(135deg,#1a0510,#04030a)}
+.g-item:nth-child(6) .g-bg{background:linear-gradient(135deg,#0d0820,#04030a)}
+.g-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(4,3,10,.9) 0%,transparent 50%);
+  opacity:0;transition:opacity .5s;
+}
+.g-item:hover .g-overlay{opacity:1}
+.g-content{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:32px;transform:translateY(12px);opacity:0;
+  transition:transform .5s var(--ease-out),opacity .5s;
+}
+.g-item:hover .g-content{transform:translateY(0);opacity:1}
+.g-tag{font-size:9px;letter-spacing:.5em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.g-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:900}
+.g-icon{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:48px;opacity:.08;pointer-events:none;
+  transition:opacity .4s,transform .4s;
+}
+.g-item:hover .g-icon{opacity:.15;transform:translate(-50%,-50%) scale(1.2)}
 
-  /* ── PARALLAX IMAGES ── */
-  .parallax-section {
-    padding: 160px 60px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-    overflow: hidden;
-  }
-  .parallax-text-block { }
-  .parallax-section-tag {
-    font-size: 11px;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 20px;
-  }
-  .parallax-section-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 4vw, 60px);
-    font-weight: 900;
-    line-height: 1.1;
-    margin-bottom: 24px;
-  }
-  .parallax-section-body {
-    font-size: 16px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.55);
-    line-height: 1.8;
-  }
-  .parallax-image-stack {
-    position: relative;
-    height: 500px;
-  }
-  .para-img {
-    position: absolute;
-    border-radius: 4px;
-    overflow: hidden;
-    will-change: transform;
-  }
-  .para-img-1 {
-    width: 65%;
-    height: 350px;
-    top: 0; right: 0;
-    background: linear-gradient(135deg, #2d1b51, #1a0a30);
-  }
-  .para-img-2 {
-    width: 50%;
-    height: 280px;
-    bottom: 0; left: 0;
-    background: linear-gradient(135deg, #0a1a2e, #001a10);
-  }
-  .para-img-label {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
-  }
-  .para-img-big-num {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    font-family: 'Playfair Display', serif;
-    font-size: 80px;
-    font-weight: 900;
-    color: rgba(255,255,255,0.06);
-  }
+/* ═══ CINEMATIC CLOSE ═══ */
+#closing{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:160px 48px;text-align:center;
+  position:relative;overflow:hidden;
+  border-top:1px solid rgba(255,255,255,.04);
+}
+.close-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 60%,rgba(24,13,53,.8) 0%,transparent 70%);
+}
+.close-eyebrow{
+  font-size:10px;letter-spacing:.6em;text-transform:uppercase;
+  color:rgba(255,255,255,.2);margin-bottom:48px;
+}
+.close-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(56px,10vw,150px);
+  font-weight:900;line-height:.9;letter-spacing:-.04em;
+  position:relative;z-index:1;
+}
+.close-title .word{overflow:hidden;display:inline-block;vertical-align:bottom}
+.close-title .word span{display:inline-block;transform:translateY(110%)}
+.close-title em{font-style:italic;color:var(--gold)}
+.close-sub{
+  margin-top:64px;font-size:15px;font-weight:200;
+  color:rgba(255,255,255,.3);letter-spacing:.1em;
+  position:relative;z-index:1;
+}
+.close-btn{
+  margin-top:56px;
+  display:inline-flex;align-items:center;gap:16px;
+  padding:18px 56px;
+  border:1px solid var(--gold);
+  color:var(--gold);text-decoration:none;
+  font-size:12px;letter-spacing:.4em;text-transform:uppercase;
+  position:relative;z-index:1;
+  overflow:hidden;
+  transition:color .4s;
+}
+.close-btn::before{
+  content:'';position:absolute;inset:0;
+  background:var(--gold);transform:translateX(-101%);
+  transition:transform .5s var(--ease-out);
+}
+.close-btn:hover::before{transform:translateX(0)}
+.close-btn:hover{color:var(--black)}
+.close-btn span{position:relative;z-index:1}
 
-  /* ── REVEAL GRID ── */
-  .reveal-section {
-    padding: 160px 60px;
-  }
-  .reveal-header {
-    text-align: center;
-    margin-bottom: 80px;
-  }
-  .reveal-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 5vw, 72px);
-    font-weight: 900;
-    line-height: 1.1;
-  }
-  .reveal-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
-  }
-  .reveal-item {
-    aspect-ratio: 4/3;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-  }
-  .reveal-item-bg {
-    position: absolute;
-    inset: 0;
-    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-  .reveal-item:hover .reveal-item-bg { transform: scale(1.08); }
-  .reveal-item:nth-child(1) .reveal-item-bg { background: linear-gradient(135deg, #2d1b51 0%, #0d0520 100%); }
-  .reveal-item:nth-child(2) .reveal-item-bg { background: linear-gradient(135deg, #0a1a2e 0%, #001030 100%); }
-  .reveal-item:nth-child(3) .reveal-item-bg { background: linear-gradient(135deg, #1a0a10 0%, #2d0a1a 100%); }
-  .reveal-item:nth-child(4) .reveal-item-bg { background: linear-gradient(135deg, #001a10 0%, #0a2010 100%); }
-  .reveal-item:nth-child(5) .reveal-item-bg { background: linear-gradient(135deg, #1a1500 0%, #2d2000 100%); }
-  .reveal-item:nth-child(6) .reveal-item-bg { background: linear-gradient(135deg, #0d0a20 0%, #1a1540 100%); }
-  .reveal-item-content {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 32px;
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
-    transform: translateY(20px);
-    opacity: 0;
-    transition: transform 0.4s, opacity 0.4s;
-  }
-  .reveal-item:hover .reveal-item-content { transform: translateY(0); opacity: 1; }
-  .reveal-item-tag {
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 8px;
-  }
-  .reveal-item-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    font-weight: 700;
-  }
-  .reveal-item-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.2);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-  .reveal-item.revealed .reveal-item-overlay { transform: scaleX(1); }
-  .reveal-item.revealed .reveal-item-overlay { transform: scaleX(0); transform-origin: right; }
-  .grid-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    font-size: 48px;
-    opacity: 0.15;
-  }
+/* ═══ FOOTER ═══ */
+footer{
+  padding:48px;
+  border-top:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.f-logo{
+  font-family:'Playfair Display',serif;
+  font-size:14px;letter-spacing:.3em;
+  font-style:italic;color:rgba(255,255,255,.4);
+}
+.f-note{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.15)}
+.f-loc{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);opacity:.6}
 
-  /* ── CINEMATIC TEXT ── */
-  .cinematic-section {
-    padding: 200px 60px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .cinematic-bg {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.05) 0%, transparent 70%);
-  }
-  .cinematic-word {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(48px, 8vw, 120px);
-    font-weight: 900;
-    line-height: 1;
-    display: inline-block;
-    overflow: hidden;
-    vertical-align: bottom;
-  }
-  .cinematic-word span {
-    display: inline-block;
-    transform: translateY(110%);
-    opacity: 0;
-  }
-  .cinematic-word.gold-word span { color: var(--gold); font-style: italic; }
-  .cinematic-divider {
-    width: 60px;
-    height: 1px;
-    background: var(--gold);
-    margin: 40px auto;
-    transform: scaleX(0);
-  }
-  .cinematic-sub {
-    font-size: 14px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    padding: 80px 60px;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .footer-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-  .footer-note {
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    color: rgba(255,255,255,0.2);
-    text-transform: uppercase;
-  }
-  .footer-gold {
-    color: var(--gold);
-    font-size: 12px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-
-  @media (max-width: 768px) {
-    nav { padding: 20px 24px; }
-    .nav-links { display: none; }
-    .stats-section { grid-template-columns: repeat(2,1fr); padding: 80px 24px; }
-    .parallax-section { grid-template-columns: 1fr; padding: 80px 24px; }
-    .parallax-image-stack { height: 300px; }
-    .reveal-grid { grid-template-columns: repeat(2,1fr); }
-    .reveal-section, .cinematic-section { padding: 80px 24px; }
-    footer { flex-direction: column; gap: 16px; text-align: center; padding: 60px 24px; }
-    .story-progress { display: none; }
-    .story-panels { padding: 0 24px; }
-  }
+/* MOBILE */
+@media(max-width:768px){
+  #nav{padding:20px 24px}
+  .nav-links,.nav-cta{display:none}
+  #hero{padding:0 24px 60px}
+  #intro{grid-template-columns:1fr}
+  .intro-left,.intro-right{padding:80px 24px}
+  .intro-left{border-right:none;border-bottom:1px solid rgba(255,255,255,.04)}
+  #feature{grid-template-columns:1fr}
+  .feat-right{height:400px}
+  .feat-left{padding:80px 24px}
+  .h-track{padding:0 24px}
+  .grid-header{flex-direction:column;gap:24px;padding:80px 24px 60px}
+  .grid-sub{text-align:left}
+  .grid-items{grid-template-columns:1fr;margin:0 24px}
+  .g-item:nth-child(1),.g-item:nth-child(4){grid-column:span 1}
+  #quote{padding:100px 24px}
+  #closing{padding:100px 24px}
+  footer{flex-direction:column;gap:16px;text-align:center;padding:40px 24px}
+  .h-section{height:700vh}
+}
 </style>
 </head>
 <body>
 
-<!-- CURSOR -->
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursor-ring"></div>
+<div class="grain"></div>
+<div id="cur"><div id="cur-dot"></div></div>
+<div id="cur-ring"></div>
 
 <!-- LOADER -->
 <div id="loader">
-  <div class="loader-brand">Prisca Dezigns</div>
-  <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
-  <div class="loader-text" id="loader-text">Loading experience — 0%</div>
+  <div class="l-panels" id="l-panels"></div>
+  <div class="l-inner">
+    <div class="l-logo">Prisca Dezigns</div>
+    <div class="l-counter" id="l-counter">0</div>
+    <div class="l-bar-wrap"><div class="l-bar" id="l-bar"></div></div>
+    <div class="l-status" id="l-status">Initialising</div>
+  </div>
 </div>
 
 <!-- NAV -->
-<nav>
-  <div class="nav-logo">PD</div>
-  <ul class="nav-links">
-    <li><a href="#story">Story</a></li>
-    <li><a href="#services">Services</a></li>
-    <li><a href="#work">Work</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
+<nav id="nav">
+  <div class="nav-logo">Prisca Dezigns</div>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="#intro">Studio</a></li>
+      <li><a href="#feature">Approach</a></li>
+      <li><a href="#grid">Services</a></li>
+    </ul>
+    <a href="#closing" class="nav-cta">Start a Project</a>
+  </div>
 </nav>
 
-<!-- HERO — THREE.JS BACKGROUND -->
+<!-- HERO -->
 <section id="hero">
-  <canvas id="three-canvas"></canvas>
-  <div class="hero-content">
-    <div class="hero-eyebrow">Trinidad & Tobago's Premier AI Agency</div>
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-noise"></div>
+  <div class="hero-inner">
+    <div class="hero-tag" id="hero-tag">Trinidad & Tobago's AI Agency</div>
     <h1 class="hero-title">
-      <span class="line">WE BUILD</span>
-      <span class="line italic">Experiences.</span>
+      <span class="ht-line"><span class="ht-word">We</span> <span class="ht-word">don't</span> <span class="ht-word">build</span></span>
+      <span class="ht-line"><span class="ht-word ht-italic">websites.</span></span>
+      <span class="ht-line"><span class="ht-word">We build</span></span>
+      <span class="ht-line"><span class="ht-word ht-italic">futures.</span></span>
     </h1>
-    <p class="hero-subtitle">AI Automation · Web Design · Digital Intelligence</p>
-    <a href="#story" class="hero-cta">Discover the Studio</a>
-  </div>
-  <div class="scroll-indicator">
-    <span>Scroll</span>
-    <div class="scroll-line"></div>
+    <div class="hero-meta" id="hero-meta">
+      <p class="hero-desc">AI automation, intelligent systems, and cinematic web experiences — built for Caribbean businesses ready to operate at the next level.</p>
+      <div class="hero-scroll">
+        <span>Scroll</span>
+        <div class="hero-scroll-line"></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- MARQUEE -->
-<div class="marquee-section">
-  <div class="marquee-track">
-    <span class="gold">✦</span><span>Customer Service Automation</span>
-    <span class="gold">✦</span><span>AI Lead Conversion</span>
-    <span class="gold">✦</span><span>Data Processing</span>
-    <span class="gold">✦</span><span>WhatsApp Intelligence</span>
-    <span class="gold">✦</span><span>Web Design</span>
-    <span class="gold">✦</span><span>Sales Automation</span>
-    <span class="gold">✦</span><span>Customer Service Automation</span>
-    <span class="gold">✦</span><span>AI Lead Conversion</span>
-    <span class="gold">✦</span><span>Data Processing</span>
-    <span class="gold">✦</span><span>WhatsApp Intelligence</span>
-    <span class="gold">✦</span><span>Web Design</span>
-    <span class="gold">✦</span><span>Sales Automation</span>
+<div class="marquee-wrap">
+  <div class="marquee-inner">
+    <div class="marquee-track">
+      <div class="m-item accent">✦ AI Automation</div>
+      <div class="m-item">Customer Service</div>
+      <div class="m-item accent">✦ WhatsApp Intelligence</div>
+      <div class="m-item">Data Processing</div>
+      <div class="m-item accent">✦ Web Design</div>
+      <div class="m-item">Lead Conversion</div>
+      <div class="m-item accent">✦ Sales Pipelines</div>
+      <div class="m-item">Email Automation</div>
+      <div class="m-item accent">✦ Caribbean Market</div>
+      <div class="m-item">Enterprise Systems</div>
+    </div>
+    <div class="marquee-track" aria-hidden="true">
+      <div class="m-item accent">✦ AI Automation</div>
+      <div class="m-item">Customer Service</div>
+      <div class="m-item accent">✦ WhatsApp Intelligence</div>
+      <div class="m-item">Data Processing</div>
+      <div class="m-item accent">✦ Web Design</div>
+      <div class="m-item">Lead Conversion</div>
+      <div class="m-item accent">✦ Sales Pipelines</div>
+      <div class="m-item">Email Automation</div>
+      <div class="m-item accent">✦ Caribbean Market</div>
+      <div class="m-item">Enterprise Systems</div>
+    </div>
   </div>
 </div>
 
-<!-- STORY — SCROLL STORYTELLING -->
-<section class="story-section" id="story">
-  <div class="story-sticky">
-    <div class="story-bg"></div>
-    <div class="story-panels">
-      <!-- Panel 1 -->
-      <div class="story-panel" id="sp1">
-        <div class="story-number">01</div>
-        <div class="story-tag">The Problem</div>
-        <h2 class="story-heading">Your business is<br>losing money<br><em style="color:var(--gold)">while you sleep.</em></h2>
-        <p class="story-body">Inquiries go unanswered. Leads fall through the cracks. Staff spend hours on tasks a system could handle in seconds. That's not a people problem — it's an infrastructure problem.</p>
+<!-- INTRO -->
+<section id="intro">
+  <div class="intro-left">
+    <div class="intro-label">About the Studio</div>
+    <h2 class="intro-heading">
+      The agency<br>that <em>replaces</em><br>your manual<br>layer.
+    </h2>
+  </div>
+  <div class="intro-right">
+    <p class="intro-para">
+      Prisca Dezigns is an AI-first agency based in Trinidad & Tobago. We specialise in replacing manual business operations with intelligent, always-on automation systems — so you can focus entirely on growth.
+    </p>
+    <div class="intro-stats">
+      <div>
+        <span class="i-stat-num" data-target="24">0</span>
+        <div class="i-stat-label">Hours active daily</div>
       </div>
-      <!-- Panel 2 -->
-      <div class="story-panel" id="sp2">
-        <div class="story-number">02</div>
-        <div class="story-tag">The Solution</div>
-        <h2 class="story-heading">AI that works<br>24 hours a day,<br><em style="color:var(--gold)">7 days a week.</em></h2>
-        <p class="story-body">We replace your manual communication layer with intelligent automation. Your website, WhatsApp, email, and phone — all handled by AI that knows your business inside out.</p>
+      <div>
+        <span class="i-stat-num" data-target="98">0</span>
+        <div class="i-stat-label">% response accuracy</div>
       </div>
-      <!-- Panel 3 -->
-      <div class="story-panel" id="sp3">
-        <div class="story-number">03</div>
-        <div class="story-tag">The Result</div>
-        <h2 class="story-heading">You focus on<br>growth. We handle<br><em style="color:var(--gold)">everything else.</em></h2>
-        <p class="story-body">Faster response times, zero missed leads, and a customer experience that makes you look like an enterprise — regardless of your team size.</p>
+      <div>
+        <span class="i-stat-num" data-target="0">4</span>
+        <div class="i-stat-label">Service tiers</div>
       </div>
-    </div>
-    <!-- Progress dots -->
-    <div class="story-progress">
-      <div class="progress-dot active" id="dot1"></div>
-      <div class="progress-dot" id="dot2"></div>
-      <div class="progress-dot" id="dot3"></div>
+      <div>
+        <span class="i-stat-num" data-target="0">TT</span>
+        <div class="i-stat-label">Caribbean-first focus</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- HORIZONTAL SCROLL — SERVICES -->
-<section class="hscroll-section" id="services">
-  <div class="hscroll-sticky">
-    <div class="hscroll-track" id="hscroll-track">
+<!-- FULLSCREEN PANELS -->
+<section class="panel-section">
+  <div class="panel-sticky" id="panel-sticky">
+    <div class="panel p1" id="panel-1">
+      <div class="panel-num">01</div>
+      <div class="panel-line" id="pl1"></div>
+      <div class="panel-tag">The Problem</div>
+      <h2 class="panel-title">Your business is<br>bleeding money<br><em style="font-style:italic;color:var(--gold)">while you sleep.</em></h2>
+      <p class="panel-body">Inquiries go unanswered. Leads fall through the cracks. Your staff spend hours doing what an intelligent system could handle in seconds. That's not a people problem — it's an infrastructure problem.</p>
+    </div>
+    <div class="panel p2" id="panel-2">
+      <div class="panel-num">02</div>
+      <div class="panel-line" id="pl2"></div>
+      <div class="panel-tag">The Shift</div>
+      <h2 class="panel-title">Intelligent systems<br>that work<br><em style="font-style:italic;color:var(--gold)">24 hours a day.</em></h2>
+      <p class="panel-body">We replace your manual communication and data layer with AI that knows your business inside out — responding, qualifying, routing, and closing without any human in the loop.</p>
+    </div>
+    <div class="panel p3" id="panel-3">
+      <div class="panel-num">03</div>
+      <div class="panel-line" id="pl3"></div>
+      <div class="panel-tag">The Stack</div>
+      <h2 class="panel-title">Website. WhatsApp.<br>Email. Voice.<br><em style="font-style:italic;color:var(--gold)">All automated.</em></h2>
+      <p class="panel-body">Four channels. One intelligent brain behind all of them. Every touchpoint your customer has with your business becomes fast, accurate, and consistently professional.</p>
+    </div>
+    <div class="panel p4" id="panel-4">
+      <div class="panel-num">04</div>
+      <div class="panel-line" id="pl4"></div>
+      <div class="panel-tag">The Result</div>
+      <h2 class="panel-title">You focus on<br>growth. We handle<br><em style="font-style:italic;color:var(--gold)">everything else.</em></h2>
+      <p class="panel-body">No missed leads. No delayed responses. No staff hours wasted on routine queries. Just a business that operates like an enterprise — regardless of your team size.</p>
+    </div>
+    <div class="panel p5" id="panel-5">
+      <div class="panel-num">05</div>
+      <div class="panel-line" id="pl5"></div>
+      <div class="panel-tag">The Investment</div>
+      <h2 class="panel-title">Cheaper than<br>one employee.<br><em style="font-style:italic;color:var(--gold)">Infinitely more capable.</em></h2>
+      <p class="panel-body">A minimum wage data entry clerk costs TT$51,000+ per year. Our Growth tier starts at TT$17,500 setup — and delivers 24/7 coverage, zero errors, and no sick days. The numbers aren't close.</p>
+    </div>
+  </div>
+</section>
 
-      <div class="hscroll-card">
-        <div class="card-bg-shape" style="width:600px;height:600px;background:#2d1b51;top:-100px;right:-100px;"></div>
-        <div class="card-inner">
-          <span class="card-icon">🤖</span>
-          <div class="card-num">Service 01</div>
-          <h2 class="card-title">Customer Service<br>Automation</h2>
-          <p class="card-desc">Replace your manual inbox with an AI that responds instantly, qualifies leads, and escalates the right conversations to your team.</p>
+<!-- HORIZONTAL SERVICES -->
+<section class="h-section">
+  <div class="h-sticky">
+    <div class="h-header">
+      <h2 class="h-title">What we <em>build</em></h2>
+      <div class="h-counter" id="h-counter">01 / 05</div>
+    </div>
+    <div class="h-track-wrap">
+      <div class="h-track" id="h-track">
+        <div class="h-card">
+          <div class="h-card-glow" style="background:#2d1b51"></div>
+          <div class="h-card-top">
+            <div class="h-card-num">01</div>
+            <div class="h-card-icon">🤖</div>
+          </div>
+          <div>
+            <div class="h-card-title">Customer Service<br>Automation</div>
+            <div class="h-card-desc">AI that handles your entire inbound communication layer — qualifying, routing, and resolving — without human intervention.</div>
+          </div>
+          <div class="h-card-arrow">↗</div>
+        </div>
+        <div class="h-card">
+          <div class="h-card-glow" style="background:#00c8ff"></div>
+          <div class="h-card-top">
+            <div class="h-card-num">02</div>
+            <div class="h-card-icon">💬</div>
+          </div>
+          <div>
+            <div class="h-card-title">WhatsApp<br>Intelligence</div>
+            <div class="h-card-desc">Turn your WhatsApp number into a 24/7 business agent. Inquiries, bookings, follow-ups — all handled automatically at scale.</div>
+          </div>
+          <div class="h-card-arrow">↗</div>
+        </div>
+        <div class="h-card">
+          <div class="h-card-glow" style="background:#b8962e"></div>
+          <div class="h-card-top">
+            <div class="h-card-num">03</div>
+            <div class="h-card-icon">📊</div>
+          </div>
+          <div>
+            <div class="h-card-title">Intelligent Data<br>Processing</div>
+            <div class="h-card-desc">Upload raw documents. Our AI extracts, structures, and writes the data directly into your existing sheets or CRM. Zero manual entry.</div>
+          </div>
+          <div class="h-card-arrow">↗</div>
+        </div>
+        <div class="h-card">
+          <div class="h-card-glow" style="background:#ff2d55"></div>
+          <div class="h-card-top">
+            <div class="h-card-num">04</div>
+            <div class="h-card-icon">🌐</div>
+          </div>
+          <div>
+            <div class="h-card-title">Cinematic<br>Web Experiences</div>
+            <div class="h-card-desc">Not templates. Not builders. Custom-engineered sites with scroll storytelling, 3D, and animation — that position you as the authority.</div>
+          </div>
+          <div class="h-card-arrow">↗</div>
+        </div>
+        <div class="h-card">
+          <div class="h-card-glow" style="background:#2d1b51"></div>
+          <div class="h-card-top">
+            <div class="h-card-num">05</div>
+            <div class="h-card-icon">🚀</div>
+          </div>
+          <div>
+            <div class="h-card-title">Sales Pipeline<br>Automation</div>
+            <div class="h-card-desc">From first inquiry to closed deal — automated follow-ups, proposal delivery, and CRM data entry that converts leads while you're offline.</div>
+          </div>
+          <div class="h-card-arrow">↗</div>
         </div>
       </div>
-
-      <div class="hscroll-card">
-        <div class="card-bg-shape" style="width:500px;height:500px;background:#00d4ff;bottom:-100px;left:-50px;"></div>
-        <div class="card-inner">
-          <span class="card-icon">💬</span>
-          <div class="card-num">Service 02</div>
-          <h2 class="card-title">WhatsApp<br>Intelligence</h2>
-          <p class="card-desc">Turn your WhatsApp number into a 24/7 sales and support agent. Handles inquiries, bookings, and follow-ups automatically.</p>
-        </div>
-      </div>
-
-      <div class="hscroll-card">
-        <div class="card-bg-shape" style="width:700px;height:700px;background:#c9a84c;top:-200px;left:50%;opacity:0.08;"></div>
-        <div class="card-inner">
-          <span class="card-icon">📊</span>
-          <div class="card-num">Service 03</div>
-          <h2 class="card-title">Intelligent Data<br>Processing</h2>
-          <p class="card-desc">Upload raw documents, forms, or exports. Our AI extracts, cleans, and writes the data directly into your existing systems — zero manual entry.</p>
-        </div>
-      </div>
-
-      <div class="hscroll-card">
-        <div class="card-bg-shape" style="width:400px;height:400px;background:#e63946;bottom:-50px;right:-50px;"></div>
-        <div class="card-inner">
-          <span class="card-icon">🌐</span>
-          <div class="card-num">Service 04</div>
-          <h2 class="card-title">High-Fidelity<br>Web Design</h2>
-          <p class="card-desc">Cinematic, conversion-focused websites. Not templates — custom-built experiences that position your business as the authority in your market.</p>
-        </div>
-      </div>
-
-      <div class="hscroll-card">
-        <div class="card-bg-shape" style="width:600px;height:600px;background:#2d1b51;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
-        <div class="card-inner">
-          <span class="card-icon">🚀</span>
-          <div class="card-num">Service 05</div>
-          <h2 class="card-title">Sales Pipeline<br>Automation</h2>
-          <p class="card-desc">From first inquiry to closed deal — automated follow-ups, proposal delivery, and CRM population that turns cold leads into paying clients.</p>
-        </div>
-      </div>
-
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<section class="stats-section">
-  <div class="stat-item">
-    <span class="stat-number" data-target="24">0</span>
-    <div class="stat-label">Hours Active Daily</div>
+<!-- FEATURE -->
+<section id="feature">
+  <div class="feat-left">
+    <div class="feat-tag">Our Approach</div>
+    <h2 class="feat-heading">Built for the<br><em>Caribbean</em><br>rhythm.</h2>
+    <ul class="feat-list">
+      <li>WhatsApp-first communication culture</li>
+      <li>Trust-based sales process</li>
+      <li>Multi-channel automation in TT$</li>
+      <li>Zero overseas dependency</li>
+      <li>Enterprise quality at local pricing</li>
+      <li>4-week beta validation before full launch</li>
+    </ul>
   </div>
-  <div class="stat-item">
-    <span class="stat-number" data-target="98">0</span>
-    <div class="stat-label">% Response Accuracy</div>
-  </div>
-  <div class="stat-item">
-    <span class="stat-number" data-target="7">0</span>
-    <div class="stat-label">Automation Domains</div>
-  </div>
-  <div class="stat-item">
-    <span class="stat-number" data-target="4">0</span>
-    <div class="stat-label">Service Tiers</div>
-  </div>
-</section>
-
-<!-- PARALLAX IMAGES -->
-<section class="parallax-section">
-  <div class="parallax-text-block">
-    <div class="parallax-section-tag">Our Philosophy</div>
-    <h2 class="parallax-section-heading">Built for the<br>Caribbean market.<br><em style="color:var(--gold)">Ready for the world.</em></h2>
-    <p class="parallax-section-body">Every system we build is designed for the specific rhythm of Caribbean business — the communication culture, the WhatsApp-first economy, the trust-based sales process. We don't import templates. We engineer solutions.</p>
-  </div>
-  <div class="parallax-image-stack">
-    <div class="para-img para-img-1" id="para1">
-      <div class="para-img-big-num">01</div>
-      <div class="para-img-label">Strategy Layer</div>
-    </div>
-    <div class="para-img para-img-2" id="para2">
-      <div class="para-img-big-num">02</div>
-      <div class="para-img-label">Execution Layer</div>
+  <div class="feat-right">
+    <div class="feat-visual">
+      <div class="feat-circle"></div>
+      <div class="feat-circle"></div>
+      <div class="feat-circle"></div>
+      <div class="feat-circle"></div>
+      <div class="feat-center-text">AI</div>
+      <div class="feat-badge">24 / 7 Active</div>
+      <div class="feat-badge">Zero Errors</div>
+      <div class="feat-badge">TT$ Pricing</div>
     </div>
   </div>
 </section>
 
-<!-- REVEAL GRID -->
-<section class="reveal-section" id="work">
-  <div class="reveal-header">
-    <div class="parallax-section-tag" style="margin-bottom:16px;">Capabilities</div>
-    <h2>What we <em style="font-style:italic;color:var(--gold)">build</em></h2>
+<!-- QUOTE -->
+<section id="quote">
+  <div class="quote-glow"></div>
+  <div class="quote-mark">"</div>
+  <p class="quote-text">
+    The business that automates its customer layer first <em>owns the market.</em><br>
+    Everyone else is paying staff to do what software does better.
+  </p>
+  <div class="quote-source">Prisca Dezigns — AI Agency Manifesto</div>
+</section>
+
+<!-- GRID -->
+<section id="grid">
+  <div class="grid-header">
+    <h2 class="grid-heading">Every sector.<br><em>Every size.</em></h2>
+    <div class="grid-sub">Our automation stack works across industries — retail, media, healthcare, government, hospitality.</div>
   </div>
-  <div class="reveal-grid">
-    <div class="reveal-item">
-      <div class="reveal-item-bg"></div>
-      <div class="grid-icon">🤖</div>
-      <div class="reveal-item-content">
-        <div class="reveal-item-tag">Automation</div>
-        <div class="reveal-item-title">AI Chatbots</div>
-      </div>
+  <div class="grid-items">
+    <div class="g-item">
+      <div class="g-bg"></div>
+      <div class="g-icon">🏢</div>
+      <div class="g-overlay"></div>
+      <div class="g-content"><div class="g-tag">Enterprise</div><div class="g-title">Media & Broadcasting</div></div>
     </div>
-    <div class="reveal-item">
-      <div class="reveal-item-bg"></div>
-      <div class="grid-icon">📱</div>
-      <div class="reveal-item-content">
-        <div class="reveal-item-tag">Messaging</div>
-        <div class="reveal-item-title">WhatsApp Systems</div>
-      </div>
+    <div class="g-item">
+      <div class="g-bg"></div>
+      <div class="g-icon">🏥</div>
+      <div class="g-overlay"></div>
+      <div class="g-content"><div class="g-tag">Healthcare</div><div class="g-title">Clinics & Practices</div></div>
     </div>
-    <div class="reveal-item">
-      <div class="reveal-item-bg"></div>
-      <div class="grid-icon">📧</div>
-      <div class="reveal-item-content">
-        <div class="reveal-item-tag">Operations</div>
-        <div class="reveal-item-title">Email Intelligence</div>
-      </div>
+    <div class="g-item">
+      <div class="g-bg"></div>
+      <div class="g-icon">🏡</div>
+      <div class="g-overlay"></div>
+      <div class="g-content"><div class="g-tag">Property</div><div class="g-title">Real Estate</div></div>
     </div>
-    <div class="reveal-item">
-      <div class="reveal-item-bg"></div>
-      <div class="grid-icon">📊</div>
-      <div class="reveal-item-content">
-        <div class="reveal-item-tag">Data</div>
-        <div class="reveal-item-title">Processing Pipelines</div>
-      </div>
+    <div class="g-item">
+      <div class="g-bg"></div>
+      <div class="g-icon">🛒</div>
+      <div class="g-overlay"></div>
+      <div class="g-content"><div class="g-tag">Retail</div><div class="g-title">E-Commerce & Stores</div></div>
     </div>
-    <div class="reveal-item">
-      <div class="reveal-item-bg"></div>
-      <div class="grid-icon">🌐</div>
-      <div class="reveal-item-content">
-        <div class="reveal-item-tag">Web</div>
-        <div class="reveal-item-title">Cinematic Sites</div>
-      </div>
+    <div class="g-item">
+      <div class="g-bg"></div>
+      <div class="g-icon">🏨</div>
+      <div class="g-overlay"></div>
+      <div class="g-content"><div class="g-tag">Hospitality</div><div class="g-title">Hotels & Restaurants</div></div>
     </div>
-    <div class="reveal-item">
-      <div class="reveal-item-bg"></div>
-      <div class="grid-icon">🚀</div>
-      <div class="reveal-item-content">
-        <div class="reveal-item-tag">Sales</div>
-        <div class="reveal-item-title">Pipeline Automation</div>
-      </div>
+    <div class="g-item">
+      <div class="g-bg"></div>
+      <div class="g-icon">🏛️</div>
+      <div class="g-overlay"></div>
+      <div class="g-content"><div class="g-tag">Public Sector</div><div class="g-title">Government Bodies</div></div>
     </div>
   </div>
 </section>
 
-<!-- CINEMATIC TEXT -->
-<section class="cinematic-section" id="contact">
-  <div class="cinematic-bg"></div>
-  <div class="cinematic-word" id="cw1"><span>Ready</span></div>
-  <span style="font-family:'Playfair Display',serif;font-size:clamp(48px,8vw,120px);font-weight:900;"> </span>
-  <div class="cinematic-word" id="cw2"><span>to</span></div>
-  <span style="font-family:'Playfair Display',serif;font-size:clamp(48px,8vw,120px);font-weight:900;"> </span>
-  <div class="cinematic-word gold-word" id="cw3"><span>evolve?</span></div>
-  <div class="cinematic-divider" id="cin-div"></div>
-  <p class="cinematic-sub" id="cin-sub">Prisca Dezigns · Trinidad & Tobago · priscillanarine@gmail.com</p>
+<!-- CLOSING -->
+<section id="closing">
+  <div class="close-bg"></div>
+  <div class="close-eyebrow" id="close-ey">Prisca Dezigns · Trinidad & Tobago</div>
+  <h2 class="close-title">
+    <div class="word" id="cw1"><span>Ready</span></div>&nbsp;
+    <div class="word" id="cw2"><span>to</span></div>&nbsp;
+    <div class="word" id="cw3"><em><span>evolve?</span></em></div>
+  </h2>
+  <p class="close-sub" id="close-sub">Let's build something that works while you sleep.</p>
+  <a href="mailto:priscillanarine@gmail.com" class="close-btn">
+    <span>Start a Conversation</span>
+    <span>↗</span>
+  </a>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Prisca Dezigns</div>
-  <div class="footer-note">© 2026 All Rights Reserved</div>
-  <div class="footer-gold">Trinidad & Tobago</div>
+  <div class="f-logo">Prisca Dezigns</div>
+  <div class="f-note">© 2026 All Rights Reserved</div>
+  <div class="f-loc">Trinidad & Tobago</div>
 </footer>
 
 <script>
+gsap.registerPlugin(ScrollTrigger);
+
 // ── CURSOR ──
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursor-ring');
-let mx = 0, my = 0, rx = 0, ry = 0;
-document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-function animateCursor() {
-  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
-  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-  requestAnimationFrame(animateCursor);
-}
-animateCursor();
-document.querySelectorAll('a, button, .reveal-item').forEach(el => {
-  el.addEventListener('mouseenter', () => { cursor.style.width = '24px'; cursor.style.height = '24px'; ring.style.width = '60px'; ring.style.height = '60px'; });
-  el.addEventListener('mouseleave', () => { cursor.style.width = '12px'; cursor.style.height = '12px'; ring.style.width = '40px'; ring.style.height = '40px'; });
-});
+const dot = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function tick(){
+  dot.style.cssText=`position:fixed;left:${mx}px;top:${my}px;`;
+  rx+=(mx-rx)*.1; ry+=(my-ry)*.1;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(tick);
+})();
+
+// ── THREE.JS HERO ──
+(function(){
+  const canvas=document.getElementById('hero-canvas');
+  const W=window.innerWidth,H=window.innerHeight;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setSize(W,H); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  const scene=new THREE.Scene();
+  const cam=new THREE.PerspectiveCamera(60,W/H,.1,100);
+  cam.position.set(0,0,4);
+
+  // Star field
+  const N=3000;
+  const pos=new Float32Array(N*3);
+  const col=new Float32Array(N*3);
+  for(let i=0;i<N;i++){
+    pos[i*3]=(Math.random()-.5)*16;
+    pos[i*3+1]=(Math.random()-.5)*16;
+    pos[i*3+2]=(Math.random()-.5)*16;
+    const warm=Math.random()>.6;
+    col[i*3]=warm?.9:.4; col[i*3+1]=warm?.7:.5; col[i*3+2]=warm?.3:.9;
+  }
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+  const mat=new THREE.PointsMaterial({size:.018,vertexColors:true,transparent:true,opacity:.8,sizeAttenuation:true});
+  scene.add(new THREE.Points(geo,mat));
+
+  // Thin rings
+  [[1.6,.012,0xb8962e,.12],[2.4,.006,0x00c8ff,.08],[3.2,.004,0xffffff,.04]].forEach(([r,t,c,o])=>{
+    const g=new THREE.TorusGeometry(r,t,4,120);
+    const m=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o});
+    scene.add(new THREE.Mesh(g,m));
+  });
+
+  // Icosahedron wireframe
+  const iGeo=new THREE.IcosahedronGeometry(1.2,1);
+  const iMat=new THREE.MeshBasicMaterial({color:0xb8962e,wireframe:true,transparent:true,opacity:.06});
+  const ico=new THREE.Mesh(iGeo,iMat);
+  scene.add(ico);
+
+  let mx2=0,my2=0;
+  document.addEventListener('mousemove',e=>{mx2=(e.clientX/W-.5)*2;my2=-(e.clientY/H-.5)*2;});
+  window.addEventListener('resize',()=>{
+    renderer.setSize(window.innerWidth,window.innerHeight);
+    cam.aspect=window.innerWidth/window.innerHeight;cam.updateProjectionMatrix();
+  });
+  const clock=new THREE.Clock();
+  (function render(){
+    const t=clock.getElapsedTime();
+    ico.rotation.x=t*.08+my2*.15;
+    ico.rotation.y=t*.12+mx2*.15;
+    scene.children[0].rotation.y=t*.015;
+    scene.children[0].rotation.x=t*.008;
+    scene.children[1].rotation.x=t*.2+my2*.1;
+    scene.children[1].rotation.y=t*.15+mx2*.1;
+    scene.children[2].rotation.z=t*.1;
+    scene.children[3].rotation.x=t*.05;
+    cam.position.x+=(mx2*.4-cam.position.x)*.04;
+    cam.position.y+=(my2*.4-cam.position.y)*.04;
+    renderer.render(scene,cam);
+    requestAnimationFrame(render);
+  })();
+})();
 
 // ── LOADER ──
-const bar = document.getElementById('loader-bar');
-const loaderText = document.getElementById('loader-text');
-let progress = 0;
-const loadInterval = setInterval(() => {
-  progress += Math.random() * 15;
-  if (progress >= 100) { progress = 100; clearInterval(loadInterval); }
-  bar.style.width = progress + '%';
-  loaderText.textContent = 'Loading experience — ' + Math.floor(progress) + '%';
-  if (progress === 100) {
-    setTimeout(() => {
-      gsap.to('#loader', { opacity: 0, duration: 0.8, ease: 'power2.inOut', onComplete: () => { document.getElementById('loader').style.display = 'none'; initAnimations(); }});
-    }, 300);
-  }
-}, 120);
-
-// ── THREE.JS HERO BACKGROUND ──
-function initThree() {
-  const canvas = document.getElementById('three-canvas');
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.z = 3;
-
-  // Particles
-  const count = 2000;
-  const positions = new Float32Array(count * 3);
-  for (let i = 0; i < count * 3; i++) {
-    positions[i] = (Math.random() - 0.5) * 10;
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const mat = new THREE.PointsMaterial({ color: 0xc9a84c, size: 0.012, transparent: true, opacity: 0.6 });
-  const particles = new THREE.Points(geo, mat);
-  scene.add(particles);
-
-  // Floating torus
-  const tGeo = new THREE.TorusGeometry(1.2, 0.015, 8, 120);
-  const tMat = new THREE.MeshBasicMaterial({ color: 0xc9a84c, transparent: true, opacity: 0.15 });
-  const torus = new THREE.Mesh(tGeo, tMat);
-  scene.add(torus);
-
-  const tGeo2 = new THREE.TorusGeometry(0.8, 0.008, 8, 120);
-  const tMat2 = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.1 });
-  const torus2 = new THREE.Mesh(tGeo2, tMat2);
-  torus2.rotation.x = Math.PI / 3;
-  scene.add(torus2);
-
-  let mouseX = 0, mouseY = 0;
-  document.addEventListener('mousemove', e => {
-    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-    mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
-  });
-
-  window.addEventListener('resize', () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-  });
-
-  const clock = new THREE.Clock();
-  function render() {
-    const t = clock.getElapsedTime();
-    particles.rotation.y = t * 0.04;
-    particles.rotation.x = t * 0.02;
-    torus.rotation.x = t * 0.3 + mouseY * 0.3;
-    torus.rotation.y = t * 0.2 + mouseX * 0.3;
-    torus2.rotation.y = t * 0.4 + mouseX * 0.2;
-    torus2.rotation.z = t * 0.15;
-    camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.05;
-    camera.position.y += (mouseY * 0.3 - camera.position.y) * 0.05;
-    renderer.render(scene, camera);
-    requestAnimationFrame(render);
-  }
-  render();
-}
-initThree();
-
-// ── MAIN ANIMATIONS ──
-function initAnimations() {
-  gsap.registerPlugin(ScrollTrigger);
-
-  // Hero entrance
-  gsap.to('.hero-eyebrow', { opacity: 1, y: 0, duration: 1, delay: 0.2, ease: 'power3.out' });
-  gsap.to('.hero-title .line', { opacity: 1, y: '0%', duration: 1.2, delay: 0.4, stagger: 0.15, ease: 'expo.out' });
-  gsap.to('.hero-subtitle', { opacity: 1, y: 0, duration: 1, delay: 0.9, ease: 'power3.out' });
-  gsap.to('.hero-cta', { opacity: 1, y: 0, duration: 1, delay: 1.1, ease: 'power3.out' });
-  gsap.to('.scroll-indicator', { opacity: 1, duration: 1, delay: 1.5 });
-
-  // Story scroll
-  const panels = ['sp1','sp2','sp3'];
-  const dots = ['dot1','dot2','dot3'];
-  let currentPanel = 0;
-
-  ScrollTrigger.create({
-    trigger: '.story-section',
-    start: 'top top',
-    end: 'bottom bottom',
-    onUpdate: self => {
-      const idx = Math.min(Math.floor(self.progress * 3), 2);
-      if (idx !== currentPanel) {
-        gsap.to('#' + panels[currentPanel], { opacity: 0, x: -60, duration: 0.5, ease: 'power2.in' });
-        document.getElementById(dots[currentPanel]).classList.remove('active');
-        currentPanel = idx;
-        gsap.fromTo('#' + panels[currentPanel],
-          { opacity: 0, x: 60 },
-          { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }
-        );
-        document.getElementById(dots[currentPanel]).classList.add('active');
-      }
-    }
-  });
-  gsap.set('#sp1', { opacity: 1, x: 0 });
-  gsap.set('#sp2, #sp3', { opacity: 0 });
-
-  // Horizontal scroll
-  const track = document.getElementById('hscroll-track');
-  gsap.to(track, {
-    x: () => -(track.offsetWidth - window.innerWidth),
-    ease: 'none',
-    scrollTrigger: {
-      trigger: '.hscroll-section',
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 1,
-      pin: '.hscroll-sticky'
-    }
-  });
-
-  // Stats counter
-  document.querySelectorAll('.stat-number').forEach(el => {
-    const target = +el.dataset.target;
-    ScrollTrigger.create({
-      trigger: el,
-      start: 'top 85%',
-      onEnter: () => {
-        gsap.to({ val: 0 }, {
-          val: target,
-          duration: 2,
-          ease: 'power2.out',
-          onUpdate: function() { el.textContent = Math.floor(this.targets()[0].val); }
+(function(){
+  let p=0;
+  const bar=document.getElementById('l-bar');
+  const counter=document.getElementById('l-counter');
+  const status=document.getElementById('l-status');
+  const statuses=['Initialising','Loading assets','Building experience','Almost ready'];
+  const iv=setInterval(()=>{
+    p+=Math.random()*8+2;
+    if(p>100)p=100;
+    bar.style.width=p+'%';
+    counter.textContent=Math.floor(p);
+    status.textContent=statuses[Math.floor(p/26)]||statuses[3];
+    if(p===100){
+      clearInterval(iv);
+      setTimeout(()=>{
+        // Panel wipe out
+        const loader=document.getElementById('loader');
+        gsap.to(loader,{
+          clipPath:'inset(0 0 100% 0)',duration:.9,ease:'power4.inOut',
+          onComplete:()=>{loader.style.display='none';initPage();}
         });
-      },
-      once: true
+      },400);
+    }
+  },80);
+})();
+
+function initPage(){
+  // HERO
+  gsap.to('#hero-tag',{opacity:1,y:0,duration:1,delay:.1,ease:'power3.out'});
+  gsap.to('.ht-word',{y:'0%',opacity:1,duration:1.2,stagger:.06,delay:.2,ease:'expo.out'});
+  gsap.to('#hero-meta',{opacity:1,y:0,duration:1,delay:.9,ease:'power3.out'});
+
+  // INTRO clip reveals
+  gsap.utils.toArray('.clip-inner').forEach(el=>{
+    gsap.to(el,{y:'0%',opacity:1,duration:1,ease:'expo.out',
+      scrollTrigger:{trigger:el,start:'top 85%',once:true}});
+  });
+
+  // STATS counter
+  gsap.utils.toArray('.i-stat-num').forEach(el=>{
+    const t=+el.dataset.target;
+    if(!t)return;
+    ScrollTrigger.create({trigger:el,start:'top 85%',once:true,
+      onEnter:()=>gsap.to({v:0},{v:t,duration:2,ease:'power2.out',
+        onUpdate:function(){el.textContent=Math.floor(this.targets()[0].v);}})
     });
   });
 
-  // Parallax images
-  ScrollTrigger.create({
-    trigger: '.parallax-section',
-    start: 'top bottom',
-    end: 'bottom top',
-    scrub: 1,
-    onUpdate: self => {
-      gsap.set('#para1', { y: self.progress * -80 });
-      gsap.set('#para2', { y: self.progress * 60 });
+  // PANELS — fullscreen wipe
+  const panels=['panel-1','panel-2','panel-3','panel-4','panel-5'];
+  const lines=['pl1','pl2','pl3','pl4','pl5'];
+  gsap.set('#'+panels[0],{clipPath:'inset(0 0% 0 0)'});
+  gsap.to('#'+lines[0],{width:'60px',duration:.6,delay:.2});
+
+  panels.forEach((id,i)=>{
+    if(i===0)return;
+    gsap.set('#'+id,{clipPath:'inset(0 100% 0 0)'});
+    ScrollTrigger.create({
+      trigger:'.panel-section',
+      start:`${i/panels.length*100}% top`,
+      end:`${(i+1)/panels.length*100}% top`,
+      onEnter:()=>{
+        gsap.to('#'+panels[i-1],{clipPath:'inset(0 0 0 100%)',duration:.8,ease:'power4.inOut'});
+        gsap.to('#'+id,{clipPath:'inset(0 0% 0 0)',duration:.8,ease:'power4.inOut'});
+        gsap.fromTo('#'+lines[i],{width:0},{width:'60px',duration:.5,delay:.4});
+      },
+      onLeaveBack:()=>{
+        gsap.to('#'+id,{clipPath:'inset(0 100% 0 0)',duration:.6,ease:'power4.inOut'});
+        gsap.to('#'+panels[i-1],{clipPath:'inset(0 0% 0 0)',duration:.6,ease:'power4.inOut'});
+      }
+    });
+  });
+
+  // HORIZONTAL scroll
+  const track=document.getElementById('h-track');
+  const cards=track.querySelectorAll('.h-card');
+  const hCounter=document.getElementById('h-counter');
+  const maxX=track.scrollWidth-window.innerWidth;
+  gsap.to(track,{
+    x:()=>-maxX,ease:'none',
+    scrollTrigger:{
+      trigger:'.h-section',start:'top top',end:'bottom bottom',scrub:1,
+      onUpdate:self=>{
+        const idx=Math.min(Math.round(self.progress*(cards.length-1)),cards.length-1);
+        hCounter.textContent=String(idx+1).padStart(2,'0')+' / '+String(cards.length).padStart(2,'0');
+      }
     }
   });
 
-  // Reveal grid
-  document.querySelectorAll('.reveal-item').forEach((item, i) => {
-    gsap.fromTo(item,
-      { opacity: 0, y: 40 },
-      {
-        opacity: 1, y: 0, duration: 0.7, delay: i * 0.08,
-        scrollTrigger: { trigger: item, start: 'top 85%', once: true }
-      }
-    );
+  // GRID items
+  gsap.utils.toArray('.g-item').forEach((el,i)=>{
+    gsap.fromTo(el,{opacity:0,y:40},{opacity:1,y:0,duration:.8,delay:i*.07,
+      scrollTrigger:{trigger:el,start:'top 88%',once:true}});
   });
 
-  // Cinematic text
-  ['cw1','cw2','cw3'].forEach((id, i) => {
-    gsap.to('#' + id + ' span', {
-      y: '0%', opacity: 1, duration: 1.2, delay: i * 0.12,
-      ease: 'expo.out',
-      scrollTrigger: { trigger: '.cinematic-section', start: 'top 70%', once: true }
-    });
+  // QUOTE
+  gsap.fromTo('.quote-text',{opacity:0,y:40},{opacity:1,y:0,duration:1.2,
+    scrollTrigger:{trigger:'#quote',start:'top 70%',once:true}});
+
+  // CLOSING words
+  ['cw1','cw2','cw3'].forEach((id,i)=>{
+    gsap.to('#'+id+' span',{y:'0%',duration:1.2,delay:i*.15,ease:'expo.out',
+      scrollTrigger:{trigger:'#closing',start:'top 65%',once:true}});
   });
-  gsap.to('#cin-div', {
-    scaleX: 1, duration: 1, delay: 0.6,
-    scrollTrigger: { trigger: '.cinematic-section', start: 'top 70%', once: true }
-  });
-  gsap.to('#cin-sub', {
-    opacity: 1, y: 0, duration: 1, delay: 0.8,
-    scrollTrigger: { trigger: '.cinematic-section', start: 'top 70%', once: true }
+  gsap.to('#close-ey',{opacity:.5,duration:1,
+    scrollTrigger:{trigger:'#closing',start:'top 70%',once:true}});
+  gsap.fromTo('#close-sub',{opacity:0,y:20},{opacity:1,y:0,duration:1,delay:.5,
+    scrollTrigger:{trigger:'#closing',start:'top 70%',once:true}});
+
+  // FEAT LIST items
+  gsap.utils.toArray('.feat-list li').forEach((li,i)=>{
+    gsap.fromTo(li,{opacity:0,x:-20},{opacity:1,x:0,duration:.6,delay:i*.08,
+      scrollTrigger:{trigger:'#feature',start:'top 70%',once:true}});
   });
 
-  // Parallax text blocks on scroll
-  gsap.utils.toArray('.story-heading, .parallax-section-heading').forEach(el => {
-    gsap.fromTo(el,
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 80%', once: true }
-      }
-    );
+  // Parallax on feat circles
+  gsap.to('.feat-circle',{
+    y:()=>-80,ease:'none',
+    scrollTrigger:{trigger:'#feature',start:'top bottom',end:'bottom top',scrub:2}
   });
 }
 </script>
