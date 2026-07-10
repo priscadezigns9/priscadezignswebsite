@@ -1,15 +1,217 @@
+
 (function(){
+    // Inject Styles
+    if(!document.getElementById('pd-chat-styles')){
+        const s = document.createElement('style');
+        s.id = 'pd-chat-styles';
+        s.textContent = `:root {
+        --cb-light-purple: #9d50bb;
+        --cb-glow-purple: #6e48aa;
+        --cb-futuristic-bg: rgba(255, 255, 255, 0.95);
+    }
+    /* ── Chatbot Bubble ── */
+    #pd-chat-bubble {
+        position:fixed; bottom:28px; right:28px; z-index:9999;
+        width:64px; height:64px; border-radius:50%;
+        background: linear-gradient(135deg, var(--cb-light-purple), var(--cb-glow-purple));
+        border:none;
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; box-shadow:0 10px 40px rgba(157, 80, 187, 0.4);
+        transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #pd-chat-bubble:hover { transform:scale(1.1) rotate(5deg); box-shadow:0 15px 50px rgba(157, 80, 187, 0.6); }
+    #pd-chat-bubble svg { width:30px; height:30px; fill:#fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+    #pd-chat-bubble .chat-x { display:none; font-size:1.6rem; color:#fff; font-weight:700; line-height:1; }
+    #pd-chat-bubble.open svg { display:none; }
+    #pd-chat-bubble.open .chat-x { display:block; }
+    
+    /* ── Chat Window ── */
+    #pd-chat-window {
+        position:fixed; bottom:108px; right:28px; z-index:9998;
+        width:420px;
+        background: var(--cb-futuristic-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(157, 80, 187, 0.15);
+        box-shadow:0 30px 90px rgba(48, 25, 52, 0.18);
+        display:flex; flex-direction:column;
+        opacity:0; pointer-events:none;
+        transform:translateY(30px) scale(0.95);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        max-height:720px;
+        border-radius:24px;
+        overflow: hidden;
+    }
+    #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
+    
+    /* ── Header ── */
+    .chat-hdr { background: linear-gradient(to right, var(--cb-light-purple), var(--cb-glow-purple)); padding:22px 26px; display:flex; align-items:center; gap:16px; flex-shrink:0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .chat-avatar { width:50px; height:50px; border-radius:16px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink:0; transform: rotate(-3deg); transition: transform 0.3s; }
+    .chat-avatar:hover { transform: rotate(0deg) scale(1.05); }
+    .chat-hdr-name { font-size:1.1rem; font-weight:800; letter-spacing:0.02em; color:#fff; font-family: 'Playfair Display', serif, system-ui; }
+    .chat-hdr-status { font-size:0.75rem; color:rgba(255,255,255,0.8); display:flex; align-items:center; gap:8px; margin-top:4px; font-weight: 500; }
+    .chat-hdr-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+    
+    /* Voice toggle button */
+    #chat-voice-toggle {
+        background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2);
+        color:#fff; border-radius:12px;
+        font-size:0.65rem; font-weight:700; text-transform: uppercase; letter-spacing:0.08em;
+        padding:7px 12px; cursor:pointer; display:flex; align-items:center; gap:6px;
+        transition: all 0.2s;
+    }
+    #chat-voice-toggle:hover { background:rgba(255,255,255,0.25); transform: translateY(-1px); }
+    #chat-voice-toggle.voice-on { background:#fff; color:var(--cb-light-purple); border-color:#fff; box-shadow: 0 4px 12px rgba(255,255,255,0.3); }
+    .chat-sdot { width:8px; height:8px; border-radius:50%; background:#00ffa3; box-shadow: 0 0 10px #00ffa3; animation:pgr 2s infinite; }
+    @keyframes pgr { 0%,100%{opacity:1; transform: scale(1);} 50%{opacity:0.6; transform: scale(1.2);} }
+    
+    /* ── Back bar ── */
+    #chat-back-bar { display:none; align-items:center; gap:10px; padding:12px 20px; border-bottom:1px solid rgba(157, 80, 187, 0.08); background:rgba(157, 80, 187, 0.03); cursor:pointer; flex-shrink:0; }
+    #chat-back-bar.vis { display:flex; }
+    #chat-back-bar span { font-size:0.75rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--cb-light-purple); opacity:0.7; }
+    #chat-back-bar:hover span { opacity:1; }
+    
+    /* ── Messages ── */
+    .chat-msgs { flex:1; overflow-y:auto; padding:24px 20px; display:flex; flex-direction:column; gap:16px; min-height:200px; max-height:480px; }
+    .chat-msgs::-webkit-scrollbar { width:4px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: rgba(157, 80, 187, 0.2); border-radius:10px; }
+    .cmsg { max-width:85%; font-size:0.95rem; line-height:1.6; padding:14px 18px; position: relative; transition: transform 0.2s; font-family: 'Inter', sans-serif, system-ui; }
+    .cmsg:hover { transform: translateX(2px); }
+    .cmsg.bot { background:#fff; color: #333; align-self:flex-start; border-radius:18px 18px 18px 4px; border: 1px solid rgba(157, 80, 187, 0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .cmsg.usr { background: var(--cb-light-purple); color:#fff; align-self:flex-end; border-radius:18px 18px 4px 18px; font-weight:500; box-shadow: 0 4px 15px rgba(157, 80, 187, 0.2); }
+    
+    /* Typing dots */
+    .cmsg.typing { background:#fff; align-self:flex-start; border-radius:18px 18px 18px 4px; padding:18px 24px; border: 1px solid rgba(157, 80, 187, 0.1); }
+    .typing-dots { display:flex; gap:6px; }
+    .typing-dots span { width:8px; height:8px; border-radius:50%; background:var(--cb-light-purple); opacity: 0.3; animation: tdot 1.4s infinite; }
+    .typing-dots span:nth-child(2){animation-delay:0.2s;}
+    .typing-dots span:nth-child(3){animation-delay:0.4s;}
+    @keyframes tdot{0%,60%,100%{transform:translateY(0); opacity: 0.3;}30%{transform:translateY(-8px); opacity: 1;}}
+    
+    /* ── Package cards ── */
+    .cpkg-grid { display:flex; flex-direction:column; gap:12px; width:100%; align-self:stretch; }
+    .cpkg-card { background:#fff; border:1px solid rgba(157, 80, 187, 0.15); padding:16px 18px; cursor:pointer; transition:all 0.3s; border-radius:16px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+    .cpkg-card:hover { border-color:var(--cb-light-purple); background:rgba(157, 80, 187, 0.04); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.1); }
+    .cpkg-name { font-size:1rem; font-weight:800; color:var(--cb-light-purple); letter-spacing:0.02em; font-family: 'Playfair Display', serif; }
+    .cpkg-price { font-size:0.85rem; font-weight:700; color:var(--cb-glow-purple); margin-top:4px; opacity: 0.8; }
+    .cpkg-desc { font-size:0.8rem; color:#666; margin-top:8px; line-height:1.5; font-family: 'Inter', sans-serif; }
+    
+    /* ── Quick replies ── */
+    .chat-qr { padding:12px 18px 16px; display:flex; flex-wrap:wrap; gap:10px; flex-shrink:0; }
+    .qrb { font-size:0.82rem; font-weight:700; letter-spacing:0.02em; padding:10px 18px; border:1px solid rgba(157, 80, 187, 0.2); background:#fff; cursor:pointer; color:var(--cb-light-purple); border-radius:14px; transition:all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); font-family: 'Inter', sans-serif; }
+    .qrb:hover { background:var(--cb-light-purple); color:#fff; border-color:var(--cb-light-purple); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(157, 80, 187, 0.2); }
+    .qrb.wa { background: #25D366; color:#fff; border-color:#25D366; display:inline-flex; align-items:center; gap:8px; text-decoration:none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
+    .qrb.wa:hover { background:#128C7E; border-color:#128C7E; }
+    
+        #pd-chat-bubble { animation: bubbleFloat 3s ease-in-out infinite; }
+    @keyframes bubbleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .ai-svg { width: 28px; height: 28px; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+    /* ── Input row ── */
+    .chat-inp-row { display:flex; border-top:1px solid rgba(0,0,0,0.05); flex-shrink:0; align-items: center; padding: 6px 12px 6px 6px; background: #fff; }
+    #chat-inp { flex:1; border:none; background:transparent; padding:18px 16px; font-size:1rem; font-family: 'Inter', sans-serif; color:#333; outline:none; }
+    #chat-inp::placeholder { color:#aaa; }
+    #chat-mic { background: transparent; border: none; cursor: pointer; padding: 12px; color: var(--cb-light-purple); opacity: 0.6; transition: all 0.2s; display: flex; align-items: center; border-radius: 12px; }
+    #chat-mic:hover { opacity: 1; background: rgba(157, 80, 187, 0.05); }
+    #chat-mic.recording { color: #ff4d4d; opacity: 1; animation: cbPulse 1.5s infinite; background: rgba(255, 77, 77, 0.1); }
+    @keyframes cbPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.4); } 70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); } }
+    #chat-snd { background: var(--cb-light-purple); border:none; cursor:pointer; width:48px; height:48px; display: flex; align-items: center; justify-content: center; color:#fff; font-size:1.2rem; transition:all 0.3s; border-radius: 14px; box-shadow: 0 4px 12px rgba(157, 80, 187, 0.3); }
+    #chat-snd:hover { background: var(--cb-glow-purple); transform: scale(1.05); }
+    
+    @media(max-width:520px){
+        #pd-chat-window{width:calc(100vw - 24px);right:12px;left:12px;bottom:90px;max-height:82vh; border-radius: 20px;}
+        .chat-hdr { padding: 18px 20px; }
+        .chat-msgs { padding: 20px 16px; }
+        .cmsg { font-size:0.92rem; padding: 12px 16px; }
+        #chat-inp { font-size:0.92rem; }
+    }
+`;
+        document.head.appendChild(s);
+    }
+    
+    // Inject HTML Structure if missing
+    if(!document.getElementById('pd-chat-bubble')){
+        const container = document.createElement('div');
+        container.innerHTML = `
+    <div id="pd-chat-bubble" onclick="toggleChat()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ai-svg"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+        <span class="chat-x">✕</span>
+    </div>
+    <div id="pd-chat-window">
+        <div class="chat-hdr">
+            <div class="chat-avatar" style="background:linear-gradient(135deg, #9d50bb, #6e48aa); display:flex; align-items:center; justify-content:center; color:#fff; border-radius:50%;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg></div>
+            <div style="flex:1">
+                <div class="chat-hdr-name">Prisca Dezigns</div>
+                <div class="chat-hdr-status"><div class="chat-sdot"></div> Online now</div>
+            </div>
+            <div class="chat-hdr-right">
+                <button id="chat-voice-toggle" onclick="toggleVoice()" title="Read replies aloud">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    VOICE OFF
+                </button>
+            </div>
+        </div>
+        <div id="chat-back-bar" onclick="chatBack()"><span>← Back</span></div>
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <div class="chat-qr" id="chat-qr"></div>
+        <div class="chat-inp-row">
+            <button id="chat-mic" onclick="toggleMic()" title="Record voice note">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            </button>
+            <input type="text" id="chat-inp" placeholder="Type a message…" onkeydown="if(event.key==='Enter')chatSend()" />
+            <button id="chat-snd" onclick="chatSend()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+        </div>
+    </div>
+`;
+        while (container.firstChild) {
+            document.body.appendChild(container.firstChild);
+        }
+    }
+
+
 const WA="https://wa.me/18683424101";
 
-const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.541 5.877L.057 23.7a.5.5 0 0 0 .613.612l5.807-1.484A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.525-5.221-1.436l-.374-.222-3.878.991.998-3.918-.243-.387A9.965 9.965 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>';
+
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nUSER PREFERENCES:\n- The user's favorite color is PURPLE. If asked about colors, always identify purple as the favorite.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n- Custom Web Packages: Starting from $1,500 setup\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI Automation: $3,500 setup + $400/mo\n- Email AI Automation: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- 40+ professional templates, live in 24hrs\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp (1-868-342-4101)\n- Speak about Evolve Mobility as a strategic partner dealership we build for.";
+
+let history = [];
+
+function getAI(txt, cb) {
+    history.push({role:'user', content:txt});
+    const payload = JSON.stringify({ system: SYSTEM_PROMPT, messages: history, max_tokens: 350 });
+    
+    fetch('https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.reply) {
+            history.push({role:'assistant', content:data.reply});
+            cb(data.reply);
+        } else {
+            fallback(txt, cb);
+        }
+    })
+    .catch(() => fallback(txt, cb));
+}
+
+function fallback(txt, cb) {
+    const s = txt.toLowerCase();
+    let r = "That's a great question. I want to make sure I give you the perfect info—would you like to see our full service menu or chat with the team on WhatsApp?";
+    if(s.includes("price") || s.includes("cost")) r = "Our agency packages are customized, but our 1-Day Custom Sites start at just $299.99 flat. Would you like the full pricing guide for our AI automation tiers?";
+    else if(s.includes("evolve")) r = "We are the lead digital architects for Evolve Mobility (driveevolve.com), the Caribbean's premier EV dealership. We handle their entire sales ecosystem. Are you interested in fleet mobility or a personal EV?";
+    cb(r);
+}
+
+const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
 
 var voiceOn=false;
 window.toggleVoice=function(){
   voiceOn=!voiceOn;
   var btn=document.getElementById('chat-voice-toggle');
   if(btn){
-    var svgPath=voiceOn?'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM16.5 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z':'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z';
-    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="'+svgPath+'"/></svg>'+(voiceOn?' VOICE ON':' VOICE OFF');
+    var svgPath=voiceOn?'M11 5L6 9H2v6h4l5 4V5z M19.07 4.93a10 10 0 0 1 0 14.14 M15.54 8.46a5 5 0 0 1 0 7.07':'M11 5L6 9H2v6h4l5 4V5z';
+    btn.innerHTML='<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"'+svgPath+'\"/></svg>'+(voiceOn?' VOICE ON':' VOICE OFF');
     btn.classList.toggle('voice-on',voiceOn);
   }
   if(!voiceOn&&window.speechSynthesis)window.speechSynthesis.cancel();
@@ -59,7 +261,6 @@ function stopMic(){
   recognition.stop();
 }
 
-
 const PKGS={
   standard:[
     {name:"Starter",desc:"1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance"},
@@ -74,8 +275,8 @@ const PKGS={
     {name:"E-Commerce Maintenance",desc:"E-Commerce Store Uptime & Security Monitoring · Monthly Product & Content Updates · High-Fidelity Technical Backups · Priority Support · $199.99/mo"}
   ],
   ai:[
-    {name:"AI Tier 1",price:"$1,500 + $150/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · [Voice Intelligence Add-on: +$500 setup +$50/mo]"},
-    {name:"AI Tier 2",price:"$3,500 + $400/mo",desc:"Everything in Tier 1 · WhatsApp AI Automation (24/7) · [Voice Intelligence Add-on: +$500 setup +$50/mo]"},
+    {name:"AI Tier 1",price:"$1,500 + $150/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · [Chatbot Audio Feature: +$500 setup +$50/mo]"},
+    {name:"AI Tier 2",price:"$3,500 + $400/mo",desc:"Everything in Tier 1 · WhatsApp AI Automation (24/7) · [Chatbot Audio Feature: +$500 setup +$50/mo]"},
     {name:"AI Tier 3",price:"$6,000 + $700/mo",desc:"Everything in Tier 1 & 2 · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Every Email · 1 Month Free Maintenance"},
     {name:"AI Tier 4",price:"$8,000 + $900/mo",desc:"Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · 1 Month Free Maintenance"}
   ],
@@ -91,668 +292,254 @@ const PKGS={
   ]
 };
 
-const STEPS={
+const STEPS = {
+    
+  council_menu:{
+    bot:"The Strategic Council is ready. Who would you like to consult with?",
+    r:[
+      {l:"👨‍💻 Strategic Council",s:"council_menu"},
+      {l:"👨‍💻 Drew (Lead Architect)",s:"council_drew"},
+      {l:"👩‍💻 Sierra (Customer Ops)",s:"council_sierra"},
+      {l:"💻 Kimi (Code Auditor)",s:"council_kimi"},
+      {l:"← Back to start",s:"start"}
+    ]
+  },
+  council_drew:{
+    bot:"I am Drew, the Lead Architect. I handle high-fidelity web design, e-commerce, and AI automation strategy. How can I help you build your brand today?",
+    r:[{l:"Talk to Drew",s:"talk"},{l:"← Back",s:"council_menu"}]
+  },
+  council_sierra:{
+    bot:"I am Sierra, Customer Operations Representative. I handle autonomous workflows, inventory management, and database actions. What operations can I streamline for you?",
+    r:[{l:"Talk to Sierra",s:"talk"},{l:"← Back",s:"council_menu"}]
+  },
+  council_kimi:{
+    bot:"I am Kimi, the Code & Fiscal Auditor. I perform deterministic checks on code and financial data for 100% accuracy. Do you have a project for review?",
+    r:[{l:"Talk to Kimi",s:"talk"},{l:"← Back",s:"council_menu"}]
+  },
   start:{
-    bot:"Hey \uD83D\uDC4B Welcome to Prisca Dezigns. What can I help you with today?",
-    r:[
-      {l:"\uD83C\uDFA8 I want a template site",s:"pkg_templates"},
-      {l:"\uD83C\uDFC7 I need a custom website",s:"need_website"},
-      {l:"\uD83E\uDD16 I need AI automation",s:"automation"},
-      {l:"\uD83D\uDCC8 I need more leads",s:"more_leads"},
-      {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
-      {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"},
-      {l:"\uD83D\uDCBC Tell us about your business",s:"talk"},
-      {l:"\uD83D\uDE04 Tell me a joke",s:"joke"}
-    ]
-  },
-
-  joke:{
-    bot:"__joke__",
-    r:[
-      {l:"\uD83D\uDE02 Another one",s:"joke"},
-      {l:"\u2190 Back to start",s:"start"}
-    ]
-  },
-
-  /* ── ABOUT BRANCH ── */
-  about:{
-    bot:"Prisca Dezigns is a full-service digital agency based in Trinidad & Tobago.\n\n❖ Websites — custom builds, template sites, e-commerce stores\n❖ AI & Automation — chatbots, WhatsApp automation, lead capture\n❖ Brand Architecture — logo, domain, social setup, copywriting\n\nEvery project is built to a professional standard.\nWe do it all for you — no drag-and-drop builders, no DIY.",
-    r:[
-      {l:"\uD83D\uDCC5 How long have you been operating?",s:"about_history"},
-      {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
-      {l:"\uD83D\uDC69\u200D\uD83D\uDCBB Who is behind it?",s:"about_founder"},
-      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
-      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
-      {l:"\u2764\uFE0F The Way Made Known (TWMK)",s:"about_twmk"},
-      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
-      {l:"\u2190 Back to start",s:"start"}
-    ]
-  },
-  about_history:{
-    bot:"Prisca Dezigns was founded in 2023 and began full operations in 2026.\n\nWhat started as a vision grew into a full-service operation covering:\n\n❖ Websites & branding\n❖ E-commerce stores\n❖ AI-powered customer service automation\n\nServing clients across Trinidad & Tobago and the wider Caribbean — with a focus on accuracy, speed, and results.",
-    r:[
-      {l:"\uD83C\uDFAF What do you specialise in?",s:"about_services"},
-      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_founder:{
-    bot:"Prisca Dezigns is led by Priscilla Narine.\n\n❖ Studied Analytical Chemistry at UWI\n❖ Discovered web design and the power of AI in business\n❖ Left the traditional path to build Prisca Dezigns\n\nHer mission: give businesses access to the same calibre of digital infrastructure that large companies use — without the agency price tag or the technical headache.",
-    r:[
-      {l:"\uD83D\uDCF1 Social media",s:"about_social"},
-      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
-      {l:"\u2764\uFE0F The Way Made Known",s:"about_twmk"},
-      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_services:{
-    bot:"We specialise in three areas:\n\n\u2756 Website Design & Development — custom builds, template sites, e-commerce stores\n\u2756 AI & Automation — chatbots, WhatsApp automation, lead capture, CRM setup\n\u2756 Brand Architecture — logo, domain, social setup, copywriting, SEO\n\nEverything is done for you. You provide the content, we handle the rest.",
-    r:[
-      {l:"\uD83D\uDCE6 See all packages",s:"pkg_menu"},
-      {l:"\uD83C\uDF10 Our brand pages",s:"about_brands"},
-      {l:"\u2764\uFE0F The Way Made Known",s:"about_twmk"},
-      {l:"\uD83D\uDCE7 Send us an email",s:"about_email"},
-      {l:"Talk to someone",s:"talk"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_social:{
-    bot:"Find us and follow along across all platforms \uD83D\uDC47",
-    r:[
-      {l:"\uD83D\uDCF8 Instagram",url:"https://www.instagram.com/priscadezigns"},
-      {l:"\uD83E\uDDF5 Threads",url:"https://www.threads.net/@priscadezigns"},
-      {l:"\uD83C\uDFB5 TikTok",url:"https://www.tiktok.com/@priscionai"},
-      {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_brands:{
-    bot:"Prisca Dezigns operates a network of specialised brand pages. Tap any to visit \uD83D\uDC47",
-    r:[
-      {l:"\uD83E\uDDF5 SeamRite Designs \u00B7 NehNeh",url:"/seamritedesigns/"},
-      {l:"\uD83C\uDFCE\uFE0F The Autodrome",url:"/theautodrome/"},
-      {l:"\u26A1 Dreaming Anime",url:"https://dreaminganime.com"},
-      {l:"\u26A1\uFE0F Evolve Mobility",url:"https://driveevolve.com"},
-      {l:"\uD83D\uDCBB Main Website",url:"https://priscadezigns.org"},
-      {l:"\uD83D\uDECD\uFE0F Template Shop",url:"https://priscadezigns.org/templates/"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_twmk:{
-    bot:"The Way Made Known (TWMK) is the faith foundation at the heart of Prisca Dezigns.\n\n❖ A Gospel-driven NGO\n❖ Committed to evidence-based, Bible-centred proclamation\n❖ The backbone of everything we build\n\nEvery product, every project, and every dollar earned is part of a mission that goes far beyond business.",
-    r:[
-      {l:"\uD83C\uDF0D Visit TWMK",url:"https://thewaymadeknown.com"},
-      {l:"\uD83E\uDD1D Support the mission",url:"https://www.paypal.com/paypalme/priscadezigns9"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_email:{
-    bot:"Prefer email? Tap below to send us a message directly. We typically respond within 24 hours on business days. \uD83D\uDCE7",
-    r:[
-      {l:"\uD83D\uDCE7 Email us now",url:"mailto:hello@priscadezigns.org"},
-      {l:"\uD83D\uDCAC WhatsApp instead",s:"talk"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-  about_location:{
-    bot:"We are based in San Fernando, Trinidad & Tobago.\n\n❖ Serving clients across the Caribbean and internationally\n❖ All work done remotely — no in-person meetings required\n❖ Communication via WhatsApp, email, and video call",
-    r:[
-      {l:"Talk to someone",s:"talk"},
-      {l:"\u2190 Back",s:"about"}
-    ]
-  },
-
-  /* ── WEBSITE BRANCH ── */
-  need_website:{
-    bot:"Our custom websites are built from scratch.\n\n❖ Fully tailored to your brand\n❖ SEO, GEO & AEO optimised\n❖ Mobile-first and fast-loading\n❖ Delivered fast\n\nWhat do you need?",
-    r:[
-      {l:"\u26A1 Need it in 24hrs",s:"pkg_oneday"},
-      {l:"I need a full custom build",s:"pkg_standard"},
-      {l:"Mine isn't converting",s:"bad_website"},
-      {l:"\uD83C\uDFA8 Show me templates instead",s:"pkg_templates"}
-    ]
-  },
-  no_website:{bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",r:[],pkg:"standard"},
-  bad_website:{bot:"A website that doesn't convert is just an expensive business card. Here's what a full rebuild looks like:",r:[],pkg:"standard"},
-
-  /* ── LEADS BRANCH ── */
-  more_leads:{
-    bot:"Most businesses don't have a lead problem — they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
-    r:[
-      {l:"No one responds fast enough",s:"slow_response"},
-      {l:"Hard to tell who's serious",s:"filter_leads"},
-      {l:"No system at all",s:"no_system"},
-      {l:"See AI packages",s:"pkg_ai"}
-    ]
-  },
-  slow_response:{
-    bot:"78% of leads buy from the first business that responds.\n\n❖ Our AI responds instantly — 24/7\n❖ Even at 2am on a Sunday\n❖ No missed messages, no missed sales",
-    r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
-  filter_leads:{
-    bot:"Our lead filter qualifies every enquiry the second it lands.\n\n❖ Checks budget, timeline & intent\n❖ Only serious buyers reach you\n❖ The rest are nurtured automatically",
-    r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
-  no_system:{
-    bot:"We build the whole system from scratch.\n\n❖ AI chatbot\n❖ WhatsApp automation\n❖ Lead capture\n❖ CRM setup\n\nYou walk away with a machine that works while you sleep.",
-    r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
-  how_it_works:{
-    bot:"We connect an AI agent to your WhatsApp, website, or email.\n\n❖ Greets every lead instantly\n❖ Asks qualifying questions\n❖ Routes serious buyers directly to you\n❖ Follows up automatically\n❖ Setup takes 2–4 weeks",
-    r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
-
-  /* ── AUTOMATION BRANCH ── */
-  automation:{
-    bot:"We build AI systems that replace a full-time customer service rep.\n\n❖ Respond to every enquiry instantly\n❖ Qualify leads automatically\n❖ Follow up all day, every day — even at 2am\n\nWhat are you trying to automate?",
-    r:[
-      {l:"Customer service / enquiries",s:"how_it_works"},
-      {l:"WhatsApp automation",s:"whatsapp_auto"},
-      {l:"Full business automation",s:"pkg_ai"},
-      {l:"Talk to someone",s:"talk"}
-    ]
-  },
-  whatsapp_auto:{
-    bot:"We integrate an AI agent directly into your WhatsApp Business.\n\n❖ Responds to every message instantly\n❖ Qualifies the lead with smart questions\n❖ Alerts you only when someone is ready to pay\n❖ Works 24/7 — no staff needed",
-    r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
-  },
-
-  /* ── PACKAGES MENU ── */
-  pkg_menu:{
-    bot:"Our full service range — from template sites to enterprise AI. What fits your stage?",
-    r:[
-      {l:"\u26A1 1-Day Website",s:"pkg_oneday"},
-      {l:"\uD83C\uDFA8 Template Sites",s:"pkg_templates"},
-      {l:"\uD83C\uDF10 Custom Website Packages",s:"pkg_standard"},
-      {l:"\uD83D\uDED2 E-Commerce Packages",s:"pkg_ecommerce"},
-      {l:"\uD83E\uDD16 AI Consultancy",s:"pkg_ai"},
-      {l:"\uD83D\uDD27 Maintenance",s:"pkg_continuity"},
-      {l:"\u2139\uFE0F About Prisca Dezigns",s:"about"}
-    ]
-  },
-
-  /* ── TEMPLATE BRANCH ── */
-  pkg_templates:{
-    bot:"24 ready-made templates. Pick a design, send your content, go live in 24 hours. No tech needed.",
-    r:[
-      {l:"\uD83D\uDDFA\uFE0F Browse all templates",s:"microstore"},
-      {l:"What's included?",s:"templates_included"},
-      {l:"\uD83D\uDECD\uFE0F Micro Store option",s:"microstore_info"},
-      {l:"\uD83E\uDD16 Template + Chatbot option",s:"templates_chatbot"},
-      {l:"Do I own the template?",s:"template_ip"},
-      {l:"Talk to someone",s:"talk"}
-    ]
-  },
-  microstore:{
-    bot:"24 live templates — pick your niche to find the best match:",
-    r:[
-      {l:"\uD83D\uDCF8 Portfolio & Creative",s:"ms_portfolio"},
-      {l:"\uD83C\uDFC6 Coach & Consultant",s:"ms_coach"},
-      {l:"\uD83D\uDED2 Store & E-Commerce",s:"ms_store"},
-      {l:"\uD83D\uDCAA Fitness & Wellness",s:"ms_wellness"},
-      {l:"\u2728 Beauty & Skincare",s:"ms_beauty"},
-      {l:"\uD83D\uDE80 Tech & Startup",s:"ms_tech"},
-      {l:"\uD83C\uDF0D Lifestyle & Travel",s:"ms_lifestyle"},
-      {l:"\uD83D\uDCCB Show all 24",s:"ms_all"}
-    ]
-  },
-  ms_portfolio:{
-    bot:"Best for creatives who showcase their work:\n\n\u2756 Folio — Photographer | Artist | Portfolio\n\u2756 Folio II — Minimal 3-Column Portfolio\n\u2756 Studio — Creative Studio | Tech Brand\n\u2756 Craft — Handmade | Maker | Artisan\n\u2756 Marquee — Video | Content Creator\n\u2756 Noir — Fashion Editorial | Dark Luxury",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_coach:{
-    bot:"Best for professionals who sell their expertise:\n\n\u2756 Persona — Personal Brand | Coach | Influencer\n\u2756 Consult — Consultant | Doctor | Lawyer\n\u2756 Summit — Author | Speaker | Mentor\n\u2756 Obvious — Minimalist Personal Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_store:{
-    bot:"Best for businesses selling products online:\n\n\u2756 Luxe — Luxury Fashion | Boutique Store\n\u2756 Glow — Skincare | Beauty Product Shop\n\u2756 Paws — Pet | Vet | Animal Care Store\n\u2756 Optica — Luxury Product Catalogue\n\u2756 Atelier — Jewelry | Artisan | Handcraft Store\n\u2756 Monsieur — Clothing | Apparel | Fashion Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_wellness:{
-    bot:"Best for fitness pros and wellness brands:\n\n\u2756 Velocity — Fitness Coach | Trainer | Athlete\n\u2756 Momentum — Motivator | Gym | Sports Brand\n\u2756 Serene — Yoga | Meditation | Spa | Holistic\n\u2756 Aura — Holistic Health | Wellness Coach",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_beauty:{
-    bot:"Best for beauty, skincare and spa businesses:\n\n\u2756 Aura — Beauty | Skincare | Wellness Spa\n\u2756 Glow — Skincare | Beauty Product Store\n\u2756 Serene — Spa | Wellness | Holistic Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_tech:{
-    bot:"Best for tech brands, SaaS and startups:\n\n\u2756 Launch — SaaS | App Launch | Startup Brand\n\u2756 Volt — Tech Builder | Developer | SaaS\n\u2756 Studio — Creative Studio | Tech Brand",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_lifestyle:{
-    bot:"Best for travel, adventure and lifestyle brands:\n\n\u2756 Horizon — Travel Photographer | Tourism\n\u2756 Obvious — Minimalist Lifestyle Brand\n\u2756 Folio — Adventure | Documentary Portfolio\n\u2756 Monsieur — Fashion Brand | Editorial Drops",
-    r:[{l:"Open Template Shop \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  ms_all:{
-    bot:"All 24 templates:\n\nFolio | Folio II | Persona | Studio | Consult | Craft | Launch | Velocity | Luxe | Momentum | Obvious | Marquee | Aura | Luxe II | Horizon | Serene | Volt | Summit | Noir | Glow | Paws | Optica | Atelier | Monsieur\n\nStandard — $149.99 setup · $19.99/mo\n⭐ Premium 3D (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\nAll live in 24hrs · Logo + content swapped in",
-    r:[{l:"Browse live previews \u2192",url:"https://priscadezigns.org/templates/"},{l:"\u2190 Back to niches",s:"microstore"},{l:"I'm ready — let's go",s:"talk"}]
-  },
-  microstore_info:{
-    bot:"The Micro Store turns any of our 24 templates into a full product shop:\n\n\u2756 Up to 12 products uploaded with copy & images\n\u2756 WhatsApp order button on every product\n\u2756 Mobile-optimised store layout\n\u2756 Live in 72-96 hours\n\u2756 $249.99 setup · $34.99/mo",
-    r:[
-      {l:"\uD83D\uDDFA\uFE0F Pick a store template",s:"ms_store"},
-      {l:"I'm ready — let's go",s:"talk"},
-      {l:"\u2190 Back to templates",s:"pkg_templates"}
-    ]
-  },
-  templates_chatbot:{
-    bot:"The AI Chatbot add-on plugs a live AI agent into your template site. It answers your business FAQs 24/7 — services, pricing, hours, how to book — and captures leads while you sleep.\n\n❖ $349.99 one-time setup\n❖ $49.99/mo ongoing\n\nAdds on top of your template site fee.",
-    r:[
-      {l:"Add chatbot to my template",s:"talk"},
-      {l:"Template only is fine",s:"microstore"},
-      {l:"\u2190 Back to templates",s:"pkg_templates"}
-    ]
-  },
-  templates_included:{
-    bot:"Every template includes:\n\u2756 Logo & colours swapped in\n\u2756 Your content & photos added\n\u2756 Mobile-optimised\n\u2756 Live in 24 hours\n\u2756 Hosted on your subdomain\n\nPricing:\n❖ Standard templates — $149.99 setup · $19.99/mo\n❖ Premium 3D templates (Aeon, Nexus, Stellar) — $299.99 setup · $19.99/mo\n\nAdd-ons:\n❖ Copywriting — $49.99 one-time\n❖ AI Chatbot — $349.99 setup · $49.99/mo\n❖ Micro Store — $249.99 setup · $34.99/mo",
-    r:[
-      {l:"\uD83D\uDDFA\uFE0F Browse templates",s:"microstore"},
-      {l:"Add chatbot",s:"templates_chatbot"},
-      {l:"\uD83D\uDECD\uFE0F Micro Store option",s:"microstore_info"},
-      {l:"I'm ready — let's go",s:"talk"}
-    ]
-  },
-  template_ip:{
-    bot:"Here's how ownership works:\n\n❖ Design, layout, code & structure — owned by Prisca Dezigns\n❖ Your content (photos, logo, text, business name) — yours completely\n❖ You receive a licence to use your customised version\n❖ Licence remains active while your subscription is active",
-    r:[{l:"\u2190 Back to templates",s:"pkg_templates"},{l:"Talk to someone",s:"talk"}]
-  },
-
-  /* ── PACKAGE STEPS ── */
-  pkg_oneday:{
-    bot:"The 1-Day Website is a fully custom site built to your brand and live within 24 hours. One flat fee. Hosting included after.",
-    r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
-  },
-  oneday_included:{
-    bot:"Your 1-Day Site includes:\n\n\u2756 Full custom design (not a template)\n\u2756 Mobile-first, fast-loading\n\u2756 SEO, GEO & AEO optimised\n\u2756 WhatsApp & contact integration\n\u2756 Live in 24 hours\n\nOne flat fee. Maintenance included after.",
-    r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
-  },
-  pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
-  pkg_ecommerce:{bot:"Here are our E-Commerce Packages:",r:[],pkg:"ecommerce"},
-  pkg_ai:{bot:"Here are our AI Consultancy Packages:",r:[],pkg:"ai"},
-  pkg_continuity:{bot:"Our System Continuity Package keeps your site fast, secure, and up to date:",r:[],pkg:"continuity"},
-  pkg_tpl_tiers:{bot:"Our Template Tiers:",r:[],pkg:"templates"},
-
-  brand_scan:{
-    bot:"Enter your domain and we'll run a real-time diagnostic on your digital identity and brand footprint.",
-    r:[],scan:true
-  },
-
-  /* ── TALK / CONTACT ── */
-  talk:{
-    bot:"Let's make sure you get the right recommendation. I'll ask you a few quick questions about your business — won't take long! 😄",
-    r:[],intake:true
-  },
-
-  /* ── FAQ / MISC ── */
-  faq_turnaround:{
-    bot:"Here are our delivery timelines:\n\n❖ Template sites — live in 24 hours\n❖ Custom websites — 3–7 business days\n❖ E-commerce stores — 3–5 business days\n❖ AI automation systems — 2–4 weeks\n\nAll timelines start from when you send your content.",
-    r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
-  },
-  faq_payment:{
-    bot:"We accept the following payment methods:\n\n❖ PayPal\n❖ Bank transfer\n\nFor template orders — pay directly through our template shop.\nFor custom projects — we send a quote via WhatsApp first.",
-    r:[{l:"Open template shop",url:"https://priscadezigns.org/templates/"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
-  },
-  faq_hosting:{
-    bot:"Yes — all our sites are hosted by us.\n\n❖ Template sites: hosted on yourbrand.priscadezigns.org\n❖ Or your own custom domain\n❖ Hosting included in the monthly fee\n❖ No technical setup required on your end",
-    r:[{l:"See packages",s:"pkg_menu"},{l:"Talk to someone",s:"talk"},{l:"\u2190 Start over",s:"start"}]
-  }
-};
-
-// ── JOKES ──
-const JOKES=[
-  "Why did the website go to therapy? It had too many unresolved issues. 😅",
-  "My client said 'make it pop'. I added confetti. They meant the colours. We don't talk about that project. 🎊",
-  "Why don't web designers go outside? Because they get too many requests. 🌐",
-  "A client once told me to make the logo bigger. The logo was already the entire homepage. 🔍",
-  "Why did the developer go broke? Because he used up all his cache. 💸",
-  "I told my client the website needed breathing room. They asked if it had asthma. 🫁",
-  "Why did the AI get promoted? It had a neural network... and excellent people skills. 🤖",
-  "A client asked for a 'simple' website. Six revisions later we had an animated 3D solar system. 🪐",
-  "Why do programmers prefer dark mode? Because light attracts bugs. 🐛",
-  "My client wanted the site to feel 'alive'. I added a heartbeat animation. They wanted plants. 🌿"
-];
-var jokeIdx = Math.floor(Math.random()*JOKES.length);
-function nextJoke(){
-  var j=JOKES[jokeIdx%JOKES.length];
-  jokeIdx++;
-  return j;
-}
-
-// ── INTAKE CONVERSATION STATE ──
-var intake={active:false,step:0,data:{}};
-var intakeSteps=[
-  {key:'name',    ask:"First — what's your name? 😊"},
-  {key:'biz',     ask:function(d){return "Nice to meet you, "+d.name+"! What's your business called? (Or describe what you do if you don't have a name yet)"}},
-  {key:'type',    ask:"What type of business is it? (e.g. coach, salon, restaurant, clothing brand, tech startup…)"},
-  {key:'email',   ask:"What's the best email to reach you on? 📧"},
-  {key:'phone',   ask:"And a phone number or WhatsApp? (optional — skip if you prefer email)"},
-  {key:'website', ask:"Do you have an existing website or social media page? Drop the link here if so 🔗"},
-  {key:'goal',    ask:"What's the main thing you're trying to achieve right now? More leads? A new website? Automating your customer service?"},
-  {key:'pain',    ask:"What's the biggest challenge your business is facing right now? Be as specific as you like — this helps us tailor the right solution 🎯"},
-  {key:'budget',  ask:"Last one — do you have a rough budget in mind? No pressure either way, it just helps me point you to the right option 🙏"}
-];
-
-function startIntake(){
-  intake.active=true;
-  intake.step=0;
-  intake.data={};
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  // show first question after short delay
-  setTimeout(function(){
-    addMsg(intakeSteps[0].ask,'bot');
-    showIntakeInput();
-  },420);
-}
-
-function showIntakeInput(){
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  // add a skip button
-  var skip=document.createElement('button');
-  skip.className='qrb';
-  skip.textContent='Skip — just take me to WhatsApp';
-  skip.onclick=function(){ intake.active=false; finishIntake(true); };
-  q.appendChild(skip);
-  // focus the text input
-  var inp=document.getElementById('chat-inp');
-  if(inp) setTimeout(function(){ inp.focus(); },100);
-}
-
-function advanceIntake(userText){
-  var currentStep=intakeSteps[intake.step];
-  intake.data[currentStep.key]=userText;
-  intake.step++;
-
-  // Occasionally drop a joke between questions
-  if(intake.step===2 || intake.step===4){
-    setTimeout(function(){ addMsg(nextJoke(),'bot'); },300);
-  }
-
-  if(intake.step < intakeSteps.length){
-    var nextQ=intakeSteps[intake.step].ask;
-    if(typeof nextQ==='function') nextQ=nextQ(intake.data);
-    setTimeout(function(){
-      addMsg(nextQ,'bot');
-      showIntakeInput();
-    },intake.step===2||intake.step===4?900:500);
-  } else {
-    // All questions answered — build summary and WhatsApp link
-    setTimeout(function(){ finishIntake(false); },500);
-  }
-}
-
-function saveIntakeLead(d){
-  var SB_URL='https://sazhdnqzaqpqcralmthh.supabase.co';
-  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
-  var payload={
-    name: (d.name||'—')+' | Biz: '+(d.biz||'—'),
-    email: d.email||('(chatbot) '+(d.biz||'—')),
-    package: (d.type||'—')+' | Goal: '+(d.goal||'—')+' | Pain: '+(d.pain||'—')+' | Budget: '+(d.budget||'—'),
-    brand: 'Prisca Dezigns (Chatbot) | Phone: '+(d.phone||'—')+' | Web: '+(d.website||'—')
-  };
-  fetch(SB_URL+'/rest/v1/client_leads',{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'apikey':SB_KEY,
-      'Authorization':'Bearer '+SB_KEY,
-      'Prefer':'return=minimal'
+        bot:"Hey 👋 What brings you here today?",
+        r:[
+          {l:"🏢 About Us",s:"about"},
+          {l:"🏗️ I need a custom website",s:"need_website"},
+          {l:"🤖 I need AI automation",s:"automation"},
+          {l:"📦 Agency Packages",s:"pkg_menu"},
+          {l:"😂 Tell me a joke",s:"jokes"}
+        ]
     },
-    body:JSON.stringify(payload)
-  }).catch(function(){});
-}
-
-function finishIntake(skipped){
-  intake.active=false;
-  var d=intake.data;
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-
-  if(skipped || !d.name){
-    addMsg("No worries — tap below and we'll pick up the conversation on WhatsApp 👇",'bot');
-    var a=document.createElement('a');
-    a.href=WA;a.target='_blank';a.rel='noopener';
-    a.className='qrb wa';a.innerHTML=WA_SVG+' Chat on WhatsApp';
-    q.appendChild(a);
-    addQR('← Start over','start');
-    return;
-  }
-
-  saveIntakeLead(d);
-
-  var summary="Perfect, "+d.name+"! Here's what I've got:\n";
-  if(d.biz)     summary+="🏢 Business: "+d.biz+"\n";
-  if(d.type)    summary+="📂 Type: "+d.type+"\n";
-  if(d.email)   summary+="📧 Email: "+d.email+"\n";
-  if(d.phone)   summary+="📱 Phone: "+d.phone+"\n";
-  if(d.website) summary+="🔗 Website: "+d.website+"\n";
-  if(d.goal)    summary+="🎯 Goal: "+d.goal+"\n";
-  if(d.pain)    summary+="⚠️ Challenge: "+d.pain+"\n";
-  if(d.budget)  summary+="💳 Budget: "+d.budget+"\n";
-  summary+="\nI'm sending this straight to the team so we can come back to you with exactly the right recommendation. 🚀";
-  addMsg(summary,'bot');
-
-  // Build WhatsApp pre-fill
-  var msg="Hi! I just came from your website chatbot.\n\n";
-  msg+="👤 Name: "+(d.name||'—')+"\n";
-  msg+="🏢 Business: "+(d.biz||'—')+"\n";
-  msg+="📂 Type: "+(d.type||'—')+"\n";
-  msg+="📧 Email: "+(d.email||'—')+"\n";
-  msg+="📱 Phone: "+(d.phone||'—')+"\n";
-  msg+="🔗 Website: "+(d.website||'—')+"\n";
-  msg+="🎯 Goal: "+(d.goal||'—')+"\n";
-  msg+="⚠️ Challenge: "+(d.pain||'—')+"\n";
-  msg+="💳 Budget: "+(d.budget||'—')+"\n\n";
-  msg+="Looking forward to hearing from you!";
-
-  setTimeout(function(){
-    addMsg(nextJoke(),'bot');
-    var a=document.createElement('a');
-    a.href=WA+'?text='+encodeURIComponent(msg);
-    a.target='_blank';a.rel='noopener';
-    a.className='qrb wa';
-    a.innerHTML=WA_SVG+' Send to WhatsApp';
-    q.appendChild(a);
-    addQR('← Start over','start');
-  },700);
-
-  // Rating prompt — appears after WhatsApp button
-  setTimeout(function(){
-    addMsg('One last thing — how was your experience with our chatbot today? 😊','bot');
-    showRating(d.name);
-  },1800);
-}
-
-function showRating(clientName){
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  var labels=[['⭐','Poor'],['⭐⭐','Fair'],['⭐⭐⭐','Good'],['⭐⭐⭐⭐','Great'],['⭐⭐⭐⭐⭐','Excellent']];
-  labels.forEach(function(pair,i){
-    var b=document.createElement('button');
-    b.className='qrb';
-    b.textContent=pair[0]+' '+pair[1];
-    (function(score){
-      b.onclick=function(){ submitRating(score,clientName); };
-    })(i+1);
-    q.appendChild(b);
-  });
-}
-
-function submitRating(score,clientName){
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  var response=score>=4
-    ? 'Thank you so much, '+clientName+'! We really appreciate that. 🙏 We\'ll be in touch soon!'
-    : score===3
-    ? 'Thanks for the feedback, '+clientName+'! We\'re always looking to improve. 🙏'
-    : 'Thanks for being honest, '+clientName+'. We\'ll use this to do better. 🙏';
-  addMsg(response,'bot');
-  var SB_URL='https://sazhdnqzaqpqcralmthh.supabase.co';
-  var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
-  fetch(SB_URL+'/rest/v1/client_leads',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-    body:JSON.stringify({
-      name:(clientName||'Unknown')+' — Rating',
-      email:'(rating)',
-      package:score+'/5 stars',
-      brand:'Prisca Dezigns (Chatbot Rating)'
-    })
-  }).catch(function(){});
-  setTimeout(function(){ addQR('← Start over','start'); },600);
-}
-
-let open=false,started=false,hist=[];
-
-window.toggleChat=function(){
-  open=!open;
-  document.getElementById('pd-chat-bubble').classList.toggle('open',open);
-  document.getElementById('pd-chat-window').classList.toggle('open',open);
-  if(open&&!started){started=true;setTimeout(function(){go('start',null);},380);}
+  about: {
+    bot: "Prisca Dezigns is a high-fidelity digital agency specializing in premium web architecture and AI automation. We're on a mission to build the future of the Caribbean.",
+    r: [
+      {l:"🚗 Evolve Mobility", s:"about_brands"},
+      {l:"✝️ The Way Made Known", s:"about_twmk"},
+      {l:"👩‍💻 About Priscilla", s:"about_founder"},
+      {l:"← Back", s:"start"}
+    ]
+  },
+  about_brands: {
+    bot: "We are the strategic digital partners for Evolve Mobility (driveevolve.com), the leading EV dealership in the Caribbean. We build their entire sales and automation ecosystem.",
+    r: [{l:"Visit Evolve Mobility", s:"templates_browse"}, {l:"← Back", s:"about"}],
+    url: "https://driveevolve.com"
+  },
+  about_twmk: {
+    bot: "The Way Made Known (TWMK) is our humanitarian backbone. We use a portion of our agency profits to share the Gospel and provide community support in Trinidad and Tobago. It's the heart of why we build.",
+    r: [{l:"Learn more", s:"talk"}, {l:"← Back", s:"about"}]
+  },
+  about_founder: {
+    bot: "Priscilla Narine is the lead architect of Prisca Dezigns. With a background in payroll administration and high-stakes data governance, she brings 100% accuracy and elite strategy to every project.",
+    r: [{l:"← Back", s:"about"}]
+  },
+  jokes: {
+    bot: "Why did the AI go to therapy? Because it had too many unresolved dependencies! 😂 Want another one?",
+    r: [{l:"One more!", s:"jokes"}, {l:"← Back to start", s:"start"}]
+  },
+    need_website:{
+        bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
+        r:[{l:"⚡ Need it in 24hrs — $299.99",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
+    },
+    no_website:{
+        bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",
+        r:[],pkg:"standard"
+    },
+    bad_website:{
+        bot:"A website that doesn't convert is just an expensive business card. Here's what a full rebuild looks like:",
+        r:[],pkg:"standard"
+    },
+    more_leads:{
+        bot:"Most businesses don't have a lead problem — they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
+        r:[{l:"No one responds fast enough",s:"slow_response"},{l:"Hard to tell who's serious",s:"filter_leads"},{l:"No system at all",s:"no_system"},{l:"See AI packages",s:"pkg_ai"}]
+    },
+    slow_response:{
+        bot:"78% of leads buy from the first business that responds. Our AI responds instantly — 24/7, even at 2am on a Sunday.",
+        r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    filter_leads:{
+        bot:"Our lead filter qualifies every enquiry the second it lands — budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
+        r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    no_system:{
+        bot:"We build the whole system from scratch — AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    how_it_works:{
+        bot:"We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up with everyone else automatically. Setup takes 2–4 weeks.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    automation:{
+        bot:"We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up — all day, every day. What are you trying to automate?",
+        r:[{l:"Customer service / enquiries",s:"how_it_works"},{l:"WhatsApp automation",s:"whatsapp_auto"},{l:"Full business automation",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    whatsapp_auto:{
+        bot:"We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
+    },
+    pkg_menu:{
+        bot:"Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
+        r:[{l:"⚡ 1-Day Website — $299.99",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
+    },
+    pkg_templates:{
+        bot:"The Template Shop is a separate service from our agency packages — faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
+        r:[{l:"Browse all templates",s:"templates_browse"},{l:"What's included?",s:"templates_included"},{l:"Template + Chatbot option",s:"templates_chatbot"},{l:"Talk to someone",s:"talk"}]
+    },
+    templates_chatbot:{
+        bot:"You're in the right place! 🎉 The chatbot add-on is $49.99 one-time setup + $10/mo added to hosting ($29.99/mo total). It answers your business FAQs 24/7 — hours, pricing, location, services, how to book. Nothing outside your business.",
+        wa:true,
+        r:[{l:"Template only is fine",s:"templates_browse"},{l:"Back to templates",s:"pkg_templates"}]
+    },
+    templates_browse:{
+        bot:"Our Template Shop has 17 live designs — pick one, send your photos and logo, and go live in 24 hours.",
+        r:[{l:"🎨 Open Template Shop →",s:"templates_browse"}],url:"https://priscadezigns.org/templates/"
+    },
+    templates_included:{
+        bot:"Every template includes: ✦ Your logo & colours ✦ Photos & content swapped in ✦ Mobile-optimised ✦ Live in 24 hours ✦ $149.99 setup · $19.99/mo hosting. Add chatbot for $50 (+$10/mo). Add copywriting for $4.99/update.",
+        r:[{l:"Browse templates",s:"templates_browse"},{l:"Add chatbot — $49.99",s:"templates_chatbot"},{l:"I'm ready — let's go",s:"talk"}]
+    },
+    pkg_oneday:{
+        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $299.99. Then $50/mo to keep it live, optimised, and secure.",
+        r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
+    },
+    oneday_included:{
+        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $299.99 flat. $50/mo maintenance.",
+        r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
+    },
+    pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
+    pkg_ecommerce:{bot:"Here are our E-Commerce Packages:",r:[],pkg:"ecommerce"},
+    pkg_ai:{bot:"Here are our AI Consultancy Packages:",r:[],pkg:"ai"},
+    pkg_continuity:{bot:"Our System Continuity Package:",r:[],pkg:"continuity"},
+    talk:{bot:"Tap below to start a WhatsApp conversation with us directly. We'll get back to you fast.",r:[],wa:true}
 };
 
-window.chatBack=function(){
-  if(!hist.length)return;
-  var p=hist.pop();
-  var m=document.getElementById('chat-msgs');
-  var q=document.getElementById('chat-qr');
-  m.innerHTML=p.m;q.innerHTML=p.q;
-  m.scrollTop=m.scrollHeight;
-  q.querySelectorAll('.qrb[data-s]').forEach(function(b){b.onclick=function(){go(b.dataset.s,b.textContent);};});
-  setBack(p.bv);
+let open=false, started=false, hist=[];
+
+window.toggleChat = function(){
+    open=!open;
+    document.getElementById('pd-chat-bubble').classList.toggle('open',open);
+    document.getElementById('pd-chat-window').classList.toggle('open',open);
+    if(open && !started){ started=true; setTimeout(()=>go('start',null),380); }
 };
 
-function setBack(v){document.getElementById('chat-back-bar').classList.toggle('vis',v);}
+window.chatBack = function(){
+    if(!hist.length) return;
+    const p=hist.pop();
+    const m=document.getElementById('chat-msgs');
+    const q=document.getElementById('chat-qr');
+    m.innerHTML=p.m; q.innerHTML=p.q;
+    m.scrollTop=m.scrollHeight;
+    q.querySelectorAll('.qrb[data-s]').forEach(b=>{ b.onclick=()=>go(b.dataset.s,b.textContent); });
+    setBack(p.bv);
+};
+
+function setBack(v){ document.getElementById('chat-back-bar').classList.toggle('vis',v); }
 
 function push(){
-  var m=document.getElementById('chat-msgs');
-  var q=document.getElementById('chat-qr');
-  hist.push({m:m.innerHTML,q:q.innerHTML,bv:document.getElementById('chat-back-bar').classList.contains('vis')});
+    const m=document.getElementById('chat-msgs');
+    const q=document.getElementById('chat-qr');
+    hist.push({m:m.innerHTML,q:q.innerHTML,bv:document.getElementById('chat-back-bar').classList.contains('vis')});
 }
 
-function go(key,userTxt){
-  push();
-  if(userTxt)addMsg(userTxt,'usr');
-  var q=document.getElementById('chat-qr');
-  q.innerHTML='';
-  var s=STEPS[key]||STEPS.start;
-  setTimeout(function(){
-    addMsg(s.bot==='__joke__'?nextJoke():s.bot,'bot');
-    setBack(hist.length>0);
-    if(s.scan){
-      var isHome=window.location.pathname==='/'||window.location.pathname.endsWith('index.html')||window.location.pathname==='';
-      if(isHome){
-        toggleChat();
-        var inp=document.getElementById('domain-input');
-        if(inp){inp.focus();inp.scrollIntoView({behavior:'smooth',block:'center'});}
-      } else {
-        addMsg("Head to our homepage to run a live Brand Scan \uD83D\uDC47",'bot');
-        var a=document.createElement('a');
-        a.href='https://priscadezigns.org';a.target='_blank';a.rel='noopener';
-        a.className='qrb wa';a.style.textDecoration='none';
-        a.innerHTML='\uD83D\uDD0D Run Brand Scan';
-        q.appendChild(a);
-        addQR('\u2190 Back','start');
-      }
-      return;
-    }
-    if(s.wa){
-      var a=document.createElement('a');
-      a.href=WA;a.target='_blank';a.rel='noopener';
-      a.className='qrb wa';a.innerHTML=WA_SVG+' Chat on WhatsApp';
-      q.appendChild(a);
-      addQR('\u2190 All packages','pkg_menu');
-      return;
-    }
-    if(s.intake){
-      startIntake();
-      return;
-    }
-    if(s.pkg){
-      renderPkgs(PKGS[s.pkg]);
-      addQR('\u2190 All packages','pkg_menu');
-      addQR('Talk to someone','talk');
-      return;
-    }
-    s.r.forEach(function(r){
-      if(r.url){
-        var a=document.createElement('a');
-        a.href=r.url;a.target='_blank';a.rel='noopener';
-        a.className='qrb';a.textContent=r.l;a.style.textDecoration='none';
-        q.appendChild(a);
-      } else {
-        addQR(r.l,r.s);
-      }
-    });
-  },420);
+function go(key, userTxt){
+    push();
+    if(userTxt) addMsg(userTxt,'usr');
+    const q=document.getElementById('chat-qr');
+    q.innerHTML='';
+    const s=STEPS[key]||STEPS.start;
+    setTimeout(()=>{
+        var botTxt = s.bot;
+        addMsg(botTxt,'bot');
+        speak(botTxt);
+        setBack(hist.length>0);
+        if(s.wa){
+            const a=document.createElement('a');
+            a.href=WA; a.target='_blank'; a.rel='noopener';
+            a.className='qrb wa'; a.innerHTML=WA_SVG+' Chat on WhatsApp';
+            q.appendChild(a);
+            addQR('← All packages','pkg_menu');
+            return;
+        }
+        if(s.pkg){
+            renderPkgs(PKGS[s.pkg]);
+            addQR('← All packages','pkg_menu');
+            addQR('Talk to someone','talk');
+            return;
+        }
+        if(s.url){
+            window.open(s.url,'_blank');
+            if(s.r) s.r.forEach(r=>addQR(r.l,r.s));
+            return;
+        }
+        if(s.r) s.r.forEach(r=>addQR(r.l,r.s));
+    },420);
 }
 
 function addQR(label,step){
-  var q=document.getElementById('chat-qr');
-  var b=document.createElement('button');
-  b.className='qrb';b.textContent=label;b.dataset.s=step;
-  b.onclick=function(){go(step,label);};
-  q.appendChild(b);
+    const q=document.getElementById('chat-qr');
+    const b=document.createElement('button');
+    b.className='qrb'; b.textContent=label; b.dataset.s=step;
+    b.onclick=()=>go(step,label);
+    q.appendChild(b);
 }
 
 function renderPkgs(list){
-  var m=document.getElementById('chat-msgs');
-  var g=document.createElement('div');g.className='cpkg-grid';
-  list.forEach(function(p){
-    var c=document.createElement('div');c.className='cpkg-card';
-    c.innerHTML='<div class="cpkg-name">'+p.name+'</div><div class="cpkg-desc">'+p.desc+'</div>';
-    c.onclick=function(){go('talk','I am interested in '+p.name);};
-    g.appendChild(c);
-  });
-  m.appendChild(g);m.scrollTop=m.scrollHeight;
+    const m=document.getElementById('chat-msgs');
+    const g=document.createElement('div'); g.className='cpkg-grid';
+    list.forEach(p=>{
+        const c=document.createElement('div'); c.className='cpkg-card';
+        c.innerHTML='<div class="cpkg-name">'+p.name+'</div>'+(p.price?'<div class="cpkg-price">'+p.price+'</div>':'')+'<div class="cpkg-desc">'+p.desc+'</div>';
+        c.onclick=()=>go('talk','I\'m interested in '+p.name);
+        g.appendChild(c);
+    });
+    m.appendChild(g); m.scrollTop=m.scrollHeight;
 }
 
 function addMsg(txt,type){
-  var m=document.getElementById('chat-msgs');
-  if(type==='bot'){
-    var dots=document.createElement('div');dots.className='cmsg typing';
-    dots.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
-    m.appendChild(dots);m.scrollTop=m.scrollHeight;
-    setTimeout(function(){
-      if(dots.parentNode)dots.parentNode.removeChild(dots);
-      var d=document.createElement('div');d.className='cmsg bot';
-      var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      d.innerHTML=safe.replace(/\n/g,'<br>');
-      m.appendChild(d);m.scrollTop=m.scrollHeight;
-      if(typeof speak==='function') speak(txt);
-    },600);
-  } else {
-    var d=document.createElement('div');d.className='cmsg usr';
-    d.textContent=txt;
-    m.appendChild(d);m.scrollTop=m.scrollHeight;
-  }
+    const m=document.getElementById('chat-msgs');
+    const d=document.createElement('div'); d.className='cmsg '+type; d.textContent=txt;
+    m.appendChild(d); m.scrollTop=m.scrollHeight;
 }
 
 window.chatSend=function(){
-  var i=document.getElementById('chat-inp');
-  var t=i.value.trim();if(!t)return;i.value='';
-  addMsg(t,'usr');
-  // If intake conversation is active, route the answer through it
-  if(intake.active){
-    advanceIntake(t);
-    return;
-  }
-  // Otherwise generic fallback — forward text to WhatsApp
-  setTimeout(function(){
-    addMsg("Got it! Tap below and we'll pick this up on WhatsApp \uD83D\uDC47",'bot');
-    var q=document.getElementById('chat-qr');q.innerHTML='';
-    var a=document.createElement('a');
-    a.href=WA+'?text='+encodeURIComponent(t);a.target='_blank';a.rel='noopener';
-    a.className='qrb wa';a.innerHTML=WA_SVG+' WhatsApp Us';
-    q.appendChild(a);setBack(true);
-  },650);
+    const i=document.getElementById('chat-inp');
+    const t=i.value.trim(); if(!t) return;
+    i.value=''; addMsg(t,'usr');
+    
+    // Typing indicator
+    const m=document.getElementById('chat-msgs');
+    const td=document.createElement('div');
+    td.className='cmsg bot typing';
+    td.id='typing-id';
+    td.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+    m.appendChild(td); m.scrollTop=m.scrollHeight;
+    
+    getAI(t, (reply) => {
+        const tid = document.getElementById('typing-id');
+        if(tid) tid.remove();
+        addMsg(reply, 'bot');
+        speak(reply);
+        setBack(true);
+    });
 };
 
 if(window.location.pathname.includes('/services')){
-  setTimeout(function(){if(!open)toggleChat();},8000);
+    setTimeout(()=>{ if(!open) toggleChat(); },8000);
 }
-})();
 
+})();
