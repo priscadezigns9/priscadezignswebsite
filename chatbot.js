@@ -318,8 +318,41 @@ const STEPS = {
   },
   start:{
         bot:"Hey 👋 What brings you here today?",
-        r:[{l:"🎨 I want a template site",s:"pkg_templates"},{l:"🏗️ I need a custom website",s:"need_website"},{l:"📈 I need more leads",s:"more_leads"},{l:"🤖 I need AI automation",s:"automation"},{l:"📦 See agency packages",s:"pkg_menu"}]
+        r:[
+          {l:"🏢 About Us",s:"about"},
+          {l:"👨‍💻 Strategic Council",s:"council_menu"},
+          {l:"🏗️ I need a custom website",s:"need_website"},
+          {l:"🤖 I need AI automation",s:"automation"},
+          {l:"📦 Agency Packages",s:"pkg_menu"},
+          {l:"😂 Tell me a joke",s:"jokes"}
+        ]
     },
+  about: {
+    bot: "Prisca Dezigns is a high-fidelity digital agency specializing in premium web architecture and AI automation. We're on a mission to build the future of the Caribbean.",
+    r: [
+      {l:"🚗 Evolve Mobility", s:"about_brands"},
+      {l:"✝️ The Way Made Known", s:"about_twmk"},
+      {l:"👩‍💻 About Priscilla", s:"about_founder"},
+      {l:"← Back", s:"start"}
+    ]
+  },
+  about_brands: {
+    bot: "We are the strategic digital partners for Evolve Mobility (driveevolve.com), the leading EV dealership in the Caribbean. We build their entire sales and automation ecosystem.",
+    r: [{l:"Visit Evolve Mobility", s:"templates_browse"}, {l:"← Back", s:"about"}],
+    url: "https://driveevolve.com"
+  },
+  about_twmk: {
+    bot: "The Way Made Known (TWMK) is our humanitarian backbone. We use a portion of our agency profits to share the Gospel and provide community support in Trinidad and Tobago. It's the heart of why we build.",
+    r: [{l:"Learn more", s:"talk"}, {l:"← Back", s:"about"}]
+  },
+  about_founder: {
+    bot: "Priscilla Narine is the lead architect of Prisca Dezigns. With a background in payroll administration and high-stakes data governance, she brings 100% accuracy and elite strategy to every project.",
+    r: [{l:"← Back", s:"about"}]
+  },
+  jokes: {
+    bot: "Why did the AI go to therapy? Because it had too many unresolved dependencies! 😂 Want another one?",
+    r: [{l:"One more!", s:"jokes"}, {l:"← Back to start", s:"start"}]
+  },
     need_website:{
         bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
         r:[{l:"⚡ Need it in 24hrs — $299.99",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
