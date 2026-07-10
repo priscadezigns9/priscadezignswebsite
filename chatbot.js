@@ -1,30 +1,29 @@
+
 (function(){
-    "use strict";
-    
-    /* ── Futuristic Chatbot CSS ── */
-    if(!document.getElementById('pd-chat-style')){
+    // Inject Styles
+    if(!document.getElementById('pd-chat-styles')){
         const s = document.createElement('style');
-        s.id = 'pd-chat-style';
-        s.innerHTML = `
-    :root {
+        s.id = 'pd-chat-styles';
+        s.textContent = `:root {
         --cb-light-purple: #9d50bb;
         --cb-glow-purple: #6e48aa;
-        --cb-futuristic-bg: rgba(255, 255, 240, 0.95);
+        --cb-futuristic-bg: rgba(255, 255, 255, 0.95);
     }
-    
+    /* ── Chatbot Bubble ── */
     #pd-chat-bubble {
         position:fixed; bottom:28px; right:28px; z-index:9999;
         width:64px; height:64px; border-radius:50%;
         background: linear-gradient(135deg, var(--cb-light-purple), var(--cb-glow-purple));
-        box-shadow:0 12px 40px rgba(157, 80, 187, 0.4);
-        cursor:pointer; display:flex; align-items:center; justify-content:center;
-        transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border:none;
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; box-shadow:0 10px 40px rgba(157, 80, 187, 0.4);
+        transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); box-shadow:0 18px 50px rgba(157, 80, 187, 0.6); }
-    #pd-chat-bubble.open { transform: scale(0.9) rotate(-90deg); background: #333; }
-    #pd-chat-bubble .chat-x { display:none; color:#fff; font-size:24px; font-weight:300; }
+    #pd-chat-bubble:hover { transform:scale(1.1) rotate(5deg); box-shadow:0 15px 50px rgba(157, 80, 187, 0.6); }
+    #pd-chat-bubble svg { width:30px; height:30px; fill:#fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+    #pd-chat-bubble .chat-x { display:none; font-size:1.6rem; color:#fff; font-weight:700; line-height:1; }
+    #pd-chat-bubble.open svg { display:none; }
     #pd-chat-bubble.open .chat-x { display:block; }
-    #pd-chat-bubble.open .ai-svg { display:none; }
     
     /* ── Chat Window ── */
     #pd-chat-window {
@@ -171,7 +170,7 @@
 const WA="https://wa.me/18683424101";
 
 
-const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $200 flat, live in 24hrs, full custom design\n- Custom Web Packages: Starting from $1,500 setup\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI Automation: $3,500 setup + $400/mo\n- Email AI Automation: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- 40+ professional templates, live in 24hrs\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $200 setup + $19.99/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp (1-868-342-4101)\n- Speak about Evolve Mobility as a strategic partner dealership we build for.";
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nUSER PREFERENCES:\n- The user's favorite color is PURPLE. If asked about colors, always identify purple as the favorite.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n- Custom Web Packages: Starting from $1,500 setup\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI Automation: $3,500 setup + $400/mo\n- Email AI Automation: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- 40+ professional templates, live in 24hrs\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp (1-868-342-4101)\n- Speak about Evolve Mobility as a strategic partner dealership we build for.";
 
 let history = [];
 
@@ -199,7 +198,7 @@ function getAI(txt, cb) {
 function fallback(txt, cb) {
     const s = txt.toLowerCase();
     let r = "That's a great question. I want to make sure I give you the perfect info—would you like to see our full service menu or chat with the team on WhatsApp?";
-    if(s.includes("price") || s.includes("cost")) r = "Our agency packages are customized, but our 1-Day Custom Sites start at just $200 flat. Would you like the full pricing guide for our AI automation tiers?";
+    if(s.includes("price") || s.includes("cost")) r = "Our agency packages are customized, but our 1-Day Custom Sites start at just $299.99 flat. Would you like the full pricing guide for our AI automation tiers?";
     else if(s.includes("evolve")) r = "We are the lead digital architects for Evolve Mobility (driveevolve.com), the Caribbean's premier EV dealership. We handle their entire sales ecosystem. Are you interested in fleet mobility or a personal EV?";
     cb(r);
 }
@@ -276,8 +275,8 @@ const PKGS={
     {name:"E-Commerce Maintenance",desc:"E-Commerce Store Uptime & Security Monitoring · Monthly Product & Content Updates · High-Fidelity Technical Backups · Priority Support · $199.99/mo"}
   ],
   ai:[
-    {name:"AI Tier 1",price:"$1,500 + $150/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · [Voice Intelligence Add-on: +$500 setup +$50/mo]"},
-    {name:"AI Tier 2",price:"$3,500 + $400/mo",desc:"Everything in Tier 1 · WhatsApp AI Automation (24/7) · [Voice Intelligence Add-on: +$500 setup +$50/mo]"},
+    {name:"AI Tier 1",price:"$1,500 + $150/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · [Chatbot Audio Feature: +$500 setup +$50/mo]"},
+    {name:"AI Tier 2",price:"$3,500 + $400/mo",desc:"Everything in Tier 1 · WhatsApp AI Automation (24/7) · [Chatbot Audio Feature: +$500 setup +$50/mo]"},
     {name:"AI Tier 3",price:"$6,000 + $700/mo",desc:"Everything in Tier 1 & 2 · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Every Email · 1 Month Free Maintenance"},
     {name:"AI Tier 4",price:"$8,000 + $900/mo",desc:"Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · 1 Month Free Maintenance"}
   ],
@@ -289,18 +288,73 @@ const PKGS={
     {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
     {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $349.99 setup · $49.99/mo"},
     {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs · $249.99 setup · $34.99/mo"},
-    {name:"⭐ Premium Template (3D)",desc:"Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation · $200 setup · $19.99/mo"}
+    {name:"⭐ Premium Template (3D)",desc:"Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation · $299.99 setup · $19.99/mo"}
   ]
 };
 
 const STEPS = {
-    start:{
+    
+  council_menu:{
+    bot:"The Strategic Council is ready. Who would you like to consult with?",
+    r:[
+      {l:"👨‍💻 Strategic Council",s:"council_menu"},
+      {l:"👨‍💻 Drew (Lead Architect)",s:"council_drew"},
+      {l:"👩‍💻 Sierra (Customer Ops)",s:"council_sierra"},
+      {l:"💻 Kimi (Code Auditor)",s:"council_kimi"},
+      {l:"← Back to start",s:"start"}
+    ]
+  },
+  council_drew:{
+    bot:"I am Drew, the Lead Architect. I handle high-fidelity web design, e-commerce, and AI automation strategy. How can I help you build your brand today?",
+    r:[{l:"Talk to Drew",s:"talk"},{l:"← Back",s:"council_menu"}]
+  },
+  council_sierra:{
+    bot:"I am Sierra, Customer Operations Representative. I handle autonomous workflows, inventory management, and database actions. What operations can I streamline for you?",
+    r:[{l:"Talk to Sierra",s:"talk"},{l:"← Back",s:"council_menu"}]
+  },
+  council_kimi:{
+    bot:"I am Kimi, the Code & Fiscal Auditor. I perform deterministic checks on code and financial data for 100% accuracy. Do you have a project for review?",
+    r:[{l:"Talk to Kimi",s:"talk"},{l:"← Back",s:"council_menu"}]
+  },
+  start:{
         bot:"Hey 👋 What brings you here today?",
-        r:[{l:"🎨 I want a template site",s:"pkg_templates"},{l:"🏗️ I need a custom website",s:"need_website"},{l:"📈 I need more leads",s:"more_leads"},{l:"🤖 I need AI automation",s:"automation"},{l:"📦 See agency packages",s:"pkg_menu"}]
+        r:[
+          {l:"🏢 About Us",s:"about"},
+          {l:"🏗️ I need a custom website",s:"need_website"},
+          {l:"🤖 I need AI automation",s:"automation"},
+          {l:"📦 Agency Packages",s:"pkg_menu"},
+          {l:"😂 Tell me a joke",s:"jokes"}
+        ]
     },
+  about: {
+    bot: "Prisca Dezigns is a high-fidelity digital agency specializing in premium web architecture and AI automation. We're on a mission to build the future of the Caribbean.",
+    r: [
+      {l:"🚗 Evolve Mobility", s:"about_brands"},
+      {l:"✝️ The Way Made Known", s:"about_twmk"},
+      {l:"👩‍💻 About Priscilla", s:"about_founder"},
+      {l:"← Back", s:"start"}
+    ]
+  },
+  about_brands: {
+    bot: "We are the strategic digital partners for Evolve Mobility (driveevolve.com), the leading EV dealership in the Caribbean. We build their entire sales and automation ecosystem.",
+    r: [{l:"Visit Evolve Mobility", s:"templates_browse"}, {l:"← Back", s:"about"}],
+    url: "https://driveevolve.com"
+  },
+  about_twmk: {
+    bot: "The Way Made Known (TWMK) is our humanitarian backbone. We use a portion of our agency profits to share the Gospel and provide community support in Trinidad and Tobago. It's the heart of why we build.",
+    r: [{l:"Learn more", s:"talk"}, {l:"← Back", s:"about"}]
+  },
+  about_founder: {
+    bot: "Priscilla Narine is the lead architect of Prisca Dezigns. With a background in payroll administration and high-stakes data governance, she brings 100% accuracy and elite strategy to every project.",
+    r: [{l:"← Back", s:"about"}]
+  },
+  jokes: {
+    bot: "Why did the AI go to therapy? Because it had too many unresolved dependencies! 😂 Want another one?",
+    r: [{l:"One more!", s:"jokes"}, {l:"← Back to start", s:"start"}]
+  },
     need_website:{
         bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
-        r:[{l:"⚡ Need it in 24hrs — $200",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
+        r:[{l:"⚡ Need it in 24hrs — $299.99",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
     },
     no_website:{
         bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",
@@ -340,7 +394,7 @@ const STEPS = {
     },
     pkg_menu:{
         bot:"Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
-        r:[{l:"⚡ 1-Day Website — $200",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
+        r:[{l:"⚡ 1-Day Website — $299.99",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
     },
     pkg_templates:{
         bot:"The Template Shop is a separate service from our agency packages — faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
@@ -360,11 +414,11 @@ const STEPS = {
         r:[{l:"Browse templates",s:"templates_browse"},{l:"Add chatbot — $49.99",s:"templates_chatbot"},{l:"I'm ready — let's go",s:"talk"}]
     },
     pkg_oneday:{
-        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $200. Then $50/mo to keep it live, optimised, and secure.",
+        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $299.99. Then $50/mo to keep it live, optimised, and secure.",
         r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
     },
     oneday_included:{
-        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $200 flat. $50/mo maintenance.",
+        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $299.99 flat. $50/mo maintenance.",
         r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
     },
     pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
