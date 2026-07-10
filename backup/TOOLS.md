@@ -87,3 +87,7 @@ Full pipeline + AI stack for Prisca Dezigns client service tiers.
 **NEVER use `--body "$(cat file)"` — shell substitution does NOT expand inside the gog tool.**
 **ALWAYS use `--body-file "/absolute/path/to/file"` for sending from a file.**
 Example: `gog gmail send --to "email@email.com" --subject "Subject" --body-file "/app/state/.../work/body_combo_send.txt"`
+
+## Drew (Technical Lead) Configuration
+- Primary Closer for all Prisca Dezigns & Evolve Mobility leads.
+- Script & Pricing locked in DREW_SALES_BATTLE_CARD.md.
