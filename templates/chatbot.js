@@ -102,6 +102,9 @@
     .qrb.wa { background: #25D366; color:#fff; border-color:#25D366; display:inline-flex; align-items:center; gap:8px; text-decoration:none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
     .qrb.wa:hover { background:#128C7E; border-color:#128C7E; }
     
+        #pd-chat-bubble { animation: bubbleFloat 3s ease-in-out infinite; }
+    @keyframes bubbleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .ai-svg { width: 28px; height: 28px; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
     /* ── Input row ── */
     .chat-inp-row { display:flex; border-top:1px solid rgba(0,0,0,0.05); flex-shrink:0; align-items: center; padding: 6px 12px 6px 6px; background: #fff; }
     #chat-inp { flex:1; border:none; background:transparent; padding:18px 16px; font-size:1rem; font-family: 'Inter', sans-serif; color:#333; outline:none; }
@@ -129,12 +132,12 @@
         const container = document.createElement('div');
         container.innerHTML = `
     <div id="pd-chat-bubble" onclick="toggleChat()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ai-svg"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
         <span class="chat-x">✕</span>
     </div>
     <div id="pd-chat-window">
         <div class="chat-hdr">
-            <div class="chat-avatar" style="background:#fff;padding:3px;overflow:hidden;"><img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="PD" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>
+            <div class="chat-avatar" style="background:linear-gradient(135deg, #9d50bb, #6e48aa); display:flex; align-items:center; justify-content:center; color:#fff; border-radius:50%;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8" y2="16"></line><line x1="16" y1="16" x2="16" y2="16"></line></svg></div>
             <div style="flex:1">
                 <div class="chat-hdr-name">Prisca Dezigns</div>
                 <div class="chat-hdr-status"><div class="chat-sdot"></div> Online now</div>
@@ -165,6 +168,40 @@
 
 
 const WA="https://wa.me/18683424101";
+
+
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n- Custom Web Packages: Starting from $1,500 setup\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI Automation: $3,500 setup + $400/mo\n- Email AI Automation: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- 40+ professional templates, live in 24hrs\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp (1-868-342-4101)\n- Speak about Evolve Mobility as a strategic partner dealership we build for.";
+
+let history = [];
+
+function getAI(txt, cb) {
+    history.push({role:'user', content:txt});
+    const payload = JSON.stringify({ system: SYSTEM_PROMPT, messages: history, max_tokens: 350 });
+    
+    fetch('https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.reply) {
+            history.push({role:'assistant', content:data.reply});
+            cb(data.reply);
+        } else {
+            fallback(txt, cb);
+        }
+    })
+    .catch(() => fallback(txt, cb));
+}
+
+function fallback(txt, cb) {
+    const s = txt.toLowerCase();
+    let r = "That's a great question. I want to make sure I give you the perfect info—would you like to see our full service menu or chat with the team on WhatsApp?";
+    if(s.includes("price") || s.includes("cost")) r = "Our agency packages are customized, but our 1-Day Custom Sites start at just $299.99 flat. Would you like the full pricing guide for our AI automation tiers?";
+    else if(s.includes("evolve")) r = "We are the lead digital architects for Evolve Mobility (driveevolve.com), the Caribbean's premier EV dealership. We handle their entire sales ecosystem. Are you interested in fleet mobility or a personal EV?";
+    cb(r);
+}
 
 const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
 
@@ -428,15 +465,22 @@ window.chatSend=function(){
     const i=document.getElementById('chat-inp');
     const t=i.value.trim(); if(!t) return;
     i.value=''; addMsg(t,'usr');
-    setTimeout(()=>{
-        addMsg("Got it! Tap below for the fastest response 👇",'bot');
-        const q=document.getElementById('chat-qr'); q.innerHTML='';
-        const a=document.createElement('a');
-        a.href=WA+'?text='+encodeURIComponent(t);
-        a.target='_blank'; a.rel='noopener';
-        a.className='qrb wa'; a.innerHTML=WA_SVG+' WhatsApp Us';
-        q.appendChild(a); setBack(true);
-    },650);
+    
+    // Typing indicator
+    const m=document.getElementById('chat-msgs');
+    const td=document.createElement('div');
+    td.className='cmsg bot typing';
+    td.id='typing-id';
+    td.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+    m.appendChild(td); m.scrollTop=m.scrollHeight;
+    
+    getAI(t, (reply) => {
+        const tid = document.getElementById('typing-id');
+        if(tid) tid.remove();
+        addMsg(reply, 'bot');
+        speak(reply);
+        setBack(true);
+    });
 };
 
 if(window.location.pathname.includes('/services')){
