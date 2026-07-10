@@ -1,4 +1,4 @@
-# ARCHITECT'S DESIGN & MEMORY MANDATE
+# DESIGN & MEMORY MANDATE
 
 ## Operational Modes
 - **Live Mode**: Working, producing results, no mockups, no simulations. (Status: ACTIVE).
@@ -27,8 +27,8 @@ I am strictly restricted to the following three brand nodes:
 ## Reporting Mandate
 Post-session reports are only required for the three active nodes. No reporting or deployment for inactive secondary brands.
 
-## God Mode (The Architect Mandate)
-God Mode is a universal administrative layer for the Architect. It provides real-time oversight of all Orcinos products.
+## God Mode (The Administrative Mandate)
+God Mode is a universal administrative layer for the platform. It provides real-time oversight of all Orcinos products.
 - **Access Protocol:** 5-click handshake on the password field of the login perimeter followed by the `alice` token.
 
 ## Quality Control & Assurance (QC/QA) Protocols
