@@ -1,6 +1,64 @@
 (function(){
 const WA="https://wa.me/18683424101";
+
 const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.541 5.877L.057 23.7a.5.5 0 0 0 .613.612l5.807-1.484A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.525-5.221-1.436l-.374-.222-3.878.991.998-3.918-.243-.387A9.965 9.965 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>';
+
+var voiceOn=false;
+window.toggleVoice=function(){
+  voiceOn=!voiceOn;
+  var btn=document.getElementById('chat-voice-toggle');
+  if(btn){
+    var svgPath=voiceOn?'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM16.5 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z':'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z';
+    btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="'+svgPath+'"/></svg>'+(voiceOn?' VOICE ON':' VOICE OFF');
+    btn.classList.toggle('voice-on',voiceOn);
+  }
+  if(!voiceOn&&window.speechSynthesis)window.speechSynthesis.cancel();
+};
+function speak(txt){
+  if(!voiceOn||!window.speechSynthesis)return;
+  var clean=txt.replace(/\n/g,' ').trim();
+  var u=new SpeechSynthesisUtterance(clean);u.rate=0.95;u.pitch=1.05;u.volume=1;
+  window.speechSynthesis.cancel();window.speechSynthesis.speak(u);
+}
+
+var recognition=null;
+if('webkitSpeechRecognition' in window){
+  recognition=new webkitSpeechRecognition();
+  recognition.continuous=false;
+  recognition.interimResults=false;
+  recognition.onresult=function(e){
+    var t=e.results[0][0].transcript;
+    var inp=document.getElementById('chat-inp');
+    if(inp){inp.value=t;window.chatSend();}
+    stopMic();
+  };
+  recognition.onerror=function(){ stopMic(); };
+  recognition.onend=function(){ stopMic(); };
+}
+
+window.toggleMic=function(){
+  if(!recognition) return alert("Speech recognition not supported in this browser.");
+  var btn=document.getElementById('chat-mic');
+  if(btn.classList.contains('recording')){
+    stopMic();
+  } else {
+    startMic();
+  }
+};
+
+function startMic(){
+  if(!recognition)return;
+  var btn=document.getElementById('chat-mic');
+  btn.classList.add('recording');
+  recognition.start();
+}
+function stopMic(){
+  if(!recognition)return;
+  var btn=document.getElementById('chat-mic');
+  btn.classList.remove('recording');
+  recognition.stop();
+}
+
 
 const PKGS={
   standard:[
@@ -654,15 +712,23 @@ function renderPkgs(list){
 
 function addMsg(txt,type){
   var m=document.getElementById('chat-msgs');
-  var d=document.createElement('div');d.className='cmsg '+type;
-  // render newlines as <br> for bot messages; escape HTML first for safety
   if(type==='bot'){
-    var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    d.innerHTML=safe.replace(/\n/g,'<br>');
+    var dots=document.createElement('div');dots.className='cmsg typing';
+    dots.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+    m.appendChild(dots);m.scrollTop=m.scrollHeight;
+    setTimeout(function(){
+      if(dots.parentNode)dots.parentNode.removeChild(dots);
+      var d=document.createElement('div');d.className='cmsg bot';
+      var safe=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      d.innerHTML=safe.replace(/\n/g,'<br>');
+      m.appendChild(d);m.scrollTop=m.scrollHeight;
+      if(typeof speak==='function') speak(txt);
+    },600);
   } else {
+    var d=document.createElement('div');d.className='cmsg usr';
     d.textContent=txt;
+    m.appendChild(d);m.scrollTop=m.scrollHeight;
   }
-  m.appendChild(d);m.scrollTop=m.scrollHeight;
 }
 
 window.chatSend=function(){
