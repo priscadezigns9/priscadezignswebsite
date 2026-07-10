@@ -171,7 +171,7 @@
 const WA="https://wa.me/18683424101";
 
 
-const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n- Custom Web Packages: Starting from $1,500 setup\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI Automation: $3,500 setup + $400/mo\n- Email AI Automation: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- 40+ professional templates, live in 24hrs\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp (1-868-342-4101)\n- Speak about Evolve Mobility as a strategic partner dealership we build for.";
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $200 flat, live in 24hrs, full custom design\n- Custom Web Packages: Starting from $1,500 setup\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI Automation: $3,500 setup + $400/mo\n- Email AI Automation: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- 40+ professional templates, live in 24hrs\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $200 setup + $19.99/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp (1-868-342-4101)\n- Speak about Evolve Mobility as a strategic partner dealership we build for.";
 
 let history = [];
 
@@ -199,7 +199,7 @@ function getAI(txt, cb) {
 function fallback(txt, cb) {
     const s = txt.toLowerCase();
     let r = "That's a great question. I want to make sure I give you the perfect info—would you like to see our full service menu or chat with the team on WhatsApp?";
-    if(s.includes("price") || s.includes("cost")) r = "Our agency packages are customized, but our 1-Day Custom Sites start at just $299.99 flat. Would you like the full pricing guide for our AI automation tiers?";
+    if(s.includes("price") || s.includes("cost")) r = "Our agency packages are customized, but our 1-Day Custom Sites start at just $200 flat. Would you like the full pricing guide for our AI automation tiers?";
     else if(s.includes("evolve")) r = "We are the lead digital architects for Evolve Mobility (driveevolve.com), the Caribbean's premier EV dealership. We handle their entire sales ecosystem. Are you interested in fleet mobility or a personal EV?";
     cb(r);
 }
@@ -289,7 +289,7 @@ const PKGS={
     {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
     {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $349.99 setup · $49.99/mo"},
     {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs · $249.99 setup · $34.99/mo"},
-    {name:"⭐ Premium Template (3D)",desc:"Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation · $299.99 setup · $19.99/mo"}
+    {name:"⭐ Premium Template (3D)",desc:"Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation · $200 setup · $19.99/mo"}
   ]
 };
 
@@ -300,7 +300,7 @@ const STEPS = {
     },
     need_website:{
         bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
-        r:[{l:"⚡ Need it in 24hrs — $299.99",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
+        r:[{l:"⚡ Need it in 24hrs — $200",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
     },
     no_website:{
         bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",
@@ -340,7 +340,7 @@ const STEPS = {
     },
     pkg_menu:{
         bot:"Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
-        r:[{l:"⚡ 1-Day Website — $299.99",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
+        r:[{l:"⚡ 1-Day Website — $200",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
     },
     pkg_templates:{
         bot:"The Template Shop is a separate service from our agency packages — faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
@@ -360,11 +360,11 @@ const STEPS = {
         r:[{l:"Browse templates",s:"templates_browse"},{l:"Add chatbot — $49.99",s:"templates_chatbot"},{l:"I'm ready — let's go",s:"talk"}]
     },
     pkg_oneday:{
-        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $299.99. Then $50/mo to keep it live, optimised, and secure.",
+        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $200. Then $50/mo to keep it live, optimised, and secure.",
         r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
     },
     oneday_included:{
-        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $299.99 flat. $50/mo maintenance.",
+        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $200 flat. $50/mo maintenance.",
         r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
     },
     pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
