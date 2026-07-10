@@ -299,7 +299,7 @@ const STEPS = {
     },
     need_website:{
         bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
-        r:[{l:"⚡ Need it in 24hrs — $200",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
+        r:[{l:"⚡ Need it in 24hrs — $299.99",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
     },
     no_website:{
         bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",
@@ -339,7 +339,7 @@ const STEPS = {
     },
     pkg_menu:{
         bot:"Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
-        r:[{l:"⚡ 1-Day Website — $200",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
+        r:[{l:"⚡ 1-Day Website — $299.99",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
     },
     pkg_templates:{
         bot:"The Template Shop is a separate service from our agency packages — faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
@@ -359,11 +359,11 @@ const STEPS = {
         r:[{l:"Browse templates",s:"templates_browse"},{l:"Add chatbot — $49.99",s:"templates_chatbot"},{l:"I'm ready — let's go",s:"talk"}]
     },
     pkg_oneday:{
-        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $200. Then $50/mo to keep it live, optimised, and secure.",
+        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $299.99. Then $50/mo to keep it live, optimised, and secure.",
         r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
     },
     oneday_included:{
-        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $200 flat. $50/mo maintenance.",
+        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $299.99 flat. $50/mo maintenance.",
         r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
     },
     pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
