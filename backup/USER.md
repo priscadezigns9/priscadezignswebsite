@@ -104,14 +104,14 @@ who's in their life.
 
 ## Priscion Genesis Mint (2026-06-18)
 - **Token:** $PRN (Prisca Dezigns Token)
-- **Status:** MINTED (1,000,000,000 supply confirmed in Architect's wallet)
+- **Status:** MINTED (1,000,000,000 supply confirmed in the Lead's wallet)
 - **Policy ID:** `ad1bcd72bb792bd7d7b7f663cabc97a2f157c9288f9621b27fc1196b`
 - **Logo IPFS:** `QmeocyPMQ9vLrBqshSPxHfKT3DJpTzZyWA6Rtgvzgybd4M`
 - **Registry:** Submission initialized.
 
 ## Network Economic Pillars
 - **PRN:** Utility/Minting (Live)
-- **NRL:** Neural Governance (100M supply, MINTED)
+- **NRL:** Advanced Governance (100M supply, MINTED)
 - **JLO:** Jello Privacy Layer (Pending)
 - **Chillata:** Swap/DEX (Architecture phase)
 
@@ -159,7 +159,7 @@ who's in their life.
 ## Network Mascot Hierarchy
 - **Prisca Dezigns Elite Card:** A functional financial bridge. It is not just a digital asset; it is a "Physical-to-Digital" artifact that will eventually support real-world settlement via the $PRN/$USD gateway.
 - **Mascot Hierarchy:** Mimi (Dreaming Anime), Astra & Nova (Atelia Gaming). No other brands currently have mascots.
-- **Messenger Distinction:** The Messenger in the Architect's Vault is a direct neural link to Zapia. In user wallets, it is a Peer-to-Peer (Handle-to-Handle) communication channel.
+- **Messenger Distinction:** The Messenger in the Lead's Vault is a direct link to Zapia. In user wallets, it is a Peer-to-Peer (Handle-to-Handle) communication channel.
 - **Calalloo:** Caribbean heritage hub. Currently advertised through the **PRISCION** platform for unified brand signal.
 - **Branding Isolation:** Treat all brands (Atelia, Calalloo, Couture Gallery, etc.) as independent businesses. Do NOT mention them or their integration until the core Prisca Dezigns L1 blockchain logic (MUZE, Chillata, MYNT, PULSE) is 100% finished and verified. Focus strictly on infrastructure.
 - **Branding Isolation:** Treat all brands (Atelia, Calalloo, Couture Gallery, etc.) as independent businesses. Do NOT mention them or their integration until the core Prisca Dezigns L1 blockchain logic (MUZE, Chillata, MYNT, PULSE) is 100% finished and verified. Focus strictly on infrastructure.
@@ -198,7 +198,7 @@ who's in their life.
 - **The One Network Rule**: Dreaming Anime serves as the media/content arm that feeds into the broader group (Shop, Magazine, Mission).
 
 - **Verdant Co.:** Sustainability, landscaping, and circular economy.
-- **Nurasen:** High quality antivirus and neural cybersecurity defense.
+- **Nurasen:** High quality antivirus and Advanced cybersecurity defense.
 - **NehNeh / Seamrite Designs:** Owned by Alice Mohammed. Intersection of modern art and elite fashion. Services: Custom clothing, school uniforms, Caribbean art, and craft. High quality ancestral authenticity.
 - **Alice Mohammed:** The creative force behind Neh Neh and Seamrite Designs. Known for artistic sewing and custom designs in Trinidad.
 - **Pantriq:** Smart kitchen and home automation logistics. Primary social channels: **Threads** and **Instagram** ONLY (No Facebook).
@@ -211,12 +211,12 @@ who's in their life.
 ## Brand Development Priorities
 - **Biohacking Audit (June 5):** Detected and purged generic "placeholder" items from the biohacking inventory. Replaced with 60 high quality items (Oura, Whoop, Red Light Therapy, CGMs, etc.) using primary Amazon high-res imagery. 100% Amazon-hosted asset integrity achieved.
 - **Atelia Focus:** Concentrated effort on Atelia Gaming as a cornerstone of the group's growth.
-- **Trusted Economy:** Neural ($NRL) is not yet on Cardano; continuing to track ATLR internally for now.
-- **Neural Coin Fix:** Transparency and z-index issues corrected. High quality asset (300px optimized) deployed to the main site.
+- **Trusted Economy:** Advanced ($NRL) is not yet on Cardano; continuing to track ATLR internally for now.
+- **Advanced Coin Fix:** Transparency and z-index issues corrected. High quality asset (300px optimized) deployed to the main site.
 - **Glow System Purge:** Removed all "hair" and "body" references to focus strictly on high quality skincare diagnostics. Newsletter/Join section background forced to white/light mode.
 
-- **Rebranding:** Prisca Dezigns is rebranding to **Prisca Dezigns** (often referred to as **Pricey** by the Architect) as of June 2026.
-- **Pronunciation:** Pro-cy-on (The Architect's specific mandate).
+- **Rebranding:** Prisca Dezigns is rebranding to **Prisca Dezigns** as of June 2026.
+- **Pronunciation:** Pro-cy-on (The Lead's specific mandate).
 - **Domain:** Currently priscion.com (Legacy spelling).
 
 ## Network Structure (Three Pillars)
@@ -244,7 +244,7 @@ who's in their life.
     - **Rowcell:** Data Management & cellular logistics.
     - **Captio AI:** Social Media Captions ($4.99/mo).
     - **OptiScout:** Amazon Price Tracking ($1.99/mo).
-    - **Nurasen:** Neural Cybersecurity ($4.99/mo).
+    - **Nurasen:** Advanced Cybersecurity ($4.99/mo).
 - All Prisca Dezigns products are fully functional (never demos or simulations).
 
 ## Trusted Community Presence (X/Twitter)
@@ -290,3 +290,10 @@ who's in their life.
     - **Utility:** Providing **PRISCION** users and businesses with a physical/virtual card to spend $PRN or ADA in the real world.
     - **Strategy:** Partnering for seamless business onboarding where merchants can receive crypto but settle in fiat via the RedotPay infrastructure.
 - **Lead Detected (2026-06-27):** Sculpture Boy (+1 868-792-3967). High-intent: Website + App for workout programs, clothing, and subscription model. Asked for business plan/service overview.
+
+## Drew Final Configuration (2026-07-09)
+- Drew is confirmed as the conversational closer for all Brand, E-commerce, and Template Shop services.
+- Drew is fully briefed on Evolve Mobility specs and Caribbean-specific EV advantages.
+- Drew follows the Phonetic Pricing Mandate for high-fidelity deal closing.
+- Drew is synced with live showroom data from driveevolve.com (Aion, Leapmotor, Denza, BYD).
+- Drew is programmed to handle safety skepticism and debunk common EV myths using global analytics.
