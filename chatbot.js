@@ -1,29 +1,30 @@
-
 (function(){
-    // Inject Styles
-    if(!document.getElementById('pd-chat-styles')){
+    "use strict";
+    
+    /* ── Futuristic Chatbot CSS ── */
+    if(!document.getElementById('pd-chat-style')){
         const s = document.createElement('style');
-        s.id = 'pd-chat-styles';
-        s.textContent = `:root {
+        s.id = 'pd-chat-style';
+        s.innerHTML = `
+    :root {
         --cb-light-purple: #9d50bb;
         --cb-glow-purple: #6e48aa;
-        --cb-futuristic-bg: rgba(255, 255, 255, 0.95);
+        --cb-futuristic-bg: rgba(255, 255, 240, 0.95);
     }
-    /* ── Chatbot Bubble ── */
+    
     #pd-chat-bubble {
         position:fixed; bottom:28px; right:28px; z-index:9999;
         width:64px; height:64px; border-radius:50%;
         background: linear-gradient(135deg, var(--cb-light-purple), var(--cb-glow-purple));
-        border:none;
-        display:flex; align-items:center; justify-content:center;
-        cursor:pointer; box-shadow:0 10px 40px rgba(157, 80, 187, 0.4);
-        transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow:0 12px 40px rgba(157, 80, 187, 0.4);
+        cursor:pointer; display:flex; align-items:center; justify-content:center;
+        transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    #pd-chat-bubble:hover { transform:scale(1.1) rotate(5deg); box-shadow:0 15px 50px rgba(157, 80, 187, 0.6); }
-    #pd-chat-bubble svg { width:30px; height:30px; fill:#fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
-    #pd-chat-bubble .chat-x { display:none; font-size:1.6rem; color:#fff; font-weight:700; line-height:1; }
-    #pd-chat-bubble.open svg { display:none; }
+    #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); box-shadow:0 18px 50px rgba(157, 80, 187, 0.6); }
+    #pd-chat-bubble.open { transform: scale(0.9) rotate(-90deg); background: #333; }
+    #pd-chat-bubble .chat-x { display:none; color:#fff; font-size:24px; font-weight:300; }
     #pd-chat-bubble.open .chat-x { display:block; }
+    #pd-chat-bubble.open .ai-svg { display:none; }
     
     /* ── Chat Window ── */
     #pd-chat-window {
@@ -170,7 +171,7 @@
 const WA="https://wa.me/18683424101";
 
 
-const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nUSER PREFERENCES:\n- The user's favorite color is PURPLE. If asked about colors, always identify purple as the favorite.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n- Custom Web Packages: Starting from $1,500 setup\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI Automation: $3,500 setup + $400/mo\n- Email AI Automation: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- 40+ professional templates, live in 24hrs\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp (1-868-342-4101)\n- Speak about Evolve Mobility as a strategic partner dealership we build for.";
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $299.99 flat, live in 24hrs, full custom design\n- Custom Web Packages: Starting from $1,500 setup\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI Automation: $3,500 setup + $400/mo\n- Email AI Automation: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- 40+ professional templates, live in 24hrs\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n\nRULES:\n- Keep replies conversational, 2-4 sentences\n- Always end with a follow-up question or clear next step\n- Never make up prices not listed\n- If asked anything outside your knowledge, offer to connect them with the team via WhatsApp (1-868-342-4101)\n- Speak about Evolve Mobility as a strategic partner dealership we build for.";
 
 let history = [];
 
@@ -275,8 +276,8 @@ const PKGS={
     {name:"E-Commerce Maintenance",desc:"E-Commerce Store Uptime & Security Monitoring · Monthly Product & Content Updates · High-Fidelity Technical Backups · Priority Support · $199.99/mo"}
   ],
   ai:[
-    {name:"AI Tier 1",price:"$1,500 + $150/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · [Chatbot Audio Feature: +$500 setup +$50/mo]"},
-    {name:"AI Tier 2",price:"$3,500 + $400/mo",desc:"Everything in Tier 1 · WhatsApp AI Automation (24/7) · [Chatbot Audio Feature: +$500 setup +$50/mo]"},
+    {name:"AI Tier 1",price:"$1,500 + $150/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · [Voice Intelligence Add-on: +$500 setup +$50/mo]"},
+    {name:"AI Tier 2",price:"$3,500 + $400/mo",desc:"Everything in Tier 1 · WhatsApp AI Automation (24/7) · [Voice Intelligence Add-on: +$500 setup +$50/mo]"},
     {name:"AI Tier 3",price:"$6,000 + $700/mo",desc:"Everything in Tier 1 & 2 · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Every Email · 1 Month Free Maintenance"},
     {name:"AI Tier 4",price:"$8,000 + $900/mo",desc:"Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · 1 Month Free Maintenance"}
   ],
@@ -293,65 +294,10 @@ const PKGS={
 };
 
 const STEPS = {
-    
-  council_menu:{
-    bot:"The Strategic Council is ready. Who would you like to consult with?",
-    r:[
-      {l:"👨‍💻 Strategic Council",s:"council_menu"},
-      {l:"👨‍💻 Drew (Lead Architect)",s:"council_drew"},
-      {l:"👩‍💻 Sierra (Customer Ops)",s:"council_sierra"},
-      {l:"💻 Kimi (Code Auditor)",s:"council_kimi"},
-      {l:"← Back to start",s:"start"}
-    ]
-  },
-  council_drew:{
-    bot:"I am Drew, the Lead Architect. I handle high-fidelity web design, e-commerce, and AI automation strategy. How can I help you build your brand today?",
-    r:[{l:"Talk to Drew",s:"talk"},{l:"← Back",s:"council_menu"}]
-  },
-  council_sierra:{
-    bot:"I am Sierra, Customer Operations Representative. I handle autonomous workflows, inventory management, and database actions. What operations can I streamline for you?",
-    r:[{l:"Talk to Sierra",s:"talk"},{l:"← Back",s:"council_menu"}]
-  },
-  council_kimi:{
-    bot:"I am Kimi, the Code & Fiscal Auditor. I perform deterministic checks on code and financial data for 100% accuracy. Do you have a project for review?",
-    r:[{l:"Talk to Kimi",s:"talk"},{l:"← Back",s:"council_menu"}]
-  },
-  start:{
+    start:{
         bot:"Hey 👋 What brings you here today?",
-        r:[
-          {l:"🏢 About Us",s:"about"},
-          {l:"🏗️ I need a custom website",s:"need_website"},
-          {l:"🤖 I need AI automation",s:"automation"},
-          {l:"📦 Agency Packages",s:"pkg_menu"},
-          {l:"😂 Tell me a joke",s:"jokes"}
-        ]
+        r:[{l:"🎨 I want a template site",s:"pkg_templates"},{l:"🏗️ I need a custom website",s:"need_website"},{l:"📈 I need more leads",s:"more_leads"},{l:"🤖 I need AI automation",s:"automation"},{l:"📦 See agency packages",s:"pkg_menu"}]
     },
-  about: {
-    bot: "Prisca Dezigns is a high-fidelity digital agency specializing in premium web architecture and AI automation. We're on a mission to build the future of the Caribbean.",
-    r: [
-      {l:"🚗 Evolve Mobility", s:"about_brands"},
-      {l:"✝️ The Way Made Known", s:"about_twmk"},
-      {l:"👩‍💻 About Priscilla", s:"about_founder"},
-      {l:"← Back", s:"start"}
-    ]
-  },
-  about_brands: {
-    bot: "We are the strategic digital partners for Evolve Mobility (driveevolve.com), the leading EV dealership in the Caribbean. We build their entire sales and automation ecosystem.",
-    r: [{l:"Visit Evolve Mobility", s:"templates_browse"}, {l:"← Back", s:"about"}],
-    url: "https://driveevolve.com"
-  },
-  about_twmk: {
-    bot: "The Way Made Known (TWMK) is our humanitarian backbone. We use a portion of our agency profits to share the Gospel and provide community support in Trinidad and Tobago. It's the heart of why we build.",
-    r: [{l:"Learn more", s:"talk"}, {l:"← Back", s:"about"}]
-  },
-  about_founder: {
-    bot: "Priscilla Narine is the lead architect of Prisca Dezigns. With a background in payroll administration and high-stakes data governance, she brings 100% accuracy and elite strategy to every project.",
-    r: [{l:"← Back", s:"about"}]
-  },
-  jokes: {
-    bot: "Why did the AI go to therapy? Because it had too many unresolved dependencies! 😂 Want another one?",
-    r: [{l:"One more!", s:"jokes"}, {l:"← Back to start", s:"start"}]
-  },
     need_website:{
         bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
         r:[{l:"⚡ Need it in 24hrs — $299.99",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
