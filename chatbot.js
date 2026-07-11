@@ -241,6 +241,11 @@
             { name: "AI Tier 2", price: "$3,500 + $500/mo", desc: "Tier 1 Included · WhatsApp AI Automation (24/7) · Lead Qualification & Routing · 1,500 conv/mo included" },
             { name: "AI Tier 3", price: "$6,000 + $750/mo", desc: "Tier 1 & 2 Included · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Emails" },
             { name: "AI Tier 4", price: "$8,000 + $900/mo", desc: "Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · Premium Deal Closing Logic" }
+        ],
+        templates: [
+            { name: "Template Site", price: "$149.99 + $19.99/mo", desc: "Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs" },
+            { name: "Micro Store", price: "$249.99 + $34.99/mo", desc: "Full product store built on your template · Up to 12 products uploaded · WhatsApp order button · Live in 72-96hrs" },
+            { name: "Premium (3D)", price: "$200 + $19.99/mo", desc: "Cinematic 3D WebGL experiences (Aeon, Nexus, Stellar) · Fully immersive · Scroll-driven animation" }
         ]
     };
 
@@ -331,5 +336,6 @@
     setTimeout(() => { if(!open) toggleChat(); }, 500);
 
 })();
+
 
 
