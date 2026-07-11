@@ -16,7 +16,7 @@
         bg: 'rgba(245, 242, 237, 0.95)',
         text: '#301934',
         glow: 'rgba(125, 82, 181, 0.3)',
-        logo: 'https://priscadezigns.org/assets/og-cover.png'
+        logo: 'https://share.zapia.com/57sonyoar08flg9xz5v667'
     };
 
     "use strict";
