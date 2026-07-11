@@ -14,14 +14,21 @@
     }
     
     #pd-chat-bubble {
-        position:fixed; bottom:28px; right:28px; z-index:9999;
-        width:64px; height:64px; border-radius:24px;
-        background: linear-gradient(135deg, var(--cb-purple), var(--cb-deep));
-        box-shadow: 0 12px 40px rgba(157, 80, 187, 0.4);
+        position:fixed; bottom:30px; right:30px; z-index:9999;
+        width:64px; height:64px; border-radius:20px;
+        background: #8E44AD;
+        box-shadow: 0 10px 30px rgba(142, 68, 173, 0.25);
         cursor:pointer; display:flex; align-items:center; justify-content:center;
-        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        animation: bubbleFloat 3s ease-in-out infinite;
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        border: 1px solid rgba(255,255,255,0.1);
     }
+    #pd-chat-bubble:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(142, 68, 173, 0.35);
+        background: #9B59FF; /* Slight brighten on hover */
+    }
+    #pd-chat-bubble:active { transform: scale(0.95); }
+    #pd-chat-bubble svg { width: 28px; height: 28px; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
     #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 50px rgba(157, 80, 187, 0.6); }
     #pd-chat-bubble.open { transform: scale(0.9) rotate(90deg); background: #1e1b4b; }
     #pd-chat-bubble .chat-x { display:none; color:#fff; font-size:24px; font-weight:300; }
@@ -540,7 +547,6 @@ if(window.location.pathname.includes('/services')){
 }
 
 })();
-
 
 
 
