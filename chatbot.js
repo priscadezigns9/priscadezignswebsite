@@ -243,9 +243,11 @@
             { name: "AI Tier 4", price: "$8,000 + $900/mo", desc: "Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · Premium Deal Closing Logic" }
         ],
         templates: [
-            { name: "Template Site", price: "$149.99 + $19.99/mo", desc: "Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs" },
+            { name: "Template Site", price: "$149.99 + $19.99/mo", desc: "Choose any of our 24 templates · Logo & colours swapped in · Your content added · Live in 24hrs" },
+            { name: "+ Copywriting Add-On", price: "$4.99/update", desc: "Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs" },
+            { name: "+ AI Chatbot Add-On", price: "$349.99 + $49.99/mo", desc: "AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book" },
             { name: "Micro Store", price: "$249.99 + $34.99/mo", desc: "Full product store built on your template · Up to 12 products uploaded · WhatsApp order button · Live in 72-96hrs" },
-            { name: "Premium (3D)", price: "$200 + $19.99/mo", desc: "Cinematic 3D WebGL experiences (Aeon, Nexus, Stellar) · Fully immersive · Scroll-driven animation" }
+            { name: "Premium (3D)", price: "$299.99 + $19.99/mo", desc: "Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation" }
         ]
     };
 
@@ -336,6 +338,7 @@
     setTimeout(() => { if(!open) toggleChat(); }, 500);
 
 })();
+
 
 
 
