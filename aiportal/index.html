@@ -141,6 +141,7 @@
     </main>
 
     
+    
     <script>
         const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
         let currentView = 'ledger';
@@ -190,26 +191,28 @@
         async function saveLead(e) {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            btn.innerText = 'Syncing...';
+            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
             
             const formData = new FormData(e.target);
-            const { error } = await sb.from('client_leads').insert({
+            const leadData = {
                 name: formData.get('name'),
                 email: formData.get('email'),
                 brand: formData.get('brand'),
-                package: 'Manual Sync',
-                status: 'Active',
-                created_at: new Date().toISOString()
-            });
+                package: formData.get('package'),
+                status: 'Active'
+            };
 
-            if(error) alert('Sync failed');
-            else {
+            const { error } = await sb.from('client_leads').insert([leadData]);
+            
+            if(error) {
+                alert('Sync failed: ' + error.message);
+                btn.innerText = 'Sync Lead';
+            } else {
                 closeAddLeadModal();
+                e.target.reset();
+                btn.innerText = 'Sync Lead';
                 fetchData();
             }
-            btn.disabled = false;
-            btn.innerText = 'Sync Signal';
         }
 
         async function enrichLead(id, name) {
@@ -227,13 +230,11 @@
         function showSection(view) {
             currentView = view;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            const targetBtn = document.getElementById('btn-' + view);
+            if(targetBtn) targetBtn.classList.add('active');
             render();
         }
 
-        
-        
-        
         function filterByBrand(brand) {
             let dataToFilter = [];
             if (currentView === 'ledger') dataToFilter = allLeads;
@@ -265,36 +266,6 @@
                 renderFiltered(filtered);
             }
         }
- else {
-                const filtered = dataToFilter.filter(l => {
-                    const brandVal = (l.brand || '').toLowerCase();
-                    const nameVal = (l.name || '').toLowerCase();
-                    const target = brand.toLowerCase();
-                    
-                    // Specific mapping for NehNeh/Seamurai
-                    if (target === 'nehneh') {
-                        return brandVal.includes('nehneh') || brandVal.includes('seamurai');
-                    }
-                    // Specific mapping for Anime/Dreaming
-                    if (target === 'dreaming') {
-                        return brandVal.includes('dreaming') || brandVal.includes('anime');
-                    }
-                    
-                    return brandVal.includes(target) || nameVal.includes(target);
-                });
-                renderFiltered(filtered);
-            }
-        }
- else {
-                const filtered = dataToFilter.filter(l => {
-                    const b = (l.brand || '').toLowerCase();
-                    const n = (l.name || '').toLowerCase();
-                    const target = brand.toLowerCase();
-                    return b.includes(target) || n.includes(target);
-                });
-                renderFiltered(filtered);
-            }
-        }
 
         async function fetchData() {
             const btn = document.getElementById('sync-btn');
@@ -321,203 +292,196 @@
 
                 financeLogs = [
                     { id: 1, date: '2026-07-10', vendor: 'GitHub', category: 'Infrastructure', amount: '$4.00', status: 'Verified' },
-                    { id: 2, date: '2026-07-09', vendor: 'Vercel', category: 'Deployment', amount: '$20.00', status: 'Verified' }
+                    { id: 2, date: '2026-07-09', vendor: 'Vapi.ai', category: 'Voice Logic', amount: '$12.50', status: 'Processing' },
+                    { id: 3, date: '2026-07-08', vendor: 'Supabase', category: 'Database', amount: '$25.00', status: 'Verified' }
                 ];
 
                 render();
-            } catch (e) { console.error('Fetch error:', e); }
-            finally { if(btn) setTimeout(() => btn.classList.remove('animate-spin'), 1000); }
-        }
-
-        function renderFiltered(data) {
-            renderTable(data);
-        }
-
-        function renderMetricsChart(canvasId) {
-            const ctx = document.getElementById(canvasId);
-            if(!ctx) return;
-            if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [
-                        { label: 'Sierra', data: [45, 52, 48, 70, 65, 80, 95], borderColor: '#a855f7', tension: 0.4 },
-                        { label: 'Organic', data: [30, 25, 35, 40, 38, 45, 50], borderColor: '#0f172a', tension: 0.4 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-            });
-        }
-
-        function render() {
-            const container = document.getElementById('view-container');
-            if(!container) return;
-            let html = '';
-
-            if (currentView === 'ledger') {
-                html = `
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                        <div class="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200">
-                            <div class="flex items-center justify-between mb-6">
-                                <h3 class="font-bold text-slate-800">Neural Traffic (7D)</h3>
-                            </div>
-                            <div class="chart-container"><canvas id="metricsChart"></canvas></div>
-                        </div>
-                        <div class="bg-indigo-900 text-white p-8 rounded-3xl shadow-xl relative overflow-hidden">
-                             <div class="relative z-10">
-                                <p class="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-2">Total Intelligence</p>
-                                <h2 class="text-4xl font-extrabold mb-4">${allLeads.length + outreachLeads.length}</h2>
-                                <p class="text-sm text-indigo-300">Total processed signals across all channels.</p>
-                             </div>
-                        </div>
-                    </div>
-                    <div id="table-anchor"></div>
-                `;
-                container.innerHTML = html;
-                renderTable(allLeads);
-                renderMetricsChart('metricsChart');
-            } else if (currentView === 'outreach') {
-                html = `
-                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200">
-                                <tr>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Prospect</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Email</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                ${outreachLeads.map(l => `
-                                    <tr class="hover:bg-slate-50 transition-all">
-                                        <td class="px-6 py-4 font-bold text-slate-800">${l.company_name || 'N/A'}</td>
-                                        <td class="px-6 py-4 text-slate-600">${l.email || 'N/A'}</td>
-                                        <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold uppercase">Outreach</span></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                container.innerHTML = html;
-            } else if (currentView === 'organic' || currentView === 'chat') {
-                const data = currentView === 'organic' ? organicLeads : chatLeads;
-                html = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        ${data.map(l => `
-                            <div class="bg-white p-6 rounded-3xl border border-slate-200 relative group">
-                                <button onclick="deleteLead('${l.id}')" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                </button>
-                                <p class="text-[10px] font-bold text-purple-600 uppercase mb-2">${l.brand || 'Lead'}</p>
-                                <h4 class="font-bold text-slate-800 mb-1">${l.name}</h4>
-                                <p class="text-sm text-slate-500 mb-4">${l.email}</p>
-                                <div class="flex items-center justify-between mt-6">
-                                    <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-400 hover:text-purple-600">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                        <span class="text-[10px] font-bold uppercase tracking-widest">${l.status === 'Qualified' ? 'Verified' : 'Apollo PPI'}</span>
-                                    </button>
-                                    <span class="text-[10px] font-bold text-slate-400">${new Date(l.created_at).toLocaleDateString()}</span>
-                                </div>
-                            </div>
-                        `).join('') || '<div class="col-span-full p-20 text-center text-slate-400">No signals found.</div>'}
-                    </div>
-                `;
-                container.innerHTML = html;
-            } else if (currentView === 'voice') {
-                html = voiceLogs.map(log => `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 flex space-x-6 items-start relative group">
-                        <button onclick="deleteDrewCall('${log.id}')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                        </button>
-                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-bold text-slate-800">${log.name}</h4>
-                                <span class="text-xs text-slate-400">${new Date(log.time).toLocaleString()}</span>
-                            </div>
-                            <p class="text-sm text-slate-600 italic bg-slate-50 p-4 rounded-2xl border border-slate-100">"${log.transcription}"</p>
-                        </div>
-                    </div>
-                `).join('') || '<div class="p-20 text-center text-slate-400">No voice logs found.</div>';
-                container.innerHTML = html;
-            } else if (currentView === 'finance') {
-                html = `
-                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200">
-                                <tr>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Vendor</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Category</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Amount</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                ${financeLogs.map(l => `
-                                    <tr class="hover:bg-slate-50 transition-all">
-                                        <td class="px-6 py-4 text-sm text-slate-600">${l.date}</td>
-                                        <td class="px-6 py-4 font-bold text-slate-800">${l.vendor}</td>
-                                        <td class="px-6 py-4 text-slate-600">${l.category}</td>
-                                        <td class="px-6 py-4 font-bold text-slate-900">${l.amount}</td>
-                                        <td class="px-6 py-4"><span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status}</span></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                container.innerHTML = html;
+                updateChart();
+            } catch (err) {
+                console.error('Fetch error:', err);
+            } finally {
+                if(btn) btn.classList.remove('animate-spin');
             }
         }
 
+        function render() {
+            const container = document.getElementById('ledger-container');
+            const title = document.getElementById('section-title');
+            
+            if (currentView === 'ledger') {
+                title.innerText = 'Strategic Lead Ledger';
+                renderTable(allLeads);
+            } else if (currentView === 'organic') {
+                title.innerText = 'Organic Intelligence';
+                renderTable(organicLeads);
+            } else if (currentView === 'chat') {
+                title.innerText = 'Chatbot Conversions';
+                renderTable(chatLeads);
+            } else if (currentView === 'outreach') {
+                title.innerText = 'Cold Outreach (Apollo)';
+                renderTable(outreachLeads);
+            } else if (currentView === 'voice') {
+                title.innerText = 'Drew: Voice Operations';
+                renderVoiceGrid();
+            } else if (currentView === 'finance') {
+                title.innerText = 'Finance & Receipts';
+                renderFinanceTable();
+            }
+        }
+
+        function renderFiltered(data) {
+            if (currentView === 'voice') renderVoiceGrid(data);
+            else renderTable(data);
+        }
+
         function renderTable(data) {
-            const anchor = document.getElementById('table-anchor');
-            if(!anchor) return;
-            anchor.innerHTML = `
-                <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden mt-8">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b border-slate-200">
-                            <tr>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo PPI</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
+            const container = document.getElementById('ledger-container');
+            container.innerHTML = `
+                <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Brand Context</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lead Identity</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Architecture</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Timestamp</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Analysis</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                <th class="px-6 py-4"></th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody class="divide-y divide-slate-50">
                             ${data.map(l => `
-                                <tr class="hover:bg-slate-50 transition-all">
+                                <tr class="hover:bg-slate-50/50 transition-all group">
                                     <td class="px-6 py-4">
-                                        <p class="font-bold text-slate-800 mb-0.5">${l.name}</p>
-                                        <p class="text-xs text-slate-400 font-medium">${l.brand || 'Organic'}</p>
+                                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase">${l.brand || 'Direct'}</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-bold text-slate-800">${l.name}</div>
+                                        <div class="text-[10px] text-slate-400">${l.email}</div>
                                     </td>
                                     <td class="px-6 py-4 text-sm font-medium text-slate-600">${l.package || 'Discovery'}</td>
                                     <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
                                     <td class="px-6 py-4">
-                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-400 hover:text-purple-600">
+                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-400 hover:text-purple-600 transition-colors">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                             <span class="text-[10px] font-bold uppercase tracking-widest">${l.status === 'Qualified' ? 'Verified' : 'Apollo PPI'}</span>
                                         </button>
                                     </td>
-                                    <td class="px-6 py-4"><span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span></td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">
+                                            ${l.status || 'Active'}
+                                        </span>
+                                    </td>
                                     <td class="px-6 py-4 text-right">
-                                        <button onclick="deleteLead('${l.id}')" class="text-slate-300 hover:text-red-500 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+                                        <button onclick="deleteLead('${l.id}')" class="text-slate-300 hover:text-red-500 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                        </button>
                                     </td>
                                 </tr>
-                            `).join('') || '<tr><td colspan="6" class="p-10 text-center text-slate-400">No signals found.</td></tr>'}
+                            `).join('') || '<tr><td colspan="7" class="p-10 text-center text-slate-400 italic">No signals found in this context.</td></tr>'}
                         </tbody>
                     </table>
                 </div>
             `;
         }
+
+        function renderVoiceGrid(data = voiceLogs) {
+            const container = document.getElementById('ledger-container');
+            container.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    ${data.map(l => `
+                        <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-slate-100 relative group">
+                            <button onclick="deleteDrewCall('${l.id}')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                            </button>
+                            <div class="flex items-center space-x-4 mb-6">
+                                <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 mb-1">${l.name}</h4>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${l.duration}</div>
+                                </div>
+                            </div>
+                            <div class="text-xs text-slate-500 mb-6 font-mono bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                ${l.transcription}
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-bold uppercase">${l.status}</span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${new Date(l.time).toLocaleTimeString()}</span>
+                            </div>
+                        </div>
+                    `).join('') || '<div class="col-span-full p-20 text-center text-slate-400 italic">No voice operations recorded.</div>'}
+                </div>
+            `;
+        }
+
+        function renderFinanceTable() {
+            const container = document.getElementById('ledger-container');
+            container.innerHTML = `
+                <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Timestamp</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vendor</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Category</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount</th>
+                                <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            ${financeLogs.map(l => `
+                                <tr class="hover:bg-slate-50/50 transition-all">
+                                    <td class="px-6 py-4 text-sm text-slate-500">${l.date}</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-slate-800">${l.vendor}</td>
+                                    <td class="px-6 py-4 text-sm text-slate-600">${l.category}</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-slate-900">${l.amount}</td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('leadChart').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
+            
+            const counts = {
+                'Autodrome': allLeads.filter(l => (l.brand||'').toLowerCase().includes('autodrome')).length,
+                'Anime': allLeads.filter(l => (l.brand||'').toLowerCase().includes('anime') || (l.brand||'').toLowerCase().includes('dreaming')).length,
+                'NehNeh': allLeads.filter(l => (l.brand||'').toLowerCase().includes('nehneh') || (l.brand||'').toLowerCase().includes('seamrite')).length,
+                'Direct': allLeads.filter(l => (l.brand||'').toLowerCase().includes('direct') || (l.brand||'').toLowerCase().includes('prisca')).length
+            };
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(counts),
+                    datasets: [{
+                        data: Object.values(counts),
+                        backgroundColor: ['#1e1b4b', '#4f46e5', '#818cf8', '#e2e8f0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '80%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // Initialize Secure Handshake
+        window.onload = () => {
+            // Keep auth-screen visible initially
+        };
     </script>
+
 
 
     <!-- Add Lead Modal -->
@@ -548,6 +512,7 @@
     </div>
 </body>
 </html>
+
 
 
 
