@@ -26,7 +26,14 @@
             body:JSON.stringify({system:SYSTEM_PROMPT, messages:history})
         }).then(r=>r.json()).then(d=>{ if(d.reply){ addMsg(d.reply, 'bot'); history.push({role:'assistant', content:d.reply}); }});
     };
-    function addMsg(t, type){ const m = document.getElementById('chat-msgs'); const d = document.createElement('div'); d.className='cmsg '+type; d.textContent=t; m.appendChild(d); m.scrollTop=m.scrollHeight; }
+    function addMsg(t, type){ const m = document.getElementById('chat-msgs'); const d = document.createElement('div'); d.className='cmsg '+type; d.textContent=t; m.appendChild(d); m.scrollTop=m.scrollHeight; if(type==='bot') speak(t); }
+
+    function speak(t){
+        if(!window.speechSynthesis) return;
+        const u = new SpeechSynthesisUtterance(t.replace(/\n/g,' '));
+        u.rate = 0.95; u.pitch = 1.05;
+        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    }
 
     let rec = null;
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
