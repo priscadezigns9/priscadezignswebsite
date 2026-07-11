@@ -17,7 +17,7 @@
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--brand-ivory); }
         .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .nav-btn { width: 100%; display: flex; items-center: center; gap: 0.75rem; padding: 0.875rem 1.25rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 600; color: rgba(255, 255, 255, 0.4); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: left; margin-bottom: 0.5rem; }
+        .nav-btn { width: 100%; display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1.25rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 600; color: rgba(255, 255, 255, 0.4); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: left; margin-bottom: 0.5rem; }
         .nav-btn:hover { color: white; background: rgba(255, 255, 255, 0.05); transform: translateX(4px); }
         .nav-btn.active { color: white; background: var(--brand-amethyst); box-shadow: 0 8px 20px -6px rgba(125, 82, 181, 0.5); }
         .chart-container { position: relative; height: 300px; width: 100%; }
@@ -32,7 +32,7 @@
     </style>
 </head>
 <body class="bg-slate-50 overflow-hidden">
-        <!-- Auth Screen -->
+    <!-- Auth Screen -->
     <div id="auth-screen" class="fixed inset-0 z-[999] auth-glass flex items-center justify-center p-6">
         <div class="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-200">
             <div class="text-center mb-8">
@@ -187,7 +187,6 @@
             }
         }
 
-        
         async function checkAuth() {
             const input = document.getElementById('auth-input').value;
             if(input.toLowerCase().trim() === 'alice') {
@@ -201,8 +200,10 @@
                 alert('Handshake failed. Verify security token.'); 
                 authClicks = 0;
                 document.getElementById('auth-input').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('auth-input').value = '';
             }
         }
+
         window.addEventListener('load', () => {
             if(sessionStorage.getItem('pd_auth') === 'true') {
                 document.getElementById('auth-screen').classList.add('hidden');
@@ -212,8 +213,6 @@
                 fetchData();
             }
         });
- else { alert('Handshake failed. Verify security token.'); }
-        }
 
         async function fetchData() {
             const btn = document.getElementById('sync-btn');
@@ -245,6 +244,12 @@
             else if (currentView === 'outreach') { title.innerText = 'Cold Outreach (Apollo)'; renderTable(outreachLeads); }
             else if (currentView === 'voice') { title.innerText = 'Drew: Voice Operations'; renderVoiceGrid(); }
             else if (currentView === 'finance') { title.innerText = 'Finance & Receipts'; renderFinanceTable(); }
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = allLeads.length;
+            document.getElementById('stat-qualified').innerText = allLeads.filter(l => l.status === 'Qualified').length;
+            document.getElementById('stat-active').innerText = allLeads.filter(l => l.status === 'Active' || !l.status).length;
         }
 
         function renderTable(data) {
@@ -332,9 +337,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
