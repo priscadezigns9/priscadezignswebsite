@@ -226,14 +226,15 @@
     /* ── Steps & Navigation ── */
     const PKGS = {
         standard: [
-            { name: "Starter ($1,500)", desc: "1-Page High-Fidelity Website · Brand Setup" },
-            { name: "Growth ($3,500)", desc: "Brand Page Management · App/Web Architecture" },
-            { name: "Trusted ($6,000)", desc: "Full Business Automation · Premium Scaling" }
+            { name: "Starter (,500)", desc: "1-Page High-Fidelity Website + Brand Strategy. Perfect for elite landing pages." },
+            { name: "Growth (,500)", desc: "Multi-page Brand Hub + Advanced UI/UX. Built for scaling businesses." },
+            { name: "Trusted (,000)", desc: "Full Business Ecosystem. Includes custom web portal + CRM integration." },
+            { name: "1-Day Site (99.99)", desc: "A professional custom-branded page live in 24 hours." }
         ],
         ai: [
-            { name: "AI Tier 1 ($1,500)", desc: "Website Chatbot · Lead Capture" },
-            { name: "AI Tier 2 ($3,500)", desc: "WhatsApp AI Automation" },
-            { name: "AI Tier 3 ($6,000)", desc: "Email Inbox AI Automation" }
+            { name: "AI Tier 1 (,500)", desc: "Smart Website Chatbot. Handles inquiries and captures leads 24/7." },
+            { name: "AI Tier 2 (,500)", desc: "WhatsApp AI Specialist. Autonomous booking via WhatsApp API." },
+            { name: "AI Tier 3 (,000)", desc: "Omnichannel AI Hub. Email + WhatsApp + Website integration." }
         ]
     };
 
