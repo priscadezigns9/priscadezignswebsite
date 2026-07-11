@@ -226,26 +226,20 @@
     /* ── Steps & Navigation ── */
     const PKGS = {
         standard: [
-            { name: "Starter", price: "$1,500 + $150/mo", desc: "1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance" },
-            { name: "Growth", price: "$3,500 + $400/mo", desc: "Manage 1 Brand Page · Full Branding & App/Web Architecture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance" },
-            { name: "Trusted", price: "$6,000 + $700/mo", desc: "Full Website Architecture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance" },
-            { name: "Custom", price: "Starting at $10,000", desc: "Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support" }
+            { name: "1-Day Launch", price: "$200 + $50/mo", desc: "1-Page High-Fidelity Website built and launched in 24 hours. Fastest way to get professional." },
+            { name: "Starter", price: "$297", desc: "1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL" },
+            { name: "Growth", price: "$597", desc: "Manage 1 Brand Page · Full Branding & App/Web Architecture · Content Creation & Copywriting · Advanced SEO & Analytics" },
+            { name: "Trusted", price: "$1,200", desc: "Full Business Automation · 10-15 Pages of High-Fidelity Content · Premium Brand Scaling & PR · 24/7 Priority Tech Support" }
         ],
         ecommerce: [
-            { name: "E-Starter", price: "$2,500 + $250/mo", desc: "1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance" },
-            { name: "E-Growth", price: "$5,000 + $500/mo", desc: "2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance" },
-            { name: "E-Trusted", price: "$8,500 + $850/mo", desc: "Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance" }
+            { name: "E-Starter", price: "$497 + $197/mo", desc: "1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration" },
+            { name: "E-Growth", price: "$1,497 + $197/mo", desc: "2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync" },
+            { name: "E-Trusted", price: "$2,500 + $197/mo", desc: "Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation" }
         ],
         ai: [
-            { name: "AI Tier 1", price: "$1,500 + $150/mo", desc: "AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup" },
-            { name: "AI Tier 2", price: "$3,500 + $400/mo", desc: "Everything in Tier 1 · WhatsApp AI Automation (24/7)" },
-            { name: "AI Tier 3", price: "$6,000 + $700/mo", desc: "Everything in Tier 1 & 2 · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Every Email" },
-            { name: "AI Tier 4", price: "$8,000 + $900/mo", desc: "Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7" }
-        ],
-        templates: [
-            { name: "Template Site", price: "$149.99 + $19.99/mo", desc: "Choose any of our 24 templates · Logo & colours swapped in · Your content added · Live in 24hrs" },
-            { name: "Micro Store", price: "$249.99 + $34.99/mo", desc: "Full product store built on your template · Up to 12 products uploaded · WhatsApp order button · Live in 72-96hrs" },
-            { name: "1-Day Site", price: "$299.99", desc: "High-speed delivery. A professional custom-branded page live in 24 hours." }
+            { name: "AI Tier 1", price: "$1,500 + $300/mo", desc: "High-Fidelity Website · AI Chatbot · Contact Form & Lead Notifications · 500 conv/mo included" },
+            { name: "AI Tier 2", price: "$3,500 + $500/mo", desc: "Tier 1 Included · WhatsApp AI Automation (24/7) · Lead Qualification & Routing · 1,500 conv/mo included" },
+            { name: "AI Tier 3", price: "$6,000 + $750/mo", desc: "Tier 1 & 2 Included · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Emails" }
         ]
     };
 
@@ -336,3 +330,4 @@
     setTimeout(() => { if(!open) toggleChat(); }, 500);
 
 })();
+
