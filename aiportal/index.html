@@ -406,20 +406,31 @@
                 row.innerHTML = `<span class="text-sm font-bold text-slate-700">${file.name}</span><span class="text-[10px] font-black text-purple-400">SYNCING...</span>`;
                 stack.prepend(row);
                 
-                // In a real scenario, you'd upload to Storage first, then insert to DB.
-                // For this high-fidelity prototype, we simulate the mirror sync.
-                const { error } = await sb.from('media').insert([{
-                    file_name: file.name,
-                    file_type: file.type,
-                    file_url: '#' // Placeholder
-                }]);
-                
-                row.classList.remove('animate-pulse');
-                if(error) {
-                    row.innerHTML = `<span class="text-sm font-bold text-slate-700">${file.name}</span><span class="text-[10px] font-black text-red-400">FAILED</span>`;
-                } else {
+                try {
+                    const fileName = `${Date.now()}_${file.name}`;
+                    const { data: uploadData, error: uploadError } = await sb.storage
+                        .from('media')
+                        .upload('intake/' + fileName, file);
+
+                    if (uploadError) throw uploadError;
+                    const { data: { publicUrl } } = sb.storage.from('media').getPublicUrl('intake/' + fileName);
+
+                    const { error: dbError } = await sb.from('media').insert([{
+                        file_name: file.name,
+                        file_url: publicUrl,
+                        file_type: file.type,
+                        tags: ['intake', 'portal']
+                    }]);
+
+                    if (dbError) throw dbError;
+
+                    row.classList.remove('animate-pulse');
                     row.innerHTML = `<span class="text-sm font-bold text-slate-700">${file.name}</span><span class="text-[10px] font-black text-green-500">SYNCED TO VAULT</span>`;
                     fetchData();
+                } catch (err) {
+                    console.error('Portal Sync Error:', err);
+                    row.classList.remove('animate-pulse');
+                    row.innerHTML = `<span class="text-sm font-bold text-slate-700">${file.name}</span><span class="text-[10px] font-black text-red-400">FAILED</span>`;
                 }
             }
         }
@@ -438,6 +449,7 @@
     </script>
 </body>
 </html>
+
 
 
 
