@@ -15,6 +15,7 @@
         box-shadow: 0 12px 40px rgba(157, 80, 187, 0.4);
         cursor:pointer; display:flex; align-items:center; justify-content:center;
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: bubbleFloat 3s ease-in-out infinite;
     }
     #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 50px rgba(157, 80, 187, 0.6); }
     #pd-chat-bubble.open { transform: scale(0.9) rotate(90deg); background: #333; }
@@ -99,7 +100,6 @@
     .qrb.wa { background: #25D366; color:#fff; border-color:#25D366; display:inline-flex; align-items:center; gap:8px; text-decoration:none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
     .qrb.wa:hover { background:#128C7E; border-color:#128C7E; }
     
-    #pd-chat-bubble { animation: bubbleFloat 3s ease-in-out infinite; }
     @keyframes bubbleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     .ai-svg { width: 28px; height: 28px; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
     /* ── Input row ── */
@@ -476,6 +476,27 @@ function addMsg(txt,type){
     if(type==='bot') speak(txt);
 }
 
+function getAI(txt, cb) {
+    history.push({role:'user', content:txt});
+    const payload = JSON.stringify({ system: SYSTEM_PROMPT, messages: history, max_tokens: 350 });
+    
+    fetch('https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.reply) {
+            history.push({role:'assistant', content:data.reply});
+            cb(data.reply);
+        } else {
+            fallback(txt, cb);
+        }
+    })
+    .catch(() => fallback(txt, cb));
+}
+
 window.chatSend=function(){
     const i=document.getElementById('chat-inp');
     const t=i.value.trim(); if(!t) return;
@@ -501,3 +522,6 @@ if(window.location.pathname.includes('/services')){
 }
 
 })();
+EOF
+
+[File arg trimmed] content of chatbot_v3.js — kept first 600 + last 400 of 32186 chars; re-read the file for the full content.
