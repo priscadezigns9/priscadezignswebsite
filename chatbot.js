@@ -178,6 +178,31 @@
         </div>
     </div>`;
         document.body.appendChild(c);
+    // ── Persistent Guidance Buttons ──
+    if(!document.getElementById('pd-roadmap-bar')){
+        const r = document.createElement('div');
+        r.id = 'pd-roadmap-bar';
+        r.style = 'padding:0 28px 12px; display:flex; gap:8px; overflow-x:auto; flex-shrink:0; scrollbar-width:none;';
+        r.innerHTML = `
+            <style>
+                #pd-roadmap-bar::-webkit-scrollbar { display:none; }
+                .road-btn { 
+                    padding:8px 16px; border-radius:12px; background:rgba(157, 80, 187, 0.05); 
+                    border:1px solid rgba(157, 80, 187, 0.1); font-size:11px; font-weight:800; 
+                    color:var(--cb-purple); cursor:pointer; white-space:nowrap; transition:all 0.3s;
+                    text-transform: uppercase; letter-spacing: 0.05em;
+                }
+                .road-btn:hover { background:var(--cb-purple); color:#fff; transform:translateY(-1px); }
+            </style>
+            <button class="road-btn" onclick="go('pkg_templates', 'I want a template site')">Template Shop</button>
+            <button class="road-btn" onclick="go('automation', 'AI Automation')">AI Automation</button>
+            <button class="road-btn" onclick="go('pkg_menu', 'Agency Packages')">Agency Packages</button>
+            <button class="road-btn" onclick="go('talk', 'Custom Build')">Custom Build</button>
+        `;
+        const msgs = document.getElementById('chat-msgs');
+        msgs.parentNode.insertBefore(r, document.querySelector('.chat-inp-row'));
+    }
+
         
         // Populate Emojis
         const ep = document.getElementById('emoji-picker');
@@ -594,6 +619,7 @@ if(window.location.pathname.includes('/services')){
 }
 
 })();
+
 
 
 
