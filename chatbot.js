@@ -87,7 +87,7 @@
                 <div class="chat-hdr">
                     <div class="chat-avatar"><img src="${THEME.logo}"></div>
                     <div>
-                        <div class="chat-hdr-name">${isAutodrome ? 'Autodrome AI' : 'Sierra'}</div>
+                        <div class="chat-hdr-name">${isAutodrome ? 'Autodrome AI' : 'Prisca Dezigns AI'}</div>
                         <div class="chat-hdr-status"><div class="chat-sdot"></div> Active Now</div>
                     </div>
                 </div>
