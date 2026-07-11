@@ -16,7 +16,7 @@
         bg: 'rgba(245, 242, 237, 0.95)',
         text: '#301934',
         glow: 'rgba(125, 82, 181, 0.3)',
-        logo: '${THEME.logo}'
+        logo: 'https://priscadezigns.org/assets/og-cover.png'
     };
 
     "use strict";
@@ -28,15 +28,15 @@
         s.innerHTML = `
     :root {
         --cb-purple: ${THEME.accent};
-        --cb-deep: #6e48aa;
-        --cb-bg: rgba(116, 48, 137, 0.85);
-        --cb-text: #1e1b4b;
+        --cb-deep: ${THEME.secondary};
+        --cb-bg: ${THEME.bg};
+        --cb-text: ${THEME.text};
     }
     
     #pd-chat-bubble {
         position:fixed; bottom:30px; right:30px; z-index:9999;
         width:64px; height:64px; border-radius:20px;
-        background: #7D52B5;
+        background: ${THEME.accent};
         box-shadow: 0 10px 30px var(--cb-glow);
         cursor:pointer; display:flex; align-items:center; justify-content:center;
         transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
@@ -157,10 +157,10 @@
     <div id="pd-chat-window">
         <div class="chat-hdr">
             <div class="chat-avatar">
-                <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="P">
+                <img src="${THEME.logo}" alt="P">
             </div>
             <div style="flex:1">
-                <div class="chat-hdr-name">Prisca Dezigns</div>
+                <div class="chat-hdr-name">${THEME.name}</div>
                 <div class="chat-hdr-status"><div class="chat-sdot"></div> Active Agent</div>
             </div>
             <div class="chat-hdr-right">
