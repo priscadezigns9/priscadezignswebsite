@@ -108,11 +108,11 @@
                 <div id="management-controls" class="hidden flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
                     <span class="text-[10px] font-bold text-slate-400 uppercase">Context:</span>
                     <select onchange="filterByBrand(this.value)" class="bg-transparent border-none text-xs font-bold text-slate-800 focus:ring-0 cursor-pointer p-0">
-                        <option value="all">Global (Priscion)</option>
+                        <option value="all">All Channels</option>
                         <option value="autodrome">The Autodrome</option>
                         <option value="dreaming">Dreaming Anime</option>
                         <option value="nehneh">NehNeh</option>
-                        <option value="priscadezigns">Client: Prisca Dezigns</option>
+                        
                     </select>
                 </div>
                 
@@ -230,12 +230,29 @@
             render();
         }
 
+        
         function filterByBrand(brand) {
-            if(brand === 'all') render();
-            else {
-                const filtered = allLeads.filter(l => (l.brand || '').toLowerCase().includes(brand.toLowerCase()));
+            let dataToFilter = [];
+            if (currentView === 'ledger') dataToFilter = allLeads;
+            else if (currentView === 'organic') dataToFilter = organicLeads;
+            else if (currentView === 'chat') dataToFilter = chatLeads;
+            else if (currentView === 'outreach') dataToFilter = outreachLeads;
+            else if (currentView === 'voice') dataToFilter = voiceLogs;
+            else if (currentView === 'finance') dataToFilter = financeLogs;
+
+            if (brand === 'all') {
+                render();
+            } else {
+                const filtered = dataToFilter.filter(l => {
+                    const b = (l.brand || '').toLowerCase();
+                    const n = (l.name || '').toLowerCase();
+                    const target = brand.toLowerCase();
+                    return b.includes(target) || n.includes(target);
+                });
                 renderFiltered(filtered);
             }
+        }
+
         }
 
         async function fetchData() {
@@ -490,6 +507,7 @@
     </div>
 </body>
 </html>
+
 
 
 
