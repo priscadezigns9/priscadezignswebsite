@@ -56,3 +56,21 @@ God Mode is a universal administrative layer for the platform. It provides real-
 - **Known pages with inline chatbots:** `index.html` (main site)
 - **Known external chatbot pages:** `services/index.html` → loads `/chatbot.js`
 - **Template shop chatbot:** `/templates/chatbot.js` — managed separately
+
+## Visual-First Build Protocol (2026-07-10)
+When the user provides a screenshot, image, or URL as a design reference:
+1. **Analyze first** — identify layout type, animation style, color system, typography, effects (3D, parallax, glassmorphism, etc.)
+2. **Auto-select skills** — never ask "which skill should I use?" — pick the right ones based on what I see:
+   - 3D floating elements / WebGL scenes → `react-three-fiber` + `threejs-webgl`
+   - Scroll-driven animations → `gsap-scrolltrigger` or `locomotive-scroll`
+   - Page transitions → `barba-js` or `motion-framer`
+   - Glassmorphism / spatial depth → `antigravity-design-expert`
+   - Particle backgrounds / animated hero → `lightweight-3d-effects`
+   - Animated components / UI kits → `animated-component-libraries`
+   - Cinematic 3D + scroll → `web3d-integration-patterns`
+   - Lottie micro-interactions → `lottie-animations`
+   - Spring physics UI → `react-spring-physics`
+   - Design system extraction → `design-dna` + `extract-design-system`
+   - Anti-slop audit → `hallmark`
+3. **Build immediately** — produce the artifact directly without asking for confirmation on tech choices
+4. **Match fidelity** — colors, spacing, font weight, border radius, shadow depth, motion timing — all extracted from the visual
