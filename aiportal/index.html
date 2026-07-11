@@ -3,115 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prisca Dezigns | AI Portal</title>
+    <title>Prisca Dezigns | Lead Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --purple-main: #9d50bb; --purple-glow: #6e48aa; }
-        body { font-family: 'Space Grotesk', sans-serif; background: #050505; color: white; margin: 0; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .purple-gradient { background: linear-gradient(135deg, var(--purple-main), var(--purple-glow)); }
-        .hidden-node { display: none !important; }
-        .login-overlay { position: fixed; inset: 0; z-index: 1000; background: #0f0c29; display: flex; items-center: center; justify-content: center; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f7ff; }
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(157, 80, 187, 0.1); }
+        .sidebar { background: linear-gradient(180deg, #4c1d95 0%, #6d28d9 100%); }
+        .purple-glow { box-shadow: 0 0 20px rgba(139, 92, 246, 0.2); }
+        #login-overlay { background: #050505; z-index: 100; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
-    <!-- Login Perimeter -->
-    <div id="login-overlay" class="login-overlay flex items-center justify-center">
-        <div class="glass p-12 rounded-[40px] w-full max-w-md text-center border-purple-500/20">
-            <h1 class="text-4xl font-bold mb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">AI PORTAL</h1>
-            <p class="text-white/30 text-[10px] uppercase tracking-[0.2em] mb-8 font-black">Neural Access Node</p>
-            <div class="space-y-4">
-                <input type="password" id="pass-field" placeholder="PROTOCOL TOKEN" class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center outline-none focus:border-purple-500/50 transition-all font-mono tracking-widest text-white">
-                <button onclick="checkAccess()" class="w-full purple-gradient p-5 rounded-2xl font-black uppercase tracking-widest hover:brightness-110 active:scale-[0.98] transition-all">Authorize</button>
-            </div>
-            <p id="access-hint" class="text-white/10 text-[9px] mt-10 uppercase tracking-widest leading-relaxed italic">Secure handshake required.</p>
+
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="fixed inset-0 flex items-center justify-center">
+        <div class="max-w-md w-full p-10 text-center">
+            <h1 class="brand-font text-4xl text-white mb-8">PRISCION</h1>
+            <input type="password" id="auth-token" placeholder="PROTOCOL TOKEN" class="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white text-center mb-4 focus:outline-none focus:border-purple-500 transition-all">
+            <button onclick="checkAuth()" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-xl font-bold transition-all shadow-lg">AUTHORIZE ACCESS</button>
+            <p id="handshake-msg" class="text-xs text-white/20 mt-6 cursor-pointer select-none">Secure handshake required.</p>
         </div>
     </div>
 
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 flex-shrink-0 text-white flex flex-col">
+        <div class="p-6">
+            <h1 class="brand-font text-2xl font-bold tracking-tight">PRISCION</h1>
+            <p class="text-purple-200 text-xs mt-1 uppercase tracking-widest font-semibold">Command Center</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <a href="#" class="flex items-center space-x-3 bg-white/10 p-3 rounded-xl transition-all border border-white/5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 text-purple-100 hover:bg-white/5 p-3 rounded-xl transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <span>Live Leads</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 text-purple-100 hover:bg-white/5 p-3 rounded-xl transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                <span>AI Conversations</span>
+            </a>
+        </nav>
+        <div class="p-6">
+            <div class="bg-white/10 rounded-2xl p-4 border border-white/5">
+                <p class="text-xs text-purple-200">System Status</p>
+                <div class="flex items-center mt-2">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
+                    <span class="text-sm font-semibold tracking-wide uppercase">Live & Securing</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
     <!-- Main Content -->
-    <main id="portal-content" class="hidden-node flex-1 flex flex-col min-w-0 bg-black/20 p-10 overflow-y-auto">
-        <header class="mb-10">
-            <h2 class="text-3xl font-bold tracking-tighter">Live Lead Stream</h2>
-            <p class="text-white/40">Real-time signal diagnostics</p>
+    <main class="flex-1 overflow-y-auto">
+        <!-- Top Nav -->
+        <header class="h-20 glass flex items-center justify-between px-8 sticky top-0 z-10">
+            <div class="flex items-center space-x-4">
+                <h2 class="text-xl font-semibold text-slate-800">Global Overview</h2>
+                <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Real-time Data</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="text-right">
+                    <p class="text-sm font-bold text-slate-800">Lead Strategist</p>
+                    <p class="text-xs text-slate-500">Prisca Dezigns</p>
+                </div>
+                <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center text-white font-bold purple-glow">P</div>
+            </div>
         </header>
-        <div class="glass rounded-[32px] overflow-hidden">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="bg-white/[0.02] text-[10px] uppercase text-white/30 font-black">
-                        <th class="px-8 py-6">Timestamp</th>
-                        <th class="px-8 py-6">Client Name</th>
-                        <th class="px-8 py-6">Package</th>
-                        <th class="px-8 py-6 text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="leads-body" class="divide-y divide-white/5"></tbody>
-            </table>
+
+        <div class="p-8 space-y-8">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="glass p-6 rounded-3xl purple-glow transition-transform hover:scale-[1.02]">
+                    <p class="text-slate-500 text-sm font-medium">New Leads Today</p>
+                    <p id="stat-leads" class="text-3xl font-bold text-slate-900 mt-2">--</p>
+                    <div class="mt-4 flex items-center text-green-500 text-xs font-bold">
+                        <span>+24% from yesterday</span>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-3xl transition-transform hover:scale-[1.02]">
+                    <p class="text-slate-500 text-sm font-medium">AI Conversions</p>
+                    <p id="stat-conv" class="text-3xl font-bold text-slate-900 mt-2">--</p>
+                    <div class="mt-4 flex items-center text-purple-500 text-xs font-bold">
+                        <span>High Intent Detection</span>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-3xl transition-transform hover:scale-[1.02]">
+                    <p class="text-slate-500 text-sm font-medium">Expected Revenue</p>
+                    <p id="stat-rev" class="text-3xl font-bold text-slate-900 mt-2">--</p>
+                    <div class="mt-4 text-slate-400 text-xs">Based on current pipeline</div>
+                </div>
+                <div class="glass p-6 rounded-3xl transition-transform hover:scale-[1.02]">
+                    <p class="text-slate-500 text-sm font-medium">AI Response Time</p>
+                    <p class="text-3xl font-bold text-slate-900 mt-2">1.2s</p>
+                    <div class="mt-4 text-slate-400 text-xs">Instant Handshake Active</div>
+                </div>
+            </div>
+
+            <!-- Leads Table -->
+            <section class="glass rounded-3xl overflow-hidden shadow-sm">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800">Recent Lead Submissions</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="showAddModal()" class="bg-purple-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-purple-700 transition-all">+ Add Lead</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-slate-400 text-xs uppercase font-bold tracking-wider">
+                            <tr>
+                                <th class="px-6 py-4">Client Name</th>
+                                <th class="px-6 py-4">Package</th>
+                                <th class="px-6 py-4">Brand Origin</th>
+                                <th class="px-6 py-4">Time Received</th>
+                                <th class="px-6 py-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lead-table-body" class="divide-y divide-slate-100 text-sm text-slate-600">
+                            <!-- Data injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- AI Insight Section -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass p-8 rounded-[40px] relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h4 class="brand-font text-xl font-bold text-slate-800 mb-4">Sierra's Daily Analysis</h4>
+                        <p class="text-slate-600 leading-relaxed italic">"I've detected a significant increase in inquiries for 'Email AI' packages this week. Recommendation: Release a blog post detailing the sandboxing protocol to address privacy concerns for Enterprise clients."</p>
+                    </div>
+                </div>
+                <div class="glass p-8 rounded-[40px] flex items-center justify-center border-dashed border-2 border-purple-200 group cursor-pointer hover:border-purple-400 transition-all">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        </div>
+                        <p class="font-bold text-slate-800">Add New Integration</p>
+                        <p class="text-xs text-slate-400 mt-1">Connect Supabase, Meta, or Slack</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
+
+    <!-- Add Lead Modal -->
+    <div id="add-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
+            <h3 class="brand-font text-2xl text-slate-800 mb-6">Capture New Signal</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Client Name</label>
+                    <input type="text" id="new-name" class="w-full mt-1 p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Package Preference</label>
+                    <input type="text" id="new-package" class="w-full mt-1 p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Brand Origin</label>
+                    <input type="text" id="new-brand" class="w-full mt-1 p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-purple-400">
+                </div>
+            </div>
+            <div class="flex space-x-3 mt-8">
+                <button onclick="hideAddModal()" class="flex-1 p-4 text-slate-400 font-bold hover:text-slate-600 transition-all">Cancel</button>
+                <button onclick="saveLead()" class="flex-1 p-4 bg-purple-600 text-white rounded-2xl font-bold shadow-lg hover:bg-purple-700 transition-all">Save Signal</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
-        
-        let clickCount = 0;
-        const passField = document.getElementById('pass-field');
-        const hint = document.getElementById('access-hint');
-        let sb_client = null;
+        const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        // Ensure supabase is loaded before using it
-        window.onload = () => {
-            if (typeof supabase !== 'undefined') {
-                sb_client = supabase.createClient(SB_URL, SB_KEY);
-            } else {
-                console.error("Supabase CDN failed to load.");
-            }
+        let clicks = 0;
+        document.getElementById('handshake-msg').onclick = () => {
+            clicks++;
+            document.getElementById('handshake-msg').innerText = "Neural Syncing... " + clicks + "/5";
+            if (clicks >= 5) authorize();
         };
 
-        passField.onclick = () => {
-            clickCount++;
-            if (clickCount >= 3) {
-                hint.textContent = "Neural Link Syncing... (" + clickCount + "/5)";
-                hint.style.color = "#9d50bb";
-            }
-        };
+        function checkAuth() {
+            const v = document.getElementById('auth-token').value.toLowerCase().trim();
+            if (v === 'alice') authorize();
+            else alert('Access Denied');
+        }
 
-        async function checkAccess() {
-            const pass = passField.value.toLowerCase().trim();
-            if (pass === 'alice' || clickCount >= 5) {
-                document.getElementById('login-overlay').classList.add('hidden-node');
-                document.getElementById('portal-content').classList.remove('hidden-node');
-                fetchAllData();
-            } else {
-                alert("Protocol Error: Authorization Denied.");
-                clickCount = 0;
-                hint.textContent = "Secure handshake required.";
-                hint.style.color = "";
+        function authorize() {
+            document.getElementById('login-overlay').style.display = 'none';
+            fetchData();
+        }
+
+        async function fetchData() {
+            const { data, error } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
+            if (data) {
+                renderTable(data);
+                updateStats(data);
             }
         }
 
-        async function fetchAllData() {
-            if (!sb_client) return;
-            try {
-                const { data: leads, error } = await sb_client.from('client_leads').select('*').order('created_at', { ascending: false });
-                if (leads) {
-                    document.getElementById('leads-body').innerHTML = leads.map(l => `
-                        <tr class="hover:bg-white/[0.02]">
-                            <td class="px-8 py-6 text-white/40 font-mono">${new Date(l.created_at).toLocaleDateString()}</td>
-                            <td class="px-8 py-6 font-bold">${l.name}</td>
-                            <td class="px-8 py-6 text-purple-400 font-bold">${l.package}</td>
-                            <td class="px-8 py-6 text-right"><button onclick="deleteLead('${l.id}')" class="text-red-500/40 hover:text-red-500 uppercase text-[10px] tracking-widest font-black">Purge</button></td>
-                        </tr>
-                    `).join('');
-                }
-            } catch (e) { console.error(e); }
+        function renderTable(leads) {
+            const body = document.getElementById('lead-table-body');
+            body.innerHTML = leads.map(l => `
+                <tr class="hover:bg-purple-50/30 transition-colors">
+                    <td class="px-6 py-4 font-semibold text-slate-800">${l.name}</td>
+                    <td class="px-6 py-4">${l.package}</td>
+                    <td class="px-6 py-4">${l.brand || 'Direct'}</td>
+                    <td class="px-6 py-4 text-xs font-medium text-slate-400">${new Date(l.created_at).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="deleteLead('${l.id}')" class="text-red-400 hover:text-red-600 font-bold text-xs uppercase tracking-widest">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats(leads) {
+            document.getElementById('stat-leads').innerText = leads.length;
+            document.getElementById('stat-conv').innerText = Math.floor(leads.length * 0.6);
+            document.getElementById('stat-rev').innerText = '$' + (leads.length * 450).toLocaleString();
+        }
+
+        function showAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
+        function hideAddModal() { document.getElementById('add-modal').classList.add('hidden'); }
+
+        async function saveLead() {
+            const name = document.getElementById('new-name').value;
+            const pkg = document.getElementById('new-package').value;
+            const brand = document.getElementById('new-brand').value;
+            if (!name) return alert('Name Required');
+            
+            const { error } = await sb.from('client_leads').insert([{ name, package: pkg, brand }]);
+            if (!error) {
+                hideAddModal();
+                fetchData();
+            }
         }
 
         async function deleteLead(id) {
-            if (!confirm("Execute Purge?")) return;
-            const { error } = await sb_client.from('client_leads').delete().eq('id', id);
-            if (!error) fetchAllData();
+            if (!confirm("Purge Signal?")) return;
+            const { error } = await sb.from('client_leads').delete().eq('id', id);
+            if (!error) fetchData();
         }
     </script>
 </body>
