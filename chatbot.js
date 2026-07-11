@@ -18,7 +18,8 @@
         logo: 'https://priscadezigns.org/assets/og-cover.png'
     };
 
-    if(!document.getElementById('pd-chat-style')){
+    // If on Autodrome, inject styles. (Main site has them in index.html)
+    if(isAutodrome && !document.getElementById('pd-chat-style')){
         const s = document.createElement('style');
         s.id = 'pd-chat-style';
         s.innerHTML = `
@@ -31,11 +32,11 @@
             }
             #pd-chat-bubble {
                 position:fixed; bottom:28px; right:28px; z-index:9999;
-                width:60px; height:60px; border-radius:18px;
+                width:64px; height:64px; border-radius:24px;
                 background: var(--cb-accent);
-                box-shadow: 0 8px 32px var(--cb-glow);
+                box-shadow: 0 12px 40px var(--cb-glow);
                 cursor:pointer; display:flex; align-items:center; justify-content:center;
-                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }
             #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); }
             #pd-chat-bubble.open { transform: scale(0.9) rotate(90deg); background: #111; }
@@ -44,42 +45,42 @@
             #pd-chat-bubble.open svg { display:none; }
             
             #pd-chat-window {
-                position:fixed; bottom:100px; right:28px; z-index:9998;
-                width:380px; background: var(--cb-bg); backdrop-filter: blur(15px);
+                position:fixed; bottom:108px; right:28px; z-index:9998;
+                width:420px; background: var(--cb-bg); backdrop-filter: blur(20px);
                 border: 1px solid rgba(255,255,255,0.1);
-                box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+                box-shadow: 0 30px 90px rgba(0,0,0,0.3);
                 display:flex; flex-direction:column;
-                opacity:0; pointer-events:none; transform:translateY(20px);
-                transition: all 0.3s ease;
-                max-height:600px; border-radius:24px; overflow: hidden;
-                color: var(--cb-text);
+                opacity:0; pointer-events:none; transform:translateY(30px);
+                transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+                max-height:720px; border-radius:24px; overflow: hidden;
             }
             #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0); }
-            .chat-hdr { background: var(--cb-accent); padding:20px; display:flex; align-items:center; gap:12px; color:#fff; }
-            .chat-avatar { width:40px; height:40px; border-radius:12px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+            .chat-hdr { background: var(--cb-accent); padding:22px 26px; display:flex; align-items:center; gap:16px; color:#fff; }
+            .chat-avatar { width:50px; height:50px; border-radius:16px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; }
             .chat-avatar img { width:80%; height:80%; object-fit:contain; }
-            .chat-hdr-name { font-weight:800; font-size:1rem; }
-            .chat-hdr-status { font-size:0.7rem; opacity:0.8; display:flex; align-items:center; gap:5px; }
-            .chat-sdot { width:8px; height:8px; border-radius:50%; background:#22c55e; }
-            .chat-msgs { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px; }
-            .cmsg { max-width:85%; padding:12px 16px; border-radius:16px; font-size:0.9rem; line-height:1.5; }
-            .cmsg.bot { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); align-self:flex-start; }
+            .chat-hdr-name { font-weight:800; font-size:1.1rem; }
+            .chat-hdr-status { font-size:0.75rem; opacity:0.8; display:flex; align-items:center; gap:8px; }
+            .chat-sdot { width:8px; height:8px; border-radius:50%; background:#00ffa3; box-shadow:0 0 10px #00ffa3; }
+            .chat-msgs { flex:1; overflow-y:auto; padding:24px 20px; display:flex; flex-direction:column; gap:16px; background:rgba(255,255,255,0.02); }
+            .cmsg { max-width:85%; padding:14px 18px; border-radius:18px; font-size:0.95rem; line-height:1.6; }
+            .cmsg.bot { background: rgba(255,255,255,0.08); align-self:flex-start; color: ${THEME.text}; }
             .cmsg.usr { background: var(--cb-accent); color:#fff; align-self:flex-end; }
-            .chat-qr { padding:10px 20px 20px; display:flex; flex-wrap:wrap; gap:8px; }
-            .qrb { padding:8px 16px; border-radius:100px; border:1px solid var(--cb-accent); background:transparent; color:var(--cb-accent); font-size:0.8rem; font-weight:700; cursor:pointer; transition:0.2s; }
+            .chat-qr { padding:12px 18px 16px; display:flex; flex-wrap:wrap; gap:10px; }
+            .qrb { padding:10px 18px; border-radius:100px; border:1px solid var(--cb-accent); background:transparent; color:var(--cb-accent); font-size:0.85rem; font-weight:700; cursor:pointer; transition:0.2s; }
             .qrb:hover { background:var(--cb-accent); color:#fff; }
-            .chat-inp-row { padding:10px 20px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.02); }
-            #chat-inp { flex:1; background:transparent; border:none; color:var(--cb-text); outline:none; font-size:0.9rem; padding:10px 0; }
-            #chat-snd { background:var(--cb-accent); color:#fff; border:none; width:40px; height:40px; border-radius:10px; cursor:pointer; }
+            .chat-inp-row { padding:15px 20px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:12px; }
+            #chat-inp { flex:1; background:transparent; border:none; color:${THEME.text}; outline:none; font-size:1rem; }
+            #chat-snd { background:var(--cb-accent); color:#fff; border:none; padding:8px 15px; border-radius:12px; cursor:pointer; font-weight:bold; }
         `;
         document.head.appendChild(s);
     }
 
+    // ONLY inject HTML if it doesn't exist (e.g., Autodrome)
     if(!document.getElementById('pd-chat-bubble')){
         const c = document.createElement('div');
         c.innerHTML = `
             <div id="pd-chat-bubble" onclick="toggleChat()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" color="#fff"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 <span class="chat-x">✕</span>
             </div>
             <div id="pd-chat-window">
@@ -90,12 +91,12 @@
                         <div class="chat-hdr-status"><div class="chat-sdot"></div> Active Now</div>
                     </div>
                 </div>
-                <div id="chat-back-bar" onclick="chatBack()"><span>← Back</span></div>
+                <div id="chat-back-bar" onclick="chatBack()"><span>← Return</span></div>
                 <div class="chat-msgs" id="chat-msgs"></div>
                 <div class="chat-qr" id="chat-qr"></div>
                 <div class="chat-inp-row">
                     <input type="text" id="chat-inp" placeholder="Type a message..." onkeypress="if(event.key==='Enter')chatSend()">
-                    <button id="chat-snd" onclick="chatSend()">➤</button>
+                    <button id="chat-snd" onclick="chatSend()">Send</button>
                 </div>
             </div>
         `;
