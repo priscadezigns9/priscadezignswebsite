@@ -265,13 +265,6 @@
         pkg_ai: { bot: "Our AI Tiers:", pkg: "ai" },
         pkg_templates: { bot: "Choose your high-fidelity foundation:", pkg: "templates" },
         talk: { bot: "I'll ask a few quick questions to get you the right recommendation...", intake: true }
-    };: {
-        start: { bot: "Hey 👋 Welcome to Prisca Dezigns. How can we evolve your brand today?", qr: [{l:"Custom Website",s:"web"},{l:"AI Automation",s:"ai"},{l:"Template Shop",url:"https://priscadezigns.org/templates/"},{l:"Talk to Sierra",s:"talk"}] },
-        web: { bot: "Our custom builds start at $1,500. We also offer 1-Day Custom Sites for $299.99. What fits your needs?", qr: [{l:"1-Day Site",s:"pkg_templates"},{l:"Custom Packages",s:"pkg_standard"},{l:"Back",s:"start"}] },
-        ai: { bot: "From WhatsApp chatbots to Voice Agents, we build the machine that works while you sleep.", qr: [{l:"See AI Tiers",s:"pkg_ai"},{l:"E-Commerce",s:"pkg_ecommerce"},{l:"Talk to Sierra",s:"talk"},{l:"Back",s:"start"}] },
-        pkg_standard: { bot: "Here are our Website Packages:", pkg: "standard" },
-        pkg_ai: { bot: "Our AI Tiers:", pkg: "ai" },
-        talk: { bot: "I'll ask a few quick questions to get you the right recommendation...", intake: true }
     };
 
     let open = false, started = false, hist = [];
@@ -361,6 +354,7 @@
     setTimeout(() => { if(!open) toggleChat(); }, 500);
 
 })();
+
 
 
 
