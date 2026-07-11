@@ -1,1 +1,39 @@
-cat: ai_portal_fixed.html: No such file or directory
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prisca Dezigns | AI Portal Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-black text-white p-10">
+    <div id="login" class="max-w-md mx-auto bg-gray-900 p-10 rounded-xl">
+        <h1 class="text-2xl font-bold mb-4">Neural Access</h1>
+        <input type="password" id="p" placeholder="TOKEN" class="w-full p-4 bg-black border border-white/10 mb-4 text-center">
+        <button onclick="auth()" class="w-full bg-purple-600 p-4 rounded font-bold">AUTHORIZE</button>
+        <p id="h" class="text-xs text-white/20 mt-4 text-center">Handshake required.</p>
+    </div>
+    <div id="data" class="hidden">
+        <h2 class="text-xl font-bold mb-4">Lead Stream</h2>
+        <table class="w-full text-left bg-gray-900 rounded-xl overflow-hidden">
+            <tbody id="b"></tbody>
+        </table>
+    </div>
+    <script>
+        const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+        const client = supabase.createClient(SB_URL, SB_KEY);
+        let clicks = 0;
+        document.getElementById('p').onclick = () => { clicks++; document.getElementById('h').innerText = "Syncing... " + clicks + "/5"; };
+        async function auth() {
+            const v = document.getElementById('p').value.toLowerCase().trim();
+            if (v === 'alice' || clicks >= 5) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('data').classList.remove('hidden');
+                const { data } = await client.from('client_leads').select('*').order('created_at', { ascending: false });
+                if (data) document.getElementById('b').innerHTML = data.map(l => `<tr><td class='p-4'>${l.name}</td><td class='p-4 text-purple-400'>${l.package}</td></tr>`).join('');
+            } else { alert('Denied'); clicks = 0; }
+        }
+    </script>
+</body>
+</html>
