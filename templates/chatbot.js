@@ -1,27 +1,24 @@
 (function(){
-    "use strict";
-    
-    /* ── Futuristic Chatbot CSS ── */
-    if(!document.getElementById('pd-chat-style')){
-        const s = document.createElement('style');
-        s.id = 'pd-chat-style';
-        s.innerHTML = `
+    /* ── Futuristic Chatbot Styles ── */
+    const s = document.createElement('style');
+    s.textContent = `
     :root {
         --cb-light-purple: #9d50bb;
         --cb-glow-purple: #6e48aa;
-        --cb-futuristic-bg: rgba(255, 255, 240, 0.95);
+        --cb-futuristic-bg: rgba(255, 255, 255, 0.98);
     }
     
     #pd-chat-bubble {
         position:fixed; bottom:28px; right:28px; z-index:9999;
-        width:64px; height:64px; border-radius:50%;
+        width:64px; height:64px; border-radius:22px;
         background: linear-gradient(135deg, var(--cb-light-purple), var(--cb-glow-purple));
-        box-shadow:0 12px 40px rgba(157, 80, 187, 0.4);
+        box-shadow: 0 12px 40px rgba(157, 80, 187, 0.4);
         cursor:pointer; display:flex; align-items:center; justify-content:center;
-        transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: bubbleFloat 3s ease-in-out infinite;
     }
-    #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); box-shadow:0 18px 50px rgba(157, 80, 187, 0.6); }
-    #pd-chat-bubble.open { transform: scale(0.9) rotate(-90deg); background: #333; }
+    #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 50px rgba(157, 80, 187, 0.6); }
+    #pd-chat-bubble.open { transform: scale(0.9) rotate(90deg); background: #333; }
     #pd-chat-bubble .chat-x { display:none; color:#fff; font-size:24px; font-weight:300; }
     #pd-chat-bubble.open .chat-x { display:block; }
     #pd-chat-bubble.open .ai-svg { display:none; }
@@ -103,7 +100,6 @@
     .qrb.wa { background: #25D366; color:#fff; border-color:#25D366; display:inline-flex; align-items:center; gap:8px; text-decoration:none; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
     .qrb.wa:hover { background:#128C7E; border-color:#128C7E; }
     
-        #pd-chat-bubble { animation: bubbleFloat 3s ease-in-out infinite; }
     @keyframes bubbleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     .ai-svg { width: 28px; height: 28px; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
     /* ── Input row ── */
@@ -171,7 +167,7 @@
 const WA="https://wa.me/18683424101";
 
 
-const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant \\u2014 the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\\n\\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert \\u2014 never robotic, never generic, never pushy. Keep replies concise (2\\u20134 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\\n\\nABOUT PRISCA DEZIGNS:\\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built \\u2014 no drag-and-drop builders. Clients provide content; the team handles everything else.\\n\\nSERVICES & PRICING:\\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\\n- Custom Web Packages: Starter ($1,500), Growth ($3,500), Trusted ($6,000)\\n- AI Consultancy: Tier 1 ($1,500), Tier 2 ($3,500), Tier 3 ($6,000), Tier 4 ($8,000)\\n- E-Commerce: E-Starter ($2,500), E-Growth ($5,000), E-Trusted ($8,500)\\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\\n\\nEVOLVE MOBILITY (driveevolve.com):\\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\\nInventory & Pricing:\\n- BYD Atto 3: Starting at $285,000 TTD\\n- BYD Dolphin: Starting at $195,000 TTD\\n- GAC AION Y Plus: Starting at $245,000 TTD\\n- Leapmotor C11: Starting at $310,000 TTD\\n- Leapmotor T03: Starting at $145,000 TTD\\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\\n\\nRULES:\\n- Keep replies conversational, 2-4 sentences.\\n- Always provide exact prices when asked about specific tiers or vehicles.\\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You are highly knowledgeable about our Privacy Policy, Terms of Use, and Blogs.\n\nPRIVACY & SECURITY:\n- We implement advanced sandboxing protocols for Enterprise Email & Voice automation. Data remains within the client's authorized CRM; it is never used for training or leaked outside the sandbox.\n- Data Governance: We treat all client data with 100% accuracy and strict confidentiality.\n\nPAYMENTS:\n- We accept PayPal, Direct Banking (Local/International), and Crypto.\n- Crypto: We accept Bitcoin (BTC), Cardano (ADA), and all major tokens. Wallet addresses are provided upon request.\n- Currency: We accept TTD and USD (via our US account).\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $299.99 flat, live in 24hrs\n- Custom Web Packages: $497 (Starter), $1,497 (Growth), $2,500 (Trusted)\n- AI Consultancy: From $1,500 setup + $150/mo\n- WhatsApp AI: $3,500 setup + $400/mo\n- Email AI: $6,000 setup + $700/mo\n- Voice Agents: Starting at $8,000 setup + $900/mo\n\nTEMPLATE SHOP (templates.priscadezigns.org):\n- Standard: $149.99 setup + $19.99/mo\n- Premium 3D (Aeon, Nexus, Stellar): $299.99 setup + $19.99/mo\n\nRULES:\n- Discuss Privacy Policy, Terms, and Blogs in detail when asked.\n- End with a follow-up question. Offer WhatsApp (1-868-342-4101) for payment requests.";
 
 let history = [];
 
@@ -199,7 +195,7 @@ function getAI(txt, cb) {
 function fallback(txt, cb) {
     const s = txt.toLowerCase();
     let r = "That's a great question. I want to make sure I give you the perfect info—would you like to see our full service menu or chat with the team on WhatsApp?";
-    if(s.includes("price") || s.includes("cost")) r = "Our agency packages are customized, but our 1-Day Custom Sites start at just $200 flat. Would you like the full pricing guide for our AI automation tiers?";
+    if(s.includes("price") || s.includes("cost")) r = "Our agency packages are customized, but our 1-Day Custom Sites start at just $299.99 flat. Would you like the full pricing guide for our AI automation tiers?";
     else if(s.includes("evolve")) r = "We are the lead digital architects for Evolve Mobility (driveevolve.com), the Caribbean's premier EV dealership. We handle their entire sales ecosystem. Are you interested in fleet mobility or a personal EV?";
     cb(r);
 }
@@ -225,415 +221,170 @@ function speak(txt){
 }
 
 var recognition=null;
-if('webkitSpeechRecognition' in window){
-  recognition=new webkitSpeechRecognition();
-  recognition.continuous=false;
-  recognition.interimResults=true;
-  recognition.onresult=function(e){
-    var t = '';
-    for(var i=e.resultIndex; i<e.results.length; ++i) {
-        t += e.results[i][0].transcript;
-    }
-    var inp=document.getElementById('chat-inp');
-    if(inp) {
+if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = function() {
+    var btn = document.getElementById('chat-mic');
+    if(btn) btn.classList.add('recording');
+    var inp = document.getElementById('chat-inp');
+    if(inp) inp.placeholder = "Listening...";
+  };
+
+  recognition.onresult = function(e) {
+    var t = e.results[0][0].transcript;
+    var inp = document.getElementById('chat-inp');
+    if(inp){
         inp.value = t;
-        inp.placeholder = 'Recording: ' + t.substring(0,25) + '...';
+        window.chatSend();
     }
   };
-  recognition.onerror=function(){ stopMic(); };
-  recognition.onend=function(){ stopMic(); };
+
+  recognition.onerror = function(e) {
+    stopMic();
+  };
+
+  recognition.onend = function() {
+    stopMic();
+  };
 }
 
 window.toggleMic=function(){
   if(!recognition) return alert("Speech recognition not supported in this browser.");
   var btn=document.getElementById('chat-mic');
-  var inp=document.getElementById('chat-inp');
   if(btn.classList.contains('recording')){
     stopMic();
-    if(inp && inp.value.trim().length > 0) window.chatSend();
   } else {
     startMic();
-    if(inp) {
-        inp.value = '';
-        inp.placeholder = 'Listening... Speak clearly';
-    }
   }
 };
 
 function startMic(){
   if(!recognition)return;
-  var btn=document.getElementById('chat-mic');
-  btn.classList.add('recording');
-  recognition.start();
+  try { recognition.start(); } catch(e) {}
 }
 function stopMic(){
-  if(!recognition)return;
-  var btn=document.getElementById('chat-mic');
-  btn.classList.remove('recording');
-  recognition.stop();
+  var btn = document.getElementById('chat-mic');
+  if(btn) btn.classList.remove('recording');
+  var inp = document.getElementById('chat-inp');
+  if(inp) inp.placeholder = "Type a message...";
+  if(recognition) try { recognition.stop(); } catch(e) {}
 }
 
-const PKGS={"standard":[{"name":"Starter","price":"$1,500 + $150/mo","desc":"1-Page High-Fidelity Website \u00b7 Full Brand Setup (Logo, Domain, Favicon) \u00b7 Social Media Integration \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Growth","price":"$3,500 + $400/mo","desc":"Manage 1 Brand Page \u00b7 Full Branding & App/Web Architecture \u00b7 Content Creation & Copywriting \u00b7 Advanced SEO & Analytics \u00b7 1 Month Free Maintenance"},{"name":"Trusted","price":"$6,000 + $700/mo","desc":"Full Website Architecture (10-15 Pages) \u00b7 Premium Brand Scaling & PR \u00b7 24/7 Priority Tech Support \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Custom","price":"Starting at $10,000","desc":"Tailored Digital Architecture \u00b7 Custom API & Tool Integration \u00b7 Unique Brand Identity Design \u00b7 Scalable Infrastructure \u00b7 Priority Sovereign Support"}],"ecommerce":[{"name":"E-Starter","price":"$2,500 + $250/mo","desc":"1-Page Online Shop \u00b7 Full Store Branding & Domain \u00b7 Integrated Social Shop Setup \u00b7 Payment Gateway Integration \u00b7 1 Month Free Maintenance"},{"name":"E-Growth","price":"$5,000 + $500/mo","desc":"2-5 Page Store Architecture \u00b7 Full Shop Logic (10+ Products) \u00b7 Deep Copywriting & Product SEO \u00b7 Automated Fulfillment Sync \u00b7 1 Month Free Maintenance"},{"name":"E-Trusted","price":"$8,500 + $850/mo","desc":"Elite Store (50+ Products) \u00b7 15+ Page Network Architecture \u00b7 Advanced Inventory & CRM Automation \u00b7 On-Chain Inventory Logic \u00b7 1 Month Free Maintenance"},{"name":"E-Commerce Maintenance","price":"$199.99/mo","desc":"E-Commerce Store Uptime & Security Monitoring \u00b7 Monthly Product & Content Updates \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"ai":[{"name":"AI Tier 1","price":"$1,500 + $150/mo","desc":"AI Website Chatbot (24/7 Live) \u00b7 Lead Capture & CRM Setup \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 2","price":"$3,500 + $400/mo","desc":"Everything in Tier 1 \u00b7 WhatsApp AI Automation (24/7) \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 3","price":"$6,000 + $700/mo","desc":"Everything in Tier 1 & 2 \u00b7 Email Inbox AI Automation (24/7) \u00b7 AI Reads, Responds & Qualifies Every Email \u00b7 1 Month Free Maintenance"},{"name":"AI Tier 4","price":"$8,000 + $900/mo","desc":"Everything in Tiers 1, 2 & 3 \u00b7 Full Voice Agent Deployment \u00b7 Answers inbound calls 24/7 \u00b7 1 Month Free Maintenance"}],"continuity":[{"name":"Maintenance","price":"$99.99/mo","desc":"Daily Uptime & Security Monitoring \u00b7 Monthly Content Optimization \u00b7 High-Fidelity Technical Backups \u00b7 Priority Sovereign Support"}],"templates":[{"name":"Template Site","price":"$149.99 + $19.99/mo","desc":"Choose any of our 24 templates \u00b7 Logo & colours swapped in \u00b7 Your content added \u00b7 Mobile-optimised \u00b7 Live in 24hrs \u00b7 Hosted on your subdomain"},{"name":"+ Copywriting Add-On","price":"$4.99/update","desc":"Everything in Template Site \u00b7 Professional copywriting for all sections \u00b7 Bio, services, CTA all written for you \u00b7 Delivered in 48-72hrs"},{"name":"+ AI Chatbot Add-On","price":"$349.99 + $49.99/mo","desc":"Everything in Template Site \u00b7 AI chatbot answering your business FAQs 24/7 \u00b7 Hours, services, location, how to book"},{"name":"Micro Store","price":"$249.99 + $34.99/mo","desc":"Full product store built on your chosen template \u00b7 Up to 12 products uploaded with copy & images \u00b7 WhatsApp order button on every product \u00b7 Live in 72-96hrs"},{"name":"Premium Template (3D)","price":"$200 + $19.99/mo","desc":"Aeon \u00b7 Nexus \u00b7 Stellar \u2014 cinematic 3D WebGL experiences \u00b7 Fully immersive \u00b7 Scroll-driven animation"}]};
+const PKGS={
+  standard:[
+    {name:"Starter",desc:"1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance"},
+    {name:"Growth",desc:"Manage 1 Brand Page · Full Branding & App/Web Architecture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance"},
+    {name:"Trusted",desc:"Full Website Architecture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance"},
+    {name:"Custom",desc:"Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support"}
+  ],
+  ecommerce:[
+    {name:"E-Starter",desc:"1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance"},
+    {name:"E-Growth",desc:"2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance"},
+    {name:"E-Trusted",desc:"Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance"},
+    {name:"E-Commerce Maintenance",desc:"E-Commerce Store Uptime & Security Monitoring · Monthly Product & Content Updates · High-Fidelity Technical Backups · Priority Support · $199.99/mo"}
+  ],
+  ai:[
+    {name:"AI Tier 1",price:"$1,500 + $150/mo",desc:"AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup · [Voice Intelligence Add-on: +$500 setup +$50/mo]"},
+    {name:"AI Tier 2",price:"$3,500 + $400/mo",desc:"Everything in Tier 1 · WhatsApp AI Automation (24/7) · [Voice Intelligence Add-on: +$500 setup +$50/mo]"},
+    {name:"AI Tier 3",price:"$6,000 + $700/mo",desc:"Everything in Tier 1 & 2 · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Every Email · 1 Month Free Maintenance"},
+    {name:"AI Tier 4",price:"$8,000 + $900/mo",desc:"Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · 1 Month Free Maintenance"}
+  ],
+  continuity:[
+    {name:"Maintenance",desc:"Daily Uptime & Security Monitoring · Monthly Content Optimization · High-Fidelity Technical Backups · Priority Sovereign Support"}
+  ],
+  templates:[
+    {name:"Template Site",desc:"Choose any of our 24 templates · Logo & colours swapped in · Your content added · Mobile-optimised · Live in 24hrs · Hosted on your subdomain"},
+    {name:"+ Copywriting Add-On",desc:"Everything in Template Site · Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs"},
+    {name:"+ AI Chatbot Add-On",desc:"Everything in Template Site · AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book · $349.99 setup · $49.99/mo"},
+    {name:"Micro Store",desc:"Full product store built on your chosen template · Up to 12 products uploaded with copy & images · WhatsApp order button on every product · Live in 72-96hrs · $249.99 setup · $34.99/mo"},
+    {name:"⭐ Premium Template (3D)",desc:"Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation · $299.99 setup · $19.99/mo"}
+  ]
+};
 
 const STEPS = {
-    "start": {
-        "bot": "Hey \ud83d\udc4b What brings you here today?",
-        "r": [
-            {
-                "l": "\ud83c\udfa8 I want a template site",
-                "s": "pkg_templates"
-            },
-            {
-                "l": "\ud83c\udfd7\ufe0f I need a custom website",
-                "s": "need_website"
-            },
-            {
-                "l": "\ud83e\udd16 I need AI automation",
-                "s": "automation"
-            },
-            {
-                "l": "\ud83d\udce6 Agency Packages",
-                "s": "pkg_menu"
-            },
-            {
-                "l": "\u2139\ufe0f About Prisca Dezigns",
-                "s": "about"
-            }
-        ]
+    start:{
+        bot:"Hey 👋 What brings you here today?",
+        r:[{l:"🎨 I want a template site",s:"pkg_templates"},{l:"🏗️ I need a custom website",s:"need_website"},{l:"📈 I need more leads",s:"more_leads"},{l:"🤖 I need AI automation",s:"automation"},{l:"📦 See agency packages",s:"pkg_menu"}]
     },
-    "about": {
-        "bot": "Prisca Dezigns is a high-fidelity digital agency specializing in premium web architecture and AI automation. We're on a mission to build the future of the Caribbean.",
-        "r": [
-            {
-                "l": "\ud83d\ude97 Evolve Mobility",
-                "s": "about_brands"
-            },
-            {
-                "l": "\u271d\ufe0f The Way Made Known",
-                "s": "about_twmk"
-            },
-            {
-                "l": "\ud83d\udc69\u200d\ud83d\udcbb About Prisca Dezigns",
-                "s": "about_founder"
-            },
-            {
-                "l": "\u2190 Back",
-                "s": "start"
-            }
-        ]
+    need_website:{
+        bot:"Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
+        r:[{l:"⚡ Need it in 24hrs — $299.99",s:"pkg_oneday"},{l:"I need a full custom build",s:"pkg_standard"},{l:"Mine isn't converting",s:"bad_website"},{l:"🎨 Show me templates instead",s:"pkg_templates"}]
     },
-    "about_brands": {
-        "bot": "We are the strategic digital partners for Evolve Mobility (driveevolve.com), the leading EV dealership in the Caribbean.\\n\\nInventory & Pricing:\\n\u26a1 BYD Atto 3: $285,000 TTD\\n\u26a1 BYD Dolphin: $195,000 TTD\\n\u26a1 GAC AION Y Plus: $245,000 TTD\\n\u26a1 Leapmotor C11: $310,000 TTD\\n\u26a1 Leapmotor T03: $145,000 TTD",
-        "r": [
-            {
-                "l": "Visit Evolve Mobility",
-                "url": "https://driveevolve.com"
-            },
-            {
-                "l": "\u2190 Back",
-                "s": "about"
-            }
-        ]
+    no_website:{
+        bot:"Every day without a website is a day your competitor gets the client that should've been yours. Here are our website packages:",
+        r:[],pkg:"standard"
     },
-    "about_twmk": {
-        "bot": "The Way Made Known (TWMK) is our humanitarian backbone. We use a portion of our agency profits to share the Gospel and provide community support in Trinidad and Tobago.",
-        "r": [
-            {
-                "l": "\u2190 Back",
-                "s": "about"
-            }
-        ]
+    bad_website:{
+        bot:"A website that doesn't convert is just an expensive business card. Here's what a full rebuild looks like:",
+        r:[],pkg:"standard"
     },
-    "about_founder": {
-        "bot": "Prisca Dezigns was founded in Trinidad & Tobago by Priscilla Narine. With a focus on high-fidelity results and precision data management, she leads a team that integrates AI into professional workflows seamlessly.",
-        "r": [
-            {
-                "l": "\u2190 Back",
-                "s": "about"
-            }
-        ]
+    more_leads:{
+        bot:"Most businesses don't have a lead problem — they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
+        r:[{l:"No one responds fast enough",s:"slow_response"},{l:"Hard to tell who's serious",s:"filter_leads"},{l:"No system at all",s:"no_system"},{l:"See AI packages",s:"pkg_ai"}]
     },
-    "need_website": {
-        "bot": "Our custom websites are built from scratch \u2014 fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
-        "r": [
-            {
-                "l": "\u26a1 Need it in 24hrs \u2014 $200",
-                "s": "pkg_oneday"
-            },
-            {
-                "l": "I need a full custom build",
-                "s": "pkg_standard"
-            },
-            {
-                "l": "Mine isn't converting",
-                "s": "bad_website"
-            },
-            {
-                "l": "\ud83c\udfa8 Show me templates instead",
-                "s": "pkg_templates"
-            }
-        ]
+    slow_response:{
+        bot:"78% of leads buy from the first business that responds. Our AI responds instantly — 24/7, even at 2am on a Sunday.",
+        r:[{l:"How does it work?",s:"how_it_works"},{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
     },
-    "pkg_menu": {
-        "bot": "Our agency packages are full custom builds \u2014 designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
-        "r": [
-            {
-                "l": "\u26a1 1-Day Website \u2014 $200",
-                "s": "pkg_oneday"
-            },
-            {
-                "l": "\ud83c\udf10 Custom Website Packages",
-                "s": "pkg_standard"
-            },
-            {
-                "l": "\ud83d\uded2 E-Commerce Packages",
-                "s": "pkg_ecommerce"
-            },
-            {
-                "l": "\ud83e\udd16 AI Consultancy",
-                "s": "pkg_ai"
-            },
-            {
-                "l": "\ud83d\udd27 Maintenance",
-                "s": "pkg_continuity"
-            },
-            {
-                "l": "\ud83c\udfa8 I want a template instead",
-                "s": "pkg_templates"
-            }
-        ]
+    filter_leads:{
+        bot:"Our lead filter qualifies every enquiry the second it lands — budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
+        r:[{l:"I want this",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
     },
-    "pkg_oneday": {
-        "bot": "The 1-Day Website is a fully custom site \u2014 built to your brand, live within 24 hours. One flat price: $200 setup. Then $50/mo to keep it live, optimised, and secure.",
-        "r": [
-            {
-                "l": "What's included?",
-                "s": "oneday_included"
-            },
-            {
-                "l": "I want this \u2014 let's talk",
-                "s": "talk"
-            },
-            {
-                "l": "See other packages",
-                "s": "pkg_menu"
-            }
-        ]
+    no_system:{
+        bot:"We build the whole system from scratch — AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
     },
-    "oneday_included": {
-        "bot": "Your 1-Day Site includes: \u2726 Full custom design (not a template) \u2726 Mobile-first, fast-loading \u2726 SEO + GEO + AEO optimised \u2726 WhatsApp & contact integration \u2726 Live in 24 hours. $200 flat. $50/mo maintenance.",
-        "r": [
-            {
-                "l": "Let's get started",
-                "s": "talk"
-            },
-            {
-                "l": "See template option instead",
-                "s": "pkg_templates"
-            },
-            {
-                "l": "See all packages",
-                "s": "pkg_menu"
-            }
-        ]
+    how_it_works:{
+        bot:"We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up with everyone else automatically. Setup takes 2–4 weeks.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
     },
-    "automation": {
-        "bot": "We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up \u2014 all day, every day. What are you trying to automate?",
-        "r": [
-            {
-                "l": "Customer service / enquiries",
-                "s": "how_it_works"
-            },
-            {
-                "l": "WhatsApp automation",
-                "s": "whatsapp_auto"
-            },
-            {
-                "l": "Full business automation",
-                "s": "pkg_ai"
-            },
-            {
-                "l": "Talk to someone",
-                "s": "talk"
-            }
-        ]
+    automation:{
+        bot:"We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up — all day, every day. What are you trying to automate?",
+        r:[{l:"Customer service / enquiries",s:"how_it_works"},{l:"WhatsApp automation",s:"whatsapp_auto"},{l:"Full business automation",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
     },
-    "whatsapp_auto": {
-        "bot": "We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
-        "r": [
-            {
-                "l": "See AI packages",
-                "s": "pkg_ai"
-            },
-            {
-                "l": "Talk to someone",
-                "s": "talk"
-            }
-        ]
+    whatsapp_auto:{
+        bot:"We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
+        r:[{l:"See AI packages",s:"pkg_ai"},{l:"Talk to someone",s:"talk"}]
     },
-    "how_it_works": {
-        "bot": "We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up with everyone else automatically. Setup takes 2\u20134 weeks.",
-        "r": [
-            {
-                "l": "See AI packages",
-                "s": "pkg_ai"
-            },
-            {
-                "l": "Talk to someone",
-                "s": "talk"
-            }
-        ]
+    pkg_menu:{
+        bot:"Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
+        r:[{l:"⚡ 1-Day Website — $299.99",s:"pkg_oneday"},{l:"🌐 Custom Website Packages",s:"pkg_standard"},{l:"🛒 E-Commerce Packages",s:"pkg_ecommerce"},{l:"🤖 AI Consultancy",s:"pkg_ai"},{l:"🔧 Maintenance",s:"pkg_continuity"},{l:"🎨 I want a template instead",s:"pkg_templates"}]
     },
-    "more_leads": {
-        "bot": "Most businesses don't have a lead problem \u2014 they have a follow-up problem. Leads come in, nobody responds fast enough, and they're gone. What's your biggest issue?",
-        "r": [
-            {
-                "l": "No one responds fast enough",
-                "s": "slow_response"
-            },
-            {
-                "l": "Hard to tell who's serious",
-                "s": "filter_leads"
-            },
-            {
-                "l": "No system at all",
-                "s": "no_system"
-            },
-            {
-                "l": "See AI packages",
-                "s": "pkg_ai"
-            }
-        ]
+    pkg_templates:{
+        bot:"The Template Shop is a separate service from our agency packages — faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
+        r:[{l:"Browse all templates",s:"templates_browse"},{l:"What's included?",s:"templates_included"},{l:"Template + Chatbot option",s:"templates_chatbot"},{l:"Talk to someone",s:"talk"}]
     },
-    "slow_response": {
-        "bot": "78% of leads buy from the first business that responds. Our AI responds instantly \u2014 24/7, even at 2am on a Sunday.",
-        "r": [
-            {
-                "l": "How does it work?",
-                "s": "how_it_works"
-            },
-            {
-                "l": "See AI packages",
-                "s": "pkg_ai"
-            },
-            {
-                "l": "Talk to someone",
-                "s": "talk"
-            }
-        ]
+    templates_chatbot:{
+        bot:"You're in the right place! 🎉 The chatbot add-on is $49.99 one-time setup + $10/mo added to hosting ($29.99/mo total). It answers your business FAQs 24/7 — hours, pricing, location, services, how to book. Nothing outside your business.",
+        wa:true,
+        r:[{l:"Template only is fine",s:"templates_browse"},{l:"Back to templates",s:"pkg_templates"}]
     },
-    "filter_leads": {
-        "bot": "Our lead filter qualifies every enquiry the second it lands \u2014 budget, timeline, intent. Only serious buyers reach you. The rest are nurtured automatically.",
-        "r": [
-            {
-                "l": "I want this",
-                "s": "pkg_ai"
-            },
-            {
-                "l": "Talk to someone",
-                "s": "talk"
-            }
-        ]
+    templates_browse:{
+        bot:"Our Template Shop has 17 live designs — pick one, send your photos and logo, and go live in 24 hours.",
+        r:[{l:"🎨 Open Template Shop →",s:"templates_browse"}],url:"https://priscadezigns.org/templates/"
     },
-    "no_system": {
-        "bot": "We build the whole system from scratch \u2014 AI chatbot, WhatsApp automation, lead capture, CRM setup. You walk away with a machine that works while you sleep.",
-        "r": [
-            {
-                "l": "See AI packages",
-                "s": "pkg_ai"
-            },
-            {
-                "l": "Talk to someone",
-                "s": "talk"
-            }
-        ]
+    templates_included:{
+        bot:"Every template includes: ✦ Your logo & colours ✦ Photos & content swapped in ✦ Mobile-optimised ✦ Live in 24 hours ✦ $149.99 setup · $19.99/mo hosting. Add chatbot for $50 (+$10/mo). Add copywriting for $4.99/update.",
+        r:[{l:"Browse templates",s:"templates_browse"},{l:"Add chatbot — $49.99",s:"templates_chatbot"},{l:"I'm ready — let's go",s:"talk"}]
     },
-    "pkg_standard": {
-        "bot": "Here are our Standard Website Packages:",
-        "r": [],
-        "pkg": "standard"
+    pkg_oneday:{
+        bot:"The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $299.99. Then $50/mo to keep it live, optimised, and secure.",
+        r:[{l:"What's included?",s:"oneday_included"},{l:"I want this — let's talk",s:"talk"},{l:"See other packages",s:"pkg_menu"}]
     },
-    "pkg_ecommerce": {
-        "bot": "Here are our E-Commerce Packages:",
-        "r": [],
-        "pkg": "ecommerce"
+    oneday_included:{
+        bot:"Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $299.99 flat. $50/mo maintenance.",
+        r:[{l:"Let's get started",s:"talk"},{l:"See template option instead",s:"pkg_templates"},{l:"See all packages",s:"pkg_menu"}]
     },
-    "pkg_ai": {
-        "bot": "Here are our AI Consultancy Packages:",
-        "r": [],
-        "pkg": "ai"
-    },
-    "pkg_continuity": {
-        "bot": "Our System Continuity Package:",
-        "r": [],
-        "pkg": "continuity"
-    },
-    "talk": {
-        "bot": "Tap below to start a WhatsApp conversation with us directly. We'll get back to you fast.",
-        "r": [],
-        "wa": true
-    },
-    "pkg_templates": {
-        "bot": "The Template Shop is a separate service from our agency packages \u2014 faster, simpler, and more affordable. Pick a design, send your photos, go live in 24 hours. No tech needed.",
-        "r": [
-            {
-                "l": "Browse all templates",
-                "s": "templates_browse"
-            },
-            {
-                "l": "What's included?",
-                "s": "templates_included"
-            },
-            {
-                "l": "Template + Chatbot option",
-                "s": "templates_chatbot"
-            },
-            {
-                "l": "Talk to someone",
-                "s": "talk"
-            }
-        ]
-    },
-    "templates_browse": {
-        "bot": "Our Template Shop has 40+ professional designs \u2014 pick one, send your photos and logo, and go live in 24 hours.",
-        "r": [
-            {
-                "l": "\ud83c\udfa8 Open Template Shop \u2192",
-                "url": "https://templates.priscadezigns.org"
-            }
-        ],
-        "url": "https://templates.priscadezigns.org"
-    },
-    "templates_included": {
-        "bot": "Every template includes: \u2726 Your logo & colours \u2726 Photos & content swapped in \u2726 Mobile-optimised \u2726 Live in 24 hours \u2726 $149.99 setup \u00b7 $19.99/mo hosting. Add chatbot for $50 (+$10/mo). Add copywriting for $4.99/update.",
-        "r": [
-            {
-                "l": "Browse templates",
-                "s": "templates_browse"
-            },
-            {
-                "l": "Add chatbot \u2014 $49.99",
-                "s": "templates_chatbot"
-            },
-            {
-                "l": "I'm ready \u2014 let's go",
-                "s": "talk"
-            }
-        ]
-    },
-    "templates_chatbot": {
-        "bot": "You're in the right place! \ud83c\udf89 The chatbot add-on is $49.99 one-time setup + $10/mo added to hosting ($29.99/mo total). It answers your business FAQs 24/7 \u2014 hours, pricing, location, services, how to book.",
-        "r": [
-            {
-                "l": "Template only is fine",
-                "s": "templates_browse"
-            },
-            {
-                "l": "Back to templates",
-                "s": "pkg_templates"
-            }
-        ]
-    }
+    pkg_standard:{bot:"Here are our Standard Website Packages:",r:[],pkg:"standard"},
+    pkg_ecommerce:{bot:"Here are our E-Commerce Packages:",r:[],pkg:"ecommerce"},
+    pkg_ai:{bot:"Here are our AI Consultancy Packages:",r:[],pkg:"ai"},
+    pkg_continuity:{bot:"Our System Continuity Package:",r:[],pkg:"continuity"},
+    talk:{bot:"Tap below to start a WhatsApp conversation with us directly. We'll get back to you fast.",r:[],wa:true}
 };
 
 let open=false, started=false, hist=[];
@@ -722,6 +473,28 @@ function addMsg(txt,type){
     const m=document.getElementById('chat-msgs');
     const d=document.createElement('div'); d.className='cmsg '+type; d.textContent=txt;
     m.appendChild(d); m.scrollTop=m.scrollHeight;
+    if(type==='bot') speak(txt);
+}
+
+function getAI(txt, cb) {
+    history.push({role:'user', content:txt});
+    const payload = JSON.stringify({ system: SYSTEM_PROMPT, messages: history, max_tokens: 350 });
+    
+    fetch('https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.reply) {
+            history.push({role:'assistant', content:data.reply});
+            cb(data.reply);
+        } else {
+            fallback(txt, cb);
+        }
+    })
+    .catch(() => fallback(txt, cb));
 }
 
 window.chatSend=function(){
@@ -741,8 +514,6 @@ window.chatSend=function(){
         const tid = document.getElementById('typing-id');
         if(tid) tid.remove();
         addMsg(reply, 'bot');
-        speak(reply);
-        setBack(true);
     });
 };
 
