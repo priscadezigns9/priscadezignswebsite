@@ -239,7 +239,8 @@
         ai: [
             { name: "AI Tier 1", price: "$1,500 + $300/mo", desc: "High-Fidelity Website · AI Chatbot · Contact Form & Lead Notifications · 500 conv/mo included" },
             { name: "AI Tier 2", price: "$3,500 + $500/mo", desc: "Tier 1 Included · WhatsApp AI Automation (24/7) · Lead Qualification & Routing · 1,500 conv/mo included" },
-            { name: "AI Tier 3", price: "$6,000 + $750/mo", desc: "Tier 1 & 2 Included · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Emails" }
+            { name: "AI Tier 3", price: "$6,000 + $750/mo", desc: "Tier 1 & 2 Included · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Emails" },
+            { name: "AI Tier 4", price: "$8,000 + $900/mo", desc: "Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · Premium Deal Closing Logic" }
         ]
     };
 
@@ -330,4 +331,5 @@
     setTimeout(() => { if(!open) toggleChat(); }, 500);
 
 })();
+
 
