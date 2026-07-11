@@ -81,7 +81,7 @@
     .typing-dots span:nth-child(3){animation-delay:0.4s;}
     @keyframes tdot{0%,60%,100%{transform:translateY(0); opacity: 0.3;}30%{transform:translateY(-8px); opacity: 1;}}
 
-    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:wrap; gap:10px; flex-shrink:0; }
+    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:wrap; gap:10px; flex-shrink:0; max-height: 180px; overflow-y: auto; }
     .qrb { 
         font-size:0.85rem; font-weight:600; padding:12px 20px; border:1px solid rgba(157, 80, 187, 0.2); 
         background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:16px; 
@@ -596,16 +596,7 @@ if(window.location.pathname.includes('/services')){
 })();
 
 
-/* ── Tawk.to Integration ── */
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/66900f07c3185b297c41a5fe/1i2ge7j98';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
+
 
 
 
