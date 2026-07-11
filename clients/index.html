@@ -27,9 +27,9 @@
     <div id="auth-screen" class="fixed inset-0 z-[999] glass flex items-center justify-center p-6">
         <div class="max-w-md w-full bg-[#1E293B] rounded-[2.5rem] p-10 shadow-2xl border border-white/5 text-center">
             <div class="w-20 h-20 bg-[#7D52B5] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-500/20"><i data-lucide="shield-check" class="w-10 h-10 text-white"></i></div>
-            <h2 class="text-3xl font-extrabold text-white mb-2 italic cursor-pointer select-none" onclick="handshake()">Secure Login</h2>
+            <h2 class="text-3xl font-extrabold text-white mb-2 italic cursor-pointer select-none" >Secure Login</h2>
             <p id="auth-status" class="text-slate-400 mb-8 font-medium">Verify your strategic token to enter the vault.</p>
-            <input type="password" id="auth-key" placeholder="Enter Token" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" onkeypress="if(event.key === 'Enter') checkAuth()">
+            <input type="password" id="auth-key" onclick="handshake()" placeholder="Enter Token" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" onkeypress="if(event.key === 'Enter') checkAuth()">
             <button onclick="checkAuth()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">CONNECT</button>
         </div>
     </div>
@@ -99,27 +99,38 @@
                 document.getElementById('auth-status').classList.add('text-purple-400');
             }
         }
+        
         function checkAuth() {
+            console.log('Login attempt initiated...');
             const key = document.getElementById('auth-key').value.trim();
             const status = document.getElementById('auth-status');
+            const screen = document.getElementById('auth-screen');
             
-            // Accept tokens directly or after handshake
+            // The Tokens: alice (admin) or 398237543 (client)
             if(key === 'alice' || key === '398237543') {
+                console.log('Token Verified.');
                 status.innerText = 'Neural Link Established. Accessing Vault...';
-                status.style.color = '#10b981'; // emerald-500
+                status.style.color = '#10b981';
+                
+                localStorage.setItem('pd_client_auth', 'true');
+                
+                // Immediate UI response
+                screen.style.transition = 'opacity 0.5s ease-out';
+                screen.style.opacity = '0';
+                
                 setTimeout(() => {
-                    document.getElementById('auth-screen').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('auth-screen').classList.add('hidden');
-                        localStorage.setItem('pd_client_auth', 'true');
-                        fetchVault(); // Trigger refresh on login
-                    }, 500);
-                }, 800);
+                    screen.classList.add('hidden');
+                    console.log('Auth Screen Hidden.');
+                    // Initialize data
+                    if(typeof fetchVault === 'function') fetchVault();
+                    if(typeof fetchLedger === 'function') fetchLedger();
+                }, 500);
             } else {
+                console.log('Token Rejected.');
                 status.innerText = 'Protocol Rejected. Retrying Handshake...';
-                status.style.color = '#ef4444'; // red-500
+                status.style.color = '#ef4444';
                 document.getElementById('auth-key').value = '';
-                clicks = 0; // Reset handshake
+                if(typeof clicks !== 'undefined') clicks = 0;
             }
         }
         if(localStorage.getItem('pd_client_auth') === 'true') { document.getElementById('auth-screen').classList.add('hidden'); }
@@ -288,6 +299,7 @@
     </script>
 </body>
 </html>
+
 
 
 
