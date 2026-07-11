@@ -522,6 +522,3 @@ if(window.location.pathname.includes('/services')){
 }
 
 })();
-EOF
-
-[File arg trimmed] content of chatbot_v3.js — kept first 600 + last 400 of 32186 chars; re-read the file for the full content.
