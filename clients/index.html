@@ -95,23 +95,23 @@
         
         const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
-        const supabase = supabase.createClient(SB_URL, SB_KEY);
+        const sbClient = supabase.createClient(SB_URL, SB_KEY);
 
         async function syncToSupabase(file) {
             try {
                 // 1. Upload to Storage
                 const fileName = `${Date.now()}_${file.name}`;
-                const { data: uploadData, error: uploadError } = await supabase.storage
+                const { data: uploadData, error: uploadError } = await sbClient.storage
                     .from('media')
                     .upload('intake/' + fileName, file);
                 
                 if (uploadError) throw uploadError;
 
                 // 2. Get Public URL
-                const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl('intake/' + fileName);
+                const { data: { publicUrl } } = sbClient.storage.from('media').getPublicUrl('intake/' + fileName);
 
                 // 3. Log to Media Table
-                const { error: dbError } = await supabase.from('media').insert([{
+                const { error: dbError } = await sbClient.from('media').insert([{
                     file_name: file.name,
                     file_url: publicUrl,
                     file_type: file.type || 'unknown',
@@ -154,3 +154,4 @@
     </script>
 </body>
 </html>
+
