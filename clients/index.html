@@ -43,11 +43,21 @@
             <button onclick="showSection('upload')" id="nav-upload" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="upload-cloud" class="w-4 h-4 mr-3"></i> Document Intake</button>
             <button onclick="showSection('ledger')" id="nav-ledger" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="database" class="w-4 h-4 mr-3"></i> Data Ledger</button>
             <button onclick="showSection('vault')" id="nav-vault" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="lock" class="w-4 h-4 mr-3"></i> Media Vault</button>
+        
+            <div class="mt-8 mb-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4">Strategic Links</div>
+            <button onclick="window.open('https://driveevolve.com', '_blank')" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors"><i data-lucide="car" class="w-4 h-4 mr-3"></i> Evolve Mobility</button>
+            <button onclick="window.open('https://thewaymadeknown.org', '_blank')" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors"><i data-lucide="heart" class="w-4 h-4 mr-3"></i> TWMK Project</button>
+            <button onclick="window.open('https://priscadezigns.org/about', '_blank')" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors"><i data-lucide="info" class="w-4 h-4 mr-3"></i> About PD</button>
+            <button onclick="alert('Audit Request Dispatched to Sierra.')" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors"><i data-lucide="clipboard-check" class="w-4 h-4 mr-3"></i> Request Audit</button>
         </nav>
         <div class="mt-auto pt-6 border-t border-white/5">
             <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold">C</div>
                 <div><div class="text-xs font-bold text-white">Client Session</div><div class="text-[9px] text-emerald-400 flex items-center font-bold uppercase tracking-tighter"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 animate-pulse"></span> Sierra Connected</div></div>
+            <button onclick="localStorage.removeItem('pd_client_auth'); location.reload();" class="mt-4 w-full flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold text-red-400 bg-red-400/5 border border-red-400/10 hover:bg-red-400/10 transition-all">
+                <i data-lucide="log-out" class="w-3.5 h-3.5 mr-2"></i> SIGN OUT
+            </button>
+        
             </div>
         </div>
     </aside>
@@ -91,12 +101,25 @@
         }
         function checkAuth() {
             const key = document.getElementById('auth-key').value.trim();
-            // Handshake + Token: alice or 398237543
+            const status = document.getElementById('auth-status');
+            
+            // Accept tokens directly or after handshake
             if(key === 'alice' || key === '398237543') {
-                document.getElementById('auth-screen').classList.add('hidden');
-                localStorage.setItem('pd_client_auth', 'true');
+                status.innerText = 'Neural Link Established. Accessing Vault...';
+                status.style.color = '#10b981'; // emerald-500
+                setTimeout(() => {
+                    document.getElementById('auth-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('auth-screen').classList.add('hidden');
+                        localStorage.setItem('pd_client_auth', 'true');
+                        fetchVault(); // Trigger refresh on login
+                    }, 500);
+                }, 800);
             } else {
-                alert('Authentication Failed. Verify token.');
+                status.innerText = 'Protocol Rejected. Retrying Handshake...';
+                status.style.color = '#ef4444'; // red-500
+                document.getElementById('auth-key').value = '';
+                clicks = 0; // Reset handshake
             }
         }
         if(localStorage.getItem('pd_client_auth') === 'true') { document.getElementById('auth-screen').classList.add('hidden'); }
@@ -265,6 +288,7 @@
     </script>
 </body>
 </html>
+
 
 
 
