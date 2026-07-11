@@ -1,108 +1,4 @@
 (function(){
-    "use strict";
-
-    const isAutodrome = window.location.href.includes('theautodrome') || window.location.hostname.includes('theautodrome');
-    const THEME = isAutodrome ? {
-        accent: '#FF3B3F',
-        secondary: '#008080',
-        bg: '#0A0A0F',
-        text: '#FFFFFF',
-        glow: 'rgba(255, 59, 63, 0.4)',
-        logo: 'https://images.unsplash.com/photo-1541443131876-44b03de101c5?w=100'
-    } : {
-        accent: '#7D52B5',
-        secondary: '#743089',
-        bg: '#F5F2ED',
-        text: '#301934',
-        glow: 'rgba(125, 82, 181, 0.3)',
-        logo: 'https://priscadezigns.org/assets/og-cover.png'
-    };
-
-    // If on Autodrome, inject styles. (Main site has them in index.html)
-    if(isAutodrome && !document.getElementById('pd-chat-style')){
-        const s = document.createElement('style');
-        s.id = 'pd-chat-style';
-        s.innerHTML = `
-            :root {
-                --cb-accent: ${THEME.accent};
-                --cb-secondary: ${THEME.secondary};
-                --cb-bg: ${THEME.bg};
-                --cb-text: ${THEME.text};
-                --cb-glow: ${THEME.glow};
-            }
-            #pd-chat-bubble {
-                position:fixed; bottom:28px; right:28px; z-index:9999;
-                width:64px; height:64px; border-radius:24px;
-                background: var(--cb-accent);
-                box-shadow: 0 12px 40px var(--cb-glow);
-                cursor:pointer; display:flex; align-items:center; justify-content:center;
-                transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            }
-            #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); }
-            #pd-chat-bubble.open { transform: scale(0.9) rotate(90deg); background: #111; }
-            #pd-chat-bubble .chat-x { display:none; color:#fff; font-size:24px; font-weight:700; }
-            #pd-chat-bubble.open .chat-x { display:block; }
-            #pd-chat-bubble.open svg { display:none; }
-            
-            #pd-chat-window {
-                position:fixed; bottom:108px; right:28px; z-index:9998;
-                width:420px; background: var(--cb-bg); backdrop-filter: blur(20px);
-                border: 1px solid rgba(255,255,255,0.1);
-                box-shadow: 0 30px 90px rgba(0,0,0,0.3);
-                display:flex; flex-direction:column;
-                opacity:0; pointer-events:none; transform:translateY(30px);
-                transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-                max-height:720px; border-radius:24px; overflow: hidden;
-            }
-            #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0); }
-            .chat-hdr { background: var(--cb-accent); padding:22px 26px; display:flex; align-items:center; gap:16px; color:#fff; }
-            .chat-avatar { width:50px; height:50px; border-radius:16px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-            .chat-avatar img { width:80%; height:80%; object-fit:contain; }
-            .chat-hdr-name { font-weight:800; font-size:1.1rem; }
-            .chat-hdr-status { font-size:0.75rem; opacity:0.8; display:flex; align-items:center; gap:8px; }
-            .chat-sdot { width:8px; height:8px; border-radius:50%; background:#00ffa3; box-shadow:0 0 10px #00ffa3; }
-            .chat-msgs { flex:1; overflow-y:auto; padding:24px 20px; display:flex; flex-direction:column; gap:16px; background:rgba(255,255,255,0.02); }
-            .cmsg { max-width:85%; padding:14px 18px; border-radius:18px; font-size:0.95rem; line-height:1.6; }
-            .cmsg.bot { background: rgba(255,255,255,0.08); align-self:flex-start; color: ${THEME.text}; }
-            .cmsg.usr { background: var(--cb-accent); color:#fff; align-self:flex-end; }
-            .chat-qr { padding:12px 18px 16px; display:flex; flex-wrap:wrap; gap:10px; }
-            .qrb { padding:10px 18px; border-radius:100px; border:1px solid var(--cb-accent); background:transparent; color:var(--cb-accent); font-size:0.85rem; font-weight:700; cursor:pointer; transition:0.2s; }
-            .qrb:hover { background:var(--cb-accent); color:#fff; }
-            .chat-inp-row { padding:15px 20px; border-top:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:12px; }
-            #chat-inp { flex:1; background:transparent; border:none; color:${THEME.text}; outline:none; font-size:1rem; }
-            #chat-snd { background:var(--cb-accent); color:#fff; border:none; padding:8px 15px; border-radius:12px; cursor:pointer; font-weight:bold; }
-        `;
-        document.head.appendChild(s);
-    }
-
-    // ONLY inject HTML if it doesn't exist (e.g., Autodrome)
-    if(!document.getElementById('pd-chat-bubble')){
-        const c = document.createElement('div');
-        c.innerHTML = `
-            <div id="pd-chat-bubble" onclick="toggleChat()">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <span class="chat-x">✕</span>
-            </div>
-            <div id="pd-chat-window">
-                <div class="chat-hdr">
-                    <div class="chat-avatar"><img src="${THEME.logo}"></div>
-                    <div>
-                        <div class="chat-hdr-name">${isAutodrome ? 'Autodrome AI' : 'Prisca Dezigns AI'}</div>
-                        <div class="chat-hdr-status"><div class="chat-sdot"></div> Active Now</div>
-                    </div>
-                </div>
-                <div id="chat-back-bar" onclick="chatBack()"><span>← Return</span></div>
-                <div class="chat-msgs" id="chat-msgs"></div>
-                <div class="chat-qr" id="chat-qr"></div>
-                <div class="chat-inp-row">
-                    <input type="text" id="chat-inp" placeholder="Type a message..." onkeypress="if(event.key==='Enter')chatSend()">
-                    <button id="chat-snd" onclick="chatSend()">Send</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(c);
-    }
-
 const WA="https://wa.me/18683424101";
 
 const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.541 5.877L.057 23.7a.5.5 0 0 0 .613.612l5.807-1.484A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.525-5.221-1.436l-.374-.222-3.878.991.998-3.918-.243-.387A9.965 9.965 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>';
@@ -858,5 +754,6 @@ window.chatSend=function(){
 if(window.location.pathname.includes('/services')){
   setTimeout(function(){if(!open)toggleChat();},8000);
 }
-
 })();
+
+
