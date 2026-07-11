@@ -244,17 +244,33 @@
         }
 
         async function fetchData() {
-            // Fetch agency leads
+            // Fetch agency leads (client_leads)
             const { data: leads, error: leadError } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
             
-            // Fetch chatbot leads (from the outreach_leads or a dedicated chatbot table if exists)
-            // For now, assuming they are consolidated in client_leads with a brand/category marker
+            // Fetch chatbot outreach leads (outreach_leads)
+            const { data: outreach, error: outreachError } = await sb.from('outreach_leads').select('*').order('created_at', { ascending: false });
             
-            if (leadError) return console.error(leadError);
-            currentLeads = leads;
-            renderLeads(leads);
-            updateStats(leads);
-            renderChart(leads);
+            if (leadError || outreachError) return console.error(leadError || outreachError);
+
+            // Combine both sources
+            // We map outreach leads to a similar structure to ensure they display correctly in the table
+            const combinedLeads = [
+                ...leads.map(l => ({ ...l, source: 'Web Form' })),
+                ...outreach.map(o => ({ 
+                    id: o.id, 
+                    name: o.company_name || o.name, 
+                    status: o.status || 'NEW', 
+                    package: o.service_category || 'Agency Outreach', 
+                    brand: 'Chatbot', 
+                    created_at: o.created_at,
+                    source: 'Chatbot'
+                }))
+            ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            currentLeads = combinedLeads;
+            renderLeads(combinedLeads);
+            updateStats(combinedLeads);
+            renderChart(combinedLeads);
         }
 
         async function fetchDrewLogs() {
