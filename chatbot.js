@@ -24,7 +24,7 @@
 
     const WA="https://wa.me/18683424101";
 
-    /* ── High-Fidelity Master Styles ── */
+    /* ── Master Styles ── */
     if(!document.getElementById('pd-chat-style')){
         const s = document.createElement('style');
         s.id = 'pd-chat-style';
@@ -167,7 +167,9 @@
         document.body.appendChild(c);
     }
 
-    const WA_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05LS471-.0250NTU2LS43NS0uMTQ5LS42NjktMS42MTItLjkxNi0yLjIwNy0uMjQyLS41NzktLjQ4Ny0uNS0uNjY5LS41MS0uMTczLS4wMDgtLjM3MS0uMDEtLjU3LS4wMS0uMTk4IDAtLjUyLjA3NC0uNzkyLjM3Mi0uMjcyLjI5Ny0xLjA0IDEuMDE2LTEuMDQgMi40NzkgMCAxLjQ2MiAxLjA2NSAyLjg3NSAxLjIxMyAzLjA3NC4xNDkuMTk4IDIuMDk2IDMuMiA1LjA3NyA0LjQ4Ny43MDkuMzA2IDEuMjYyLjQ4OSAxLjY5NC42MjUuNzEyLjIyNyAxLjM2LjE5NSAxLjg3MS4xMTguNTcxLS4wODUgMS43NTgtLjcxOSAyLjAwNi0xLjQxMy4yNDgtLjY5NC4yNDgtMS4yODkuMTczLTEuNDEzLS4wNzQtLjEyNC0uMjcyLS4xOTgtLjU3LS4zNDd6Ii8+PHBhdGggZD0iTTEyIDBDNS4zNzMgMCAwIDUuMzczIDAgMTJjMCAyLjEzNi41NjEgNC4xNCAxLjU0MSA1Ljg3N0wuMDU3IDIzLjdhLjUuNSAwIDAgMCAuNjEzLjYxMmw1LjgwNy0xLjQ4NEExMS45NCAxMS45NCAwIDAgMCAxMiAyNGM2LjYyNyAwIDEyLTUuMzczIDEyLTEyUzE4LjYyNyAwIDEyIDB6bTAgMjJjLTEuOTA3IDAtMy42OTMtLjUyNS01LjIyMS0xLjQzNmwtLjM3NC0uMjIyLTMuODc4Ljk5MS45OTgtMy45MTgtLjI0My0uMzg3QTkuOTY1IDkuOTY1IDAgMCAxIDIgMTJDMiA2LjQ3NyA2LjQ3NyAyIDEyIDJzMTAgNC40NzcgMTAgMTAtNC40NzcgMTAtMTAgMTB6Ii8+PC9zdmc+JzsKCi    const PKGS = {
+    const WA_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.136.561 4.14 1.541 5.877L.057 23.7a.5.5 0 0 0 .613.612l5.807-1.484A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.693-.525-5.221-1.436l-.374-.222-3.878.991.998-3.918-.243-.387A9.965 9.965 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>';
+
+    const PKGS = {
         standard: [
             { id: "starter", name: "Starter Pkg", price: "$297 USD", desc: "1-Page High-Fidelity Website. Full Brand Setup (Logo, Domain). Technical SEO. 1 Month Free Maint." },
             { id: "growth", name: "Growth Pkg", price: "$597 USD", desc: "Managed Brand Page. Deep Content Creation. App/Web Architecture. 1 Month Free Maint." },
@@ -207,40 +209,26 @@
 
     function go(step, label){
         if(label) addMsg(label, 'usr');
-        
         const m = document.getElementById('chat-msgs');
         const td = document.createElement('div');
-        td.className = 'cmsg bot typing';
-        td.id = 'typing-id';
+        td.className = 'cmsg bot typing'; td.id = 'typing-id';
         td.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
         m.appendChild(td); m.scrollTop = m.scrollHeight;
         
         setTimeout(() => {
             if(document.getElementById('typing-id')) document.getElementById('typing-id').remove();
-            
-            // Push current state to history for Back button
             const q = document.getElementById('chat-qr');
             hist.push({ m: m.innerHTML, q: q.innerHTML, bv: document.getElementById('chat-back-bar').classList.contains('vis') });
-            
             q.innerHTML = '';
             const s = STEPS[step];
             const botTxt = s.bot.replace('${THEME.persona}', THEME.persona);
-            addMsg(botTxt, 'bot');
-            speak(botTxt);
-            setBack(hist.length > 1);
-            
+            addMsg(botTxt, 'bot'); speak(botTxt); setBack(hist.length > 1);
             if(s.wa){
                 const a = document.createElement('a'); a.href = WA; a.target = '_blank';
                 a.className = 'qrb wa'; a.innerHTML = WA_SVG + '<span>Chat on WhatsApp</span>';
-                q.appendChild(a);
-                addQR('← Back to Menu', 'start');
-                return;
+                q.appendChild(a); addQR('← Back to Menu', 'start'); return;
             }
-            if(s.pkg){
-                renderPkgs(PKGS[s.pkg]);
-                addQR('← Back to Menu', 'start');
-                return;
-            }
+            if(s.pkg){ renderPkgs(PKGS[s.pkg]); addQR('← Back to Menu', 'start'); return; }
             if(s.r) s.r.forEach(r => addQR(r.l, r.s));
         }, 800);
     }
@@ -248,8 +236,7 @@
     function addQR(label, step){
         const q = document.getElementById('chat-qr');
         const b = document.createElement('button');
-        b.className = 'qrb';
-        b.innerHTML = `<span>${label}</span>`;
+        b.className = 'qrb'; b.innerHTML = `<span>${label}</span>`;
         b.onclick = () => go(step, label);
         q.appendChild(b);
     }
@@ -257,30 +244,23 @@
     function setBack(vis){ document.getElementById('chat-back-bar').classList.toggle('vis', vis); }
     window.chatBack = function(){ 
         if(hist.length < 2) return; 
-        hist.pop(); 
-        const p = hist.pop(); 
-        const m = document.getElementById('chat-msgs');
-        const q = document.getElementById('chat-qr');
-        m.innerHTML = p.m; q.innerHTML = p.q;
-        m.scrollTop = m.scrollHeight;
-        setBack(p.bv);
+        hist.pop(); const p = hist.pop(); 
+        const m = document.getElementById('chat-msgs'); const q = document.getElementById('chat-qr');
+        m.innerHTML = p.m; q.innerHTML = p.q; m.scrollTop = m.scrollHeight; setBack(p.bv);
     };
 
     function addMsg(txt, side){
         const m = document.getElementById('chat-msgs');
         const d = document.createElement('div');
-        d.className = 'cmsg ' + side;
-        d.innerHTML = txt.replace(/\n/g, '<br>');
+        d.className = 'cmsg ' + side; d.innerHTML = txt.replace(/\n/g, '<br>');
         m.appendChild(d); m.scrollTop = m.scrollHeight;
     }
 
     function renderPkgs(list){
         const m = document.getElementById('chat-msgs');
-        const g = document.createElement('div');
-        g.className = 'cpkg-grid';
+        const g = document.createElement('div'); g.className = 'cpkg-grid';
         list.forEach(p => {
-            const c = document.createElement('div');
-            c.className = 'cpkg-card';
+            const c = document.createElement('div'); c.className = 'cpkg-card';
             c.innerHTML = `<div class="cpkg-name">${p.name}</div><div class="cpkg-price">${p.price}</div><div class="cpkg-desc">${p.desc}</div>`;
             c.onclick = () => go('talk', "I'm interested in " + p.name);
             g.appendChild(c);
@@ -295,18 +275,15 @@
         const td = document.createElement('div'); td.className = 'cmsg bot typing'; td.id = 'typing-id';
         td.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
         m.appendChild(td); m.scrollTop = m.scrollHeight;
-        
         fetch('https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ persona: THEME.persona, message: t })
         }).then(r=>r.json()).then(data=>{
             if(document.getElementById('typing-id')) document.getElementById('typing-id').remove();
-            addMsg(data.reply || "Signal received. Let's talk on WhatsApp.", 'bot');
-            speak(data.reply);
+            addMsg(data.reply || "Signal received. Let's talk on WhatsApp.", 'bot'); speak(data.reply);
         }).catch(()=>{
             if(document.getElementById('typing-id')) document.getElementById('typing-id').remove();
-            addMsg("Connection is slow. Message us on WhatsApp for an immediate reply!", 'bot');
+            addMsg("Connection is slow. Message us on WhatsApp!", 'bot');
         });
     };
 
@@ -322,8 +299,8 @@
     function speak(txt){
         if(!voiceOn||!window.speechSynthesis)return;
         var clean=txt.replace(/\n/g,' ').trim();
-        var u=new SpeechSynthesisUtterance(clean);u.rate=0.95;u.pitch=1.05;u.volume=1;
-        window.speechSynthesis.cancel();window.speechSynthesis.speak(u);
+        var u=new SpeechSynthesisUtterance(clean); u.rate=0.95; u.pitch=1.05; u.volume=1;
+        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
     }
 
     var recognition=null;
@@ -337,7 +314,7 @@
         recognition.onend = function(){ stopMic(); if(document.getElementById('chat-inp').value.length > 2) window.chatSend(); };
     }
     window.toggleMic = function(){
-        if(!recognition) return alert("Voice input not supported in this browser.");
+        if(!recognition) return alert("Voice input not supported.");
         var btn=document.getElementById('chat-mic');
         if(btn.classList.contains('recording')) stopMic(); else startMic();
     };
