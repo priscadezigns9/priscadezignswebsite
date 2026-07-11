@@ -125,6 +125,51 @@
         .chat-hdr { padding: 20px 24px; }
         .chat-msgs { padding: 24px 20px; }
     }
+
+    #pd-chat-window {
+        width: 440px;
+        height: 780px;
+        border-radius: 32px;
+    }
+    .chat-hdr {
+        padding: 24px;
+        background: linear-gradient(160deg, var(--cb-accent), var(--cb-secondary));
+    }
+    .chat-avatar {
+        width: 48px; height: 48px; border-radius: 14px;
+    }
+    
+    /* Minimalist Icons */
+    .icon-btn {
+        background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .icon-btn:hover { opacity: 0.7; }
+    
+    .chat-inp-row {
+        padding: 16px 20px; gap: 12px; border-top: 1px solid rgba(0,0,0,0.04);
+    }
+    #chat-inp {
+        background: #F4F4F9; border-radius: 16px; padding: 12px 16px;
+    }
+    
+    /* New Feature Buttons */
+    .chat-tools {
+        display: flex; gap: 14px; padding: 0 20px 12px;
+    }
+    .tool-btn {
+        color: #94a3b8; transition: 0.2s; cursor: pointer;
+    }
+    .tool-btn:hover { color: var(--cb-accent); }
+    
+    /* Attachment Preview */
+    #attach-preview {
+        display: none; padding: 10px 20px; background: #f8fafc; border-top: 1px solid #f1f5f9; align-items: center; gap: 10px; font-size: 0.8rem;
+    }
+    #attach-preview.active { display: flex; }
+    .file-chip {
+        background: #fff; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px;
+    }
+
     `;
         document.head.appendChild(s);
     }
@@ -154,13 +199,24 @@
         <div id="chat-back-bar" onclick="chatBack()"><span>← Back to Menu</span></div>
         <div class="chat-msgs" id="chat-msgs"></div>
         <div class="chat-qr" id="chat-qr"></div>
+        
+        <div id="attach-preview"></div>
+        <div class="chat-tools">
+            <div class="tool-btn" onclick="openEmoji()" title="Emoji">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <div class="tool-btn" onclick="document.getElementById('chat-file').click()" title="Attachment">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <input type="file" id="chat-file" style="display:none" onchange="handleFile(this)" />
+            </div>
+        </div>
         <div class="chat-inp-row">
-            <button id="chat-mic" onclick="toggleMic()" title="Voice Input">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+            <button id="chat-mic" class="icon-btn" onclick="toggleMic()" title="Voice Input">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
             </button>
-            <input type="text" id="chat-inp" placeholder="Message ${THEME.persona}..." onkeydown="if(event.key==='Enter')chatSend()" />
-            <button id="chat-snd" onclick="chatSend()">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <input type="text" id="chat-inp" placeholder="Type a message..." onkeydown="if(event.key==='Enter')chatSend()" />
+            <button id="chat-snd" class="icon-btn" onclick="chatSend()" style="color: var(--cb-accent)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
         </div>
     </div>`;
@@ -324,4 +380,26 @@
     if(window.location.pathname.includes('/services')){
         setTimeout(() => { if(!open) toggleChat(); }, 8000);
     }
+
+    window.openEmoji = function() {
+        const i = document.getElementById('chat-inp');
+        i.value += "✨"; // Simple starter, can be expanded to a picker
+        i.focus();
+    };
+
+    window.handleFile = function(input) {
+        if(!input.files[0]) return;
+        const f = input.files[0];
+        const p = document.getElementById('attach-preview');
+        p.innerHTML = `<div class="file-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> ${f.name} <span onclick="clearFile()" style="cursor:pointer;margin-left:5px">✕</span></div>`;
+        p.classList.add('active');
+    };
+
+    window.clearFile = function() {
+        document.getElementById('chat-file').value = '';
+        const p = document.getElementById('attach-preview');
+        p.innerHTML = '';
+        p.classList.remove('active');
+    };
+
 })();
