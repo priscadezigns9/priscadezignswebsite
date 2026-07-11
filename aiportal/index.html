@@ -166,6 +166,7 @@
                                     <th class="px-8 py-4">Phone</th>
                                     <th class="px-8 py-4">Drew's Summary</th>
                                     <th class="px-8 py-4">Timestamp</th>
+                                    <th class="px-8 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="drew-table-body" class="divide-y divide-slate-50 text-sm text-slate-600">
@@ -243,12 +244,17 @@
         }
 
         async function fetchData() {
-            const { data, error } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
-            if (error) return console.error(error);
-            currentLeads = data;
-            renderLeads(data);
-            updateStats(data);
-            renderChart(data);
+            // Fetch agency leads
+            const { data: leads, error: leadError } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
+            
+            // Fetch chatbot leads (from the outreach_leads or a dedicated chatbot table if exists)
+            // For now, assuming they are consolidated in client_leads with a brand/category marker
+            
+            if (leadError) return console.error(leadError);
+            currentLeads = leads;
+            renderLeads(leads);
+            updateStats(leads);
+            renderChart(leads);
         }
 
         async function fetchDrewLogs() {
@@ -303,6 +309,9 @@
                     <td class="px-8 py-6 font-mono text-xs">${l.phone}</td>
                     <td class="px-8 py-6 text-xs text-slate-500 max-w-xs leading-relaxed">${l.summary}</td>
                     <td class="px-8 py-6 text-[10px] uppercase font-bold text-slate-400">${new Date(l.call_date).toLocaleString()}</td>
+                    <td class="px-8 py-6 text-right">
+                        <button onclick="deleteDrewLog(${l.id})" class="text-xs font-bold text-red-300 hover:text-red-600 transition-colors">Purge</button>
+                    </td>
                 </tr>
             `).join('');
         }
@@ -369,6 +378,12 @@
             if (!confirm("Purge signal from ledger?")) return;
             const { error } = await sb.from('client_leads').delete().eq('id', id);
             if (!error) fetchData();
+        }
+
+        async function deleteDrewLog(id) {
+            if (!confirm("Purge voice log from history?")) return;
+            const { error } = await sb.from('drew_calls').delete().eq('id', id);
+            if (!error) fetchDrewLogs();
         }
 
         async function enrichLead(id, name) {
