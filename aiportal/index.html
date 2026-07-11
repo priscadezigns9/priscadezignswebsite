@@ -97,50 +97,6 @@
     </aside>
 
     <!-- Main Content -->
-    
-    <!-- Add Lead Modal -->
-    <div id="add-lead-modal" class="fixed inset-0 z-[110] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-6">
-        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-slate-800">New Neural Signal</h3>
-                <button onclick="closeAddLeadModal()" class="text-slate-400 hover:text-slate-600 transition-all">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <form onsubmit="saveLead(event)" class="p-8 space-y-6">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Customer Name</label>
-                    <input id="new-name" required type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none text-slate-800 font-medium">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Email Address</label>
-                    <input id="new-email" required type="email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none text-slate-800 font-medium">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Brand Hub</label>
-                        <select id="new-brand" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none text-slate-800 font-medium">
-                            <option value="Direct">Direct</option>
-                            <option value="Autodrome">The Autodrome</option>
-                            <option value="Anime">Dreaming Anime</option>
-                            <option value="NehNeh">NehNeh</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Package Tier</label>
-                        <select id="new-package" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none text-slate-800 font-medium">
-                            <option value="Tier 1">Tier 1</option>
-                            <option value="Tier 2">Tier 2</option>
-                            <option value="Tier 3">Tier 3</option>
-                            <option value="Custom">Custom</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">Add Signal</button>
-            </form>
-        </div>
-    </div>
-
     <main class="flex-1 overflow-y-auto hidden" id="main-content">
         <!-- Top Nav -->
         <header class="h-20 glass flex items-center justify-between px-8 sticky top-0 z-10">
@@ -152,7 +108,7 @@
                 <div id="management-controls" class="hidden flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
                     <span class="text-[10px] font-bold text-slate-400 uppercase">Context:</span>
                     <select onchange="filterByBrand(this.value)" class="bg-transparent border-none text-xs font-bold text-slate-800 focus:ring-0 cursor-pointer p-0">
-                        <option value="all">Global Dashboard</option>
+                        <option value="all">Global (Priscion)</option>
                         <option value="autodrome">The Autodrome</option>
                         <option value="dreaming">Dreaming Anime</option>
                         <option value="nehneh">NehNeh</option>
@@ -160,13 +116,11 @@
                     </select>
                 </div>
                 
-                <button onclick="openAddLeadModal()" class="flex items-center space-x-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
+                <button onclick="openAddLeadModal()" class="flex items-center space-x-2 px-4 py-2 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all shadow-lg text-xs">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    <span>Add Signal / Lead</span>
+                    <span>New Signal</span>
                 </button>
-                <div class="h-8 w-[1px] bg-slate-200"></div>
-
-                <button onclick="fetchData()" class="p-2 hover:bg-slate-100 rounded-full transition-all text-purple-600" id="sync-btn" title="Neural Sync">
+<button onclick="fetchData()" class="p-2 hover:bg-slate-100 rounded-full transition-all text-purple-600" id="sync-btn" title="Neural Sync">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
                 <div class="h-8 w-[1px] bg-slate-200"></div>
@@ -204,6 +158,55 @@
                 const controls = document.getElementById('management-controls');
                 if(controls) controls.classList.remove('hidden');
                 fetchData();
+        async function deleteLead(id) {
+            if(!confirm('Permanently remove this signal?')) return;
+            const { error } = await sb.from('client_leads').delete().eq('id', id);
+            if(error) alert('Error deleting');
+            else fetchData();
+        }
+        async function deleteDrewCall(id) {
+            if(!confirm('Permanently remove this call log?')) return;
+            const { error } = await sb.from('drew_calls').delete().eq('id', id);
+            if(error) alert('Error deleting');
+            else fetchData();
+        }
+        function openAddLeadModal() {
+            document.getElementById('add-lead-modal').classList.remove('hidden');
+        }
+        function closeAddLeadModal() {
+            document.getElementById('add-lead-modal').classList.add('hidden');
+        }
+        async function saveLead(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = 'Syncing...';
+            const formData = new FormData(e.target);
+            const lead = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                brand: formData.get('brand'),
+                package: formData.get('package'),
+                created_at: new Date().toISOString()
+            };
+            const { error } = await sb.from('client_leads').insert([lead]);
+            if(error) alert('Handshake Error: ' + error.message);
+            else {
+                closeAddLeadModal();
+                fetchData();
+            }
+        }
+        async function enrichLead(id, name) {
+            const btn = event.currentTarget;
+            btn.innerHTML = "<span>Enriching...</span>";
+            alert('Intelligence Handshake Initialized. Sierra is retrieving Apollo PPI data...');
+            setTimeout(async () => {
+                btn.innerHTML = '<span class="p-1 bg-green-100 rounded-md">✅</span> <span>Verified</span>';
+                alert(`Success: Signal "${name}" enriched with Apollo data.`);
+                await sb.from('client_leads').update({ status: 'Qualified' }).eq('id', id);
+                fetchData();
+            }, 1500);
+        }
+
             } else {
                 alert('Handshake failed. Verify security token.');
             }
@@ -232,6 +235,55 @@
             console.log('Filtering context:', brand);
             if (brand === 'all') {
                 fetchData();
+        async function deleteLead(id) {
+            if(!confirm('Permanently remove this signal?')) return;
+            const { error } = await sb.from('client_leads').delete().eq('id', id);
+            if(error) alert('Error deleting');
+            else fetchData();
+        }
+        async function deleteDrewCall(id) {
+            if(!confirm('Permanently remove this call log?')) return;
+            const { error } = await sb.from('drew_calls').delete().eq('id', id);
+            if(error) alert('Error deleting');
+            else fetchData();
+        }
+        function openAddLeadModal() {
+            document.getElementById('add-lead-modal').classList.remove('hidden');
+        }
+        function closeAddLeadModal() {
+            document.getElementById('add-lead-modal').classList.add('hidden');
+        }
+        async function saveLead(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = 'Syncing...';
+            const formData = new FormData(e.target);
+            const lead = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                brand: formData.get('brand'),
+                package: formData.get('package'),
+                created_at: new Date().toISOString()
+            };
+            const { error } = await sb.from('client_leads').insert([lead]);
+            if(error) alert('Handshake Error: ' + error.message);
+            else {
+                closeAddLeadModal();
+                fetchData();
+            }
+        }
+        async function enrichLead(id, name) {
+            const btn = event.currentTarget;
+            btn.innerHTML = "<span>Enriching...</span>";
+            alert('Intelligence Handshake Initialized. Sierra is retrieving Apollo PPI data...');
+            setTimeout(async () => {
+                btn.innerHTML = '<span class="p-1 bg-green-100 rounded-md">✅</span> <span>Verified</span>';
+                alert(`Success: Signal "${name}" enriched with Apollo data.`);
+                await sb.from('client_leads').update({ status: 'Qualified' }).eq('id', id);
+                fetchData();
+            }, 1500);
+        }
+
             } else {
                 const filteredLeads = allLeads.filter(l => (l.brand || '').toLowerCase().includes(brand.toLowerCase()) || (l.package || '').toLowerCase().includes(brand.toLowerCase()));
                 renderFiltered(filteredLeads);
@@ -266,7 +318,6 @@
                 // 3. Live Drew Logs (Handshake)
                 const { data: calls } = await sb.from('drew_calls').select('*').order('call_date', { ascending: false });
                 voiceLogs = (calls || []).map(d => ({
-                    id: d.id,
                     name: d.customer_name,
                     status: d.outcome,
                     duration: 'Handshake Active',
@@ -331,83 +382,6 @@
             });
         }
 
-        
-        
-        
-        async function deleteDrewCall(id) {
-            if(!confirm('Permanently delete this call log from the ledger?')) return;
-            try {
-                const { error } = await sb.from('drew_calls').delete().eq('id', id);
-                if (error) throw error;
-                fetchData();
-            } catch (e) { alert('Delete failed: ' + e.message); }
-        }
-
-        async function deleteLead(id) {
-            if(!confirm('Permanently delete this signal from the ledger?')) return;
-            try {
-                const { error } = await sb.from('client_leads').delete().eq('id', id);
-                if (error) throw error;
-                fetchData();
-            } catch (e) { alert('Delete failed: ' + e.message); }
-        }
-
-        function openAddLeadModal() {
-            document.getElementById('add-lead-modal').classList.remove('hidden');
-            document.getElementById('add-lead-modal').classList.add('flex');
-        }
-
-        function closeAddLeadModal() {
-            document.getElementById('add-lead-modal').classList.add('hidden');
-            document.getElementById('add-lead-modal').classList.remove('flex');
-        }
-
-        async function saveLead(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            btn.innerText = 'Syncing...';
-
-            const payload = {
-                name: document.getElementById('new-name').value,
-                email: document.getElementById('new-email').value,
-                brand: document.getElementById('new-brand').value,
-                package: document.getElementById('new-package').value,
-                status: 'New'
-            };
-
-            try {
-                const { error } = await sb.from('client_leads').insert([payload]);
-                if (error) throw error;
-                closeAddLeadModal();
-                fetchData();
-                e.target.reset();
-            } catch (e) { alert('Save failed: ' + e.message); }
-            finally {
-                btn.disabled = false;
-                btn.innerText = 'Add Signal';
-            }
-        }
-
-        async function enrichLead(id, name) {
-            const btn = event.currentTarget;
-            btn.innerHTML = "<span>Enriching...</span>";
-            btn.disabled = true;
-
-            alert('Intelligence Handshake Initialized. Sierra is retrieving decision-maker LinkedIn profiles, verified company revenue, and technology stack data from Apollo.io...');
-            
-            setTimeout(async () => {
-                btn.innerHTML = '<span class="p-1 bg-green-100 rounded-md">✅</span> <span>Synced</span>';
-                btn.classList.replace('text-slate-500', 'text-green-600');
-                btn.disabled = false;
-                
-                alert(`Success: Signal "${name}" enriched. Apollo data (LinkedIn: Active, Revenue: High, Tech: AI-Driven) has been attached to the ledger and synced to Drew's call sheet.`);
-                
-                await sb.from('client_leads').update({ status: 'Qualified' }).eq('id', id);
-                fetchData();
-            }, 2500);
-        }
-
         function render() {
             const container = document.getElementById('view-container');
             if(!container) return;
@@ -459,14 +433,14 @@
                     </div>
                     <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
                         <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200">
-                                <tr>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Vendor</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Amount</th>
-                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                </tr>
-                            </thead>
+                            <thead class="bg-slate-50 border-b border-slate-200"><tr>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo PPI</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
+</tr></thead>
                             <tbody class="divide-y divide-slate-100">
                                 ${financeLogs.map(f => `<tr><td class="px-6 py-4 text-sm text-slate-500">${f.date}</td><td class="px-6 py-4 font-bold">${f.vendor}</td><td class="px-6 py-4 font-bold">${f.amount}</td><td class="px-6 py-4"><span class="text-xs font-bold uppercase ${f.status === 'Verified' ? 'text-green-600' : 'text-amber-500'}">${f.status}</span></td></tr>`).join('')}
                             </tbody>
@@ -474,74 +448,76 @@
                     </div>
                 `;
                 container.innerHTML = html;
-            
             } else if (currentView === 'organic' || currentView === 'chat') {
                 const targetData = currentView === 'organic' ? organicLeads : chatLeads;
                 html = targetData.map(l => `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 hover:shadow-lg transition-all flex justify-between items-center group">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-3 mb-1">
-                                <h4 class="font-bold text-slate-800 text-lg">${l.name}</h4>
-                                <span class="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold uppercase tracking-wider">${l.brand || 'Handshake'}</span>
-                            </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 hover:shadow-lg transition-all flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg">${l.name}</h4>
                             <p class="text-sm text-slate-500">${l.email}</p>
                         </div>
-                        <div class="flex items-center space-x-6">
-                            <div class="text-right">
-                                <div class="text-[10px] font-bold text-purple-600 uppercase mb-1">${l.package || 'Custom'}</div>
-                                <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-400 hover:text-purple-600 transition-all">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === 'Qualified' ? 'Verified' : 'Apollo PPI'}</span>
-                                </button>
-                            </div>
-                            <div class="h-10 w-[1px] bg-slate-100"></div>
-                            <button onclick="deleteLead('${l.id}')" class="p-2 text-slate-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
+                        <div class="text-right">
+                            <div class="text-xs font-bold text-slate-400 uppercase mb-1">${l.brand || 'Handshake'}</div>
+                            <div class="text-sm font-bold text-purple-600">${l.package || 'Custom'}</div>
                         </div>
                     </div>
                 `).join('') || '<div class="p-20 text-center text-slate-400 font-medium">No signals detected in this frequency.</div>';
                 container.innerHTML = html;
-
-            
             } else if (currentView === 'drew') {
                 html = voiceLogs.map(log => `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 flex space-x-6 items-start group">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 flex space-x-6 items-start">
                         <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
                         </div>
                         <div class="flex-1">
                             <div class="flex justify-between items-center mb-2">
-                                <div>
-                                    <h4 class="font-bold text-slate-800">${log.name}</h4>
-                                    <div class="text-[10px] text-slate-400 mt-0.5">${log.time} • ${log.duration}</div>
-                                </div>
-                                <div class="flex items-center space-x-4">
-                                    <button onclick="enrichLead('${log.id}', '${log.name}')" class="flex items-center space-x-1.5 text-slate-400 hover:text-purple-600 transition-all">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                        <span class="text-[10px] font-bold uppercase tracking-wider">Apollo PPI</span>
-                                    </button>
-                                    <button onclick="deleteDrewCall('${log.id}')" class="p-1.5 text-slate-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </div>
+                                <h4 class="font-bold text-slate-800">${log.name}</h4>
+                                <span class="text-xs text-slate-400">${log.time} • ${log.duration}</span>
                             </div>
                             <p class="text-sm text-slate-600 italic bg-slate-50 p-4 rounded-2xl border border-slate-100">"${log.transcription}"</p>
                         </div>
                     </div>
-                `).join('') || '<div class="p-20 text-center text-slate-400 font-medium">No voice handshakes detected.</div>';
+                `).join('');
                 container.innerHTML = html;
-
             } else if (currentView === 'outreach') {
                 html = `
                     <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
                         <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200">
-                                <tr><th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Company</th><th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Contact</th><th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th></tr>
-                            </thead>
-                            <tbody>
-                                ${outreachLeads.map(o => `<tr><td class="px-6 py-4 font-bold text-slate-800">${o.company || 'N/A'}</td><td class="px-6 py-4 text-sm text-slate-500">${o.email}</td><td class="px-6 py-4"><span class="text-[10px] font-bold uppercase ${o.status === 'Bounced' ? 'text-red-500' : 'text-green-600'}">${o.status || 'Active'}</span></td></tr>`).join('')}
-                            </tbody>
+                            <thead class="bg-slate-50 border-b border-slate-200"><tr>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo PPI</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
+</tr></thead>
+                            <tbody>${data.map(l => `
+                                <tr class="hover:bg-slate-50 transition-all">
+                                    <td class="px-6 py-4">
+                                        <div class="font-bold text-slate-800">${l.name || 'Anonymous'}</div>
+                                        <div class="text-xs text-slate-500">${l.email || 'No Email'}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-bold text-slate-700">${l.brand || 'Direct'}</div>
+                                        <div class="text-[10px] font-bold text-purple-600 uppercase">${l.package || 'Custom'}</div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
+                                    <td class="px-6 py-4">
+                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-500 hover:text-purple-600 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                            <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === 'Qualified' ? 'Verified' : 'Apollo PPI'}</span>
+                                        </button>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button onclick="deleteLead('${l.id}')" class="p-2 text-slate-400 hover:text-red-500 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </td>
+                                </tr>
+`).join("") || "<tr><td colspan='6'>No signals found.</td></tr>"}</tbody>
                         </table>
                     </div>
                 `;
@@ -568,26 +544,23 @@
             }
         }
 
-        
         function renderTable(data) {
             const anchor = document.getElementById('table-anchor');
             if(!anchor) return;
             anchor.innerHTML = `
                 <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
                     <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b border-slate-200">
-                            <tr>
+                        <thead class="bg-slate-50 border-b border-slate-200"><tr>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo Intelligence</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo PPI</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
-                            </tr>
-                        </thead>
+</tr></thead>
                         <tbody class="divide-y divide-slate-100">
                             ${data.map(l => `
-                                <tr class="hover:bg-slate-50 transition-all">
+                                <tr class="hover:bg-slate-50 transition-all cursor-pointer">
                                     <td class="px-6 py-4">
                                         <div class="font-bold text-slate-800">${l.name || 'Anonymous'}</div>
                                         <div class="text-xs text-slate-500">${l.email || 'No Email'}</div>
@@ -598,42 +571,7 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
                                     <td class="px-6 py-4">
-                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-500 hover:text-purple-600 transition-all">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                            <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === 'Qualified' ? 'Verified' : 'Enrich Signal'}</span>
-                                        </button>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button onclick="deleteLead('${l.id}')" class="p-2 text-slate-400 hover:text-red-500 transition-all">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('') || '<tr><td colspan="6" class="p-10 text-center text-slate-400">No signals found in this context.</td></tr>'}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-</div>
-                                        <div class="text-xs text-slate-500">${l.email || 'No Email'}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-bold text-slate-700">${l.brand || 'Direct'}</div>
-                                        <div class="text-[10px] font-bold text-purple-600 uppercase">${l.package || 'Custom'}</div>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
-                                    <td class="px-6 py-4">
-                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-500 hover:text-purple-600 transition-all">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                            <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === "Qualified" ? "Verified" : "Apollo PPI"}</span>
-                                        </button>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
+                                        <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
                                     </td>
                                 </tr>
                             `).join('') || '<tr><td colspan="4" class="p-10 text-center text-slate-400">No signals found in this context.</td></tr>'}
@@ -643,10 +581,34 @@
             `;
         }
     </script>
+
+    <!-- Add Lead Modal -->
+    <div id="add-lead-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-6 bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold text-slate-800 mb-6">Log New Signal</h3>
+            <form onsubmit="saveLead(event)" class="space-y-4">
+                <input name="name" placeholder="Contact Name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                <input name="email" type="email" placeholder="Email Address" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                <select name="brand" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                    <option value="Autodrome">The Autodrome</option>
+                    <option value="Anime">Dreaming Anime</option>
+                    <option value="NehNeh">NehNeh</option>
+                    <option value="Direct">Prisca Dezigns (Direct)</option>
+                </select>
+                <select name="package" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                    <option value="Starter">Starter Package</option>
+                    <option value="Growth">Growth Package</option>
+                    <option value="Elite">Elite Tier</option>
+                    <option value="Custom">Custom Architecture</option>
+                </select>
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" onclick="closeAddLeadModal()" class="flex-1 px-4 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 px-4 py-3 font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl shadow-lg transition-all">Sync Lead</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
-
-
-
 
 
