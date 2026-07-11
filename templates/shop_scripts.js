@@ -441,43 +441,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+
 // Hover Image Logic
 (function() {
-    let cursorImg, mouseX = 0, mouseY = 0, currentX = 0, currentY = 0;
-    const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
+    // Prevent double initialization
+    if (document.getElementById("cursorImg")) return;
 
-    function initHoverImage() {
-        if (!document.getElementById("cursorImg")) {
-            cursorImg = document.createElement("div");
-            cursorImg.id = "cursorImg";
-            cursorImg.innerHTML = "<img src=\"\" alt=\"Preview\">";
-            document.body.appendChild(cursorImg);
-        } else {
-            cursorImg = document.getElementById("cursorImg");
-        }
+    const cursorImg = document.createElement("div");
+    cursorImg.id = "cursorImg";
+    const img = document.createElement("img");
+    cursorImg.appendChild(img);
+    document.body.appendChild(cursorImg);
 
-        document.addEventListener("mousemove", (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
+    let mouseX = 0, mouseY = 0;
+    let posX = 0, posY = 0;
+    const lerp = 0.1;
 
-        function animate() {
-            currentX = lerp(currentX, mouseX, 0.1);
-            currentY = lerp(currentY, mouseY, 0.1);
-            if (cursorImg) {
-                cursorImg.style.left = currentX + "px";
-                cursorImg.style.top = currentY + "px";
-            }
-            requestAnimationFrame(animate);
-        }
-        animate();
-        bindHoverEvents();
+    window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    function update() {
+        posX += (mouseX - posX) * lerp;
+        posY += (mouseY - posY) * lerp;
+        cursorImg.style.left = posX + "px";
+        cursorImg.style.top = posY + "px";
+        requestAnimationFrame(update);
     }
+    update();
 
     function bindHoverEvents() {
         const cards = document.querySelectorAll(".t-card");
-        const img = cursorImg.querySelector("img");
-
         cards.forEach(card => {
             if (card.dataset.hoverBound) return;
             card.dataset.hoverBound = "true";
@@ -505,17 +500,16 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(grid, { childList: true, subtree: true });
     }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-            if (document.getElementById("t-grid")) {
-                initHoverImage();
-                observeGrid();
-            }
-        });
-    } else {
+    function init() {
         if (document.getElementById("t-grid")) {
-            initHoverImage();
+            bindHoverEvents();
             observeGrid();
         }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
     }
 })();
