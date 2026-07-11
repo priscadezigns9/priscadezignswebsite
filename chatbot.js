@@ -143,7 +143,7 @@
     <div id="pd-chat-window">
         <div class="chat-hdr">
             <div class="chat-avatar">
-                <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="P">
+                <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/images/PD_Logo_Circle.png" alt="P">
             </div>
             <div style="flex:1">
                 <div class="chat-hdr-name">Prisca Dezigns</div>
@@ -606,3 +606,4 @@ s1.charset='UTF-8';
 s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
+
