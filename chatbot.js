@@ -68,6 +68,11 @@
     .cmsg.bot { background:#f3f4f6; color: var(--cb-text); align-self:flex-start; border-bottom-left-radius: 4px; }
     .cmsg.usr { background: var(--cb-purple); color:#fff; align-self:flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(157, 80, 187, 0.2); font-weight: 500; }
     
+    /* Media/Link Style */
+    .cmsg a { color: inherit; text-decoration: underline; font-weight: 700; }
+    .cmsg img { max-width: 100%; border-radius: 12px; margin-top: 8px; cursor: pointer; }
+    .chat-audio-msg { display: flex; align-items: center; gap: 10px; }
+    
     /* Typing dots */
     .cmsg.typing { background:#f3f4f6; align-self:flex-start; border-radius:24px 24px 24px 4px; padding:18px 24px; }
     .typing-dots { display:flex; gap:6px; }
@@ -88,19 +93,28 @@
     .qrb:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.2); }
     .qrb.wa { background: #22c55e; color:#fff; border-color:#22c55e; display:inline-flex; align-items:center; gap:8px; }
     
-    .chat-inp-row { display:flex; border-top:1px solid rgba(0,0,0,0.05); padding:12px 16px; background:#fff; align-items:center; gap:8px; }
-    #chat-inp { flex:1; border:none; background:#f9fafb; padding:14px 20px; font-size:0.95rem; border-radius:20px; outline:none; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+    .chat-inp-row { display:flex; border-top:1px solid rgba(0,0,0,0.05); padding:12px 16px; background:#fff; align-items:center; gap:6px; position: relative; }
+    #chat-inp { flex:1; border:none; background:#f9fafb; padding:12px 16px; font-size:0.95rem; border-radius:16px; outline:none; transition: all 0.2s; font-family: 'Inter', sans-serif; }
     #chat-inp:focus { background: #fff; box-shadow: inset 0 0 0 2px rgba(157, 80, 187, 0.1); }
     
-    #chat-mic, #chat-snd { 
-        width:48px; height:48px; display:flex; align-items:center; justify-content:center; 
-        border-radius:16px; cursor:pointer; transition:all 0.2s; border:none; 
+    .chat-tool-btn { 
+        width:40px; height:40px; display:flex; align-items:center; justify-content:center; 
+        border-radius:12px; cursor:pointer; transition:all 0.2s; border:none; background: transparent; color: #64748b;
     }
-    #chat-mic { background: #f3f4f6; color: var(--cb-purple); }
+    .chat-tool-btn:hover { color: var(--cb-purple); background: #f3f4f6; }
     #chat-mic.recording { background: #fee2e2; color: #ef4444; animation: cbPulse 1.5s infinite; }
-    #chat-snd { background: var(--cb-purple); color: #fff; box-shadow: 0 4px 12px rgba(157, 80, 187, 0.2); }
-    #chat-snd:hover { transform: scale(1.05); background: var(--cb-deep); }
+    #chat-snd { color: var(--cb-purple); }
+    #chat-snd:hover { transform: scale(1.1); }
     
+    #emoji-picker {
+        position: absolute; bottom: 70px; right: 16px; background: #fff; border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 16px; display: none; grid-template-columns: repeat(6, 1fr);
+        padding: 10px; gap: 8px; z-index: 10000;
+    }
+    #emoji-picker.open { display: grid; }
+    .emoji-item { cursor: pointer; font-size: 20px; transition: transform 0.1s; }
+    .emoji-item:hover { transform: scale(1.3); }
+
     @keyframes bubbleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     @keyframes cbPulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
@@ -145,21 +159,45 @@
         <div id="chat-back-bar" onclick="chatBack()"><span>← Return</span></div>
         <div class="chat-msgs" id="chat-msgs"></div>
         <div class="chat-qr" id="chat-qr"></div>
+        <div id="emoji-picker"></div>
         <div class="chat-inp-row">
-            <button id="chat-mic" onclick="toggleMic()" title="Voice Input">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+            <button class="chat-tool-btn" onclick="document.getElementById('chat-file-inp').click()" title="Attach File">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
             </button>
+            <input type="file" id="chat-file-inp" style="display:none" onchange="handleChatFile(this.files)" />
             <input type="text" id="chat-inp" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')chatSend()" />
-            <button id="chat-snd" onclick="chatSend()">
+            <button class="chat-tool-btn" onclick="toggleEmojis()" title="Emojis">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+            </button>
+            <button id="chat-mic" class="chat-tool-btn" onclick="toggleMic()" title="Voice Note">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+            </button>
+            <button id="chat-snd" class="chat-tool-btn" onclick="chatSend()">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
         </div>
     </div>`;
         document.body.appendChild(c);
+        
+        // Populate Emojis
+        const ep = document.getElementById('emoji-picker');
+        ['👋','🔥','🚀','💎','✨','✅','🙏','💯','💡','📱','💻','🎨','💼','⚡','🔋','🛠️','📣','💬'].forEach(e => {
+            const span = document.createElement('span');
+            span.className = 'emoji-item';
+            span.innerText = e;
+            span.onclick = () => {
+                const inp = document.getElementById('chat-inp');
+                inp.value += e;
+                inp.focus();
+                toggleEmojis();
+            };
+            ep.appendChild(span);
+        });
     }
 
-
 const WA="https://wa.me/18683424101";
+const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
+const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
 
 const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($1,500), Growth ($3,500), Trusted ($6,000)\n- AI Consultancy: Tier 1 ($1,500), Tier 2 ($3,500), Tier 3 ($6,000), Tier 4 ($8,000)\n- E-Commerce: E-Starter ($2,500), E-Growth ($5,000), E-Trusted ($8,500)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
 
@@ -169,7 +207,7 @@ function getAI(txt, cb) {
     history.push({role:'user', content:txt});
     const payload = JSON.stringify({ system: SYSTEM_PROMPT, messages: history, max_tokens: 350 });
     
-    fetch('https://sazhdnqzaqpqcralmthh.supabase.co/functions/v1/chat-proxy', {
+    fetch(SB_URL + '/functions/v1/chat-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payload
@@ -194,7 +232,7 @@ function fallback(txt, cb) {
     cb(r);
 }
 
-const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
+const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.5 8.5 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
 
 var voiceOn=false;
 window.toggleVoice=function(){
@@ -214,72 +252,85 @@ function speak(txt){
   window.speechSynthesis.cancel();window.speechSynthesis.speak(u);
 }
 
-var recognition=null;
-if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window){
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = true;
-  recognition.lang = 'en-US';
-
-  recognition.onstart = function() {
-    console.log("Mic active");
-  };
-
-  recognition.onresult = function(e){
-    var t = '';
-    for(var i=e.resultIndex; i<e.results.length; ++i) {
-        t += e.results[i][0].transcript;
-    }
-    var inp=document.getElementById('chat-inp');
-    if(inp) {
-        inp.value = t;
-    }
-  };
-
-  recognition.onerror = function(event) {
-    console.error("Mic error", event.error);
-    stopMic();
-    if(event.error === 'not-allowed') {
-        alert("Microphone access denied. Please enable it in your browser settings.");
-    }
-  };
-
-  recognition.onend = function() {
-    stopMic();
-    const inp = document.getElementById('chat-inp');
-    if(inp && inp.value.trim().length > 2) {
-        window.chatSend();
-    }
-  };
-}
-
-window.toggleMic = function(){
-  if(!recognition) return alert("Speech recognition not supported in this browser. Try Chrome or Safari.");
-  var btn=document.getElementById('chat-mic');
-  if(btn.classList.contains('recording')){
-    stopMic();
-  } else {
-    startMic();
-  }
+window.toggleEmojis = function() {
+    document.getElementById('emoji-picker').classList.toggle('open');
 };
 
-function startMic(){
-  if(!recognition)return;
-  try {
-    var btn=document.getElementById('chat-mic');
-    btn.classList.add('recording');
-    recognition.start();
-  } catch(e) {
-    console.error(e);
-    stopMic();
-  }
+// --- High-Fidelity Voice Recording & Attachment Handlers ---
+let mediaRecorder;
+let audioChunks = [];
+
+window.toggleMic = function() {
+    const btn = document.getElementById('chat-mic');
+    if (btn.classList.contains('recording')) {
+        stopAudioRecord();
+    } else {
+        startAudioRecord();
+    }
+};
+
+function startAudioRecord() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
+            document.getElementById('chat-mic').classList.add('recording');
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                uploadToVault(blob, 'voice_note_' + Date.now() + '.webm', 'audio');
+            };
+        })
+        .catch(err => alert("Microphone access denied or not supported."));
 }
-function stopMic(){
-  if(!recognition)return;
-  var btn=document.getElementById('chat-mic');
-  btn.classList.remove('recording');
-  try { recognition.stop(); } catch(e) {}
+
+function stopAudioRecord() {
+    if (mediaRecorder) {
+        mediaRecorder.stop();
+        document.getElementById('chat-mic').classList.remove('recording');
+    }
+}
+
+window.handleChatFile = function(files) {
+    if (files && files[0]) {
+        uploadToVault(files[0], files[0].name, 'file');
+    }
+};
+
+function uploadToVault(file, fileName, type) {
+    addMsg("Uploading " + type + "...", 'bot');
+    const path = 'chatbot_uploads/' + fileName;
+    
+    fetch(SB_URL + '/storage/v1/object/media-vault/' + path, {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + SB_ANON,
+            'Content-Type': file.type,
+            'x-upsert': 'true'
+        },
+        body: file
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.Key || data.path) {
+            const url = SB_URL + '/storage/v1/object/public/media-vault/' + path;
+            if (type === 'audio') {
+                addMsg(`<div class="chat-audio-msg">🎤 Voice Note: <audio controls src="${url}"></audio></div>`, 'usr');
+            } else if (file.type.startsWith('image/')) {
+                addMsg(`<img src="${url}" onclick="window.open('${url}')" />`, 'usr');
+            } else {
+                addMsg(`📎 File attached: <a href="${url}" target="_blank">${fileName}</a>`, 'usr');
+            }
+            // Notify Zapia (Sierra) about the upload
+            getAI("I just uploaded a " + type + ": " + url, (reply) => {
+                addMsg(reply, 'bot');
+            });
+        } else {
+            addMsg("Upload failed. Please try again.", 'bot');
+        }
+    })
+    .catch(() => addMsg("Upload error. Check connection.", 'bot'));
 }
 
 const PKGS={"standard":[{"name":"Starter","price":"$1,500 + $150/mo","desc":"1-Page High-Fidelity Website \u00b7 Full Brand Setup (Logo, Domain, Favicon) \u00b7 Social Media Integration \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Growth","price":"$3,500 + $400/mo","desc":"Manage 1 Brand Page \u00b7 Full Branding & App/Web Architecture \u00b7 Content Creation & Copywriting \u00b7 Advanced SEO & Analytics \u00b7 1 Month Free Maintenance"},{"name":"Trusted","price":"$6,000 + $700/mo","desc":"Full Website Architecture (10-15 Pages) \u00b7 Premium Brand Scaling & PR \u00b7 24/7 Priority Tech Support \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Custom","price":"Starting at $10,000","desc":"Tailored Digital Architecture \u00b7 Custom API & Tool Integration \u00b7 Unique Brand Identity Design \u00b7 Scalable Infrastructure \u00b7 Priority Sovereign Support"}],"ecommerce":[{"name":"E-Starter","price":"$2,500 + $250/mo","desc":"1-Page Online Shop \u00b7 Full Store Branding & Domain \u00b7 Integrated Social Shop Setup \u00b7 Payment Gateway Integration \u00b7 1 Month Free Maintenance"},{"name":"E-Growth","price":"$5,000 + $500/mo","desc":"2-5 Page Store Architecture \u00b7 Full Shop Logic (10+ Products) \u00b7 Deep Copywriting & Product SEO \u00b7 Automated Fulfillment Sync \u00b7 1 Month Free Maintenance"},{"name":"E-Trusted","price":"$8,500 + $850/mo","desc":"Elite Store (50+ Products) \u00b7 15+ Page Network Architecture \u00b7 Advanced Inventory & CRM Automation \u00b7 On-Chain Inventory Logic \u00b7 1 Month Free Maintenance"},{"name":"E-Commerce Maintenance","price":"$199.99/mo","desc":"E-Commerce Store Uptime & Security Monitoring \u00b7 Monthly Product & Content Updates \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"ai":[{"name":"AI Tier 1","price":"$1,500 + $150/mo","desc":"AI Website Chatbot (24/7 Live) \u00b7 Lead Capture & CRM Setup \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 2","price":"$3,500 + $400/mo","desc":"Everything in Tier 1 \u00b7 WhatsApp AI Automation (24/7) \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 3","price":"$6,000 + $700/mo","desc":"Everything in Tier 1 & 2 \u00b7 Email Inbox AI Automation (24/7) \u00b7 AI Reads, Responds & Qualifies Every Email \u00b7 1 Month Free Maintenance"},{"name":"AI Tier 4","price":"$8,000 + $900/mo","desc":"Everything in Tiers 1, 2 & 3 \u00b7 Full Voice Agent Deployment \u00b7 Answers inbound calls 24/7 \u00b7 1 Month Free Maintenance"}],"continuity":[{"name":"Maintenance","price":"$99.99/mo","desc":"Daily Uptime & Security Monitoring \u00b7 Monthly Content Optimization \u00b7 High-Fidelity Technical Backups \u00b7 Priority Sovereign Support"}],"templates":[{"name":"Template Site","price":"$149.99 + $19.99/mo","desc":"Choose any of our 24 templates \u00b7 Logo & colours swapped in \u00b7 Your content added \u00b7 Mobile-optimised \u00b7 Live in 24hrs \u00b7 Hosted on your subdomain"},{"name":"+ Copywriting Add-On","price":"$4.99/update","desc":"Everything in Template Site \u00b7 Professional copywriting for all sections \u00b7 Bio, services, CTA all written for you \u00b7 Delivered in 48-72hrs"},{"name":"+ AI Chatbot Add-On","price":"$349.99 + $49.99/mo","desc":"Everything in Template Site \u00b7 AI chatbot answering your business FAQs 24/7 \u00b7 Hours, services, location, how to book"},{"name":"Micro Store","price":"$249.99 + $34.99/mo","desc":"Full product store built on your chosen template \u00b7 Up to 12 products uploaded with copy & images \u00b7 WhatsApp order button on every product \u00b7 Live in 72-96hrs"},{"name":"Premium Template (3D)","price":"$200 + $19.99/mo","desc":"Aeon \u00b7 Nexus \u00b7 Stellar \u2014 cinematic 3D WebGL experiences \u00b7 Fully immersive \u00b7 Scroll-driven animation"}]};
@@ -435,7 +486,7 @@ function go(step, label){
             return;
         }
         if(s.url) window.open(s.url, '_blank');
-        if(s.r) s.r.forEach(r => addQR(r.l, r.s));
+        if(s.r) s.r.forEach(r => addQR(r.l, r.s, r.i));
     }, 600);
 }
 
@@ -446,7 +497,6 @@ function addQR(label, step, icon){
     
     let iconSvg = '';
     if(icon){
-      // Minimalist Lucide-style SVG mapping
       const icons = {
         'color-swatch': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>',
         'layout': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/>',
