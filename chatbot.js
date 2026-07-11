@@ -194,10 +194,11 @@
                 }
                 .road-btn:hover { background:var(--cb-purple); color:#fff; transform:translateY(-1px); }
             </style>
-            <button class="road-btn" onclick="go('pkg_templates', 'I want a template site')">Template Shop</button>
-            <button class="road-btn" onclick="go('automation', 'AI Automation')">AI Automation</button>
-            <button class="road-btn" onclick="go('pkg_menu', 'Agency Packages')">Agency Packages</button>
-            <button class="road-btn" onclick="go('talk', 'Custom Build')">Custom Build</button>
+            <button class="road-btn" onclick="go('about_brands', 'Show me Evolve')">Evolve</button>
+            <button class="road-btn" onclick="go('about_twmk', 'What is TWMK?')">TWMK</button>
+            <button class="road-btn" onclick="go('about', 'About Prisca Dezigns')">About PD</button>
+            <button class="road-btn" onclick="go('request_audit', 'I want an audit')">Request Audit</button>
+            <button class="road-btn" onclick="go('start', 'Back to menu')">Home</button>
         `;
         const msgs = document.getElementById('chat-msgs');
         msgs.parentNode.insertBefore(r, document.querySelector('.chat-inp-row'));
@@ -361,6 +362,21 @@ function uploadToVault(file, fileName, type) {
 const PKGS={"standard":[{"name":"Starter","price":"$1,500 + $150/mo","desc":"1-Page High-Fidelity Website \u00b7 Full Brand Setup (Logo, Domain, Favicon) \u00b7 Social Media Integration \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Growth","price":"$3,500 + $400/mo","desc":"Manage 1 Brand Page \u00b7 Full Branding & App/Web Architecture \u00b7 Content Creation & Copywriting \u00b7 Advanced SEO & Analytics \u00b7 1 Month Free Maintenance"},{"name":"Trusted","price":"$6,000 + $700/mo","desc":"Full Website Architecture (10-15 Pages) \u00b7 Premium Brand Scaling & PR \u00b7 24/7 Priority Tech Support \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Custom","price":"Starting at $10,000","desc":"Tailored Digital Architecture \u00b7 Custom API & Tool Integration \u00b7 Unique Brand Identity Design \u00b7 Scalable Infrastructure \u00b7 Priority Sovereign Support"}],"ecommerce":[{"name":"E-Starter","price":"$2,500 + $250/mo","desc":"1-Page Online Shop \u00b7 Full Store Branding & Domain \u00b7 Integrated Social Shop Setup \u00b7 Payment Gateway Integration \u00b7 1 Month Free Maintenance"},{"name":"E-Growth","price":"$5,000 + $500/mo","desc":"2-5 Page Store Architecture \u00b7 Full Shop Logic (10+ Products) \u00b7 Deep Copywriting & Product SEO \u00b7 Automated Fulfillment Sync \u00b7 1 Month Free Maintenance"},{"name":"E-Trusted","price":"$8,500 + $850/mo","desc":"Elite Store (50+ Products) \u00b7 15+ Page Network Architecture \u00b7 Advanced Inventory & CRM Automation \u00b7 On-Chain Inventory Logic \u00b7 1 Month Free Maintenance"},{"name":"E-Commerce Maintenance","price":"$199.99/mo","desc":"E-Commerce Store Uptime & Security Monitoring \u00b7 Monthly Product & Content Updates \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"ai":[{"name":"AI Tier 1","price":"$1,500 + $150/mo","desc":"AI Website Chatbot (24/7 Live) \u00b7 Lead Capture & CRM Setup \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 2","price":"$3,500 + $400/mo","desc":"Everything in Tier 1 \u00b7 WhatsApp AI Automation (24/7) \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 3","price":"$6,000 + $700/mo","desc":"Everything in Tier 1 & 2 \u00b7 Email Inbox AI Automation (24/7) \u00b7 AI Reads, Responds & Qualifies Every Email \u00b7 1 Month Free Maintenance"},{"name":"AI Tier 4","price":"$8,000 + $900/mo","desc":"Everything in Tiers 1, 2 & 3 \u00b7 Full Voice Agent Deployment \u00b7 Answers inbound calls 24/7 \u00b7 1 Month Free Maintenance"}],"continuity":[{"name":"Maintenance","price":"$99.99/mo","desc":"Daily Uptime & Security Monitoring \u00b7 Monthly Content Optimization \u00b7 High-Fidelity Technical Backups \u00b7 Priority Sovereign Support"}],"templates":[{"name":"Template Site","price":"$149.99 + $19.99/mo","desc":"Choose any of our 24 templates \u00b7 Logo & colours swapped in \u00b7 Your content added \u00b7 Mobile-optimised \u00b7 Live in 24hrs \u00b7 Hosted on your subdomain"},{"name":"+ Copywriting Add-On","price":"$4.99/update","desc":"Everything in Template Site \u00b7 Professional copywriting for all sections \u00b7 Bio, services, CTA all written for you \u00b7 Delivered in 48-72hrs"},{"name":"+ AI Chatbot Add-On","price":"$349.99 + $49.99/mo","desc":"Everything in Template Site \u00b7 AI chatbot answering your business FAQs 24/7 \u00b7 Hours, services, location, how to book"},{"name":"Micro Store","price":"$249.99 + $34.99/mo","desc":"Full product store built on your chosen template \u00b7 Up to 12 products uploaded with copy & images \u00b7 WhatsApp order button on every product \u00b7 Live in 72-96hrs"},{"name":"Premium Template (3D)","price":"$200 + $19.99/mo","desc":"Aeon \u00b7 Nexus \u00b7 Stellar \u2014 cinematic 3D WebGL experiences \u00b7 Fully immersive \u00b7 Scroll-driven animation"}]};
 
 const STEPS = {
+    "request_audit": {
+    "bot": "I can run a full high-fidelity audit on your current digital infrastructure \u2014 from your website conversion to your automation efficiency. Ready to level up?",
+    "r": [
+        {
+            "l": "Yes, start audit",
+            "s": "talk",
+            "i": "clipboard-check"
+        },
+        {
+            "l": "Back",
+            "s": "start",
+            "i": "arrow-left"
+        }
+    ]
+},
     "start": {
         "bot": "Hey 👋 What brings you here today?",
         "r": [
@@ -619,6 +635,7 @@ if(window.location.pathname.includes('/services')){
 }
 
 })();
+
 
 
 
