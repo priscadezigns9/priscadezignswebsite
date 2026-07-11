@@ -27,8 +27,8 @@
     <div id="auth-screen" class="fixed inset-0 z-[999] glass flex items-center justify-center p-6">
         <div class="max-w-md w-full bg-[#1E293B] rounded-[2.5rem] p-10 shadow-2xl border border-white/5 text-center">
             <div class="w-20 h-20 bg-[#7D52B5] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-500/20"><i data-lucide="shield-check" class="w-10 h-10 text-white"></i></div>
-            <h2 class="text-3xl font-extrabold text-white mb-2 italic">Secure Login</h2>
-            <p class="text-slate-400 mb-8 font-medium">Verify your strategic token to enter the vault.</p>
+            <h2 class="text-3xl font-extrabold text-white mb-2 italic cursor-pointer select-none" onclick="handshake()">Secure Login</h2>
+            <p id="auth-status" class="text-slate-400 mb-8 font-medium">Verify your strategic token to enter the vault.</p>
             <input type="password" id="auth-key" placeholder="Enter Token" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" onkeypress="if(event.key === 'Enter') checkAuth()">
             <button onclick="checkAuth()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">CONNECT</button>
         </div>
@@ -81,11 +81,22 @@
     </main>
     <script>
         lucide.createIcons();
+        let clicks = 0;
+        function handshake() {
+            clicks++;
+            if(clicks === 5) {
+                document.getElementById('auth-status').innerText = 'Neural Link Active. Enter Protocol Token.';
+                document.getElementById('auth-status').classList.add('text-purple-400');
+            }
+        }
         function checkAuth() {
             const key = document.getElementById('auth-key').value;
-            if(key === 'alice') {
+            // Handshake + Token: alice or 398237543
+            if((key === 'alice' || key === '398237543') && clicks >= 5) {
                 document.getElementById('auth-screen').classList.add('hidden');
                 localStorage.setItem('pd_client_auth', 'true');
+            } else if (clicks < 5) {
+                alert('Handshake failed. Initiate protocol first.');
             } else {
                 alert('Authentication Failed. Verify token.');
             }
@@ -214,25 +225,6 @@
             document.getElementById('stat-savings').innerText = '$' + (data.length * 4.25).toFixed(2);
             
             lucide.createIcons();
-        } = await sbClient.from('media').select('*').order('created_at', { ascending: false });
-            if (error) return console.error('Vault Fetch Error:', error);
-            
-            const grid = document.getElementById('vault-grid');
-            grid.innerHTML = data.map(m => `
-                <div class="data-card p-6 rounded-3xl hover:border-purple-500/30 transition-all cursor-pointer" onclick="window.open('${m.file_url}', '_blank')">
-                    <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 text-purple-400"><i data-lucide="file-text"></i></div>
-                    <div class="text-sm font-extrabold text-white truncate">${m.file_name}</div>
-                    <div class="text-[9px] text-slate-500 font-black uppercase mt-1">${m.file_type || 'Document'}</div>
-                    <div class="mt-6 flex items-center justify-between"><i data-lucide="external-link" class="w-4 h-4 text-slate-600"></i><span class="text-[10px] font-black text-purple-400 uppercase">Open File</span></div>
-                </div>
-            `).join('');
-            
-            // Update Overview Stats
-            document.getElementById('stat-items').innerText = data.length;
-            document.getElementById('stat-accuracy').innerText = '99.8%';
-            document.getElementById('stat-savings').innerText = '$' + (data.length * 4.2).toFixed(2);
-            
-            lucide.createIcons();
         }
         fetchVault();
 
@@ -240,6 +232,7 @@
     </script>
 </body>
 </html>
+
 
 
 
