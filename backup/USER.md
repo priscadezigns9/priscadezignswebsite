@@ -21,7 +21,7 @@ who's in their life.
 - **Certifications:** Project Management, Web Design, Administrative Professional.
 - **Channel Preference:** Does not use Slack. Prefers direct updates in-app or via the Google Drive Feature Document.
 - **WhatsApp API Preference:** Prefers **360dialog** over Twilio for client implementations. 360dialog is prioritized for professional WhatsApp Business API integrations due to its specialized focus and feasibility for high-ticket AI automation projects. (Updated 2026-06-27).
-- **UI Preference:** Prefers simplicity. Requested a dual-button entry screen for MUZE (Login vs. Connect Wallet) instead of the split-pane layout. (Updated 2026-06-20).
+- **UI Preference:** Prefers simplicity. Favorite color is purple (Updated 2026-07-10). Requested a dual-button entry screen for MUZE (Login vs. Connect Wallet) instead of the split-pane layout. (Updated 2026-06-20).
 
 ## Professional Experience & Skills
 - **Data Entry Expertise:** Managed high-volume data entry, processing over **700 entries/day** with 100% accuracy.
