@@ -328,7 +328,7 @@ function uploadToVault(file, fileName, type) {
     addMsg("Uploading " + type + "...", 'bot');
     const path = 'chatbot_uploads/' + fileName;
     
-    fetch(SB_URL + '/storage/v1/object/media-vault/' + path, {
+    fetch(SB_URL + '/storage/v1/object/media/' + path, {
         method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + SB_ANON,
@@ -340,7 +340,7 @@ function uploadToVault(file, fileName, type) {
     .then(r => r.json())
     .then(data => {
         if (data.Key || data.path) {
-            const url = SB_URL + '/storage/v1/object/public/media-vault/' + path;
+            const url = SB_URL + '/storage/v1/object/public/media/' + path;
             if (type === 'audio') {
                 addMsg(`<div class="chat-audio-msg">🎤 Voice Note: <audio controls src="${url}"></audio></div>`, 'usr');
             } else if (file.type.startsWith('image/')) {
