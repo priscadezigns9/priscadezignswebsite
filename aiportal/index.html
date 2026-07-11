@@ -111,7 +111,7 @@
                         <option value="all">All Channels</option>
                         <option value="autodrome">The Autodrome</option>
                         <option value="dreaming">Dreaming Anime</option>
-                        <option value="nehneh">NehNeh (Seamurai)</option>
+                        <option value="nehneh">NehNeh (Seamritedesigns)</option>
                         <option value="priscadezigns">Prisca Dezigns</option>
                         
                     </select>
@@ -233,6 +233,7 @@
 
         
         
+        
         function filterByBrand(brand) {
             let dataToFilter = [];
             if (currentView === 'ledger') dataToFilter = allLeads;
@@ -245,6 +246,26 @@
             if (brand === 'all') {
                 render();
             } else {
+                const filtered = dataToFilter.filter(l => {
+                    const brandVal = (l.brand || '').toLowerCase();
+                    const nameVal = (l.name || '').toLowerCase();
+                    const target = brand.toLowerCase();
+                    
+                    // Unified mapping for NehNeh / Seamritedesigns
+                    if (target === 'nehneh') {
+                        return brandVal.includes('nehneh') || brandVal.includes('seamrite');
+                    }
+                    // Mapping for Dreaming Anime
+                    if (target === 'dreaming') {
+                        return brandVal.includes('dreaming') || brandVal.includes('anime');
+                    }
+                    
+                    return brandVal.includes(target) || nameVal.includes(target) || (l.package || '').toLowerCase().includes(target);
+                });
+                renderFiltered(filtered);
+            }
+        }
+ else {
                 const filtered = dataToFilter.filter(l => {
                     const brandVal = (l.brand || '').toLowerCase();
                     const nameVal = (l.name || '').toLowerCase();
@@ -527,6 +548,7 @@
     </div>
 </body>
 </html>
+
 
 
 
