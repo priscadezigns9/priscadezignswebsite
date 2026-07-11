@@ -73,6 +73,10 @@
                     Sierra Chatbot
                 </button>
                 <button onclick="showSection('analysis')" id="btn-analysis" class="nav-btn">
+                <button onclick="showSection('finance')" id="btn-finance" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Finance & Receipts
+                </button>
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                     Sierra Daily Analysis
                 </button>
@@ -124,7 +128,14 @@
         let outreachLeads = [];
         let organicLeads = [];
         let chatLeads = [];
+                // 4. Fetch Finance/Receipts (Placeholder for Claude+Make integration)
+                financeLogs = [
+                    { id: 1, date: '2026-07-10', vendor: 'Amazon', category: 'Infrastructure', amount: '50.00', status: 'Verified' },
+                    { id: 2, date: '2026-07-09', vendor: 'Vultr', category: 'Hosting', amount: '0.00', status: 'Pending' }
+                ];
+
         let voiceLogs = [];
+        let financeLogs = [];
         let chartInstance = null;
 
         async function checkAuth() {
@@ -146,7 +157,8 @@
                 drew: "Drew's Voice Logs",
                 outreach: 'Cold Email Outreach Logs',
                 chat: 'Sierra Organic Chatbot Leads',
-                analysis: 'Sierra Daily Analysis & Metrics'
+                analysis: 'Sierra Daily Analysis & Metrics',
+                finance: 'Financial Intelligence & Receipt Vault'
             };
             document.getElementById('section-title').innerText = titles[view];
             render();
@@ -181,6 +193,12 @@
                 outreachLeads = oLeads || [];
 
                 // 3. Mock Drew Logs (until table is ready)
+                // 4. Fetch Finance/Receipts (Placeholder for Claude+Make integration)
+                financeLogs = [
+                    { id: 1, date: '2026-07-10', vendor: 'Amazon', category: 'Infrastructure', amount: '50.00', status: 'Verified' },
+                    { id: 2, date: '2026-07-09', vendor: 'Vultr', category: 'Hosting', amount: '0.00', status: 'Pending' }
+                ];
+
                 voiceLogs = [
                     { name: 'Michael Chen', status: 'Completed', duration: '4:12', time: '2h ago', transcription: 'Interested in the $1500 Starter package...' },
                     { name: 'Sarah Lopez', status: 'In Progress', duration: '1:45', time: '5h ago', transcription: 'Asking about EV safety for BYD Dolphin...' }
@@ -406,6 +424,53 @@
                 `).join('');
             }
 
+            } else if (currentView === 'finance') {
+                html = ` 
+                    <div class="flex justify-between items-center mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                            <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Monthly Burn</p>
+                                <h3 class="text-3xl font-bold text-slate-800">$170.00</h3>
+                            </div>
+                            <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Receipts Processed</p>
+                                <h3 class="text-3xl font-bold text-purple-600">${financeLogs.length}</h3>
+                            </div>
+                        </div>
+                        <button class="ml-6 bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all flex items-center shrink-0">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap=round stroke-linejoin=round stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Export PDF
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-bottom border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Vendor</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Category</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Amount</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${financeLogs.map(f => ` 
+                                    <tr class="hover:bg-slate-50 transition-all cursor-pointer">
+                                        <td class="px-6 py-4 text-sm text-slate-500">${f.date}</td>
+                                        <td class="px-6 py-4 font-bold text-slate-800">${f.vendor}</td>
+                                        <td class="px-6 py-4">
+                                            <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase">${f.category}</span>
+                                        </td>
+                                        <td class="px-6 py-4 font-bold text-slate-800">${f.amount}</td>
+                                        <td class="px-6 py-4">
+                                            <span class="text-xs font-bold ${f.status === 'Verified' ? 'text-green-600' : 'text-amber-500'}">${f.status}</span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
             container.innerHTML = html;
         }
     </script>
