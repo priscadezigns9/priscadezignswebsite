@@ -443,63 +443,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// Hover Image Logic
+// Cinematic Marquee Hover Logic
 (function() {
-    if (window.hoverImageInitialized) return;
-    window.hoverImageInitialized = true;
-
-    const cursorImg = document.createElement('div');
-    cursorImg.id = 'cursorImg';
-    const img = document.createElement('img');
-    cursorImg.appendChild(img);
-    document.body.appendChild(cursorImg);
-
-    let mouseX = 0, mouseY = 0, posX = 0, posY = 0;
-    const lerp = 0.1;
-
-    window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
-
-    function update() {
-        posX += (mouseX - posX) * lerp;
-        posY += (mouseY - posY) * lerp;
-        cursorImg.style.left = posX + 'px';
-        cursorImg.style.top = posY + 'px';
-        requestAnimationFrame(update);
-    }
-    update();
-
-    function bindHoverEvents() {
+    function bindMarqueeEvents() {
         const cards = document.querySelectorAll('.t-card');
         cards.forEach(card => {
-            if (card.dataset.hoverBound) return;
-            card.dataset.hoverBound = 'true';
+            if (card.dataset.marqueeBound) return;
+            card.dataset.marqueeBound = 'true';
 
-            card.addEventListener('mouseenter', () => {
-                const thumb = card.querySelector('.t-thumb-img');
-                if (thumb && thumb.src) {
-                    img.src = thumb.src;
-                    cursorImg.classList.add('active');
-                }
-            });
+            // Use .t-iframe-wrap as the image container for injection
+            const wrap = card.querySelector('.t-iframe-wrap');
+            if (wrap) {
+                // Dynamically inject the marquee elements
+                const overlay = document.createElement('div');
+                overlay.className = 'marquee-overlay';
+                const label = document.createElement('div');
+                label.className = 'view-label';
+                label.textContent = 'View Preview';
+                
+                wrap.appendChild(overlay);
+                wrap.appendChild(label);
 
-            card.addEventListener('mouseleave', () => {
-                cursorImg.classList.remove('active');
-            });
+                // Add mousemove listener to update CSS variables for the radial gradient
+                card.addEventListener('mousemove', (e) => {
+                    const rect = wrap.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    wrap.style.setProperty('--x', x + '%');
+                    wrap.style.setProperty('--y', y + '%');
+                });
+            }
         });
     }
 
     function observeGrid() {
         const grid = document.getElementById('t-grid');
         if (!grid) return;
-        new MutationObserver(bindHoverEvents).observe(grid, { childList: true, subtree: true });
+        new MutationObserver(bindMarqueeEvents).observe(grid, { childList: true, subtree: true });
     }
 
     function init() {
         if (document.getElementById('t-grid')) {
-            bindHoverEvents();
+            bindMarqueeEvents();
             observeGrid();
         }
     }
