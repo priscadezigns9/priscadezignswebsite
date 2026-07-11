@@ -442,22 +442,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+
 // Hover Image Logic
 (function() {
-    // Prevent double initialization
-    if (document.getElementById("cursorImg")) return;
+    if (window.hoverImageInitialized) return;
+    window.hoverImageInitialized = true;
 
-    const cursorImg = document.createElement("div");
-    cursorImg.id = "cursorImg";
-    const img = document.createElement("img");
+    const cursorImg = document.createElement('div');
+    cursorImg.id = 'cursorImg';
+    const img = document.createElement('img');
     cursorImg.appendChild(img);
     document.body.appendChild(cursorImg);
 
-    let mouseX = 0, mouseY = 0;
-    let posX = 0, posY = 0;
+    let mouseX = 0, mouseY = 0, posX = 0, posY = 0;
     const lerp = 0.1;
 
-    window.addEventListener("mousemove", (e) => {
+    window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
     });
@@ -465,50 +465,47 @@ document.addEventListener('DOMContentLoaded', function() {
     function update() {
         posX += (mouseX - posX) * lerp;
         posY += (mouseY - posY) * lerp;
-        cursorImg.style.left = posX + "px";
-        cursorImg.style.top = posY + "px";
+        cursorImg.style.left = posX + 'px';
+        cursorImg.style.top = posY + 'px';
         requestAnimationFrame(update);
     }
     update();
 
     function bindHoverEvents() {
-        const cards = document.querySelectorAll(".t-card");
+        const cards = document.querySelectorAll('.t-card');
         cards.forEach(card => {
             if (card.dataset.hoverBound) return;
-            card.dataset.hoverBound = "true";
+            card.dataset.hoverBound = 'true';
 
-            card.addEventListener("mouseenter", () => {
-                const thumb = card.querySelector(".t-thumb-img");
+            card.addEventListener('mouseenter', () => {
+                const thumb = card.querySelector('.t-thumb-img');
                 if (thumb && thumb.src) {
                     img.src = thumb.src;
-                    cursorImg.classList.add("active");
+                    cursorImg.classList.add('active');
                 }
             });
 
-            card.addEventListener("mouseleave", () => {
-                cursorImg.classList.remove("active");
+            card.addEventListener('mouseleave', () => {
+                cursorImg.classList.remove('active');
             });
         });
     }
 
     function observeGrid() {
-        const grid = document.getElementById("t-grid");
+        const grid = document.getElementById('t-grid');
         if (!grid) return;
-        const observer = new MutationObserver(() => {
-            bindHoverEvents();
-        });
-        observer.observe(grid, { childList: true, subtree: true });
+        new MutationObserver(bindHoverEvents).observe(grid, { childList: true, subtree: true });
     }
 
     function init() {
-        if (document.getElementById("t-grid")) {
+        if (document.getElementById('t-grid')) {
             bindHoverEvents();
             observeGrid();
         }
     }
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
