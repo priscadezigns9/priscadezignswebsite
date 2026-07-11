@@ -41,7 +41,8 @@
     #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
     
     .chat-hdr { background: linear-gradient(135deg, var(--cb-purple), var(--cb-deep)); padding:24px 28px; display:flex; align-items:center; gap:16px; flex-shrink:0; }
-    .chat-avatar { width:48px; height:48px; border-radius:18px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-shrink:0; color: var(--cb-purple); }
+    .chat-avatar { width:48px; height:48px; border-radius:18px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-shrink:0; padding: 4px; overflow: hidden; }
+    .chat-avatar img { width: 100%; height: 100%; object-fit: contain; }
     .chat-hdr-name { font-size:1.1rem; font-weight:800; color:#fff; font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
     .chat-hdr-status { font-size:0.75rem; color:rgba(255,255,255,0.8); display:flex; align-items:center; gap:8px; margin-top:2px; font-weight: 500; }
     .chat-sdot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow: 0 0 10px #22c55e; animation: pgr 2s infinite; }
@@ -81,7 +82,9 @@
         background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:16px; 
         transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         font-family: 'Inter', sans-serif;
+        display: flex; align-items: center; gap: 10px;
     }
+    .qrb svg { width: 16px; height: 16px; flex-shrink: 0; stroke-width: 2.5; }
     .qrb:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.2); }
     .qrb.wa { background: #22c55e; color:#fff; border-color:#22c55e; display:inline-flex; align-items:center; gap:8px; }
     
@@ -126,7 +129,7 @@
     <div id="pd-chat-window">
         <div class="chat-hdr">
             <div class="chat-avatar">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="P">
             </div>
             <div style="flex:1">
                 <div class="chat-hdr-name">Prisca Dezigns</div>
@@ -285,98 +288,98 @@ const STEPS = {
     "start": {
         "bot": "Hey 👋 What brings you here today?",
         "r": [
-            { "l": "🎨 I want a template site", "s": "pkg_templates" },
-            { "l": "🏗️ I need a custom website", "s": "need_website" },
-            { "l": "🤖 I need AI automation", "s": "automation" },
-            { "l": "📦 Agency Packages", "s": "pkg_menu" },
-            { "l": "ℹ️ About Prisca Dezigns", "s": "about" }
+            { "l": "I want a template site", "s": "pkg_templates", "i": "color-swatch" },
+            { "l": "I need a custom website", "s": "need_website", "i": "layout" },
+            { "l": "I need AI automation", "s": "automation", "i": "cpu" },
+            { "l": "Agency Packages", "s": "pkg_menu", "i": "package" },
+            { "l": "About Prisca Dezigns", "s": "about", "i": "info" }
         ]
     },
     "about": {
         "bot": "Prisca Dezigns is a high-fidelity digital agency specializing in premium web architecture and AI automation. We're on a mission to build the future of the Caribbean.",
         "r": [
-            { "l": "🚗 Evolve Mobility", "s": "about_brands" },
-            { "l": "✝️ The Way Made Known", "s": "about_twmk" },
-            { "l": "👩‍💻 About Prisca Dezigns", "s": "about_founder" },
-            { "l": "← Back", "s": "start" }
+            { "l": "Evolve Mobility", "s": "about_brands", "i": "car" },
+            { "l": "The Way Made Known", "s": "about_twmk", "i": "heart" },
+            { "l": "About Prisca Dezigns", "s": "about_founder", "i": "user" },
+            { "l": "Back", "s": "start", "i": "arrow-left" }
         ]
     },
     "about_brands": {
         "bot": "We are the strategic digital partners for Evolve Mobility (driveevolve.com), the leading EV dealership in the Caribbean.\n\nInventory & Pricing:\n⚡ BYD Atto 3: $285,000 TTD\n⚡ BYD Dolphin: $195,000 TTD\n⚡ GAC AION Y Plus: $245,000 TTD\n⚡ Leapmotor C11: $310,000 TTD\n⚡ Leapmotor T03: $145,000 TTD",
         "r": [
-            { "l": "Visit Evolve Mobility", "url": "https://driveevolve.com" },
-            { "l": "← Back", "s": "about" }
+            { "l": "Visit Evolve Mobility", "url": "https://driveevolve.com", "i": "external-link" },
+            { "l": "Back", "s": "about", "i": "arrow-left" }
         ]
     },
     "about_twmk": {
         "bot": "The Way Made Known (TWMK) is our humanitarian backbone. We use a portion of our agency profits to share the Gospel and provide community support in Trinidad and Tobago.",
         "r": [
-            { "l": "← Back", "s": "about" }
+            { "l": "Back", "s": "about", "i": "arrow-left" }
         ]
     },
     "about_founder": {
         "bot": "Prisca Dezigns was founded in Trinidad & Tobago by Priscilla Narine. With a focus on high-fidelity results and precision data management, she leads a team that integrates AI into professional workflows seamlessly.",
         "r": [
-            { "l": "← Back", "s": "about" }
+            { "l": "Back", "s": "about", "i": "arrow-left" }
         ]
     },
     "need_website": {
         "bot": "Our custom websites are built from scratch — fully tailored to your brand, SEO-optimised, and delivered fast. What do you need?",
         "r": [
-            { "l": "⚡ Need it in 24hrs — $200", "s": "pkg_oneday" },
-            { "l": "I need a full custom build", "s": "pkg_standard" },
-            { "l": "Mine isn't converting", "s": "bad_website" },
-            { "l": "🎨 Show me templates instead", "s": "pkg_templates" }
+            { "l": "Need it in 24hrs — $200", "s": "pkg_oneday", "i": "zap" },
+            { "l": "I need a full custom build", "s": "pkg_standard", "i": "code" },
+            { "l": "Mine isn't converting", "s": "bad_website", "i": "trending-down" },
+            { "l": "Show me templates instead", "s": "pkg_templates", "i": "color-swatch" }
         ]
     },
     "pkg_menu": {
         "bot": "Our agency packages are full custom builds — designed, developed and delivered by Prisca Dezigns. Which fits your needs?",
         "r": [
-            { "l": "⚡ 1-Day Website — $200", "s": "pkg_oneday" },
-            { "l": "🌐 Custom Website Packages", "s": "pkg_standard" },
-            { "l": "🛒 E-Commerce Packages", "s": "pkg_ecommerce" },
-            { "l": "🤖 AI Consultancy", "s": "pkg_ai" },
-            { "l": "🔧 Maintenance", "s": "pkg_continuity" },
-            { "l": "🎨 I want a template instead", "s": "pkg_templates" }
+            { "l": "1-Day Website — $200", "s": "pkg_oneday", "i": "zap" },
+            { "l": "Custom Website Packages", "s": "pkg_standard", "i": "layout" },
+            { "l": "E-Commerce Packages", "s": "pkg_ecommerce", "i": "shopping-bag" },
+            { "l": "AI Consultancy", "s": "pkg_ai", "i": "cpu" },
+            { "l": "Maintenance", "s": "pkg_continuity", "i": "tool" },
+            { "l": "I want a template instead", "s": "pkg_templates", "i": "color-swatch" }
         ]
     },
     "pkg_oneday": {
         "bot": "The 1-Day Website is a fully custom site — built to your brand, live within 24 hours. One flat price: $200 setup. Then $50/mo to keep it live, optimised, and secure.",
         "r": [
-            { "l": "What's included?", "s": "oneday_included" },
-            { "l": "I want this — let's talk", "s": "talk" },
-            { "l": "See other packages", "s": "pkg_menu" }
+            { "l": "What's included?", "s": "oneday_included", "i": "check-circle" },
+            { "l": "I want this — let's talk", "s": "talk", "i": "message-circle" },
+            { "l": "See other packages", "s": "pkg_menu", "i": "package" }
         ]
     },
     "oneday_included": {
         "bot": "Your 1-Day Site includes: ✦ Full custom design (not a template) ✦ Mobile-first, fast-loading ✦ SEO + GEO + AEO optimised ✦ WhatsApp & contact integration ✦ Live in 24 hours. $200 flat. $50/mo maintenance.",
         "r": [
-            { "l": "Let's get started", "s": "talk" },
-            { "l": "See template option instead", "s": "pkg_templates" },
-            { "l": "See all packages", "s": "pkg_menu" }
+            { "l": "Let's get started", "s": "talk", "i": "zap" },
+            { "l": "See template option instead", "s": "pkg_templates", "i": "color-swatch" },
+            { "l": "See all packages", "s": "pkg_menu", "i": "package" }
         ]
     },
     "automation": {
         "bot": "We build AI systems that replace a full-time customer service rep. They respond, qualify, and follow up — all day, every day. What are you trying to automate?",
         "r": [
-            { "l": "Customer service / enquiries", "s": "how_it_works" },
-            { "l": "WhatsApp automation", "s": "whatsapp_auto" },
-            { "l": "Full business automation", "s": "pkg_ai" },
-            { "l": "Talk to someone", "s": "talk" }
+            { "l": "Customer service / enquiries", "s": "how_it_works", "i": "headphones" },
+            { "l": "WhatsApp automation", "s": "whatsapp_auto", "i": "message-square" },
+            { "l": "Full business automation", "s": "pkg_ai", "i": "settings" },
+            { "l": "Talk to someone", "s": "talk", "i": "message-circle" }
         ]
     },
     "whatsapp_auto": {
         "bot": "We integrate an AI agent directly into your WhatsApp Business. It responds to every message instantly, qualifies the lead, and alerts you only when someone is ready to pay.",
         "r": [
-            { "l": "See AI packages", "s": "pkg_ai" },
-            { "l": "Talk to someone", "s": "talk" }
+            { "l": "See AI packages", "s": "pkg_ai", "i": "package" },
+            { "l": "Talk to someone", "s": "talk", "i": "message-circle" }
         ]
     },
     "how_it_works": {
         "bot": "We connect an AI agent to your WhatsApp, website, or email. It greets every lead, asks qualifying questions, routes serious buyers to you, and follows up with everyone else automatically. Setup takes 2–4 weeks.",
         "r": [
-            { "l": "See AI packages", "s": "pkg_ai" },
-            { "l": "Talk to someone", "s": "talk" }
+            { "l": "See AI packages", "s": "pkg_ai", "i": "package" },
+            { "l": "Talk to someone", "s": "talk", "i": "message-circle" }
         ]
     },
     "talk": {
@@ -436,10 +439,40 @@ function go(step, label){
     }, 600);
 }
 
-function addQR(label, step){
+function addQR(label, step, icon){
     const q = document.getElementById('chat-qr');
     const b = document.createElement('button');
-    b.className = 'qrb'; b.textContent = label;
+    b.className = 'qrb';
+    
+    let iconSvg = '';
+    if(icon){
+      // Minimalist Lucide-style SVG mapping
+      const icons = {
+        'color-swatch': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>',
+        'layout': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/>',
+        'cpu': '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 20v2M15 20v2M9 2v2M15 2v2M20 9h2M20 15h2M2 9h2M2 15h2M9 9h6v6H9z"/>',
+        'package': '<path d="m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>',
+        'info': '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+        'car': '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/>',
+        'heart': '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+        'user': '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+        'arrow-left': '<path d="m12 19-7-7 7-7M19 12H5"/>',
+        'zap': '<path d="M13 2 L3 14 L12 14 L11 22 L21 10 L12 10 L13 2 Z"/>',
+        'code': '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+        'trending-down': '<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>',
+        'shopping-bag': '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+        'tool': '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+        'check-circle': '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+        'message-circle': '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+        'headphones': '<path d="M3 14h3v7H3v-7zm15 0h3v7h-3v-7z"/><path d="M3 14v-4a9 9 0 0 1 18 0v4"/>',
+        'message-square': '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+        'settings': '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+        'external-link': '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>'
+      };
+      iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${icons[icon] || icons['info']}</svg>`;
+    }
+
+    b.innerHTML = iconSvg + `<span>${label}</span>`;
     b.onclick = () => go(step, label);
     q.appendChild(b);
 }
