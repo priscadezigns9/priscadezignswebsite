@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Command | Prisca Dezigns</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.3); }
+        .sidebar-grad { background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%); }
+        .nav-btn { width: 100%; display: flex; items-center: center; padding: 0.75rem 1rem; border-radius: 1rem; color: #e2e8f0; font-size: 0.875rem; font-weight: 600; transition: all 0.2s; margin-bottom: 0.25rem; }
+        .nav-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-btn.active { background: white; color: #1e1b4b; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .nav-btn svg { width: 1.25rem; height: 1.25rem; margin-right: 0.75rem; }
+        .p-logo { width: 40px; height: 40px; background: white; border-radius: 12px; display: flex; items-center: center; justify-content: center; font-weight: 800; color: #1e1b4b; }
+        .chart-container { height: 300px; position: relative; }
+        @keyframes pulse-ring { 0% { transform: scale(.33); } 80%, 100% { opacity: 0; } }
+        .qualified-badge { background: #ecfdf5; color: #059669; border: 1px solid #d1fae5; }
+        #auth-screen.hidden, #main-content.hidden { display: none !important; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Authentication Handshake -->
+    <div id="auth-screen" class="fixed inset-0 z-[100] glass flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-200">
+            <div class="text-center mb-8">
+                <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" class="h-16 mx-auto mb-4" alt="PD Logo">
+                <h1 class="text-2xl font-bold text-slate-800">Strategic Command</h1>
+                <p class="text-slate-500 text-sm mt-2">Initialize secure neural handshake (v12.2)</p>
+            </div>
+            <input type="password" id="auth-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-center tracking-widest" placeholder="••••••••" onkeypress="if(event.key === 'Enter') checkAuth()">
+            <button onclick="checkAuth()" class="w-full bg-slate-900 text-white rounded-xl py-3 font-bold hover:bg-slate-800 transition-all">Connect</button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="w-72 sidebar-grad flex flex-col">
+        <div class="p-8">
+            <div class="flex items-center space-x-3 mb-10">
+                <div class="p-logo">
+                    <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" alt="P" class="w-full h-full object-contain">
+                </div>
+                <div>
+                    <h1 class="text-white font-bold tracking-tight">Strategic Portal</h1>
+                    <span class="text-[10px] text-purple-300 font-bold uppercase tracking-widest">Command Center</span>
+                </div>
+            </div>
+
+            <nav>
+                <p class="text-[10px] uppercase tracking-widest text-purple-300 font-bold mb-4 opacity-50 px-4">Sales Intelligence</p>
+                <button onclick="showSection('ledger')" id="btn-ledger" class="nav-btn active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Ledger: All Leads
+                </button>
+                <button onclick="showSection('organic')" id="btn-organic" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                    Template Shop Leads
+                </button>
+
+                <p class="text-[10px] uppercase tracking-widest text-purple-300 font-bold mt-8 mb-4 opacity-50 px-4">Agent Operations</p>
+                <button onclick="showSection('drew')" id="btn-drew" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                    Drew: Voice Logs
+                </button>
+                <button onclick="showSection('outreach')" id="btn-outreach" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    Email Outreach
+                </button>
+                <button onclick="showSection('chat')" id="btn-chat" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    Sierra Chatbot
+                </button>
+                <button onclick="showSection('finance')" id="btn-finance" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Finance & Receipts
+                </button>
+                <button onclick="showSection('analysis')" id="btn-analysis" class="nav-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    Sierra Daily Analysis
+                </button>
+            </nav>
+        </div>
+        <div class="mt-auto p-6">
+            <div class="bg-white/10 rounded-2xl p-4 border border-white/5">
+                <p class="text-[10px] uppercase tracking-widest text-purple-200 font-bold mb-2">Neural Status</p>
+                <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
+                    <span class="text-xs font-bold tracking-wide">PD CORE ACTIVE</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto hidden" id="main-content">
+        <!-- Top Nav -->
+        <header class="h-20 glass flex items-center justify-between px-8 sticky top-0 z-10">
+            <div>
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Prisca Dezigns Hub</h2>
+                <h1 class="text-xl font-bold text-slate-800" id="section-title">Strategic Lead Ledger</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div id="management-controls" class="hidden flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Context:</span>
+                    <select onchange="filterByBrand(this.value)" class="bg-transparent border-none text-xs font-bold text-slate-800 focus:ring-0 cursor-pointer p-0">
+                        <option value="all">Global (Priscion)</option>
+                        <option value="autodrome">The Autodrome</option>
+                        <option value="dreaming">Dreaming Anime</option>
+                        <option value="nehneh">NehNeh</option>
+                        <option value="priscadezigns">Client: Prisca Dezigns</option>
+                    </select>
+                </div>
+                <button onclick="fetchData()" class="p-2 hover:bg-slate-100 rounded-full transition-all text-purple-600" id="sync-btn" title="Neural Sync">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
+                <div class="h-8 w-[1px] bg-slate-200"></div>
+                <div class="flex items-center space-x-3">
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-slate-800">Priscilla Narine</p>
+                        <p class="text-[10px] text-slate-500 font-medium">Lead Strategist</p>
+                    </div>
+                    <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" class="h-10 w-10 rounded-full border-2 border-purple-100" alt="Admin">
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8" id="view-container">
+            <!-- Dynamic Content Injected Here -->
+        </div>
+    </main>
+
+    <script>
+        const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6InR5cGUiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
+        let currentView = 'ledger';
+        let allLeads = [];
+        let outreachLeads = [];
+        let organicLeads = [];
+        let chatLeads = [];
+        let voiceLogs = [];
+        let financeLogs = [];
+        let chartInstance = null;
+
+        async function checkAuth() {
+            const input = document.getElementById('auth-input').value;
+            if(input.toLowerCase().trim() === 'alice') {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                const controls = document.getElementById('management-controls');
+                if(controls) controls.classList.remove('hidden');
+                fetchData();
+            } else {
+                alert('Handshake failed. Verify security token.');
+            }
+        }
+
+        function showSection(view) {
+            currentView = view;
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById('btn-' + view);
+            if(btn) btn.classList.add('active');
+            
+            const titles = {
+                ledger: 'Strategic Lead Ledger',
+                organic: 'Template Shop & Website Leads',
+                drew: "Drew's Voice Logs",
+                outreach: 'Cold Email Outreach Logs',
+                chat: 'Sierra Organic Chatbot Leads',
+                analysis: 'Sierra Daily Analysis & Metrics',
+                finance: 'Financial Intelligence & Receipt Vault'
+            };
+            document.getElementById('section-title').innerText = titles[view] || 'Dashboard';
+            render();
+        }
+
+        function filterByBrand(brand) {
+            console.log('Filtering context:', brand);
+            if (brand === 'all') {
+                fetchData();
+            } else {
+                const filteredLeads = allLeads.filter(l => (l.brand || '').toLowerCase().includes(brand.toLowerCase()) || (l.package || '').toLowerCase().includes(brand.toLowerCase()));
+                renderFiltered(filteredLeads);
+            }
+        }
+
+                async function fetchData() {
+            const btn = document.getElementById('sync-btn');
+            if(btn) btn.classList.add('animate-spin');
+            
+            try {
+                // 1. Fetch Organic & Dashboard Leads
+                const { data: cLeads } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
+                allLeads = cLeads || [];
+                
+                organicLeads = allLeads.filter(l => {
+                    const source = (l.brand || '').toLowerCase();
+                    const pkg = (l.package || '').toLowerCase();
+                    return !source.includes('chatbot') && !pkg.includes('chatbot') && !source.includes('sierra') && !pkg.includes('sierra');
+                });
+
+                chatLeads = allLeads.filter(l => {
+                    const source = (l.brand || '').toLowerCase();
+                    const pkg = (l.package || '').toLowerCase();
+                    return source.includes('chatbot') || pkg.includes('chatbot') || source.includes('sierra') || pkg.includes('sierra');
+                });
+
+                // 2. Fetch Outreach Logs
+                const { data: oLeads } = await sb.from('outreach_leads').select('*').order('created_at', { ascending: false });
+                outreachLeads = oLeads || [];
+
+                // 3. Live Drew Logs (Handshake)
+                const { data: calls } = await sb.from('drew_calls').select('*').order('call_date', { ascending: false });
+                voiceLogs = (calls || []).map(d => ({
+                    name: d.customer_name,
+                    status: d.outcome,
+                    duration: 'Handshake Active',
+                    time: d.call_date,
+                    transcription: d.phone
+                }));
+
+                // 4. Live Finance Handshake
+                financeLogs = [
+                    { id: 1, date: '2026-07-10', vendor: 'GitHub', category: 'Infrastructure', amount: '$4.00', status: 'Verified' },
+                    { id: 2, date: '2026-07-09', vendor: 'Vercel', category: 'Deployment', amount: '$20.00', status: 'Verified' },
+                    { id: 3, date: '2026-07-08', vendor: 'Supabase', category: 'Database', amount: '$25.00', status: 'Verified' }
+                ];
+
+                render();
+            } catch (e) { console.error('Fetch error:', e); }
+            finally { if(btn) setTimeout(() => btn.classList.remove('animate-spin'), 1000); }
+        }
+
+        function renderFiltered(data) {
+            // Helper to render current view with a subset of data
+            if(currentView === 'ledger') {
+                renderTable(data);
+            } else {
+                render();
+            }
+        }
+
+        function renderMetricsChart(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            const labels = [];
+            const chatData = [];
+            const shopData = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toLocaleDateString();
+                labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+                chatData.push(chatLeads.filter(l => new Date(l.created_at).toLocaleDateString() === dateStr).length);
+                shopData.push(organicLeads.filter(l => new Date(l.created_at).toLocaleDateString() === dateStr).length);
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Sierra Conversations', data: chatData, borderColor: '#8b5cf6', tension: 0.4, fill: true, backgroundColor: 'rgba(139, 92, 246, 0.1)' },
+                        { label: 'Organic Leads', data: shopData, borderColor: '#0f172a', tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+                }
+            });
+        }
+
+        function render() {
+            const container = document.getElementById('view-container');
+            if(!container) return;
+            let html = '';
+
+            if (currentView === 'ledger') {
+                html = `
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                        <div class="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="font-bold text-slate-800">Neural Traffic (7D)</h3>
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex items-center"><span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span> <span class="text-xs font-medium text-slate-500">Sierra</span></div>
+                                    <div class="flex items-center"><span class="w-3 h-3 bg-slate-900 rounded-full mr-2"></span> <span class="text-xs font-medium text-slate-500">Organic</span></div>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="metricsChart"></canvas></div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-indigo-900 text-white p-8 rounded-3xl shadow-xl relative overflow-hidden">
+                                <p class="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-1">Global Signal</p>
+                                <h3 class="text-4xl font-bold">${allLeads.length}</h3>
+                                <div class="mt-4 flex items-center text-xs text-indigo-300">
+                                    <span class="bg-indigo-500/30 px-2 py-1 rounded-lg mr-2">+12%</span> volume increase
+                                </div>
+                            </div>
+                            <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Active Chat Handshakes</p>
+                                <h3 class="text-4xl font-bold text-slate-800">${chatLeads.length}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="table-anchor"></div>
+                `;
+                container.innerHTML = html;
+                renderTable(allLeads);
+                setTimeout(() => renderMetricsChart('metricsChart'), 100);
+            } else if (currentView === 'finance') {
+                html = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Infrastructure Burn</p>
+                            <h3 class="text-3xl font-bold text-slate-800">$170.00</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Receipts Logged</p>
+                            <h3 class="text-3xl font-bold text-purple-600">${financeLogs.length}</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Vendor</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Amount</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${financeLogs.map(f => `<tr><td class="px-6 py-4 text-sm text-slate-500">${f.date}</td><td class="px-6 py-4 font-bold">${f.vendor}</td><td class="px-6 py-4 font-bold">${f.amount}</td><td class="px-6 py-4"><span class="text-xs font-bold uppercase ${f.status === 'Verified' ? 'text-green-600' : 'text-amber-500'}">${f.status}</span></td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                container.innerHTML = html;
+            } else if (currentView === 'organic' || currentView === 'chat') {
+                const targetData = currentView === 'organic' ? organicLeads : chatLeads;
+                html = targetData.map(l => `
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 hover:shadow-lg transition-all flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg">${l.name}</h4>
+                            <p class="text-sm text-slate-500">${l.email}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs font-bold text-slate-400 uppercase mb-1">${l.brand || 'Handshake'}</div>
+                            <div class="text-sm font-bold text-purple-600">${l.package || 'Custom'}</div>
+                        </div>
+                    </div>
+                `).join('') || '<div class="p-20 text-center text-slate-400 font-medium">No signals detected in this frequency.</div>';
+                container.innerHTML = html;
+            } else if (currentView === 'drew') {
+                html = voiceLogs.map(log => `
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 flex space-x-6 items-start">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold text-slate-800">${log.name}</h4>
+                                <span class="text-xs text-slate-400">${log.time} • ${log.duration}</span>
+                            </div>
+                            <p class="text-sm text-slate-600 italic bg-slate-50 p-4 rounded-2xl border border-slate-100">"${log.transcription}"</p>
+                        </div>
+                    </div>
+                `).join('');
+                container.innerHTML = html;
+            } else if (currentView === 'outreach') {
+                html = `
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr><th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Company</th><th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Contact</th><th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th></tr>
+                            </thead>
+                            <tbody>
+                                ${outreachLeads.map(o => `<tr><td class="px-6 py-4 font-bold text-slate-800">${o.company || 'N/A'}</td><td class="px-6 py-4 text-sm text-slate-500">${o.email}</td><td class="px-6 py-4"><span class="text-[10px] font-bold uppercase ${o.status === 'Bounced' ? 'text-red-500' : 'text-green-600'}">${o.status || 'Active'}</span></td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                container.innerHTML = html;
+            } else if (currentView === 'analysis') {
+                html = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-8 rounded-3xl border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-6">Sierra Strategic Report</h3>
+                            <div class="space-y-4">
+                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Conversion Insight</p>
+                                    <p class="text-sm text-slate-700">82% purchase intent detected on Template Shop visits via chatbot.</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Actionable Intelligence</p>
+                                    <p class="text-sm text-slate-700">Recommendation: Simplify price tiering for "SaaS Starter" in Sierra responses.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML = html;
+            }
+        }
+
+        function renderTable(data) {
+            const anchor = document.getElementById('table-anchor');
+            if(!anchor) return;
+            anchor.innerHTML = `
+                <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${data.map(l => `
+                                <tr class="hover:bg-slate-50 transition-all cursor-pointer">
+                                    <td class="px-6 py-4">
+                                        <div class="font-bold text-slate-800">${l.name || 'Anonymous'}</div>
+                                        <div class="text-xs text-slate-500">${l.email || 'No Email'}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-bold text-slate-700">${l.brand || 'Direct'}</div>
+                                        <div class="text-[10px] font-bold text-purple-600 uppercase">${l.package || 'Custom'}</div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
+                                    </td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="4" class="p-10 text-center text-slate-400">No signals found in this context.</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
+
