@@ -7,7 +7,7 @@
         s.id = 'pd-chat-style';
         s.innerHTML = `
     :root {
-        --cb-purple: #9B59FF;
+        --cb-purple: #8E44AD;
         --cb-deep: #6e48aa;
         --cb-bg: rgba(116, 48, 137, 0.85);
         --cb-text: #1e1b4b;
@@ -540,5 +540,6 @@ if(window.location.pathname.includes('/services')){
 }
 
 })();
+
 
 
