@@ -495,3 +495,6 @@ document.addEventListener('DOMContentLoaded', function() {
         init();
     }
 })();
+
+
+(function(){function h(){const ps=document.querySelectorAll(".t-iframe-placeholder");ps.forEach(p=>{if(p.dataset.c)return;p.dataset.c=1;const o=document.createElement("div");o.className="marquee-overlay";p.appendChild(o);const l=document.createElement("div");l.className="view-label-cinematic";l.textContent="View Preview";p.appendChild(l);p.onmousemove=e=>{const r=p.getBoundingClientRect();const x=(e.clientX-r.left)/r.width*100;const y=(e.clientY-r.top)/r.height*100;p.style.setProperty("--x",x+"%");p.style.setProperty("--y",y+"%")}})}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",h);else h();const g=document.querySelector(".t-grid")||document.body;new MutationObserver(h).observe(g,{childList:1,subtree:1})})();
