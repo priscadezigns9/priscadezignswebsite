@@ -1,27 +1,24 @@
-
-(function(){
-    function initCinematic(){
-        const items = document.querySelectorAll('.t-iframe-placeholder');
-        items.forEach(el => {
-            if (el.dataset.cinematic) return;
-            el.dataset.cinematic = 'true';
-            const overlay = document.createElement('div');
-            overlay.className = 'marquee-overlay';
-            el.appendChild(overlay);
-            const label = document.createElement('div');
-            label.className = 'view-label-cinematic';
-            label.textContent = 'View Preview';
-            el.appendChild(label);
-            el.addEventListener('mousemove', (e) => {
-                const rect = el.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                el.style.setProperty('--x', x + '%');
-                el.style.setProperty('--y', y + '%');
-            });
+(function() {
+    function init() {
+        document.querySelectorAll('.t-iframe-placeholder').forEach(ph => {
+            if (ph.dataset.cin) return; ph.dataset.cin = '1';
+            const o = document.createElement('div'); o.className = 'cinematic-overlay'; ph.appendChild(o);
+            const l = document.createElement('div'); l.className = 'cinematic-label'; l.textContent = 'View Preview'; ph.appendChild(l);
+            ph.onmousemove = e => {
+                const r = ph.getBoundingClientRect();
+                ph.style.setProperty('--x', ((e.clientX - r.left) / r.width) * 100 + '%');
+                ph.style.setProperty('--y', ((e.clientY - r.top) / r.height) * 100 + '%');
+            };
+            ph.onmouseenter = () => {
+                const i = ph.querySelector('.t-thumb-img');
+                if (i) { i.style.transform = 'scale(1.1)'; i.style.filter = 'brightness(0.7) contrast(1.2)'; i.style.transition = 'all 0.5s ease'; }
+            };
+            ph.onmouseleave = () => {
+                const i = ph.querySelector('.t-thumb-img');
+                if (i) { i.style.transform = 'scale(1)'; i.style.filter = 'none'; }
+            };
         });
     }
-    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initCinematic); } else { initCinematic(); }
-    const target = document.querySelector('.t-grid') || document.body;
-    new MutationObserver(initCinematic).observe(target, { childList: true, subtree: true });
+    init();
+    new MutationObserver(init).observe(document.body, { childList: true, subtree: true });
 })();
