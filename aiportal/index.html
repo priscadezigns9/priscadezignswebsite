@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Command Centre | Prisca Dezigns</title>
+    <title>Strategic Command | Prisca Dezigns</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,345 +13,308 @@
             --brand-amethyst: #7D52B5;
             --brand-orchid: #743089;
             --brand-ivory: #F5F2ED;
-            --brand-dark: #743089;
         }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--brand-ivory); }
-        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .nav-btn { width: 100%; display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1.25rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 600; color: rgba(255, 255, 255, 0.4); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: left; margin-bottom: 0.5rem; }
-        .nav-btn:hover { color: white; background: rgba(255, 255, 255, 0.05); transform: translateX(4px); }
-        .nav-btn.active { color: white; background: var(--brand-amethyst); box-shadow: 0 8px 20px -6px rgba(125, 82, 181, 0.5); }
-        .chart-container { position: relative; height: 300px; width: 100%; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #743089; margin: 0; overflow: hidden; }
         
-        .auth-glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); }
-        #auth-screen input { background: rgba(245, 242, 237, 0.05) !important; border: 1px solid rgba(125, 82, 181, 0.2) !important; color: var(--brand-dark) !important; }
-        #auth-screen button { background: var(--brand-amethyst) !important; color: white !important; box-shadow: 0 10px 20px -5px rgba(125, 82, 181, 0.4); cursor: pointer; }
-        #auth-screen button:hover { background: var(--brand-orchid) !important; transform: translateY(-2px); }
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #301934 0%, #743089 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.5s ease;
+        }
+        
+        .auth-card {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 3rem;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transform: translateY(0);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 1.25rem;
+            background: #F8F9FB;
+            border: 2px solid #F1F3F5;
+            border-radius: 1.25rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .auth-input:focus { border-color: var(--brand-amethyst); background: white; }
+
+        .auth-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 1.25rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-btn:hover { background: #000; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3); }
+
+        .nav-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 1.25rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+
+        .nav-btn:hover { color: white; background: rgba(255, 255, 255, 0.05); }
+        .nav-btn.active { color: white; background: var(--brand-amethyst); }
+
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-slate-50 overflow-hidden">
-    <!-- Auth Screen -->
-    <div id="auth-screen" class="fixed inset-0 z-[999] auth-glass flex items-center justify-center p-6">
-        <div class="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-200">
-            <div class="text-center mb-8">
-                <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" class="h-16 mx-auto mb-4" alt="PD Logo">
-                <h1 class="text-2xl font-bold text-slate-800 cursor-pointer select-none" onclick="handleAuthClick()">Strategic Command</h1>
-                <p class="text-slate-500 text-sm mt-2">Initialize secure neural handshake</p>
+<body>
+    <!-- Login Screen -->
+    <div id="auth-screen" class="auth-overlay">
+        <div class="auth-card">
+            <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" class="h-16 mx-auto mb-6" alt="PD Logo">
+            <h1 class="text-2xl font-extrabold text-slate-900 mb-2">Strategic Command</h1>
+            <p class="text-slate-400 text-sm font-medium mb-8">Accessing PD Neural Infrastructure</p>
+            
+            <div id="login-form">
+                <input type="password" id="auth-pass" class="auth-input" placeholder="••••••••" onkeypress="if(event.key === 'Enter') attemptLogin()">
+                <button onclick="attemptLogin()" class="auth-btn">Initialize Sync</button>
             </div>
-            <input type="password" id="auth-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-center tracking-widest text-slate-900 opacity-0 pointer-events-none" placeholder="••••••••" onkeypress="if(event.key === 'Enter') checkAuth()">
-            <button onclick="checkAuth()" class="w-full bg-slate-900 text-white rounded-xl py-3 font-bold hover:bg-slate-800 transition-all">Connect</button>
-            <div class="mt-8 text-[9px] text-slate-400 uppercase tracking-[0.3em]">Prisca Dezigns AI Infrastructure</div>
+            
+            <p class="mt-8 text-[10px] text-slate-300 font-bold uppercase tracking-widest">Secured by PD | God Mode Active</p>
         </div>
     </div>
 
-    <!-- Layout Wrapper -->
-    <div class="flex h-screen overflow-hidden">
+    <!-- Main Portal -->
+    <div id="portal-ui" class="flex h-screen hidden">
         <!-- Sidebar -->
-        <aside class="w-72 bg-[#743089] text-white flex flex-col h-screen relative z-20 shadow-2xl">
-            <div class="p-8 border-b border-white/5">
+        <aside class="w-80 bg-[#301934] border-r border-white/5 flex flex-col p-8">
+            <div class="mb-12">
                 <div class="flex items-center space-x-3 mb-2">
-                    <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center font-bold">P</div>
-                    <h1 class="text-lg font-bold tracking-tight">Strategic Portal</h1>
+                    <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-purple-500/20">P</div>
+                    <span class="text-xl font-bold text-white tracking-tight">Strategic Portal</span>
                 </div>
-                <p class="text-[10px] text-purple-400 font-bold uppercase tracking-widest">Agency Infrastructure</p>
+                <div class="text-[10px] text-purple-400 font-black uppercase tracking-[0.2em] px-1">Infrastructure Hub</div>
             </div>
-            
-            <nav class="flex-1 p-6 custom-scrollbar overflow-y-auto">
-                <button id="btn-ledger" onclick="showSection('ledger')" class="nav-btn active">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+
+            <nav class="flex-1 overflow-y-auto space-y-2">
+                <button onclick="switchTab('ledger')" id="tab-ledger" class="nav-btn active">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2" stroke-linecap="round"></path></svg>
                     <span>Lead Ledger</span>
                 </button>
-                <button id="btn-upload" onclick="showSection('upload')" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M16 8l-4-4m0 0L8 8m4-4v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <button onclick="switchTab('intake')" id="tab-intake" class="nav-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M16 8l-4-4m0 0L8 8m4-4v12" stroke-width="2" stroke-linecap="round"></path></svg>
                     <span>Document Intake</span>
                 </button>
-                <button id="btn-vault" onclick="showSection('vault')" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <button onclick="switchTab('vault')" id="tab-vault" class="nav-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2" stroke-linecap="round"></path></svg>
                     <span>Media Vault</span>
                 </button>
-                <button id="btn-organic" onclick="showSection('organic')" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    <span>Organic Intel</span>
-                </button>
-                <button id="btn-chat" onclick="showSection('chat')" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    <span>Chat Context</span>
-                </button>
-                <button id="btn-outreach" onclick="showSection('outreach')" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    <span>Outreach Hub</span>
-                </button>
-                <button id="btn-voice" onclick="showSection('voice')" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    <span>Voice Operations</span>
-                </button>
-                <button id="btn-finance" onclick="showSection('finance')" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2v14a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    <span>Financials</span>
+                <button onclick="switchTab('voice')" id="tab-voice" class="nav-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-width="2" stroke-linecap="round"></path></svg>
+                    <span>Voice Logs</span>
                 </button>
             </nav>
 
-            <div class="p-8">
-                <div class="bg-white/5 rounded-2xl p-4 border border-white/10">
-                    <p class="text-[10px] text-purple-300 font-bold uppercase mb-2">System Status</p>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span class="text-xs text-white">All Signals Live</span>
-                    </div>
+            <div class="mt-auto p-6 bg-white/5 rounded-3xl border border-white/5">
+                <div class="flex items-center space-x-3">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span class="text-[10px] font-bold text-white uppercase tracking-widest">Neural Link Active</span>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto hidden bg-[#F5F2ED]" id="main-content">
-            <header class="h-20 bg-white/80 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-10 border-b border-slate-200/50">
-                <div class="flex items-center space-x-4">
-                    <h2 id="section-title" class="text-xl font-bold text-slate-800">Strategic Lead Ledger</h2>
-                    <div id="management-controls" class="hidden flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-                        <button onclick="openAddLeadModal()" class="text-[10px] font-bold uppercase text-slate-500 hover:text-purple-600">Add Lead</button>
-                        <span class="text-slate-300">|</span>
-                        <button id="sync-btn" onclick="fetchData()" class="text-[10px] font-bold uppercase text-slate-500 hover:text-purple-600">Manual Sync</button>
-                    </div>
+        <!-- Content Area -->
+        <main class="flex-1 bg-[#F5F2ED] overflow-y-auto">
+            <header class="h-24 bg-white/50 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between px-10 sticky top-0 z-10">
+                <div>
+                    <h2 id="view-title" class="text-2xl font-extrabold text-slate-800">Lead Ledger</h2>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Strategic Intelligence Hub</p>
                 </div>
-                <div class="flex items-center space-x-6">
-                    <select onchange="filterByBrand(this.value)" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-purple-500">
-                        <option value="all">All Brands</option>
-                        <option value="autodrome">The Autodrome</option>
-                        <option value="dreaming">Dreaming Anime</option>
-                        <option value="nehneh">NehNeh</option>
-                        <option value="direct">Prisca Dezigns</option>
-                    </select>
-                    <div class="flex items-center space-x-3 border-l pl-6 border-slate-200">
-                        <div class="text-right">
-                            <div class="text-sm font-bold text-slate-800">Prisca Dezigns</div>
-                            <div class="text-[10px] text-slate-400 font-bold uppercase">Lead Strategist</div>
-                        </div>
-                        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center font-bold text-slate-400">PN</div>
-                    </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="syncAll()" id="sync-btn" class="p-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="2" stroke-linecap="round"></path></svg>
+                    </button>
                 </div>
             </header>
 
-            <div class="p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                    <div class="lg:col-span-2 bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-200/60">
-                        <div class="flex items-center justify-between mb-8">
-                            <div>
-                                <h3 class="text-lg font-bold text-slate-800">Performance Matrix</h3>
-                                <p class="text-sm text-slate-500">Live signal distribution across brand nodes</p>
-                            </div>
-                        </div>
-                        <div class="chart-container"><canvas id="leadChart"></canvas></div>
-                    </div>
-                    <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-200/60">
-                        <h3 class="text-lg font-bold text-slate-800 mb-6">Quick Stats</h3>
-                        <div class="space-y-6">
-                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100"><div class="text-[10px] text-slate-400 font-bold uppercase mb-1">Total Intelligence</div><div id="stat-total" class="text-2xl font-bold text-slate-800">0</div></div>
-                            <div class="p-5 bg-purple-50 rounded-2xl border border-purple-100"><div class="text-[10px] text-purple-400 font-bold uppercase mb-1">Qualified Nodes</div><div id="stat-qualified" class="text-2xl font-bold text-purple-700">0</div></div>
-                            <div class="p-5 bg-purple-50 rounded-2xl border border-purple-100"><div class="text-[10px] text-purple-400 font-bold uppercase mb-1">Active Conversions</div><div id="stat-active" class="text-2xl font-bold text-purple-700">0</div></div>
-                        </div>
-                    </div>
-                </div>
-                <div id="ledger-container"></div>
-                <div id="section-upload" class="max-w-4xl mx-auto hidden">
-                    <header class="mb-12"><h1 class="text-4xl font-extrabold text-slate-800 mb-2 italic">Document Intake</h1><p class="text-slate-400 font-bold">Drag and drop any business file for Sierra to process.</p></header>
-                    <div class="bg-white rounded-[2.5rem] p-20 border-4 border-dashed border-slate-200 text-center hover:border-purple-500/50 transition-all cursor-pointer group" onclick="document.getElementById('file-input').click()"><div class="w-16 h-16 bg-slate-50 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform"><svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2" stroke-linecap="round"></path></svg></div><h3 class="text-xl font-extrabold text-slate-800 tracking-tight">Drop Files or Click to Browse</h3><p class="text-slate-500 mt-2 font-bold">PDF, Images, Excel, CSV</p><input type="file" id="file-input" class="hidden" multiple onchange="handleUpload(this.files)"></div>
-                    <div id="upload-stack" class="mt-8 space-y-4"></div>
-                </div>
-                <div id="section-vault" class="max-w-6xl mx-auto hidden">
-                     <header class="mb-12"><h1 class="text-4xl font-extrabold text-slate-800 mb-2 italic">Media Vault</h1><p class="text-slate-400 font-bold">Secure access to raw documents mirrored in Google Drive.</p></header>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="vault-grid">
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 hover:border-purple-500/30 transition-all cursor-pointer"><div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mb-6 text-purple-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2" stroke-linecap="round"></path></svg></div><div class="text-sm font-extrabold text-slate-800 truncate">Recent Upload</div><div class="text-[9px] text-slate-500 font-black uppercase mt-1">Sierra is Processing...</div><div class="mt-6 flex items-center justify-between"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="2" stroke-linecap="round"></path></svg><span class="text-[10px] font-black text-purple-400 uppercase">Pending Sync</span></div></div>
-                    </div>
-                </div>
+            <div class="p-10" id="render-mount">
+                <!-- Dynamic Content Here -->
             </div>
         </main>
     </div>
 
-    <!-- Modals -->
-    <div id="add-lead-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-md">
-        <div class="bg-white rounded-[3rem] p-10 w-full max-w-md shadow-2xl border border-white/20">
-            <h3 class="text-xl font-bold text-slate-800 mb-6">Log New Signal</h3>
-            <form onsubmit="saveLead(event)" class="space-y-4">
-                <input name="name" placeholder="Contact Name" required class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 transition-all">
-                <input name="email" type="email" placeholder="Email Address" required class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 transition-all">
-                <select name="brand" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 transition-all">
-                    <option value="Autodrome">The Autodrome</option><option value="Anime">Dreaming Anime</option><option value="NehNeh">NehNeh</option><option value="Direct">Prisca Dezigns</option>
-                </select>
-                <select name="package" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 transition-all">
-                    <option value="Starter">Starter Package</option><option value="Growth">Growth Package</option><option value="Elite">Elite Tier</option><option value="Custom">Custom Architecture</option>
-                </select>
-                <div class="flex space-x-4 pt-6">
-                    <button type="button" onclick="closeAddLeadModal()" class="flex-1 px-4 py-4 font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-all">Cancel</button>
-                    <button type="submit" class="flex-1 px-4 py-4 font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-2xl shadow-xl transition-all">Sync Lead</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
-        const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
-        let currentView = 'ledger';
-        let allLeads = [], outreachLeads = [], organicLeads = [], chatLeads = [], voiceLogs = [], financeLogs = [];
-        let chartInstance = null;
+        const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        let authClicks = 0;
-        function handleAuthClick() {
-            authClicks++;
-            if(authClicks >= 5) {
-                const input = document.getElementById('auth-input');
-                input.classList.remove('opacity-0', 'pointer-events-none');
-                input.focus();
-            }
-        }
+        let activeTab = 'ledger';
+        let store = { leads: [], calls: [], docs: [] };
 
-        async function checkAuth() {
-            const input = document.getElementById('auth-input').value;
-            if(input.toLowerCase().trim() === 'alice') {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-                const controls = document.getElementById('management-controls');
-                if(controls) controls.classList.remove('hidden');
+        async function attemptLogin() {
+            const pass = document.getElementById('auth-pass').value.trim().toLowerCase();
+            if(pass === 'alice') {
                 sessionStorage.setItem('pd_auth', 'true');
-                fetchData();
-            } else { 
-                alert('Handshake failed. Verify security token.'); 
-                authClicks = 0;
-                document.getElementById('auth-input').classList.add('opacity-0', 'pointer-events-none');
-                document.getElementById('auth-input').value = '';
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('portal-ui').classList.remove('hidden');
+                syncAll();
+            } else {
+                alert('Neural Handshake Failed. Verify Security Token.');
             }
         }
 
-        window.addEventListener('load', () => {
+        window.onload = () => {
             if(sessionStorage.getItem('pd_auth') === 'true') {
                 document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-                const controls = document.getElementById('management-controls');
-                if(controls) controls.classList.remove('hidden');
-                fetchData();
+                document.getElementById('portal-ui').classList.remove('hidden');
+                syncAll();
             }
-        });
+        };
 
-        async function fetchData() {
+        async function syncAll() {
             const btn = document.getElementById('sync-btn');
             if(btn) btn.classList.add('animate-spin');
+            
             try {
-                const { data: cLeads } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
-                allLeads = cLeads || [];
-                organicLeads = allLeads.filter(l => !((l.brand||'').toLowerCase().includes('chatbot') || (l.package||'').toLowerCase().includes('chatbot')));
-                chatLeads = allLeads.filter(l => (l.brand||'').toLowerCase().includes('chatbot') || (l.package||'').toLowerCase().includes('chatbot'));
+                const [leads, calls] = await Promise.all([
+                    sb.from('client_leads').select('*').order('created_at', { ascending: false }),
+                    sb.from('drew_calls').select('*').order('call_date', { ascending: false })
+                ]);
                 
-                const { data: oLeads } = await sb.from('outreach_leads').select('*').order('created_at', { ascending: false });
-                outreachLeads = oLeads || [];
-                
-                const { data: calls } = await sb.from('drew_calls').select('*').order('call_date', { ascending: false });
-                voiceLogs = (calls || []).map(d => ({ id: d.id, name: d.customer_name, status: d.outcome, duration: 'Voice Logic Active', time: d.call_date, transcription: d.phone }));
-                
-                financeLogs = [ { id: 1, date: '2026-07-10', vendor: 'GitHub', category: 'Infrastructure', amount: '$4.00', status: 'Verified' }, { id: 2, date: '2026-07-09', vendor: 'Vapi.ai', category: 'Voice Logic', amount: '$12.50', status: 'Processing' }, { id: 3, date: '2026-07-08', vendor: 'Supabase', category: 'Database', amount: '$25.00', status: 'Verified' } ];
-                
-                render(); updateChart(); updateStats();
-            } catch (err) { console.error('Fetch error:', err); }
-            finally { if(btn) btn.classList.remove('animate-spin'); }
+                store.leads = leads.data || [];
+                store.calls = calls.data || [];
+                render();
+            } catch(e) {
+                console.error('Sync error:', e);
+            } finally {
+                if(btn) btn.classList.remove('animate-spin');
+            }
         }
 
-        function render() {
-            const title = document.getElementById('section-title');
-            if (currentView === 'ledger') { title.innerText = 'Strategic Lead Ledger'; renderTable(allLeads); }
-            else if (currentView === 'organic') { title.innerText = 'Organic Intelligence'; renderTable(organicLeads); }
-            else if (currentView === 'chat') { title.innerText = 'Chatbot Conversions'; renderTable(chatLeads); }
-            else if (currentView === 'outreach') { title.innerText = 'Cold Outreach (Apollo)'; renderTable(outreachLeads); }
-            else if (currentView === 'voice') { title.innerText = 'Drew: Voice Operations'; renderVoiceGrid(); }
-            else if (currentView === 'finance') { title.innerText = 'Finance & Receipts'; renderFinanceTable(); }
-        }
-
-        function updateStats() {
-            document.getElementById('stat-total').innerText = allLeads.length;
-            document.getElementById('stat-qualified').innerText = allLeads.filter(l => l.status === 'Qualified').length;
-            document.getElementById('stat-active').innerText = allLeads.filter(l => l.status === 'Active' || !l.status).length;
-        }
-
-        function renderTable(data) {
-            const container = document.getElementById('ledger-container');
-            container.innerHTML = `
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
-                    <table class="w-full text-left border-collapse">
-                        <thead><tr class="bg-slate-50/50 border-b border-slate-100"><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Brand Context</th><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lead Identity</th><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Architecture</th><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Timestamp</th><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Status</th><th class="px-6 py-5"></th></tr></thead>
-                        <tbody class="divide-y divide-slate-50">${data.map(l => `<tr class="hover:bg-slate-50/30 transition-all group"><td class="px-6 py-5"><span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase">${l.brand || 'Direct'}</span></td><td class="px-6 py-5"><div class="text-sm font-bold text-slate-800">${l.name}</div><div class="text-[10px] text-slate-400">${l.email}</div></td><td class="px-6 py-5 text-sm font-medium text-slate-600">${l.package || 'Discovery'}</td><td class="px-6 py-5 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td><td class="px-6 py-5 text-center"><span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span></td><td class="px-6 py-5 text-right"><button onclick="deleteLead('${l.id}')" class="text-slate-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button></td></tr>`).join('') || '<tr><td colspan="6" class="p-20 text-center text-slate-400 italic">No signals found.</td></tr>'}</tbody>
-                    </table>
-                </div>`;
-        }
-
-        function renderVoiceGrid(data = voiceLogs) {
-            const container = document.getElementById('ledger-container');
-            container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">${data.map(l => `<div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-200/60 relative group"><button onclick="deleteDrewCall('${l.id}')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button><div class="flex items-center space-x-4 mb-6"><div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><div><h4 class="font-bold text-slate-800 mb-1">${l.name}</h4><div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${l.duration}</div></div></div><div class="text-xs text-slate-500 mb-6 font-mono bg-slate-50 p-5 rounded-2xl border border-slate-100">${l.transcription}</div><div class="flex items-center justify-between"><span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-full text-[10px] font-bold uppercase">${l.status}</span><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${new Date(l.time).toLocaleTimeString()}</span></div></div>`).join('') || '<div class="col-span-full p-20 text-center text-slate-400 italic">No voice operations recorded.</div>'}</div>`;
-        }
-
-        function renderFinanceTable() {
-            const container = document.getElementById('ledger-container');
-            container.innerHTML = `<div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden"><table class="w-full text-left border-collapse"><thead><tr class="bg-slate-50/50 border-b border-slate-100"><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Timestamp</th><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vendor</th><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Category</th><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount</th><th class="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th></tr></thead><tbody class="divide-y divide-slate-50">${financeLogs.map(l => `<tr class="hover:bg-slate-50/30 transition-all"><td class="px-6 py-5 text-sm text-slate-500">${l.date}</td><td class="px-6 py-5 text-sm font-bold text-slate-800">${l.vendor}</td><td class="px-6 py-5 text-sm text-slate-600">${l.category}</td><td class="px-6 py-5 text-sm font-bold text-slate-900">${l.amount}</td><td class="px-6 py-5"><span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status}</span></td></tr>`).join('')}</tbody></table></div>`;
-        }
-
-        function updateChart() {
-            const ctx = document.getElementById('leadChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-            const counts = { 'Autodrome': allLeads.filter(l => (l.brand||'').toLowerCase().includes('autodrome')).length, 'Anime': allLeads.filter(l => (l.brand||'').toLowerCase().includes('anime') || (l.brand||'').toLowerCase().includes('dreaming')).length, 'NehNeh': allLeads.filter(l => (l.brand||'').toLowerCase().includes('nehneh') || (l.brand||'').toLowerCase().includes('seamrite')).length, 'Direct': allLeads.filter(l => (l.brand||'').toLowerCase().includes('direct') || (l.brand||'').toLowerCase().includes('prisca')).length };
-            chartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts), backgroundColor: ['#1a0f1c', '#7D52B5', '#818cf8', '#e2e8f0'], borderWidth: 0 }] }, options: { cutout: '85%', plugins: { legend: { display: false } } } });
-        }
-
-        function showSection(view) {
-            currentView = view;
+        function switchTab(tab) {
+            activeTab = tab;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            const targetBtn = document.getElementById('btn-' + view);
-            if(targetBtn) targetBtn.classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('view-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1) + (tab === 'ledger' ? ' Ledger' : '');
             render();
         }
 
-        function filterByBrand(brand) {
-            let dataToFilter = [];
-            if (currentView === 'ledger') dataToFilter = allLeads;
-            else if (currentView === 'organic') dataToFilter = organicLeads;
-            else if (currentView === 'chat') dataToFilter = chatLeads;
-            else if (currentView === 'outreach') dataToFilter = outreachLeads;
-            else if (currentView === 'voice') dataToFilter = voiceLogs;
-            else if (currentView === 'finance') dataToFilter = financeLogs;
-
-            if (brand === 'all') { render(); } else {
-                const filtered = dataToFilter.filter(l => {
-                    const brandVal = (l.brand || '').toLowerCase(), nameVal = (l.name || '').toLowerCase(), target = brand.toLowerCase();
-                    if (target === 'nehneh') return brandVal.includes('nehneh') || brandVal.includes('seamrite');
-                    if (target === 'dreaming') return brandVal.includes('dreaming') || brandVal.includes('anime');
-                    return brandVal.includes(target) || nameVal.includes(target) || (l.package || '').toLowerCase().includes(target);
-                });
-                renderFiltered(filtered);
-            }
+        function render() {
+            const mount = document.getElementById('render-mount');
+            if(activeTab === 'ledger') renderLedger(mount);
+            else if(activeTab === 'intake') renderIntake(mount);
+            else if(activeTab === 'vault') renderVault(mount);
+            else if(activeTab === 'voice') renderVoice(mount);
         }
 
-        function renderFiltered(data) { if (currentView === 'voice') renderVoiceGrid(data); else renderTable(data); }
-        function openAddLeadModal() { document.getElementById('add-lead-modal').classList.remove('hidden'); }
-        function closeAddLeadModal() { document.getElementById('add-lead-modal').classList.add('hidden'); }
-
-        async function saveLead(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>';
-            const formData = new FormData(e.target);
-            const leadData = { name: formData.get('name'), email: formData.get('email'), brand: formData.get('brand'), package: formData.get('package'), status: 'Active' };
-            const { error } = await sb.from('client_leads').insert([leadData]);
-            if(error) { alert('Sync failed: ' + error.message); btn.innerText = 'Sync Lead'; }
-            else { closeAddLeadModal(); e.target.reset(); btn.innerText = 'Sync Lead'; fetchData(); }
+        function renderLedger(mount) {
+            mount.innerHTML = `
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50/50 border-b border-slate-100">
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Brand</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Identity</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Package</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            ${store.leads.map(l => `
+                                <tr class="hover:bg-slate-50/30 transition-all">
+                                    <td class="px-8 py-6"><span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase">${l.brand || 'Direct'}</span></td>
+                                    <td class="px-8 py-6">
+                                        <div class="text-sm font-bold text-slate-800">${l.name}</div>
+                                        <div class="text-[10px] text-slate-400 font-medium">${l.email}</div>
+                                    </td>
+                                    <td class="px-8 py-6 text-sm font-bold text-slate-600">${l.package || '--'}</td>
+                                    <td class="px-8 py-6 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
+                                    <td class="px-8 py-6"><span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
         }
 
-        async function deleteLead(id) {
-            if(!confirm('Permanently remove this signal?')) return;
-            const { error } = await sb.from('client_leads').delete().eq('id', id);
-            if(error) alert('Error deleting'); else fetchData();
+        function renderIntake(mount) {
+            mount.innerHTML = `
+                <div class="max-w-3xl mx-auto py-12">
+                    <div class="bg-white rounded-[3rem] p-16 border-4 border-dashed border-slate-200 text-center hover:border-purple-400 transition-all cursor-pointer group" onclick="alert('Analysis Logic Engaged')">
+                        <div class="w-20 h-20 bg-slate-50 rounded-3xl mx-auto mb-8 flex items-center justify-center group-hover:scale-110 transition-all">
+                            <svg class="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2" stroke-linecap="round"></path></svg>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-slate-800 mb-2">Initialize Intake</h2>
+                        <p class="text-slate-500 font-bold">Drag documents here for Sierra AI processing</p>
+                    </div>
+                </div>
+            `;
         }
 
-        async function deleteDrewCall(id) {
-            if(!confirm('Permanently remove this call log?')) return;
-            const { error } = await sb.from('drew_calls').delete().eq('id', id);
-            if(error) alert('Error deleting'); else fetchData();
+        function renderVault(mount) {
+            mount.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm opacity-50 grayscale">
+                        <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 text-slate-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2" stroke-linecap="round"></path></svg>
+                        </div>
+                        <div class="text-sm font-bold text-slate-800 mb-1">Encrypted Node</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">Awaiting Data Sync</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVoice(mount) {
+            mount.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    ${store.calls.map(c => `
+                        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                            <div class="flex items-center space-x-4 mb-6">
+                                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-width="2" stroke-linecap="round"></path></svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800">${c.customer_name}</h4>
+                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${new Date(c.call_date).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs text-slate-600 font-medium mb-6">
+                                ${c.phone || 'Voice sequence recorded'}
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold uppercase">${c.outcome}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
     </script>
 </body>
