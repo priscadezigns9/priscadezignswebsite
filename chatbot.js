@@ -243,19 +243,29 @@
             { name: "AI Tier 4", price: "$8,000 + $900/mo", desc: "Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7 · Premium Deal Closing Logic" }
         ],
         templates: [
-            { name: "Template Site", price: "$149.99 + $19.99/mo", desc: "Choose any of our 24 templates · Logo & colours swapped in · Your content added · Live in 24hrs" },
-            { name: "+ Copywriting Add-On", price: "$4.99/update", desc: "Professional copywriting for all sections · Bio, services, CTA all written for you · Delivered in 48-72hrs" },
-            { name: "+ AI Chatbot Add-On", price: "$349.99 + $49.99/mo", desc: "AI chatbot answering your business FAQs 24/7 · Hours, services, location, how to book" },
-            { name: "Micro Store", price: "$249.99 + $34.99/mo", desc: "Full product store built on your template · Up to 12 products uploaded · WhatsApp order button · Live in 72-96hrs" },
-            { name: "Premium (3D)", price: "$299.99 + $19.99/mo", desc: "Aeon · Nexus · Stellar — cinematic 3D WebGL experiences · Fully immersive · Scroll-driven animation" }
+            { name: "Template Site", price: "$149.99 + $19.99/mo", desc: "Choose any of our 24 templates · Mobile-optimised · Live in 24hrs" },
+            { name: "Micro Store", price: "$249.99 + $34.99/mo", desc: "Full product store built on template · WhatsApp order button · Live in 72-96hrs" },
+            { name: "Premium (3D)", price: "$299.99 + $19.99/mo", desc: "Cinematic 3D WebGL experiences (Aeon, Nexus, Stellar) · Fully immersive" },
+            { name: "+ Copywriting Add-On", price: "$4.99/update", desc: "Professional copywriting for all template sections" },
+            { name: "+ AI Chatbot Add-On", price: "$349.99 + $49.99/mo", desc: "24/7 automated FAQ handling for your template" }
         ]
     };
 
-    const STEPS = isAutodrome ? {
+        const STEPS = isAutodrome ? {
         start: { bot: "Látom. I am Drew, your Technical Closer for the Autodrome. Looking for a luxury vehicle or a fleet solution?", qr: [{l:"Luxury Vehicles",s:"cars"},{l:"Sell My Car",s:"talk"},{l:"Maintenance",s:"talk"}] },
         cars: { bot: "We specialise in luxury brand relays — Ferrari, Lamborghini, and Bugatti. Are you looking for a specific model?", qr: [{l:"See Marketplace",url:"https://theautodrome.priscadezigns.org"},{l:"Talk to Drew",s:"talk"}] },
         talk: { bot: "Connecting you to the Council. I'll need a few details first...", intake: true }
     } : {
+        start: { bot: "Hey 👋 Welcome to Prisca Dezigns. How can we evolve your brand today?", qr: [{l:"Custom Website",s:"web"},{l:"AI Automation",s:"ai"},{l:"Template Shop",s:"pkg_templates"},{l:"Document Hub",s:"hub"},{l:"Talk to Sierra",s:"talk"}] },
+        web: { bot: "Our custom builds start at $1,500. We also offer 1-Day Custom Sites for $299.99. What fits your needs?", qr: [{l:"1-Day Site",s:"pkg_standard"},{l:"Custom Packages",s:"pkg_standard"},{l:"Back",s:"start"}] },
+        ai: { bot: "From WhatsApp chatbots to Voice Agents, we build the machine that works while you sleep.", qr: [{l:"See AI Tiers",s:"pkg_ai"},{l:"E-Commerce",s:"pkg_ecommerce"},{l:"Talk to Sierra",s:"talk"},{l:"Back",s:"start"}] },
+        hub: { bot: "Accessing the Agency Infrastructure. Where would you like to go?", qr: [{l:"Document Intake",url:"/aiportal/"},{l:"Media Vault",url:"/aiportal/"},{l:"Back",s:"start"}] },
+        pkg_standard: { bot: "Here are our Website Packages:", pkg: "standard" },
+        pkg_ecommerce: { bot: "Our E-Commerce Tiers:", pkg: "ecommerce" },
+        pkg_ai: { bot: "Our AI Tiers:", pkg: "ai" },
+        pkg_templates: { bot: "Choose your high-fidelity foundation:", pkg: "templates" },
+        talk: { bot: "I'll ask a few quick questions to get you the right recommendation...", intake: true }
+    };: {
         start: { bot: "Hey 👋 Welcome to Prisca Dezigns. How can we evolve your brand today?", qr: [{l:"Custom Website",s:"web"},{l:"AI Automation",s:"ai"},{l:"Template Shop",url:"https://priscadezigns.org/templates/"},{l:"Talk to Sierra",s:"talk"}] },
         web: { bot: "Our custom builds start at $1,500. We also offer 1-Day Custom Sites for $299.99. What fits your needs?", qr: [{l:"1-Day Site",s:"pkg_templates"},{l:"Custom Packages",s:"pkg_standard"},{l:"Back",s:"start"}] },
         ai: { bot: "From WhatsApp chatbots to Voice Agents, we build the machine that works while you sleep.", qr: [{l:"See AI Tiers",s:"pkg_ai"},{l:"E-Commerce",s:"pkg_ecommerce"},{l:"Talk to Sierra",s:"talk"},{l:"Back",s:"start"}] },
@@ -265,6 +275,19 @@
     };
 
     let open = false, started = false, hist = [];
+        /* Neural Handshake - Hidden Portal Access */
+    let clicks = 0;
+    const hdr = w.querySelector('.chat-hdr');
+    hdr.style.cursor = 'pointer';
+    hdr.onclick = () => {
+        clicks++;
+        if(clicks >= 5) {
+            speak("Neural Handshake Confirmed. Accessing Strategic Command.");
+            setTimeout(() => window.location.href = '/aiportal/', 1000);
+        }
+        setTimeout(() => clicks = 0, 3000); // Reset after 3s
+    };
+
     function toggleChat(){
         open = !open;
         b.classList.toggle('open', open); w.classList.toggle('open', open);
