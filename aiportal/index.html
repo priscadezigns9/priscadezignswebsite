@@ -2,37 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Prisca Dezigns | AI Portal Debug</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prisca Dezigns | AI Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --purple-main: #9d50bb; --purple-glow: #6e48aa; }
+        body { font-family: 'Space Grotesk', sans-serif; background: #050505; color: white; margin: 0; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .purple-gradient { background: linear-gradient(135deg, var(--purple-main), var(--purple-glow)); }
+        .hidden-node { display: none !important; }
+        .login-overlay { position: fixed; inset: 0; z-index: 1000; background: #0f0c29; display: flex; items-center: center; justify-content: center; }
+    </style>
 </head>
-<body class="bg-black text-white p-10">
-    <div id="login" class="max-w-md mx-auto bg-gray-900 p-10 rounded-xl">
-        <h1 class="text-2xl font-bold mb-4">Neural Access</h1>
-        <input type="password" id="p" placeholder="TOKEN" class="w-full p-4 bg-black border border-white/10 mb-4 text-center">
-        <button onclick="auth()" class="w-full bg-purple-600 p-4 rounded font-bold">AUTHORIZE</button>
-        <p id="h" class="text-xs text-white/20 mt-4 text-center">Handshake required.</p>
+<body class="flex h-screen overflow-hidden">
+    <!-- Login Perimeter -->
+    <div id="login-overlay" class="login-overlay flex items-center justify-center">
+        <div class="glass p-12 rounded-[40px] w-full max-w-md text-center border-purple-500/20">
+            <h1 class="text-4xl font-bold mb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">AI PORTAL</h1>
+            <p class="text-white/30 text-[10px] uppercase tracking-[0.2em] mb-8 font-black">Neural Access Node</p>
+            <div class="space-y-4">
+                <input type="password" id="pass-field" placeholder="PROTOCOL TOKEN" class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-center outline-none focus:border-purple-500/50 transition-all font-mono tracking-widest text-white">
+                <button onclick="checkAccess()" class="w-full purple-gradient p-5 rounded-2xl font-black uppercase tracking-widest hover:brightness-110 active:scale-[0.98] transition-all">Authorize</button>
+            </div>
+            <p id="access-hint" class="text-white/10 text-[9px] mt-10 uppercase tracking-widest leading-relaxed italic">Secure handshake required.</p>
+        </div>
     </div>
-    <div id="data" class="hidden">
-        <h2 class="text-xl font-bold mb-4">Lead Stream</h2>
-        <table class="w-full text-left bg-gray-900 rounded-xl overflow-hidden">
-            <tbody id="b"></tbody>
-        </table>
-    </div>
+
+    <!-- Main Content -->
+    <main id="portal-content" class="hidden-node flex-1 flex flex-col min-w-0 bg-black/20 p-10 overflow-y-auto">
+        <header class="mb-10">
+            <h2 class="text-3xl font-bold tracking-tighter">Live Lead Stream</h2>
+            <p class="text-white/40">Real-time signal diagnostics</p>
+        </header>
+        <div class="glass rounded-[32px] overflow-hidden">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-white/[0.02] text-[10px] uppercase text-white/30 font-black">
+                        <th class="px-8 py-6">Timestamp</th>
+                        <th class="px-8 py-6">Client Name</th>
+                        <th class="px-8 py-6">Package</th>
+                        <th class="px-8 py-6 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="leads-body" class="divide-y divide-white/5"></tbody>
+            </table>
+        </div>
+    </main>
+
     <script>
         const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
-        const client = supabase.createClient(SB_URL, SB_KEY);
-        let clicks = 0;
-        document.getElementById('p').onclick = () => { clicks++; document.getElementById('h').innerText = "Syncing... " + clicks + "/5"; };
-        async function auth() {
-            const v = document.getElementById('p').value.toLowerCase().trim();
-            if (v === 'alice' || clicks >= 5) {
-                document.getElementById('login').style.display = 'none';
-                document.getElementById('data').classList.remove('hidden');
-                const { data } = await client.from('client_leads').select('*').order('created_at', { ascending: false });
-                if (data) document.getElementById('b').innerHTML = data.map(l => `<tr><td class='p-4'>${l.name}</td><td class='p-4 text-purple-400'>${l.package}</td></tr>`).join('');
-            } else { alert('Denied'); clicks = 0; }
+        
+        let clickCount = 0;
+        const passField = document.getElementById('pass-field');
+        const hint = document.getElementById('access-hint');
+        let sb_client = null;
+
+        // Ensure supabase is loaded before using it
+        window.onload = () => {
+            if (typeof supabase !== 'undefined') {
+                sb_client = supabase.createClient(SB_URL, SB_KEY);
+            } else {
+                console.error("Supabase CDN failed to load.");
+            }
+        };
+
+        passField.onclick = () => {
+            clickCount++;
+            if (clickCount >= 3) {
+                hint.textContent = "Neural Link Syncing... (" + clickCount + "/5)";
+                hint.style.color = "#9d50bb";
+            }
+        };
+
+        async function checkAccess() {
+            const pass = passField.value.toLowerCase().trim();
+            if (pass === 'alice' || clickCount >= 5) {
+                document.getElementById('login-overlay').classList.add('hidden-node');
+                document.getElementById('portal-content').classList.remove('hidden-node');
+                fetchAllData();
+            } else {
+                alert("Protocol Error: Authorization Denied.");
+                clickCount = 0;
+                hint.textContent = "Secure handshake required.";
+                hint.style.color = "";
+            }
+        }
+
+        async function fetchAllData() {
+            if (!sb_client) return;
+            try {
+                const { data: leads, error } = await sb_client.from('client_leads').select('*').order('created_at', { ascending: false });
+                if (leads) {
+                    document.getElementById('leads-body').innerHTML = leads.map(l => `
+                        <tr class="hover:bg-white/[0.02]">
+                            <td class="px-8 py-6 text-white/40 font-mono">${new Date(l.created_at).toLocaleDateString()}</td>
+                            <td class="px-8 py-6 font-bold">${l.name}</td>
+                            <td class="px-8 py-6 text-purple-400 font-bold">${l.package}</td>
+                            <td class="px-8 py-6 text-right"><button onclick="deleteLead('${l.id}')" class="text-red-500/40 hover:text-red-500 uppercase text-[10px] tracking-widest font-black">Purge</button></td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function deleteLead(id) {
+            if (!confirm("Execute Purge?")) return;
+            const { error } = await sb_client.from('client_leads').delete().eq('id', id);
+            if (!error) fetchAllData();
         }
     </script>
 </body>
