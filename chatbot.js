@@ -226,15 +226,26 @@
     /* ── Steps & Navigation ── */
     const PKGS = {
         standard: [
-            { name: "Starter (,500)", desc: "1-Page High-Fidelity Website + Brand Strategy. Perfect for elite landing pages." },
-            { name: "Growth (,500)", desc: "Multi-page Brand Hub + Advanced UI/UX. Built for scaling businesses." },
-            { name: "Trusted (,000)", desc: "Full Business Ecosystem. Includes custom web portal + CRM integration." },
-            { name: "1-Day Site (99.99)", desc: "A professional custom-branded page live in 24 hours." }
+            { name: "Starter", price: "$1,500 + $150/mo", desc: "1-Page High-Fidelity Website · Full Brand Setup (Logo, Domain, Favicon) · Social Media Integration · Technical SEO & SSL · 1 Month Free Maintenance" },
+            { name: "Growth", price: "$3,500 + $400/mo", desc: "Manage 1 Brand Page · Full Branding & App/Web Architecture · Content Creation & Copywriting · Advanced SEO & Analytics · 1 Month Free Maintenance" },
+            { name: "Trusted", price: "$6,000 + $700/mo", desc: "Full Website Architecture (10-15 Pages) · Premium Brand Scaling & PR · 24/7 Priority Tech Support · Technical SEO & SSL · 1 Month Free Maintenance" },
+            { name: "Custom", price: "Starting at $10,000", desc: "Tailored Digital Architecture · Custom API & Tool Integration · Unique Brand Identity Design · Scalable Infrastructure · Priority Sovereign Support" }
+        ],
+        ecommerce: [
+            { name: "E-Starter", price: "$2,500 + $250/mo", desc: "1-Page Online Shop · Full Store Branding & Domain · Integrated Social Shop Setup · Payment Gateway Integration · 1 Month Free Maintenance" },
+            { name: "E-Growth", price: "$5,000 + $500/mo", desc: "2-5 Page Store Architecture · Full Shop Logic (10+ Products) · Deep Copywriting & Product SEO · Automated Fulfillment Sync · 1 Month Free Maintenance" },
+            { name: "E-Trusted", price: "$8,500 + $850/mo", desc: "Elite Store (50+ Products) · 15+ Page Network Architecture · Advanced Inventory & CRM Automation · On-Chain Inventory Logic · 1 Month Free Maintenance" }
         ],
         ai: [
-            { name: "AI Tier 1 (,500)", desc: "Smart Website Chatbot. Handles inquiries and captures leads 24/7." },
-            { name: "AI Tier 2 (,500)", desc: "WhatsApp AI Specialist. Autonomous booking via WhatsApp API." },
-            { name: "AI Tier 3 (,000)", desc: "Omnichannel AI Hub. Email + WhatsApp + Website integration." }
+            { name: "AI Tier 1", price: "$1,500 + $150/mo", desc: "AI Website Chatbot (24/7 Live) · Lead Capture & CRM Setup" },
+            { name: "AI Tier 2", price: "$3,500 + $400/mo", desc: "Everything in Tier 1 · WhatsApp AI Automation (24/7)" },
+            { name: "AI Tier 3", price: "$6,000 + $700/mo", desc: "Everything in Tier 1 & 2 · Email Inbox AI Automation (24/7) · AI Reads, Responds & Qualifies Every Email" },
+            { name: "AI Tier 4", price: "$8,000 + $900/mo", desc: "Everything in Tiers 1, 2 & 3 · Full Voice Agent Deployment · Answers inbound calls 24/7" }
+        ],
+        templates: [
+            { name: "Template Site", price: "$149.99 + $19.99/mo", desc: "Choose any of our 24 templates · Logo & colours swapped in · Your content added · Live in 24hrs" },
+            { name: "Micro Store", price: "$249.99 + $34.99/mo", desc: "Full product store built on your template · Up to 12 products uploaded · WhatsApp order button · Live in 72-96hrs" },
+            { name: "1-Day Site", price: "$299.99", desc: "High-speed delivery. A professional custom-branded page live in 24 hours." }
         ]
     };
 
@@ -244,8 +255,8 @@
         talk: { bot: "Connecting you to the Council. I'll need a few details first...", intake: true }
     } : {
         start: { bot: "Hey 👋 Welcome to Prisca Dezigns. How can we evolve your brand today?", qr: [{l:"Custom Website",s:"web"},{l:"AI Automation",s:"ai"},{l:"Template Shop",url:"https://priscadezigns.org/templates/"},{l:"Talk to Sierra",s:"talk"}] },
-        web: { bot: "Our custom builds start at $1,500. We also offer 1-Day Custom Sites for $299.99. What fits your needs?", qr: [{l:"1-Day Site",s:"talk"},{l:"Custom Packages",s:"pkg_standard"},{l:"Back",s:"start"}] },
-        ai: { bot: "From WhatsApp chatbots to Voice Agents, we build the machine that works while you sleep.", qr: [{l:"See AI Tiers",s:"pkg_ai"},{l:"Talk to Sierra",s:"talk"},{l:"Back",s:"start"}] },
+        web: { bot: "Our custom builds start at $1,500. We also offer 1-Day Custom Sites for $299.99. What fits your needs?", qr: [{l:"1-Day Site",s:"pkg_templates"},{l:"Custom Packages",s:"pkg_standard"},{l:"Back",s:"start"}] },
+        ai: { bot: "From WhatsApp chatbots to Voice Agents, we build the machine that works while you sleep.", qr: [{l:"See AI Tiers",s:"pkg_ai"},{l:"E-Commerce",s:"pkg_ecommerce"},{l:"Talk to Sierra",s:"talk"},{l:"Back",s:"start"}] },
         pkg_standard: { bot: "Here are our Website Packages:", pkg: "standard" },
         pkg_ai: { bot: "Our AI Tiers:", pkg: "ai" },
         talk: { bot: "I'll ask a few quick questions to get you the right recommendation...", intake: true }
@@ -288,7 +299,7 @@
         const g = document.createElement('div'); g.className = 'cpkg-grid';
         list.forEach(p => {
             const c = document.createElement('div'); c.className = 'cpkg-card';
-            c.innerHTML = `<div class="cpkg-name">${p.name}</div><div class="cpkg-desc">${p.desc}</div>`;
+            c.innerHTML = `<div class="cpkg-name">${p.name} (${p.price})</div><div class="cpkg-desc">${p.desc}</div>`;
             c.onclick = () => go('talk', p.name);
             g.appendChild(c);
         });
