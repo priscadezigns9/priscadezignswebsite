@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Client Portal | Prisca Dezigns</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --portal-bg: #0F172A; --portal-sidebar: #1E293B; --portal-accent: #7D52B5; --portal-text: #F8FAF C; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--portal-bg); color: var(--portal-text); margin: 0; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); }
+        .sidebar-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-item:hover { background: rgba(255,255,255,0.05); }
+        .sidebar-item.active { background: var(--portal-accent); color: white; box-shadow: 0 10px 15px -3px rgba(125, 82, 181, 0.3); }
+        .data-card { background: #1E293B; border: 1px solid rgba(255,255,255,0.05); }
+        .hidden { display: none; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+    <div id="auth-screen" class="fixed inset-0 z-[999] glass flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-[#1E293B] rounded-[2.5rem] p-10 shadow-2xl border border-white/5 text-center">
+            <div class="w-20 h-20 bg-[#7D52B5] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-500/20"><i data-lucide="shield-check" class="w-10 h-10 text-white"></i></div>
+            <h2 class="text-3xl font-extrabold text-white mb-2 italic">Neural Handshake</h2>
+            <p class="text-slate-400 mb-8 font-medium">Verify your strategic token to enter the vault.</p>
+            <input type="password" id="auth-key" placeholder="Enter Token" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" onkeypress="if(event.key === 'Enter') checkAuth()">
+            <button onclick="checkAuth()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">CONNECT</button>
+        </div>
+    </div>
+    <aside class="w-72 bg-[#1E293B] border-r border-white/5 flex flex-col p-6 z-10">
+        <div class="flex items-center space-x-3 mb-12">
+            <div class="w-10 h-10 bg-[#7D52B5] rounded-xl flex items-center justify-center"><img src="https://share.zapia.com/57sonyoar08flg9xz5v667" class="w-6 h-6 filter brightness-0 invert"></div>
+            <div><div class="text-white font-extrabold tracking-tight text-sm">Strategic Portal</div><div class="text-purple-400 text-[9px] font-black uppercase tracking-widest">Client Edition v2.0</div></div>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <button onclick="showSection('overview')" id="nav-overview" class="sidebar-item active w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="layout-dashboard" class="w-4 h-4 mr-3"></i> Overview</button>
+            <button onclick="showSection('upload')" id="nav-upload" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="upload-cloud" class="w-4 h-4 mr-3"></i> Document Intake</button>
+            <button onclick="showSection('ledger')" id="nav-ledger" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="database" class="w-4 h-4 mr-3"></i> Data Ledger</button>
+            <button onclick="showSection('vault')" id="nav-vault" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="lock" class="w-4 h-4 mr-3"></i> Media Vault</button>
+        </nav>
+        <div class="mt-auto pt-6 border-t border-white/5">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold">C</div>
+                <div><div class="text-xs font-bold text-white">Client Session</div><div class="text-[9px] text-emerald-400 flex items-center font-bold uppercase tracking-tighter"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 animate-pulse"></span> Sierra Connected</div></div>
+            </div>
+        </div>
+    </aside>
+    <main class="flex-1 overflow-y-auto bg-[#0F172A] p-10 relative">
+        <div id="section-overview" class="max-w-5xl mx-auto">
+            <header class="mb-12"><h1 class="text-4xl font-extrabold text-white mb-2 italic">Neural Overview</h1><p class="text-slate-400 font-bold">Real-time status of your business infrastructure.</p></header>
+            <div class="grid grid-cols-3 gap-6 mb-12">
+                <div class="data-card p-8 rounded-3xl"><div class="text-slate-400 text-xs font-black uppercase mb-4 tracking-widest">Processed Items</div><div class="text-4xl font-extrabold text-white">1,248</div><div class="text-emerald-400 text-[10px] mt-2 font-bold">+12% from last month</div></div>
+                <div class="data-card p-8 rounded-3xl"><div class="text-slate-400 text-xs font-black uppercase mb-4 tracking-widest">Accuracy Rate</div><div class="text-4xl font-extrabold text-white">99.8%</div><div class="text-emerald-400 text-[10px] mt-2 font-bold">Sierra Optimized</div></div>
+                <div class="data-card p-8 rounded-3xl"><div class="text-slate-400 text-xs font-black uppercase mb-4 tracking-widest">Automation Savings</div><div class="text-4xl font-extrabold text-white">$4.2k</div><div class="text-emerald-400 text-[10px] mt-2 font-bold">Calculated by Drew</div></div>
+            </div>
+        </div>
+        <div id="section-upload" class="max-w-4xl mx-auto hidden">
+            <header class="mb-12"><h1 class="text-4xl font-extrabold text-white mb-2 italic">Document Intake</h1><p class="text-slate-400 font-bold">Drag and drop any business file for Sierra to process.</p></header>
+            <div class="bg-[#1E293B] rounded-[2.5rem] p-20 border-4 border-dashed border-white/5 text-center hover:border-purple-500/50 transition-all cursor-pointer group" onclick="document.getElementById('file-input').click()"><div class="w-16 h-16 bg-white/5 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="plus" class="w-8 h-8 text-purple-400"></i></div><h3 class="text-xl font-extrabold text-white tracking-tight">Drop Files or Click to Browse</h3><p class="text-slate-500 mt-2 font-bold">PDF, Images, Excel, CSV</p><input type="file" id="file-input" class="hidden" multiple onchange="handleUpload(this.files)"></div>
+            <div id="upload-stack" class="mt-8 space-y-4"></div>
+        </div>
+        <div id="section-ledger" class="max-w-6xl mx-auto hidden">
+            <header class="flex items-center justify-between mb-12"><div><h1 class="text-4xl font-extrabold text-white mb-2 italic">Data Ledger</h1><p class="text-slate-400 font-bold">Structured business intelligence extracted by AI.</p></div><button onclick="exportData()" class="px-6 py-3 bg-white text-slate-900 rounded-xl font-bold flex items-center hover:bg-slate-200 transition-colors"><i data-lucide="download" class="w-4 h-4 mr-2"></i> Export CSV</button></header>
+            <div class="bg-[#1E293B] rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/5">
+                <table class="w-full text-left">
+                    <thead><tr class="bg-white/5 border-b border-white/5"><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Entry Date</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Classification</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Merchant / Entity</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Value</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest text-right">Status</th></tr></thead>
+                    <tbody id="ledger-body"><tr class="border-b border-white/5 hover:bg-white/5 transition-colors"><td class="px-8 py-6 font-bold text-white italic">2026-07-11</td><td class="px-8 py-6"><span class="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-[10px] font-black uppercase">Infrastructure</span></td><td class="px-8 py-6 font-bold text-slate-300">Vercel Inc.</td><td class="px-8 py-6 font-black text-white">$12.00</td><td class="px-8 py-6 text-right"><span class="text-emerald-400 font-black text-[10px] uppercase">Synced</span></td></tr></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="section-vault" class="max-w-6xl mx-auto hidden">
+             <header class="mb-12"><h1 class="text-4xl font-extrabold text-white mb-2 italic">Media Vault</h1><p class="text-slate-400 font-bold">Secure access to raw documents mirrored in Google Drive.</p></header>
+            <div class="grid grid-cols-4 gap-6" id="vault-grid">
+                <div class="data-card p-6 rounded-3xl hover:border-purple-500/30 transition-all cursor-pointer"><div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 text-purple-400"><i data-lucide="file-text"></i></div><div class="text-sm font-extrabold text-white truncate">invoice_0711.pdf</div><div class="text-[9px] text-slate-500 font-black uppercase mt-1">2.4 MB • PDF</div><div class="mt-6 flex items-center justify-between"><i data-lucide="external-link" class="w-4 h-4 text-slate-600"></i><span class="text-[10px] font-black text-purple-400 uppercase">View Drive</span></div></div>
+            </div>
+        </div>
+    </main>
+    <script>
+        lucide.createIcons();
+        function checkAuth() { const key = document.getElementById('auth-key').value; if(key === 'alice') { document.getElementById('auth-screen').classList.add('hidden'); localStorage.setItem('pd_client_auth', 'true'); } else { alert('Neural Handshake Failed. Verify token.'); } }
+        if(localStorage.getItem('pd_client_auth') === 'true') { document.getElementById('auth-screen').classList.add('hidden'); }
+        function showSection(id) { ['overview', 'upload', 'ledger', 'vault'].forEach(s => { document.getElementById('section-' + s).classList.add('hidden'); document.getElementById('nav-' + s).classList.remove('active'); }); document.getElementById('section-' + id).classList.remove('hidden'); document.getElementById('nav-' + id).classList.add('active'); }
+        function handleUpload(files) { const stack = document.getElementById('upload-stack'); stack.innerHTML = ''; Array.from(files).forEach(file => { const card = document.createElement('div'); card.className = "bg-[#1E293B] p-6 rounded-3xl border border-white/5 flex items-center justify-between animate-pulse"; card.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mr-5 text-purple-400"><i data-lucide="file-up"></i></div><div><div class="text-sm font-extrabold text-white">${file.name}</div><div class="text-[10px] text-purple-400 font-black uppercase">Sierra is Analyzing Logic...</div></div></div><div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden"><div class="h-full bg-purple-500 w-1/3 animate-progress"></div></div>`; stack.appendChild(card); lucide.createIcons(); setTimeout(() => { card.classList.remove('animate-pulse'); card.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mr-5 text-emerald-400"><i data-lucide="check-circle-2"></i></div><div><div class="text-sm font-extrabold text-white">${file.name}</div><div class="text-[10px] text-emerald-400 font-black uppercase">Processed & Synced to Ledger</div></div></div><i data-lucide="external-link" class="w-4 h-4 text-slate-600"></i>`; lucide.createIcons(); }, 3000 + (Math.random() * 2000)); }); }
+        function exportData() { alert('Exporting Ledger to CSV... Preparing download via Sierra.'); }
+    </script>
+</body>
+</html>
