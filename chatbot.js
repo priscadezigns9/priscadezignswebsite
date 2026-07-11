@@ -10,6 +10,6 @@
     `;
     document.head.appendChild(s);
     const b = document.createElement('div'); b.id = 'pd-chat-bubble'; b.innerHTML = 'AI'; document.body.appendChild(b);
-    const w = document.createElement('div'); w.id = 'pd-chat-window'; w.innerHTML = '<div style="padding:20px">Sierra v2.1 (Glassmorphism)</div>'; document.body.appendChild(w);
+    const w = document.createElement('div'); w.id = 'pd-chat-window'; w.innerHTML = '<div style="padding:20px">Sierra v2.1 (Glassmorphism)</div>'; document.body.appendChild(b);
     b.onclick = () => { w.lclassList.toggle('open'); };
 })();
