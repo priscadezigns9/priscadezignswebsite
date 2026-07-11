@@ -7,7 +7,7 @@
         s.id = 'pd-chat-style';
         s.innerHTML = `
     :root {
-        --pd-deep: #301934;
+        --pd-deep: ;
         --pd-lilac: #C8A2C8;
         --pd-ivory: #F9F9F7;
         --pd-glass: rgba(255, 255, 240, 0.92);
@@ -244,6 +244,7 @@
 
     setTimeout(() => runStep('start'), 1000);
 })();
+
 
 
 
