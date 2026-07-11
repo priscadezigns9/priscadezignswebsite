@@ -43,9 +43,13 @@
                 <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
                 <span class="font-semibold">Drew's Logs</span>
             </button>
-            <button onclick="showSection('sierra')" class="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-white/10 transition-all group">
+            <button onclick="showSection('outreach')" class="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-white/10 transition-all group">
                 <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                <span class="font-semibold">Sierra (Outreach)</span>
+                <span class="font-semibold">Email Outreach</span>
+            </button>
+            <button onclick="showSection('chatbot')" class="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-white/10 transition-all group">
+                <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                <span class="font-semibold">Sierra Chat</span>
             </button>
         </nav>
         <div class="p-6">
@@ -275,15 +279,11 @@
         }
 
         async function fetchData() {
-            // Fetch agency leads (client_leads)
             const { data: leads, error: leadError } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
-            
-            // Fetch chatbot outreach leads (outreach_leads)
             const { data: outreach, error: outreachError } = await sb.from('outreach_leads').select('*').order('created_at', { ascending: false });
             
             if (leadError || outreachError) return console.error(leadError || outreachError);
 
-            // Combine both sources for the main ledger
             const combinedLeads = [
                 ...leads.map(l => ({ ...l, source: 'Web Form' })),
                 ...outreach.map(o => ({ 
@@ -291,9 +291,9 @@
                     name: o.company_name || o.name || 'Anonymous Signal', 
                     status: o.status || 'NEW', 
                     package: o.service_category || 'Agency Outreach', 
-                    brand: 'Chatbot', 
+                    brand: 'Outreach', 
                     created_at: o.created_at,
-                    source: 'Outreach'
+                    source: o.campaign && o.campaign.includes('Combo') ? 'Email' : 'Chatbot'
                 }))
             ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
@@ -301,20 +301,42 @@
             renderLeads(combinedLeads);
             updateStats(combinedLeads);
             renderChart(combinedLeads);
-            renderSierraLogs(outreach);
+            
+            // Distribute to specific hubs
+            const emailLogs = outreach.filter(o => o.campaign && o.campaign.includes('Combo'));
+            const chatLogs = outreach.filter(o => !o.campaign || !o.campaign.includes('Combo'));
+            
+            renderOutreachLogs(emailLogs);
+            renderChatbotLogs(chatLogs);
         }
 
-        function renderSierraLogs(logs) {
-            const tbody = document.getElementById('sierra-table-body');
+        function renderOutreachLogs(logs) {
+            const tbody = document.getElementById('outreach-table-body');
+            document.getElementById('outreach-sent-count').innerText = `${logs.filter(l => l.status === 'Sent').length} Sent`;
+            document.getElementById('outreach-bounce-count').innerText = `${logs.filter(l => l.status === 'Bounced').length} Bounced`;
+            
             tbody.innerHTML = logs.map(l => `
                 <tr class="hover:bg-slate-50/80 transition-colors">
                     <td class="px-8 py-6 font-bold text-slate-800">${l.company_name || l.name || 'Anonymous'}</td>
                     <td class="px-8 py-6 text-xs text-slate-500">${l.email || '--'}</td>
-                    <td class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">${l.campaign || 'General'}</td>
                     <td class="px-8 py-6 uppercase font-black text-[10px] ${l.status === 'Bounced' ? 'text-red-400' : 'text-purple-600'} tracking-widest">${l.status || 'NEW'}</td>
-                    <td class="px-8 py-6 text-xs text-slate-500 max-w-xs leading-relaxed">
-                        ${l.notes || '--'}
+                    <td class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">${l.campaign || 'General'}</td>
+                    <td class="px-8 py-6 text-xs text-slate-500 max-w-xs leading-relaxed">${l.notes || '--'}</td>
+                    <td class="px-8 py-6 text-right">
+                        <button onclick="deleteOutreachLead(${l.id})" class="text-xs font-bold text-red-300 hover:text-red-600 transition-colors">Purge</button>
                     </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderChatbotLogs(logs) {
+            const tbody = document.getElementById('chatbot-table-body');
+            tbody.innerHTML = logs.map(l => `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="px-8 py-6 font-bold text-slate-800">${l.name || l.company_name || 'In-Progress'}</td>
+                    <td class="px-8 py-6 uppercase font-black text-[10px] text-purple-600 tracking-widest">${l.status || 'Capturing'}</td>
+                    <td class="px-8 py-6 text-xs text-slate-500 max-w-xs leading-relaxed">${l.notes || 'Conversation handshake...'}</td>
+                    <td class="px-8 py-6 text-[10px] uppercase font-bold text-slate-400">${new Date(l.created_at).toLocaleString()}</td>
                     <td class="px-8 py-6 text-right">
                         <button onclick="deleteOutreachLead(${l.id})" class="text-xs font-bold text-red-300 hover:text-red-600 transition-colors">Purge</button>
                     </td>
@@ -430,13 +452,15 @@
         function showSection(id) {
             document.getElementById('section-leads').classList.add('hidden');
             document.getElementById('section-drew').classList.add('hidden');
-            document.getElementById('section-sierra').classList.add('hidden');
+            document.getElementById('section-outreach').classList.add('hidden');
+            document.getElementById('section-chatbot').classList.add('hidden');
             document.getElementById('section-' + id).classList.remove('hidden');
             
             const titles = {
                 'leads': 'Strategic Lead Ledger',
                 'drew': "Drew's Voice Conversation Hub",
-                'sierra': "Sierra's Outreach Hub"
+                'outreach': "Email Outreach Command",
+                'chatbot': "Sierra Chatbot Handshakes"
             };
             document.getElementById('section-title').innerText = titles[id];
         }
