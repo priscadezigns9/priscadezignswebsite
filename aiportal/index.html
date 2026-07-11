@@ -162,7 +162,7 @@
                 
                 <button onclick="openAddLeadModal()" class="flex items-center space-x-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    <span>New Signal</span>
+                    <span>Add Signal / Lead</span>
                 </button>
                 <div class="h-8 w-[1px] bg-slate-200"></div>
 
@@ -266,6 +266,7 @@
                 // 3. Live Drew Logs (Handshake)
                 const { data: calls } = await sb.from('drew_calls').select('*').order('call_date', { ascending: false });
                 voiceLogs = (calls || []).map(d => ({
+                    id: d.id,
                     name: d.customer_name,
                     status: d.outcome,
                     duration: 'Handshake Active',
@@ -332,6 +333,16 @@
 
         
         
+        
+        async function deleteDrewCall(id) {
+            if(!confirm('Permanently delete this call log from the ledger?')) return;
+            try {
+                const { error } = await sb.from('drew_calls').delete().eq('id', id);
+                if (error) throw error;
+                fetchData();
+            } catch (e) { alert('Delete failed: ' + e.message); }
+        }
+
         async function deleteLead(id) {
             if(!confirm('Permanently delete this signal from the ledger?')) return;
             try {
@@ -463,37 +474,64 @@
                     </div>
                 `;
                 container.innerHTML = html;
+            
             } else if (currentView === 'organic' || currentView === 'chat') {
                 const targetData = currentView === 'organic' ? organicLeads : chatLeads;
                 html = targetData.map(l => `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 hover:shadow-lg transition-all flex justify-between items-center">
-                        <div>
-                            <h4 class="font-bold text-slate-800 text-lg">${l.name}</h4>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 hover:shadow-lg transition-all flex justify-between items-center group">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-1">
+                                <h4 class="font-bold text-slate-800 text-lg">${l.name}</h4>
+                                <span class="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[10px] font-bold uppercase tracking-wider">${l.brand || 'Handshake'}</span>
+                            </div>
                             <p class="text-sm text-slate-500">${l.email}</p>
                         </div>
-                        <div class="text-right">
-                            <div class="text-xs font-bold text-slate-400 uppercase mb-1">${l.brand || 'Handshake'}</div>
-                            <div class="text-sm font-bold text-purple-600">${l.package || 'Custom'}</div>
+                        <div class="flex items-center space-x-6">
+                            <div class="text-right">
+                                <div class="text-[10px] font-bold text-purple-600 uppercase mb-1">${l.package || 'Custom'}</div>
+                                <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-400 hover:text-purple-600 transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === 'Qualified' ? 'Verified' : 'Apollo PPI'}</span>
+                                </button>
+                            </div>
+                            <div class="h-10 w-[1px] bg-slate-100"></div>
+                            <button onclick="deleteLead('${l.id}')" class="p-2 text-slate-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
                         </div>
                     </div>
                 `).join('') || '<div class="p-20 text-center text-slate-400 font-medium">No signals detected in this frequency.</div>';
                 container.innerHTML = html;
+
+            
             } else if (currentView === 'drew') {
                 html = voiceLogs.map(log => `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 flex space-x-6 items-start">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 flex space-x-6 items-start group">
                         <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
                         </div>
                         <div class="flex-1">
                             <div class="flex justify-between items-center mb-2">
-                                <h4 class="font-bold text-slate-800">${log.name}</h4>
-                                <span class="text-xs text-slate-400">${log.time} • ${log.duration}</span>
+                                <div>
+                                    <h4 class="font-bold text-slate-800">${log.name}</h4>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">${log.time} • ${log.duration}</div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <button onclick="enrichLead('${log.id}', '${log.name}')" class="flex items-center space-x-1.5 text-slate-400 hover:text-purple-600 transition-all">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">Apollo PPI</span>
+                                    </button>
+                                    <button onclick="deleteDrewCall('${log.id}')" class="p-1.5 text-slate-300 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
                             </div>
                             <p class="text-sm text-slate-600 italic bg-slate-50 p-4 rounded-2xl border border-slate-100">"${log.transcription}"</p>
                         </div>
                     </div>
-                `).join('');
+                `).join('') || '<div class="p-20 text-center text-slate-400 font-medium">No voice handshakes detected.</div>';
                 container.innerHTML = html;
+
             } else if (currentView === 'outreach') {
                 html = `
                     <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
@@ -591,7 +629,7 @@
                                     <td class="px-6 py-4">
                                         <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-500 hover:text-purple-600 transition-all">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                            <span class="text-[10px] font-bold uppercase tracking-wider">Enrich Signal</span>
+                                            <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === "Qualified" ? "Verified" : "Apollo PPI"}</span>
                                         </button>
                                     </td>
                                     <td class="px-6 py-4">
@@ -607,6 +645,7 @@
     </script>
 </body>
 </html>
+
 
 
 
