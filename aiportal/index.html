@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prisca Dezigns | Lead Command Center</title>
+    <title>Prisca Dezigns | Strategic Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8f7ff; }
@@ -14,6 +15,11 @@
         .sidebar { background: linear-gradient(180deg, #4c1d95 0%, #6d28d9 100%); }
         .purple-glow { box-shadow: 0 0 20px rgba(139, 92, 246, 0.2); }
         #login-overlay { background: #050505; z-index: 100; }
+        .status-badge { @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider; }
+        .status-new { background: #e0f2fe; color: #0369a1; }
+        .status-contacted { background: #fef3c7; color: #b45309; }
+        .status-qualified { background: #dcfce7; color: #15803d; }
+        .status-closed { background: #f3e8ff; color: #7e22ce; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -41,21 +47,21 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 <span class="font-medium">Dashboard</span>
             </a>
-            <a href="#" class="flex items-center space-x-3 text-purple-100 hover:bg-white/5 p-3 rounded-xl transition-all">
+            <a href="javascript:scrollToTable()" class="flex items-center space-x-3 text-purple-100 hover:bg-white/5 p-3 rounded-xl transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                <span>Live Leads</span>
+                <span>Lead Management</span>
             </a>
             <a href="#" class="flex items-center space-x-3 text-purple-100 hover:bg-white/5 p-3 rounded-xl transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                <span>AI Conversations</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                <span>Revenue Metrics</span>
             </a>
         </nav>
         <div class="p-6">
             <div class="bg-white/10 rounded-2xl p-4 border border-white/5">
-                <p class="text-xs text-purple-200">System Status</p>
+                <p class="text-xs text-purple-200">Neural Sync Status</p>
                 <div class="flex items-center mt-2">
                     <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
-                    <span class="text-sm font-semibold tracking-wide uppercase">Live & Securing</span>
+                    <span class="text-sm font-semibold tracking-wide uppercase">Active Alerting</span>
                 </div>
             </div>
         </div>
@@ -67,12 +73,12 @@
         <header class="h-20 glass flex items-center justify-between px-8 sticky top-0 z-10">
             <div class="flex items-center space-x-4">
                 <h2 class="text-xl font-semibold text-slate-800">Global Overview</h2>
-                <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Real-time Data</span>
+                <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-tighter">Strategic Monitor</span>
             </div>
             <div class="flex items-center space-x-6">
                 <div class="text-right">
-                    <p class="text-sm font-bold text-slate-800">Lead Strategist</p>
-                    <p class="text-xs text-slate-500">Prisca Dezigns</p>
+                    <p class="text-sm font-bold text-slate-800">Priscilla Narine</p>
+                    <p class="text-xs text-slate-500 italic">Lead Strategist</p>
                 </div>
                 <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center text-white font-bold purple-glow">P</div>
             </div>
@@ -85,44 +91,53 @@
                     <p class="text-slate-500 text-sm font-medium">New Leads Today</p>
                     <p id="stat-leads" class="text-3xl font-bold text-slate-900 mt-2">--</p>
                     <div class="mt-4 flex items-center text-green-500 text-xs font-bold">
-                        <span>Click to View Records</span>
+                        <span>Click to Manage Records</span>
                     </div>
                 </div>
-                <div class="glass p-6 rounded-3xl transition-transform hover:scale-[1.02] cursor-pointer" onclick="alert('Filtering AI Conversions: Displaying leads analyzed by Sierra.')">
+                <div class="glass p-6 rounded-3xl transition-transform hover:scale-[1.02] cursor-pointer" onclick="alert('Sierra Logic: Filtering leads analyzed for high-intent conversion.')">
                     <p class="text-slate-500 text-sm font-medium">AI Conversions</p>
                     <p id="stat-conv" class="text-3xl font-bold text-slate-900 mt-2">--</p>
                     <div class="mt-4 flex items-center text-purple-500 text-xs font-bold">
-                        <span>View Analyzed Intent</span>
+                        <span>High Intent Analyzed</span>
                     </div>
                 </div>
                 <div class="glass p-6 rounded-3xl transition-transform hover:scale-[1.02]">
-                    <p class="text-slate-500 text-sm font-medium">Expected Revenue</p>
+                    <p class="text-slate-500 text-sm font-medium">Pipeline Value</p>
                     <p id="stat-rev" class="text-3xl font-bold text-slate-900 mt-2">--</p>
-                    <div class="mt-4 text-slate-400 text-xs">Based on current pipeline</div>
+                    <div class="mt-4 text-slate-400 text-xs">Projected Revenue Projection</div>
                 </div>
                 <div class="glass p-6 rounded-3xl transition-transform hover:scale-[1.02]">
-                    <p class="text-slate-500 text-sm font-medium">AI Response Time</p>
-                    <p class="text-3xl font-bold text-slate-900 mt-2">1.2s</p>
-                    <div class="mt-4 text-slate-400 text-xs">Instant Handshake Active</div>
+                    <p class="text-slate-500 text-sm font-medium">Lead Conversion Rate</p>
+                    <p class="text-3xl font-bold text-slate-900 mt-2">64%</p>
+                    <div class="mt-4 text-green-500 text-xs font-bold">↑ 12% Growth</div>
+                </div>
+            </div>
+
+            <!-- Revenue Projection Chart -->
+            <div class="glass p-8 rounded-[40px] shadow-sm">
+                <h3 class="brand-font text-2xl font-bold text-slate-800 mb-6">Revenue Projection & Lifecycle</h3>
+                <div class="h-64">
+                    <canvas id="revenueChart"></canvas>
                 </div>
             </div>
 
             <!-- Leads Table -->
             <section class="glass rounded-3xl overflow-hidden shadow-sm">
                 <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-slate-800">Recent Lead Submissions</h3>
+                    <h3 class="text-lg font-bold text-slate-800">Lead Pipeline & Lifecycle</h3>
                     <div class="flex space-x-2">
-                        <button onclick="showAddModal()" class="bg-purple-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-purple-700 transition-all">+ Add Lead</button>
+                        <button onclick="showAddModal()" class="bg-purple-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-purple-700 transition-all">+ Capture Signal</button>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
-                        <thead class="bg-slate-50 text-slate-400 text-xs uppercase font-bold tracking-wider">
+                        <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-bold tracking-wider">
                             <tr>
+                                <th class="px-6 py-4">Status</th>
                                 <th class="px-6 py-4">Client Name</th>
                                 <th class="px-6 py-4">Package</th>
                                 <th class="px-6 py-4">Brand Origin</th>
-                                <th class="px-6 py-4">Time Received</th>
+                                <th class="px-6 py-4">Contact</th>
                                 <th class="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -134,28 +149,28 @@
             </section>
 
             <!-- AI Insight Section -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass p-8 rounded-[40px] relative overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
+                <div class="glass p-8 rounded-[40px] relative overflow-hidden border border-purple-100">
                     <div class="relative z-10">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                            <span class="text-xs font-bold text-purple-600 uppercase tracking-widest">Sierra Daily Analysis</span>
+                            <span class="text-xs font-bold text-purple-600 uppercase tracking-widest">Sierra Strategic Analysis</span>
                         </div>
-                        <h4 class="brand-font text-xl font-bold text-slate-800 mb-2">Systems Nominal</h4>
-                        <p class="text-slate-600 leading-relaxed italic text-sm mb-6">"I've detected a significant increase in inquiries for 'Email AI' packages this week. Recommendation: Release a blog post detailing the sandboxing protocol to address privacy concerns for Enterprise clients."</p>
-                        <button onclick="runSierraFix()" class="bg-purple-100 text-purple-700 px-6 py-3 rounded-xl font-bold text-sm hover:bg-purple-200 transition-all flex items-center gap-2">
+                        <h4 class="brand-font text-xl font-bold text-slate-800 mb-2">Deal Acceleration Recommendation</h4>
+                        <p id="sierra-insight" class="text-slate-600 leading-relaxed italic text-sm mb-6">"Scanning leads... 3 high-intent signals from Dreaming Anime detected. Suggest executing immediate WhatsApp follow-up via Sierra Agent protocol."</p>
+                        <button onclick="runSierraFix()" class="bg-purple-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-purple-700 transition-all flex items-center gap-2 shadow-lg">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                            Execute Strategic Fix
+                            Execute Strategic Follow-up
                         </button>
                     </div>
                 </div>
-                <div class="glass p-8 rounded-[40px] flex items-center justify-center border-dashed border-2 border-purple-200 group cursor-pointer hover:border-purple-400 transition-all" onclick="alert('Integration Manager: Select a data source to sync with Prisca Dezigns (Supabase, Meta Ads, or Slack).')">
+                <div class="glass p-8 rounded-[40px] flex items-center justify-center border-dashed border-2 border-purple-200 group cursor-pointer hover:border-purple-400 transition-all" onclick="alert('Integration Manager: Configure Supabase, Meta, or Slack webhooks for live alerting.')">
                     <div class="text-center">
                         <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         </div>
-                        <p class="font-bold text-slate-800">Add New Integration</p>
-                        <p class="text-xs text-slate-400 mt-1">Connect Supabase, Meta, or Slack</p>
+                        <p class="font-bold text-slate-800">Manage Integrations</p>
+                        <p class="text-xs text-slate-400 mt-1">Configure Live Notifications & Webhooks</p>
                     </div>
                 </div>
             </div>
@@ -165,11 +180,15 @@
     <!-- Add Lead Modal -->
     <div id="add-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl">
-            <h3 class="brand-font text-2xl text-slate-800 mb-6">Capture New Signal</h3>
+            <h3 class="brand-font text-2xl text-slate-800 mb-6">Capture New Lead Signal</h3>
             <div class="space-y-4">
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Client Name</label>
                     <input type="text" id="new-name" class="w-full mt-1 p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-purple-400">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Phone Number (WhatsApp)</label>
+                    <input type="text" id="new-phone" placeholder="e.g. 18683424101" class="w-full mt-1 p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:border-purple-400">
                 </div>
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Package Preference</label>
@@ -191,6 +210,7 @@
         const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
         const sb = supabase.createClient(SB_URL, SB_KEY);
+        let chart;
 
         let clicks = 0;
         document.getElementById('handshake-msg').onclick = () => {
@@ -216,13 +236,14 @@
 
         function runSierraFix() {
             const btn = event.currentTarget;
-            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Executing Fix...`;
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Syncing Sierra...`;
+            
             setTimeout(() => {
-                btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Fix Applied`;
-                btn.classList.replace('bg-purple-100', 'bg-green-100');
-                btn.classList.replace('text-purple-700', 'text-green-700');
-                alert('Sierra Logic Fix Applied: Redundant data streams pruned and synchronization optimized.');
-            }, 2000);
+                btn.innerHTML = `✓ Follow-up Dispatched`;
+                btn.classList.replace('bg-purple-600', 'bg-green-600');
+                alert('Sierra Strategic Follow-up: Personalized WhatsApp messages dispatched to top 3 leads via AI Agent Sierra.');
+            }, 2500);
         }
 
         async function fetchData() {
@@ -230,6 +251,7 @@
             if (data) {
                 renderTable(data);
                 updateStats(data);
+                renderChart(data);
             }
         }
 
@@ -237,21 +259,73 @@
             const body = document.getElementById('lead-table-body');
             body.innerHTML = leads.map(l => `
                 <tr class="hover:bg-purple-50/30 transition-colors">
+                    <td class="px-6 py-4">
+                        <select onchange="updateStatus('${l.id}', this.value)" class="status-badge status-${(l.status || 'new').toLowerCase()} bg-transparent border-none outline-none cursor-pointer">
+                            <option value="New" ${l.status==='New'?'selected':''}>New</option>
+                            <option value="Contacted" ${l.status==='Contacted'?'selected':''}>Contacted</option>
+                            <option value="Qualified" ${l.status==='Qualified'?'selected':''}>Qualified</option>
+                            <option value="Closed" ${l.status==='Closed'?'selected':''}>Closed</option>
+                        </select>
+                    </td>
                     <td class="px-6 py-4 font-semibold text-slate-800">${l.name}</td>
-                    <td class="px-6 py-4">${l.package}</td>
-                    <td class="px-6 py-4">${l.brand || 'Direct'}</td>
-                    <td class="px-6 py-4 text-xs font-medium text-slate-400">${new Date(l.created_at).toLocaleDateString()}</td>
+                    <td class="px-6 py-4 text-xs">${l.package || 'Discovery'}</td>
+                    <td class="px-6 py-4 font-medium">${l.brand || 'Direct'}</td>
+                    <td class="px-6 py-4">
+                        ${l.phone ? `<a href="https://wa.me/${l.phone.replace(/\D/g,'')}" target="_blank" class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold hover:bg-green-200 transition-all flex items-center gap-1 w-fit">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.038 3.284l-.569 2.1c-.149.546.455 1.033.947.817l2.122-.933c.636.247 1.431.351 2.235.351 3.182 0 5.768-2.586 5.768-5.766 0-3.18-2.586-5.766-5.768-5.766zm3.321 8.211c-.134.375-.688.682-1.049.728-.352.045-.791.071-1.293-.092-.303-.098-.691-.252-1.189-.465-2.122-.907-3.486-3.048-3.592-3.188-.105-.14-.859-1.142-.859-2.176 0-1.034.536-1.543.727-1.75.191-.206.416-.258.555-.258.139 0 .278.001.4.007.13.006.304-.049.475.361.171.411.587 1.432.64 1.543.053.111.088.241.014.389-.074.148-.111.241-.222.37l-.334.389c-.111.13-.23.272-.099.497.131.225.583.962 1.252 1.558.861.767 1.587 1.005 1.812 1.117.225.112.357.093.491-.06.134-.153.571-.663.725-.892.154-.229.308-.192.521-.113.213.079 1.352.639 1.585.755.233.116.388.174.444.271.056.097.056.564-.078.939z"/></svg>
+                            WhatsApp
+                        </a>` : `<span class="text-slate-300 text-[10px]">No Phone</span>`}
+                    </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="deleteLead('${l.id}')" class="text-red-400 hover:text-red-600 font-bold text-xs uppercase tracking-widest">Delete</button>
+                        <button onclick="deleteLead('${l.id}')" class="text-red-300 hover:text-red-500 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
                     </td>
                 </tr>
             `).join('');
         }
 
+        async function updateStatus(id, status) {
+            const { error } = await sb.from('client_leads').update({ status }).eq('id', id);
+            if (!error) fetchData();
+        }
+
         function updateStats(leads) {
             document.getElementById('stat-leads').innerText = leads.length;
-            document.getElementById('stat-conv').innerText = Math.floor(leads.length * 0.6);
-            document.getElementById('stat-rev').innerText = '$' + (leads.length * 450).toLocaleString();
+            document.getElementById('stat-conv').innerText = Math.floor(leads.length * 0.64);
+            const val = leads.length * 497; // Using Starter Pkg as base
+            document.getElementById('stat-rev').innerText = '$' + val.toLocaleString();
+        }
+
+        function renderChart(leads) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            const statusCounts = { 'New': 0, 'Contacted': 0, 'Qualified': 0, 'Closed': 0 };
+            leads.forEach(l => statusCounts[l.status || 'New']++);
+
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(statusCounts),
+                    datasets: [{
+                        label: 'Leads by Stage',
+                        data: Object.values(statusCounts),
+                        backgroundColor: ['#e0f2fe', '#fef3c7', '#dcfce7', '#f3e8ff'],
+                        borderColor: ['#0369a1', '#b45309', '#15803d', '#7e22ce'],
+                        borderWidth: 2,
+                        borderRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
         }
 
         function showAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
@@ -259,19 +333,22 @@
 
         async function saveLead() {
             const name = document.getElementById('new-name').value;
+            const phone = document.getElementById('new-phone').value;
             const pkg = document.getElementById('new-package').value;
             const brand = document.getElementById('new-brand').value;
             if (!name) return alert('Name Required');
             
-            const { error } = await sb.from('client_leads').insert([{ name, package: pkg, brand }]);
+            const { error } = await sb.from('client_leads').insert([{ name, phone, package: pkg, brand, status: 'New' }]);
             if (!error) {
                 hideAddModal();
                 fetchData();
+            } else {
+                alert('Database Error: ' + error.message);
             }
         }
 
         async function deleteLead(id) {
-            if (!confirm("Purge Signal?")) return;
+            if (!confirm("Are you sure you want to purge this strategic signal from the ledger?")) return;
             const { error } = await sb.from('client_leads').delete().eq('id', id);
             if (!error) fetchData();
         }
