@@ -44,8 +44,8 @@
                 <span class="font-semibold">Drew's Logs</span>
             </button>
             <button onclick="showSection('sierra')" class="w-full flex items-center space-x-3 p-4 rounded-2xl hover:bg-white/10 transition-all group">
-                <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                <span class="font-semibold">Sierra (Chatbot)</span>
+                <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <span class="font-semibold">Sierra (Outreach)</span>
             </button>
         </nav>
         <div class="p-6">
@@ -181,21 +181,22 @@
                 </div>
             </section>
 
-            <!-- Sierra Chatbot Section -->
+            <!-- Sierra Outreach Section -->
             <section id="section-sierra" class="space-y-6 hidden">
                 <div class="glass rounded-[40px] overflow-hidden">
                     <div class="px-8 py-6 border-b border-slate-100">
-                        <h3 class="font-bold text-slate-800">Sierra's Chatbot Conversation Hub</h3>
-                        <p class="text-xs text-slate-400 mt-1">Direct transcripts and data captures from Sierra's customer interactions.</p>
+                        <h3 class="font-bold text-slate-800">Sierra's Strategic Outreach Hub</h3>
+                        <p class="text-xs text-slate-400 mt-1">Direct signals and delivery status from Sierra's B2B email campaigns.</p>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead class="bg-slate-50/50 text-slate-400 text-[10px] uppercase font-bold tracking-widest">
                                 <tr>
-                                    <th class="px-8 py-4">Lead</th>
-                                    <th class="px-8 py-4">Interest Level</th>
-                                    <th class="px-8 py-4">Capture Data</th>
-                                    <th class="px-8 py-4">Timestamp</th>
+                                    <th class="px-8 py-4">Company</th>
+                                    <th class="px-8 py-4">Email</th>
+                                    <th class="px-8 py-4">Campaign</th>
+                                    <th class="px-8 py-4">Status</th>
+                                    <th class="px-8 py-4">Notes</th>
                                     <th class="px-8 py-4 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -292,7 +293,7 @@
                     package: o.service_category || 'Agency Outreach', 
                     brand: 'Chatbot', 
                     created_at: o.created_at,
-                    source: 'Chatbot'
+                    source: 'Outreach'
                 }))
             ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
@@ -307,12 +308,13 @@
             const tbody = document.getElementById('sierra-table-body');
             tbody.innerHTML = logs.map(l => `
                 <tr class="hover:bg-slate-50/80 transition-colors">
-                    <td class="px-8 py-6 font-bold text-slate-800">${l.name || l.company_name || 'In-Progress'}</td>
-                    <td class="px-8 py-6 uppercase font-black text-[10px] text-purple-600 tracking-widest">${l.status || 'Capturing'}</td>
+                    <td class="px-8 py-6 font-bold text-slate-800">${l.company_name || l.name || 'Anonymous'}</td>
+                    <td class="px-8 py-6 text-xs text-slate-500">${l.email || '--'}</td>
+                    <td class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">${l.campaign || 'General'}</td>
+                    <td class="px-8 py-6 uppercase font-black text-[10px] ${l.status === 'Bounced' ? 'text-red-400' : 'text-purple-600'} tracking-widest">${l.status || 'NEW'}</td>
                     <td class="px-8 py-6 text-xs text-slate-500 max-w-xs leading-relaxed">
-                        ${l.notes || 'Capture in progress via Sierra Handshake...'}
+                        ${l.notes || '--'}
                     </td>
-                    <td class="px-8 py-6 text-[10px] uppercase font-bold text-slate-400">${new Date(l.created_at).toLocaleString()}</td>
                     <td class="px-8 py-6 text-right">
                         <button onclick="deleteOutreachLead(${l.id})" class="text-xs font-bold text-red-300 hover:text-red-600 transition-colors">Purge</button>
                     </td>
@@ -434,7 +436,7 @@
             const titles = {
                 'leads': 'Strategic Lead Ledger',
                 'drew': "Drew's Voice Conversation Hub",
-                'sierra': "Sierra's Chatbot Hub"
+                'sierra': "Sierra's Outreach Hub"
             };
             document.getElementById('section-title').innerText = titles[id];
         }
