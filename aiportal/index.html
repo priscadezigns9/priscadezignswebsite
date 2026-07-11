@@ -97,6 +97,50 @@
     </aside>
 
     <!-- Main Content -->
+    
+    <!-- Add Lead Modal -->
+    <div id="add-lead-modal" class="fixed inset-0 z-[110] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-6">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800">New Neural Signal</h3>
+                <button onclick="closeAddLeadModal()" class="text-slate-400 hover:text-slate-600 transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form onsubmit="saveLead(event)" class="p-8 space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Customer Name</label>
+                    <input id="new-name" required type="text" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none text-slate-800 font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Email Address</label>
+                    <input id="new-email" required type="email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none text-slate-800 font-medium">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Brand Hub</label>
+                        <select id="new-brand" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none text-slate-800 font-medium">
+                            <option value="Direct">Direct</option>
+                            <option value="Autodrome">The Autodrome</option>
+                            <option value="Anime">Dreaming Anime</option>
+                            <option value="NehNeh">NehNeh</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">Package Tier</label>
+                        <select id="new-package" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 outline-none text-slate-800 font-medium">
+                            <option value="Tier 1">Tier 1</option>
+                            <option value="Tier 2">Tier 2</option>
+                            <option value="Tier 3">Tier 3</option>
+                            <option value="Custom">Custom</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">Add Signal</button>
+            </form>
+        </div>
+    </div>
+
     <main class="flex-1 overflow-y-auto hidden" id="main-content">
         <!-- Top Nav -->
         <header class="h-20 glass flex items-center justify-between px-8 sticky top-0 z-10">
@@ -115,6 +159,13 @@
                         <option value="priscadezigns">Client: Prisca Dezigns</option>
                     </select>
                 </div>
+                
+                <button onclick="openAddLeadModal()" class="flex items-center space-x-2 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    <span>New Signal</span>
+                </button>
+                <div class="h-8 w-[1px] bg-slate-200"></div>
+
                 <button onclick="fetchData()" class="p-2 hover:bg-slate-100 rounded-full transition-all text-purple-600" id="sync-btn" title="Neural Sync">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 </button>
@@ -280,6 +331,53 @@
         }
 
         
+        
+        async function deleteLead(id) {
+            if(!confirm('Permanently delete this signal from the ledger?')) return;
+            try {
+                const { error } = await sb.from('client_leads').delete().eq('id', id);
+                if (error) throw error;
+                fetchData();
+            } catch (e) { alert('Delete failed: ' + e.message); }
+        }
+
+        function openAddLeadModal() {
+            document.getElementById('add-lead-modal').classList.remove('hidden');
+            document.getElementById('add-lead-modal').classList.add('flex');
+        }
+
+        function closeAddLeadModal() {
+            document.getElementById('add-lead-modal').classList.add('hidden');
+            document.getElementById('add-lead-modal').classList.remove('flex');
+        }
+
+        async function saveLead(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerText = 'Syncing...';
+
+            const payload = {
+                name: document.getElementById('new-name').value,
+                email: document.getElementById('new-email').value,
+                brand: document.getElementById('new-brand').value,
+                package: document.getElementById('new-package').value,
+                status: 'New'
+            };
+
+            try {
+                const { error } = await sb.from('client_leads').insert([payload]);
+                if (error) throw error;
+                closeAddLeadModal();
+                fetchData();
+                e.target.reset();
+            } catch (e) { alert('Save failed: ' + e.message); }
+            finally {
+                btn.disabled = false;
+                btn.innerText = 'Add Signal';
+            }
+        }
+
         async function enrichLead(id, name) {
             const btn = event.currentTarget;
             btn.innerHTML = "<span>Enriching...</span>";
@@ -432,6 +530,7 @@
             }
         }
 
+        
         function renderTable(data) {
             const anchor = document.getElementById('table-anchor');
             if(!anchor) return;
@@ -443,14 +542,45 @@
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo Intelligence</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             ${data.map(l => `
-                                <tr class="hover:bg-slate-50 transition-all cursor-pointer">
+                                <tr class="hover:bg-slate-50 transition-all">
                                     <td class="px-6 py-4">
                                         <div class="font-bold text-slate-800">${l.name || 'Anonymous'}</div>
+                                        <div class="text-xs text-slate-500">${l.email || 'No Email'}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-bold text-slate-700">${l.brand || 'Direct'}</div>
+                                        <div class="text-[10px] font-bold text-purple-600 uppercase">${l.package || 'Custom'}</div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
+                                    <td class="px-6 py-4">
+                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-500 hover:text-purple-600 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                            <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === 'Qualified' ? 'Verified' : 'Enrich Signal'}</span>
+                                        </button>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button onclick="deleteLead('${l.id}')" class="p-2 text-slate-400 hover:text-red-500 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="6" class="p-10 text-center text-slate-400">No signals found in this context.</td></tr>'}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+</div>
                                         <div class="text-xs text-slate-500">${l.email || 'No Email'}</div>
                                     </td>
                                     <td class="px-6 py-4">
@@ -477,6 +607,7 @@
     </script>
 </body>
 </html>
+
 
 
 
