@@ -193,7 +193,7 @@
     <script>
         const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
         let currentView = 'ledger';
-        let allLeads = [], outreachLeads = [], organicLeads = [], chatLeads = [], voiceLogs = [], financeLogs = [];
+        let allLeads = [], allMedia = [], outreachLeads = [], organicLeads = [], chatLeads = [], voiceLogs = [], financeLogs = [];
         let chartInstance = null;
 
         let authClicks = 0;
@@ -239,6 +239,9 @@
             try {
                 const { data: cLeads } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
                 allLeads = cLeads || [];
+                const { data: mediaData } = await sb.from('media').select('*').order('created_at', { ascending: false });
+                allMedia = mediaData || [];
+    
                 organicLeads = allLeads.filter(l => !((l.brand||'').toLowerCase().includes('chatbot') || (l.package||'').toLowerCase().includes('chatbot')));
                 chatLeads = allLeads.filter(l => (l.brand||'').toLowerCase().includes('chatbot') || (l.package||'').toLowerCase().includes('chatbot'));
                 
@@ -261,7 +264,11 @@
             else if (currentView === 'organic') { title.innerText = 'Organic Intelligence'; renderTable(organicLeads); }
             else if (currentView === 'chat') { title.innerText = 'Chatbot Conversions'; renderTable(chatLeads); }
             else if (currentView === 'outreach') { title.innerText = 'Cold Outreach (Apollo)'; renderTable(outreachLeads); }
+            
             else if (currentView === 'voice') { title.innerText = 'Drew: Voice Operations'; renderVoiceGrid(); }
+            else if (currentView === 'vault') { title.innerText = 'Media Vault'; renderVault(); }
+            else if (currentView === 'upload') { title.innerText = 'Document Intake'; }
+    
             else if (currentView === 'finance') { title.innerText = 'Finance & Receipts'; renderFinanceTable(); }
         }
 
@@ -304,6 +311,27 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             const targetBtn = document.getElementById('btn-' + view);
             if(targetBtn) targetBtn.classList.add('active');
+            
+            // Toggle Section Visibility
+            const sections = ['ledger', 'upload', 'vault', 'organic', 'chat', 'outreach', 'voice', 'finance'];
+            sections.forEach(s => {
+                const el = document.getElementById('section-' + s);
+                if(el) el.classList.add('hidden');
+            });
+            
+            const ledgerContainer = document.getElementById('ledger-container');
+            const managementControls = document.getElementById('management-controls');
+            
+            if(view === 'upload' || view === 'vault') {
+                if(ledgerContainer) ledgerContainer.classList.add('hidden');
+                if(managementControls) managementControls.classList.add('hidden');
+                const targetSec = document.getElementById('section-' + view);
+                if(targetSec) targetSec.classList.remove('hidden');
+            } else {
+                if(ledgerContainer) ledgerContainer.classList.remove('hidden');
+                if(managementControls) managementControls.classList.remove('hidden');
+            }
+            
             render();
         }
 
@@ -348,6 +376,60 @@
             if(error) alert('Error deleting'); else fetchData();
         }
 
+        
+        function renderVault() {
+            const grid = document.getElementById('vault-grid');
+            if(!grid) return;
+            grid.innerHTML = allMedia.map(m => `
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/60 hover:border-purple-500/30 transition-all cursor-pointer group relative">
+                    <button onclick="deleteMedia('${m.id}')" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    </button>
+                    <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center mb-6 text-purple-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    </div>
+                    <div class="text-sm font-extrabold text-slate-800 truncate">${m.file_name}</div>
+                    <div class="text-[9px] text-slate-500 font-black uppercase mt-1">${m.file_type || 'Document'}</div>
+                    <div class="mt-6 flex items-center justify-between">
+                        <span class="text-[10px] font-black text-purple-400 uppercase">Synced</span>
+                        <span class="text-[9px] text-slate-400">${new Date(m.created_at).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('') || '<div class="col-span-full p-20 text-center text-slate-400 italic">Vault is empty. Upload documents to mirror them here.</div>';
+        }
+
+        async function handleUpload(files) {
+            const stack = document.getElementById('upload-stack');
+            for(let file of files) {
+                const row = document.createElement('div');
+                row.className = "bg-white p-4 rounded-2xl border border-slate-100 flex items-center justify-between animate-pulse";
+                row.innerHTML = `<span class="text-sm font-bold text-slate-700">${file.name}</span><span class="text-[10px] font-black text-purple-400">SYNCING...</span>`;
+                stack.prepend(row);
+                
+                // In a real scenario, you'd upload to Storage first, then insert to DB.
+                // For this high-fidelity prototype, we simulate the mirror sync.
+                const { error } = await sb.from('media').insert([{
+                    file_name: file.name,
+                    file_type: file.type,
+                    file_url: '#' // Placeholder
+                }]);
+                
+                row.classList.remove('animate-pulse');
+                if(error) {
+                    row.innerHTML = `<span class="text-sm font-bold text-slate-700">${file.name}</span><span class="text-[10px] font-black text-red-400">FAILED</span>`;
+                } else {
+                    row.innerHTML = `<span class="text-sm font-bold text-slate-700">${file.name}</span><span class="text-[10px] font-black text-green-500">SYNCED TO VAULT</span>`;
+                    fetchData();
+                }
+            }
+        }
+
+        async function deleteMedia(id) {
+            if(!confirm('Permanently remove this file from the Vault?')) return;
+            const { error } = await sb.from('media').delete().eq('id', id);
+            if(error) alert('Error deleting'); else fetchData();
+        }
+    
         async function deleteDrewCall(id) {
             if(!confirm('Permanently remove this call log?')) return;
             const { error } = await sb.from('drew_calls').delete().eq('id', id);
@@ -356,4 +438,5 @@
     </script>
 </body>
 </html>
+
 
