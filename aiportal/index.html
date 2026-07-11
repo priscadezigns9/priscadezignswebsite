@@ -187,6 +187,7 @@
             }
         }
 
+        
         async function checkAuth() {
             const input = document.getElementById('auth-input').value;
             if(input.toLowerCase().trim() === 'alice') {
@@ -194,8 +195,24 @@
                 document.getElementById('main-content').classList.remove('hidden');
                 const controls = document.getElementById('management-controls');
                 if(controls) controls.classList.remove('hidden');
+                sessionStorage.setItem('pd_auth', 'true');
                 fetchData();
-            } else { alert('Handshake failed. Verify security token.'); }
+            } else { 
+                alert('Handshake failed. Verify security token.'); 
+                authClicks = 0;
+                document.getElementById('auth-input').classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+        window.addEventListener('load', () => {
+            if(sessionStorage.getItem('pd_auth') === 'true') {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                const controls = document.getElementById('management-controls');
+                if(controls) controls.classList.remove('hidden');
+                fetchData();
+            }
+        });
+ else { alert('Handshake failed. Verify security token.'); }
         }
 
         async function fetchData() {
