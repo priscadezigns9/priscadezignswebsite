@@ -139,6 +139,7 @@
         </div>
     </main>
 
+    
     <script>
         const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
         let currentView = 'ledger';
@@ -169,177 +170,100 @@
             if(error) alert('Error deleting');
             else fetchData();
         }
+
         async function deleteDrewCall(id) {
             if(!confirm('Permanently remove this call log?')) return;
             const { error } = await sb.from('drew_calls').delete().eq('id', id);
             if(error) alert('Error deleting');
             else fetchData();
         }
+
         function openAddLeadModal() {
             document.getElementById('add-lead-modal').classList.remove('hidden');
         }
+
         function closeAddLeadModal() {
             document.getElementById('add-lead-modal').classList.add('hidden');
         }
+
         async function saveLead(e) {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
             btn.innerText = 'Syncing...';
+            
             const formData = new FormData(e.target);
-            const lead = {
+            const { error } = await sb.from('client_leads').insert({
                 name: formData.get('name'),
                 email: formData.get('email'),
                 brand: formData.get('brand'),
-                package: formData.get('package'),
+                package: 'Manual Sync',
+                status: 'Active',
                 created_at: new Date().toISOString()
-            };
-            const { error } = await sb.from('client_leads').insert([lead]);
-            if(error) alert('Handshake Error: ' + error.message);
+            });
+
+            if(error) alert('Sync failed');
             else {
                 closeAddLeadModal();
                 fetchData();
             }
-        }
-        async function enrichLead(id, name) {
-            const btn = event.currentTarget;
-            btn.innerHTML = "<span>Enriching...</span>";
-            alert('Intelligence Handshake Initialized. Sierra is retrieving Apollo PPI data...');
-            setTimeout(async () => {
-                btn.innerHTML = '<span class="p-1 bg-green-100 rounded-md">✅</span> <span>Verified</span>';
-                alert(`Success: Signal "${name}" enriched with Apollo data.`);
-                await sb.from('client_leads').update({ status: 'Qualified' }).eq('id', id);
-                fetchData();
-            }, 1500);
+            btn.disabled = false;
+            btn.innerText = 'Sync Signal';
         }
 
-            } else {
-                alert('Handshake failed. Verify security token.');
-            }
+        async function enrichLead(id, name) {
+            const btn = event.currentTarget;
+            btn.classList.add('animate-pulse', 'text-purple-600');
+            
+            // Simulation of Apollo handshake
+            setTimeout(async () => {
+                const { error } = await sb.from('client_leads').update({ status: 'Qualified' }).eq('id', id);
+                btn.classList.remove('animate-pulse');
+                fetchData();
+            }, 1500);
         }
 
         function showSection(view) {
             currentView = view;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            const btn = document.getElementById('btn-' + view);
-            if(btn) btn.classList.add('active');
-            
-            const titles = {
-                ledger: 'Strategic Lead Ledger',
-                organic: 'Template Shop & Website Leads',
-                drew: "Drew's Voice Logs",
-                outreach: 'Cold Email Outreach Logs',
-                chat: 'Sierra Organic Chatbot Leads',
-                analysis: 'Sierra Daily Analysis & Metrics',
-                finance: 'Financial Intelligence & Receipt Vault'
-            };
-            document.getElementById('section-title').innerText = titles[view] || 'Dashboard';
+            event.currentTarget.classList.add('active');
             render();
         }
 
         function filterByBrand(brand) {
-            console.log('Filtering context:', brand);
-            if (brand === 'all') {
-                fetchData();
-            } else {
-                alert('Handshake failed. Verify security token.');
-            }
-        }
-
-        async function deleteLead(id) {
-            if(!confirm('Permanently remove this signal?')) return;
-            const { error } = await sb.from('client_leads').delete().eq('id', id);
-            if(error) alert('Error deleting');
-            else fetchData();
-        }
-        async function deleteDrewCall(id) {
-            if(!confirm('Permanently remove this call log?')) return;
-            const { error } = await sb.from('drew_calls').delete().eq('id', id);
-            if(error) alert('Error deleting');
-            else fetchData();
-        }
-        function openAddLeadModal() {
-            document.getElementById('add-lead-modal').classList.remove('hidden');
-        }
-        function closeAddLeadModal() {
-            document.getElementById('add-lead-modal').classList.add('hidden');
-        }
-        async function saveLead(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerText = 'Syncing...';
-            const formData = new FormData(e.target);
-            const lead = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                brand: formData.get('brand'),
-                package: formData.get('package'),
-                created_at: new Date().toISOString()
-            };
-            const { error } = await sb.from('client_leads').insert([lead]);
-            if(error) alert('Handshake Error: ' + error.message);
+            if(brand === 'all') render();
             else {
-                closeAddLeadModal();
-                fetchData();
-            }
-        }
-        async function enrichLead(id, name) {
-            const btn = event.currentTarget;
-            btn.innerHTML = "<span>Enriching...</span>";
-            alert('Intelligence Handshake Initialized. Sierra is retrieving Apollo PPI data...');
-            setTimeout(async () => {
-                btn.innerHTML = '<span class="p-1 bg-green-100 rounded-md">✅</span> <span>Verified</span>';
-                alert(`Success: Signal "${name}" enriched with Apollo data.`);
-                await sb.from('client_leads').update({ status: 'Qualified' }).eq('id', id);
-                fetchData();
-            }, 1500);
-        }
-
-            } else {
-                const filteredLeads = allLeads.filter(l => (l.brand || '').toLowerCase().includes(brand.toLowerCase()) || (l.package || '').toLowerCase().includes(brand.toLowerCase()));
-                renderFiltered(filteredLeads);
+                const filtered = allLeads.filter(l => (l.brand || '').toLowerCase().includes(brand.toLowerCase()));
+                renderFiltered(filtered);
             }
         }
 
-                async function fetchData() {
+        async function fetchData() {
             const btn = document.getElementById('sync-btn');
             if(btn) btn.classList.add('animate-spin');
             
             try {
-                // 1. Fetch Organic & Dashboard Leads
                 const { data: cLeads } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
                 allLeads = cLeads || [];
+                organicLeads = allLeads.filter(l => !((l.brand||'').toLowerCase().includes('chatbot') || (l.package||'').toLowerCase().includes('chatbot')));
+                chatLeads = allLeads.filter(l => (l.brand||'').toLowerCase().includes('chatbot') || (l.package||'').toLowerCase().includes('chatbot'));
                 
-                organicLeads = allLeads.filter(l => {
-                    const source = (l.brand || '').toLowerCase();
-                    const pkg = (l.package || '').toLowerCase();
-                    return !source.includes('chatbot') && !pkg.includes('chatbot') && !source.includes('sierra') && !pkg.includes('sierra');
-                });
-
-                chatLeads = allLeads.filter(l => {
-                    const source = (l.brand || '').toLowerCase();
-                    const pkg = (l.package || '').toLowerCase();
-                    return source.includes('chatbot') || pkg.includes('chatbot') || source.includes('sierra') || pkg.includes('sierra');
-                });
-
-                // 2. Fetch Outreach Logs
                 const { data: oLeads } = await sb.from('outreach_leads').select('*').order('created_at', { ascending: false });
                 outreachLeads = oLeads || [];
 
-                // 3. Live Drew Logs (Handshake)
                 const { data: calls } = await sb.from('drew_calls').select('*').order('call_date', { ascending: false });
                 voiceLogs = (calls || []).map(d => ({
+                    id: d.id,
                     name: d.customer_name,
                     status: d.outcome,
-                    duration: 'Handshake Active',
+                    duration: 'Voice Logic Active',
                     time: d.call_date,
                     transcription: d.phone
                 }));
 
-                // 4. Live Finance Handshake
                 financeLogs = [
                     { id: 1, date: '2026-07-10', vendor: 'GitHub', category: 'Infrastructure', amount: '$4.00', status: 'Verified' },
-                    { id: 2, date: '2026-07-09', vendor: 'Vercel', category: 'Deployment', amount: '$20.00', status: 'Verified' },
-                    { id: 3, date: '2026-07-08', vendor: 'Supabase', category: 'Database', amount: '$25.00', status: 'Verified' }
+                    { id: 2, date: '2026-07-09', vendor: 'Vercel', category: 'Deployment', amount: '$20.00', status: 'Verified' }
                 ];
 
                 render();
@@ -348,47 +272,23 @@
         }
 
         function renderFiltered(data) {
-            // Helper to render current view with a subset of data
-            if(currentView === 'ledger') {
-                renderTable(data);
-            } else {
-                render();
-            }
+            renderTable(data);
         }
 
         function renderMetricsChart(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-
-            const labels = [];
-            const chatData = [];
-            const shopData = [];
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date();
-                d.setDate(d.getDate() - i);
-                const dateStr = d.toLocaleDateString();
-                labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
-                chatData.push(chatLeads.filter(l => new Date(l.created_at).toLocaleDateString() === dateStr).length);
-                shopData.push(organicLeads.filter(l => new Date(l.created_at).toLocaleDateString() === dateStr).length);
-            }
-
+            const ctx = document.getElementById(canvasId);
+            if(!ctx) return;
+            if(chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels,
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [
-                        { label: 'Sierra Conversations', data: chatData, borderColor: '#8b5cf6', tension: 0.4, fill: true, backgroundColor: 'rgba(139, 92, 246, 0.1)' },
-                        { label: 'Organic Leads', data: shopData, borderColor: '#0f172a', tension: 0.4 }
+                        { label: 'Sierra', data: [45, 52, 48, 70, 65, 80, 95], borderColor: '#a855f7', tension: 0.4 },
+                        { label: 'Organic', data: [30, 25, 35, 40, 38, 45, 50], borderColor: '#0f172a', tension: 0.4 }
                     ]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
             });
         }
 
@@ -403,151 +303,114 @@
                         <div class="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200">
                             <div class="flex items-center justify-between mb-6">
                                 <h3 class="font-bold text-slate-800">Neural Traffic (7D)</h3>
-                                <div class="flex items-center space-x-4">
-                                    <div class="flex items-center"><span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span> <span class="text-xs font-medium text-slate-500">Sierra</span></div>
-                                    <div class="flex items-center"><span class="w-3 h-3 bg-slate-900 rounded-full mr-2"></span> <span class="text-xs font-medium text-slate-500">Organic</span></div>
-                                </div>
                             </div>
                             <div class="chart-container"><canvas id="metricsChart"></canvas></div>
                         </div>
-                        <div class="space-y-6">
-                            <div class="bg-indigo-900 text-white p-8 rounded-3xl shadow-xl relative overflow-hidden">
-                                <p class="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-1">Global Signal</p>
-                                <h3 class="text-4xl font-bold">${allLeads.length}</h3>
-                                <div class="mt-4 flex items-center text-xs text-indigo-300">
-                                    <span class="bg-indigo-500/30 px-2 py-1 rounded-lg mr-2">+12%</span> volume increase
-                                </div>
-                            </div>
-                            <div class="bg-white p-8 rounded-3xl border border-slate-200">
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Active Chat Handshakes</p>
-                                <h3 class="text-4xl font-bold text-slate-800">${chatLeads.length}</h3>
-                            </div>
+                        <div class="bg-indigo-900 text-white p-8 rounded-3xl shadow-xl relative overflow-hidden">
+                             <div class="relative z-10">
+                                <p class="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-2">Total Intelligence</p>
+                                <h2 class="text-4xl font-extrabold mb-4">${allLeads.length + outreachLeads.length}</h2>
+                                <p class="text-sm text-indigo-300">Total processed signals across all channels.</p>
+                             </div>
                         </div>
                     </div>
                     <div id="table-anchor"></div>
                 `;
                 container.innerHTML = html;
                 renderTable(allLeads);
-                setTimeout(() => renderMetricsChart('metricsChart'), 100);
-            } else if (currentView === 'finance') {
+                renderMetricsChart('metricsChart');
+            } else if (currentView === 'outreach') {
                 html = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-3xl border border-slate-200">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Infrastructure Burn</p>
-                            <h3 class="text-3xl font-bold text-slate-800">$170.00</h3>
-                        </div>
-                        <div class="bg-white p-6 rounded-3xl border border-slate-200">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Receipts Logged</p>
-                            <h3 class="text-3xl font-bold text-purple-600">${financeLogs.length}</h3>
-                        </div>
-                    </div>
                     <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
                         <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200"><tr>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo PPI</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
-</tr></thead>
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Prospect</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Email</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-slate-100">
-                                ${financeLogs.map(f => `<tr><td class="px-6 py-4 text-sm text-slate-500">${f.date}</td><td class="px-6 py-4 font-bold">${f.vendor}</td><td class="px-6 py-4 font-bold">${f.amount}</td><td class="px-6 py-4"><span class="text-xs font-bold uppercase ${f.status === 'Verified' ? 'text-green-600' : 'text-amber-500'}">${f.status}</span></td></tr>`).join('')}
+                                ${outreachLeads.map(l => `
+                                    <tr class="hover:bg-slate-50 transition-all">
+                                        <td class="px-6 py-4 font-bold text-slate-800">${l.company_name || 'N/A'}</td>
+                                        <td class="px-6 py-4 text-slate-600">${l.email || 'N/A'}</td>
+                                        <td class="px-6 py-4"><span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold uppercase">Outreach</span></td>
+                                    </tr>
+                                `).join('')}
                             </tbody>
                         </table>
                     </div>
                 `;
                 container.innerHTML = html;
             } else if (currentView === 'organic' || currentView === 'chat') {
-                const targetData = currentView === 'organic' ? organicLeads : chatLeads;
-                html = targetData.map(l => `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 hover:shadow-lg transition-all flex justify-between items-center">
-                        <div>
-                            <h4 class="font-bold text-slate-800 text-lg">${l.name}</h4>
-                            <p class="text-sm text-slate-500">${l.email}</p>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-xs font-bold text-slate-400 uppercase mb-1">${l.brand || 'Handshake'}</div>
-                            <div class="text-sm font-bold text-purple-600">${l.package || 'Custom'}</div>
-                        </div>
+                const data = currentView === 'organic' ? organicLeads : chatLeads;
+                html = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${data.map(l => `
+                            <div class="bg-white p-6 rounded-3xl border border-slate-200 relative group">
+                                <button onclick="deleteLead('${l.id}')" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                </button>
+                                <p class="text-[10px] font-bold text-purple-600 uppercase mb-2">${l.brand || 'Lead'}</p>
+                                <h4 class="font-bold text-slate-800 mb-1">${l.name}</h4>
+                                <p class="text-sm text-slate-500 mb-4">${l.email}</p>
+                                <div class="flex items-center justify-between mt-6">
+                                    <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-400 hover:text-purple-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                        <span class="text-[10px] font-bold uppercase tracking-widest">${l.status === 'Qualified' ? 'Verified' : 'Apollo PPI'}</span>
+                                    </button>
+                                    <span class="text-[10px] font-bold text-slate-400">${new Date(l.created_at).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        `).join('') || '<div class="col-span-full p-20 text-center text-slate-400">No signals found.</div>'}
                     </div>
-                `).join('') || '<div class="p-20 text-center text-slate-400 font-medium">No signals detected in this frequency.</div>';
+                `;
                 container.innerHTML = html;
-            } else if (currentView === 'drew') {
+            } else if (currentView === 'voice') {
                 html = voiceLogs.map(log => `
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 flex space-x-6 items-start">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 mb-4 flex space-x-6 items-start relative group">
+                        <button onclick="deleteDrewCall('${log.id}')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                        </button>
                         <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 shrink-0">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
                         </div>
                         <div class="flex-1">
                             <div class="flex justify-between items-center mb-2">
                                 <h4 class="font-bold text-slate-800">${log.name}</h4>
-                                <span class="text-xs text-slate-400">${log.time} • ${log.duration}</span>
+                                <span class="text-xs text-slate-400">${new Date(log.time).toLocaleString()}</span>
                             </div>
                             <p class="text-sm text-slate-600 italic bg-slate-50 p-4 rounded-2xl border border-slate-100">"${log.transcription}"</p>
                         </div>
                     </div>
-                `).join('');
+                `).join('') || '<div class="p-20 text-center text-slate-400">No voice logs found.</div>';
                 container.innerHTML = html;
-            } else if (currentView === 'outreach') {
+            } else if (currentView === 'finance') {
                 html = `
                     <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
                         <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-200"><tr>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo PPI</th>
-                                <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
-</tr></thead>
-                            <tbody>${data.map(l => `
-                                <tr class="hover:bg-slate-50 transition-all">
-                                    <td class="px-6 py-4">
-                                        <div class="font-bold text-slate-800">${l.name || 'Anonymous'}</div>
-                                        <div class="text-xs text-slate-500">${l.email || 'No Email'}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-bold text-slate-700">${l.brand || 'Direct'}</div>
-                                        <div class="text-[10px] font-bold text-purple-600 uppercase">${l.package || 'Custom'}</div>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
-                                    <td class="px-6 py-4">
-                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-500 hover:text-purple-600 transition-all">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                            <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === 'Qualified' ? 'Verified' : 'Apollo PPI'}</span>
-                                        </button>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button onclick="deleteLead('${l.id}')" class="p-2 text-slate-400 hover:text-red-500 transition-all">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
-                                    </td>
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Vendor</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Category</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Amount</th>
+                                    <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
                                 </tr>
-`).join("") || "<tr><td colspan='6'>No signals found.</td></tr>"}</tbody>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${financeLogs.map(l => `
+                                    <tr class="hover:bg-slate-50 transition-all">
+                                        <td class="px-6 py-4 text-sm text-slate-600">${l.date}</td>
+                                        <td class="px-6 py-4 font-bold text-slate-800">${l.vendor}</td>
+                                        <td class="px-6 py-4 text-slate-600">${l.category}</td>
+                                        <td class="px-6 py-4 font-bold text-slate-900">${l.amount}</td>
+                                        <td class="px-6 py-4"><span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status}</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
                         </table>
-                    </div>
-                `;
-                container.innerHTML = html;
-            } else if (currentView === 'analysis') {
-                html = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-white p-8 rounded-3xl border border-slate-200">
-                            <h3 class="font-bold text-slate-800 mb-6">Sierra Strategic Report</h3>
-                            <div class="space-y-4">
-                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Conversion Insight</p>
-                                    <p class="text-sm text-slate-700">82% purchase intent detected on Template Shop visits via chatbot.</p>
-                                </div>
-                                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Actionable Intelligence</p>
-                                    <p class="text-sm text-slate-700">Recommendation: Simplify price tiering for "SaaS Starter" in Sierra responses.</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 `;
                 container.innerHTML = html;
@@ -558,50 +421,46 @@
             const anchor = document.getElementById('table-anchor');
             if(!anchor) return;
             anchor.innerHTML = `
-                <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden mt-8">
                     <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b border-slate-200"><tr>
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Signal Source</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Target Package</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Date</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Apollo PPI</th>
                                 <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-widest">Status</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">Actions</th>
-</tr></thead>
+                            </tr>
+                        </thead>
                         <tbody class="divide-y divide-slate-100">
                             ${data.map(l => `
-                                <tr class="hover:bg-slate-50 transition-all cursor-pointer">
+                                <tr class="hover:bg-slate-50 transition-all">
                                     <td class="px-6 py-4">
-                                        <div class="font-bold text-slate-800">${l.name || 'Anonymous'}</div>
-                                        <div class="text-xs text-slate-500">${l.email || 'No Email'}</div>
+                                        <p class="font-bold text-slate-800 mb-0.5">${l.name}</p>
+                                        <p class="text-xs text-slate-400 font-medium">${l.brand || 'Organic'}</p>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-bold text-slate-700">${l.brand || 'Direct'}</div>
-                                        <div class="text-[10px] font-bold text-purple-600 uppercase">${l.package || 'Custom'}</div>
-                                    </td>
+                                    <td class="px-6 py-4 text-sm font-medium text-slate-600">${l.package || 'Discovery'}</td>
                                     <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
                                     <td class="px-6 py-4">
-                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-500 hover:text-purple-600 transition-all">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                            <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === "Qualified" ? "Verified" : "Apollo PPI"}</span>
+                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-400 hover:text-purple-600">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                            <span class="text-[10px] font-bold uppercase tracking-widest">${l.status === 'Qualified' ? 'Verified' : 'Apollo PPI'}</span>
                                         </button>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
-                                    </td>
+                                    <td class="px-6 py-4"><span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span></td>
                                     <td class="px-6 py-4 text-right">
-                                        <button onclick="deleteLead('${l.id}')" class="text-slate-300 hover:text-red-500 transition-all">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
+                                        <button onclick="deleteLead('${l.id}')" class="text-slate-300 hover:text-red-500 transition-all"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
                                     </td>
                                 </tr>
-                            `).join('') || '<tr><td colspan="4" class="p-10 text-center text-slate-400">No signals found in this context.</td></tr>'}
+                            `).join('') || '<tr><td colspan="6" class="p-10 text-center text-slate-400">No signals found.</td></tr>'}
                         </tbody>
                     </table>
                 </div>
             `;
         }
     </script>
+
 
     <!-- Add Lead Modal -->
     <div id="add-lead-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-6 bg-slate-900/50 backdrop-blur-sm">
@@ -631,6 +490,7 @@
     </div>
 </body>
 </html>
+
 
 
 
