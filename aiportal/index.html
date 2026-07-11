@@ -9,313 +9,148 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --brand-amethyst: #7D52B5;
-            --brand-orchid: #743089;
-            --brand-ivory: #F5F2ED;
-        }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #743089; margin: 0; overflow: hidden; }
-        
-        .auth-overlay {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, #301934 0%, #743089 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: all 0.5s ease;
-        }
-        
-        .auth-card {
-            background: white;
-            width: 100%;
-            max-width: 400px;
-            padding: 3rem;
-            border-radius: 3rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            transform: translateY(0);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 1.25rem;
-            background: #F8F9FB;
-            border: 2px solid #F1F3F5;
-            border-radius: 1.25rem;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-weight: 700;
-            letter-spacing: 0.25em;
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        .auth-input:focus { border-color: var(--brand-amethyst); background: white; }
-
-        .auth-btn {
-            width: 100%;
-            padding: 1.25rem;
-            background: #1a1a1a;
-            color: white;
-            border: none;
-            border-radius: 1.25rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .auth-btn:hover { background: #000; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3); }
-
-        .nav-btn {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.5rem;
-            color: rgba(255, 255, 255, 0.6);
-            border-radius: 1.25rem;
-            font-weight: 600;
-            transition: all 0.2s;
-            margin-bottom: 0.5rem;
-            text-align: left;
-        }
-
-        .nav-btn:hover { color: white; background: rgba(255, 255, 255, 0.05); }
-        .nav-btn.active { color: white; background: var(--brand-amethyst); }
-
-        .hidden { display: none !important; }
+        :root { --brand-amethyst: #7D52B5; --brand-orchid: #743089; --brand-ivory: #F5F2ED; --brand-dark: #301934; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--brand-ivory); color: var(--brand-dark); }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05); }
+        .nav-btn { width: 100%; display: flex; align-items: center; gap: 0.75rem; padding: 1rem 1.5rem; border-radius: 1.25rem; font-size: 0.875rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-btn:hover { color: white; background: rgba(255, 255, 255, 0.1); transform: translateX(5px); }
+        .nav-btn.active { color: white; background: var(--brand-amethyst); box-shadow: 0 10px 25px -5px rgba(125, 82, 181, 0.5); }
+        .sidebar { background: #1a0b2e; }
+        #auth-screen { background: radial-gradient(circle at top right, #301934, #1a0b2e); }
     </style>
 </head>
-<body>
-    <!-- Login Screen -->
-    <div id="auth-screen" class="auth-overlay">
-        <div class="auth-card">
-            <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" class="h-16 mx-auto mb-6" alt="PD Logo">
-            <h1 class="text-2xl font-extrabold text-slate-900 mb-2">Strategic Command</h1>
-            <p class="text-slate-400 text-sm font-medium mb-8">Accessing PD Neural Infrastructure</p>
-            
-            <div id="login-form">
-                <input type="password" id="auth-pass" class="auth-input" placeholder="••••••••" onkeypress="if(event.key === 'Enter') attemptLogin()">
-                <button onclick="attemptLogin()" class="auth-btn">Initialize Sync</button>
-            </div>
-            
-            <p class="mt-8 text-[10px] text-slate-300 font-bold uppercase tracking-widest">Secured by PD | God Mode Active</p>
+<body class="bg-slate-50 overflow-hidden">
+    <div id="auth-screen" class="fixed inset-0 z-[999] flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-white rounded-[3rem] p-12 shadow-2xl text-center">
+            <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" class="h-20 mx-auto mb-6">
+            <h1 class="text-3xl font-extrabold text-slate-800 mb-2 cursor-pointer" onclick="handleAuthClick()">Strategic Command</h1>
+            <p class="text-slate-400 mb-10">Handshake Required</p>
+            <input type="password" id="auth-input" class="w-full bg-slate-100 border-none rounded-2xl px-6 py-4 mb-6 outline-none focus:ring-2 focus:ring-purple-500 text-center tracking-[0.5em] opacity-0 pointer-events-none" placeholder="••••••••" onkeypress="if(event.key === 'Enter') checkAuth()">
+            <button onclick="checkAuth()" class="w-full bg-slate-900 text-white rounded-2xl py-4 font-bold">Initialize</button>
         </div>
     </div>
 
-    <!-- Main Portal -->
-    <div id="portal-ui" class="flex h-screen hidden">
-        <!-- Sidebar -->
-        <aside class="w-80 bg-[#301934] border-r border-white/5 flex flex-col p-8">
-            <div class="mb-12">
-                <div class="flex items-center space-x-3 mb-2">
-                    <div class="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-purple-500/20">P</div>
-                    <span class="text-xl font-bold text-white tracking-tight">Strategic Portal</span>
-                </div>
-                <div class="text-[10px] text-purple-400 font-black uppercase tracking-[0.2em] px-1">Infrastructure Hub</div>
-            </div>
-
-            <nav class="flex-1 overflow-y-auto space-y-2">
-                <button onclick="switchTab('ledger')" id="tab-ledger" class="nav-btn active">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2" stroke-linecap="round"></path></svg>
-                    <span>Lead Ledger</span>
-                </button>
-                <button onclick="switchTab('intake')" id="tab-intake" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M16 8l-4-4m0 0L8 8m4-4v12" stroke-width="2" stroke-linecap="round"></path></svg>
-                    <span>Document Intake</span>
-                </button>
-                <button onclick="switchTab('vault')" id="tab-vault" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2" stroke-linecap="round"></path></svg>
-                    <span>Media Vault</span>
-                </button>
-                <button onclick="switchTab('voice')" id="tab-voice" class="nav-btn">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-width="2" stroke-linecap="round"></path></svg>
-                    <span>Voice Logs</span>
-                </button>
-            </nav>
-
-            <div class="mt-auto p-6 bg-white/5 rounded-3xl border border-white/5">
-                <div class="flex items-center space-x-3">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span class="text-[10px] font-bold text-white uppercase tracking-widest">Neural Link Active</span>
-                </div>
+    <div id="main-layout" class="flex h-screen opacity-0 transition-opacity duration-1000">
+        <aside class="w-80 sidebar flex flex-col border-r border-white/5">
+            <div class="p-10">
+                <div class="flex items-center gap-3 mb-10 text-white font-bold text-xl">SIERRA HUB</div>
+                <nav class="space-y-2">
+                    <button id="btn-ledger" onclick="showSection('ledger')" class="nav-btn active">Lead Ledger</button>
+                    <button id="btn-intake" onclick="showSection('intake')" class="nav-btn">Document Intake</button>
+                    <button id="btn-vault" onclick="showSection('vault')" class="nav-btn">Media Vault</button>
+                    <button id="btn-voice" onclick="showSection('voice')" class="nav-btn">Voice Ops</button>
+                </nav>
             </div>
         </aside>
 
-        <!-- Content Area -->
-        <main class="flex-1 bg-[#F5F2ED] overflow-y-auto">
-            <header class="h-24 bg-white/50 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between px-10 sticky top-0 z-10">
-                <div>
-                    <h2 id="view-title" class="text-2xl font-extrabold text-slate-800">Lead Ledger</h2>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Strategic Intelligence Hub</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button onclick="syncAll()" id="sync-btn" class="p-3 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
-                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="2" stroke-linecap="round"></path></svg>
-                    </button>
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
+            <header class="h-24 bg-white border-b border-slate-200 px-12 flex items-center justify-between">
+                <h2 id="section-title" class="text-2xl font-extrabold text-slate-800">Lead Ledger</h2>
+                <div class="flex items-center gap-4">
+                    <button onclick="syncAll()" class="p-3 bg-slate-100 rounded-xl">Refresh</button>
+                    <button onclick="openAddLeadModal()" class="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold">+ New Lead</button>
                 </div>
             </header>
-
-            <div class="p-10" id="render-mount">
-                <!-- Dynamic Content Here -->
-            </div>
+            <div id="content-mount" class="flex-1 overflow-y-auto p-12"></div>
         </main>
     </div>
 
+    <div id="add-lead-modal" class="fixed inset-0 z-[1000] hidden flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-[2.5rem] p-12 max-w-xl w-full">
+            <h3 class="text-2xl font-bold mb-8">Sync Manual Lead</h3>
+            <form onsubmit="saveLead(event)" class="space-y-4">
+                <input name="name" placeholder="Contact Name" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
+                <input name="email" type="email" placeholder="Email" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
+                <input name="brand" placeholder="Brand" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
+                <select name="package" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
+                    <option value="Starter">Starter</option><option value="Growth">Growth</option><option value="Trusted">Trusted</option>
+                </select>
+                <div class="flex gap-4 mt-8">
+                    <button type="button" onclick="closeAddLeadModal()" class="flex-1 bg-slate-100 py-4 rounded-xl">Cancel</button>
+                    <button type="submit" class="flex-2 bg-slate-900 text-white py-4 rounded-xl px-10">Sync</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
-        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+        const sbUrl = 'https://sazhdnqzaqpqcralmthh.supabase.co';
+        const sbKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+        const sb = supabase.createClient(sbUrl, sbKey);
 
-        let activeTab = 'ledger';
-        let store = { leads: [], calls: [], docs: [] };
+        let clickCount = 0; let allLeads = []; let allMedia = []; let allCalls = []; let currentSection = 'ledger';
 
-        async function attemptLogin() {
-            const pass = document.getElementById('auth-pass').value.trim().toLowerCase();
-            if(pass === 'alice') {
-                sessionStorage.setItem('pd_auth', 'true');
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('portal-ui').classList.remove('hidden');
-                syncAll();
-            } else {
-                alert('Neural Handshake Failed. Verify Security Token.');
-            }
-        }
-
-        window.onload = () => {
-            if(sessionStorage.getItem('pd_auth') === 'true') {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('portal-ui').classList.remove('hidden');
-                syncAll();
-            }
-        };
+        function handleAuthClick() { clickCount++; if(clickCount >= 5) { const i = document.getElementById('auth-input'); i.style.opacity = '1'; i.style.pointerEvents = 'auto'; i.focus(); } }
+        function checkAuth() { if(document.getElementById('auth-input').value === 'alice') { localStorage.setItem('pd_auth', 'true'); location.reload(); } else alert('Fail'); }
 
         async function syncAll() {
-            const btn = document.getElementById('sync-btn');
-            if(btn) btn.classList.add('animate-spin');
-            
-            try {
-                const [leads, calls] = await Promise.all([
-                    sb.from('client_leads').select('*').order('created_at', { ascending: false }),
-                    sb.from('drew_calls').select('*').order('call_date', { ascending: false })
-                ]);
-                
-                store.leads = leads.data || [];
-                store.calls = calls.data || [];
-                render();
-            } catch(e) {
-                console.error('Sync error:', e);
-            } finally {
-                if(btn) btn.classList.remove('animate-spin');
-            }
+            const { data: l } = await sb.from('client_leads').select('*').order('created_at', { ascending: false });
+            const { data: m } = await sb.from('media').select('*').order('created_at', { ascending: false });
+            const { data: c } = await sb.from('drew_calls').select('*').order('created_at', { ascending: false });
+            allLeads = l || []; allMedia = m || []; allCalls = c || [];
+            showSection(currentSection);
         }
 
-        function switchTab(tab) {
-            activeTab = tab;
+        function showSection(id) {
+            currentSection = id;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.getElementById('view-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1) + (tab === 'ledger' ? ' Ledger' : '');
-            render();
+            document.getElementById('btn-' + id).classList.add('active');
+            const m = document.getElementById('content-mount');
+            if(id === 'ledger') renderLedger(m);
+            if(id === 'intake') renderIntake(m);
+            if(id === 'vault') renderVault(m);
+            if(id === 'voice') renderVoice(m);
         }
 
-        function render() {
-            const mount = document.getElementById('render-mount');
-            if(activeTab === 'ledger') renderLedger(mount);
-            else if(activeTab === 'intake') renderIntake(mount);
-            else if(activeTab === 'vault') renderVault(mount);
-            else if(activeTab === 'voice') renderVoice(mount);
-        }
-
-        function renderLedger(mount) {
-            mount.innerHTML = `
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="bg-slate-50/50 border-b border-slate-100">
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Brand</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Identity</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Package</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</th>
-                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-50">
-                            ${store.leads.map(l => `
-                                <tr class="hover:bg-slate-50/30 transition-all">
-                                    <td class="px-8 py-6"><span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase">${l.brand || 'Direct'}</span></td>
-                                    <td class="px-8 py-6">
-                                        <div class="text-sm font-bold text-slate-800">${l.name}</div>
-                                        <div class="text-[10px] text-slate-400 font-medium">${l.email}</div>
-                                    </td>
-                                    <td class="px-8 py-6 text-sm font-bold text-slate-600">${l.package || '--'}</td>
-                                    <td class="px-8 py-6 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
-                                    <td class="px-8 py-6"><span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span></td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+        function renderLedger(m) {
+            m.innerHTML = `
+                <div class="grid grid-cols-2 gap-8 mb-12">
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200">Total: ${allLeads.length}</div>
+                    <div class="bg-white p-8 rounded-3xl border border-slate-200 text-purple-600">Active: ${allLeads.filter(x=>x.status==='Active').length}</div>
                 </div>
-            `;
+                <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left"><tbody class="divide-y divide-slate-100">
+                        ${allLeads.map(l => `<tr class="hover:bg-slate-50"><td class="p-8"><b>${l.brand}</b> (${l.name})</td><td class="p-8 text-right"><button onclick="deleteLead('${l.id}')">Delete</button></td></tr>`).join('')}
+                    </tbody></table>
+                </div>`;
         }
 
-        function renderIntake(mount) {
-            mount.innerHTML = `
-                <div class="max-w-3xl mx-auto py-12">
-                    <div class="bg-white rounded-[3rem] p-16 border-4 border-dashed border-slate-200 text-center hover:border-purple-400 transition-all cursor-pointer group" onclick="alert('Analysis Logic Engaged')">
-                        <div class="w-20 h-20 bg-slate-50 rounded-3xl mx-auto mb-8 flex items-center justify-center group-hover:scale-110 transition-all">
-                            <svg class="w-10 h-10 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-width="2" stroke-linecap="round"></path></svg>
-                        </div>
-                        <h2 class="text-2xl font-extrabold text-slate-800 mb-2">Initialize Intake</h2>
-                        <p class="text-slate-500 font-bold">Drag documents here for Sierra AI processing</p>
+        function renderIntake(m) {
+            m.innerHTML = `
+                <div class="max-w-2xl mx-auto py-20">
+                    <div class="bg-white rounded-[3rem] p-20 border-4 border-dashed border-slate-200 text-center hover:border-purple-400 cursor-pointer" onclick="document.getElementById('file-in').click()">
+                        <input type="file" id="file-in" class="hidden" onchange="handleUp(this.files)">
+                        <h3 class="text-2xl font-bold">Drop Files Here</h3>
+                        <p class="text-slate-400 mt-2">Analysis Logic Active</p>
                     </div>
-                </div>
-            `;
+                    <div id="stack" class="mt-8 space-y-4"></div>
+                </div>`;
         }
 
-        function renderVault(mount) {
-            mount.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm opacity-50 grayscale">
-                        <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 text-slate-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2" stroke-linecap="round"></path></svg>
-                        </div>
-                        <div class="text-sm font-bold text-slate-800 mb-1">Encrypted Node</div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase">Awaiting Data Sync</div>
-                    </div>
-                </div>
-            `;
+        async function handleUp(files) {
+            const s = document.getElementById('stack');
+            for(let f of files) {
+                const r = document.createElement('div'); r.className = 'bg-white p-4 rounded-xl border'; r.innerText = f.name + ' - Processing...'; s.appendChild(r);
+                await sb.from('media').insert([{ name: f.name, status: 'Processed', type: f.type, size: f.size }]);
+            }
+            setTimeout(syncAll, 1500);
         }
 
-        function renderVoice(mount) {
-            mount.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    ${store.calls.map(c => `
-                        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
-                            <div class="flex items-center space-x-4 mb-6">
-                                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" stroke-width="2" stroke-linecap="round"></path></svg>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800">${c.customer_name}</h4>
-                                    <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${new Date(c.call_date).toLocaleDateString()}</div>
-                                </div>
-                            </div>
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs text-slate-600 font-medium mb-6">
-                                ${c.phone || 'Voice sequence recorded'}
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-[10px] font-bold uppercase">${c.outcome}</span>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+        function renderVault(m) {
+            m.innerHTML = `<div class="grid grid-cols-3 gap-6">${allMedia.map(x => `<div class="bg-white p-8 rounded-3xl border"><b>${x.name}</b><br><small>${x.status}</small></div>`).join('')}</div>`;
         }
+
+        function renderVoice(m) {
+            m.innerHTML = `<div class="bg-white rounded-3xl border overflow-hidden"><table class="w-full text-left"><tbody class="divide-y divide-slate-100">${allCalls.map(c => `<tr><td class="p-8"><b>${c.agent}</b>: ${c.summary}</td></tr>`).join('')}</tbody></table></div>`;
+        }
+
+        function openAddLeadModal() { document.getElementById('add-lead-modal').classList.remove('hidden'); }
+        function closeAddLeadModal() { document.getElementById('add-lead-modal').classList.add('hidden'); }
+        async function saveLead(e) { e.preventDefault(); const d = new FormData(e.target); await sb.from('client_leads').insert([{ name: d.get('name'), email: d.get('email'), brand: d.get('brand'), package: d.get('package'), status: 'Active' }]); closeAddLeadModal(); syncAll(); }
+        async function deleteLead(id) { if(confirm('Delete?')) { await sb.from('client_leads').delete().eq('id', id); syncAll(); } }
+
+        if(localStorage.getItem('pd_auth') === 'true') { document.getElementById('auth-screen').style.display='none'; document.getElementById('main-layout').classList.remove('opacity-0'); syncAll(); }
     </script>
 </body>
 </html>
