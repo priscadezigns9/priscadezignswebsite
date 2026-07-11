@@ -158,6 +158,11 @@
                 const controls = document.getElementById('management-controls');
                 if(controls) controls.classList.remove('hidden');
                 fetchData();
+            } else {
+                alert('Handshake failed. Verify security token.');
+            }
+        }
+
         async function deleteLead(id) {
             if(!confirm('Permanently remove this signal?')) return;
             const { error } = await sb.from('client_leads').delete().eq('id', id);
@@ -235,6 +240,11 @@
             console.log('Filtering context:', brand);
             if (brand === 'all') {
                 fetchData();
+            } else {
+                alert('Handshake failed. Verify security token.');
+            }
+        }
+
         async function deleteLead(id) {
             if(!confirm('Permanently remove this signal?')) return;
             const { error } = await sb.from('client_leads').delete().eq('id', id);
@@ -571,7 +581,18 @@
                                     </td>
                                     <td class="px-6 py-4 text-sm text-slate-500">${new Date(l.created_at).toLocaleDateString()}</td>
                                     <td class="px-6 py-4">
-                                        <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
+                                        <button onclick="enrichLead('${l.id}', '${l.name}')" class="flex items-center space-x-2 text-slate-500 hover:text-purple-600 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                            <span class="text-[10px] font-bold uppercase tracking-wider">${l.status === "Qualified" ? "Verified" : "Apollo PPI"}</span>
+                                        </button>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 ${l.status === 'Qualified' ? 'bg-purple-100 text-purple-700' : 'bg-green-50 text-green-700'} rounded-full text-[10px] font-bold uppercase">${l.status || 'Active'}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <button onclick="deleteLead('${l.id}')" class="text-slate-300 hover:text-red-500 transition-all">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
                                     </td>
                                 </tr>
                             `).join('') || '<tr><td colspan="4" class="p-10 text-center text-slate-400">No signals found in this context.</td></tr>'}
@@ -610,5 +631,6 @@
     </div>
 </body>
 </html>
+
 
 
