@@ -27,11 +27,12 @@
     <div id="auth-screen" class="fixed inset-0 z-[999] glass flex items-center justify-center p-6">
         <div class="max-w-md w-full bg-[#1E293B] rounded-[2.5rem] p-10 shadow-2xl border border-white/5 text-center">
             <div class="w-20 h-20 bg-[#7D52B5] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-500/20"><i data-lucide="shield-check" class="w-10 h-10 text-white"></i></div>
-            <h2 class="text-3xl font-extrabold text-white mb-2 italic">Secure Login</h2>
+            <h2 id="auth-heading" class="text-3xl font-extrabold text-white mb-2 italic">Secure Login</h2>
             <p id="auth-status" class="text-slate-400 mb-8 font-medium">Sign in with your Prisca Dezigns account.</p>
-            <input type="email" id="auth-email" placeholder="priscadezigns9@gmail.com" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-3 text-center font-bold text-white transition-all" autocomplete="username">
+            <input type="email" id="auth-email" placeholder="you@example.com" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-3 text-center font-bold text-white transition-all" autocomplete="username">
             <input type="password" id="auth-key" placeholder="Password" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" autocomplete="current-password" onkeypress="if(event.key === 'Enter') checkAuth()">
-            <button onclick="checkAuth()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">CONNECT</button>
+            <button id="auth-primary-btn" onclick="checkAuth()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">CONNECT</button>
+            <button id="auth-toggle-btn" onclick="toggleAuthMode()" class="w-full mt-4 text-slate-400 text-sm font-medium hover:text-white transition-all">Don't have an account? <span class="text-[#a78bda] font-bold">Sign up</span></button>
         </div>
     </div>
     <aside class="w-72 bg-[#1E293B] border-r border-white/5 flex flex-col p-6 z-10">
@@ -91,13 +92,35 @@
         </div>
     </main>
     <script>
-        lucide.createIcons();
+        try { lucide.createIcons(); } catch(e) {}
 
         const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
         const sbClient = supabase.createClient(SB_URL, SB_KEY);
 
+        let authMode = 'login';
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'signup' : 'login';
+            const heading = document.getElementById('auth-heading');
+            const status = document.getElementById('auth-status');
+            const primaryBtn = document.getElementById('auth-primary-btn');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+            status.style.color = '';
+            if (authMode === 'signup') {
+                heading.innerText = 'Create Your Account';
+                status.innerText = 'Sign up to access your client dashboard.';
+                primaryBtn.innerText = 'SIGN UP';
+                toggleBtn.innerHTML = 'Already have an account? <span class="text-[#a78bda] font-bold">Sign in</span>';
+            } else {
+                heading.innerText = 'Secure Login';
+                status.innerText = 'Sign in with your Prisca Dezigns account.';
+                primaryBtn.innerText = 'CONNECT';
+                toggleBtn.innerHTML = "Don't have an account? <span class=\"text-[#a78bda] font-bold\">Sign up</span>";
+            }
+        }
+
         async function checkAuth() {
+            if (authMode === 'signup') return doSignUp();
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-key').value;
             const status = document.getElementById('auth-status');
@@ -120,6 +143,41 @@
                 screen.classList.add('hidden');
                 if(typeof fetchVault === 'function') fetchVault();
             }, 500);
+        }
+
+        async function doSignUp() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-key').value;
+            const status = document.getElementById('auth-status');
+
+            if (!email || password.length < 6) {
+                status.innerText = 'Enter a valid email and a password (6+ characters).';
+                status.style.color = '#ef4444';
+                return;
+            }
+
+            const { data, error } = await sbClient.auth.signUp({ email, password });
+            if (error) {
+                status.innerText = error.message || 'Sign-up failed. Try again.';
+                status.style.color = '#ef4444';
+                return;
+            }
+
+            // New accounts get a plain 'client' role automatically via a database trigger.
+            if (data.session) {
+                localStorage.setItem('pd_remembered_email', email);
+                status.innerText = 'Account created. Welcome!';
+                status.style.color = '#10b981';
+                setTimeout(() => {
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    if (typeof fetchVault === 'function') fetchVault();
+                }, 800);
+            } else {
+                // Email confirmation is required by the project's Supabase Auth settings.
+                status.innerText = 'Account created — check your email to confirm before signing in.';
+                status.style.color = '#10b981';
+                toggleAuthMode();
+            }
         }
 
         (async () => {
@@ -177,7 +235,7 @@
                 card.className = "bg-[#1E293B] p-6 rounded-3xl border border-white/5 flex items-center justify-between animate-pulse";
                 card.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mr-5 text-purple-400"><i data-lucide="file-up"></i></div><div><div class="text-sm font-extrabold text-white">${file.name}</div><div class="text-[10px] text-purple-400 font-black uppercase">Sierra is Syncing to Supabase...</div></div></div><div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden"><div class="h-full bg-purple-500 w-1/3 animate-progress"></div></div>`;
                 stack.appendChild(card);
-                lucide.createIcons();
+                try { lucide.createIcons(); } catch(e) {}
 
                 const success = await syncToSupabase(file);
                 
@@ -187,7 +245,7 @@
                 } else {
                     card.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mr-5 text-red-400"><i data-lucide="alert-circle"></i></div><div><div class="text-sm font-extrabold text-white">${file.name}</div><div class="text-[10px] text-red-400 font-black uppercase">Sync Failed. Check Configuration.</div></div></div>`;
                 }
-                lucide.createIcons();
+                try { lucide.createIcons(); } catch(e) {}
             }
         }
 
@@ -268,7 +326,7 @@
             document.getElementById('stat-items').innerText = data.length;
             document.getElementById('stat-accuracy').innerText = data.length > 0 ? '100%' : '—';
             document.getElementById('stat-savings').innerText = '$' + (data.length * 4.25).toFixed(2);
-            lucide.createIcons();
+            try { lucide.createIcons(); } catch(e) {}
         }
         fetchVault();
 
