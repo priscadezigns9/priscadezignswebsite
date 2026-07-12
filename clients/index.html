@@ -149,12 +149,14 @@
                 // 2. Get Public URL
                 const { data: { publicUrl } } = sbClient.storage.from('media').getPublicUrl('intake/' + fileName);
 
-                // 3. Log to Media Table
+                // 3. Log to Media Table, tagged to the logged-in client
+                const { data: { user } } = await sbClient.auth.getUser();
                 const { error: dbError } = await sbClient.from('media').insert([{
                     file_name: file.name,
                     file_url: publicUrl,
                     file_type: file.type || 'unknown',
-                    tags: ['client_intake', 'automated_sync']
+                    tags: ['client_intake', 'automated_sync'],
+                    user_id: user ? user.id : null
                 }]);
 
                 if (dbError) throw dbError;
