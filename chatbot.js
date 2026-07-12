@@ -202,6 +202,16 @@
                     flex-shrink: 0;
                 }
                 .road-btn:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.2); }
+                @media (max-width: 520px) {
+                    #pd-roadmap-bar { padding-left:16px !important; padding-right:16px !important; gap:6px !important; }
+                    .road-btn { font-size:0.72rem; padding:9px 12px; gap:5px; border-radius:12px; }
+                    .road-btn svg { width:13px; height:13px; }
+                }
+                @media (max-width: 340px) {
+                    #pd-roadmap-bar { padding-left:10px !important; padding-right:10px !important; gap:4px !important; }
+                    .road-btn { font-size:0.64rem; padding:8px 9px; gap:4px; }
+                    .road-btn svg { width:12px; height:12px; }
+                }
             </style>
             <button class="road-btn" onclick="go('about_brands', 'Show me Evolve')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></svg>
