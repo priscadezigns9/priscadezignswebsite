@@ -190,6 +190,7 @@
                 document.getElementById('auth-input').value = '';
                 return;
             }
+            localStorage.setItem('pd_remembered_email', email);
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
             const controls = document.getElementById('management-controls');
@@ -198,6 +199,13 @@
         }
 
         window.addEventListener('load', async () => {
+            const remembered = localStorage.getItem('pd_remembered_email');
+            if (remembered) {
+                const emailField = document.getElementById('auth-email');
+                emailField.value = remembered;
+                // Jump straight to the password field so returning users just type a password.
+                setTimeout(() => document.getElementById('auth-input').focus(), 50);
+            }
             const { data: { session } } = await sb.auth.getSession();
             if (session) {
                 document.getElementById('auth-screen').classList.add('hidden');

@@ -110,6 +110,7 @@
                 document.getElementById('auth-key').value = '';
                 return;
             }
+            localStorage.setItem('pd_remembered_email', email);
 
             status.innerText = 'Access granted.';
             status.style.color = '#10b981';
@@ -122,6 +123,12 @@
         }
 
         (async () => {
+            const remembered = localStorage.getItem('pd_remembered_email');
+            if (remembered) {
+                const emailField = document.getElementById('auth-email');
+                emailField.value = remembered;
+                setTimeout(() => document.getElementById('auth-key').focus(), 50);
+            }
             const { data: { session } } = await sbClient.auth.getSession();
             if (session) {
                 document.getElementById('auth-screen').classList.add('hidden');
