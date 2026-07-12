@@ -81,25 +81,28 @@
     .typing-dots span:nth-child(3){animation-delay:0.4s;}
     @keyframes tdot{0%,60%,100%{transform:translateY(0); opacity: 0.3;}30%{transform:translateY(-8px); opacity: 1;}}
 
-    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:wrap; gap:10px; flex-shrink:0; max-height: 180px; overflow-y: auto; }
+    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:nowrap; overflow-x:auto; gap:10px; flex-shrink:0; scrollbar-width: none; -ms-overflow-style: none; }
+    .chat-qr::-webkit-scrollbar { display: none; }
     .qrb { 
         font-size:0.85rem; font-weight:600; padding:12px 20px; border:1px solid rgba(157, 80, 187, 0.2); 
         background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:16px; 
         transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         font-family: 'Inter', sans-serif;
         display: flex; align-items: center; gap: 10px;
+        flex-shrink: 0;
     }
     .qrb svg { width: 16px; height: 16px; flex-shrink: 0; stroke-width: 2.5; }
     .qrb:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.2); }
     .qrb.wa { background: #22c55e; color:#fff; border-color:#22c55e; display:inline-flex; align-items:center; gap:8px; }
     
-    .chat-inp-row { display:flex; border-top:1px solid rgba(0,0,0,0.05); padding:12px 16px; background:#fff; align-items:center; gap:6px; position: relative; }
-    #chat-inp { flex:1; border:none; background:#f9fafb; padding:12px 16px; font-size:0.95rem; border-radius:16px; outline:none; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+    .chat-inp-row { display:flex; border-top:1px solid rgba(0,0,0,0.05); padding:10px 12px; background:#fff; align-items:center; gap:4px; position: relative; }
+    #chat-inp { flex:1; min-width:0; border:none; background:#f3f4f6; padding:10px 14px; font-size:0.9rem; border-radius:14px; outline:none; transition: all 0.2s; font-family: 'Inter', sans-serif; }
     #chat-inp:focus { background: #fff; box-shadow: inset 0 0 0 2px rgba(157, 80, 187, 0.1); }
     
     .chat-tool-btn { 
-        width:40px; height:40px; display:flex; align-items:center; justify-content:center; 
+        width:36px; height:36px; display:flex; align-items:center; justify-content:center; 
         border-radius:12px; cursor:pointer; transition:all 0.2s; border:none; background: transparent; color: #64748b;
+        flex-shrink: 0;
     }
     .chat-tool-btn:hover { color: var(--cb-purple); background: #f3f4f6; }
     #chat-mic.recording { background: #fee2e2; color: #ef4444; animation: cbPulse 1.5s infinite; }
