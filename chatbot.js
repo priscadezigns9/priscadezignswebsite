@@ -610,7 +610,7 @@ window.toggleChat = function(){
     if(open && hist.length === 0) go('start');
 };
 
-function go(step, label){
+window.go = function(step, label){
     const s = STEPS[step];
     if(!s) return;
     if(label) addMsg(label, 'usr');
