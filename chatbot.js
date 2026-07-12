@@ -397,7 +397,7 @@ window.toggleVoice=function(){
 };
 function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
-  var clean=txt.replace(/<[^>]*>/g,' ').replace(/\n/g,' ').replace(/Prisca Dezigns/gi, 'Pry-ska Designs').replace(/\bPrisca\b/gi, 'Pry-ska').trim();
+  var clean=txt.replace(/<[^>]*>/g,' ').replace(/\n/g,' ').trim();
   if(!clean) return;
   var u=new SpeechSynthesisUtterance(clean);u.rate=1.0;u.pitch=1.03;u.volume=1;
   if(!preferredVoice) pickVoice();
