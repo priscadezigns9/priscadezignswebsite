@@ -36,7 +36,7 @@
         display:flex; flex-direction:column;
         opacity:0; pointer-events:none; transform:translateY(30px) scale(0.95);
         transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        max-height:720px; border-radius:32px; overflow: hidden;
+        max-height: min(720px, calc(100vh - 140px)); border-radius:32px; overflow: hidden;
     }
     #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
     
@@ -144,7 +144,7 @@
     .cpkg-desc { font-size:0.85rem; color:#475569; margin-top:12px; line-height:1.6; }
 
     @media(max-width:520px){
-        #pd-chat-window { width:calc(100vw - 32px); right:16px; bottom:100px; border-radius:24px; }
+        #pd-chat-window { width:calc(100vw - 32px); right:16px; bottom:100px; border-radius:24px; max-height: calc(100vh - 130px); }
     }
     `;
         document.head.appendChild(s);
