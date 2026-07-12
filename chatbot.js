@@ -61,7 +61,7 @@
     #chat-back-bar.vis { display:flex; }
     #chat-back-bar span { font-size:11px; font-weight:800; text-transform:uppercase; color:var(--cb-purple); letter-spacing: 0.05em; }
     
-    .chat-msgs { flex:1; overflow-y:auto; padding:28px; display:flex; flex-direction:column; gap:16px; min-height:200px; max-height:480px; scroll-behavior: smooth; }
+    .chat-msgs { flex:1; overflow-y:auto; padding:28px; display:flex; flex-direction:column; gap:16px; min-height:60px; max-height:480px; scroll-behavior: smooth; }
     .chat-msgs::-webkit-scrollbar { width:4px; }
     .chat-msgs::-webkit-scrollbar-thumb { background: rgba(157, 80, 187, 0.1); border-radius:10px; }
     
