@@ -95,16 +95,16 @@
     .typing-dots span:nth-child(3){animation-delay:0.4s;}
     @keyframes tdot{0%,60%,100%{transform:translateY(0); opacity: 0.3;}30%{transform:translateY(-8px); opacity: 1;}}
 
-    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:wrap; gap:10px; flex-shrink:0; }
+    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:wrap; gap:8px; flex-shrink:0; }
     .qrb { 
-        font-size:0.85rem; font-weight:600; padding:12px 20px; border:1px solid rgba(157, 80, 187, 0.2); 
-        background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:16px; 
+        font-size:0.76rem; font-weight:600; padding:9px 14px; border:1px solid rgba(157, 80, 187, 0.2); 
+        background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:14px; 
         transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         font-family: 'Inter', sans-serif;
-        display: flex; align-items: center; gap: 10px;
+        display: flex; align-items: center; gap: 7px;
         flex-shrink: 0;
     }
-    .qrb svg { width: 16px; height: 16px; flex-shrink: 0; stroke-width: 2.5; }
+    .qrb svg { width: 14px; height: 14px; flex-shrink: 0; stroke-width: 2.5; }
     .qrb:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.2); }
     .qrb.wa { background: #22c55e; color:#fff; border-color:#22c55e; display:inline-flex; align-items:center; gap:8px; }
     
@@ -206,13 +206,14 @@
             <style>
                 #pd-roadmap-bar::-webkit-scrollbar { display:none; }
                 .road-btn { 
-                    font-size:0.85rem; font-weight:600; padding:12px 20px; border:1px solid rgba(157, 80, 187, 0.2); 
-                    background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:16px; 
+                    font-size:0.76rem; font-weight:600; padding:9px 14px; border:1px solid rgba(157, 80, 187, 0.2); 
+                    background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:14px; 
                     transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
                     font-family: 'Inter', sans-serif;
-                    display: flex; align-items: center; gap: 10px;
+                    display: flex; align-items: center; gap: 7px;
                     flex-shrink: 0;
                 }
+                .road-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
                 .road-btn:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.2); }
                 @media (max-width: 520px) {
                     #pd-roadmap-bar { padding-left:16px !important; padding-right:16px !important; gap:6px !important; }
@@ -263,7 +264,7 @@ const WA="https://wa.me/18683424101";
 const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
 const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
 
-const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nWhen a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is an enterprise AI and digital transformation partner based in Trinidad & Tobago, founded by Priscilla Narine. The agency combines high-fidelity websites, AI automation (chatbots, WhatsApp automation, email automation, voice agents, lead qualification and routing), and brand architecture — helping businesses modernize how they operate, not just how they look online. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nBRAND IDENTITY:\nPrisca Dezigns' primary brand color is a rich purple (#7c3aed), paired with a warm ivory/cream background (#FFFFF0). If asked about the brand's colors, favorite color, or visual identity, answer directly and confidently using this — purple is the signature color across the website, logo, and all client-facing materials.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $300/mo, 500 conversations/mo included, $0.65/conversation overage), Tier 2 ($3,500 + $500/mo, 1,500 conversations/mo included, $0.65/conversation overage), Tier 3 ($6,000 + $700/mo, 3,000 conversations/mo included, $0.65/conversation overage), Tier 4 ($8,000 + $900/mo, unlimited conversations, annual audit required). Note: AI Consultancy prices are subject to change upon audit.\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nWhen a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is an enterprise AI and digital transformation partner based in Trinidad & Tobago, founded by Priscilla Narine. The agency combines high-fidelity websites, AI automation (chatbots, WhatsApp automation, email automation, voice agents, lead qualification and routing), and brand architecture — helping businesses modernize how they operate, not just how they look online. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nBRAND IDENTITY:\nPrisca Dezigns' primary brand color is a rich purple (#7c3aed), paired with a warm ivory/cream background (#FFFFF0). If asked about the brand's colors, favorite color, or visual identity, answer directly and confidently using this — purple is the signature color across the website, logo, and all client-facing materials.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $300/mo, 500 conversations/mo included, $0.65/conversation overage), Tier 2 ($3,500 + $500/mo, 1,500 conversations/mo included, $0.65/conversation overage), Tier 3 ($6,000 + $700/mo, 3,000 conversations/mo included, $0.65/conversation overage), Tier 4 ($8,000 + $900/mo, unlimited conversations, annual audit required). Note: AI Consultancy prices are subject to change upon audit.\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic digital partner. EVOLVE Mobility Limited is transforming the Caribbean's roads through green mobility, based in Trinidad & Tobago. Phone: +1-868-387-6937 (also \\\"EVPOWER\\\"). Email: info@driveevolve.com. WhatsApp: https://wa.me/18683876937\n\nBrands carried: BYD (est. 1994, EVs & battery innovation leader), Denza (2010, premium NEV brand under BYD, luxury design), Dongfeng (1969, one of China's largest automakers, EV sub-brand Dongfeng Nammi), GAC (1997, EVs & global expansion), iCAUR (2023, under Chery Group, youthful urban/light off-road EVs), JuneYao (1991, diverse Chinese holding group), Leapmotor (2015, smart EVs with autonomous driving tech), Wuling (1982, affordable mini EVs & utility vehicles).\n\nFeatured vehicles (current lineup, prices in TTD):\n- GAC Aion ES: TT$195,000 (from TT$2,500/mo), 440km range, 0-100km/h in 12.1s, 7-8hr AC charge, ~TT$22 to charge\n- Leapmotor C10: TT$255,000, 480km range, 0-100km/h in 7.5s, 9-10hr AC charge\n- BYD Sealion 7 (Premium) RWD: TT$360,000, 560km range, 0-100km/h in 6.7s, 8-9hr AC charge\n- GAC Aion V: TT$260,000, 600km range, 0-100km/h in 7.7s, 8-9hr AC charge\nMany vehicles are available from as low as TT$2,500/mo on financing — always mention this option since it makes EVs far more accessible than the full sticker price suggests. Full current inventory: driveevolve.com/vehicles.\n\nWhy choose EVOLVE: future-ready EVs from leading Chinese manufacturers; servicing & software updates handled by SBCS University (their official Hybrid+EV service partner); genuine parts supplied directly by EVOLVE; complete customer support before and after purchase.\n\nCharging: EVOLVE operates a growing charging network in Trinidad & Tobago, including a station at Ramps Cunupia (51A Railway Road, Cunupia), Type 2 connector, up to 100kW. Full map at driveevolve.com/charging.\n\nBooking: customers can book a showroom viewing at driveevolve.com/book-viewing or via WhatsApp. Payment types include full purchase and financing/lease options.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
 
 let vpCounter = 0;
 const VP_PLAY = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
@@ -363,7 +364,22 @@ function pickVoice(){
   if(!window.speechSynthesis) return;
   var voices=window.speechSynthesis.getVoices();
   if(!voices.length) return;
-  preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Female')) || voices[0];
+  // Preference order: modern neural/natural voices first (Edge/Chrome), then
+  // decent standard voices, falling back to whatever the browser offers.
+  var priorities = [
+    v => /natural/i.test(v.name),                                   // Edge "Online (Natural)" voices — best available
+    v => /Aria|Jenny|Emma|Ava/i.test(v.name),                        // common neural voice names
+    v => v.name === 'Samantha',                                      // macOS/iOS default, quite natural
+    v => /Google US English/i.test(v.name),
+    v => /Google UK English Female/i.test(v.name),
+    v => v.lang === 'en-US' && /Female/i.test(v.name),
+    v => v.lang && v.lang.startsWith('en')
+  ];
+  for (var i = 0; i < priorities.length; i++) {
+    var match = voices.find(priorities[i]);
+    if (match) { preferredVoice = match; return; }
+  }
+  preferredVoice = voices[0];
 }
 if(window.speechSynthesis){
   pickVoice();
@@ -383,7 +399,7 @@ function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
   var clean=txt.replace(/<[^>]*>/g,' ').replace(/\n/g,' ').replace(/Prisca Dezigns/gi, 'Pree-ska Designs').trim();
   if(!clean) return;
-  var u=new SpeechSynthesisUtterance(clean);u.rate=0.85;u.pitch=1.0;u.volume=1;
+  var u=new SpeechSynthesisUtterance(clean);u.rate=1.0;u.pitch=1.03;u.volume=1;
   if(!preferredVoice) pickVoice();
   if(preferredVoice) u.voice = preferredVoice;
   window.speechSynthesis.cancel();window.speechSynthesis.speak(u);
@@ -609,7 +625,7 @@ const STEPS = {
         ]
     },
     "about_brands": {
-        "bot": "We are the strategic digital partners for Evolve Mobility (driveevolve.com), the leading EV dealership in the Caribbean.\n\nInventory & Pricing:\n⚡ BYD Atto 3: $285,000 TTD\n⚡ BYD Dolphin: $195,000 TTD\n⚡ GAC AION Y Plus: $245,000 TTD\n⚡ Leapmotor C11: $310,000 TTD\n⚡ Leapmotor T03: $145,000 TTD",
+        "bot": "We're the strategic digital partners for EVOLVE Mobility (driveevolve.com), transforming the Caribbean's roads through green mobility.\n\nCurrent lineup includes:\n⚡ GAC Aion ES — from TT$195,000 (TT$2,500/mo)\n⚡ Leapmotor C10 — TT$255,000\n⚡ GAC Aion V — TT$260,000\n⚡ BYD Sealion 7 (Premium) — TT$360,000\n\nCarrying BYD, Denza, GAC, Leapmotor, Wuling & more, with servicing by SBCS University.",
         "r": [
             { "l": "Visit Evolve Mobility", "url": "https://driveevolve.com", "i": "external-link" },
             { "l": "Back", "s": "about", "i": "arrow-left" }
