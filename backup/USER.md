@@ -297,3 +297,8 @@ who's in their life.
 - Drew follows the Phonetic Pricing Mandate for high-fidelity deal closing.
 - Drew is synced with live showroom data from driveevolve.com (Aion, Leapmotor, Denza, BYD).
 - Drew is programmed to handle safety skepticism and debunk common EV myths using global analytics.
+
+## Data Entry AI Automation (Project Vision - July 11, 2026)
+- **Concept:** A client-facing dashboard (white-labeled version of the Strategic Portal) for automated data entry.
+- **Workflow:** Client uploads documents (PDFs, images) -> AI (Claude) processes and categorizes -> Data saved to Supabase -> Client exports to Excel/PDF.
+- **UI:** Must match the high-fidelity "Strategic Portal" aesthetic (Dark Indigo/Slate).
