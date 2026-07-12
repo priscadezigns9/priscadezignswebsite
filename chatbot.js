@@ -348,6 +348,16 @@ function fallback(txt, cb) {
 
 const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.5 8.5 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
 
+function ensureWhatsAppBtn(botText){
+    if(!botText || !/whatsapp/i.test(botText)) return;
+    const q = document.getElementById('chat-qr');
+    if(!q || q.querySelector('.qrb.wa')) return; // already offered, don't duplicate
+    const a = document.createElement('a');
+    a.href = WA; a.target = '_blank';
+    a.className = 'qrb wa'; a.innerHTML = WA_SVG + ' Chat on WhatsApp';
+    q.appendChild(a);
+}
+
 var voiceOn=false;
 var preferredVoice=null;
 function pickVoice(){
@@ -801,6 +811,7 @@ function addMsg(txt, side){
     d.innerHTML = txt.replace(/\n/g, '<br>');
     m.appendChild(d);
     m.scrollTop = m.scrollHeight;
+    if(side === 'bot') ensureWhatsAppBtn(txt);
 }
 
 function renderPkgs(list, note){
