@@ -37,12 +37,14 @@
         <div class="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-200">
             <div class="text-center mb-8">
                 <img src="https://share.zapia.com/57sonyoar08flg9xz5v667" class="h-16 mx-auto mb-4" alt="PD Logo">
-                <h1 class="text-2xl font-bold text-slate-800 cursor-pointer select-none" onclick="handleAuthClick()">Strategic Command</h1>
-                <p class="text-slate-500 text-sm mt-2">Initialize secure neural handshake</p>
+                <h1 class="text-2xl font-bold text-slate-800">Strategic Command</h1>
+                <p class="text-slate-500 text-sm mt-2">Sign in with your Prisca Dezigns account</p>
             </div>
-            <input type="password" id="auth-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-center tracking-widest text-slate-900 opacity-0 pointer-events-none" placeholder="••••••••" onkeypress="if(event.key === 'Enter') checkAuth()">
-            <button onclick="checkAuth()" class="w-full bg-slate-900 text-white rounded-xl py-3 font-bold hover:bg-slate-800 transition-all">Connect</button>
-            <div class="mt-8 text-[9px] text-slate-400 uppercase tracking-[0.3em]">Prisca Dezigns AI Infrastructure</div>
+            <input type="email" id="auth-email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-3 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-slate-900" placeholder="you@priscadezigns.org" autocomplete="username">
+            <input type="password" id="auth-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-slate-900" placeholder="Password" autocomplete="current-password" onkeypress="if(event.key === 'Enter') checkAuth()">
+            <button onclick="checkAuth()" class="w-full bg-slate-900 text-white rounded-xl py-3 font-bold hover:bg-slate-800 transition-all">Sign In</button>
+            <div id="auth-error" class="text-red-500 text-xs text-center mt-3 hidden">Sign-in failed. Check your email and password.</div>
+            <div class="mt-8 text-[9px] text-slate-400 uppercase tracking-[0.3em] text-center">Prisca Dezigns AI Infrastructure</div>
         </div>
     </div>
 
@@ -177,35 +179,27 @@
         let allLeads = [], outreachLeads = [], organicLeads = [], chatLeads = [], voiceLogs = [], financeLogs = [];
         let chartInstance = null;
 
-        let authClicks = 0;
-        function handleAuthClick() {
-            authClicks++;
-            if(authClicks >= 5) {
-                const input = document.getElementById('auth-input');
-                input.classList.remove('opacity-0', 'pointer-events-none');
-                input.focus();
-            }
-        }
-
         async function checkAuth() {
-            const input = document.getElementById('auth-input').value;
-            if(input.toLowerCase().trim() === 'alice') {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-                const controls = document.getElementById('management-controls');
-                if(controls) controls.classList.remove('hidden');
-                sessionStorage.setItem('pd_auth', 'true');
-                fetchData();
-            } else { 
-                alert('Handshake failed. Verify security token.'); 
-                authClicks = 0;
-                document.getElementById('auth-input').classList.add('opacity-0', 'pointer-events-none');
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-input').value;
+            const errEl = document.getElementById('auth-error');
+            errEl.classList.add('hidden');
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+            if (error || !data.session) {
+                errEl.classList.remove('hidden');
                 document.getElementById('auth-input').value = '';
+                return;
             }
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            const controls = document.getElementById('management-controls');
+            if(controls) controls.classList.remove('hidden');
+            fetchData();
         }
 
-        window.addEventListener('load', () => {
-            if(sessionStorage.getItem('pd_auth') === 'true') {
+        window.addEventListener('load', async () => {
+            const { data: { session } } = await sb.auth.getSession();
+            if (session) {
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('main-content').classList.remove('hidden');
                 const controls = document.getElementById('management-controls');
