@@ -95,8 +95,7 @@
     .typing-dots span:nth-child(3){animation-delay:0.4s;}
     @keyframes tdot{0%,60%,100%{transform:translateY(0); opacity: 0.3;}30%{transform:translateY(-8px); opacity: 1;}}
 
-    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:nowrap; overflow-x:auto; gap:10px; flex-shrink:0; scrollbar-width: none; -ms-overflow-style: none; }
-    .chat-qr::-webkit-scrollbar { display: none; }
+    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:wrap; gap:10px; flex-shrink:0; }
     .qrb { 
         font-size:0.85rem; font-weight:600; padding:12px 20px; border:1px solid rgba(157, 80, 187, 0.2); 
         background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:16px; 
@@ -202,7 +201,7 @@
     if(!document.getElementById('pd-roadmap-bar')){
         const r = document.createElement('div');
         r.id = 'pd-roadmap-bar';
-        r.style = 'padding:0 28px 12px; display:flex; gap:10px; overflow-x:auto; flex-shrink:0; scrollbar-width:none;';
+        r.style = 'padding:0 28px 12px; display:flex; flex-wrap:wrap; gap:10px; flex-shrink:0;';
         r.innerHTML = `
             <style>
                 #pd-roadmap-bar::-webkit-scrollbar { display:none; }
