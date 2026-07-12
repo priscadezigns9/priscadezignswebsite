@@ -665,11 +665,11 @@ window.go = function(step, label){
             return;
         }
         if(s.url) window.open(s.url, '_blank');
-        if(s.r) s.r.forEach(r => addQR(r.l, r.s, r.i));
+        if(s.r) s.r.forEach(r => addQR(r.l, r.s, r.i, r.url));
     }, 600);
 }
 
-function addQR(label, step, icon){
+function addQR(label, step, icon, url){
     const q = document.getElementById('chat-qr');
     const b = document.createElement('button');
     b.className = 'qrb';
@@ -703,7 +703,7 @@ function addQR(label, step, icon){
     }
 
     b.innerHTML = iconSvg + `<span>${label}</span>`;
-    b.onclick = () => go(step, label);
+    b.onclick = url ? () => window.open(url, '_blank') : () => go(step, label);
     q.appendChild(b);
 }
 
