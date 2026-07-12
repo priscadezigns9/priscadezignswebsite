@@ -106,6 +106,8 @@
     }
     .chat-tool-btn:hover { color: var(--cb-purple); background: #f3f4f6; }
     #chat-mic.recording { background: #fee2e2; color: #ef4444; animation: cbPulse 1.5s infinite; }
+    #chat-timer { display:none; font-size:12px; font-weight:700; color:#ef4444; margin-right:4px; font-family:monospace; }
+    #chat-timer.vis { display:inline; }
     #chat-snd { color: var(--cb-purple); }
     #chat-snd:hover { transform: scale(1.1); }
     
@@ -175,6 +177,7 @@
             <button id="chat-mic" class="chat-tool-btn" onclick="toggleMic()" title="Voice Note">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
             </button>
+            <span id="chat-timer">00:00</span>
             <button id="chat-snd" class="chat-tool-btn" onclick="chatSend()">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
@@ -288,6 +291,8 @@ window.toggleEmojis = function() {
 // --- High-Fidelity Voice Recording & Attachment Handlers ---
 let mediaRecorder;
 let audioChunks = [];
+let recInterval;
+let recSeconds = 0;
 
 window.toggleMic = function() {
     const btn = document.getElementById('chat-mic');
@@ -304,6 +309,18 @@ function startAudioRecord() {
             mediaRecorder = new MediaRecorder(stream);
             mediaRecorder.start();
             document.getElementById('chat-mic').classList.add('recording');
+            
+            const timer = document.getElementById('chat-timer');
+            timer.innerText = '00:00';
+            timer.classList.add('vis');
+            recSeconds = 0;
+            recInterval = setInterval(() => {
+                recSeconds++;
+                const m = Math.floor(recSeconds / 60).toString().padStart(2, '0');
+                const s = (recSeconds % 60).toString().padStart(2, '0');
+                timer.innerText = `${m}:${s}`;
+            }, 1000);
+
             audioChunks = [];
             mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
             mediaRecorder.onstop = () => {
@@ -318,6 +335,8 @@ function stopAudioRecord() {
     if (mediaRecorder) {
         mediaRecorder.stop();
         document.getElementById('chat-mic').classList.remove('recording');
+        document.getElementById('chat-timer').classList.remove('vis');
+        clearInterval(recInterval);
     }
 }
 
