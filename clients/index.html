@@ -27,9 +27,10 @@
     <div id="auth-screen" class="fixed inset-0 z-[999] glass flex items-center justify-center p-6">
         <div class="max-w-md w-full bg-[#1E293B] rounded-[2.5rem] p-10 shadow-2xl border border-white/5 text-center">
             <div class="w-20 h-20 bg-[#7D52B5] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-500/20"><i data-lucide="shield-check" class="w-10 h-10 text-white"></i></div>
-            <h2 class="text-3xl font-extrabold text-white mb-2 italic cursor-pointer select-none" >Secure Login</h2>
-            <p id="auth-status" class="text-slate-400 mb-8 font-medium">Verify your strategic token to enter the vault.</p>
-            <input type="password" id="auth-key" onclick="handshake()" placeholder="Enter Token" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" onkeypress="if(event.key === 'Enter') checkAuth()">
+            <h2 class="text-3xl font-extrabold text-white mb-2 italic">Secure Login</h2>
+            <p id="auth-status" class="text-slate-400 mb-8 font-medium">Sign in with your Prisca Dezigns account.</p>
+            <input type="email" id="auth-email" placeholder="priscadezigns9@gmail.com" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-3 text-center font-bold text-white transition-all" autocomplete="username">
+            <input type="password" id="auth-key" placeholder="Password" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" autocomplete="current-password" onkeypress="if(event.key === 'Enter') checkAuth()">
             <button onclick="checkAuth()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">CONNECT</button>
         </div>
     </div>
@@ -54,7 +55,7 @@
             <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold">C</div>
                 <div><div class="text-xs font-bold text-white">Client Session</div><div class="text-[9px] text-emerald-400 flex items-center font-bold uppercase tracking-tighter"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 animate-pulse"></span> Sierra Connected</div></div>
-            <button onclick="localStorage.removeItem('pd_client_auth'); location.reload();" class="mt-4 w-full flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold text-red-400 bg-red-400/5 border border-red-400/10 hover:bg-red-400/10 transition-all">
+            <button onclick="sbClient.auth.signOut().then(() => location.reload());" class="mt-4 w-full flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold text-red-400 bg-red-400/5 border border-red-400/10 hover:bg-red-400/10 transition-all">
                 <i data-lucide="log-out" class="w-3.5 h-3.5 mr-2"></i> SIGN OUT
             </button>
         
@@ -91,53 +92,42 @@
     </main>
     <script>
         lucide.createIcons();
-        let clicks = 0;
-        function handshake() {
-            clicks++;
-            if(clicks === 5) {
-                document.getElementById('auth-status').innerText = 'Neural Link Active. Enter Protocol Token.';
-                document.getElementById('auth-status').classList.add('text-purple-400');
-            }
-        }
-        
-        function checkAuth() {
-            console.log('Login attempt initiated...');
-            const key = document.getElementById('auth-key').value.trim();
-            const status = document.getElementById('auth-status');
-            const screen = document.getElementById('auth-screen');
-            
-            // The Tokens: alice (admin) or 398237543 (client)
-            if(key === 'alice' || key === '398237543') {
-                console.log('Token Verified.');
-                status.innerText = 'Neural Link Established. Accessing Vault...';
-                status.style.color = '#10b981';
-                
-                localStorage.setItem('pd_client_auth', 'true');
-                
-                // Immediate UI response
-                screen.style.transition = 'opacity 0.5s ease-out';
-                screen.style.opacity = '0';
-                
-                setTimeout(() => {
-                    screen.classList.add('hidden');
-                    console.log('Auth Screen Hidden.');
-                    // Initialize data
-                    if(typeof fetchVault === 'function') fetchVault();
-                    if(typeof fetchLedger === 'function') fetchLedger();
-                }, 500);
-            } else {
-                console.log('Token Rejected.');
-                status.innerText = 'Protocol Rejected. Retrying Handshake...';
-                status.style.color = '#ef4444';
-                document.getElementById('auth-key').value = '';
-                if(typeof clicks !== 'undefined') clicks = 0;
-            }
-        }
-        if(localStorage.getItem('pd_client_auth') === 'true') { document.getElementById('auth-screen').classList.add('hidden'); }
-        
+
         const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
         const sbClient = supabase.createClient(SB_URL, SB_KEY);
+
+        async function checkAuth() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-key').value;
+            const status = document.getElementById('auth-status');
+            const screen = document.getElementById('auth-screen');
+
+            const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+            if (error || !data.session) {
+                status.innerText = 'Sign-in failed. Check your email and password.';
+                status.style.color = '#ef4444';
+                document.getElementById('auth-key').value = '';
+                return;
+            }
+
+            status.innerText = 'Access granted.';
+            status.style.color = '#10b981';
+            screen.style.transition = 'opacity 0.5s ease-out';
+            screen.style.opacity = '0';
+            setTimeout(() => {
+                screen.classList.add('hidden');
+                if(typeof fetchVault === 'function') fetchVault();
+            }, 500);
+        }
+
+        (async () => {
+            const { data: { session } } = await sbClient.auth.getSession();
+            if (session) {
+                document.getElementById('auth-screen').classList.add('hidden');
+            }
+        })();
+        
 
         async function syncToSupabase(file) {
             try {
@@ -203,7 +193,6 @@
         }
 
         
-        let currentData = [];
         let currentData = [];
         async function fetchVault() {
             const { data, error } = await sbClient.from('media').select('*').order('created_at', { ascending: false });
