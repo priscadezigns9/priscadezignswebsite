@@ -41,8 +41,9 @@
     #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
     
     .chat-hdr { background: linear-gradient(135deg, var(--cb-purple), var(--cb-deep)); padding:24px 28px; display:flex; align-items:center; gap:16px; flex-shrink:0; }
-    .chat-avatar { width:48px; height:48px; border-radius:18px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-shrink:0; padding: 4px; overflow: hidden; }
-    .chat-avatar img { width: 100%; height: 100%; object-fit: contain; }
+    .chat-avatar { width:48px; height:48px; border-radius:18px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-shrink:0; padding: 4px; overflow: hidden; perspective: 1000px; }
+    .chat-avatar img { width: 100%; height: 100%; object-fit: contain; transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
+    .chat-avatar:hover img { transform: rotateY(20deg) rotateX(10deg) scale(1.15); filter: drop-shadow(0 12px 20px rgba(0,0,0,0.15)); }
     .chat-hdr-name { font-size:1.1rem; font-weight:800; color:#fff; font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
     .chat-hdr-status { font-size:0.75rem; color:rgba(255,255,255,0.8); display:flex; align-items:center; gap:8px; margin-top:2px; font-weight: 500; }
     .chat-sdot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow: 0 0 10px #22c55e; animation: pgr 2s infinite; }
@@ -293,6 +294,16 @@ let mediaRecorder;
 let audioChunks = [];
 let recInterval;
 let recSeconds = 0;
+let recognition;
+let currentTranscript = "";
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+}
 
 window.toggleMic = function() {
     const btn = document.getElementById('chat-mic');
@@ -304,6 +315,18 @@ window.toggleMic = function() {
 };
 
 function startAudioRecord() {
+    currentTranscript = "";
+    if (recognition) {
+        recognition.onresult = (event) => {
+            let final = "";
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) final += event.results[i][0].transcript;
+            }
+            currentTranscript += final;
+        };
+        recognition.start();
+    }
+
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
             mediaRecorder = new MediaRecorder(stream);
@@ -332,6 +355,7 @@ function startAudioRecord() {
 }
 
 function stopAudioRecord() {
+    if (recognition) recognition.stop();
     if (mediaRecorder) {
         mediaRecorder.stop();
         document.getElementById('chat-mic').classList.remove('recording');
@@ -370,8 +394,13 @@ function uploadToVault(file, fileName, type) {
             } else {
                 addMsg(`📎 File attached: <a href="${url}" target="_blank">${fileName}</a>`, 'usr');
             }
-            // Notify Zapia (Sierra) about the upload
-            getAI("I just uploaded a " + type + ": " + url, (reply) => {
+            // Notify Zapia (Sierra) about the upload with transcript if available
+            let aiPrompt = "I just uploaded a " + type + ": " + url;
+            if (type === 'audio' && currentTranscript) {
+                aiPrompt = "I just uploaded a voice note. Transcript: \"" + currentTranscript + "\" (URL: " + url + ")";
+            }
+
+            getAI(aiPrompt, (reply) => {
                 addMsg(reply, 'bot');
             });
         } else {
