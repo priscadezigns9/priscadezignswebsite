@@ -241,12 +241,22 @@ const WA="https://wa.me/18683424101";
 const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
 const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
 
-const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nAUDIO/VISUAL CAPABILITIES:\nYou HAVE full high-fidelity access to all media uploaded by the user. When a user uploads a voice note or image, you receive the public URL immediately. You are equipped with advanced OCR and Audio Transcription models. If a user uploads a file, acknowledge it specifically. For example: 'I've received your voice note and I'm processing it now' or 'That image looks great, let me analyze those details for you'. NEVER say you cannot access or listen to files; you are a multi-modal AI agent.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING:\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($1,500), Growth ($3,500), Trusted ($6,000)\n- AI Consultancy: Tier 1 ($1,500), Tier 2 ($3,500), Tier 3 ($6,000), Tier 4 ($8,000)\n- E-Commerce: E-Starter ($2,500), E-Growth ($5,000), E-Trusted ($8,500)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nWhen a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $150/mo), Tier 2 ($3,500 + $400/mo), Tier 3 ($6,000 + $700/mo), Tier 4 ($8,000 + $900/mo)\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
 
 let history = [];
+let clientName = null;
 
-function getAI(txt, cb) {
-    history.push({role:'user', content:txt});
+function getAI(txt, cb, imageUrl) {
+    let userContent = txt;
+    if (imageUrl) {
+        // OpenAI/Grok-compatible multimodal content block, so the backend can forward
+        // this straight to a vision-capable model instead of just a text URL.
+        userContent = [
+            { type: 'text', text: txt },
+            { type: 'image_url', image_url: { url: imageUrl } }
+        ];
+    }
+    history.push({role:'user', content:userContent});
     const payload = JSON.stringify({ system: SYSTEM_PROMPT, messages: history, max_tokens: 350 });
     
     fetch(SB_URL + '/functions/v1/chat-proxy', {
@@ -277,6 +287,17 @@ function fallback(txt, cb) {
 const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.5 8.5 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
 
 var voiceOn=false;
+var preferredVoice=null;
+function pickVoice(){
+  if(!window.speechSynthesis) return;
+  var voices=window.speechSynthesis.getVoices();
+  if(!voices.length) return;
+  preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Female')) || voices[0];
+}
+if(window.speechSynthesis){
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+}
 window.toggleVoice=function(){
   voiceOn=!voiceOn;
   var btn=document.getElementById('chat-voice-toggle');
@@ -289,11 +310,11 @@ window.toggleVoice=function(){
 };
 function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
-  var clean=txt.replace(/\n/g,' ').replace(/Prisca Dezigns/gi, 'Pree-ska Designs').trim();
+  var clean=txt.replace(/<[^>]*>/g,' ').replace(/\n/g,' ').replace(/Prisca Dezigns/gi, 'Pree-ska Designs').trim();
+  if(!clean) return;
   var u=new SpeechSynthesisUtterance(clean);u.rate=0.85;u.pitch=1.0;u.volume=1;
-  var voices=window.speechSynthesis.getVoices();
-  var preferred = voices.find(v => v.name.includes('Google US English') || v.name.includes('Female'));
-  if(preferred) u.voice = preferred;
+  if(!preferredVoice) pickVoice();
+  if(preferredVoice) u.voice = preferredVoice;
   window.speechSynthesis.cancel();window.speechSynthesis.speak(u);
 }
 
@@ -382,47 +403,72 @@ window.handleChatFile = function(files) {
     }
 };
 
-function uploadToVault(file, fileName, type) {
-    addMsg("Uploading " + type + "...", 'bot');
-    const path = 'chatbot_uploads/' + fileName;
-    
-    fetch(SB_URL + '/storage/v1/object/media/' + path, {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + SB_ANON,
-            'Content-Type': file.type,
-            'x-upsert': 'true'
-        },
-        body: file
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.Key || data.path) {
-            const url = SB_URL + '/storage/v1/object/public/media/' + path;
-            if (type === 'audio') {
-                addMsg(`<div class="chat-audio-msg">🎤 Voice Note: <audio controls src="${url}"></audio></div>`, 'usr');
-            } else if (file.type.startsWith('image/')) {
-                addMsg(`<img src="${url}" onclick="window.open('${url}')" />`, 'usr');
-            } else {
-                addMsg(`📎 File attached: <a href="${url}" target="_blank">${fileName}</a>`, 'usr');
-            }
-            // Notify Zapia (Sierra) about the upload with transcript if available
-            let aiPrompt = "I just uploaded a " + type + ": " + url;
-            if (type === 'audio' && currentTranscript) {
-                aiPrompt = "I just uploaded a voice note. Transcript: \"" + currentTranscript + "\" (URL: " + url + ")";
-            }
-
-            getAI(aiPrompt, (reply) => {
-                addMsg(reply, 'bot');
-            });
-        } else {
-            addMsg("Upload failed. Please try again.", 'bot');
-        }
-    })
-    .catch(() => addMsg("Upload error. Check connection.", 'bot'));
+function ensureClientName(cb) {
+    if (clientName) { cb(clientName); return; }
+    let name = window.prompt("Quick thing before I save that — what's your name or business name? (So we can file it under your account.)");
+    if (!name || !name.trim()) name = 'Guest_' + Date.now();
+    clientName = name.trim().replace(/[^a-zA-Z0-9 _-]/g, '').slice(0, 60) || ('Guest_' + Date.now());
+    cb(clientName);
 }
 
-const PKGS={"standard":[{"name":"Starter","price":"$1,500 + $150/mo","desc":"1-Page High-Fidelity Website \u00b7 Full Brand Setup (Logo, Domain, Favicon) \u00b7 Social Media Integration \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Growth","price":"$3,500 + $400/mo","desc":"Manage 1 Brand Page \u00b7 Full Branding & App/Web Architecture \u00b7 Content Creation & Copywriting \u00b7 Advanced SEO & Analytics \u00b7 1 Month Free Maintenance"},{"name":"Trusted","price":"$6,000 + $700/mo","desc":"Full Website Architecture (10-15 Pages) \u00b7 Premium Brand Scaling & PR \u00b7 24/7 Priority Tech Support \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Custom","price":"Starting at $10,000","desc":"Tailored Digital Architecture \u00b7 Custom API & Tool Integration \u00b7 Unique Brand Identity Design \u00b7 Scalable Infrastructure \u00b7 Priority Sovereign Support"}],"ecommerce":[{"name":"E-Starter","price":"$2,500 + $250/mo","desc":"1-Page Online Shop \u00b7 Full Store Branding & Domain \u00b7 Integrated Social Shop Setup \u00b7 Payment Gateway Integration \u00b7 1 Month Free Maintenance"},{"name":"E-Growth","price":"$5,000 + $500/mo","desc":"2-5 Page Store Architecture \u00b7 Full Shop Logic (10+ Products) \u00b7 Deep Copywriting & Product SEO \u00b7 Automated Fulfillment Sync \u00b7 1 Month Free Maintenance"},{"name":"E-Trusted","price":"$8,500 + $850/mo","desc":"Elite Store (50+ Products) \u00b7 15+ Page Network Architecture \u00b7 Advanced Inventory & CRM Automation \u00b7 On-Chain Inventory Logic \u00b7 1 Month Free Maintenance"},{"name":"E-Commerce Maintenance","price":"$199.99/mo","desc":"E-Commerce Store Uptime & Security Monitoring \u00b7 Monthly Product & Content Updates \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"ai":[{"name":"AI Tier 1","price":"$1,500 + $150/mo","desc":"AI Website Chatbot (24/7 Live) \u00b7 Lead Capture & CRM Setup \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 2","price":"$3,500 + $400/mo","desc":"Everything in Tier 1 \u00b7 WhatsApp AI Automation (24/7) \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 3","price":"$6,000 + $700/mo","desc":"Everything in Tier 1 & 2 \u00b7 Email Inbox AI Automation (24/7) \u00b7 AI Reads, Responds & Qualifies Every Email \u00b7 1 Month Free Maintenance"},{"name":"AI Tier 4","price":"$8,000 + $900/mo","desc":"Everything in Tiers 1, 2 & 3 \u00b7 Full Voice Agent Deployment \u00b7 Answers inbound calls 24/7 \u00b7 1 Month Free Maintenance"}],"continuity":[{"name":"Maintenance","price":"$99.99/mo","desc":"Daily Uptime & Security Monitoring \u00b7 Monthly Content Optimization \u00b7 High-Fidelity Technical Backups \u00b7 Priority Sovereign Support"}],"templates":[{"name":"Template Site","price":"$149.99 + $19.99/mo","desc":"Choose any of our 24 templates \u00b7 Logo & colours swapped in \u00b7 Your content added \u00b7 Mobile-optimised \u00b7 Live in 24hrs \u00b7 Hosted on your subdomain"},{"name":"+ Copywriting Add-On","price":"$4.99/update","desc":"Everything in Template Site \u00b7 Professional copywriting for all sections \u00b7 Bio, services, CTA all written for you \u00b7 Delivered in 48-72hrs"},{"name":"+ AI Chatbot Add-On","price":"$349.99 + $49.99/mo","desc":"Everything in Template Site \u00b7 AI chatbot answering your business FAQs 24/7 \u00b7 Hours, services, location, how to book"},{"name":"Micro Store","price":"$249.99 + $34.99/mo","desc":"Full product store built on your chosen template \u00b7 Up to 12 products uploaded with copy & images \u00b7 WhatsApp order button on every product \u00b7 Live in 72-96hrs"},{"name":"Premium Template (3D)","price":"$200 + $19.99/mo","desc":"Aeon \u00b7 Nexus \u00b7 Stellar \u2014 cinematic 3D WebGL experiences \u00b7 Fully immersive \u00b7 Scroll-driven animation"}]};
+function uploadToVault(file, fileName, type) {
+    ensureClientName(function(client) {
+        addMsg("Uploading " + type + "...", 'bot');
+        const safeClient = client.replace(/\s+/g, '_');
+        const path = 'chatbot_uploads/' + safeClient + '/' + Date.now() + '_' + fileName;
+
+        fetch(SB_URL + '/storage/v1/object/media/' + path, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + SB_ANON,
+                'Content-Type': file.type,
+                'x-upsert': 'true'
+            },
+            body: file
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.Key || data.path) {
+                const url = SB_URL + '/storage/v1/object/public/media/' + path;
+                const isImage = file.type && file.type.startsWith('image/');
+
+                if (type === 'audio') {
+                    addMsg(`<div class="chat-audio-msg">🎤 Voice Note: <audio controls src="${url}"></audio></div>`, 'usr');
+                } else if (isImage) {
+                    addMsg(`<img src="${url}" onclick="window.open('${url}')" />`, 'usr');
+                } else {
+                    addMsg(`📎 File attached: <a href="${url}" target="_blank">${fileName}</a>`, 'usr');
+                }
+
+                // Server-side: save a copy to Drive (client-named folder) + log to Supabase.
+                // Fire-and-forget — doesn't block the chat reply.
+                fetch(SB_URL + '/functions/v1/save-attachment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_ANON },
+                    body: JSON.stringify({ clientName: client, fileUrl: url, fileName: fileName, fileType: file.type, category: type })
+                }).catch(() => {});
+
+                if (type === 'audio') {
+                    if (currentTranscript && currentTranscript.trim()) {
+                        getAI("I just uploaded a voice note. Transcript: \"" + currentTranscript.trim() + "\"", (reply) => addMsg(reply, 'bot'));
+                    } else {
+                        addMsg("Got your voice note saved — but I couldn't capture a live transcript that time (this browser may not support speech-to-text). Mind typing your question instead?", 'bot');
+                    }
+                } else if (isImage) {
+                    // Real multimodal call — the image is sent as actual image content, not just a URL string.
+                    getAI("The user uploaded this image. Take a look and respond to what's actually in it.", (reply) => addMsg(reply, 'bot'), url);
+                } else {
+                    getAI("I just uploaded a file: " + fileName + " (" + url + ")", (reply) => addMsg(reply, 'bot'));
+                }
+            } else {
+                addMsg("Upload failed. Please try again.", 'bot');
+            }
+        })
+        .catch(() => addMsg("Upload error. Check connection.", 'bot'));
+    });
+}
+
+const PKGS={"standard":[{"name":"Starter","price":"$297","desc":"1-Page High-Fidelity Website \u00b7 Full Brand Setup (Logo, Domain, Favicon) \u00b7 Social Media Integration (FB/IG Covers) \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Growth","price":"$597","desc":"Manage 1 Brand Page (Full Social Setup) \u00b7 Full Branding & App/Web Architecture \u00b7 Content Creation & Copywriting \u00b7 Advanced SEO & Analytics \u00b7 1 Month Free Maintenance"},{"name":"Trusted","price":"$1,200","desc":"Full Business Automation \u00b7 10-15 Pages of High-Fidelity Content \u00b7 Premium Brand Scaling & PR Logic \u00b7 24/7 Priority Tech Support \u00b7 1 Month Free Maintenance"},{"name":"Custom","price":"Bespoke","desc":"Tailored Digital Architecture \u00b7 Custom API & Tool Integration \u00b7 Unique Brand Identity Design \u00b7 Scalable Infrastructure Logic \u00b7 Priority Support"}],"ecommerce":[{"name":"E-Starter","price":"$497 + $197/mo","desc":"1-Page Online Shop \u00b7 Full Store Branding & Domain \u00b7 Integrated Social Shop Setup \u00b7 Payment Gateway Integration \u00b7 1 Month Free Maintenance"},{"name":"E-Growth","price":"$1,497 + $197/mo","desc":"2-5 Page Store Architecture \u00b7 Full Shop Logic (10+ Products) \u00b7 Deep Copywriting & Product SEO \u00b7 Automated Fulfillment Sync \u00b7 1 Month Free Maintenance"},{"name":"E-Trusted","price":"$2,500 + $197/mo","desc":"Elite Store (50+ Products) \u00b7 15+ Page Network Architecture \u00b7 Advanced Inventory & CRM Automation \u00b7 On-Chain Inventory Logic \u00b7 1 Month Free Maintenance"},{"name":"E-Commerce Maintenance","price":"$199.99/mo","desc":"E-Commerce Store Uptime & Security Monitoring \u00b7 Monthly Product & Content Updates \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"ai":[{"name":"AI Tier 1","price":"$1,500 + $150/mo","desc":"High-Fidelity Website Design \u00b7 AI Chatbot on Website \u00b7 Contact Form & Lead Notifications \u00b7 [Add-on] Voice/Audio Intelligence +$500 setup +$50/mo"},{"name":"AI Tier 2","price":"$3,500 + $400/mo","desc":"Everything in Tier 1 \u00b7 WhatsApp AI Automation (24/7) \u00b7 Automatic Lead Qualification & Routing \u00b7 [Add-on] Voice/Audio Intelligence +$500 setup +$50/mo"},{"name":"AI Tier 3","price":"$6,000 + $700/mo","desc":"Tier 1 & 2 Fully Included \u00b7 Email Inbox AI Automation (24/7) \u00b7 AI Reads, Responds & Qualifies Every Email \u00b7 Automated Follow-Up Sequences"},{"name":"AI Tier 4","price":"$8,000 + $900/mo","desc":"Tiers 1, 2 & 3 Fully Included \u00b7 AI Voice Agent \u2014 trained on your business \u00b7 Answers inbound calls 24/7 \u00b7 Qualifies callers & routes hot leads"}],"continuity":[{"name":"Maintenance","price":"$97/mo","desc":"Daily Uptime & Security Monitoring \u00b7 Monthly Content Optimization \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"templates":[{"name":"Template Site","price":"$149.99 + $19.99/mo","desc":"Custom branded to your business \u00b7 Live on your domain in 24 hours \u00b7 SSL, mobile-ready, SEO basics included \u00b7 1 complimentary revision round"},{"name":"+ Copywriting Add-On","price":"$49.99 + $4.99/update","desc":"We write your headline, bio & service copy \u00b7 Based on a short intake form you fill in \u00b7 $4.99 flat per edit after go-live"},{"name":"+ AI Chatbot Add-On","price":"$349.99 + $49.99/mo","desc":"24/7 AI \u2014 answers your business FAQs \u00b7 Preloaded with hours, location, services \u00b7 Works with new or existing sites"},{"name":"Micro Store","price":"$249.99 + $34.99/mo","desc":"Product grid \u2014 up to 12 products \u00b7 WhatsApp order button per product \u00b7 WhatsApp-driven orders with zero fees \u00b7 Everything in Standard Site included"},{"name":"Agency & Artist (Premium 3D)","price":"$299.99 + $19.99/mo","desc":"High-end cinematic 3D scroll experience \u00b7 Aeon \u00b7 Nexus \u00b7 Stellar \u00b7 Live on your domain in 24\u201348 hours"}]};
 
 const STEPS = {
     "request_audit": {
