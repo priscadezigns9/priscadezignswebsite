@@ -37,12 +37,13 @@
         <div class="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-200">
             <div class="text-center mb-8">
                 <img src="/assets/logo.png" class="h-16 mx-auto mb-4" alt="PD Logo">
-                <h1 class="text-2xl font-bold text-slate-800">Strategic Command</h1>
-                <p class="text-slate-500 text-sm mt-2">Sign in with your Prisca Dezigns account</p>
+                <h1 id="auth-heading" class="text-2xl font-bold text-slate-800">Strategic Command</h1>
+                <p id="auth-status" class="text-slate-500 text-sm mt-2">Sign in with your Prisca Dezigns account</p>
             </div>
             <input type="email" id="auth-email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-3 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-slate-900" placeholder="you@priscadezigns.org" autocomplete="username">
             <input type="password" id="auth-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-slate-900" placeholder="Password" autocomplete="current-password" onkeypress="if(event.key === 'Enter') checkAuth()">
-            <button onclick="checkAuth()" class="w-full bg-slate-900 text-white rounded-xl py-3 font-bold hover:bg-slate-800 transition-all">Sign In</button>
+            <button id="auth-primary-btn" onclick="checkAuth()" class="w-full bg-slate-900 text-white rounded-xl py-3 font-bold hover:bg-slate-800 transition-all">Sign In</button>
+            <button id="auth-toggle-btn" onclick="toggleAuthMode()" class="w-full mt-4 text-slate-400 text-sm font-medium hover:text-slate-700 transition-all">Don't have an account? <span class="text-purple-600 font-bold">Sign up</span></button>
             <div id="auth-error" class="text-red-500 text-xs text-center mt-3 hidden">Sign-in failed. Check your email and password.</div>
             <div class="mt-8 text-[9px] text-slate-400 uppercase tracking-[0.3em] text-center">Prisca Dezigns AI Infrastructure</div>
         </div>
@@ -174,12 +175,33 @@
     </div>
 
     <script>
+        let authMode = 'login';
         const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
         let currentView = 'ledger';
         let allLeads = [], outreachLeads = [], organicLeads = [], chatLeads = [], voiceLogs = [], financeLogs = [];
         let chartInstance = null;
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'signup' : 'login';
+            const heading = document.getElementById('auth-heading');
+            const status = document.getElementById('auth-status');
+            const primaryBtn = document.getElementById('auth-primary-btn');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+            status.style.color = '';
+            if (authMode === 'signup') {
+                heading.innerText = 'Create Your Account';
+                status.innerText = 'Sign up for Strategic Command access.';
+                primaryBtn.innerText = 'Sign Up';
+                toggleBtn.innerHTML = 'Already have an account? <span class="text-purple-600 font-bold">Sign in</span>';
+            } else {
+                heading.innerText = 'Strategic Command';
+                status.innerText = 'Sign in with your Prisca Dezigns account';
+                primaryBtn.innerText = 'Sign In';
+                toggleBtn.innerHTML = "Don't have an account? <span class=\"text-purple-600 font-bold\">Sign up</span>";
+            }
+        }
 
         async function checkAuth() {
+            if (authMode === 'signup') return doSignUp();
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-input').value;
             const errEl = document.getElementById('auth-error');
@@ -196,6 +218,46 @@
             const controls = document.getElementById('management-controls');
             if(controls) controls.classList.remove('hidden');
             fetchData();
+        }
+
+        async function doSignUp() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-input').value;
+            const status = document.getElementById('auth-status');
+
+            if (!email || password.length < 6) {
+                status.innerText = 'Enter a valid email and a password (6+ characters).';
+                status.style.color = '#ef4444';
+                return;
+            }
+
+            const { data, error } = await sb.auth.signUp({ email, password });
+            if (error) {
+                status.innerText = error.message || 'Sign-up failed. Try again.';
+                status.style.color = '#ef4444';
+                return;
+            }
+
+            // New accounts get a plain 'client' role automatically via a database
+            // trigger -- they will NOT see any admin-only data here (RLS enforces
+            // that regardless of how the account was created), so this just lands
+            // them on an empty dashboard rather than granting real access.
+            if (data.session) {
+                localStorage.setItem('pd_remembered_email', email);
+                status.innerText = 'Account created. Welcome!';
+                status.style.color = '#10b981';
+                setTimeout(() => {
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                    const controls = document.getElementById('management-controls');
+                    if(controls) controls.classList.remove('hidden');
+                    fetchData();
+                }, 800);
+            } else {
+                status.innerText = 'Account created — check your email to confirm before signing in.';
+                status.style.color = '#10b981';
+                toggleAuthMode();
+            }
         }
 
         window.addEventListener('load', async () => {
