@@ -426,6 +426,7 @@ let recInterval;
 let recSeconds = 0;
 let recognition;
 let currentTranscript = "";
+let isRecordingActive = false;
 
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -446,6 +447,7 @@ window.toggleMic = function() {
 
 function startAudioRecord() {
     currentTranscript = "";
+    isRecordingActive = true;
     if (recognition) {
         recognition.onresult = (event) => {
             let final = "";
@@ -454,7 +456,22 @@ function startAudioRecord() {
             }
             currentTranscript += final;
         };
-        recognition.start();
+        // Mobile Chrome stops listening after a few seconds of silence even
+        // with continuous=true -- unlike desktop. If it ends on its own while
+        // the user is still recording, just restart it so it keeps capturing
+        // for the full duration of the recording.
+        recognition.onend = () => {
+            if (isRecordingActive) {
+                try { recognition.start(); } catch (e) { /* already running */ }
+            }
+        };
+        recognition.onerror = (e) => {
+            // 'no-speech' and 'aborted' are routine (esp. on mobile) and are
+            // always followed by onend, which will restart it -- don't treat
+            // these as fatal. Other errors just get logged, not thrown.
+            console.log('Speech recognition:', e.error);
+        };
+        try { recognition.start(); } catch (e) { /* ignore if already started */ }
     }
 
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -485,6 +502,7 @@ function startAudioRecord() {
 }
 
 function stopAudioRecord() {
+    isRecordingActive = false;
     document.getElementById('chat-mic').classList.remove('recording');
     document.getElementById('chat-timer').classList.remove('vis');
     clearInterval(recInterval);
