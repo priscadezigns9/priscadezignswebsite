@@ -407,12 +407,25 @@ function startAudioRecord() {
 }
 
 function stopAudioRecord() {
-    if (recognition) recognition.stop();
-    if (mediaRecorder) {
-        mediaRecorder.stop();
-        document.getElementById('chat-mic').classList.remove('recording');
-        document.getElementById('chat-timer').classList.remove('vis');
-        clearInterval(recInterval);
+    document.getElementById('chat-mic').classList.remove('recording');
+    document.getElementById('chat-timer').classList.remove('vis');
+    clearInterval(recInterval);
+
+    const finishRecording = () => {
+        clearTimeout(recStopSafety);
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    };
+
+    if (recognition) {
+        // Wait for recognition to fully finish (including any final result still
+        // in flight) before stopping the recorder and triggering the upload —
+        // otherwise the transcript can still be empty at the moment it's checked.
+        recognition.onend = finishRecording;
+        recognition.stop();
+        // Safety net in case onend never fires (e.g. permission hiccup).
+        var recStopSafety = setTimeout(finishRecording, 1200);
+    } else {
+        finishRecording();
     }
 }
 
