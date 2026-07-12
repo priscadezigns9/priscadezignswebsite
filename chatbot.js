@@ -176,7 +176,7 @@
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
             </button>
             <button id="chat-mic" class="chat-tool-btn" onclick="toggleMic()" title="Voice Note">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
             </button>
             <span id="chat-timer">00:00</span>
             <button id="chat-snd" class="chat-tool-btn" onclick="chatSend()">
@@ -244,7 +244,6 @@ const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
 const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nWhen a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $150/mo), Tier 2 ($3,500 + $400/mo), Tier 3 ($6,000 + $700/mo), Tier 4 ($8,000 + $900/mo)\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
 
 let history = [];
-let clientName = null;
 
 function getAI(txt, cb, imageUrl) {
     let userContent = txt;
@@ -403,11 +402,18 @@ window.handleChatFile = function(files) {
     }
 };
 
+// Auto-generated per-session identifier so every visitor still gets their own
+// folder without being interrupted by a popup. If they later tell the bot
+// their name in conversation, we swap it in for future uploads this session.
+let clientName = 'Visitor-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+function maybeCaptureName(text) {
+    const m = text.match(/\bmy name is ([a-zA-Z][a-zA-Z '.-]{1,40})/i) || text.match(/\bi'?m ([a-zA-Z][a-zA-Z '.-]{1,40})\b/i);
+    if (m && m[1]) {
+        const cleaned = m[1].trim().replace(/[^a-zA-Z0-9 _-]/g, '').slice(0, 60);
+        if (cleaned) clientName = cleaned;
+    }
+}
 function ensureClientName(cb) {
-    if (clientName) { cb(clientName); return; }
-    let name = window.prompt("Quick thing before I save that — what's your name or business name? (So we can file it under your account.)");
-    if (!name || !name.trim()) name = 'Guest_' + Date.now();
-    clientName = name.trim().replace(/[^a-zA-Z0-9 _-]/g, '').slice(0, 60) || ('Guest_' + Date.now());
     cb(clientName);
 }
 
@@ -725,6 +731,7 @@ window.chatSend = function(){
     const i = document.getElementById('chat-inp');
     const t = i.value.trim(); if(!t) return;
     i.value = ''; addMsg(t, 'usr');
+    maybeCaptureName(t);
     
     const m = document.getElementById('chat-msgs');
     const td = document.createElement('div');
