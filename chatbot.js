@@ -73,6 +73,19 @@
     .cmsg a { color: inherit; text-decoration: underline; font-weight: 700; }
     .cmsg img { max-width: 100%; border-radius: 12px; margin-top: 8px; cursor: pointer; }
     .chat-audio-msg { display: flex; align-items: center; gap: 10px; }
+    .voice-player { display: flex; align-items: center; gap: 10px; min-width: 190px; }
+    .vp-btn { width: 30px; height: 30px; border-radius: 50%; border: none; flex-shrink: 0; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+    .vp-btn:active { transform: scale(0.9); }
+    .cmsg.usr .vp-btn { background: rgba(255,255,255,0.22); color: #fff; }
+    .cmsg.bot .vp-btn { background: var(--cb-purple); color: #fff; }
+    .vp-track { flex: 1; height: 3px; border-radius: 3px; cursor: pointer; position: relative; }
+    .cmsg.usr .vp-track { background: rgba(255,255,255,0.28); }
+    .cmsg.bot .vp-track { background: rgba(157, 80, 187, 0.18); }
+    .vp-fill { height: 100%; border-radius: 3px; width: 0%; pointer-events: none; }
+    .cmsg.usr .vp-fill { background: #fff; }
+    .cmsg.bot .vp-fill { background: var(--cb-purple); }
+    .vp-time { font-size: 0.7rem; font-weight: 600; opacity: 0.75; flex-shrink: 0; min-width: 32px; font-variant-numeric: tabular-nums; }
     
     /* Typing dots */
     .cmsg.typing { background:#f3f4f6; align-self:flex-start; border-radius:24px 24px 24px 4px; padding:18px 24px; }
@@ -251,7 +264,47 @@ const WA="https://wa.me/18683424101";
 const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
 const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
 
-const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nWhen a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is an enterprise AI and digital transformation partner based in Trinidad & Tobago, founded by Priscilla Narine. The agency combines high-fidelity websites, AI automation (chatbots, WhatsApp automation, email automation, voice agents, lead qualification and routing), and brand architecture — helping businesses modernize how they operate, not just how they look online. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $300/mo, 500 conversations/mo included, $0.65/conversation overage), Tier 2 ($3,500 + $500/mo, 1,500 conversations/mo included, $0.65/conversation overage), Tier 3 ($6,000 + $700/mo, 3,000 conversations/mo included, $0.65/conversation overage), Tier 4 ($8,000 + $900/mo, unlimited conversations, annual audit required). Note: AI Consultancy prices are subject to change upon audit.\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nWhen a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is an enterprise AI and digital transformation partner based in Trinidad & Tobago, founded by Priscilla Narine. The agency combines high-fidelity websites, AI automation (chatbots, WhatsApp automation, email automation, voice agents, lead qualification and routing), and brand architecture — helping businesses modernize how they operate, not just how they look online. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nBRAND IDENTITY:\nPrisca Dezigns' primary brand color is a rich purple (#7c3aed), paired with a warm ivory/cream background (#FFFFF0). If asked about the brand's colors, favorite color, or visual identity, answer directly and confidently using this — purple is the signature color across the website, logo, and all client-facing materials.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $300/mo, 500 conversations/mo included, $0.65/conversation overage), Tier 2 ($3,500 + $500/mo, 1,500 conversations/mo included, $0.65/conversation overage), Tier 3 ($6,000 + $700/mo, 3,000 conversations/mo included, $0.65/conversation overage), Tier 4 ($8,000 + $900/mo, unlimited conversations, annual audit required). Note: AI Consultancy prices are subject to change upon audit.\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
+
+let vpCounter = 0;
+const VP_PLAY = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
+const VP_PAUSE = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+
+function voicePlayerHtml(url) {
+    const id = 'vp' + (vpCounter++);
+    setTimeout(() => initVoicePlayer(id, url), 0);
+    return `<div class="voice-player" id="${id}">
+        <button class="vp-btn" data-play>${VP_PLAY}</button>
+        <div class="vp-track" data-track><div class="vp-fill" data-fill></div></div>
+        <span class="vp-time" data-time>0:00</span>
+    </div>`;
+}
+
+function initVoicePlayer(id, url) {
+    const root = document.getElementById(id);
+    if (!root) return;
+    const audio = new Audio(url);
+    const btn = root.querySelector('[data-play]');
+    const track = root.querySelector('[data-track]');
+    const fill = root.querySelector('[data-fill]');
+    const timeEl = root.querySelector('[data-time]');
+    const fmt = s => { s = Math.floor(s || 0); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+
+    btn.onclick = () => { audio.paused ? audio.play() : audio.pause(); };
+    audio.onplay = () => { btn.innerHTML = VP_PAUSE; };
+    audio.onpause = () => { btn.innerHTML = VP_PLAY; };
+    audio.onended = () => { btn.innerHTML = VP_PLAY; fill.style.width = '0%'; timeEl.textContent = fmt(audio.duration); };
+    audio.onloadedmetadata = () => { timeEl.textContent = fmt(audio.duration); };
+    audio.ontimeupdate = () => {
+        if (audio.duration) fill.style.width = ((audio.currentTime / audio.duration) * 100) + '%';
+        timeEl.textContent = fmt(audio.currentTime);
+    };
+    track.onclick = (e) => {
+        if (!audio.duration) return;
+        const rect = track.getBoundingClientRect();
+        audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    };
+}
 
 let history = [];
 
@@ -472,7 +525,7 @@ function uploadToVault(file, fileName, type) {
                 const isImage = file.type && file.type.startsWith('image/');
 
                 if (type === 'audio') {
-                    addMsg(`<div class="chat-audio-msg">🎤 Voice Note: <audio controls src="${url}"></audio></div>`, 'usr');
+                    addMsg(`<div class="chat-audio-msg">${voicePlayerHtml(url)}</div>`, 'usr');
                 } else if (isImage) {
                     addMsg(`<img src="${url}" onclick="window.open('${url}')" />`, 'usr');
                 } else {
