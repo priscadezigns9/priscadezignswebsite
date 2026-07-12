@@ -42,20 +42,17 @@ God Mode is a universal administrative layer for the platform. It provides real-
 - Fetching the full file from GitHub and re-editing it risks restoring previously removed content.
 - Pattern: READ local → EDIT local → GET sha only from GitHub → PUT with local b64 content.
 
-## Chatbot Sync Rule (CRITICAL — 2026-07-06)
-**ALL chatbots across priscadezigns.org must always reflect the same STEPS and flows.**
-- **Pricing in chatbots is ALLOWED.** Package cards can show name, description, and pricing. Client template chatbots follow the client's preference.
-- The master chatbot logic lives in `/chatbot.js` (root) — this is the single source of truth for the main site.
-- The template shop chatbot lives in `/templates/chatbot.js` — separate scope, do not cross-contaminate.
-- Any page with an **inline chatbot script** (like services/index.html) must be converted to load `/chatbot.js` externally.
-- When any chatbot change is made (new flows, removed features), check ALL of the following:
-  1. `/index.html` (inline STEPS — check if it still has any; convert to external if so)
-  2. `/chatbot.js` (root shared)
-  3. `/services/index.html` (external — auto-synced via `/chatbot.js`)
-  4. Any other page with an inline chatbot found via: `grep -rn "const STEPS"`
-- **Known pages with inline chatbots:** `index.html` (main site)
-- **Known external chatbot pages:** `services/index.html` → loads `/chatbot.js`
-- **Template shop chatbot:** `/templates/chatbot.js` — managed separately
+## Chatbot Sync Rule (CRITICAL — 2026-07-11)
+**SIERRA is ONE.** All pages across priscadezigns.org (Main site, Services, Template Shop) must use the same master `chatbot.js` architecture.
+- **Unified Branding**: Strictly use the Deep Purple (`#301934`) and Lilac (`#C8A2C8`) design system.
+- **Single Source of Truth**: The master script lives at `/chatbot.js` (root). The file at `/templates/chatbot.js` is now a direct mirror of the root script.
+- **Unified Logic**: Both the general inquiry flow and the template shopping flow are managed within this single script.
+- **Version Control**: When any design or logic change is made, increment the version tag on all pages (e.g., `chatbot.js?v=2.3`).
+- **Pages to Sync**:
+  1. `/index.html`
+  2. `/services/index.html`
+  3. `/templates/index.html`
+- **Mandate**: Never create a separate chatbot file for a sub-brand or shop. Integration is the only path.
 
 ## Visual-First Build Protocol (2026-07-10)
 When the user provides a screenshot, image, or URL as a design reference:
