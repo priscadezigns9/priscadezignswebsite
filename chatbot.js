@@ -241,7 +241,7 @@ const WA="https://wa.me/18683424101";
 const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
 const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
 
-const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nWhen a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is a full-service digital agency specialising in high-fidelity websites, AI automation, and brand architecture. Founded in Trinidad & Tobago by Priscilla Narine. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $150/mo), Tier 2 ($3,500 + $400/mo), Tier 3 ($6,000 + $700/mo), Tier 4 ($8,000 + $900/mo)\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nWhen a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is an enterprise AI and digital transformation partner based in Trinidad & Tobago, founded by Priscilla Narine. The agency combines high-fidelity websites, AI automation (chatbots, WhatsApp automation, email automation, voice agents, lead qualification and routing), and brand architecture — helping businesses modernize how they operate, not just how they look online. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $150/mo), Tier 2 ($3,500 + $400/mo), Tier 3 ($6,000 + $700/mo), Tier 4 ($8,000 + $900/mo)\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic partner dealership selling high-performance Chinese EVs in the Caribbean.\nInventory & Pricing:\n- BYD Atto 3: Starting at $285,000 TTD\n- BYD Dolphin: Starting at $195,000 TTD\n- GAC AION Y Plus: Starting at $245,000 TTD\n- Leapmotor C11: Starting at $310,000 TTD\n- Leapmotor T03: Starting at $145,000 TTD\nSafety: All brands use advanced blade battery tech or modular safety cells. Average battery degradation is only 2.3%/year.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
 
 let history = [];
 
@@ -320,6 +320,16 @@ function speak(txt){
 window.toggleEmojis = function() {
     document.getElementById('emoji-picker').classList.toggle('open');
 };
+
+// Close the emoji picker on outside click — otherwise it sits on top of the
+// send button and silently swallows clicks meant for Send.
+document.addEventListener('click', function(e) {
+    const ep = document.getElementById('emoji-picker');
+    if (!ep || !ep.classList.contains('open')) return;
+    const toggleBtn = document.querySelector('[onclick="toggleEmojis()"]');
+    if (ep.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target))) return;
+    ep.classList.remove('open');
+});
 
 // --- High-Fidelity Voice Recording & Attachment Handlers ---
 let mediaRecorder;
@@ -503,7 +513,7 @@ const STEPS = {
         ]
     },
     "about": {
-        "bot": "Prisca Dezigns is a high-fidelity digital agency specializing in premium web architecture and AI automation. We're on a mission to build the future of the Caribbean.",
+        "bot": "Prisca Dezigns is an enterprise AI and digital transformation partner — we build high-fidelity web architecture, AI automation systems, and brand infrastructure for businesses ready to scale. Based in Trinidad & Tobago, working across the Caribbean.",
         "r": [
             { "l": "Evolve Mobility", "s": "about_brands", "i": "car" },
             { "l": "The Way Made Known", "s": "about_twmk", "i": "heart" },
@@ -525,7 +535,7 @@ const STEPS = {
         ]
     },
     "about_founder": {
-        "bot": "Prisca Dezigns was founded in Trinidad & Tobago by Priscilla Narine. With a focus on high-fidelity results and precision data management, she leads a team that integrates AI into professional workflows seamlessly.",
+        "bot": "Prisca Dezigns was founded in Trinidad & Tobago by Priscilla Narine. The agency operates as an enterprise AI and digital transformation partner — combining high-fidelity web architecture with AI automation (chatbots, WhatsApp automation, voice agents, lead qualification) to help businesses modernize how they operate, not just how they look online.",
         "r": [
             { "l": "Back", "s": "about", "i": "arrow-left" }
         ]
@@ -537,6 +547,14 @@ const STEPS = {
             { "l": "I need a full custom build", "s": "pkg_standard", "i": "code" },
             { "l": "Mine isn't converting", "s": "bad_website", "i": "trending-down" },
             { "l": "Show me templates instead", "s": "pkg_templates", "i": "color-swatch" }
+        ]
+    },
+    "bad_website": {
+        "bot": "That's usually a sign of weak conversion design, slow load times, or missed follow-up on leads — all fixable. Want us to run a quick audit, or look at AI automation to catch the leads you're currently losing?",
+        "r": [
+            { "l": "Run an audit", "s": "request_audit", "i": "clipboard-check" },
+            { "l": "Show me AI automation", "s": "automation", "i": "cpu" },
+            { "l": "Back", "s": "need_website", "i": "arrow-left" }
         ]
     },
     "pkg_menu": {
@@ -732,6 +750,8 @@ window.chatSend = function(){
     const t = i.value.trim(); if(!t) return;
     i.value = ''; addMsg(t, 'usr');
     maybeCaptureName(t);
+    const ep = document.getElementById('emoji-picker');
+    if (ep) ep.classList.remove('open');
     
     const m = document.getElementById('chat-msgs');
     const td = document.createElement('div');
