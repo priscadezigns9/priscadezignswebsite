@@ -551,15 +551,17 @@ function uploadToVault(file, fileName, type) {
 
                 if (type === 'audio') {
                     if (currentTranscript && currentTranscript.trim()) {
-                        getAI("I just uploaded a voice note. Transcript: \"" + currentTranscript.trim() + "\"", (reply) => addMsg(reply, 'bot'));
+                        getAI("I just uploaded a voice note. Transcript: \"" + currentTranscript.trim() + "\"", (reply) => { addMsg(reply, 'bot'); speak(reply); });
                     } else {
-                        addMsg("Got your voice note saved — but I couldn't capture a live transcript that time (this browser may not support speech-to-text). Mind typing your question instead?", 'bot');
+                        const noTranscriptMsg = "Got your voice note saved — but I couldn't capture a live transcript that time (this browser may not support speech-to-text). Mind typing your question instead?";
+                        addMsg(noTranscriptMsg, 'bot');
+                        speak(noTranscriptMsg);
                     }
                 } else if (isImage) {
                     // Real multimodal call — the image is sent as actual image content, not just a URL string.
-                    getAI("The user uploaded this image. Take a look and respond to what's actually in it.", (reply) => addMsg(reply, 'bot'), url);
+                    getAI("The user uploaded this image. Take a look and respond to what's actually in it.", (reply) => { addMsg(reply, 'bot'); speak(reply); }, url);
                 } else {
-                    getAI("I just uploaded a file: " + fileName + " (" + url + ")", (reply) => addMsg(reply, 'bot'));
+                    getAI("I just uploaded a file: " + fileName + " (" + url + ")", (reply) => { addMsg(reply, 'bot'); speak(reply); });
                 }
             } else {
                 addMsg("Upload failed. Please try again.", 'bot');
