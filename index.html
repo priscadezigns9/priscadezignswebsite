@@ -1018,9 +1018,21 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
 dirLight.position.set(5, 5, 5);
 scene.add(dirLight);
 const globeGeo = new THREE.SphereGeometry(2.8, 64, 64);
-const globeMat = new THREE.MeshPhongMaterial({ color: 0xC8A2C8, wireframe: false, transparent: true, opacity: 0.8 });
+const globeMat = new THREE.MeshStandardMaterial({ color: 0xC8A2C8, metalness: 0.1, roughness: 0.5, transparent: true, opacity: 0.7, wireframe: true });
 const globe = new THREE.Mesh(globeGeo, globeMat);
 scene.add(globe);
+
+const pointsGeo = new THREE.BufferGeometry();
+const pointsCount = 1000;
+const posArray = new Float32Array(pointsCount * 3);
+for(let i=0; i < pointsCount * 3; i++) {
+    posArray[i] = (Math.random() - 0.5) * 10;
+}
+pointsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+const pointsMat = new THREE.PointsMaterial({ size: 0.005, color: 0x7c3aed });
+const starField = new THREE.Points(pointsGeo, pointsMat);
+scene.add(starField);
+
 camera.position.z = 6.5;
 const brands = [
 { name: "YOUR LEADS ARE LEAKING", sector: "PRISCA DEZIGNS", logo: "", desc: "Every unanswered message is revenue walking out the door. We build the system that closes for you — automatically.", type: "cta-services" },
@@ -1231,7 +1243,37 @@ rotateSlices(wheelAccumulator > 0 ? 'next' : 'prev');
 wheelAccumulator = 0;
 }
 }, { passive: true });
-function animate() { requestAnimationFrame(animate); globe.rotation.y += 0.0015; renderer.render(scene, camera); }
+
+let mouseX = 0, mouseY = 0;
+let targetX = 0, targetY = 0;
+const windowHalfX = window.innerWidth / 2;
+const windowHalfY = window.innerHeight / 2;
+
+document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX - windowHalfX);
+    mouseY = (e.clientY - windowHalfY);
+});
+
+function animate() { 
+    requestAnimationFrame(animate); 
+    
+    // Dynamic Rotation
+    targetX = mouseX * 0.0002;
+    targetY = mouseY * 0.0002;
+    
+    // Auto-rotation + Interaction
+    if (!isAnimating) {
+        globe.rotation.y += 0.0015 + (targetX * 0.1);
+        globe.rotation.x += (targetY - globe.rotation.x) * 0.05;
+    }
+    
+    // Subtle Pulse
+    const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.01;
+    globe.scale.set(pulse, pulse, pulse);
+
+    renderer.render(scene, camera); 
+}
+
 animate();
 window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 // Mobile Menu Logic
