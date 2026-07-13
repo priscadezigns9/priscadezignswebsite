@@ -44,8 +44,22 @@
             <input type="password" id="auth-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-slate-900" placeholder="Password" autocomplete="current-password" onkeypress="if(event.key === 'Enter') checkAuth()">
             <button id="auth-primary-btn" onclick="checkAuth()" class="w-full bg-slate-900 text-white rounded-xl py-3 font-bold hover:bg-slate-800 transition-all">Sign In</button>
             <button id="auth-toggle-btn" onclick="toggleAuthMode()" class="w-full mt-4 text-slate-400 text-sm font-medium hover:text-slate-700 transition-all">Don't have an account? <span class="text-purple-600 font-bold">Sign up</span></button>
+            <button onclick="sendResetEmail()" class="w-full mt-2 text-slate-400 text-xs font-medium hover:text-slate-700 transition-all">Forgot your password?</button>
             <div id="auth-error" class="text-red-500 text-xs text-center mt-3 hidden">Sign-in failed. Check your email and password.</div>
             <div class="mt-8 text-[9px] text-slate-400 uppercase tracking-[0.3em] text-center">Prisca Dezigns AI Infrastructure</div>
+        </div>
+    </div>
+
+    <div id="recovery-screen" class="fixed inset-0 z-[999] auth-glass flex items-center justify-center p-6 hidden">
+        <div class="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl border border-slate-200">
+            <div class="text-center mb-8">
+                <img src="/assets/logo.png" class="h-16 mx-auto mb-4" alt="PD Logo">
+                <h1 class="text-2xl font-bold text-slate-800">Set a New Password</h1>
+                <p id="recovery-status" class="text-slate-500 text-sm mt-2">Choose a new password for your account.</p>
+            </div>
+            <input type="password" id="recovery-pw1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-3 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-slate-900" placeholder="New password" autocomplete="new-password">
+            <input type="password" id="recovery-pw2" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-purple-500 transition-all text-slate-900" placeholder="Confirm new password" autocomplete="new-password" onkeypress="if(event.key === 'Enter') submitNewPassword()">
+            <button onclick="submitNewPassword()" class="w-full bg-slate-900 text-white rounded-xl py-3 font-bold hover:bg-slate-800 transition-all">Save New Password</button>
         </div>
     </div>
 
@@ -258,6 +272,64 @@
                 status.style.color = '#10b981';
                 toggleAuthMode();
             }
+        }
+
+        // If this page was opened from a password-reset email link, Supabase
+        // fires a PASSWORD_RECOVERY event -- show the "set new password" form
+        // instead of the normal login screen.
+        sb.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-content').classList.add('hidden');
+                document.getElementById('recovery-screen').classList.remove('hidden');
+            }
+        });
+
+        async function sendResetEmail() {
+            const email = document.getElementById('auth-email').value.trim();
+            const errEl = document.getElementById('auth-error');
+            if (!email) {
+                errEl.textContent = 'Enter your email above first, then click "Forgot your password?"';
+                errEl.classList.remove('hidden');
+                return;
+            }
+            const { error } = await sb.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/aiportal/'
+            });
+            errEl.classList.remove('hidden');
+            errEl.style.color = error ? '#ef4444' : '#10b981';
+            errEl.textContent = error ? (error.message || 'Could not send reset email.') : 'Check your email for a reset link.';
+        }
+
+        async function submitNewPassword() {
+            const pw1 = document.getElementById('recovery-pw1').value;
+            const pw2 = document.getElementById('recovery-pw2').value;
+            const statusEl = document.getElementById('recovery-status');
+            if (pw1.length < 6) {
+                statusEl.textContent = 'Password must be at least 6 characters.';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            if (pw1 !== pw2) {
+                statusEl.textContent = "Passwords don't match.";
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            const { error } = await sb.auth.updateUser({ password: pw1 });
+            if (error) {
+                statusEl.textContent = error.message || 'Could not update password.';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            statusEl.textContent = 'Password updated! Loading your dashboard...';
+            statusEl.style.color = '#10b981';
+            setTimeout(() => {
+                document.getElementById('recovery-screen').classList.add('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+                const controls = document.getElementById('management-controls');
+                if (controls) controls.classList.remove('hidden');
+                fetchData();
+            }, 1000);
         }
 
         window.addEventListener('load', async () => {

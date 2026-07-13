@@ -33,6 +33,17 @@
             <input type="password" id="auth-key" placeholder="Password" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" autocomplete="current-password" onkeypress="if(event.key === 'Enter') checkAuth()">
             <button id="auth-primary-btn" onclick="checkAuth()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">CONNECT</button>
             <button id="auth-toggle-btn" onclick="toggleAuthMode()" class="w-full mt-4 text-slate-400 text-sm font-medium hover:text-white transition-all">Don't have an account? <span class="text-[#a78bda] font-bold">Sign up</span></button>
+            <button onclick="sendResetEmail()" class="w-full mt-2 text-slate-500 text-xs font-medium hover:text-slate-300 transition-all">Forgot your password?</button>
+        </div>
+    </div>
+    <div id="recovery-screen" class="fixed inset-0 z-[999] glass flex items-center justify-center p-6 hidden">
+        <div class="max-w-md w-full bg-[#1E293B] rounded-[2.5rem] p-10 shadow-2xl border border-white/5 text-center">
+            <div class="w-20 h-20 bg-[#7D52B5] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-500/20"><i data-lucide="key-round" class="w-10 h-10 text-white"></i></div>
+            <h2 class="text-3xl font-extrabold text-white mb-2 italic">Set a New Password</h2>
+            <p id="recovery-status" class="text-slate-400 mb-8 font-medium">Choose a new password for your account.</p>
+            <input type="password" id="recovery-pw1" placeholder="New password" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-3 text-center font-bold text-white transition-all" autocomplete="new-password">
+            <input type="password" id="recovery-pw2" placeholder="Confirm new password" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold text-white transition-all" autocomplete="new-password" onkeypress="if(event.key === 'Enter') submitNewPassword()">
+            <button onclick="submitNewPassword()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">Save New Password</button>
         </div>
     </div>
     <aside class="w-72 bg-[#1E293B] border-r border-white/5 flex flex-col p-6 z-10">
@@ -178,6 +189,56 @@
                 status.style.color = '#10b981';
                 toggleAuthMode();
             }
+        }
+
+        sbClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('recovery-screen').classList.remove('hidden');
+            }
+        });
+
+        async function sendResetEmail() {
+            const email = document.getElementById('auth-email').value.trim();
+            const status = document.getElementById('auth-status');
+            if (!email) {
+                status.textContent = 'Enter your email above first, then click "Forgot your password?"';
+                status.style.color = '#ef4444';
+                return;
+            }
+            const { error } = await sbClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/clients/'
+            });
+            status.style.color = error ? '#ef4444' : '#10b981';
+            status.textContent = error ? (error.message || 'Could not send reset email.') : 'Check your email for a reset link.';
+        }
+
+        async function submitNewPassword() {
+            const pw1 = document.getElementById('recovery-pw1').value;
+            const pw2 = document.getElementById('recovery-pw2').value;
+            const statusEl = document.getElementById('recovery-status');
+            if (pw1.length < 6) {
+                statusEl.textContent = 'Password must be at least 6 characters.';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            if (pw1 !== pw2) {
+                statusEl.textContent = "Passwords don't match.";
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            const { error } = await sbClient.auth.updateUser({ password: pw1 });
+            if (error) {
+                statusEl.textContent = error.message || 'Could not update password.';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            statusEl.textContent = 'Password updated! Loading your dashboard...';
+            statusEl.style.color = '#10b981';
+            setTimeout(() => {
+                document.getElementById('recovery-screen').classList.add('hidden');
+                if (typeof fetchVault === 'function') fetchVault();
+            }, 1000);
         }
 
         (async () => {
