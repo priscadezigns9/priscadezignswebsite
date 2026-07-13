@@ -1018,7 +1018,7 @@ const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
 dirLight.position.set(5, 5, 5);
 scene.add(dirLight);
 const globeGeo = new THREE.SphereGeometry(2.8, 64, 64);
-const globeMat = new THREE.MeshStandardMaterial({ color: 0x301934, emissive: 0x7c3aed, emissiveIntensity: 0.5, metalness: 0.9, roughness: 0.1, transparent: true, opacity: 0.9, wireframe: true });
+const globeMat = new THREE.MeshStandardMaterial({ color: 0xC8A2C8, metalness: 0.1, roughness: 0.5, transparent: true, opacity: 0.7, wireframe: true });
 const globe = new THREE.Mesh(globeGeo, globeMat);
 scene.add(globe);
 
@@ -1032,37 +1032,6 @@ pointsGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 const pointsMat = new THREE.PointsMaterial({ size: 0.005, color: 0x7c3aed });
 const starField = new THREE.Points(pointsGeo, pointsMat);
 scene.add(starField);
-
-// ── NEURAL AI RING ──────────────────────────
-const ringGeo = new THREE.TorusGeometry(3.5, 0.02, 16, 100);
-const ringMat = new THREE.MeshStandardMaterial({ 
-    color: 0x7c3aed, 
-    emissive: 0x7c3aed, 
-    emissiveIntensity: 2, 
-    transparent: true, 
-    opacity: 0.6 
-});
-const ring = new THREE.Mesh(ringGeo, ringMat);
-ring.rotation.x = Math.PI / 2;
-scene.add(ring);
-
-// Second outer orbiting ring
-const ring2 = ring.clone();
-ring2.scale.set(1.2, 1.2, 1);
-ring2.rotation.y = Math.PI / 4;
-scene.add(ring2);
-
-// Add data nodes (small cubes) on the ring
-const nodeGeo = new THREE.BoxGeometry(0.08, 0.08, 0.08);
-const nodeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff });
-for(let i=0; i<8; i++) {
-    const node = new THREE.Mesh(nodeGeo, nodeMat);
-    const angle = (i / 8) * Math.PI * 2;
-    node.position.x = Math.cos(angle) * 3.5;
-    node.position.z = Math.sin(angle) * 3.5;
-    ring.add(node);
-}
-
 
 camera.position.z = 6.5;
 const brands = [
@@ -1301,17 +1270,6 @@ function animate() {
     // Subtle Pulse
     const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.01;
     globe.scale.set(pulse, pulse, pulse);
-
-    
-    // Ring Rotations
-    if(typeof ring !== 'undefined') {
-        ring.rotation.z += 0.005;
-        ring.rotation.x += Math.sin(Date.now() * 0.001) * 0.002;
-    }
-    if(typeof ring2 !== 'undefined') {
-        ring2.rotation.z -= 0.003;
-        ring2.rotation.y += Math.cos(Date.now() * 0.001) * 0.002;
-    }
 
     renderer.render(scene, camera); 
 }
