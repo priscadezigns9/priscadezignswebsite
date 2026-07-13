@@ -11,3 +11,6 @@
 - Dreaming Anime: Updated schedule for Anime Expo 2026, removed Funimation integration, fixed Gojo ASIN and Luffy shop image. Added legal pages (Privacy, Terms, Disclosure).
 - The Way Made Known: Pushed final v8 build with FAQ section, animation enhancements, and social link restoration.
 - Prime Land Network: Pushed legal page fixes.
+
+[2026-07-13]
+- Template Shop: Added template #41 "Nova" — full-screen color-shifting hero carousel (coral/green/pink/blue scenes, oversized display type, 650ms motion). Standard $149.99 website tier via addTemplate('Nova'). Categories: Creative & Agency, Artists, Personal Brand. New files: /templates/nova/index.html (self-contained, embedded images) and /template_previews/nova.webp. No existing templates, cards, prices, or scripts modified.
