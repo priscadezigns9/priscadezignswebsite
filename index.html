@@ -1221,236 +1221,59 @@
         dirLight.position.set(5, 5, 5);
         scene.add(dirLight);
 
-        const globeGeo = new THREE.SphereGeometry(2.8, 64, 64);
-        const globeMat = new THREE.MeshPhongMaterial({ color: 0xC8A2C8, wireframe: false, transparent: true, opacity: 0.8 });
-        const globe = new THREE.Mesh(globeGeo, globeMat);
-        scene.add(globe);
-        camera.position.z = 6.5;
+        
+    const globeGroup = new THREE.Group();
+    scene.add(globeGroup);
 
-        const brands = [
-            { name: "YOUR LEADS ARE LEAKING", sector: "PRISCA DEZIGNS", logo: "", desc: "Every unanswered message is revenue walking out the door. We build the system that closes for you — automatically.", type: "cta-services" },
+    const globeGeo = new THREE.SphereGeometry(2.8, 64, 64);
+    
+    // 1. Core Solid Sphere
+    const coreMat = new THREE.MeshPhongMaterial({
+        color: 0x301934,
+        emissive: 0x1a0a1a,
+        transparent: true,
+        opacity: 0.8,
+        shininess: 100
+    });
+    const core = new THREE.Mesh(globeGeo, coreMat);
+    globeGroup.add(core);
 
-            { name: "PACKAGES", sector: "SYSTEM HUB", logo: "", desc: "Explore our high-fidelity service tiers and brand packages.", type: "scroll" },
-            { name: "TEMPLATE SHOP", sector: "SYSTEM ENTRY", logo: "", desc: "Done-for-you website templates. Live in 24 hours.", url: "https://priscadezigns.org/templates/", type: "external" },
-            { name: "THE AUTODROME", sector: "BRAND", logo: "", desc: "Engineering-grade supercar culture and automotive performance.", url: "https://theautodrome.priscadezigns.org", type: "external" },
-            { name: "DREAMING ANIME", sector: "BRAND", logo: "", desc: "High-fidelity animation media and studio production news.", url: "https://dreaminganime.com", type: "external" },
-            { name: "SEAMRITE DESIGNS", sector: "BRAND", logo: "", desc: "High-fidelity fashion and apparel design studio.", url: "https://seamritedesigns.priscadezigns.org", type: "external" },
-            { name: "THE WAY MADE KNOWN", sector: "MISSION", logo: "", desc: "Analytical faith evidence and historical gospel proclamation.", url: "https://thewaymadeknown.com", type: "external" },
-            { name: "EVOLVE", sector: "PARTNER", logo: "", desc: "Caribbean-wide corporate mobility and fleet sales logistics.", url: "/evolve/", type: "external" },
-            { name: "PRIVACY", sector: "LEGAL", logo: "", desc: "Sovereign data protection and privacy policy protocols.", url: "https://priscadezigns.org/privacy.html", type: "external" },
-            { name: "THE BLOG", sector: "INTELLIGENCE", logo: "", desc: "Deep-dives into product news and digital agency evolution.", url: "blog.html", type: "external" }
-        ];
+    // 2. Glowing Wireframe Shell
+    const wireMat = new THREE.MeshBasicMaterial({
+        color: 0x7c3aed,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.15
+    });
+    const shell = new THREE.Mesh(new THREE.SphereGeometry(2.82, 40, 40), wireMat);
+    globeGroup.add(shell);
 
-        let currentIndex = 0;
-        let isAnimating = false;
-        const isMobile = /Mobi|Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0); 
-        const searchInput = document.getElementById('neural-search');
-        const searchResults = document.getElementById('search-results');
-        searchInput.oninput = (e) => {
-            const query = e.target.value.toLowerCase();
-            if (query.length < 1) { searchResults.style.display = 'none'; return; }
-            const matches = brands.filter(b => b.name.toLowerCase().includes(query) || b.sector.toLowerCase().includes(query));
-            if (matches.length > 0) {
-                searchResults.innerHTML = matches.map(m => {
-                    const idx = brands.indexOf(m);
-                    return `<div onclick="jumpTo(${idx}); document.getElementById('neural-search').value=''; document.getElementById('search-results').style.display='none';" 
-                                 style="padding: 15px 20px; font-size: 0.75rem; font-weight: 900; letter-spacing: 1px; color: #1a1a1a; cursor: pointer; border-bottom: 1px solid #f0f0f0; text-transform: uppercase;">
-                                 ${m.name}
-                            </div>`;
-                }).join('');
-                searchResults.style.display = 'flex';
-            } else { searchResults.style.display = 'none'; }
-        };
-        window.addEventListener('click', (e) => {
-            if (!document.getElementById('neural-search-container').contains(e.target)) { searchResults.style.display = 'none'; }
-        });
+    // 3. Neural Points (Stars on Surface)
+    const pointsGeo = new THREE.SphereGeometry(2.85, 48, 48);
+    const pointsMat = new THREE.PointsMaterial({
+        color: 0xC8A2C8,
+        size: 0.03,
+        transparent: true,
+        opacity: 0.6
+    });
+    const points = new THREE.Points(pointsGeo, pointsMat);
+    globeGroup.add(points);
 
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0x7c3aed, 2);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
 
+    camera.position.z = 6;
 
-        function rotateSlices(dir) {
-            if (isAnimating) return;
-            isAnimating = true;
-            const direction = dir === 'next' ? 1 : -1;
-            currentIndex = (currentIndex + direction + brands.length) % brands.length;
-            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * direction), duration: 0.8, ease: "power2.out", onComplete: () => { isAnimating = false; } });
-            setTimeout(() => { isAnimating = false; }, 1000);
-            updateUI(currentIndex);
-        }
+    function animate() {
+        requestAnimationFrame(animate);
+        globeGroup.rotation.y += 0.002;
+        shell.rotation.y -= 0.001; // Counter-rotation for depth
+        renderer.render(scene, camera);
+    }
 
-        function jumpTo(index) {
-            if (isAnimating || index === currentIndex) return;
-            const diff = index - currentIndex;
-            isAnimating = true; currentIndex = index;
-            gsap.to(globe.rotation, { y: globe.rotation.y + (Math.PI / 2.5 * diff), duration: 0.8, ease: "power2.out", onComplete: () => { isAnimating = false; } });
-            updateUI(currentIndex);
-        }
-
-        const dotsContainer = document.getElementById('scroll-indicator');
-        brands.forEach((brand, i) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'dot-wrapper' + (i === 0 ? ' active' : '');
-            wrapper.onclick = () => jumpTo(i);
-            const label = document.createElement('span'); label.className = 'dot-label'; label.innerText = brand.name;
-            const dot = document.createElement('div'); dot.className = 'dot';
-            wrapper.appendChild(label); wrapper.appendChild(dot);
-            dotsContainer.appendChild(wrapper);
-        });
-
-        function updateUI(index) {
-            const brand = brands[index];
-            gsap.to(".brand-visual-container", { opacity: 0, y: 30, duration: 0.3, onComplete: () => {
-                document.getElementById('current-brand').innerText = brand.name;
-                document.getElementById('current-sector').innerText = brand.sector;
-                document.getElementById('current-desc').innerText = brand.desc;
-                document.getElementById('current-price').innerText = brand.price || "";
-                const cta = document.getElementById('main-cta');
-                if (brand.type === "cta-services") {
-                    cta.innerText = "YOUR LEADS ARE LEAKING →";
-                    cta.style.background = "#E53935";
-                    cta.style.color = "#000000";
-                    cta.style.letterSpacing = "0.15em";
-                    cta.onclick = () => window.location.href = "services/";
-                } else if (brand.type === "scroll") {
-                    cta.style.background = "";
-                    cta.style.color = "";
-                    cta.style.letterSpacing = "";
-                    cta.innerText = "VIEW PACKAGES";
-                    cta.onclick = () => {
-                        document.body.classList.add('package-active');
-                        setTimeout(() => {
-                            document.getElementById('package-section').scrollIntoView({ behavior: "smooth", block: "start" });
-                        }, 10);
-                    };
-                } else {
-                    cta.style.background = "";
-                    cta.style.color = "";
-                    cta.style.letterSpacing = "";
-                    cta.innerText = "ENTER DOMAIN";
-                    cta.onclick = () => window.open(brand.url, '_blank');
-                }
-                const dots = document.querySelectorAll('.dot-wrapper');
-                dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-                gsap.to(".brand-visual-container", { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" });
-            }});
-        }
-
-        function openModal(pkgName) {
-            const pkgData = {
-                '1-DAY LAUNCH': { title: 'Activate 1-Day Launch', items: ['1-Day Development Cycle', '1-Page High-Fidelity Design', 'Mobile Responsive & SEO Ready', 'Social Media Link-in-Bio Setup', '24-Hour Go-Live Guarantee'] },
-                'STARTER PKG': { title: 'Activate Starter', items: ['1-Page High-Fidelity Website', 'Full Brand Setup (Logo, Domain, Favicon)', 'Social Media Integration', 'Technical SEO & SSL', '1 Month Free Maintenance'] },
-                'GROWTH PKG': { title: 'Activate Growth', items: ['Manage 1 Brand Page (Social Setup)', 'Full Branding & Architecture', 'Content Creation & Copywriting', 'Advanced SEO & Analytics', '1 Month Free Maintenance'] },
-                'TRUSTED PKG': { title: 'Trusted Package', items: ['Full Business Automation', '10-15 Pages of Content', 'Premium Brand Scaling & PR', '24/7 Priority Tech Support', '1 Month Free Maintenance'] },
-                'CUSTOM PKG': { title: 'Custom Inquiry', items: ['Tailored Digital Architecture', 'Custom API & Tool Integration', 'Unique Brand Identity Design', 'Scalable Infrastructure Logic', 'Priority Sovereign Support'] },
-                'E-STARTER PKG': { title: 'E-Starter Package', items: ['1-Page Online Shop', 'Full Store Branding & Domain', 'Integrated Social Shop Setup', 'Payment Gateway Integration', '1 Month Free Maintenance'] },
-                'E-GROWTH PKG': { title: 'Activate E-Growth', items: ['2-5 Page Store Architecture', 'Full Shop Logic (10+ Products)', 'Deep Copywriting & Product SEO', 'Automated Fulfillment Sync', '1 Month Free Maintenance'] },
-                'E-TRUSTED PKG': { title: 'Activate E-Trusted', items: ['Elite Store (50+ Products)', '15+ Page Network Architecture', 'Advanced Inventory Automation', 'On-Chain Inventory Logic', '1 Month Free Maintenance'] },
-                'MAINTENANCE PKG': { title: 'Activate Maintenance', items: ['Daily Uptime & Security Monitoring', 'Monthly Content Optimization', 'Technical Backups', 'Priority Sovereign Support', '1 Month Free Maintenance'] },
-                'ECOMMERCE MAINTENANCE PKG': { title: 'Activate E-Commerce Maintenance', items: ['E-Commerce Store Uptime & Security', 'Monthly Product & Content Updates', 'High-Fidelity Technical Backups', 'Payment Gateway Monitoring', 'Priority Sovereign Support', '$199.99 / month'] },
-                'AI TIER 1': { title: 'AI Consultancy — Tier 1', items: ['High-Fidelity Website Design', 'AI Chatbot on Website', 'Contact Form & Lead Notifications', 'Mobile Responsive & Fast Load Speed', '1 Month Free Maintenance', '[Add-on] Voice/Audio Intelligence (+$500 setup · +$50/mo)', '$1,500 USD setup · $300 USD/mo · 500 conv/mo included'] },
-                'AI TIER 2': { title: 'AI Consultancy — Tier 2', items: ['Tier 1 Fully Included', 'WhatsApp AI Automation (24/7)', 'Automatic Lead Qualification & Routing', 'Sales Team Alerts for Hot Leads Only', '1 Month Free Maintenance', '[Add-on] Voice/Audio Intelligence (+$500 setup · +$50/mo)', '$3,500 USD setup · $500 USD/mo · 1,500 conv/mo included'] },
-                'AI TIER 3': { title: 'AI Consultancy — Tier 3', items: ['Tier 1 & 2 Fully Included', 'Email Inbox AI Automation (24/7)', 'AI Reads, Responds & Qualifies Every Email', 'Automated Follow-Up Sequences', 'Direct Consultation & Strategy Support', '1 Month Free Maintenance', '$6,000 USD setup · $700 USD/mo'] },
-                'AI TIER 4': { title: 'AI Consultancy — Tier 4 (Voice Agent)', items: ['Tiers 1, 2 & 3 Fully Included', 'AI Voice Agent trained on your business', 'Answers inbound calls 24/7 automatically', 'Gives pricing, product & service info by voice', 'Qualifies callers & routes hot leads to your team', 'Handles FAQs, scheduling & general inquiries', 'Customised to your brand voice & tone', '1 Month Free Maintenance', '$8,000 USD setup · $900 USD/mo'] },
-                'DATA ENTRY STARTER': { title: 'Data Entry Automation — Starter (Beta)', items: ['Up to 500 records/month, automated', 'Single data source integration', 'Nightly automated backup', 'Error & anomaly alerts', 'TT$4,200 setup · TT$875/mo'] },
-                'DATA ENTRY GROWTH': { title: 'Data Entry Automation — Growth (Beta)', items: ['Up to 1,000 records/month, automated', 'Multiple data source integration', 'Nightly automated backup', 'Validation rules & duplicate detection', 'Monthly accuracy reporting', 'TT$8,750 setup · TT$1,750/mo'] },
-                'DATA ENTRY ENTERPRISE': { title: 'Data Entry Automation — Enterprise (Beta)', items: ['2,000+ records/month (volume-based)', 'Full multi-system integration', 'Nightly automated backup', 'Advanced validation & anomaly detection', 'Weekly reports & audit trail', 'Priority support & dedicated pipeline', 'Custom Quote — confirmed after full volume audit'] }
-            };
-            const data = pkgData[pkgName];
-            document.getElementById('target-package').value = pkgName;
-            document.getElementById('modal-title').innerText = data.title;
-            const list = document.getElementById('checklist-items');
-            list.innerHTML = "";
-            data.items.forEach(item => { const li = document.createElement('li'); li.innerText = item; list.appendChild(li); });
-            document.getElementById('pkg-checklist').style.display = "block";
-            document.body.classList.add('modal-active');
-        }
-
-        function hidePackages() {
-            document.body.classList.remove('package-active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        document.getElementById('close-modal').onclick = () => document.body.classList.remove('modal-active');
-        document.getElementById('modal-overlay').onclick = (e) => { if (e.target.id === 'modal-overlay') document.body.classList.remove('modal-active'); };
-
-        const leadForm = document.getElementById('lead-form');
-        const submitBtn = document.getElementById('submit-btn');
-        const formMsg = document.getElementById('form-msg');
-        leadForm.onsubmit = async (e) => {
-            e.preventDefault();
-            submitBtn.disabled = true; submitBtn.innerText = "SENDING...";
-            const data = {
-                name: document.getElementById('user-name').value,
-                email: document.getElementById('user-email').value,
-                package: document.getElementById('target-package').value,
-                brand: "Prisca Dezigns"
-            };
-            const { error } = await supabaseClient.from('client_leads').insert([data]);
-            if (error) {
-                formMsg.style.color = "#EF4444"; formMsg.innerText = "ERROR: UPLINK FAILED.";
-                submitBtn.disabled = false; submitBtn.innerText = "TRY AGAIN";
-            } else {
-                formMsg.style.color = "var(--accent)"; formMsg.innerText = "Message sent! We'll be in touch shortly.";
-                submitBtn.innerText = "MESSAGE SENT ✓";
-                leadForm.reset();
-                setTimeout(() => document.body.classList.remove('modal-active'), 2000);
-            }
-        };
-
-        let startX = 0;
-        window.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX; });
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging || isAnimating) return;
-            const dx = e.clientX - startX;
-            if (Math.abs(dx) > 50) { if (dx > 0) rotateSlices('prev'); else rotateSlices('next'); startX = e.clientX; }
-        });
-        window.addEventListener('mouseup', () => { isDragging = false; });
-
-        // Touch — robust single-swipe, measured on touchend only
-        let touchStartY = 0, touchStartX = 0;
-        window.addEventListener('touchstart', (e) => {
-            touchStartY = e.changedTouches[0].clientY;
-            touchStartX = e.changedTouches[0].clientX;
-        }, { passive: true });
-
-        window.addEventListener('touchend', (e) => {
-            if (isAnimating || document.body.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
-            const touchEndY = e.changedTouches[0].clientY;
-            const touchEndX = e.changedTouches[0].clientX;
-            const dy = touchStartY - touchEndY;
-            const dx = Math.abs(touchStartX - touchEndX);
-            const TOUCH_THRESHOLD = 30;
-            // Only fire on clear vertical swipe, not horizontal scroll
-            if (Math.abs(dy) >= TOUCH_THRESHOLD && Math.abs(dy) > dx) {
-                rotateSlices(dy > 0 ? 'next' : 'prev');
-            }
-        }, { passive: true });
-
-        let wheelAccumulator = 0;
-        const WHEEL_THRESHOLD = 25; // Reduced from default behavior for higher sensitivity
-
-        // Block wheel events that originate from touch (desktop mode on phone)
-        let touchActive = false, touchCooldown = null;
-        window.addEventListener('touchstart', () => {
-            touchActive = true;
-            clearTimeout(touchCooldown);
-        }, { passive: true });
-        window.addEventListener('touchend', () => {
-            touchCooldown = setTimeout(() => { touchActive = false; }, 700);
-        }, { passive: true });
-
-        window.addEventListener('wheel', (e) => { 
-            if (touchActive) return; // Block wheel during/after touch gesture
-            if (isAnimating || document.body.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
-            
-            wheelAccumulator += e.deltaY;
-            
-            if (Math.abs(wheelAccumulator) >= WHEEL_THRESHOLD) {
-                rotateSlices(wheelAccumulator > 0 ? 'next' : 'prev');
-                wheelAccumulator = 0;
-            }
-        }, { passive: true });
-
-        function animate() { requestAnimationFrame(animate); globe.rotation.y += 0.0015; renderer.render(scene, camera); }
         animate();
 
         window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
@@ -1563,6 +1386,7 @@
             }
         })();
     </script>
+
 
 
 
