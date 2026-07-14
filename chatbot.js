@@ -364,6 +364,13 @@ function pickVoice(){
   if(!window.speechSynthesis) return;
   var voices=window.speechSynthesis.getVoices();
   if(!voices.length) return;
+  // If the user has manually picked a voice via the voice picker, honor that
+  // above all else -- it's guaranteed correct since they heard it themselves.
+  var savedName = localStorage.getItem('pd_chosen_voice');
+  if (savedName) {
+    var saved = voices.find(v => v.name === savedName);
+    if (saved) { preferredVoice = saved; return; }
+  }
   // Preference order: an explicitly female-labeled voice first (this is what
   // was reliably working), then natural/neural-named voices as a secondary
   // preference, falling back to whatever the browser offers.
@@ -924,6 +931,69 @@ window.chatSend = function(){
 
 if(window.location.pathname.includes('/services')){
     setTimeout(() => { if(!open) toggleChat(); }, 8000);
+}
+
+// --- Voice Picker: visit any page with ?voicepicker=1 to open this ---
+if (window.location.search.includes('voicepicker=1')) {
+    function buildVoicePicker() {
+        if (!window.speechSynthesis) return;
+        var voices = window.speechSynthesis.getVoices();
+        if (!voices.length) { setTimeout(buildVoicePicker, 300); return; }
+
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#fff;overflow-y:auto;padding:20px;font-family:sans-serif;';
+        var currentSaved = localStorage.getItem('pd_chosen_voice');
+
+        var header = document.createElement('div');
+        header.innerHTML = '<h2 style="margin:0 0 6px;">Pick the chatbot\'s voice</h2><p style="color:#666;margin:0 0 20px;font-size:14px;">Tap a voice to hear it, then tap "Use this voice" on the one you like.</p>';
+        overlay.appendChild(header);
+
+        voices.forEach(function(v) {
+            var row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #eee;border-radius:12px;margin-bottom:8px;' + (v.name === currentSaved ? 'border-color:#9d50bb;background:#faf5ff;' : '');
+
+            var label = document.createElement('div');
+            label.style.cssText = 'flex:1;font-size:14px;';
+            label.innerHTML = '<b>' + v.name + '</b><br><span style="color:#888;font-size:12px;">' + v.lang + (v.name === currentSaved ? ' — currently selected' : '') + '</span>';
+
+            var playBtn = document.createElement('button');
+            playBtn.textContent = '▶ Hear it';
+            playBtn.style.cssText = 'padding:8px 14px;border-radius:8px;border:1px solid #9d50bb;background:#fff;color:#9d50bb;font-weight:bold;cursor:pointer;';
+            playBtn.onclick = function() {
+                window.speechSynthesis.cancel();
+                var u = new SpeechSynthesisUtterance("Hi! I'm the Prisca Dezigns assistant. This is what I sound like.");
+                u.voice = v; u.rate = 1.0; u.pitch = 1.03;
+                window.speechSynthesis.speak(u);
+            };
+
+            var useBtn = document.createElement('button');
+            useBtn.textContent = 'Use this voice';
+            useBtn.style.cssText = 'padding:8px 14px;border-radius:8px;border:none;background:#9d50bb;color:#fff;font-weight:bold;cursor:pointer;';
+            useBtn.onclick = function() {
+                localStorage.setItem('pd_chosen_voice', v.name);
+                preferredVoice = v;
+                alert('Saved! "' + v.name + '" will now be used everywhere on the site.');
+                overlay.remove();
+            };
+
+            row.appendChild(label);
+            row.appendChild(playBtn);
+            row.appendChild(useBtn);
+            overlay.appendChild(row);
+        });
+
+        var closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Close without changing';
+        closeBtn.style.cssText = 'margin-top:10px;padding:10px 16px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;';
+        closeBtn.onclick = function() { overlay.remove(); };
+        overlay.appendChild(closeBtn);
+
+        document.body.appendChild(overlay);
+    }
+    if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = buildVoicePicker;
+        buildVoicePicker();
+    }
 }
 
 })();
