@@ -124,19 +124,21 @@
                 let dy = y * sweetheart;
                 let dz = z * waistCinch * flare;
 
-                // 2. CAR MORPH (Aerodynamic Chassis)
-                const carY = dy * (1.0 - (morphState.carScale * 0.75));
-                const carZ = dz * (1.0 + (morphState.carScale * 2.2));
-                const carX = dx * (1.0 + (morphState.carScale * 0.3));
-                // Cockpit bump
-                const bump = morphState.carScale * 0.4 * Math.exp(-Math.pow(carZ - 0.5, 2) * 2) * Math.exp(-Math.pow(carX, 2) * 4);
+                // 2. CAR MORPH (Luxury Sedan DNA - i7 Silhouette)
+                const sedanZ = dz * (1.0 + (morphState.carScale * 2.8)); 
+                const sedanY = dy * (1.0 - (morphState.carScale * 0.72));
+                const sedanX = dx * (1.0 + (morphState.carScale * 0.4)); 
+                
+                // Front Grille Flattening + Cabin Lift
+                const grilleFlatten = morphState.carScale * Math.max(0, sedanZ - 2.5) * 0.8;
+                const cabinLift = morphState.carScale * 0.35 * Math.exp(-Math.pow(sedanZ + 0.2, 2) * 1.5) * Math.exp(-Math.pow(sedanX, 2) * 2);
                 
                 // 3. NOISE/FLUIDITY
                 const noise = (Math.sin(nx * 5 + time) * Math.cos(ny * 5 + time)) * morphState.noise;
 
-                positions[i] = carX * (1 + noise);
-                positions[i+1] = (carY + bump) * (1 + noise);
-                positions[i+2] = carZ * (1 + noise);
+                positions[i] = sedanX * (1 + noise);
+                positions[i+1] = (sedanY + cabinLift) * (1 + noise);
+                positions[i+2] = (sedanZ - grilleFlatten) * (1 + noise);
             }
             positionAttribute.needsUpdate = true;
         }
