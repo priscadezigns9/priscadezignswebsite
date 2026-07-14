@@ -124,58 +124,83 @@
             const time = Date.now() * 0.001;
 
             for (let i = 0; i < positions.length; i += 3) {
-                let x = originalPositions[i];
-                let y = originalPositions[i+1];
-                let z = originalPositions[i+2];
+                const ox = originalPositions[i];
+                const oy = originalPositions[i+1];
+                const oz = originalPositions[i+2];
 
-                const mag = Math.sqrt(x*x + y*y + z*z);
-                let nx = x / mag;
-                let ny = y / mag;
-                let nz = z / mag;
+                const mag = Math.sqrt(ox*ox + oy*oy + oz*oz);
+                const nx = ox / mag;
+                const ny = oy / mag;
+                const nz = oz / mag;
 
-                // 1. DRESS MORPH (Vintage Cap-Sleeve A-Line)
-                const waistCinch = 1.0 - (morphState.dressScale * 0.55 * Math.exp(-Math.pow(y - 0.2, 2) * 12.0));
-                const skirtFlare = 1.0 + (morphState.dressScale * 2.2 * Math.max(0, -y + 0.1));
-                const sweetheart = 1.0 - (morphState.dressScale * 0.15 * Math.exp(-Math.pow(y - 0.85, 2) * 15.0));
+                // 1. DRESS TARGET
+                const waistCinch = 1.0 - (0.55 * Math.exp(-Math.pow(oy - 0.2, 2) * 12.0));
+                const skirtFlare = 1.0 + (2.2 * Math.max(0, -oy + 0.1));
+                const sweetheart = 1.0 - (0.15 * Math.exp(-Math.pow(oy - 0.85, 2) * 15.0));
+                const sleeveExp = 0.65 * Math.exp(-Math.pow(oy - 0.75, 2) * 20.0) * (Math.abs(ox) > 0.4 ? 1.0 : 0.0);
                 
-                // Cap Sleeves
-                const sleeveExp = morphState.dressScale * 0.65 * Math.exp(-Math.pow(y - 0.75, 2) * 20.0) * (Math.abs(x) > 0.4 ? 1.0 : 0.0);
+                const dX = ox * (waistCinch + sleeveExp);
+                const dY = oy * sweetheart;
+                const dZ = oz * waistCinch * skirtFlare;
+
+                // 2. CAR TARGET
+                const cZ = oz * (1.0 + 3.2); 
+                const cY = oy * (1.0 - 0.78);
+                const cX = ox * (1.0 + 0.6); 
+                const gFlatten = Math.max(0, cZ - 2.8) * 1.2;
+                const cLift = 0.42 * Math.exp(-Math.pow(cZ + 0.5, 2) * 1.2) * Math.exp(-Math.pow(cX * 0.8, 2) * 2.5);
                 
-                let dx = x * (waistCinch + sleeveExp);
-                let dy = y * sweetheart;
-                let dz = z * waistCinch * skirtFlare;
+                const carX = cX;
+                const carY = cY + cLift;
+                const carZ = cZ - gFlatten;
 
-                // 2. CAR MORPH (Audi-style Fastback)
-                const sedanZ = dz * (1.0 + (morphState.carScale * 3.2)); 
-                const sedanY = dy * (1.0 - (morphState.carScale * 0.78));
-                const sedanX = dx * (1.0 + (morphState.carScale * 0.6)); 
-                const grilleFlatten = morphState.carScale * Math.max(0, sedanZ - 2.8) * 1.2;
-                const cabinLift = morphState.carScale * 0.42 * Math.exp(-Math.pow(sedanZ + 0.5, 2) * 1.2) * Math.exp(-Math.pow(sedanX * 0.8, 2) * 2.5);
-
-                // 3. LAPTOP MORPH (Screen + Base)
+                // 3. LAPTOP TARGET
                 const isTop = ny > 0;
-                const laptopZ = sedanZ * (1.0 + (morphState.laptopScale * 1.2));
-                const laptopX = sedanX * (1.0 + (morphState.laptopScale * 0.8));
-                const laptopY = sedanY * (1.0 - (morphState.laptopScale * 0.5));
-                
-                // Hinge/Opening: Top half tilts back, bottom half tilts forward
-                const hingeBend = morphState.laptopScale * (isTop ? -0.8 : 0.4);
-                const lY = laptopY + (isTop ? morphState.laptopScale * 0.5 : -morphState.laptopScale * 0.2);
-                const lZ = laptopZ + (isTop ? -morphState.laptopScale * 0.8 : morphState.laptopScale * 0.4);
+                const lZ_base = oz * (1.0 + 1.2);
+                const lX_base = ox * (1.0 + 0.8);
+                const lY_base = oy * (1.0 - 0.5);
+                const laptopX = lX_base;
+                const laptopY = lY_base + (isTop ? 0.5 : -0.2);
+                const laptopZ = lZ_base + (isTop ? -0.8 : 0.4);
 
-                // 4. WHATSAPP LOGO (Circular Outline + Indicator Tail)
-                const circleFactor = 1.0 - (morphState.waScale * (1.0 - 1.0 / mag));
+                // 4. WHATSAPP TARGET
                 const tailAngle = -2.4; 
                 const distToTail = Math.sqrt(Math.pow(nx - Math.cos(tailAngle)*0.9, 2) + Math.pow(ny - Math.sin(tailAngle)*0.9, 2));
-                const tailExp = morphState.waScale * 0.8 * Math.exp(-distToTail * 10.0);
-                
-                // Final Assembly
-                const noise = (Math.sin(nx * 5 + time) * Math.cos(ny * 5 + time)) * morphState.noise;
+                const tExp = 0.8 * Math.exp(-distToTail * 10.0);
+                const waX = nx + (nx < 0 ? -tExp * 0.5 : 0);
+                const waY = ny + (ny < 0 ? -tExp : 0);
+                const waZ = nz;
 
-                positions[i] = (laptopX * circleFactor + (nx < 0 ? -tailExp * 0.5 : 0)) * (1 + noise);
-                positions[i+1] = ((lY + cabinLift) * circleFactor + (ny < 0 ? -tailExp : 0)) * (1 + noise);
-                positions[i+2] = ((lZ - grilleFlatten) * circleFactor) * (1 + noise);
+                // BLENDING LOGIC (Sequential Lerp)
+                let finalX = ox, finalY = oy, finalZ = oz;
+
+                // Sphere -> Dress
+                finalX = finalX * (1 - morphState.dressScale) + dX * morphState.dressScale;
+                finalY = finalY * (1 - morphState.dressScale) + dY * morphState.dressScale;
+                finalZ = finalZ * (1 - morphState.dressScale) + dZ * morphState.dressScale;
+
+                // -> Car
+                finalX = finalX * (1 - morphState.carScale) + carX * morphState.carScale;
+                finalY = finalY * (1 - morphState.carScale) + carY * morphState.carScale;
+                finalZ = finalZ * (1 - morphState.carScale) + carZ * morphState.carScale;
+
+                // -> Laptop
+                finalX = finalX * (1 - morphState.laptopScale) + laptopX * morphState.laptopScale;
+                finalY = finalY * (1 - morphState.laptopScale) + laptopY * morphState.laptopScale;
+                finalZ = finalZ * (1 - morphState.laptopScale) + laptopZ * morphState.laptopScale;
+
+                // -> WhatsApp
+                finalX = finalX * (1 - morphState.waScale) + waX * morphState.waScale;
+                finalY = finalY * (1 - morphState.waScale) + waY * morphState.waScale;
+                finalZ = finalZ * (1 - morphState.waScale) + waZ * morphState.waScale;
+
+                const noise = (Math.sin(nx * 5 + time) * Math.cos(ny * 5 + time)) * morphState.noise;
+                positions[i] = finalX * (1 + noise);
+                positions[i+1] = finalY * (1 + noise);
+                positions[i+2] = finalZ * (1 + noise);
             }
+            positionAttribute.needsUpdate = true;
+        }
             positionAttribute.needsUpdate = true;
         }
 
