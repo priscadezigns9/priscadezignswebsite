@@ -3,55 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poly-Morphing Core | Scroll Architecture</title>
+    <title>Poly-Morphing Core | Prisca Dezigns</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
-        :root { --purple: #1d0e21; --accent: #7c3aed; }
-        body { margin: 0; background: var(--purple); color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        canvas { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
+        :root { --purple: #1d0e21; --accent: #7c3aed; --ivory: #f5f2ed; --lilac: #c8a2c8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--ivory); color: var(--purple); font-family: sans-serif; overflow-x: hidden; }
         
-        .scroll-container { position: relative; z-index: 2; }
-        section { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 10%; pointer-events: none; }
-        
-        .content-box { max-width: 500px; pointer-events: auto; background: rgba(29, 14, 33, 0.4); backdrop-filter: blur(10px); padding: 40px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        h2 { font-size: 3rem; margin: 0; font-family: 'Playfair Display', serif; }
-        p { font-size: 1.1rem; opacity: 0.8; line-height: 1.6; }
+        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; pointer-events: none; }
+        #mercury-canvas { width: 100%; height: 100%; }
 
-        .indicator { position: fixed; right: 40px; top: 50%; transform: translateY(-50%); z-index: 10; display: flex; flex-direction: column; gap: 20px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid white; opacity: 0.3; transition: 0.3s; }
-        .dot.active { opacity: 1; background: white; height: 30px; border-radius: 10px; }
+        .scroll-container { position: relative; z-index: 2; }
+        section { height: 100vh; display: flex; align-items: center; padding: 0 10%; pointer-events: none; }
+        .content-box { max-width: 500px; background: rgba(245, 242, 237, 0.8); backdrop-filter: blur(10px); padding: 40px; border-radius: 2px; border-left: 4px solid var(--accent); pointer-events: auto; }
+        h2 { font-size: 3rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: -1px; }
+        p { font-size: 1.1rem; line-height: 1.6; color: #4a4a4a; }
+
+        .nav-dots { position: fixed; right: 40px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 20px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--accent); transition: 0.3s; cursor: pointer; }
+        .dot.active { background: var(--accent); transform: scale(1.5); }
     </style>
 </head>
 <body>
-    <canvas id="mercury-canvas"></canvas>
+    <div id="canvas-container">
+        <canvas id="mercury-canvas"></canvas>
+    </div>
 
-    <div class="indicator">
+    <div class="nav-dots">
         <div class="dot active" id="dot-0"></div>
         <div class="dot" id="dot-1"></div>
         <div class="dot" id="dot-2"></div>
+        <div class="dot" id="dot-3"></div>
     </div>
 
     <div class="scroll-container">
         <section id="section-core">
             <div class="content-box">
-                <h2>The Core</h2>
-                <p>A fluid foundation of digital intelligence. Responsive, adaptive, and infinitely scalable.</p>
+                <h2>The Neural Core</h2>
+                <p>Digital mercury in its purest state. A fluid, sentient intelligence capable of infinite adaptation.</p>
             </div>
         </section>
 
         <section id="section-fashion">
             <div class="content-box">
-                <h2>Precision Sculpt</h2>
-                <p>Extracting the DNA of style. From cinched waists to flowing flares, we architect aesthetic authority.</p>
+                <h2>High-Fidelity Style</h2>
+                <p>Anatomical DNA mapping. Morphing from liquid brain to structural couture—where code meets the silhouette.</p>
             </div>
         </section>
 
         <section id="section-automotive">
             <div class="content-box">
                 <h2>Aerodynamic Logic</h2>
-                <p>Engineered for speed. Low-profile chassis deformation for high-performance digital environments.</p>
+                <p>The Luxury Sedan profile. Low-profile chassis, executive wheelbase, and the authority of high-performance engineering.</p>
+            </div>
+        </section>
+
+        <section id="section-whatsapp">
+            <div class="content-box">
+                <h2>Global Connectivity</h2>
+                <p>The sovereign network. Morphing into the structural "Squircle"—the geometry of seamless AI communication.</p>
             </div>
         </section>
     </div>
@@ -94,6 +106,7 @@
         let morphState = {
             carScale: 0,
             dressScale: 0,
+            waScale: 0,
             noise: 0.15
         };
 
@@ -106,18 +119,12 @@
                 let y = originalPositions[i+1];
                 let z = originalPositions[i+2];
 
-                // Base Sphere normalized
                 const mag = Math.sqrt(x*x + y*y + z*z);
                 let nx = x / mag;
                 let ny = y / mag;
                 let nz = z / mag;
 
-                // 1. DRESS MORPH (Vintage Flare v2)
-                // - Sleeves: Lateral shoulder expansion
-                // - Waist: The Cinch (y ~ 0)
-                // - Skirt: Dramatic Power-Function Flare
-                // - Sweetheart: Top dip
-                
+                // 1. DRESS MORPH
                 const sleeveExp = morphState.dressScale * 1.5 * Math.exp(-Math.pow(y - 0.7, 2) * 5) * Math.exp(-Math.pow(Math.abs(x) - 1.0, 2) * 2);
                 const waistCinch = 1.0 - (morphState.dressScale * Math.exp(-Math.pow(y * 1.5, 2)) * 0.7);
                 const skirtFlare = 1.0 + (morphState.dressScale * Math.pow(Math.max(0, -y - 0.2), 1.8) * 3.5);
@@ -127,69 +134,50 @@
                 let dy = y * sweetheart;
                 let dz = z * waistCinch * skirtFlare;
 
-                // 2. CAR MORPH (Luxury Sedan DNA - i7 Silhouette)
+                // 2. CAR MORPH
                 const sedanZ = dz * (1.0 + (morphState.carScale * 2.8)); 
                 const sedanY = dy * (1.0 - (morphState.carScale * 0.72));
                 const sedanX = dx * (1.0 + (morphState.carScale * 0.4)); 
-                
-                // Front Grille Flattening + Cabin Lift
                 const grilleFlatten = morphState.carScale * Math.max(0, sedanZ - 2.5) * 0.8;
                 const cabinLift = morphState.carScale * 0.35 * Math.exp(-Math.pow(sedanZ + 0.2, 2) * 1.5) * Math.exp(-Math.pow(sedanX, 2) * 2);
-                
-                // 3. NOISE/FLUIDITY
+
+                // 3. WHATSAPP LOGO (Squircle)
+                const squirclePower = 4.0;
+                const sFactor = 1.0 - (morphState.waScale * (1.0 - 1.0 / Math.pow(Math.pow(nx, 4) + Math.pow(ny, 4) + Math.pow(nz, 4), 0.25)));
+
+                // Final Assembly
                 const noise = (Math.sin(nx * 5 + time) * Math.cos(ny * 5 + time)) * morphState.noise;
 
-                positions[i] = sedanX * (1 + noise);
-                positions[i+1] = (sedanY + cabinLift) * (1 + noise);
-                positions[i+2] = (sedanZ - grilleFlatten) * (1 + noise);
+                positions[i] = (sedanX * sFactor) * (1 + noise);
+                positions[i+1] = ((sedanY + cabinLift) * sFactor) * (1 + noise);
+                positions[i+2] = ((sedanZ - grilleFlatten) * sFactor) * (1 + noise);
             }
             positionAttribute.needsUpdate = true;
         }
 
         // SCROLL TRIGGER ANIMATIONS
         gsap.to(morphState, {
-            dressScale: 1,
-            noise: 0.05,
-            scrollTrigger: {
-                trigger: "#section-fashion",
-                start: "top bottom",
-                end: "top top",
-                scrub: 1,
-                onToggle: self => document.querySelector('#dot-1').classList.toggle('active', self.isActive)
-            }
+            dressScale: 1, noise: 0.05,
+            scrollTrigger: { trigger: "#section-fashion", start: "top bottom", end: "top top", scrub: 1 }
         });
 
         gsap.to(morphState, {
-            carScale: 1,
-            dressScale: 0,
-            noise: 0.02,
-            scrollTrigger: {
-                trigger: "#section-automotive",
-                start: "top bottom",
-                end: "top top",
-                scrub: 1,
-                onToggle: self => document.querySelector('#dot-2').classList.toggle('active', self.isActive)
-            }
+            carScale: 1, dressScale: 0, noise: 0.02,
+            scrollTrigger: { trigger: "#section-automotive", start: "top bottom", end: "top top", scrub: 1 }
+        });
+
+        gsap.to(morphState, {
+            waScale: 1, carScale: 0, noise: 0.05,
+            scrollTrigger: { trigger: "#section-whatsapp", start: "top bottom", end: "top top", scrub: 1 }
         });
 
         // Indicators
-        ScrollTrigger.create({
-            trigger: "#section-core",
-            start: "top center",
-            end: "bottom center",
-            onToggle: self => { if(self.isActive) updateDots(0); }
-        });
-        ScrollTrigger.create({
-            trigger: "#section-fashion",
-            start: "top center",
-            end: "bottom center",
-            onToggle: self => { if(self.isActive) updateDots(1); }
-        });
-        ScrollTrigger.create({
-            trigger: "#section-automotive",
-            start: "top center",
-            end: "bottom center",
-            onToggle: self => { if(self.isActive) updateDots(2); }
+        const sections = ["#section-core", "#section-fashion", "#section-automotive", "#section-whatsapp"];
+        sections.forEach((id, i) => {
+            ScrollTrigger.create({
+                trigger: id, start: "top center", end: "bottom center",
+                onToggle: self => { if(self.isActive) updateDots(i); }
+            });
         });
 
         function updateDots(index) {
