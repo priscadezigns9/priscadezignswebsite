@@ -3,120 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surgical Mercury Core — Prisca Dezigns</title>
+    <title>Architecture DNA: Dress Sculpt — Prisca Dezigns</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/api/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body { margin: 0; background: #05000a; color: white; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
         canvas { position: fixed; top: 0; left: 0; }
-        #label { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; letter-spacing: 0.4em; text-transform: uppercase; opacity: 0.5; pointer-events: none; }
-        #status { position: fixed; top: 20px; left: 20px; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: #7d52b5; }
+        #ui { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 10; }
+        button { background: rgba(125, 82, 181, 0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 12px 24px; border-radius: 30px; cursor: pointer; backdrop-filter: blur(10px); transition: 0.3s; font-family: 'Inter'; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+        button:hover { background: rgba(125, 82, 181, 0.5); border-color: #fff; }
+        #label { position: fixed; top: 40px; width: 100%; text-align: center; font-size: 0.8rem; letter-spacing: 5px; opacity: 0.5; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    <div id="status">System: Surgical Precision Active</div>
-    <div id="label">Scroll to Morph</div>
+    <div id="label">Morphing Core v3.0 // Structural DNA</div>
+    <div id="ui">
+        <button onclick="setMorph('sphere')">Sphere</button>
+        <button onclick="setMorph('dress')">Vintage Flare</button>
+        <button onclick="setMorph('car')">Luxury Chassis</button>
+    </div>
+
     <script>
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(window.devicePixelRatio);
         document.body.appendChild(renderer.domElement);
 
-        // High-Density Geometry for precise sculpting
-        const geometry = new THREE.IcosahedronGeometry(2, 64);
+        const geometry = new THREE.SphereGeometry(1, 128, 128);
+        const originalPositions = geometry.attributes.position.array.slice();
         
-        const vertexShader = `
-            varying vec3 vNormal;
-            varying vec3 vPosition;
-            uniform float uTime;
-            uniform float uState; // 0: Globe, 1: Dress, 2: Car
-            
-            void main() {
-                vNormal = normal;
-                vec3 pos = position;
-                
-                // STATE 1: FASHION (DRESS)
-                // Distinct waist cinch + bell flare
-                float waistCinch = 1.0 - smoothstep(-0.5, 0.5, pos.y) * 0.6;
-                float flare = 1.0 + smoothstep(-2.0, -0.5, pos.y) * 1.5;
-                vec3 dressPos = pos;
-                dressPos.xz *= waistCinch;
-                dressPos.xz *= flare;
-                
-                // STATE 2: AUTOMOTIVE (CAR)
-                // Flat chassis + Greenhouse cockpit
-                vec3 carPos = pos;
-                carPos.y *= 0.35; // Flatten into chassis
-                carPos.z *= 2.5;  // Stretch length
-                carPos.x *= 1.2;  // Wide stance
-                
-                // Add the Cockpit/Roof
-                float cockpit = smoothstep(0.0, 1.5, carPos.z) * smoothstep(3.0, 1.5, carPos.z);
-                cockpit *= smoothstep(1.5, 0.0, abs(carPos.x));
-                carPos.y += cockpit * 0.8;
-
-                // BLENDING LOGIC
-                float s1 = clamp(uState, 0.0, 1.0);
-                float s2 = clamp(uState - 1.0, 0.0, 1.0);
-                
-                vec3 finalPos = mix(pos, dressPos, s1);
-                finalPos = mix(finalPos, carPos, s2);
-                
-                // Subtle Mercury Ripple (Keep structure dominant)
-                finalPos += normal * sin(pos.y * 10.0 + uTime * 2.0) * 0.03;
-
-                vPosition = finalPos;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);
-            }
-        `;
-
-        const fragmentShader = `
-            varying vec3 vNormal;
-            varying vec3 vPosition;
-            void main() {
-                vec3 viewDir = normalize(vec3(0,0,5) - vPosition);
-                float fresnel = pow(1.0 - dot(vNormal, viewDir), 3.0);
-                vec3 color = mix(vec3(0.11, 0.05, 0.13), vec3(0.8, 0.8, 1.0), fresnel);
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `;
-
-        const material = new THREE.ShaderMaterial({
-            vertexShader,
-            fragmentShader,
-            uniforms: { uTime: { value: 0 }, uState: { value: 0 } }
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x1d0e21,
+            metalness: 1,
+            roughness: 0.05,
+            flatShading: false,
+            emissive: 0x2d1b3d,
+            emissiveIntensity: 0.2
         });
 
         const core = new THREE.Mesh(geometry, material);
         scene.add(core);
 
-        camera.position.z = 6;
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
 
-        let scrollTarget = 0;
-        let currentScroll = 0;
+        const pointLight1 = new THREE.PointLight(0x7D52B5, 2);
+        pointLight1.position.set(5, 5, 5);
+        scene.add(pointLight1);
 
-        window.addEventListener('wheel', (e) => {
-            scrollTarget += e.deltaY * 0.002;
-            scrollTarget = Math.max(0, Math.min(2, scrollTarget));
-        });
+        const pointLight2 = new THREE.PointLight(0xffffff, 1);
+        pointLight2.position.set(-5, -5, 2);
+        scene.add(pointLight2);
 
-        // Touch support
-        let touchY = 0;
-        window.addEventListener('touchstart', e => touchY = e.touches[0].clientY);
-        window.addEventListener('touchmove', e => {
-            const delta = touchY - e.touches[0].clientY;
-            scrollTarget += delta * 0.005;
-            scrollTarget = Math.max(0, Math.min(2, scrollTarget));
-            touchY = e.touches[0].clientY;
-        });
+        camera.position.z = 3;
+
+        let currentMorph = 'sphere';
+        const targetPositions = new Float32Array(originalPositions.length);
+
+        function setMorph(type) {
+            currentMorph = type;
+            const pos = geometry.attributes.position.array;
+
+            for (let i = 0; i < pos.length; i += 3) {
+                const x = originalPositions[i];
+                const y = originalPositions[i + 1];
+                const z = originalPositions[i + 2];
+
+                if (type === 'sphere') {
+                    targetPositions[i] = x;
+                    targetPositions[i + 1] = y;
+                    targetPositions[i + 2] = z;
+                } else if (type === 'dress') {
+                    // Vintage Flare DNA: Sweetheart top, cinched waist, wide A-line flare
+                    let radius = Math.sqrt(x*x + z*z);
+                    let angle = Math.atan2(z, x);
+                    
+                    let newY = y * 1.5; // Stretch vertical
+                    let scale = 1.0;
+
+                    if (y > 0.4) {
+                        // Sweetheart Neckline / Shoulders
+                        scale = 1.2 * (1.0 - (y - 0.4));
+                        scale += Math.sin(angle * 2) * 0.2; // Heart shape dip
+                    } else if (y > -0.2 && y <= 0.4) {
+                        // The Cinch (Waist)
+                        scale = 0.4 + (y + 0.2) * 0.5;
+                    } else {
+                        // The Flare (Skirt)
+                        scale = 0.4 + Math.pow(Math.abs(y + 0.2), 1.5) * 3.5;
+                    }
+
+                    targetPositions[i] = Math.cos(angle) * scale;
+                    targetPositions[i+1] = newY - 0.2; // Center offset
+                    targetPositions[i+2] = Math.sin(angle) * scale;
+
+                } else if (type === 'car') {
+                    // Luxury Chassis DNA: Low, long, wide
+                    targetPositions[i] = x * 1.5; // Wide
+                    targetPositions[i + 1] = y * 0.45; // Flat
+                    targetPositions[i + 2] = z * 2.8; // Long
+                    
+                    // Add a "Cab" bump
+                    if (z > -0.5 && z < 1.0 && y > 0) {
+                         targetPositions[i + 1] += Math.cos(z) * 0.3;
+                    }
+                }
+            }
+
+            // Animate transition using a proxy object for GSAP
+            const proxy = { t: 0 };
+            const startPos = geometry.attributes.position.array.slice();
+            
+            gsap.to(proxy, {
+                t: 1,
+                duration: 1.5,
+                ease: "expo.out",
+                onUpdate: () => {
+                    for (let i = 0; i < pos.length; i++) {
+                        pos[i] = startPos[i] + (targetPositions[i] - startPos[i]) * proxy.t;
+                    }
+                    geometry.attributes.position.needsUpdate = true;
+                }
+            });
+        }
 
         function animate() {
-            material.uniforms.uTime.value += 0.01;
-            currentScroll += (scrollTarget - currentScroll) * 0.1;
-            material.uniforms.uState.value = currentScroll;
+            const time = Date.now() * 0.001;
             
+            // Subtle breathing
             core.rotation.y += 0.005;
             
             renderer.render(scene, camera);
