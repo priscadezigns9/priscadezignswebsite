@@ -214,7 +214,7 @@
                 const aY = oy;
                 const aZ = oz * spikyHair * neckCinch;
 
-                // --- LAYERED BLENDING ---
+                // --- LAYERED BLENDING (LINEAR MIXING) ---
                 let fX = ox, fY = oy, fZ = oz;
 
                 const ease = (t) => t * t * (3 - 2 * t);
@@ -224,25 +224,13 @@
                 const aS = ease(morphState.animeScale);
                 const wS = ease(morphState.waScale);
 
-                fX = fX * (1 - dS) + dX * dS;
-                fY = fY * (1 - dS) + dY * dS;
-                fZ = fZ * (1 - dS) + dZ * dS;
+                // Cumulative weight to ensure normalization if multiple scales are active
+                const totalScale = dS + cS + lS + aS + wS;
+                const baseWeight = Math.max(0, 1 - totalScale);
 
-                fX = fX * (1 - cS) + carX * cS;
-                fY = fY * (1 - cS) + carY * cS;
-                fZ = fZ * (1 - cS) + carZ * cS;
-
-                fX = fX * (1 - lS) + laptopX * lS;
-                fY = fY * (1 - lS) + laptopY * lS;
-                fZ = fZ * (1 - lS) + laptopZ * lS;
-
-                fX = fX * (1 - aS) + aX * aS;
-                fY = fY * (1 - aS) + aY * aS;
-                fZ = fZ * (1 - aS) + aZ * aS;
-
-                fX = fX * (1 - wS) + waX * wS;
-                fY = fY * (1 - wS) + waY * wS;
-                fZ = fZ * (1 - wS) + waZ * wS;
+                fX = ox * baseWeight + dX * dS + carX * cS + laptopX * lS + aX * aS + waX * wS;
+                fY = oy * baseWeight + dY * dS + carY * cS + laptopY * lS + aY * aS + waY * wS;
+                fZ = oz * baseWeight + dZ * dS + carZ * cS + laptopZ * lS + aZ * aS + waZ * wS;
 
                 // --- SENTIENT PULSE & VEINS ---
                 const pulse = Math.sin(time * 0.8) * 0.06;
@@ -258,27 +246,27 @@
 
         // SCROLL TRIGGER ANIMATIONS
         gsap.to(morphState, {
-            dressScale: 1, noise: 0.12, rotationSpeed: 0.01,
+            dressScale: 1, noise: 0.08, rotationSpeed: 0.005,
             scrollTrigger: { trigger: "#section-fashion", start: "top bottom", end: "top top", scrub: 0.5 }
         });
 
         gsap.to(morphState, {
-            carScale: 1, dressScale: 0, noise: 0.04, rotationSpeed: 0.005,
+            carScale: 1, dressScale: 0, noise: 0.04, rotationSpeed: 0.002,
             scrollTrigger: { trigger: "#section-automotive", start: "top bottom", end: "top top", scrub: 0.5 }
         });
 
         gsap.to(morphState, {
-            laptopScale: 1, carScale: 0, noise: 0.05, rotationSpeed: 0.008,
+            laptopScale: 1, carScale: 0, noise: 0.03, rotationSpeed: 0.001,
             scrollTrigger: { trigger: "#section-laptop", start: "top bottom", end: "top top", scrub: 0.5 }
         });
 
         gsap.to(morphState, {
-            animeScale: 1, laptopScale: 0, noise: 0.2, rotationSpeed: 0.02,
+            animeScale: 1, laptopScale: 0, noise: 0.06, rotationSpeed: 0.005,
             scrollTrigger: { trigger: "#section-anime", start: "top bottom", end: "top top", scrub: 0.5 }
         });
 
         gsap.to(morphState, {
-            waScale: 1, animeScale: 0, noise: 0.1, rotationSpeed: 0.015,
+            waScale: 1, animeScale: 0, noise: 0.02, rotationSpeed: 0.002,
             scrollTrigger: { trigger: "#section-whatsapp", start: "top bottom", end: "top top", scrub: 0.5 }
         });
 
