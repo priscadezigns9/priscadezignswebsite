@@ -112,17 +112,20 @@
                 let ny = y / mag;
                 let nz = z / mag;
 
-                // 1. DRESS MORPH (Vintage Flare)
-                // - Cinch waist at y=0
-                // - Flare at bottom (y < -0.5)
-                // - Sweetheart dip at top (y > 0.8)
+                // 1. DRESS MORPH (Vintage Flare v2)
+                // - Sleeves: Lateral shoulder expansion
+                // - Waist: The Cinch (y ~ 0)
+                // - Skirt: Dramatic Power-Function Flare
+                // - Sweetheart: Top dip
+                
+                const sleeveExp = morphState.dressScale * 1.5 * Math.exp(-Math.pow(y - 0.7, 2) * 5) * Math.exp(-Math.pow(Math.abs(x) - 1.0, 2) * 2);
                 const waistCinch = 1.0 - (morphState.dressScale * Math.exp(-Math.pow(y * 1.5, 2)) * 0.7);
-                const flare = 1.0 + (morphState.dressScale * Math.max(0, -y - 0.5) * 1.5);
+                const skirtFlare = 1.0 + (morphState.dressScale * Math.pow(Math.max(0, -y - 0.2), 1.8) * 3.5);
                 const sweetheart = 1.0 - (morphState.dressScale * Math.max(0, y - 0.8) * Math.exp(-Math.pow(x * 4, 2)) * 0.5);
                 
-                let dx = x * waistCinch * flare;
+                let dx = x * waistCinch * skirtFlare + (x > 0 ? sleeveExp : -sleeveExp);
                 let dy = y * sweetheart;
-                let dz = z * waistCinch * flare;
+                let dz = z * waistCinch * skirtFlare;
 
                 // 2. CAR MORPH (Luxury Sedan DNA - i7 Silhouette)
                 const sedanZ = dz * (1.0 + (morphState.carScale * 2.8)); 
