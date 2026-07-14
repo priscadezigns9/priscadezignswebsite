@@ -364,15 +364,16 @@ function pickVoice(){
   if(!window.speechSynthesis) return;
   var voices=window.speechSynthesis.getVoices();
   if(!voices.length) return;
-  // Preference order: modern neural/natural voices first (Edge/Chrome), then
-  // decent standard voices, falling back to whatever the browser offers.
+  // Preference order: an explicitly female-labeled voice first (this is what
+  // was reliably working), then natural/neural-named voices as a secondary
+  // preference, falling back to whatever the browser offers.
   var priorities = [
-    v => /natural/i.test(v.name),                                   // Edge "Online (Natural)" voices — best available
-    v => /Aria|Jenny|Emma|Ava/i.test(v.name),                        // common neural voice names
-    v => v.name === 'Samantha',                                      // macOS/iOS default, quite natural
-    v => /Google US English/i.test(v.name),
+    v => /female/i.test(v.name),                                     // explicit female label -- top priority
     v => /Google UK English Female/i.test(v.name),
-    v => v.lang === 'en-US' && /Female/i.test(v.name),
+    v => v.name === 'Samantha',                                      // macOS/iOS default, female, quite natural
+    v => /natural/i.test(v.name) && /female/i.test(v.name),          // female + Edge "Online (Natural)" voices
+    v => /Aria|Jenny|Emma|Ava/i.test(v.name),                        // common neural voice names (often female)
+    v => /Google US English/i.test(v.name),
     v => v.lang && v.lang.startsWith('en')
   ];
   for (var i = 0; i < priorities.length; i++) {
