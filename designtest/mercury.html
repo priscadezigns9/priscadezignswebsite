@@ -147,16 +147,21 @@
                 // Fastback Roofline (Lift in middle, sharp drop at rear)
                 const cabinLift = morphState.carScale * 0.42 * Math.exp(-Math.pow(sedanZ + 0.5, 2) * 1.2) * Math.exp(-Math.pow(sedanX * 0.8, 2) * 2.5);
 
-                // 3. WHATSAPP LOGO (Squircle)
-                const squirclePower = 4.0;
-                const sFactor = 1.0 - (morphState.waScale * (1.0 - 1.0 / Math.pow(Math.pow(nx, 4) + Math.pow(ny, 4) + Math.pow(nz, 4), 0.25)));
-
+                // 3. WHATSAPP LOGO (Circular Outline + Indicator Tail)
+                // Base Circular outline factor
+                const circleFactor = 1.0 - (morphState.waScale * (1.0 - 1.0 / mag));
+                
+                // The "Tail" (Triangle pointing down-left: ny < -0.6, nx < -0.4)
+                const tailAngle = -2.4; // -135 degrees approx
+                const distToTail = Math.sqrt(Math.pow(nx - Math.cos(tailAngle)*0.9, 2) + Math.pow(ny - Math.sin(tailAngle)*0.9, 2));
+                const tailExp = morphState.waScale * 0.8 * Math.exp(-distToTail * 10.0);
+                
                 // Final Assembly
                 const noise = (Math.sin(nx * 5 + time) * Math.cos(ny * 5 + time)) * morphState.noise;
 
-                positions[i] = (sedanX * sFactor) * (1 + noise);
-                positions[i+1] = ((sedanY + cabinLift) * sFactor) * (1 + noise);
-                positions[i+2] = ((sedanZ - grilleFlatten) * sFactor) * (1 + noise);
+                positions[i] = (sedanX * circleFactor + (nx < 0 ? -tailExp * 0.5 : 0)) * (1 + noise);
+                positions[i+1] = ((sedanY + cabinLift) * circleFactor + (ny < 0 ? -tailExp : 0)) * (1 + noise);
+                positions[i+2] = ((sedanZ - grilleFlatten) * circleFactor) * (1 + noise);
             }
             positionAttribute.needsUpdate = true;
         }
