@@ -3,167 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>High-Fidelity Mercury Core — Prisca Dezigns</title>
+    <title>Surgical Mercury Core — Prisca Dezigns</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/api/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         body { margin: 0; background: #05000a; color: white; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
         canvas { position: fixed; top: 0; left: 0; }
-        #label {
-            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
-            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.6rem;
-            opacity: 0.6; pointer-events: none; text-align: center;
-        }
-        #label span { display: block; font-size: 0.6rem; letter-spacing: 0.2rem; margin-top: 10px; opacity: 0.5; }
+        #label { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; letter-spacing: 0.4em; text-transform: uppercase; opacity: 0.5; pointer-events: none; }
+        #status { position: fixed; top: 20px; left: 20px; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: #7d52b5; }
     </style>
 </head>
 <body>
-    <div id="label">Globe <span>Scroll to Morph</span></div>
-
-    <script id="vertexShader" type="x-shader/x-vertex">
-        uniform float uTime;
-        uniform float uTargetState; 
-        varying vec3 vNormal;
-        varying vec3 vPosition;
-
-        void main() {
-            vNormal = normal;
-            vec3 pos = position;
-            
-            // --- STATE 1: FASHION (The Dress Silhouette) ---
-            // Defined by a tight waist (cinch) and a wide, dramatic floor-length flare
-            vec3 dressPos = pos;
-            float dressY = pos.y;
-            // Waist at y=0.2, Flare starting below y=0.0
-            float dressCinch = 1.0 - (exp(-pow(dressY - 0.25, 2.0) * 15.0) * 0.6);
-            float dressFlare = pow(max(0.0, -dressY + 0.4), 2.2) * 2.5;
-            dressPos.xz *= (dressCinch + dressFlare);
-            dressPos.y *= 1.5; // Elongate for elegance
-
-            // --- STATE 2: AUTOMOTIVE (The Car Silhouette) ---
-            // Defined by a low chassis, long hood, and a distinct cabin/roof bump
-            vec3 carPos = pos;
-            // 1. Flatten the entire sphere into a slab
-            carPos.y *= 0.35; 
-            // 2. Stretch into a long rectangle (Z is forward/back)
-            carPos.z *= 2.8;
-            // 3. Widen slightly for stance
-            carPos.x *= 1.4;
-            
-            // 4. Carve the Roof/Cabin (A gaussian bump centered at z=-0.2)
-            float cabin = exp(-pow(pos.z + 0.2, 2.0) * 8.0) * smoothstep(-0.5, 0.5, pos.y);
-            carPos.y += cabin * 0.6;
-            
-            // 5. Taper the front (hood) and back (trunk)
-            float carTaper = 1.0 - pow(abs(pos.z), 3.0) * 0.4;
-            carPos.xy *= carTaper;
-
-            // --- MORPHING ENGINE ---
-            vec3 finalPos = pos;
-            if (uTargetState <= 1.0) {
-                finalPos = mix(pos, dressPos, uTargetState);
-            } else {
-                // Smooth transition from Dress directly to Car
-                finalPos = mix(dressPos, carPos, uTargetState - 1.0);
-            }
-
-            // --- MERCURY SURFACE ---
-            // Surface stays "liquid" even when the shape is locked
-            float ripple = sin(pos.y * 10.0 + uTime * 2.0) * 0.02;
-            ripple += cos(pos.x * 10.0 + uTime * 1.5) * 0.02;
-            finalPos += normal * ripple;
-
-            vPosition = finalPos;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);
-        }
-    </script>
-
-    <script id="fragmentShader" type="x-shader/x-fragment">
-        varying vec3 vNormal;
-        varying vec3 vPosition;
-        uniform float uTime;
-
-        void main() {
-            vec3 viewDir = normalize(vec3(0.0, 0.0, 8.0) - vPosition);
-            
-            // Chrome/Fresnel effect
-            float fresnel = pow(1.0 - dot(vNormal, viewDir), 2.0);
-            
-            // Deep Prisca Purple to Silver Chrome
-            vec3 baseColor = vec3(0.15, 0.02, 0.25);
-            vec3 chromeColor = vec3(0.8, 0.75, 1.0);
-            
-            vec3 finalColor = mix(baseColor, chromeColor, fresnel);
-            
-            // Add a moving "light" streak for mercury feel
-            float scan = smoothstep(0.4, 0.5, sin(vPosition.y * 2.0 + uTime));
-            finalColor += scan * 0.1;
-            
-            gl_FragColor = vec4(finalColor, 1.0);
-        }
-    </script>
-
+    <div id="status">System: Surgical Precision Active</div>
+    <div id="label">Scroll to Morph</div>
     <script>
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x05000a, 1);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        // High-density geometry for smooth morphing
-        const geometry = new THREE.SphereGeometry(1.5, 128, 128);
-        const uniforms = {
-            uTime: { value: 0 },
-            uTargetState: { value: 0 }
-        };
+        // High-Density Geometry for precise sculpting
+        const geometry = new THREE.IcosahedronGeometry(2, 64);
+        
+        const vertexShader = `
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            uniform float uTime;
+            uniform float uState; // 0: Globe, 1: Dress, 2: Car
+            
+            void main() {
+                vNormal = normal;
+                vec3 pos = position;
+                
+                // STATE 1: FASHION (DRESS)
+                // Distinct waist cinch + bell flare
+                float waistCinch = 1.0 - smoothstep(-0.5, 0.5, pos.y) * 0.6;
+                float flare = 1.0 + smoothstep(-2.0, -0.5, pos.y) * 1.5;
+                vec3 dressPos = pos;
+                dressPos.xz *= waistCinch;
+                dressPos.xz *= flare;
+                
+                // STATE 2: AUTOMOTIVE (CAR)
+                // Flat chassis + Greenhouse cockpit
+                vec3 carPos = pos;
+                carPos.y *= 0.35; // Flatten into chassis
+                carPos.z *= 2.5;  // Stretch length
+                carPos.x *= 1.2;  // Wide stance
+                
+                // Add the Cockpit/Roof
+                float cockpit = smoothstep(0.0, 1.5, carPos.z) * smoothstep(3.0, 1.5, carPos.z);
+                cockpit *= smoothstep(1.5, 0.0, abs(carPos.x));
+                carPos.y += cockpit * 0.8;
+
+                // BLENDING LOGIC
+                float s1 = clamp(uState, 0.0, 1.0);
+                float s2 = clamp(uState - 1.0, 0.0, 1.0);
+                
+                vec3 finalPos = mix(pos, dressPos, s1);
+                finalPos = mix(finalPos, carPos, s2);
+                
+                // Subtle Mercury Ripple (Keep structure dominant)
+                finalPos += normal * sin(pos.y * 10.0 + uTime * 2.0) * 0.03;
+
+                vPosition = finalPos;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            void main() {
+                vec3 viewDir = normalize(vec3(0,0,5) - vPosition);
+                float fresnel = pow(1.0 - dot(vNormal, viewDir), 3.0);
+                vec3 color = mix(vec3(0.11, 0.05, 0.13), vec3(0.8, 0.8, 1.0), fresnel);
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
 
         const material = new THREE.ShaderMaterial({
-            uniforms: uniforms,
-            vertexShader: document.getElementById('vertexShader').textContent,
-            fragmentShader: document.getElementById('fragmentShader').textContent
+            vertexShader,
+            fragmentShader,
+            uniforms: { uTime: { value: 0 }, uState: { value: 0 } }
         });
 
-        const mercury = new THREE.Mesh(geometry, material);
-        scene.add(mercury);
-        camera.position.z = 8;
+        const core = new THREE.Mesh(geometry, material);
+        scene.add(core);
 
-        const states = ["Globe", "Fashion Architecture", "Automotive Core"];
-        let currentStateIndex = 0;
-        let isTransitioning = false;
-        const label = document.getElementById('label');
+        camera.position.z = 6;
 
-        function updateMorph(index) {
-            if (isTransitioning || index < 0 || index >= states.length) return;
-            isTransitioning = true;
-            
-            gsap.to(uniforms.uTargetState, {
-                value: index,
-                duration: 2.2,
-                ease: "expo.inOut",
-                onStart: () => { label.style.opacity = 0.1; },
-                onComplete: () => {
-                    isTransitioning = false;
-                    label.innerHTML = `${states[index]} <span>${index === 2 ? 'Final State' : 'Scroll to Morph'}</span>`;
-                    label.style.opacity = 0.6;
-                }
-            });
-            currentStateIndex = index;
-        }
+        let scrollTarget = 0;
+        let currentScroll = 0;
 
         window.addEventListener('wheel', (e) => {
-            if (isTransitioning) return;
-            if (e.deltaY > 30) updateMorph(currentStateIndex + 1);
-            else if (e.deltaY < -30) updateMorph(currentStateIndex - 1);
-        }, { passive: true });
+            scrollTarget += e.deltaY * 0.002;
+            scrollTarget = Math.max(0, Math.min(2, scrollTarget));
+        });
 
-        function animate(time) {
-            uniforms.uTime.value = time * 0.001;
-            mercury.rotation.y += 0.003;
+        // Touch support
+        let touchY = 0;
+        window.addEventListener('touchstart', e => touchY = e.touches[0].clientY);
+        window.addEventListener('touchmove', e => {
+            const delta = touchY - e.touches[0].clientY;
+            scrollTarget += delta * 0.005;
+            scrollTarget = Math.max(0, Math.min(2, scrollTarget));
+            touchY = e.touches[0].clientY;
+        });
+
+        function animate() {
+            material.uniforms.uTime.value += 0.01;
+            currentScroll += (scrollTarget - currentScroll) * 0.1;
+            material.uniforms.uState.value = currentScroll;
+            
+            core.rotation.y += 0.005;
+            
             renderer.render(scene, camera);
             requestAnimationFrame(animate);
         }
-        requestAnimationFrame(animate);
+        animate();
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
