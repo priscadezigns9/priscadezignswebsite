@@ -68,6 +68,13 @@
             </div>
         </section>
 
+        <section id="section-anime">
+            <div class="content-box">
+                <h2>Dreaming Anime</h2>
+                <p>The Media Hub. High-fidelity news, trailers, and signals from the world of animation. Lamborghini-level urgency for the Otaku culture.</p>
+            </div>
+        </section>
+
         <section id="section-whatsapp">
             <div class="content-box">
                 <h2>Global Connectivity</h2>
@@ -115,6 +122,7 @@
             carScale: 0,
             dressScale: 0,
             laptopScale: 0,
+            animeScale: 0,
             waScale: 0,
             noise: 0.35, // High initial noise for sentient core
             rotationSpeed: 0.02
@@ -198,6 +206,14 @@
                 const waY = tailY;
                 const waZ = sZ;
 
+                // 5. ANIME (NARUTO): Spiky Hair Silhouette
+                const headY = 1.0;
+                const spikyHair = oy > 0.6 ? 1.0 + 0.4 * Math.sin(ox * 20.0) * Math.cos(oz * 20.0) : 1.0;
+                const neckCinch = oy > 0.4 && oy < 0.7 ? 0.6 : 1.0;
+                const aX = ox * spikyHair * neckCinch;
+                const aY = oy;
+                const aZ = oz * spikyHair * neckCinch;
+
                 // --- LAYERED BLENDING ---
                 let fX = ox, fY = oy, fZ = oz;
 
@@ -205,6 +221,7 @@
                 const dS = ease(morphState.dressScale);
                 const cS = ease(morphState.carScale);
                 const lS = ease(morphState.laptopScale);
+                const aS = ease(morphState.animeScale);
                 const wS = ease(morphState.waScale);
 
                 fX = fX * (1 - dS) + dX * dS;
@@ -218,6 +235,10 @@
                 fX = fX * (1 - lS) + laptopX * lS;
                 fY = fY * (1 - lS) + laptopY * lS;
                 fZ = fZ * (1 - lS) + laptopZ * lS;
+
+                fX = fX * (1 - aS) + aX * aS;
+                fY = fY * (1 - aS) + aY * aS;
+                fZ = fZ * (1 - aS) + aZ * aS;
 
                 fX = fX * (1 - wS) + waX * wS;
                 fY = fY * (1 - wS) + waY * wS;
@@ -252,12 +273,21 @@
         });
 
         gsap.to(morphState, {
-            waScale: 1, laptopScale: 0, noise: 0.1, rotationSpeed: 0.015,
+            animeScale: 1, laptopScale: 0, noise: 0.2, rotationSpeed: 0.02,
+            scrollTrigger: { trigger: "#section-anime", start: "top bottom", end: "top top", scrub: 0.5 }
+        });
+
+        gsap.to(morphState, {
+            waScale: 1, animeScale: 0, noise: 0.1, rotationSpeed: 0.015,
             scrollTrigger: { trigger: "#section-whatsapp", start: "top bottom", end: "top top", scrub: 0.5 }
         });
 
         // Indicators
-        const sections = ["#section-core", "#section-fashion", "#section-automotive", "#section-laptop", "#section-whatsapp"];
+        // Sections to keep track of
+        const sections = ["#section-core", "#section-fashion", "#section-automotive", "#section-laptop", "#section-anime", "#section-whatsapp"];
+        
+        // Update the HTML scroll container
+        // I will do this in the next step to add the Naruto section
         sections.forEach((id, i) => {
             ScrollTrigger.create({
                 trigger: id, start: "top center", end: "bottom center",
