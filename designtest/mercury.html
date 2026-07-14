@@ -3,25 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercury Morph Master — Prisca Dezigns</title>
+    <title>High-Fidelity Mercury Core — Prisca Dezigns</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
-        body { margin: 0; background: #110022; color: white; height: 100vh; overflow: hidden; font-family: sans-serif; }
+        body { margin: 0; background: #05000a; color: white; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
         canvas { position: fixed; top: 0; left: 0; }
-        #status {
-            position: absolute; top: 20px; left: 20px; color: #cc66ff; font-family: monospace; z-index: 100;
-        }
         #label {
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5rem;
-            opacity: 0.8; pointer-events: none;
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.6rem;
+            opacity: 0.6; pointer-events: none; text-align: center;
         }
+        #label span { display: block; font-size: 0.6rem; letter-spacing: 0.2rem; margin-top: 10px; opacity: 0.5; }
     </style>
 </head>
 <body>
-    <div id="status">System: Initializing Core...</div>
-    <div id="label">Globe</div>
+    <div id="label">Globe <span>Scroll to Morph</span></div>
 
     <script id="vertexShader" type="x-shader/x-vertex">
         uniform float uTime;
@@ -33,31 +30,48 @@
             vNormal = normal;
             vec3 pos = position;
             
-            // State 1: Fashion (Dress)
-            float flare = pow(max(0.0, -pos.y + 0.5), 2.0) * 1.5;
-            float cinch = 1.0 - (exp(-pow(pos.y - 0.2, 2.0) * 10.0) * 0.5);
+            // --- STATE 1: FASHION (The Dress Silhouette) ---
+            // Defined by a tight waist (cinch) and a wide, dramatic floor-length flare
             vec3 dressPos = pos;
-            dressPos.xz *= (1.0 + flare) * cinch;
-            dressPos.y *= 1.3;
+            float dressY = pos.y;
+            // Waist at y=0.2, Flare starting below y=0.0
+            float dressCinch = 1.0 - (exp(-pow(dressY - 0.25, 2.0) * 15.0) * 0.6);
+            float dressFlare = pow(max(0.0, -dressY + 0.4), 2.2) * 2.5;
+            dressPos.xz *= (dressCinch + dressFlare);
+            dressPos.y *= 1.5; // Elongate for elegance
 
-            // State 2: Automotive (Car)
+            // --- STATE 2: AUTOMOTIVE (The Car Silhouette) ---
+            // Defined by a low chassis, long hood, and a distinct cabin/roof bump
             vec3 carPos = pos;
-            carPos.y *= 0.45;
-            carPos.z *= 2.3;
-            carPos.x *= 1.3;
-            float roof = smoothstep(0.5, -0.4, abs(pos.z)) * smoothstep(-0.1, 0.2, pos.y);
-            carPos.y += roof * 0.4;
+            // 1. Flatten the entire sphere into a slab
+            carPos.y *= 0.35; 
+            // 2. Stretch into a long rectangle (Z is forward/back)
+            carPos.z *= 2.8;
+            // 3. Widen slightly for stance
+            carPos.x *= 1.4;
+            
+            // 4. Carve the Roof/Cabin (A gaussian bump centered at z=-0.2)
+            float cabin = exp(-pow(pos.z + 0.2, 2.0) * 8.0) * smoothstep(-0.5, 0.5, pos.y);
+            carPos.y += cabin * 0.6;
+            
+            // 5. Taper the front (hood) and back (trunk)
+            float carTaper = 1.0 - pow(abs(pos.z), 3.0) * 0.4;
+            carPos.xy *= carTaper;
 
-            // Simple Blending
+            // --- MORPHING ENGINE ---
             vec3 finalPos = pos;
             if (uTargetState <= 1.0) {
                 finalPos = mix(pos, dressPos, uTargetState);
             } else {
+                // Smooth transition from Dress directly to Car
                 finalPos = mix(dressPos, carPos, uTargetState - 1.0);
             }
 
-            // Subtle Pulse
-            finalPos += normal * sin(pos.y * 5.0 + uTime * 2.0) * 0.03;
+            // --- MERCURY SURFACE ---
+            // Surface stays "liquid" even when the shape is locked
+            float ripple = sin(pos.y * 10.0 + uTime * 2.0) * 0.02;
+            ripple += cos(pos.x * 10.0 + uTime * 1.5) * 0.02;
+            finalPos += normal * ripple;
 
             vPosition = finalPos;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);
@@ -70,99 +84,92 @@
         uniform float uTime;
 
         void main() {
-            vec3 viewDir = normalize(vec3(0.0, 0.0, 6.0) - vPosition);
-            float fresnel = pow(1.0 - dot(vNormal, viewDir), 2.5);
-            vec3 color = mix(vec3(0.2, 0.05, 0.3), vec3(0.9, 0.8, 1.0), fresnel);
-            gl_FragColor = vec4(color, 1.0);
+            vec3 viewDir = normalize(vec3(0.0, 0.0, 8.0) - vPosition);
+            
+            // Chrome/Fresnel effect
+            float fresnel = pow(1.0 - dot(vNormal, viewDir), 2.0);
+            
+            // Deep Prisca Purple to Silver Chrome
+            vec3 baseColor = vec3(0.15, 0.02, 0.25);
+            vec3 chromeColor = vec3(0.8, 0.75, 1.0);
+            
+            vec3 finalColor = mix(baseColor, chromeColor, fresnel);
+            
+            // Add a moving "light" streak for mercury feel
+            float scan = smoothstep(0.4, 0.5, sin(vPosition.y * 2.0 + uTime));
+            finalColor += scan * 0.1;
+            
+            gl_FragColor = vec4(finalColor, 1.0);
         }
     </script>
 
     <script>
-        const status = document.getElementById('status');
-        try {
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x050011, 1);
-            document.body.appendChild(renderer.domElement);
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x05000a, 1);
+        document.body.appendChild(renderer.domElement);
 
-            const geometry = new THREE.SphereGeometry(1.5, 64, 64);
-            const uniforms = {
-                uTime: { value: 0 },
-                uTargetState: { value: 0 }
-            };
+        // High-density geometry for smooth morphing
+        const geometry = new THREE.SphereGeometry(1.5, 128, 128);
+        const uniforms = {
+            uTime: { value: 0 },
+            uTargetState: { value: 0 }
+        };
 
-            const material = new THREE.ShaderMaterial({
-                uniforms: uniforms,
-                vertexShader: document.getElementById('vertexShader').textContent,
-                fragmentShader: document.getElementById('fragmentShader').textContent
-            });
+        const material = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: document.getElementById('vertexShader').textContent,
+            fragmentShader: document.getElementById('fragmentShader').textContent
+        });
 
-            const mercury = new THREE.Mesh(geometry, material);
-            scene.add(mercury);
-            camera.position.z = 6;
+        const mercury = new THREE.Mesh(geometry, material);
+        scene.add(mercury);
+        camera.position.z = 8;
 
-            const states = ["Globe", "Fashion", "Automotive"];
-            let currentStateIndex = 0;
-            let isTransitioning = false;
-            const label = document.getElementById('label');
+        const states = ["Globe", "Fashion Architecture", "Automotive Core"];
+        let currentStateIndex = 0;
+        let isTransitioning = false;
+        const label = document.getElementById('label');
 
-            function updateMorph(index) {
-                if (isTransitioning || index < 0 || index >= states.length) return;
-                isTransitioning = true;
-                
-                gsap.to(uniforms.uTargetState, {
-                    value: index,
-                    duration: 1.5,
-                    ease: "power2.inOut",
-                    onStart: () => { label.style.opacity = 0.2; },
-                    onComplete: () => {
-                        isTransitioning = false;
-                        label.textContent = states[index];
-                        label.style.opacity = 0.8;
-                    }
-                });
-                currentStateIndex = index;
-            }
-
-            window.addEventListener('wheel', (e) => {
-                if (isTransitioning) return;
-                if (e.deltaY > 20) updateMorph(currentStateIndex + 1);
-                else if (e.deltaY < -20) updateMorph(currentStateIndex - 1);
-            }, { passive: true });
-
-            // Touch support for mobile
-            let touchStartY = 0;
-            window.addEventListener('touchstart', e => touchStartY = e.touches[0].clientY);
-            window.addEventListener('touchend', e => {
-                const deltaY = touchStartY - e.changedTouches[0].clientY;
-                if (Math.abs(deltaY) > 50) {
-                    if (deltaY > 0) updateMorph(currentStateIndex + 1);
-                    else updateMorph(currentStateIndex - 1);
+        function updateMorph(index) {
+            if (isTransitioning || index < 0 || index >= states.length) return;
+            isTransitioning = true;
+            
+            gsap.to(uniforms.uTargetState, {
+                value: index,
+                duration: 2.2,
+                ease: "expo.inOut",
+                onStart: () => { label.style.opacity = 0.1; },
+                onComplete: () => {
+                    isTransitioning = false;
+                    label.innerHTML = `${states[index]} <span>${index === 2 ? 'Final State' : 'Scroll to Morph'}</span>`;
+                    label.style.opacity = 0.6;
                 }
             });
-
-            function animate(time) {
-                uniforms.uTime.value = time * 0.001;
-                mercury.rotation.y += 0.005;
-                renderer.render(scene, camera);
-                requestAnimationFrame(animate);
-            }
-            requestAnimationFrame(animate);
-            
-            status.textContent = "System: Core Active";
-            setTimeout(() => status.style.opacity = 0, 3000);
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        } catch (e) {
-            status.textContent = "System Error: " + e.message;
-            status.style.color = "red";
+            currentStateIndex = index;
         }
+
+        window.addEventListener('wheel', (e) => {
+            if (isTransitioning) return;
+            if (e.deltaY > 30) updateMorph(currentStateIndex + 1);
+            else if (e.deltaY < -30) updateMorph(currentStateIndex - 1);
+        }, { passive: true });
+
+        function animate(time) {
+            uniforms.uTime.value = time * 0.001;
+            mercury.rotation.y += 0.003;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
