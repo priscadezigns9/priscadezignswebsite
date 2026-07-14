@@ -144,75 +144,32 @@
 
                 // --- SHAPE DEFINITIONS (SPECIFIC GEOMETRY) ---
 
-                // 1. DRESS: Pronounced A-line, Cinched Waist, Sweetheart Neckline
-                const waistY = 0.25;
-                const waistDist = Math.abs(oy - waistY);
-                const waistCinch = 0.4 + 0.6 * (1.0 - Math.exp(-waistDist * 8.0));
-                const skirtFlare = oy < waistY ? 1.0 + Math.pow(waistY - oy, 1.5) * 3.5 : 1.0;
-                const sweetheart = oy > 0.8 ? 1.0 - 0.2 * Math.sin((ox + 1) * Math.PI) : 1.0;
-                
-                const dX = ox * waistCinch * (oy < waistY ? 1.2 : 1.0);
-                const dY = oy * sweetheart;
-                const dZ = oz * waistCinch * skirtFlare;
+                // 1. DRESS: Distinct Triangular Silhouette (A-Line)
+                const dX = ox * (oy < 0 ? 3.0 : 0.6); 
+                const dY = oy;
+                const dZ = oz * (oy < 0 ? 3.0 : 0.6);
 
-                // 2. CAR: Low-profile Luxury Sedan Silhouette
-                const carLength = 4.2;
-                const carWidth = 1.8;
-                const carHeight = 0.6;
-                
-                let cX = ox * carWidth;
-                let cY = oy * carHeight;
-                let cZ = oz * carLength;
+                // 2. CAR: Long Rectangular Chassis (Luxury Sedan)
+                const carX = ox * 2.8; 
+                const carY = (oy + 0.5) * 0.4;
+                const carZ = oz * 6.0; 
 
-                const floor = -0.3;
-                if (cY < floor) cY = floor + (cY - floor) * 0.1;
-                const roofCurve = 1.0 - Math.pow(Math.abs(cZ) / carLength, 2) * 0.4;
-                cY *= roofCurve;
+                // 3. LAPTOP: Wide Flat Rectangle (Workstation)
+                const laptopX = ox * 4.5;
+                const laptopY = oy * 0.15;
+                const laptopZ = oz * 3.5;
 
-                const taper = 1.0 - Math.pow(Math.abs(cZ) / carLength, 3) * 0.5;
-                cX *= taper;
+                // 4. WHATSAPP: High-Contrast Squircle
+                const wPower = 8;
+                const wX = Math.sign(ox) * Math.pow(Math.abs(ox), 1/wPower) * 2.5;
+                const wY = Math.sign(oy) * Math.pow(Math.abs(oy), 1/wPower) * 2.5;
+                const wZ = Math.sign(oz) * Math.pow(Math.abs(oz), 1/wPower) * 0.2;
 
-                const carX = cX;
-                const carY = cY + 0.2; 
-                const carZ = cZ;
-
-                // 3. LAPTOP: Clamshell with distinct hinge
-                const isTop = ny > 0.05;
-                const lWidth = 2.4;
-                const lDepth = 1.8;
-                const lThick = 0.15;
-
-                let lpX = ox * lWidth;
-                let lpY = isTop ? 0.8 : -0.1;
-                let lpZ = isTop ? (oz * lDepth - 1.2) : (oz * lDepth + 0.2);
-                lpY += (oy * lThick);
-                
-                const laptopX = lpX;
-                const laptopY = lpY;
-                const laptopZ = lpZ;
-
-                // 4. WHATSAPP: Structural Squircle + Direct Tail
-                const radius = 1.4;
-                const power = 4; 
-                const sX = Math.sign(ox) * Math.pow(Math.abs(nx), 1/power) * radius;
-                const sY = Math.sign(oy) * Math.pow(Math.abs(ny), 1/power) * radius;
-                const sZ = nz * 0.5;
-
-                const isTailArea = (nx < -0.5 && ny < -0.5);
-                const tailX = isTailArea ? sX - 0.6 : sX;
-                const tailY = isTailArea ? sY - 0.6 : sY;
-
-                const waX = tailX;
-                const waY = tailY;
-                const waZ = sZ;
-
-                // 5. ANIME (NARUTO): Spiky Hair Silhouette
-                const headY = 1.0;
-                const spikyHair = oy > 0.6 ? 1.0 + 0.4 * Math.sin(ox * 20.0) * Math.cos(oz * 20.0) : 1.0;
-                const neckCinch = oy > 0.4 && oy < 0.7 ? 0.6 : 1.0;
-                const aX = ox * spikyHair * neckCinch;
-                const aY = oy;
-                const aZ = oz * spikyHair * neckCinch;
+                // 5. ANIME (NARUTO): Aggressive Spiky Hair Silhouette
+                const headSpike = 1.0 + 1.2 * Math.abs(Math.sin(ox * 15) * Math.sin(oy * 15));
+                const aX = ox * headSpike;
+                const aY = oy * headSpike;
+                const aZ = oz * headSpike;
 
                 // --- LAYERED BLENDING (LINEAR MIXING) ---
                 let fX = ox, fY = oy, fZ = oz;
