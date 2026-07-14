@@ -32,11 +32,12 @@
     </div>
 
     <div class="nav-dots">
-        <div class="dot active" id="dot-0"></div>
-        <div class="dot" id="dot-1"></div>
-        <div class="dot" id="dot-2"></div>
-        <div class="dot" id="dot-3"></div>
-        <div class="dot" id="dot-4"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
     </div>
 
     <div class="scroll-container">
@@ -50,35 +51,35 @@
         <section id="section-fashion">
             <div class="content-box">
                 <h2>High-Fidelity Style</h2>
-                <p>Anatomical DNA mapping. Morphing from liquid brain to structural couture—where code meets the silhouette.</p>
+                <p>NehNeh. Anatomical DNA mapping. Morphing into the structural couture silhouette.</p>
             </div>
         </section>
 
         <section id="section-automotive">
             <div class="content-box">
                 <h2>Aerodynamic Logic</h2>
-                <p>The Luxury Sedan profile. Low-profile chassis, executive wheelbase, and the authority of high-performance engineering.</p>
+                <p>The Autodrome. High-performance luxury sedan chassis engineering.</p>
             </div>
         </section>
 
         <section id="section-laptop">
             <div class="content-box">
                 <h2>Technical Infrastructure</h2>
-                <p>The Mobile Workstation. High-performance computing architecture, optimized for strategic AI deployment.</p>
+                <p>The Productivity Core. Optimized architecture for strategic AI deployment.</p>
             </div>
         </section>
 
         <section id="section-anime">
             <div class="content-box">
                 <h2>Dreaming Anime</h2>
-                <p>The Media Hub. High-fidelity news, trailers, and signals from the world of animation. Lamborghini-level urgency for the Otaku culture.</p>
+                <p>The Media Hub. High-fidelity signals from the world of animation.</p>
             </div>
         </section>
 
         <section id="section-whatsapp">
             <div class="content-box">
                 <h2>Global Connectivity</h2>
-                <p>The sovereign network. Morphing into the structural "Squircle"—the geometry of seamless AI communication.</p>
+                <p>The structural squircle. Seamless communication geometry.</p>
             </div>
         </section>
     </div>
@@ -100,32 +101,29 @@
             color: 0x1d0e21,
             metalness: 1,
             roughness: 0.1,
-            flatShading: false
+            emissive: 0x7c3aed,
+            emissiveIntensity: 0.2
         });
+
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
 
-        const light1 = new THREE.DirectionalLight(0x7c3aed, 1.5);
-        light1.position.set(2, 2, 5);
-        scene.add(light1);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
 
-        const light2 = new THREE.PointLight(0xffffff, 1);
-        light2.position.set(-5, -2, 2);
-        scene.add(light2);
-
-        scene.add(new THREE.AmbientLight(0x404040, 0.5));
+        const pointLight = new THREE.PointLight(0x7c3aed, 2);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
 
         camera.position.z = 5;
 
-        // Current Morph State
         let morphState = {
-            carScale: 0,
-            dressScale: 0,
-            laptopScale: 0,
-            animeScale: 0,
-            waScale: 0,
-            noise: 0.35, // High initial noise for sentient core
-            rotationSpeed: 0.02
+            dress: 0,
+            car: 0,
+            laptop: 0,
+            anime: 0,
+            whatsapp: 0,
+            noise: 0.35
         };
 
         function updateGeometry() {
@@ -133,106 +131,63 @@
             const time = Date.now() * 0.0015;
 
             for (let i = 0; i < positions.length; i += 3) {
-                const ox = originalPositions[i];
-                const oy = originalPositions[i+1];
-                const oz = originalPositions[i+2];
+                const x = originalPositions[i];
+                const y = originalPositions[i+1];
+                const z = originalPositions[i+2];
 
-                const mag = Math.sqrt(ox*ox + oy*oy + oz*oz);
-                const nx = ox / mag;
-                const ny = oy / mag;
-                const nz = oz / mag;
+                // --- FORM TARGETS ---
+                // Dress: A-Line
+                const dX = x * (y < 0 ? 2.5 : 0.7);
+                const dY = y;
+                const dZ = z * (y < 0 ? 2.5 : 0.7);
 
-                // --- SHAPE DEFINITIONS (SPECIFIC GEOMETRY) ---
+                // Car: Long Chassis
+                const cX = x * 2.5;
+                const cY = y * 0.5;
+                const cZ = z * 4.5;
 
-                // 1. DRESS: Distinct Triangular Silhouette (A-Line)
-                const dX = ox * (oy < 0 ? 3.0 : 0.6); 
-                const dY = oy;
-                const dZ = oz * (oy < 0 ? 3.0 : 0.6);
+                // Laptop: Flat Wide
+                const lX = x * 4.0;
+                const lY = y * 0.1;
+                const lZ = z * 2.5;
 
-                // 2. CAR: Long Rectangular Chassis (Luxury Sedan)
-                const carX = ox * 2.8; 
-                const carY = (oy + 0.5) * 0.4;
-                const carZ = oz * 6.0; 
+                // Anime: Spiky
+                const spike = 1.0 + 0.5 * Math.sin(x * 10) * Math.sin(y * 10);
+                const aX = x * spike;
+                const aY = y * spike;
+                const aZ = z * spike;
 
-                // 3. LAPTOP: Wide Flat Rectangle (Workstation)
-                const laptopX = ox * 4.5;
-                const laptopY = oy * 0.15;
-                const laptopZ = oz * 3.5;
+                // WhatsApp: Squircle
+                const p = 6;
+                const wX = Math.sign(x) * Math.pow(Math.abs(x), 1/p) * 2.0;
+                const wY = Math.sign(y) * Math.pow(Math.abs(y), 1/p) * 2.0;
+                const wZ = z * 0.3;
 
-                // 4. WHATSAPP: High-Contrast Squircle
-                const wPower = 8;
-                const wX = Math.sign(ox) * Math.pow(Math.abs(ox), 1/wPower) * 2.5;
-                const wY = Math.sign(oy) * Math.pow(Math.abs(oy), 1/wPower) * 2.5;
-                const wZ = Math.sign(oz) * Math.pow(Math.abs(oz), 1/wPower) * 0.2;
+                // --- MIXING ---
+                const s = morphState;
+                const total = s.dress + s.car + s.laptop + s.anime + s.whatsapp;
+                const b = Math.max(0, 1 - total);
 
-                // 5. ANIME (NARUTO): Aggressive Spiky Hair Silhouette
-                const headSpike = 1.0 + 1.2 * Math.abs(Math.sin(ox * 15) * Math.sin(oy * 15));
-                const aX = ox * headSpike;
-                const aY = oy * headSpike;
-                const aZ = oz * headSpike;
+                let fx = x * b + dX * s.dress + cX * s.car + lX * s.laptop + aX * s.anime + wX * s.whatsapp;
+                let fy = y * b + dY * s.dress + cY * s.car + lY * s.laptop + aY * s.anime + wY * s.whatsapp;
+                let fz = z * b + dZ * s.dress + cZ * s.car + lZ * s.laptop + aZ * s.anime + wZ * s.whatsapp;
 
-                // --- LAYERED BLENDING (LINEAR MIXING) ---
-                let fX = ox, fY = oy, fZ = oz;
-
-                const ease = (t) => t * t * (3 - 2 * t);
-                const dS = ease(morphState.dressScale);
-                const cS = ease(morphState.carScale);
-                const lS = ease(morphState.laptopScale);
-                const aS = ease(morphState.animeScale);
-                const wS = ease(morphState.waScale);
-
-                // Cumulative weight to ensure normalization if multiple scales are active
-                const totalScale = dS + cS + lS + aS + wS;
-                const baseWeight = Math.max(0, 1 - totalScale);
-
-                fX = ox * baseWeight + dX * dS + carX * cS + laptopX * lS + aX * aS + waX * wS;
-                fY = oy * baseWeight + dY * dS + carY * cS + laptopY * lS + aY * aS + waY * wS;
-                fZ = oz * baseWeight + dZ * dS + carZ * cS + laptopZ * lS + aZ * aS + waZ * wS;
-
-                // --- SENTIENT PULSE & VEINS ---
-                const pulse = Math.sin(time * 0.8) * 0.06;
-                const vein = Math.sin(nx * 8 + time) * Math.cos(ny * 8 + time * 0.5) * 0.03;
-                const wave = (Math.sin(nx * 4 + time * 2) * Math.cos(ny * 4 + time)) * (morphState.noise + pulse + vein);
-                
-                positions[i] = fX * (1 + wave);
-                positions[i+1] = fY * (1 + wave);
-                positions[i+2] = fZ * (1 + wave);
+                // Noise
+                const noise = (Math.sin(x * 4 + time) * Math.cos(y * 4 + time)) * s.noise;
+                positions[i] = fx + noise;
+                positions[i+1] = fy + noise;
+                positions[i+2] = fz + noise;
             }
             positionAttribute.needsUpdate = true;
         }
 
-        // SCROLL TRIGGER ANIMATIONS
-        gsap.to(morphState, {
-            dressScale: 1, noise: 0.08, rotationSpeed: 0.005,
-            scrollTrigger: { trigger: "#section-fashion", start: "top bottom", end: "top top", scrub: 0.5 }
-        });
+        gsap.to(morphState, { dress: 1, noise: 0.1, scrollTrigger: { trigger: "#section-fashion", scrub: 0.5 } });
+        gsap.to(morphState, { car: 1, dress: 0, noise: 0.05, scrollTrigger: { trigger: "#section-automotive", scrub: 0.5 } });
+        gsap.to(morphState, { laptop: 1, car: 0, noise: 0.05, scrollTrigger: { trigger: "#section-laptop", scrub: 0.5 } });
+        gsap.to(morphState, { anime: 1, laptop: 0, noise: 0.1, scrollTrigger: { trigger: "#section-anime", scrub: 0.5 } });
+        gsap.to(morphState, { whatsapp: 1, anime: 0, noise: 0.05, scrollTrigger: { trigger: "#section-whatsapp", scrub: 0.5 } });
 
-        gsap.to(morphState, {
-            carScale: 1, dressScale: 0, noise: 0.04, rotationSpeed: 0.002,
-            scrollTrigger: { trigger: "#section-automotive", start: "top bottom", end: "top top", scrub: 0.5 }
-        });
-
-        gsap.to(morphState, {
-            laptopScale: 1, carScale: 0, noise: 0.03, rotationSpeed: 0.001,
-            scrollTrigger: { trigger: "#section-laptop", start: "top bottom", end: "top top", scrub: 0.5 }
-        });
-
-        gsap.to(morphState, {
-            animeScale: 1, laptopScale: 0, noise: 0.06, rotationSpeed: 0.005,
-            scrollTrigger: { trigger: "#section-anime", start: "top bottom", end: "top top", scrub: 0.5 }
-        });
-
-        gsap.to(morphState, {
-            waScale: 1, animeScale: 0, noise: 0.02, rotationSpeed: 0.002,
-            scrollTrigger: { trigger: "#section-whatsapp", start: "top bottom", end: "top top", scrub: 0.5 }
-        });
-
-        // Indicators
-        // Sections to keep track of
         const sections = ["#section-core", "#section-fashion", "#section-automotive", "#section-laptop", "#section-anime", "#section-whatsapp"];
-        
-        // Update the HTML scroll container
-        // I will do this in the next step to add the Naruto section
         sections.forEach((id, i) => {
             ScrollTrigger.create({
                 trigger: id, start: "top center", end: "bottom center",
