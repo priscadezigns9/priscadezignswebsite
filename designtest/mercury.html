@@ -36,6 +36,7 @@
         <div class="dot" id="dot-1"></div>
         <div class="dot" id="dot-2"></div>
         <div class="dot" id="dot-3"></div>
+        <div class="dot" id="dot-4"></div>
     </div>
 
     <div class="scroll-container">
@@ -57,6 +58,13 @@
             <div class="content-box">
                 <h2>Aerodynamic Logic</h2>
                 <p>The Luxury Sedan profile. Low-profile chassis, executive wheelbase, and the authority of high-performance engineering.</p>
+            </div>
+        </section>
+
+        <section id="section-laptop">
+            <div class="content-box">
+                <h2>Technical Infrastructure</h2>
+                <p>The Mobile Workstation. High-performance computing architecture, optimized for strategic AI deployment.</p>
             </div>
         </section>
 
@@ -106,6 +114,7 @@
         let morphState = {
             carScale: 0,
             dressScale: 0,
+            laptopScale: 0,
             waScale: 0,
             noise: 0.15
         };
@@ -129,7 +138,7 @@
                 const skirtFlare = 1.0 + (morphState.dressScale * 2.2 * Math.max(0, -y + 0.1));
                 const sweetheart = 1.0 - (morphState.dressScale * 0.15 * Math.exp(-Math.pow(y - 0.85, 2) * 15.0));
                 
-                // Cap Sleeves (Diagonal expansion at the top-sides)
+                // Cap Sleeves
                 const sleeveExp = morphState.dressScale * 0.65 * Math.exp(-Math.pow(y - 0.75, 2) * 20.0) * (Math.abs(x) > 0.4 ? 1.0 : 0.0);
                 
                 let dx = x * (waistCinch + sleeveExp);
@@ -140,28 +149,32 @@
                 const sedanZ = dz * (1.0 + (morphState.carScale * 3.2)); 
                 const sedanY = dy * (1.0 - (morphState.carScale * 0.78));
                 const sedanX = dx * (1.0 + (morphState.carScale * 0.6)); 
-                
-                // Front Grille Flattening (Horizontal wide face)
                 const grilleFlatten = morphState.carScale * Math.max(0, sedanZ - 2.8) * 1.2;
-                
-                // Fastback Roofline (Lift in middle, sharp drop at rear)
                 const cabinLift = morphState.carScale * 0.42 * Math.exp(-Math.pow(sedanZ + 0.5, 2) * 1.2) * Math.exp(-Math.pow(sedanX * 0.8, 2) * 2.5);
 
-                // 3. WHATSAPP LOGO (Circular Outline + Indicator Tail)
-                // Base Circular outline factor
-                const circleFactor = 1.0 - (morphState.waScale * (1.0 - 1.0 / mag));
+                // 3. LAPTOP MORPH (Screen + Base)
+                const isTop = ny > 0;
+                const laptopZ = sedanZ * (1.0 + (morphState.laptopScale * 1.2));
+                const laptopX = sedanX * (1.0 + (morphState.laptopScale * 0.8));
+                const laptopY = sedanY * (1.0 - (morphState.laptopScale * 0.5));
                 
-                // The "Tail" (Triangle pointing down-left: ny < -0.6, nx < -0.4)
-                const tailAngle = -2.4; // -135 degrees approx
+                // Hinge/Opening: Top half tilts back, bottom half tilts forward
+                const hingeBend = morphState.laptopScale * (isTop ? -0.8 : 0.4);
+                const lY = laptopY + (isTop ? morphState.laptopScale * 0.5 : -morphState.laptopScale * 0.2);
+                const lZ = laptopZ + (isTop ? -morphState.laptopScale * 0.8 : morphState.laptopScale * 0.4);
+
+                // 4. WHATSAPP LOGO (Circular Outline + Indicator Tail)
+                const circleFactor = 1.0 - (morphState.waScale * (1.0 - 1.0 / mag));
+                const tailAngle = -2.4; 
                 const distToTail = Math.sqrt(Math.pow(nx - Math.cos(tailAngle)*0.9, 2) + Math.pow(ny - Math.sin(tailAngle)*0.9, 2));
                 const tailExp = morphState.waScale * 0.8 * Math.exp(-distToTail * 10.0);
                 
                 // Final Assembly
                 const noise = (Math.sin(nx * 5 + time) * Math.cos(ny * 5 + time)) * morphState.noise;
 
-                positions[i] = (sedanX * circleFactor + (nx < 0 ? -tailExp * 0.5 : 0)) * (1 + noise);
-                positions[i+1] = ((sedanY + cabinLift) * circleFactor + (ny < 0 ? -tailExp : 0)) * (1 + noise);
-                positions[i+2] = ((sedanZ - grilleFlatten) * circleFactor) * (1 + noise);
+                positions[i] = (laptopX * circleFactor + (nx < 0 ? -tailExp * 0.5 : 0)) * (1 + noise);
+                positions[i+1] = ((lY + cabinLift) * circleFactor + (ny < 0 ? -tailExp : 0)) * (1 + noise);
+                positions[i+2] = ((lZ - grilleFlatten) * circleFactor) * (1 + noise);
             }
             positionAttribute.needsUpdate = true;
         }
@@ -178,12 +191,17 @@
         });
 
         gsap.to(morphState, {
-            waScale: 1, carScale: 0, noise: 0.05,
+            laptopScale: 1, carScale: 0, noise: 0.03,
+            scrollTrigger: { trigger: "#section-laptop", start: "top bottom", end: "top top", scrub: 1 }
+        });
+
+        gsap.to(morphState, {
+            waScale: 1, laptopScale: 0, noise: 0.05,
             scrollTrigger: { trigger: "#section-whatsapp", start: "top bottom", end: "top top", scrub: 1 }
         });
 
         // Indicators
-        const sections = ["#section-core", "#section-fashion", "#section-automotive", "#section-whatsapp"];
+        const sections = ["#section-core", "#section-fashion", "#section-automotive", "#section-laptop", "#section-whatsapp"];
         sections.forEach((id, i) => {
             ScrollTrigger.create({
                 trigger: id, start: "top center", end: "bottom center",
