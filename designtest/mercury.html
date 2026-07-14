@@ -9,125 +9,102 @@
     <style>
         body { margin: 0; background: #050505; color: white; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
         canvas { position: fixed; top: 0; left: 0; outline: none; }
-        .ui {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            text-align: center;
-            pointer-events: none;
+        #label {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.8rem;
+            opacity: 0.5; transition: opacity 0.5s; pointer-events: none;
         }
-        .status { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3rem; opacity: 0.5; margin-bottom: 10px; }
-        .label { font-size: 1.5rem; font-weight: 300; letter-spacing: 0.1rem; }
     </style>
 </head>
 <body>
-    <div class="ui">
-        <div class="status">System State</div>
-        <div class="label" id="stateLabel">Core Globe</div>
-    </div>
+    <div id="label">Globe</div>
 
     <script id="vertexShader" type="x-shader/x-vertex">
-        varying vec2 vUv;
+        uniform float uTime;
+        uniform float uTargetState; 
+        uniform float uFlare;
+        uniform float uCinch;
         varying vec3 vNormal;
         varying vec3 vPosition;
-        uniform float uTime;
-        
-        // Morph Targets
-        uniform float uMorphDress;
-        uniform float uMorphCar;
 
-        // Simplex Noise
-        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
-        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-        float snoise(vec3 v) {
-            const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
-            const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
-            vec3 i  = floor(v + dot(v, C.yyy) );
-            vec3 x0 =   v - i + dot(i, C.xxx) ;
-            vec3 g = step(x0.yzx, x0.xyz);
-            vec3 l = 1.0 - g;
-            vec3 i1 = min( g.xyz, l.zxy );
-            vec3 i2 = max( g.xyz, l.zxy );
-            vec3 x1 = x0 - i1 + C.xxx;
-            vec3 x2 = x0 - i2 + C.yyy;
-            vec3 x3 = x0 - D.yyy;
-            i = mod289(i);
-            vec4 p = permute( permute( permute(
-                    i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-                    + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
-                    + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-            float n_ = 0.142857142857;
-            vec3  ns = n_ * D.wyz - D.xzx;
-            vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-            vec4 x_ = floor(j * ns.z);
-            vec4 y_ = floor(j - 7.0 * x_ );
-            vec4 x = x_ *ns.x + ns.yyyy;
-            vec4 y = y_ *ns.x + ns.yyyy;
-            vec4 h = 1.0 - abs(x) - abs(y);
-            vec4 b0 = vec4( x.xy, y.xy );
-            vec4 b1 = vec4( x.zw, y.zw );
-            vec4 s0 = floor(b0)*2.0 + 1.0;
-            vec4 s1 = floor(b1)*2.0 + 1.0;
-            vec4 sh = -step(h, vec4(0.0));
-            vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
-            vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
-            vec3 p0 = vec3(a0.xy,h.x);
-            vec3 p1 = vec3(a0.zw,h.y);
-            vec3 p2 = vec3(a1.xy,h.z);
-            vec3 p3 = vec3(a1.zw,h.w);
-            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-            p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-            vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-            m = m * m;
-            return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+        vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+        float snoise(vec2 v){
+          const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+          vec2 i  = floor(v + dot(v, C.yy) );
+          vec2 x0 = v -   i + dot(i, C.xx);
+          vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+          vec4 x12 = x0.xyxy + C.xxzz;
+          x12.xy -= i1;
+          i = mod(i, 289.0);
+          vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+          vec3 m = max(0.5 - vec4(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw), 0.0), 0.0);
+          m = m*m*m*m;
+          vec3 x = 2.0 * fract(p * C.www) - 1.0;
+          vec3 h = abs(x) - 0.5;
+          vec3 ox = floor(x + 0.5);
+          vec3 a0 = x - ox;
+          m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+          vec3 g;
+          g.x  = a0.x  * x0.x  + h.x  * x0.y;
+          g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+          return 130.0 * dot(m, g);
         }
 
         void main() {
-            vUv = uv;
             vNormal = normal;
             vec3 pos = position;
+            
+            // STATE 0: GLOBE
+            vec3 globePos = pos;
 
-            // DRESS Target
-            float dFlare = smoothstep(0.5, -1.0, pos.y) * 2.5;
-            float dCinch = 1.0 - (smoothstep(-0.2, 0.2, abs(pos.y)) * 0.3);
+            // STATE 1: DRESS
+            float flare = pow(max(0.0, -pos.y + 0.5), 2.0) * uFlare;
+            float cinch = 1.0 - (exp(-pow(pos.y - 0.2, 2.0) * 10.0) * (1.0 - uCinch));
             vec3 dressPos = pos;
-            dressPos.xz *= (1.0 + dFlare);
-            dressPos.xz *= dCinch;
-            dressPos.y *= 1.5;
+            dressPos.xz *= (1.0 + flare) * cinch;
+            dressPos.y *= 1.4;
 
-            // CAR Target (Aero-Slab)
+            // STATE 2: CAR (Sleek Sedan/EV Profile)
             vec3 carPos = pos;
-            carPos.x *= 2.5; // Length
-            carPos.y *= 0.4; // Height
-            carPos.z *= 1.2; // Width
-            carPos.y += sin(pos.x * 2.0) * 0.2; // Aero curve
+            carPos.y *= 0.4;  // Low profile
+            carPos.z *= 2.5;  // Long chassis
+            carPos.x *= 1.4;  // Wide stance
+            // Cab/Roof logic
+            float roof = smoothstep(0.6, -0.4, abs(pos.z)) * smoothstep(-0.2, 0.3, pos.y);
+            carPos.y += roof * 0.45;
+            // Aerodynamic taper
+            float taper = 1.0 - pow(abs(pos.z), 3.0) * 0.3;
+            carPos.xy *= taper;
 
-            // Blend
-            vec3 morphed = pos;
-            morphed = mix(morphed, dressPos, uMorphDress);
-            morphed = mix(morphed, carPos, uMorphCar);
+            // BLENDING
+            vec3 finalPos = globePos;
+            float t1 = clamp(uTargetState, 0.0, 1.0);
+            finalPos = mix(globePos, dressPos, t1);
+            float t2 = clamp(uTargetState - 1.0, 0.0, 1.0);
+            finalPos = mix(finalPos, carPos, t2);
 
-            // Mercury Noise (Always active)
-            float noise = snoise(vec3(morphed * 1.5 + uTime * 0.4));
-            morphed += normal * noise * 0.08;
+            // Mercury Ripple
+            float noise = snoise(pos.xy * 1.5 + uTime * 0.4) * 0.08;
+            finalPos += normal * noise;
 
-            vPosition = morphed;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(morphed, 1.0);
+            vPosition = finalPos;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);
         }
     </script>
 
     <script id="fragmentShader" type="x-shader/x-fragment">
         varying vec3 vNormal;
         varying vec3 vPosition;
-        
+        uniform float uTime;
+
         void main() {
             vec3 viewDir = normalize(cameraPosition - vPosition);
-            float fresnel = pow(1.0 - dot(viewDir, vNormal), 3.0);
-            vec3 color = mix(vec3(0.05, 0.0, 0.1), vec3(0.7, 0.6, 0.9), fresnel);
+            float fresnel = pow(1.0 - dot(vNormal, viewDir), 3.0);
+            
+            vec3 baseColor = vec3(0.18, 0.09, 0.2); // Deep Purple
+            vec3 chromeColor = vec3(0.8, 0.8, 0.9); // Chrome
+            
+            vec3 color = mix(baseColor, chromeColor, fresnel);
             gl_FragColor = vec4(color, 1.0);
         }
     </script>
@@ -139,11 +116,12 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        const geometry = new THREE.IcosahedronGeometry(2, 64);
+        const geometry = new THREE.SphereGeometry(1.5, 128, 128);
         const uniforms = {
             uTime: { value: 0 },
-            uMorphDress: { value: 0 },
-            uMorphCar: { value: 0 }
+            uTargetState: { value: 0 },
+            uFlare: { value: 1.5 },
+            uCinch: { value: 0.5 }
         };
 
         const material = new THREE.ShaderMaterial({
@@ -156,43 +134,39 @@
         scene.add(mercury);
         camera.position.z = 6;
 
-        // Discrete States
-        const states = [
-            { name: 'Core Globe', dress: 0, car: 0 },
-            { name: 'AI Fashion', dress: 1, car: 0 },
-            { name: 'Evolve Mobility', dress: 0, car: 1 }
-        ];
-        let currentState = 0;
-        let isAnimating = false;
+        const states = ["Globe", "Fashion", "Automotive"];
+        let currentStateIndex = 0;
+        let isTransitioning = false;
+        const label = document.getElementById('label');
 
-        function transitionTo(index) {
-            if (isAnimating || index === currentState) return;
-            isAnimating = true;
-            const target = states[index];
+        function updateMorph(index) {
+            if (isTransitioning || index < 0 || index >= states.length) return;
+            isTransitioning = true;
             
-            document.getElementById('stateLabel').innerText = target.name;
-
-            gsap.to(uniforms.uMorphDress, { value: target.dress, duration: 1.5, ease: "expo.inOut" });
-            gsap.to(uniforms.uMorphCar, { value: target.car, duration: 1.5, ease: "expo.inOut" });
+            label.style.opacity = 0;
             
-            setTimeout(() => { 
-                currentState = index;
-                isAnimating = false; 
-            }, 1500);
+            gsap.to(uniforms.uTargetState, {
+                value: index,
+                duration: 1.8,
+                ease: "expo.inOut",
+                onComplete: () => {
+                    isTransitioning = false;
+                    label.textContent = states[index];
+                    label.style.opacity = 0.5;
+                }
+            });
+            currentStateIndex = index;
         }
 
-        // Discrete Scroll Trigger
         window.addEventListener('wheel', (e) => {
-            if (isAnimating) return;
-            if (e.deltaY > 20) { // Scroll Down
-                if (currentState < states.length - 1) transitionTo(currentState + 1);
-            } else if (e.deltaY < -20) { // Scroll Up
-                if (currentState > 0) transitionTo(currentState - 1);
-            }
-        });
+            if (isTransitioning) return;
+            if (e.deltaY > 30) updateMorph(currentStateIndex + 1);
+            else if (e.deltaY < -30) updateMorph(currentStateIndex - 1);
+        }, { passive: true });
 
         function animate(time) {
             uniforms.uTime.value = time * 0.001;
+            mercury.rotation.y += 0.002;
             renderer.render(scene, camera);
             requestAnimationFrame(animate);
         }
