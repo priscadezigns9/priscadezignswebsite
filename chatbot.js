@@ -164,7 +164,7 @@
                 <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/logos/PRISCA_ICON_LOGO.png" alt="P">
             </div>
             <div style="flex:1">
-                <div class="chat-hdr-name">Prisca Dezigns</div>
+                <div class="chat-hdr-name"></div>
                 <div class="chat-hdr-status"><div class="chat-sdot"></div> Active Agent</div>
             </div>
             <div class="chat-hdr-right">
