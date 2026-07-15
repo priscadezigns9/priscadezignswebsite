@@ -5,7 +5,7 @@ Account Context — no need to duplicate it here. This file is for things
 Account can't capture: how the user communicates, what they care about,
 who's in their life.
 
-- **Personal Finance:** Practices disciplined financial tracking using mobile apps. Philosophy influenced by "Rich Dad Poor Dad" (Kiyosaki) and social media educational content. Currently in a high-intensity "survival mode" phase, reinvesting the majority of surplus capital into business infrastructure and organization activities. Zapia tracks daily expenses in finance_tracking_YYYY_MM.md files.
+- **The Orcinos Vision (Update July 14, 2026):** Transforming the SaaS portfolio into **ORCINOS**, a unified sovereign AI platform. Unlike generic models (OpenAI/Claude), Orcinos focuses on **Neural Connectors** (WhatsApp, Outlook, Google Calendar) and **Caribbean Contextual Intelligence**. The goal is to provide a world-class AI experience specifically optimized for regional data and high-fidelity communication channels.
 - **Project 5 (Referrals):** Confirmed lineup: Joel (18683409143), Jamaal, Nicholas, Anarion, and Shane. All coached on the "Car + Laptop" requirement (Rule 3: Triple-Layer Sync initiated).
 - **Insurance Leads (Maritime):** Discontinued. Per user request (2026-07-02), all Maritime Genesis lead monitoring and reporting have been deactivated. Focus shifted exclusively back to the Triple Brand nodes.
 - **Identity Profile:** Results-oriented, self-motivated, highly focused, and goal-oriented. Requires minimal supervision and thrives in high-stakes environments.
