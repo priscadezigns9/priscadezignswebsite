@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Development | Prisca Dezigns</title>
+<meta name="description" content="High-fidelity web development packages — from 1-Day Launch sites to full e-commerce ecosystems. Built and launched by Prisca Dezigns.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    --purple-deep: #301934;
+    --purple-light: #7c3aed;
+    --lilac: #C8A2C8;
+    --bg: #0a0a0f;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.07);
+    --border: rgba(200,162,200,0.12);
+    --text: #f0eaf5;
+    --text-muted: rgba(240,234,245,0.5);
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 40px;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--font-heading);
+    font-size: 0.9rem; font-weight: 900;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--lilac);
+    text-decoration: none;
+  }
+  .nav-back {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--lilac); }
+  .nav-cta {
+    font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: var(--purple-light);
+    color: #fff;
+    border: none; border-radius: 100px;
+    padding: 10px 22px; cursor: pointer;
+    transition: opacity 0.2s;
+    text-decoration: none;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(124,58,237,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.65rem; font-weight: 800;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--lilac);
+    border: 1px solid rgba(200,162,200,0.3);
+    border-radius: 100px;
+    padding: 6px 18px;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-family: var(--font-heading);
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fff 0%, var(--lilac) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .hero-btns {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+  }
+  .btn-primary {
+    background: var(--purple-light);
+    color: #fff;
+    border: none; border-radius: 100px;
+    padding: 14px 32px;
+    font-size: 0.8rem; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 14px 32px;
+    font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-ghost:hover { border-color: var(--lilac); color: var(--lilac); }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    display: flex; justify-content: center; gap: 60px;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: var(--font-heading);
+    font-size: 2.2rem; font-weight: 900;
+    color: var(--lilac);
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* ─── SECTIONS ─── */
+  .section {
+    padding: 100px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-size: 0.65rem; font-weight: 800;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--purple-light);
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 500px;
+    line-height: 1.7;
+    margin-bottom: 60px;
+  }
+
+  /* ─── CATEGORY TITLE ─── */
+  .pkg-category-title {
+    grid-column: 1 / -1;
+    font-family: var(--font-heading);
+    font-size: 1.1rem; font-weight: 900;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--lilac);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+  .pkg-category-title:first-child { margin-top: 0; }
+
+  /* ─── PACKAGE GRID ─── */
+  .package-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+    width: 100%;
+    margin-bottom: 60px;
+  }
+
+  /* ─── CARDS ─── */
+  .pkg-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 24px;
+    display: flex; flex-direction: column;
+    gap: 0;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .pkg-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--purple-light), var(--lilac));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .pkg-card:hover {
+    background: var(--surface-hover);
+    border-color: rgba(200,162,200,0.25);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(124,58,237,0.15);
+  }
+  .pkg-card:hover::before { opacity: 1; }
+
+  .fast-track-badge {
+    background: var(--purple-light);
+    color: white;
+    font-size: 0.58rem; font-weight: 800;
+    padding: 3px 10px; border-radius: 100px;
+    display: inline-block; margin-bottom: 10px;
+    letter-spacing: 1px; text-transform: uppercase;
+    width: fit-content;
+  }
+
+  .pkg-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem; font-weight: 900;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .pkg-desc {
+    font-size: 0.72rem;
+    color: var(--purple-light);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .price {
+    font-family: var(--font-heading);
+    font-size: 2rem; font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .price-sub {
+    font-size: 0.65rem;
+    color: var(--purple-light);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .pkg-card ul {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 24px;
+    flex: 1;
+  }
+  .pkg-card ul li {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .pkg-card ul li::before {
+    content: '✓';
+    position: absolute; left: 0;
+    color: var(--lilac);
+    font-weight: 800; font-size: 0.7rem;
+  }
+  .pkg-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(124,58,237,0.4);
+    color: var(--purple-light);
+    border-radius: 100px;
+    padding: 11px;
+    font-size: 0.72rem; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: auto;
+  }
+  .pkg-btn:hover {
+    background: var(--purple-light);
+    border-color: var(--purple-light);
+    color: #fff;
+  }
+
+  /* ─── CONTACT FOOTER ─── */
+  .contact-footer {
+    text-align: center;
+    padding: 60px 40px;
+    border-top: 1px solid var(--border);
+  }
+  .contact-footer .label {
+    font-size: 0.65rem; font-weight: 800;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--purple-light);
+    margin-bottom: 20px;
+  }
+  .contact-footer a {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1.1rem; font-weight: 900;
+    color: var(--lilac);
+    text-decoration: none;
+    letter-spacing: 1px;
+    margin: 8px 0;
+    transition: color 0.2s;
+  }
+  .contact-footer a:hover { color: #fff; }
+
+  /* ─── MODAL ─── */
+  #modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(10px);
+    align-items: center; justify-content: center;
+  }
+  body.modal-active #modal-overlay { display: flex; }
+  #modal-content {
+    background: #13111a;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+    width: 90%; max-width: 480px;
+    position: relative;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .close-modal {
+    position: absolute; top: 18px; right: 22px;
+    font-size: 1.4rem; color: var(--text-muted);
+    cursor: pointer; line-height: 1;
+  }
+  .close-modal:hover { color: var(--text); }
+  #modal-title {
+    font-family: var(--font-heading);
+    font-size: 1.4rem; font-weight: 900;
+    color: var(--purple-light);
+    margin-bottom: 20px;
+  }
+  #pkg-checklist {
+    background: rgba(124,58,237,0.06);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    display: none;
+  }
+  #checklist-items {
+    list-style: none;
+    display: grid; gap: 8px;
+  }
+  #checklist-items li {
+    font-size: 0.82rem; color: var(--text-muted);
+    padding-left: 18px; position: relative;
+  }
+  #checklist-items li::before {
+    content: '✓'; position: absolute; left: 0;
+    color: var(--lilac); font-weight: 800; font-size: 0.72rem;
+  }
+  #lead-form { display: flex; flex-direction: column; gap: 16px; }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field label {
+    font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .form-field input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-field input:focus { border-color: var(--purple-light); }
+  .form-field input[readonly] { opacity: 0.6; }
+  #submit-btn {
+    background: var(--purple-light);
+    color: #fff; border: none; border-radius: 100px;
+    padding: 14px;
+    font-size: 0.8rem; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: opacity 0.2s;
+    margin-top: 4px;
+  }
+  #submit-btn:hover { opacity: 0.85; }
+  #submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  #form-msg {
+    font-size: 0.82rem; text-align: center;
+    margin-top: 8px; color: var(--lilac);
+    font-weight: 600;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    nav { padding: 14px 20px; }
+    .hero { padding: 100px 24px 60px; }
+    .section { padding: 70px 24px; }
+    .stats-bar { gap: 30px; padding: 30px 24px; }
+    .package-grid { grid-template-columns: 1fr; padding: 0; }
+    .contact-footer { padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">Prisca Dezigns</a>
+  <a href="/" class="nav-back">← Back to Network</a>
+  <a href="#packages" class="nav-cta">View Packages</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-tag">Web Development</div>
+  <h1>Your Brand.<br>Live in 24 Hours.</h1>
+  <p>High-fidelity websites built for Caribbean businesses — from fast-track one-pagers to full e-commerce ecosystems. We build, launch, and maintain. You close.</p>
+  <div class="hero-btns">
+    <a href="#packages" class="btn-primary">See Packages</a>
+    <a href="https://wa.me/18683424101" target="_blank" class="btn-ghost">Talk to Us on WhatsApp</a>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-num">24h</span>
+    <span class="stat-label">1-Day Launch</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">100%</span>
+    <span class="stat-label">Mobile Ready</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">$200</span>
+    <span class="stat-label">Entry Price</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">24/7</span>
+    <span class="stat-label">Maintenance Available</span>
+  </div>
+</div>
+
+<!-- PACKAGES -->
+<section class="section" id="packages">
+  <div class="section-label">Our Packages</div>
+  <h2 class="section-title">High-Fidelity Web Packages</h2>
+  <p class="section-sub">Select the tier that fits your business stage. Every package is built with precision and launched with care.</p>
+
+  <!-- STANDARD BRAND PACKAGES -->
+  <div class="package-grid">
+    <div class="pkg-category-title">Standard Brand Packages</div>
+
+    <div class="pkg-card">
+      <div class="fast-track-badge">Fast-Track</div>
+      <h3>1-Day Launch</h3>
+      <p class="pkg-desc">A high-fidelity one-page website designed, built, and launched in exactly 24 hours.</p>
+      <div class="price">$200</div>
+      <div class="price-sub">+ $50/mo hosting</div>
+      <ul>
+        <li>1-Day Development</li>
+        <li>1-Page Design</li>
+        <li>Mobile &amp; SEO Ready</li>
+        <li>24-Hour Go-Live</li>
+        <li>1 Revision Included</li>
+        <li>Add-ons: $50 USD each</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('1-DAY LAUNCH')">Launch Now</button>
+    </div>
+
+    <div class="pkg-card">
+      <h3>Starter</h3>
+      <p class="pkg-desc">A polished one-page website with your logo, domain, and social media branding.</p>
+      <div class="price">$297</div>
+      <ul>
+        <li>1-Page Website</li>
+        <li>Full Brand Setup</li>
+        <li>Social Integration</li>
+        <li>SSL &amp; SEO</li>
+        <li>1 Month Free Maintenance</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('STARTER PKG')">Get Started</button>
+    </div>
+
+    <div class="pkg-card">
+      <h3>Growth</h3>
+      <p class="pkg-desc">A full website plus managed social media presence and SEO handled for you.</p>
+      <div class="price">$597</div>
+      <ul>
+        <li>Social Setup</li>
+        <li>Full Architecture</li>
+        <li>Copywriting</li>
+        <li>Advanced SEO</li>
+        <li>1 Month Free Maintenance</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('GROWTH PKG')">Get Started</button>
+    </div>
+
+    <div class="pkg-card">
+      <h3>Trusted</h3>
+      <p class="pkg-desc">A complete 10–15 page website with business automations and 24/7 support.</p>
+      <div class="price">$1,200</div>
+      <ul>
+        <li>Full Automation</li>
+        <li>10-15 Pages</li>
+        <li>Brand Scaling</li>
+        <li>24/7 Support</li>
+        <li>1 Month Free Maintenance</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('TRUSTED PKG')">Get Started</button>
+    </div>
+
+    <div class="pkg-card">
+      <h3>Custom</h3>
+      <p class="pkg-desc">A fully tailored solution built around your unique business architecture and needs.</p>
+      <div class="price">Bespoke</div>
+      <ul>
+        <li>Tailored Architecture</li>
+        <li>Custom API Integration</li>
+        <li>Unique Identity Design</li>
+        <li>Scalable Infrastructure</li>
+        <li>Priority Support</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('CUSTOM PKG')">Inquire</button>
+    </div>
+  </div>
+
+  <!-- E-COMMERCE ECOSYSTEMS -->
+  <div class="package-grid">
+    <div class="pkg-category-title">E-Commerce Ecosystems</div>
+
+    <div class="pkg-card">
+      <h3>E-Starter</h3>
+      <p class="pkg-desc">A simple one-page online shop with payment processing and full branding.</p>
+      <div class="price">$497</div>
+      <ul>
+        <li>1-Page Shop</li>
+        <li>Full Branding</li>
+        <li>Social Shop</li>
+        <li>Payment Gateway</li>
+        <li>1 Month Free Maintenance</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('E-STARTER PKG')">Get Started</button>
+    </div>
+
+    <div class="pkg-card">
+      <h3>E-Growth</h3>
+      <p class="pkg-desc">A multi-page store for 10+ products with automated fulfilment and deep SEO.</p>
+      <div class="price">$1,497</div>
+      <ul>
+        <li>2-5 Page Store</li>
+        <li>Full Shop Logic (10+ Products)</li>
+        <li>SEO &amp; Copywriting</li>
+        <li>Fulfillment Sync</li>
+        <li>1 Month Free Maintenance</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('E-GROWTH PKG')">Get Started</button>
+    </div>
+
+    <div class="pkg-card">
+      <h3>E-Trusted</h3>
+      <p class="pkg-desc">A large-scale store for 50+ products with full inventory and CRM automation.</p>
+      <div class="price">$2,500</div>
+      <ul>
+        <li>Elite Store (50+ Products)</li>
+        <li>15+ Page Network</li>
+        <li>CRM &amp; Inventory Automation</li>
+        <li>On-Chain Inventory Logic</li>
+        <li>1 Month Free Maintenance</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('E-TRUSTED PKG')">Get Started</button>
+    </div>
+  </div>
+
+  <!-- WEBSITE MAINTENANCE -->
+  <div class="package-grid">
+    <div class="pkg-category-title">Website Maintenance</div>
+
+    <div class="pkg-card">
+      <h3>Standard Maintenance</h3>
+      <p class="pkg-desc">Monthly care plan for standard websites — updates, security, and performance monitoring.</p>
+      <div class="price">$99<span style="font-size:1rem;">/mo</span></div>
+      <ul>
+        <li>Monthly Updates</li>
+        <li>Security Monitoring</li>
+        <li>Performance Checks</li>
+        <li>1 Content Edit/mo</li>
+        <li>Priority Support</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('MAINTENANCE PKG')">Get Started</button>
+    </div>
+
+    <div class="pkg-card">
+      <h3>E-Commerce Maintenance</h3>
+      <p class="pkg-desc">Full monthly care for your online store — inventory, payments, and uptime guaranteed.</p>
+      <div class="price">$199<span style="font-size:1rem;">.99/mo</span></div>
+      <ul>
+        <li>Store &amp; Inventory Updates</li>
+        <li>Payment Gateway Checks</li>
+        <li>Security &amp; SSL Monitoring</li>
+        <li>2 Content Edits/mo</li>
+        <li>Priority Support</li>
+      </ul>
+      <button class="pkg-btn" onclick="openModal('ECOMMERCE MAINTENANCE PKG')">Get Started</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT FOOTER -->
+<div class="contact-footer">
+  <div class="label">Direct Consultations</div>
+  <a href="tel:+13024697276">GLOBAL HELP DESK: +1 (302) 469-7276</a>
+  <a href="https://wa.me/18683424101">WHATSAPP DIRECT: +1 (868) 342-4101</a>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal-content">
+    <span class="close-modal" id="close-modal">&times;</span>
+    <h2 id="modal-title">Secure Your Slot</h2>
+    <div id="pkg-checklist">
+      <ul id="checklist-items"></ul>
+    </div>
+    <form id="lead-form">
+      <div class="form-field">
+        <label>Full Name</label>
+        <input type="text" id="user-name" placeholder="E.g. Satoshi Nakamoto" required>
+      </div>
+      <div class="form-field">
+        <label>Email Address</label>
+        <input type="email" id="user-email" placeholder="email@nexus.com" required>
+      </div>
+      <div class="form-field">
+        <label>Phone Number (for a callback)</label>
+        <input type="tel" id="user-phone" placeholder="+1 868 XXX XXXX">
+      </div>
+      <div class="form-field">
+        <label>Selected Package</label>
+        <input type="text" id="target-package" readonly>
+      </div>
+      <button type="submit" id="submit-btn">SEND MESSAGE</button>
+    </form>
+    <div id="form-msg"></div>
+  </div>
+</div>
+
+<script>
+const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+const pkgData = {
+  '1-DAY LAUNCH': { title: 'Activate 1-Day Launch', items: ['1-Day Development Cycle', '1-Page High-Fidelity Design', 'Mobile Responsive & SEO Ready', 'Social Media Link-in-Bio Setup', '24-Hour Go-Live Guarantee', '1 Revision Included', 'Any add-on (booking form, extra section, etc.) = +$50 USD'] },
+  'STARTER PKG': { title: 'Activate Starter', items: ['1-Page High-Fidelity Website', 'Full Brand Setup (Logo, Domain, Favicon)', 'Social Media Integration', 'Technical SEO & SSL', '1 Month Free Maintenance'] },
+  'GROWTH PKG': { title: 'Activate Growth', items: ['Manage 1 Brand Page (Social Setup)', 'Full Branding & Architecture', 'Content Creation & Copywriting', 'Advanced SEO & Analytics', '1 Month Free Maintenance'] },
+  'TRUSTED PKG': { title: 'Trusted Package', items: ['Full Business Automation', '10-15 Pages of Content', 'Premium Brand Scaling & PR', '24/7 Priority Tech Support', '1 Month Free Maintenance'] },
+  'CUSTOM PKG': { title: 'Custom Inquiry', items: ['Tailored Digital Architecture', 'Custom API & Tool Integration', 'Unique Brand Identity Design', 'Scalable Infrastructure Logic', 'Priority Sovereign Support'] },
+  'E-STARTER PKG': { title: 'E-Starter Package', items: ['1-Page Online Shop', 'Full Store Branding & Domain', 'Integrated Social Shop Setup', 'Payment Gateway Integration', '1 Month Free Maintenance'] },
+  'E-GROWTH PKG': { title: 'Activate E-Growth', items: ['2-5 Page Store Architecture', 'Full Shop Logic (10+ Products)', 'Deep Copywriting & Product SEO', 'Automated Fulfillment Sync', '1 Month Free Maintenance'] },
+  'E-TRUSTED PKG': { title: 'Activate E-Trusted', items: ['Elite Store (50+ Products)', '15+ Page Network Architecture', 'Advanced Inventory Automation', 'On-Chain Inventory Logic', '1 Month Free Maintenance'] },
+  'MAINTENANCE PKG': { title: 'Activate Maintenance', items: ['Daily Uptime & Security Monitoring', 'Monthly Content Optimization', '1 Content Edit/mo', 'Technical Backups', 'Priority Support', '$99 / month'] },
+  'ECOMMERCE MAINTENANCE PKG': { title: 'Activate E-Commerce Maintenance', items: ['E-Commerce Store Uptime & Security', 'Monthly Product & Content Updates', '2 Content Edits/mo', 'Payment Gateway Monitoring', 'High-Fidelity Technical Backups', 'Priority Support', '$199.99 / month'] }
+};
+
+function openModal(pkgName) {
+  const data = pkgData[pkgName];
+  if (!data) return;
+  document.getElementById('target-package').value = pkgName;
+  document.getElementById('modal-title').innerText = data.title;
+  const list = document.getElementById('checklist-items');
+  list.innerHTML = '';
+  data.items.forEach(item => {
+    const li = document.createElement('li');
+    li.innerText = item;
+    list.appendChild(li);
+  });
+  document.getElementById('pkg-checklist').style.display = 'block';
+  document.getElementById('form-msg').innerText = '';
+  document.getElementById('lead-form').reset();
+  document.getElementById('target-package').value = pkgName;
+  document.body.classList.add('modal-active');
+}
+
+document.getElementById('close-modal').onclick = () => document.body.classList.remove('modal-active');
+document.getElementById('modal-overlay').onclick = (e) => {
+  if (e.target.id === 'modal-overlay') document.body.classList.remove('modal-active');
+};
+
+const leadForm = document.getElementById('lead-form');
+const submitBtn = document.getElementById('submit-btn');
+const formMsg = document.getElementById('form-msg');
+
+leadForm.onsubmit = async (e) => {
+  e.preventDefault();
+  submitBtn.disabled = true;
+  submitBtn.innerText = 'SENDING...';
+
+  const payload = {
+    name: document.getElementById('user-name').value,
+    email: document.getElementById('user-email').value,
+    phone: document.getElementById('user-phone').value || null,
+    package: document.getElementById('target-package').value,
+    brand: 'Web Development',
+    source: 'webdev-page'
+  };
+
+  try {
+    const { error } = await sb.from('client_leads').insert([payload]);
+    if (error) throw error;
+    formMsg.style.color = '#C8A2C8';
+    formMsg.innerText = '✅ Message received. Drew will be in touch shortly.';
+    leadForm.reset();
+    document.getElementById('target-package').value = payload.package;
+  } catch (err) {
+    formMsg.style.color = '#f87171';
+    formMsg.innerText = '❌ Something went wrong. Please WhatsApp us directly.';
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerText = 'SEND MESSAGE';
+  }
+};
+
+// Entrance animation
+gsap.from('.hero-tag', { opacity: 0, y: 20, duration: 0.6, delay: 0.2 });
+gsap.from('.hero h1', { opacity: 0, y: 30, duration: 0.7, delay: 0.35 });
+gsap.from('.hero p', { opacity: 0, y: 20, duration: 0.6, delay: 0.5 });
+gsap.from('.hero-btns', { opacity: 0, y: 20, duration: 0.6, delay: 0.65 });
+gsap.from('.stats-bar .stat', { opacity: 0, y: 20, duration: 0.5, stagger: 0.1, delay: 0.8 });
+</script>
+</body>
+</html>
