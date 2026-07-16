@@ -699,22 +699,14 @@ function addMsg(txt, side){
 
 function saveLead(name, phone, pkgName){
     if(!name && !phone) return;
-    fetch(SB_URL + '/rest/v1/client_leads', {
+    fetch(SB_URL + '/functions/v1/drew-lead-capture', {
         method: 'POST',
-        headers: {
-            'apikey': SB_ANON,
-            'Authorization': 'Bearer ' + SB_ANON,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             name: name || 'Website Visitor',
             phone: phone || '',
             email: '',
-            package: pkgName,
-            brand: 'Prisca Dezigns',
-            status: 'hot_lead',
-            notified: false
+            service: pkgName
         })
     }).catch(() => {});
 }
