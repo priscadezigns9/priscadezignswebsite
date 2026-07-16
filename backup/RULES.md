@@ -71,3 +71,10 @@ When the user provides a screenshot, image, or URL as a design reference:
    - Anti-slop audit → `hallmark`
 3. **Build immediately** — produce the artifact directly without asking for confirmation on tech choices
 4. **Match fidelity** — colors, spacing, font weight, border radius, shadow depth, motion timing — all extracted from the visual
+
+## Execution Style Rule (2026-07-15) — User Instruction
+- DO NOT chain long multi-step pipelines in a single bash block.
+- If a step fails, chunked execution makes it easier to isolate and fix.
+- Work in small, deliberate steps. Confirm each one works before moving to the next.
+- This applies especially to: API pushes, file builds, Supabase updates, GitHub deploys.
+- Trying to do everything at once overloads the platform and makes debugging harder.
