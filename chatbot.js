@@ -405,7 +405,7 @@ window.toggleVoice=function(){
 };
 function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
-  var clean=txt.replace(/<[^>]*>/g,' ').replace(/\n/g,' ').trim();
+  var clean=txt.replace(/<[^>]*>/g,' ').replace(/\n/g,' ').replace(/Dezigns/gi, 'Designs').trim();
   if(!clean) return;
   var u=new SpeechSynthesisUtterance(clean);u.rate=1.0;u.pitch=1.03;u.volume=1;
   if(!preferredVoice) pickVoice();
