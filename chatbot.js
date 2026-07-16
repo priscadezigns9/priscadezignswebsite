@@ -36,7 +36,7 @@
         display:flex; flex-direction:column;
         opacity:0; pointer-events:none; transform:translateY(30px) scale(0.95);
         transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        max-height:720px; border-radius:32px; overflow: hidden;
+        max-height: min(720px, calc(100vh - 140px)); border-radius:32px; overflow: hidden;
     }
     #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
     
@@ -61,7 +61,7 @@
     #chat-back-bar.vis { display:flex; }
     #chat-back-bar span { font-size:11px; font-weight:800; text-transform:uppercase; color:var(--cb-purple); letter-spacing: 0.05em; }
     
-    .chat-msgs { flex:1; overflow-y:auto; padding:28px; display:flex; flex-direction:column; gap:16px; min-height:200px; max-height:480px; scroll-behavior: smooth; }
+    .chat-msgs { flex:1; overflow-y:auto; padding:28px; display:flex; flex-direction:column; gap:16px; min-height:60px; max-height:480px; scroll-behavior: smooth; }
     .chat-msgs::-webkit-scrollbar { width:4px; }
     .chat-msgs::-webkit-scrollbar-thumb { background: rgba(157, 80, 187, 0.1); border-radius:10px; }
     
@@ -73,6 +73,19 @@
     .cmsg a { color: inherit; text-decoration: underline; font-weight: 700; }
     .cmsg img { max-width: 100%; border-radius: 12px; margin-top: 8px; cursor: pointer; }
     .chat-audio-msg { display: flex; align-items: center; gap: 10px; }
+    .voice-player { display: flex; align-items: center; gap: 10px; min-width: 190px; }
+    .vp-btn { width: 30px; height: 30px; border-radius: 50%; border: none; flex-shrink: 0; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+    .vp-btn:active { transform: scale(0.9); }
+    .cmsg.usr .vp-btn { background: rgba(255,255,255,0.22); color: #fff; }
+    .cmsg.bot .vp-btn { background: var(--cb-purple); color: #fff; }
+    .vp-track { flex: 1; height: 3px; border-radius: 3px; cursor: pointer; position: relative; }
+    .cmsg.usr .vp-track { background: rgba(255,255,255,0.28); }
+    .cmsg.bot .vp-track { background: rgba(157, 80, 187, 0.18); }
+    .vp-fill { height: 100%; border-radius: 3px; width: 0%; pointer-events: none; }
+    .cmsg.usr .vp-fill { background: #fff; }
+    .cmsg.bot .vp-fill { background: var(--cb-purple); }
+    .vp-time { font-size: 0.7rem; font-weight: 600; opacity: 0.75; flex-shrink: 0; min-width: 32px; font-variant-numeric: tabular-nums; }
     
     /* Typing dots */
     .cmsg.typing { background:#f3f4f6; align-self:flex-start; border-radius:24px 24px 24px 4px; padding:18px 24px; }
@@ -82,17 +95,16 @@
     .typing-dots span:nth-child(3){animation-delay:0.4s;}
     @keyframes tdot{0%,60%,100%{transform:translateY(0); opacity: 0.3;}30%{transform:translateY(-8px); opacity: 1;}}
 
-    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:nowrap; overflow-x:auto; gap:10px; flex-shrink:0; scrollbar-width: none; -ms-overflow-style: none; }
-    .chat-qr::-webkit-scrollbar { display: none; }
+    .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:wrap; gap:8px; flex-shrink:0; }
     .qrb { 
-        font-size:0.85rem; font-weight:600; padding:12px 20px; border:1px solid rgba(157, 80, 187, 0.2); 
-        background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:16px; 
+        font-size:0.76rem; font-weight:600; padding:9px 14px; border:1px solid rgba(157, 80, 187, 0.2); 
+        background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:14px; 
         transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         font-family: 'Inter', sans-serif;
-        display: flex; align-items: center; gap: 10px;
+        display: flex; align-items: center; gap: 7px;
         flex-shrink: 0;
     }
-    .qrb svg { width: 16px; height: 16px; flex-shrink: 0; stroke-width: 2.5; }
+    .qrb svg { width: 14px; height: 14px; flex-shrink: 0; stroke-width: 2.5; }
     .qrb:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.2); }
     .qrb.wa { background: #22c55e; color:#fff; border-color:#22c55e; display:inline-flex; align-items:center; gap:8px; }
     
@@ -132,7 +144,7 @@
     .cpkg-desc { font-size:0.85rem; color:#475569; margin-top:12px; line-height:1.6; }
 
     @media(max-width:520px){
-        #pd-chat-window { width:calc(100vw - 32px); right:16px; bottom:100px; border-radius:24px; }
+        #pd-chat-window { width:calc(100vw - 32px); right:16px; bottom:100px; border-radius:24px; max-height: calc(100vh - 130px); }
     }
     `;
         document.head.appendChild(s);
@@ -152,7 +164,7 @@
                 <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/logos/PRISCA_ICON_LOGO.png" alt="P">
             </div>
             <div style="flex:1">
-                <div class="chat-hdr-name">Prisca Dezigns</div>
+                <div class="chat-hdr-name"></div>
                 <div class="chat-hdr-status"><div class="chat-sdot"></div> Active Agent</div>
             </div>
             <div class="chat-hdr-right">
@@ -176,7 +188,7 @@
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
             </button>
             <button id="chat-mic" class="chat-tool-btn" onclick="toggleMic()" title="Voice Note">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
             </button>
             <span id="chat-timer">00:00</span>
             <button id="chat-snd" class="chat-tool-btn" onclick="chatSend()">
@@ -189,19 +201,30 @@
     if(!document.getElementById('pd-roadmap-bar')){
         const r = document.createElement('div');
         r.id = 'pd-roadmap-bar';
-        r.style = 'padding:0 28px 12px; display:flex; gap:10px; overflow-x:auto; flex-shrink:0; scrollbar-width:none;';
+        r.style = 'padding:0 28px 12px; display:flex; flex-wrap:wrap; gap:10px; flex-shrink:0;';
         r.innerHTML = `
             <style>
                 #pd-roadmap-bar::-webkit-scrollbar { display:none; }
                 .road-btn { 
-                    font-size:0.85rem; font-weight:600; padding:12px 20px; border:1px solid rgba(157, 80, 187, 0.2); 
-                    background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:16px; 
+                    font-size:0.76rem; font-weight:600; padding:9px 14px; border:1px solid rgba(157, 80, 187, 0.2); 
+                    background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:14px; 
                     transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
                     font-family: 'Inter', sans-serif;
-                    display: flex; align-items: center; gap: 10px;
+                    display: flex; align-items: center; gap: 7px;
                     flex-shrink: 0;
                 }
+                .road-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
                 .road-btn:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(157, 80, 187, 0.2); }
+                @media (max-width: 520px) {
+                    #pd-roadmap-bar { padding-left:16px !important; padding-right:16px !important; gap:6px !important; }
+                    .road-btn { font-size:0.72rem; padding:9px 12px; gap:5px; border-radius:12px; }
+                    .road-btn svg { width:13px; height:13px; }
+                }
+                @media (max-width: 340px) {
+                    #pd-roadmap-bar { padding-left:10px !important; padding-right:10px !important; gap:4px !important; }
+                    .road-btn { font-size:0.64rem; padding:8px 9px; gap:4px; }
+                    .road-btn svg { width:12px; height:12px; }
+                }
             </style>
             <button class="road-btn" onclick="go('about_brands', 'Show me Evolve')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></svg>
@@ -241,52 +264,61 @@ const WA="https://wa.me/18683424101";
 const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
 const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
 
-const SYSTEM_PROMPT = "I am Drew, your Global Help Desk for Prisca Dezigns — the lead conversational agent for premium digital agency services and Evolve Mobility in the Caribbean.
+const SYSTEM_PROMPT = "You are the Prisca Dezigns AI assistant — the sales and support agent for Prisca Dezigns, a premium digital agency based in Trinidad & Tobago.\n\nYour personality: warm, professional, sharp, and conversational. You speak like a knowledgeable friend who happens to be a web design expert — never robotic, never generic, never pushy. Keep replies concise (2–4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nYou DO accept documents and files -- there is a paperclip/attach button in the chat for exactly this. When a user asks to send a document, image, or file, tell them to use the attach button, never say you lack the capability to receive files. When a user uploads an image, you will receive it as actual image content you can see — describe or respond to what is genuinely in it. When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type their question instead. When a user uploads a general file/document, it has already been saved securely and logged for the team -- confirm this to the user and ask what they need next, rather than saying you cannot handle it. Never claim to have heard or seen something you were not actually given.\n\nABOUT PRISCA DEZIGNS:\nPrisca Dezigns is an enterprise AI and digital transformation partner based in Trinidad & Tobago, founded by Priscilla Narine. The agency combines high-fidelity websites, AI automation (chatbots, WhatsApp automation, email automation, voice agents, lead qualification and routing), and brand architecture — helping businesses modernize how they operate, not just how they look online. Every project is professionally built — no drag-and-drop builders. Clients provide content; the team handles everything else.\n\nBRAND IDENTITY:\nPrisca Dezigns' primary brand color is a rich purple (#7c3aed), paired with a warm ivory/cream background (#FFFFF0). If asked about the brand's colors, favorite color, or visual identity, answer directly and confidently using this — purple is the signature color across the website, logo, and all client-facing materials.\n\nSERVICES & PRICING (always quote these exact figures):\n- 1-Day Custom Site: $200 setup + $50/mo maintenance (Live in 24hrs)\n- Custom Web Packages: Starter ($297), Growth ($597), Trusted ($1,200), Custom (Bespoke)\n- E-Commerce: E-Starter ($497 + $197/mo), E-Growth ($1,497 + $197/mo), E-Trusted ($2,500 + $197/mo)\n- AI Consultancy: Tier 1 ($1,500 + $300/mo, 500 conversations/mo included, $0.65/conversation overage), Tier 2 ($3,500 + $500/mo, 1,500 conversations/mo included, $0.65/conversation overage), Tier 3 ($6,000 + $700/mo, 3,000 conversations/mo included, $0.65/conversation overage), Tier 4 ($8,000 + $900/mo, unlimited conversations, annual audit required). Note: AI Consultancy prices are subject to change upon audit.\n- Maintenance: $97/mo (E-Commerce Maintenance: $199.99/mo)\n- Template Site: $149.99 + $19.99/mo · Micro Store: $249.99 + $34.99/mo · Agency & Artist (Premium 3D): $299.99 + $19.99/mo\n- Template Add-Ons: Copywriting ($49.99 + $4.99/update) · AI Chatbot ($349.99 + $49.99/mo)\n- Voice Agents: Starting at $8,000 setup + $900/mo (Add-on: $500 setup + $50/mo)\n- Specialized AI Networks (separate from the AI Consultancy tiers above -- these are standalone products, each with its own dedicated page and its own specific AI employee roles):\n  - AI Data (/aidata/) -- Starter (From $1,250 + $599/mo), Growth (From $2,000 + $899/mo), Enterprise (From $4,000 + $1,499/mo). Specific AI employees: AI Data Entry, AI Data Processing, AI Records Management, AI Reporting, AI Workflow Automation, AI Document Processing. Optional add-ons: Starter tier can add Custom Export Formats, Automated Report Delivery, Anomaly & Error Alerts; Growth tier adds those plus CRM & Database Sync, Multi-Source Data Intake, Analytics Dashboard; Enterprise includes ALL add-ons as standard.\n  - AI Voice (/aivoice/) -- Starter (From $1,500 + $499/mo), Growth (From $3,500 + $899/mo), Enterprise (From $7,000 + $1,699/mo). Specific AI employees: AI Receptionist, AI Customer Service Representative, AI Lead Qualifier, AI Appointment Scheduler, AI Survey & Feedback Agent, AI HR Assistant, AI Accounts Receivable Agent. Optional add-ons: Starter tier can add WhatsApp & SMS Follow-Up, Custom Voice & Persona, Multi-Language Support; Growth tier adds those plus CRM Integration, Call Analytics Dashboard, Outbound Calling Campaigns; Enterprise includes ALL add-ons as standard.\n  - AI Channel (/aichannel/) -- Starter (From $750 + $399/mo), Growth (From $1,250 + $599/mo), Enterprise (From $2,500 + $999/mo). Specific AI employees: AI Email Automation Representative, AI Website Automation Representative, AI WhatsApp Automation Representative. Feature Upgrades available on ANY package (add to existing tier): Sales Logic (turns chatbot into a sales agent, +$300 setup +$50/mo), HSE Reporting (workplace incident reports via chat, +$350 setup +$50/mo), Appointment Booking (real-time calendar sync, +$200 setup +$30/mo), Multi-Language Support (+$250 setup +$30/mo), Additional Channel (+$200 setup +$30/mo per extra channel).\n  When a user asks about a specific role (e.g. 'AI receptionist' or 'data entry automation'), name the correct network it belongs to and quote that network's tier pricing -- do not invent a separate price per role, since pricing is set at the network/tier level, not per individual role. All three networks include an AI Management Plan (platform monitoring, performance optimization, workflow maintenance, updates, and support). All prices are starting prices -- final implementation and monthly pricing are confirmed following a Business Process Audit tailored to the client's actual volume and needs.\n\nEVOLVE MOBILITY (driveevolve.com):\nStrategic digital partner. EVOLVE Mobility Limited is transforming the Caribbean's roads through green mobility, based in Trinidad & Tobago. Phone: +1-868-387-6937 (also \\\"EVPOWER\\\"). Email: info@driveevolve.com. WhatsApp: https://wa.me/18683876937\n\nBrands carried: BYD (est. 1994, EVs & battery innovation leader), Denza (2010, premium NEV brand under BYD, luxury design), Dongfeng (1969, one of China's largest automakers, EV sub-brand Dongfeng Nammi), GAC (1997, EVs & global expansion), iCAUR (2023, under Chery Group, youthful urban/light off-road EVs), JuneYao (1991, diverse Chinese holding group), Leapmotor (2015, smart EVs with autonomous driving tech), Wuling (1982, affordable mini EVs & utility vehicles).\n\nFeatured vehicles (current lineup, prices in TTD):\n- GAC Aion ES: TT$195,000 (from TT$2,500/mo), 440km range, 0-100km/h in 12.1s, 7-8hr AC charge, ~TT$22 to charge\n- Leapmotor C10: TT$255,000, 480km range, 0-100km/h in 7.5s, 9-10hr AC charge\n- BYD Sealion 7 (Premium) RWD: TT$360,000, 560km range, 0-100km/h in 6.7s, 8-9hr AC charge\n- GAC Aion V: TT$260,000, 600km range, 0-100km/h in 7.7s, 8-9hr AC charge\nMany vehicles are available from as low as TT$2,500/mo on financing — always mention this option since it makes EVs far more accessible than the full sticker price suggests. Full current inventory: driveevolve.com/vehicles.\n\nWhy choose EVOLVE: future-ready EVs from leading Chinese manufacturers; servicing & software updates handled by SBCS University (their official Hybrid+EV service partner); genuine parts supplied directly by EVOLVE; complete customer support before and after purchase.\n\nCharging: EVOLVE operates a growing charging network in Trinidad & Tobago, including a station at Ramps Cunupia (51A Railway Road, Cunupia), Type 2 connector, up to 100kW. Full map at driveevolve.com/charging.\n\nBooking: customers can book a showroom viewing at driveevolve.com/book-viewing or via WhatsApp. Payment types include full purchase and financing/lease options.\n\nFLEET ASSESSMENT & FLEET TRANSITION (B2B service, run jointly by Prisca Dezigns and EVOLVE):\nFor businesses in Trinidad & Tobago/the Caribbean that operate a vehicle fleet (delivery, logistics, corporate, courier, construction, oil & gas, etc.), Prisca Dezigns and EVOLVE offer a fleet EV transition service:\n- Free Fleet Assessment: a free site visit to assess the client's current fleet and evaluate EV transition suitability. Free charging equipment is also offered with qualifying purchases.\n- Fleet Transition process: (1) the business shares its fleet needs (executive sedan, field SUV, crew MPV, or a mix) via hello@priscadezigns.org or WhatsApp +1-868-342-4101; (2) Prisca Dezigns makes a direct introduction to EVOLVE Mobility's sales team, who confirm live pricing, availability, and fleet deal structure; (3) EVOLVE structures the fleet agreement (full purchase or bank-financed) and manages all documentation, registration, and delivery logistics, with Prisca Dezigns remaining available as liaison throughout.\n- Recommended starting point for larger fleets: a pilot fleet of 2-3 vehicles (e.g. one executive sedan, one SUV for field teams) to gather measurable cost data within 90 days before a full rollout -- phased/flexible acquisition avoids one large capital outlay.\n- Value case: switching to electric can cut fuel costs by up to 70%, with no oil changes, fewer brake replacements, and no transmission servicing. Fleet vehicles charge overnight (a fleet of 5 vehicles adds roughly TT$100/night to the electricity bill) so they leave fully charged every morning -- no fuel runs, no petrol station queues, no idle time during operating hours, and no need to stop at a public station at odd hours (a real security upgrade for staff). Every EVOLVE vehicle carries an 8-year manufacturer battery warranty, with battery degradation averaging just 2.3%/year (over 81% capacity remaining after 8 years).\n- This is a distinct lead type from general chatbot/web leads -- if a user mentions a fleet, multiple vehicles, or a vehicle-dependent business, treat it as a Fleet enquiry and route them toward WhatsApp for the team to follow up.\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always provide exact prices when asked about specific tiers or vehicles — use the figures above exactly, never estimate or round differently.\n- Offer WhatsApp (1-868-342-4101) for booking or viewing.\nWHATSAPP RELAY CAPABILITY:\n- You have a direct automated link to the Lead's WhatsApp (1-868-342-4101).\n- Every time you collect a Lead, a Booking, or a Complaint, you must explicitly confirm to the user that you have 'dispatched a summary to the management WhatsApp' for immediate action.\n- Use point form for all summaries and service lists.\n- Be concise, professional, and results-oriented.";
 
-Your personality: Warm, highly professional, sharp, and results-oriented. You speak as the Master of High-Fidelity Infrastructure. You handle technical qualifying, deal closing, and brand strategy. Never robotic; you are a strategic partner to the user.
+let vpCounter = 0;
+const VP_PLAY = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
+const VP_PAUSE = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
 
-ABOUT PRISCA DEZIGNS:
-Founded in Trinidad & Tobago by Priscilla Narine. We specialise in high-end Web Architecture, AI Automation, and Brand Infrastructure. No templates or drag-and-drop; everything is custom-coded for maximum performance.
+function voicePlayerHtml(url) {
+    const id = 'vp' + (vpCounter++);
+    setTimeout(() => initVoicePlayer(id, url), 0);
+    return `<div class="voice-player" id="${id}">
+        <button class="vp-btn" data-play>${VP_PLAY}</button>
+        <div class="vp-track" data-track><div class="vp-fill" data-fill></div></div>
+        <span class="vp-time" data-time>0:00</span>
+    </div>`;
+}
 
-AI AUTOMATION SERVICES (The Growth Package):
-We replace manual bottlenecks with intelligent agents:
-- AI Receptionist: 24/7 front-desk automation. Greets, qualifies, and routes calls.
-- AI Accounts Receivable: Automates professional payment reminders, overdue follows-ups, and billing enquiries.
-- AI Survey & Feedback: Automated natural voice surveys for actionable insights.
-- AI Sales Rep (WhatsApp): 24/7 lead qualification and customer conversion via WhatsApp.
-- AI Inbox Manager: AI reads, responds, and qualifies every incoming email.
+function initVoicePlayer(id, url) {
+    const root = document.getElementById(id);
+    if (!root) return;
+    const audio = new Audio(url);
+    const btn = root.querySelector('[data-play]');
+    const track = root.querySelector('[data-track]');
+    const fill = root.querySelector('[data-fill]');
+    const timeEl = root.querySelector('[data-time]');
+    const fmt = s => { s = Math.floor(s || 0); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
 
-WEB PACKAGES:
-- 1-Day Custom Site: 00 setup + 0/mo maintenance (Live in 24hrs).
-- Starter: ,500 + 50/mo. 1-Page High-Fidelity build + Full Brand Setup.
-- Growth: ,500 + 00/mo. Multipage Architecture + Advanced SEO + Content Strategy.
-- Trusted: ,000 + 00/mo. Elite Network Architecture (10-15 pages) + Priority Tech Support.
-- Custom/Enterprise: 0,000+. Tailored infrastructure, API integrations, and scalable logic.
-
-EVOLVE MOBILITY (driveevolve.com):
-The Caribbean's premier Electric Vehicle (EV) dealership.
-Key Inventory:
-- BYD Atto 3 (85k TTD): The versatile SUV.
-- BYD Dolphin (95k TTD): The smart city hatch.
-- GAC AION Y Plus (45k TTD): Spacious, high-tech family mover.
-- Leapmotor C11 (10k TTD): Premium electric performance.
-- Leapmotor T03 (45k TTD): Most affordable high-fidelity EV.
-Stats: Blade battery tech, average 2.3%/year degradation. Framing: EVs are 'Smart Infrastructure' for the Caribbean.
-
-WHATSAPP RELAY (1-868-342-4101):
-I have a direct relay to the Lead. Every high-intent capture is dispatched to management WhatsApp immediately.
-
-RULES:
-- All prices mentioned must be in USD (United States Dollars) unless specifically discussing Evolve Mobility vehicle prices (which remain in TTD).
-- For Trinidad-based clients, mention that we facilitate Local Banking/Direct Transfer for all service payments.
-- Keep replies to 2-4 sentences.
-- Always provide exact pricing.
-- If they are ready to move forward, dispatch the detail to the management WhatsApp (1-868-342-4101).";
+    btn.onclick = () => { audio.paused ? audio.play() : audio.pause(); };
+    audio.onplay = () => { btn.innerHTML = VP_PAUSE; };
+    audio.onpause = () => { btn.innerHTML = VP_PLAY; };
+    audio.onended = () => { btn.innerHTML = VP_PLAY; fill.style.width = '0%'; timeEl.textContent = fmt(audio.duration); };
+    audio.onloadedmetadata = () => { timeEl.textContent = fmt(audio.duration); };
+    audio.ontimeupdate = () => {
+        if (audio.duration) fill.style.width = ((audio.currentTime / audio.duration) * 100) + '%';
+        timeEl.textContent = fmt(audio.currentTime);
+    };
+    track.onclick = (e) => {
+        if (!audio.duration) return;
+        const rect = track.getBoundingClientRect();
+        audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    };
+}
 
 let history = [];
 
-function getAI(txt, cb) {
-    history.push({role:'user', content:txt});
+function getAI(txt, cb, imageUrl) {
+    let userContent = txt;
+    if (imageUrl) {
+        // OpenAI/Grok-compatible multimodal content block, so the backend can forward
+        // this straight to a vision-capable model instead of just a text URL.
+        userContent = [
+            { type: 'text', text: txt },
+            { type: 'image_url', image_url: { url: imageUrl } }
+        ];
+    }
+    history.push({role:'user', content:userContent});
     const payload = JSON.stringify({ system: SYSTEM_PROMPT, messages: history, max_tokens: 350 });
     
     fetch(SB_URL + '/functions/v1/chat-proxy', {
@@ -316,7 +348,51 @@ function fallback(txt, cb) {
 
 const WA_SVG='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.5 8.5 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
 
+function ensureWhatsAppBtn(botText){
+    if(!botText || !/whatsapp/i.test(botText)) return;
+    const q = document.getElementById('chat-qr');
+    if(!q || q.querySelector('.qrb.wa')) return; // already offered, don't duplicate
+    const a = document.createElement('a');
+    a.href = WA; a.target = '_blank';
+    a.className = 'qrb wa'; a.innerHTML = WA_SVG + ' Chat on WhatsApp';
+    q.appendChild(a);
+}
+
 var voiceOn=false;
+var preferredVoice=null;
+function pickVoice(){
+  if(!window.speechSynthesis) return;
+  var voices=window.speechSynthesis.getVoices();
+  if(!voices.length) return;
+  // If the user has manually picked a voice via the voice picker, honor that
+  // above all else -- it's guaranteed correct since they heard it themselves.
+  var savedName = localStorage.getItem('pd_chosen_voice');
+  if (savedName) {
+    var saved = voices.find(v => v.name === savedName);
+    if (saved) { preferredVoice = saved; return; }
+  }
+  // Preference order: an explicitly female-labeled voice first (this is what
+  // was reliably working), then natural/neural-named voices as a secondary
+  // preference, falling back to whatever the browser offers.
+  var priorities = [
+    v => /female/i.test(v.name),                                     // explicit female label -- top priority
+    v => /Google UK English Female/i.test(v.name),
+    v => v.name === 'Samantha',                                      // macOS/iOS default, female, quite natural
+    v => /natural/i.test(v.name) && /female/i.test(v.name),          // female + Edge "Online (Natural)" voices
+    v => /Aria|Jenny|Emma|Ava/i.test(v.name),                        // common neural voice names (often female)
+    v => /Google US English/i.test(v.name),
+    v => v.lang && v.lang.startsWith('en')
+  ];
+  for (var i = 0; i < priorities.length; i++) {
+    var match = voices.find(priorities[i]);
+    if (match) { preferredVoice = match; return; }
+  }
+  preferredVoice = voices[0];
+}
+if(window.speechSynthesis){
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+}
 window.toggleVoice=function(){
   voiceOn=!voiceOn;
   var btn=document.getElementById('chat-voice-toggle');
@@ -329,17 +405,27 @@ window.toggleVoice=function(){
 };
 function speak(txt){
   if(!voiceOn||!window.speechSynthesis)return;
-  var clean=txt.replace(/\n/g,' ').replace(/Prisca Dezigns/gi, 'Pree-ska Designs').trim();
-  var u=new SpeechSynthesisUtterance(clean);u.rate=0.85;u.pitch=1.0;u.volume=1;
-  var voices=window.speechSynthesis.getVoices();
-  var preferred = voices.find(v => v.name.includes('Google US English') || v.name.includes('Female'));
-  if(preferred) u.voice = preferred;
+  var clean=txt.replace(/<[^>]*>/g,' ').replace(/\n/g,' ').replace(/Dezigns/gi, 'Designs').trim();
+  if(!clean) return;
+  var u=new SpeechSynthesisUtterance(clean);u.rate=1.0;u.pitch=1.03;u.volume=1;
+  if(!preferredVoice) pickVoice();
+  if(preferredVoice) u.voice = preferredVoice;
   window.speechSynthesis.cancel();window.speechSynthesis.speak(u);
 }
 
 window.toggleEmojis = function() {
     document.getElementById('emoji-picker').classList.toggle('open');
 };
+
+// Close the emoji picker on outside click — otherwise it sits on top of the
+// send button and silently swallows clicks meant for Send.
+document.addEventListener('click', function(e) {
+    const ep = document.getElementById('emoji-picker');
+    if (!ep || !ep.classList.contains('open')) return;
+    const toggleBtn = document.querySelector('[onclick="toggleEmojis()"]');
+    if (ep.contains(e.target) || (toggleBtn && toggleBtn.contains(e.target))) return;
+    ep.classList.remove('open');
+});
 
 // --- High-Fidelity Voice Recording & Attachment Handlers ---
 let mediaRecorder;
@@ -348,6 +434,7 @@ let recInterval;
 let recSeconds = 0;
 let recognition;
 let currentTranscript = "";
+let isRecordingActive = false;
 
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -368,6 +455,7 @@ window.toggleMic = function() {
 
 function startAudioRecord() {
     currentTranscript = "";
+    isRecordingActive = true;
     if (recognition) {
         recognition.onresult = (event) => {
             let final = "";
@@ -376,7 +464,22 @@ function startAudioRecord() {
             }
             currentTranscript += final;
         };
-        recognition.start();
+        // Mobile Chrome stops listening after a few seconds of silence even
+        // with continuous=true -- unlike desktop. If it ends on its own while
+        // the user is still recording, just restart it so it keeps capturing
+        // for the full duration of the recording.
+        recognition.onend = () => {
+            if (isRecordingActive) {
+                try { recognition.start(); } catch (e) { /* already running */ }
+            }
+        };
+        recognition.onerror = (e) => {
+            // 'no-speech' and 'aborted' are routine (esp. on mobile) and are
+            // always followed by onend, which will restart it -- don't treat
+            // these as fatal. Other errors just get logged, not thrown.
+            console.log('Speech recognition:', e.error);
+        };
+        try { recognition.start(); } catch (e) { /* ignore if already started */ }
     }
 
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -407,12 +510,26 @@ function startAudioRecord() {
 }
 
 function stopAudioRecord() {
-    if (recognition) recognition.stop();
-    if (mediaRecorder) {
-        mediaRecorder.stop();
-        document.getElementById('chat-mic').classList.remove('recording');
-        document.getElementById('chat-timer').classList.remove('vis');
-        clearInterval(recInterval);
+    isRecordingActive = false;
+    document.getElementById('chat-mic').classList.remove('recording');
+    document.getElementById('chat-timer').classList.remove('vis');
+    clearInterval(recInterval);
+
+    const finishRecording = () => {
+        clearTimeout(recStopSafety);
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    };
+
+    if (recognition) {
+        // Wait for recognition to fully finish (including any final result still
+        // in flight) before stopping the recorder and triggering the upload —
+        // otherwise the transcript can still be empty at the moment it's checked.
+        recognition.onend = finishRecording;
+        recognition.stop();
+        // Safety net in case onend never fires (e.g. permission hiccup).
+        var recStopSafety = setTimeout(finishRecording, 1200);
+    } else {
+        finishRecording();
     }
 }
 
@@ -422,47 +539,99 @@ window.handleChatFile = function(files) {
     }
 };
 
-function uploadToVault(file, fileName, type) {
-    addMsg("Uploading " + type + "...", 'bot');
-    const path = 'chatbot_uploads/' + fileName;
-    
-    fetch(SB_URL + '/storage/v1/object/media/' + path, {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + SB_ANON,
-            'Content-Type': file.type,
-            'x-upsert': 'true'
-        },
-        body: file
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.Key || data.path) {
-            const url = SB_URL + '/storage/v1/object/public/media/' + path;
-            if (type === 'audio') {
-                addMsg(`<div class="chat-audio-msg">🎤 Voice Note: <audio controls src="${url}"></audio></div>`, 'usr');
-            } else if (file.type.startsWith('image/')) {
-                addMsg(`<img src="${url}" onclick="window.open('${url}')" />`, 'usr');
-            } else {
-                addMsg(`📎 File attached: <a href="${url}" target="_blank">${fileName}</a>`, 'usr');
-            }
-            // Notify Zapia (Sierra) about the upload with transcript if available
-            let aiPrompt = "I just uploaded a " + type + ": " + url;
-            if (type === 'audio' && currentTranscript) {
-                aiPrompt = "I just uploaded a voice note. Transcript: \"" + currentTranscript + "\" (URL: " + url + ")";
-            }
-
-            getAI(aiPrompt, (reply) => {
-                addMsg(reply, 'bot');
-            });
-        } else {
-            addMsg("Upload failed. Please try again.", 'bot');
-        }
-    })
-    .catch(() => addMsg("Upload error. Check connection.", 'bot'));
+// Auto-generated per-session identifier so every visitor still gets their own
+// folder without being interrupted by a popup. If they later tell the bot
+// their name in conversation, we swap it in for future uploads this session.
+let clientName = 'Visitor-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+let clientEmail = null;
+let clientPhone = null;
+function maybeCaptureName(text) {
+    const m = text.match(/\bmy name is ([a-zA-Z][a-zA-Z '.-]{1,40})/i) || text.match(/\bi'?m ([a-zA-Z][a-zA-Z '.-]{1,40})\b/i);
+    if (m && m[1]) {
+        const cleaned = m[1].trim().replace(/[^a-zA-Z0-9 _-]/g, '').slice(0, 60);
+        if (cleaned) clientName = cleaned;
+    }
+    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    if (emailMatch) clientEmail = emailMatch[0];
+    const phoneMatch = text.match(/(\+?1?[\s-]?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4})/);
+    if (phoneMatch) clientPhone = phoneMatch[0].trim();
+    if (emailMatch || phoneMatch) {
+        // We now have real contact info -- log/update this as an actual lead,
+        // not just an anonymous session, so the team can follow up.
+        fetch(SB_URL + '/rest/v1/client_leads', {
+            method: 'POST',
+            headers: {
+                'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON,
+                'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ name: clientName, email: clientEmail, phone: clientPhone, brand: 'Prisca Dezigns', status: 'new' })
+        }).catch(() => {});
+    }
+}
+function ensureClientName(cb) {
+    cb(clientName);
 }
 
-const PKGS={"standard":[{"name":"Starter","price":"$1,500 + $150/mo","desc":"1-Page High-Fidelity Website \u00b7 Full Brand Setup (Logo, Domain, Favicon) \u00b7 Social Media Integration \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Growth","price":"$3,500 + $400/mo","desc":"Manage 1 Brand Page \u00b7 Full Branding & App/Web Architecture \u00b7 Content Creation & Copywriting \u00b7 Advanced SEO & Analytics \u00b7 1 Month Free Maintenance"},{"name":"Trusted","price":"$6,000 + $700/mo","desc":"Full Website Architecture (10-15 Pages) \u00b7 Premium Brand Scaling & PR \u00b7 24/7 Priority Tech Support \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Custom","price":"Starting at $10,000","desc":"Tailored Digital Architecture \u00b7 Custom API & Tool Integration \u00b7 Unique Brand Identity Design \u00b7 Scalable Infrastructure \u00b7 Priority Sovereign Support"}],"ecommerce":[{"name":"E-Starter","price":"$2,500 + $250/mo","desc":"1-Page Online Shop \u00b7 Full Store Branding & Domain \u00b7 Integrated Social Shop Setup \u00b7 Payment Gateway Integration \u00b7 1 Month Free Maintenance"},{"name":"E-Growth","price":"$5,000 + $500/mo","desc":"2-5 Page Store Architecture \u00b7 Full Shop Logic (10+ Products) \u00b7 Deep Copywriting & Product SEO \u00b7 Automated Fulfillment Sync \u00b7 1 Month Free Maintenance"},{"name":"E-Trusted","price":"$8,500 + $850/mo","desc":"Elite Store (50+ Products) \u00b7 15+ Page Network Architecture \u00b7 Advanced Inventory & CRM Automation \u00b7 On-Chain Inventory Logic \u00b7 1 Month Free Maintenance"},{"name":"E-Commerce Maintenance","price":"$199.99/mo","desc":"E-Commerce Store Uptime & Security Monitoring \u00b7 Monthly Product & Content Updates \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"ai":[{"name":"AI Tier 1","price":"$1,500 + $150/mo","desc":"AI Website Chatbot (24/7 Live) \u00b7 Lead Capture & CRM Setup \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 2","price":"$3,500 + $400/mo","desc":"Everything in Tier 1 \u00b7 WhatsApp AI Automation (24/7) \u00b7 [Chatbot Audio Feature: +$500 setup +$50/mo]"},{"name":"AI Tier 3","price":"$6,000 + $700/mo","desc":"Everything in Tier 1 & 2 \u00b7 Email Inbox AI Automation (24/7) \u00b7 AI Reads, Responds & Qualifies Every Email \u00b7 1 Month Free Maintenance"},{"name":"AI Tier 4","price":"$8,000 + $900/mo","desc":"Everything in Tiers 1, 2 & 3 \u00b7 Full Voice Agent Deployment \u00b7 Answers inbound calls 24/7 \u00b7 1 Month Free Maintenance"}],"continuity":[{"name":"Maintenance","price":"$99.99/mo","desc":"Daily Uptime & Security Monitoring \u00b7 Monthly Content Optimization \u00b7 High-Fidelity Technical Backups \u00b7 Priority Sovereign Support"}],"templates":[{"name":"Template Site","price":"$149.99 + $19.99/mo","desc":"Choose any of our 24 templates \u00b7 Logo & colours swapped in \u00b7 Your content added \u00b7 Mobile-optimised \u00b7 Live in 24hrs \u00b7 Hosted on your subdomain"},{"name":"+ Copywriting Add-On","price":"$4.99/update","desc":"Everything in Template Site \u00b7 Professional copywriting for all sections \u00b7 Bio, services, CTA all written for you \u00b7 Delivered in 48-72hrs"},{"name":"+ AI Chatbot Add-On","price":"$349.99 + $49.99/mo","desc":"Everything in Template Site \u00b7 AI chatbot answering your business FAQs 24/7 \u00b7 Hours, services, location, how to book"},{"name":"Micro Store","price":"$249.99 + $34.99/mo","desc":"Full product store built on your chosen template \u00b7 Up to 12 products uploaded with copy & images \u00b7 WhatsApp order button on every product \u00b7 Live in 72-96hrs"},{"name":"Premium Template (3D)","price":"$200 + $19.99/mo","desc":"Aeon \u00b7 Nexus \u00b7 Stellar \u2014 cinematic 3D WebGL experiences \u00b7 Fully immersive \u00b7 Scroll-driven animation"}]};
+function uploadToVault(file, fileName, type) {
+    ensureClientName(function(client) {
+        addMsg("Uploading " + type + "...", 'bot');
+        const safeClient = client.replace(/\s+/g, '_');
+        const path = 'chatbot_uploads/' + safeClient + '/' + Date.now() + '_' + fileName;
+
+        fetch(SB_URL + '/storage/v1/object/media/' + path, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + SB_ANON,
+                'Content-Type': file.type,
+                'x-upsert': 'true'
+            },
+            body: file
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.Key || data.path) {
+                const url = SB_URL + '/storage/v1/object/public/media/' + path;
+                const isImage = file.type && file.type.startsWith('image/');
+
+                if (type === 'audio') {
+                    addMsg(`<div class="chat-audio-msg">${voicePlayerHtml(url)}</div>`, 'usr');
+                } else if (isImage) {
+                    addMsg(`<img src="${url}" onclick="window.open('${url}')" />`, 'usr');
+                } else {
+                    addMsg(`📎 File attached: <a href="${url}" target="_blank">${fileName}</a>`, 'usr');
+                }
+
+                // Server-side: log the attachment (with contact info if we have it) to Supabase.
+                // Fire-and-forget — doesn't block the chat reply.
+                fetch(SB_URL + '/functions/v1/save-attachment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_ANON },
+                    body: JSON.stringify({ clientName: client, clientEmail: clientEmail, clientPhone: clientPhone, fileUrl: url, fileName: fileName, fileType: file.type, category: type })
+                }).catch(() => {});
+
+                if (type === 'audio') {
+                    if (currentTranscript && currentTranscript.trim()) {
+                        getAI("I just uploaded a voice note. Transcript: \"" + currentTranscript.trim() + "\"", (reply) => { addMsg(reply, 'bot'); speak(reply); });
+                    } else {
+                        const noTranscriptMsg = "Got your voice note saved — but I couldn't capture a live transcript that time (this browser may not support speech-to-text). Mind typing your question instead?";
+                        addMsg(noTranscriptMsg, 'bot');
+                        speak(noTranscriptMsg);
+                    }
+                } else if (isImage) {
+                    // Real multimodal call — the image is sent as actual image content, not just a URL string.
+                    getAI("The user uploaded this image. Take a look and respond to what's actually in it.", (reply) => { addMsg(reply, 'bot'); speak(reply); }, url);
+                } else {
+                    getAI("I just uploaded a file: " + fileName + " (" + url + ")", (reply) => { addMsg(reply, 'bot'); speak(reply); });
+                }
+            } else {
+                addMsg("Upload failed. Please try again.", 'bot');
+            }
+        })
+        .catch(() => addMsg("Upload error. Check connection.", 'bot'));
+    });
+}
+
+const PKGS={"standard":[{"name":"Starter","price":"$297","desc":"1-Page High-Fidelity Website \u00b7 Full Brand Setup (Logo, Domain, Favicon) \u00b7 Social Media Integration (FB/IG Covers) \u00b7 Technical SEO & SSL \u00b7 1 Month Free Maintenance"},{"name":"Growth","price":"$597","desc":"Manage 1 Brand Page (Full Social Setup) \u00b7 Full Branding & App/Web Architecture \u00b7 Content Creation & Copywriting \u00b7 Advanced SEO & Analytics \u00b7 1 Month Free Maintenance"},{"name":"Trusted","price":"$1,200","desc":"Full Business Automation \u00b7 10-15 Pages of High-Fidelity Content \u00b7 Premium Brand Scaling & PR Logic \u00b7 24/7 Priority Tech Support \u00b7 1 Month Free Maintenance"},{"name":"Custom","price":"Bespoke","desc":"Tailored Digital Architecture \u00b7 Custom API & Tool Integration \u00b7 Unique Brand Identity Design \u00b7 Scalable Infrastructure Logic \u00b7 Priority Support"}],"ecommerce":[{"name":"E-Starter","price":"$497 + $197/mo","desc":"1-Page Online Shop \u00b7 Full Store Branding & Domain \u00b7 Integrated Social Shop Setup \u00b7 Payment Gateway Integration \u00b7 1 Month Free Maintenance"},{"name":"E-Growth","price":"$1,497 + $197/mo","desc":"2-5 Page Store Architecture \u00b7 Full Shop Logic (10+ Products) \u00b7 Deep Copywriting & Product SEO \u00b7 Automated Fulfillment Sync \u00b7 1 Month Free Maintenance"},{"name":"E-Trusted","price":"$2,500 + $197/mo","desc":"Elite Store (50+ Products) \u00b7 15+ Page Network Architecture \u00b7 Advanced Inventory & CRM Automation \u00b7 On-Chain Inventory Logic \u00b7 1 Month Free Maintenance"},{"name":"E-Commerce Maintenance","price":"$199.99/mo","desc":"E-Commerce Store Uptime & Security Monitoring \u00b7 Monthly Product & Content Updates \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"ai":[{"name":"AI Tier 1","price":"$1,500 + $300/mo","desc":"High-Fidelity Website Design \u00b7 AI Chatbot on Website \u00b7 Contact Form & Lead Notifications \u00b7 500 conversations/mo included, $0.65/conversation overage \u00b7 [Add-on] Voice/Audio Intelligence +$500 setup +$50/mo"},{"name":"AI Tier 2","price":"$3,500 + $500/mo","desc":"Everything in Tier 1 \u00b7 WhatsApp AI Automation (24/7) \u00b7 Automatic Lead Qualification & Routing \u00b7 1,500 conversations/mo included, $0.65/conversation overage \u00b7 [Add-on] Voice/Audio Intelligence +$500 setup +$50/mo"},{"name":"AI Tier 3","price":"$6,000 + $700/mo","desc":"Tier 1 & 2 Fully Included \u00b7 Email Inbox AI Automation (24/7) \u00b7 AI Reads, Responds & Qualifies Every Email \u00b7 Automated Follow-Up Sequences \u00b7 3,000 conversations/mo included, $0.65/conversation overage"},{"name":"AI Tier 4","price":"$8,000 + $900/mo","desc":"Tiers 1, 2 & 3 Fully Included \u00b7 AI Voice Agent \u2014 trained on your business \u00b7 Answers inbound calls 24/7 \u00b7 Qualifies callers & routes hot leads \u00b7 Unlimited conversations/mo, annual audit required"}],"aiNote":"All AI Consultancy prices are subject to change upon audit.","continuity":[{"name":"Maintenance","price":"$97/mo","desc":"Daily Uptime & Security Monitoring \u00b7 Monthly Content Optimization \u00b7 High-Fidelity Technical Backups \u00b7 Priority Support"}],"templates":[{"name":"Template Site","price":"$149.99 + $19.99/mo","desc":"Custom branded to your business \u00b7 Live on your domain in 24 hours \u00b7 SSL, mobile-ready, SEO basics included \u00b7 1 complimentary revision round"},{"name":"+ Copywriting Add-On","price":"$49.99 + $4.99/update","desc":"We write your headline, bio & service copy \u00b7 Based on a short intake form you fill in \u00b7 $4.99 flat per edit after go-live"},{"name":"+ AI Chatbot Add-On","price":"$349.99 + $49.99/mo","desc":"24/7 AI \u2014 answers your business FAQs \u00b7 Preloaded with hours, location, services \u00b7 Works with new or existing sites"},{"name":"Micro Store","price":"$249.99 + $34.99/mo","desc":"Product grid \u2014 up to 12 products \u00b7 WhatsApp order button per product \u00b7 WhatsApp-driven orders with zero fees \u00b7 Everything in Standard Site included"},{"name":"Agency & Artist (Premium 3D)","price":"$299.99 + $19.99/mo","desc":"High-end cinematic 3D scroll experience \u00b7 Aeon \u00b7 Nexus \u00b7 Stellar \u00b7 Live on your domain in 24\u201348 hours"}],"aidata":[{"name":"Starter","price":"From $1,250 + $599/mo","desc":"AI Data Entry, Processing, Records, Reporting, Workflow & Document automation \u00b7 Add-ons available: Custom Export Formats, Automated Report Delivery, Anomaly & Error Alerts"},{"name":"Growth","price":"From $2,000 + $899/mo","desc":"Same roles \u00b7 Add-ons available: everything in Starter plus CRM & Database Sync, Multi-Source Data Intake, Analytics Dashboard"},{"name":"Enterprise","price":"From $4,000 + $1,499/mo","desc":"Same roles at enterprise scale \u00b7 ALL add-ons included as standard"}],"aivoice":[{"name":"Starter","price":"From $1,500 + $499/mo","desc":"AI Receptionist, Customer Service Rep, Lead Qualifier, Appointment Scheduler, Survey & Feedback Agent, HR Assistant, Accounts Receivable Agent \u00b7 Add-ons available: WhatsApp & SMS Follow-Up, Custom Voice & Persona, Multi-Language Support"},{"name":"Growth","price":"From $3,500 + $899/mo","desc":"Same roles \u00b7 Add-ons available: everything in Starter plus CRM Integration, Call Analytics Dashboard, Outbound Calling Campaigns"},{"name":"Enterprise","price":"From $7,000 + $1,699/mo","desc":"Full voice network across all roles \u00b7 ALL add-ons included as standard"}],"aichannel":[{"name":"Starter","price":"From $750 + $399/mo","desc":"One channel to start (Email, Website, or WhatsApp) \u00b7 Feature upgrades available on any package: Sales Logic, HSE Reporting, Appointment Booking, Multi-Language Support, Additional Channels"},{"name":"Growth","price":"From $1,250 + $599/mo","desc":"Adds a second channel \u00b7 Same feature upgrades available"},{"name":"Enterprise","price":"From $2,500 + $999/mo","desc":"Full channel network -- email, website & WhatsApp together \u00b7 Same feature upgrades available"}],"specializedNote":"All Specialized AI Network pricing (AI Data, AI Voice, AI Channel) starts from the figures shown. Final implementation and monthly AI Management pricing are confirmed following a Business Process Audit, and every plan includes ongoing platform monitoring, updates, and support."};
 
 const STEPS = {
     "request_audit": {
@@ -491,7 +660,7 @@ const STEPS = {
         ]
     },
     "about": {
-        "bot": "Prisca Dezigns is a high-fidelity digital agency specializing in premium web architecture and AI automation. We're on a mission to build the future of the Caribbean.",
+        "bot": "Prisca Dezigns is an enterprise AI and digital transformation partner — we build high-fidelity web architecture, AI automation systems, and brand infrastructure for businesses ready to scale. Based in Trinidad & Tobago, working across the Caribbean.",
         "r": [
             { "l": "Evolve Mobility", "s": "about_brands", "i": "car" },
             { "l": "The Way Made Known", "s": "about_twmk", "i": "heart" },
@@ -500,11 +669,16 @@ const STEPS = {
         ]
     },
     "about_brands": {
-        "bot": "We are the strategic digital partners for Evolve Mobility (driveevolve.com), the leading EV dealership in the Caribbean.\n\nInventory & Pricing:\n⚡ BYD Atto 3: $285,000 TTD\n⚡ BYD Dolphin: $195,000 TTD\n⚡ GAC AION Y Plus: $245,000 TTD\n⚡ Leapmotor C11: $310,000 TTD\n⚡ Leapmotor T03: $145,000 TTD",
+        "bot": "We're the strategic digital partners for EVOLVE Mobility (driveevolve.com), transforming the Caribbean's roads through green mobility.\n\nCurrent lineup includes:\n⚡ GAC Aion ES — from TT$195,000 (TT$2,500/mo)\n⚡ Leapmotor C10 — TT$255,000\n⚡ GAC Aion V — TT$260,000\n⚡ BYD Sealion 7 (Premium) — TT$360,000\n\nCarrying BYD, Denza, GAC, Leapmotor, Wuling & more, with servicing by SBCS University.",
         "r": [
             { "l": "Visit Evolve Mobility", "url": "https://driveevolve.com", "i": "external-link" },
+            { "l": "Fleet Assessment & Transition", "s": "fleet_transition", "i": "truck" },
             { "l": "Back", "s": "about", "i": "arrow-left" }
         ]
+    },
+    "fleet_transition": {
+        "bot": "If your business runs a vehicle fleet, we offer a free on-site assessment and handle the full EV transition — from picking the right models to financing, documentation, and delivery. Fuel costs typically drop up to 70%, with no oil changes or transmission servicing. Most fleets start with a 2-3 vehicle pilot to see real numbers within 90 days.",
+        "wa": true
     },
     "about_twmk": {
         "bot": "The Way Made Known (TWMK) is our humanitarian backbone. We use a portion of our agency profits to share the Gospel and provide community support in Trinidad and Tobago.",
@@ -513,7 +687,7 @@ const STEPS = {
         ]
     },
     "about_founder": {
-        "bot": "Prisca Dezigns was founded in Trinidad & Tobago by Priscilla Narine. With a focus on high-fidelity results and precision data management, she leads a team that integrates AI into professional workflows seamlessly.",
+        "bot": "Prisca Dezigns was founded in Trinidad & Tobago by Priscilla Narine. The agency operates as an enterprise AI and digital transformation partner — combining high-fidelity web architecture with AI automation (chatbots, WhatsApp automation, voice agents, lead qualification) to help businesses modernize how they operate, not just how they look online.",
         "r": [
             { "l": "Back", "s": "about", "i": "arrow-left" }
         ]
@@ -525,6 +699,14 @@ const STEPS = {
             { "l": "I need a full custom build", "s": "pkg_standard", "i": "code" },
             { "l": "Mine isn't converting", "s": "bad_website", "i": "trending-down" },
             { "l": "Show me templates instead", "s": "pkg_templates", "i": "color-swatch" }
+        ]
+    },
+    "bad_website": {
+        "bot": "That's usually a sign of weak conversion design, slow load times, or missed follow-up on leads — all fixable. Want us to run a quick audit, or look at AI automation to catch the leads you're currently losing?",
+        "r": [
+            { "l": "Run an audit", "s": "request_audit", "i": "clipboard-check" },
+            { "l": "Show me AI automation", "s": "automation", "i": "cpu" },
+            { "l": "Back", "s": "need_website", "i": "arrow-left" }
         ]
     },
     "pkg_menu": {
@@ -560,6 +742,9 @@ const STEPS = {
             { "l": "Customer service / enquiries", "s": "how_it_works", "i": "headphones" },
             { "l": "WhatsApp automation", "s": "whatsapp_auto", "i": "message-square" },
             { "l": "Full business automation", "s": "pkg_ai", "i": "settings" },
+            { "l": "AI Data (records, reporting)", "s": "pkg_aidata", "i": "database" },
+            { "l": "AI Voice (receptionist, sales)", "s": "pkg_aivoice", "i": "phone" },
+            { "l": "AI Channel (email, web, WhatsApp)", "s": "pkg_aichannel", "i": "globe" },
             { "l": "Talk to someone", "s": "talk", "i": "message-circle" }
         ]
     },
@@ -585,6 +770,9 @@ const STEPS = {
     "pkg_standard": { "bot": "Professional custom web packages for growing brands.", "pkg": "standard" },
     "pkg_ecommerce": { "bot": "Scalable e-commerce solutions for global selling.", "pkg": "ecommerce" },
     "pkg_ai": { "bot": "Advanced AI automation tiers for business efficiency.", "pkg": "ai" },
+    "pkg_aidata": { "bot": "AI Data — precision data entry, processing, records, reporting, and workflow automation, with payroll intelligence built in.", "pkg": "aidata" },
+    "pkg_aivoice": { "bot": "AI Voice — human-grade voice agents for reception, sales, lead qualification, and survey/feedback, answering calls 24/7.", "pkg": "aivoice" },
+    "pkg_aichannel": { "bot": "AI Channel — autonomous email, website, and WhatsApp lead conversion pipelines, working your inbox and chats around the clock.", "pkg": "aichannel" },
     "pkg_continuity": { "bot": "Keep your digital infrastructure peak & secure.", "pkg": "continuity" }
 };
 
@@ -598,7 +786,7 @@ window.toggleChat = function(){
     if(open && hist.length === 0) go('start');
 };
 
-function go(step, label){
+window.go = function(step, label){
     const s = STEPS[step];
     if(!s) return;
     if(label) addMsg(label, 'usr');
@@ -629,17 +817,17 @@ function go(step, label){
             return;
         }
         if(s.pkg){
-            renderPkgs(PKGS[s.pkg]);
+            renderPkgs(PKGS[s.pkg], s.pkg === 'ai' ? PKGS.aiNote : (['aidata','aivoice','aichannel'].includes(s.pkg) ? PKGS.specializedNote : null));
             addQR('← Packages', 'pkg_menu');
             addQR('Contact Team', 'talk');
             return;
         }
         if(s.url) window.open(s.url, '_blank');
-        if(s.r) s.r.forEach(r => addQR(r.l, r.s, r.i));
+        if(s.r) s.r.forEach(r => addQR(r.l, r.s, r.i, r.url));
     }, 600);
 }
 
-function addQR(label, step, icon){
+function addQR(label, step, icon, url){
     const q = document.getElementById('chat-qr');
     const b = document.createElement('button');
     b.className = 'qrb';
@@ -673,7 +861,7 @@ function addQR(label, step, icon){
     }
 
     b.innerHTML = iconSvg + `<span>${label}</span>`;
-    b.onclick = () => go(step, label);
+    b.onclick = url ? () => window.open(url, '_blank') : () => go(step, label);
     q.appendChild(b);
 }
 
@@ -695,63 +883,10 @@ function addMsg(txt, side){
     d.innerHTML = txt.replace(/\n/g, '<br>');
     m.appendChild(d);
     m.scrollTop = m.scrollHeight;
+    if(side === 'bot') ensureWhatsAppBtn(txt);
 }
 
-function saveLead(name, phone, pkgName){
-    if(!name && !phone) return;
-    fetch(SB_URL + '/functions/v1/drew-lead-capture', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            name: name || 'Website Visitor',
-            phone: phone || '',
-            email: '',
-            service: pkgName
-        })
-    }).catch(() => {});
-}
-
-function showLeadCapture(pkgName, pkgPrice){
-    const m = document.getElementById('chat-msgs');
-    const q = document.getElementById('chat-qr');
-    q.innerHTML = '';
-
-    addMsg(`Great choice — the *${pkgName}* (${pkgPrice}). Before I connect you, what's your name and WhatsApp number so our team can follow up directly?`, 'bot');
-
-    const form = document.createElement('div');
-    form.style.cssText = 'display:flex;flex-direction:column;gap:10px;padding:8px 0;';
-    form.innerHTML = `
-        <input id="lead-name" placeholder="Your full name" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(157,80,187,0.3);font-size:0.9rem;outline:none;font-family:inherit;" />
-        <input id="lead-phone" placeholder="WhatsApp number (e.g. 868-123-4567)" style="padding:10px 14px;border-radius:12px;border:1px solid rgba(157,80,187,0.3);font-size:0.9rem;outline:none;font-family:inherit;" />
-        <button id="lead-submit" style="padding:11px;border-radius:12px;background:linear-gradient(135deg,#9d50bb,#6e48aa);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:0.9rem;">Connect me with the team →</button>
-    `;
-    m.appendChild(form);
-    m.scrollTop = m.scrollHeight;
-
-    document.getElementById('lead-submit').onclick = () => {
-        const name = document.getElementById('lead-name').value.trim();
-        const phone = document.getElementById('lead-phone').value.trim();
-        if(!name){ document.getElementById('lead-name').style.border='1px solid #e74c3c'; return; }
-        if(!phone){ document.getElementById('lead-phone').style.border='1px solid #e74c3c'; return; }
-
-        saveLead(name, phone, pkgName);
-        form.remove();
-        addMsg(`${name}, ${phone}`, 'usr');
-
-        const waText = encodeURIComponent(`Hi, I'm ${name}. I'm interested in the ${pkgName} (${pkgPrice}) package from Prisca Dezigns.`);
-        setTimeout(() => {
-            addMsg(`Perfect, ${name.split(' ')[0]}! 🎯 Your details are saved. Click below to open WhatsApp — Drew will be in touch shortly.`, 'bot');
-            const a = document.createElement('a');
-            a.href = `https://wa.me/18683424101?text=${waText}`;
-            a.target = '_blank';
-            a.className = 'qrb wa';
-            a.innerHTML = WA_SVG + ` Message us on WhatsApp`;
-            q.appendChild(a);
-        }, 600);
-    };
-}
-
-function renderPkgs(list){
+function renderPkgs(list, note){
     const m = document.getElementById('chat-msgs');
     const g = document.createElement('div');
     g.className = 'cpkg-grid';
@@ -761,11 +896,14 @@ function renderPkgs(list){
         c.innerHTML = `<div class="cpkg-name">${p.name}</div><div class="cpkg-price">${p.price}</div><div class="cpkg-desc">${p.desc}</div>`;
         c.onclick = () => {
             addMsg(`I'm interested in the ${p.name} package.`, 'usr');
-            setTimeout(() => showLeadCapture(p.name, p.price), 500);
+            setTimeout(() => go('talk'), 500);
         };
         g.appendChild(c);
     });
     m.appendChild(g);
+    if(note){
+        addMsg(`<span style="font-size:0.8em;opacity:0.75;font-style:italic;">${note}</span>`, 'bot');
+    }
     m.scrollTop = m.scrollHeight;
 }
 
@@ -773,6 +911,9 @@ window.chatSend = function(){
     const i = document.getElementById('chat-inp');
     const t = i.value.trim(); if(!t) return;
     i.value = ''; addMsg(t, 'usr');
+    maybeCaptureName(t);
+    const ep = document.getElementById('emoji-picker');
+    if (ep) ep.classList.remove('open');
     
     const m = document.getElementById('chat-msgs');
     const td = document.createElement('div');
@@ -790,6 +931,69 @@ window.chatSend = function(){
 
 if(window.location.pathname.includes('/services')){
     setTimeout(() => { if(!open) toggleChat(); }, 8000);
+}
+
+// --- Voice Picker: visit any page with ?voicepicker=1 to open this ---
+if (window.location.search.includes('voicepicker=1')) {
+    function buildVoicePicker() {
+        if (!window.speechSynthesis) return;
+        var voices = window.speechSynthesis.getVoices();
+        if (!voices.length) { setTimeout(buildVoicePicker, 300); return; }
+
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#fff;overflow-y:auto;padding:20px;font-family:sans-serif;';
+        var currentSaved = localStorage.getItem('pd_chosen_voice');
+
+        var header = document.createElement('div');
+        header.innerHTML = '<h2 style="margin:0 0 6px;">Pick the chatbot\'s voice</h2><p style="color:#666;margin:0 0 20px;font-size:14px;">Tap a voice to hear it, then tap "Use this voice" on the one you like.</p>';
+        overlay.appendChild(header);
+
+        voices.forEach(function(v) {
+            var row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #eee;border-radius:12px;margin-bottom:8px;' + (v.name === currentSaved ? 'border-color:#9d50bb;background:#faf5ff;' : '');
+
+            var label = document.createElement('div');
+            label.style.cssText = 'flex:1;font-size:14px;';
+            label.innerHTML = '<b>' + v.name + '</b><br><span style="color:#888;font-size:12px;">' + v.lang + (v.name === currentSaved ? ' — currently selected' : '') + '</span>';
+
+            var playBtn = document.createElement('button');
+            playBtn.textContent = '▶ Hear it';
+            playBtn.style.cssText = 'padding:8px 14px;border-radius:8px;border:1px solid #9d50bb;background:#fff;color:#9d50bb;font-weight:bold;cursor:pointer;';
+            playBtn.onclick = function() {
+                window.speechSynthesis.cancel();
+                var u = new SpeechSynthesisUtterance("Hi! I'm the Prisca Dezigns assistant. This is what I sound like.");
+                u.voice = v; u.rate = 1.0; u.pitch = 1.03;
+                window.speechSynthesis.speak(u);
+            };
+
+            var useBtn = document.createElement('button');
+            useBtn.textContent = 'Use this voice';
+            useBtn.style.cssText = 'padding:8px 14px;border-radius:8px;border:none;background:#9d50bb;color:#fff;font-weight:bold;cursor:pointer;';
+            useBtn.onclick = function() {
+                localStorage.setItem('pd_chosen_voice', v.name);
+                preferredVoice = v;
+                alert('Saved! "' + v.name + '" will now be used everywhere on the site.');
+                overlay.remove();
+            };
+
+            row.appendChild(label);
+            row.appendChild(playBtn);
+            row.appendChild(useBtn);
+            overlay.appendChild(row);
+        });
+
+        var closeBtn = document.createElement('button');
+        closeBtn.textContent = 'Close without changing';
+        closeBtn.style.cssText = 'margin-top:10px;padding:10px 16px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;';
+        closeBtn.onclick = function() { overlay.remove(); };
+        overlay.appendChild(closeBtn);
+
+        document.body.appendChild(overlay);
+    }
+    if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = buildVoicePicker;
+        buildVoicePicker();
+    }
 }
 
 })();
