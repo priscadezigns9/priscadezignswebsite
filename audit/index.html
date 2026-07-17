@@ -1348,6 +1348,20 @@
   <h2>Audit Submitted Successfully</h2>
   <p>Thank you for completing the Prisca Dezigns Client Audit.<br/>Our team will review your responses and reach out within <strong>1–2 business days</strong> with a tailored AI recommendation.</p>
   <div class="success-brand">PRISCA DEZIGNS · AI-POWERED AGENCY</div>
+
+  <!-- STRIKE REPORT -->
+  <div id="strikeReport" style="margin-top:40px;background:#F8F5FF;border:1.5px solid #E2D5F4;border-radius:12px;padding:28px 24px;text-align:left;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <span style="font-size:1.3rem;">⚡</span>
+      <h3 style="font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:1.4px;color:#2D0057;">Strike Report</h3>
+      <span style="margin-left:auto;font-size:0.72rem;color:#7B6A8A;font-weight:500;">INTERNAL · FOUNDER USE ONLY</span>
+    </div>
+    <div id="strikeBody" style="font-size:0.84rem;line-height:1.85;color:#1A0030;white-space:pre-wrap;font-family:'Courier New',monospace;background:#fff;border:1px solid #E2D5F4;border-radius:8px;padding:16px 18px;"></div>
+    <div style="margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;">
+      <button onclick="copyStrike()" style="background:#2D0057;color:#fff;border:none;padding:12px 24px;border-radius:50px;font-size:0.82rem;font-weight:700;cursor:pointer;letter-spacing:0.5px;">📋 Copy Report</button>
+      <a id="strikeWA" href="#" target="_blank" style="background:#25D366;color:#fff;padding:12px 24px;border-radius:50px;font-size:0.82rem;font-weight:700;text-decoration:none;letter-spacing:0.5px;">📲 Send to WhatsApp</a>
+    </div>
+  </div>
 </div>
 
 </div></div>
@@ -1717,6 +1731,8 @@ async function submitAudit() {
 
     if (res.ok || res.status === 201) {
       localStorage.removeItem(SAVE_KEY);
+      // Build Strike Report
+      buildStrikeReport(payload);
       // Show success screen
       document.getElementById('auditForm').style.display = 'none';
       document.getElementById('successScreen').style.display = 'block';
@@ -1746,6 +1762,105 @@ function showToast(msg, isError) {
 checkResume();
 
 // ── HSE SECTION TOGGLE ────────────────────────────────────────────────────────
+// ── STRIKE REPORT ─────────────────────────────────────────────────────────────
+function buildStrikeReport(payload) {
+  const sd = payload.section_data || {};
+
+  // Hubs selected
+  const interests = sd.service_interest || [];
+  const hasChannel = interests.includes('AI Channel');
+  const hasData    = interests.includes('AI Data');
+  const hasVoice   = interests.includes('AI Voice');
+
+  // AI Channel details
+  const chEmployees = sd.channel_products || [];
+  const chDeploy    = sd.channel_deploy   || [];
+
+  // AI Data details
+  const dataDepts   = sd.data_products    || [];
+
+  // AI Voice details
+  const voiceRoles  = sd.voice_products   || [];
+
+  // Tier logic
+  function channelTier(employees, channels) {
+    const combos = employees.length * channels.length;
+    if (combos <= 1) return 'Starter';
+    if (combos <= 4) return 'Growth';
+    return 'Enterprise';
+  }
+  function dataTier(depts) {
+    if (depts.length <= 3) return 'Starter';
+    if (depts.length <= 6) return 'Growth';
+    return 'Enterprise';
+  }
+  function voiceTier(roles) {
+    if (roles.length <= 1) return 'Starter';
+    if (roles.length <= 3) return 'Growth';
+    return 'Enterprise';
+  }
+
+  const tierPrices = {
+    'AI Channel': { Starter: '$800/mo', Growth: '$1,500/mo', Enterprise: '$2,800/mo' },
+    'AI Data':    { Starter: '$1,250/mo', Growth: '$2,500/mo', Enterprise: '$4,500/mo' },
+    'AI Voice':   { Starter: '$600/mo', Growth: '$1,200/mo', Enterprise: '$2,200/mo' }
+  };
+
+  let lines = [];
+  lines.push('⚡ STRIKE REPORT — PRISCA DEZIGNS');
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push(`Business:  ${payload.business_name}`);
+  lines.push(`Contact:   ${payload.contact_name}`);
+  lines.push(`Email:     ${payload.contact_email}`);
+  if (payload.contact_phone) lines.push(`Phone:     ${payload.contact_phone}`);
+  lines.push(`Industry:  ${payload.industry}${payload.industry_sub ? ' › ' + payload.industry_sub : ''}`);
+  lines.push(`Budget:    ${payload.monthly_budget || 'Not specified'}`);
+  lines.push(`Timeline:  ${sd.timeline || 'Not specified'}`);
+  lines.push('');
+  lines.push('── HUBS SELECTED ──────────────────');
+
+  if (hasChannel) {
+    const tier = channelTier(chEmployees, chDeploy);
+    lines.push(`✅ AI CHANNEL  [${tier} — ${tierPrices['AI Channel'][tier]}]`);
+    lines.push(`   Employees: ${chEmployees.join(', ') || '—'}`);
+    lines.push(`   Channels:  ${chDeploy.join(', ') || '—'}`);
+  }
+  if (hasData) {
+    const tier = dataTier(dataDepts);
+    lines.push(`✅ AI DATA     [${tier} — ${tierPrices['AI Data'][tier]}]`);
+    lines.push(`   Depts: ${dataDepts.join(', ') || '—'}`);
+  }
+  if (hasVoice) {
+    const tier = voiceTier(voiceRoles);
+    lines.push(`✅ AI VOICE    [${tier} — ${tierPrices['AI Voice'][tier]}]`);
+    lines.push(`   Roles: ${voiceRoles.join(', ') || '—'}`);
+  }
+  if (!hasChannel && !hasData && !hasVoice) {
+    lines.push('No hubs selected.');
+  }
+
+  lines.push('');
+  lines.push('── PAIN POINTS ────────────────────');
+  const pain = sd.pain || [];
+  lines.push(pain.length ? pain.join(', ') : '—');
+
+  lines.push('');
+  lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  lines.push('PRISCA DEZIGNS · INTERNAL · 2026');
+
+  const reportText = lines.join('\n');
+  document.getElementById('strikeBody').textContent = reportText;
+
+  // WhatsApp link
+  const waText = encodeURIComponent(reportText);
+  document.getElementById('strikeWA').href = `https://wa.me/18683424101?text=${waText}`;
+}
+
+function copyStrike() {
+  const text = document.getElementById('strikeBody').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Strike Report copied!', false));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const hseCheckboxes = document.querySelectorAll('input[name="voice_products"]');
   hseCheckboxes.forEach(function(cb) {
