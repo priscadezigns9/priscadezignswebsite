@@ -78,3 +78,24 @@ When the user provides a screenshot, image, or URL as a design reference:
 - Work in small, deliberate steps. Confirm each one works before moving to the next.
 - This applies especially to: API pushes, file builds, Supabase updates, GitHub deploys.
 - Trying to do everything at once overloads the platform and makes debugging harder.
+
+## Claude Traceability Mandate (2026-07-16)
+Every action Claude AI performs must be tagged and traceable. No silent edits.
+
+### GitHub Commits
+All commit messages must be prefixed with `[Zapia]`:
+- Example: `[Zapia] fix: chatbot Sierra sync v2.5`
+- Example: `[Zapia] feat: add AI Channel pricing to homepage`
+- Example: `[Zapia] update: Drew prompt v4 — AI Channel/Voice/Data`
+
+### Supabase Changes
+Every INSERT, UPDATE, or DELETE performed by Claude must include a `performed_by` field set to `"claude-ai"` where the table supports it. For tables without that field, log the action to `job_audit_log` with:
+- `action`: what was done
+- `performed_by`: `claude-ai`
+- `target`: table or file affected
+- `notes`: brief reason
+
+### File Edits (GitHub / Workspace)
+Any file modified in the workspace or pushed to GitHub must include a comment or commit tag identifying Claude as the author of that change.
+
+### Rule: No silent edits. Every Claude action leaves a trace.
