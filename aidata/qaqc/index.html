@@ -44,10 +44,15 @@ h1{font-size:clamp(2.5rem,8vw,4.5rem);font-weight:900;color:var(--purple);margin
 .custom-btn{display:inline-block;background:white;color:var(--purple);padding:16px 40px;border-radius:50px;font-size:0.9rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;text-decoration:none;box-shadow:0 8px 25px rgba(0,0,0,0.2);transition:all 0.3s;}
 .custom-btn:hover{transform:translateY(-2px);box-shadow:0 12px 35px rgba(0,0,0,0.3);}
 footer{background:var(--glass);backdrop-filter:blur(12px);border-top:1px solid var(--glass-border);padding:40px 5%;text-align:center;}
+
+/* ── Animated Gradient Mesh ── */
+.mesh-hero{position:relative;overflow:hidden;}
+#mesh-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+header>*:not(#mesh-canvas){position:relative;z-index:1;}
 </style>
 </head>
 <body>
-<header><div class="badge">AI Employees — Quality Assurance & Control</div><h1>AI QA/QC Department</h1><p class="subtitle">Digital checklists, non-conformance tracking, and corrective action follow-up — automated so quality never slips.</p></header>
+<header class="mesh-hero"><canvas id="mesh-canvas"></canvas><div class="badge">AI Employees — Quality Assurance & Control</div><h1>AI QA/QC Department</h1><p class="subtitle">Digital checklists, non-conformance tracking, and corrective action follow-up — automated so quality never slips.</p></header>
 <nav class="sticky-nav"><a class="nav-link" href="#ai-checklist-officer">Checklist Officer</a><a class="nav-link" href="#ai-ncr-logger">NCR Logger</a><a class="nav-link" href="#ai-corrective-action-tracker">Corrective Action Tracker</a></nav>
 <div class="emp-section" id="ai-checklist-officer">
 <div class="emp-header"><div class="emp-icon">📋</div><h2>AI Checklist Officer</h2></div>
@@ -108,6 +113,36 @@ navLinks.forEach(link=>{
         if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
     });
 });
+</script>
+
+<script>
+(function(){
+  const c=document.getElementById('mesh-canvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H,pts,t=0;
+  const COLORS=['rgba(124,58,237,','rgba(192,132,252,','rgba(109,40,217,','rgba(167,139,250,'];
+  function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;pts=Array.from({length:7},(_,i)=>({
+    x:Math.random()*W,y:Math.random()*H,
+    vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,
+    r:Math.random()*220+180,ci:i%COLORS.length
+  }));}
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='rgba(245,243,255,0.5)';ctx.fillRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<-p.r)p.x=W+p.r;if(p.x>W+p.r)p.x=-p.r;
+      if(p.y<-p.r)p.y=H+p.r;if(p.y>H+p.r)p.y=-p.r;
+      const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
+      g.addColorStop(0,COLORS[p.ci]+'0.18)');
+      g.addColorStop(1,COLORS[p.ci]+'0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+    });
+    t++;requestAnimationFrame(draw);
+  }
+  resize();window.addEventListener('resize',resize);draw();
+})();
 </script>
 </body>
 </html>
