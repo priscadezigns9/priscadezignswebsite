@@ -55,7 +55,7 @@ Full pipeline + AI stack for Prisca Dezigns client service tiers.
 ## Supabase Project Map
 | Project Name | Project ID | Credential | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Trogon** | `sazhdnqzaqpqcralmthh` | `supabase-trogon-admin` | Main project — outreach_leads, client_leads |
+| **Prisca Dezigns** | `sazhdnqzaqpqcralmthh` | `supabase-trogon-admin` | Main project — outreach_leads, client_leads |
 | **Old/Wrong** | `sktpjacowqaedddtrhuz` | none | Do NOT use — was old homepage reference |
 
 ## Supabase PAT
@@ -63,7 +63,7 @@ Full pipeline + AI stack for Prisca Dezigns client service tiers.
 - Base URL: `https://api.supabase.com`
 - Use for: running SQL via `/v1/projects/{id}/database/query`
 
-## Trogon Tables
+## Prisca Dezigns Tables
 | Table | Purpose |
 | :--- | :--- |
 | `outreach_leads` | 166 B2B outreach records for email campaigns |
