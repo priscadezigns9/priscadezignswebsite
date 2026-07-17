@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Client Audit — Prisca Dezigns</title>
+<style>
+  :root {
+    --purple:     #2D0057;
+    --purple-mid: #4B0082;
+    --gold:       #C9A84C;
+    --light:      #FAF7FF;
+    --white:      #ffffff;
+    --gray:       #7B6A8A;
+    --text:       #1A0030;
+    --border:     #4B0082;
+    --success:    #27ae60;
+    --error:      #c0392b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--light); color: var(--text); }
+
+  /* HEADER */
+  header {
+    background: var(--purple);
+    padding: 40px 24px 30px;
+    text-align: center;
+    border-bottom: 3px solid var(--gold);
+  }
+  header h1 { color: var(--white); font-size: 1.9rem; font-weight: 700; letter-spacing: 0.5px; }
+  header p  { color: var(--gold); font-size: 0.95rem; margin-top: 8px; }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    background: var(--white);
+    border-bottom: 1px solid #e0d5f0;
+    padding: 18px 24px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(45,0,87,0.08);
+  }
+  .progress-steps {
+    display: flex;
+    align-items: center;
+    max-width: 780px;
+    margin: 0 auto;
+    gap: 0;
+  }
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+  }
+  .step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 55%;
+    width: 90%;
+    height: 2px;
+    background: #ddd;
+    z-index: 0;
+  }
+  .step-item.done:not(:last-child)::after { background: var(--gold); }
+  .step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #ddd;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1;
+    transition: background 0.3s;
+  }
+  .step-item.active .step-dot  { background: var(--purple-mid); }
+  .step-item.done   .step-dot  { background: var(--gold); }
+  .step-label {
+    font-size: 0.68rem;
+    margin-top: 5px;
+    color: var(--gray);
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .step-item.active .step-label { color: var(--purple-mid); }
+  .step-item.done   .step-label { color: var(--gold); }
+
+  /* STAGE WRAPPER */
+  .form-wrap { max-width: 780px; margin: 32px auto 60px; padding: 0 16px; }
+  .stage { display: none; }
+  .stage.active { display: block; }
+
+  /* STAGE TITLE */
+  .stage-title {
+    background: var(--purple);
+    border-radius: 10px 10px 0 0;
+    padding: 18px 24px;
+    border-bottom: 3px solid var(--gold);
+    margin-bottom: 0;
+  }
+  .stage-title h2 { color: var(--white); font-size: 1.1rem; font-weight: 700; }
+  .stage-title p  { color: var(--gold); font-size: 0.85rem; margin-top: 5px; }
+
+  /* SECTION */
+  .section {
+    background: var(--white);
+    margin-bottom: 24px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(45,0,87,0.07);
+    border-radius: 10px;
+  }
+  .section:first-of-type { border-radius: 0 0 10px 10px; }
+  .section-head {
+    background: var(--purple-mid);
+    padding: 13px 20px;
+    border-bottom: 2px solid var(--gold);
+  }
+  .section-head h3 { color: var(--white); font-size: 0.92rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; }
+  .section-head p  { color: var(--gold); font-size: 0.8rem; margin-top: 3px; }
+  .section-body { padding: 22px 20px; display: grid; gap: 18px; }
+
+  /* FIELDS */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-weight: 600; font-size: 0.87rem; color: var(--purple); }
+  .field input, .field textarea, .field select {
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 0.91rem;
+    background: var(--light);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    font-family: inherit;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--gold); background: #fff;
+  }
+  .field textarea { resize: vertical; min-height: 72px; }
+  .field small { font-size: 0.77rem; color: var(--gray); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:560px){ .two-col { grid-template-columns: 1fr; } }
+
+  /* CHECKBOXES & RADIO */
+  .check-group, .radio-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .check-item, .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.87rem; }
+  .check-item input[type=checkbox],
+  .radio-item  input[type=radio] { width: 17px; height: 17px; accent-color: var(--purple-mid); cursor: pointer; }
+
+  /* NAV BUTTONS */
+  .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 12px; }
+  .btn-row.end { justify-content: center; }
+  .btn {
+    padding: 14px 36px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.4px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn:hover  { transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-next   { background: var(--purple-mid); color: var(--white); border-bottom: 3px solid var(--gold); }
+  .btn-back   { background: var(--light); color: var(--purple); border: 1.5px solid var(--border); }
+  .btn-submit { background: var(--purple); color: var(--white); border-bottom: 3px solid var(--gold); }
+
+  /* TOAST */
+  #toast {
+    display: none;
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+    background: var(--success); color: #fff;
+    padding: 14px 28px; border-radius: 8px;
+    font-weight: 600; font-size: 0.93rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    z-index: 9999; white-space: nowrap;
+  }
+  #toast.error { background: var(--error); }
+
+  /* SUCCESS SCREEN */
+  #successScreen {
+    display: none;
+    max-width: 780px;
+    margin: 60px auto;
+    padding: 60px 32px;
+    background: var(--white);
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(45,0,87,0.1);
+    border-top: 4px solid var(--gold);
+  }
+  #successScreen h2 { color: var(--purple); font-size: 1.6rem; }
+  #successScreen p  { color: var(--gray); margin-top: 12px; font-size: 0.95rem; line-height: 1.6; }
+  .checkmark { font-size: 3.5rem; margin-bottom: 16px; }
+
+  footer { text-align: center; padding: 24px 16px; font-size: 0.8rem; color: var(--gray); }
+  footer a { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Client Audit</h1>
+  <p>Prisca Dezigns · Confidential Assessment · Complete both stages to receive your recommendation</p>
+</header>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps">
+    <div class="step-item active" data-step="1"><div class="step-dot">1</div><div class="step-label">Business</div></div>
+    <div class="step-item" data-step="2"><div class="step-dot">2</div><div class="step-label">Operations</div></div>
+    <div class="step-item" data-step="3"><div class="step-dot">3</div><div class="step-label">Pain Points</div></div>
+    <div class="step-item" data-step="4"><div class="step-dot">4</div><div class="step-label">Budget</div></div>
+    <div class="step-item" data-step="5"><div class="step-dot">5</div><div class="step-label">Interests</div></div>
+    <div class="step-item" data-step="6"><div class="step-dot">6</div><div class="step-label">AI Channel</div></div>
+    <div class="step-item" data-step="7"><div class="step-dot">7</div><div class="step-label">WhatsApp</div></div>
+    <div class="step-item" data-step="8"><div class="step-dot">8</div><div class="step-label">Website</div></div>
+    <div class="step-item" data-step="9"><div class="step-dot">9</div><div class="step-label">Email</div></div>
+  </div>
+</div>
+
+<div class="form-wrap">
+<form id="auditForm">
+
+  <!-- ═══════════════════════════════════════════
+       STAGE 1 — MASTER BUSINESS AUDIT
+  ═══════════════════════════════════════════ -->
+
+  <!-- STEP 1: BUSINESS IDENTITY -->
+  <div class="stage active" id="step1">
+    <div class="stage-title">
+      <h2>Stage 1 of 2 — Master Business Audit</h2>
+      <p>Section 1 of 5 · Business Identity</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>Business Identity</h3>
+        <p>Tell us about your business so we can tailor our recommendations.</p>
+      </div>
+      <div class="section-body">
+        <div class="two-col">
+          <div class="field">
+            <label>Business Name *</label>
+            <input type="text" name="business_name" required placeholder="e.g. Sunrise Bakery Ltd"/>
+          </div>
+          <div class="field">
+            <label>Your Name *</label>
+            <input type="text" name="contact_name" required placeholder="First & Last Name"/>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label>Email Address *</label>
+            <input type="email" name="contact_email" required placeholder="you@yourbusiness.com"/>
+          </div>
+          <div class="field">
+            <label>Phone / WhatsApp</label>
+            <input type="tel" name="contact_phone" placeholder="+1 868 XXX XXXX"/>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="field">
+            <label>Industry / Type of Business *</label>
+            <input type="text" name="industry" required placeholder="e.g. Retail, Food & Beverage, Services"/>
+          </div>
+          <div class="field">
+            <label>Years in Operation</label>
+            <select name="years_in_operation">
+              <option value="">— Select —</option>
+              <option>Less than 1 year</option>
+              <option>1–3 years</option>
+              <option>3–5 years</option>
+              <option>5+ years</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Team Size</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="business_size" value="Just me"/> Just me</label>
+            <label class="radio-item"><input type="radio" name="business_size" value="2–5"/> 2–5 people</label>
+            <label class="radio-item"><input type="radio" name="business_size" value="6–15"/> 6–15 people</label>
+            <label class="radio-item"><input type="radio" name="business_size" value="16+"/> 16+ people</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Any additional details about your business?</label>
+          <textarea name="s1_notes" placeholder="Anything else we should know..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row end"><button type="button" class="btn btn-next" onclick="goTo(2)">Continue →</button></div>
+  </div>
+
+  <!-- STEP 2: OPERATIONS -->
+  <div class="stage" id="step2">
+    <div class="stage-title">
+      <h2>Stage 1 of 2 — Master Business Audit</h2>
+      <p>Section 2 of 5 · Current Operations & Tools</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>Current Operations & Tools</h3>
+        <p>Help us understand how your business runs today.</p>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>What tools do you currently use? (Select all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="tools" value="WhatsApp"/> WhatsApp</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Email"/> Email</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Website"/> Website</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Social Media"/> Social Media</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Spreadsheets"/> Spreadsheets</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="Accounting Software"/> Accounting Software</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="CRM"/> CRM</label>
+            <label class="check-item"><input type="checkbox" name="tools" value="None"/> None</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>How do you handle customer inquiries? (Select all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="inquiry_method" value="Manually by me"/> Manually by me</label>
+            <label class="check-item"><input type="checkbox" name="inquiry_method" value="Staff member"/> Staff member</label>
+            <label class="check-item"><input type="checkbox" name="inquiry_method" value="Auto-reply"/> Auto-reply only</label>
+            <label class="check-item"><input type="checkbox" name="inquiry_method" value="No system"/> No system</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>How many inquiries do you receive per week (approx.)?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="inquiry_volume" value="1–10"/> 1–10</label>
+            <label class="radio-item"><input type="radio" name="inquiry_volume" value="11–30"/> 11–30</label>
+            <label class="radio-item"><input type="radio" name="inquiry_volume" value="31–100"/> 31–100</label>
+            <label class="radio-item"><input type="radio" name="inquiry_volume" value="100+"/> 100+</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Any additional details about your operations?</label>
+          <textarea name="s2_notes" placeholder="Current process, bottlenecks, or challenges..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-back" onclick="goTo(1)">← Back</button>
+      <button type="button" class="btn btn-next" onclick="goTo(3)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: PAIN POINTS -->
+  <div class="stage" id="step3">
+    <div class="stage-title">
+      <h2>Stage 1 of 2 — Master Business Audit</h2>
+      <p>Section 3 of 5 · Pain Points & Challenges</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>Pain Points & Challenges</h3>
+        <p>This helps us identify where AI automation will have the biggest impact.</p>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>What are your biggest operational challenges? (Select all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="pain" value="Slow response times"/> Slow response times</label>
+            <label class="check-item"><input type="checkbox" name="pain" value="Missing leads"/> Missing leads</label>
+            <label class="check-item"><input type="checkbox" name="pain" value="Manual data entry"/> Manual data entry</label>
+            <label class="check-item"><input type="checkbox" name="pain" value="No follow-up system"/> No follow-up system</label>
+            <label class="check-item"><input type="checkbox" name="pain" value="High staff cost"/> High staff cost</label>
+            <label class="check-item"><input type="checkbox" name="pain" value="Inconsistent service"/> Inconsistent service quality</label>
+            <label class="check-item"><input type="checkbox" name="pain" value="No reporting"/> No data or reporting</label>
+            <label class="check-item"><input type="checkbox" name="pain" value="Overwhelmed"/> Owner/team overwhelmed</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>How urgent is solving these problems?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="urgency" value="Critical — now"/> 🔴 Critical — need it now</label>
+            <label class="radio-item"><input type="radio" name="urgency" value="Soon — 1–3 months"/> 🟡 Soon — within 1–3 months</label>
+            <label class="radio-item"><input type="radio" name="urgency" value="Planning — 3–6 months"/> 🟢 Planning — 3–6 months</label>
+            <label class="radio-item"><input type="radio" name="urgency" value="Exploring"/> Just exploring for now</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Describe your biggest pain point in your own words</label>
+          <textarea name="s3_notes" placeholder="e.g. I miss too many leads after hours and my team can't keep up..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-back" onclick="goTo(2)">← Back</button>
+      <button type="button" class="btn btn-next" onclick="goTo(4)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: BUDGET -->
+  <div class="stage" id="step4">
+    <div class="stage-title">
+      <h2>Stage 1 of 2 — Master Business Audit</h2>
+      <p>Section 4 of 5 · Budget & Timeline</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>Budget & Timeline</h3>
+        <p>No commitment required — this helps us recommend the right tier.</p>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Approximate monthly budget for automation tools?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="monthly_budget" value="Under $300"/> Under $300 USD/mo</label>
+            <label class="radio-item"><input type="radio" name="monthly_budget" value="$300–$700"/> $300–$700 USD/mo</label>
+            <label class="radio-item"><input type="radio" name="monthly_budget" value="$700–$1,500"/> $700–$1,500 USD/mo</label>
+            <label class="radio-item"><input type="radio" name="monthly_budget" value="$1,500+"/> $1,500+ USD/mo</label>
+            <label class="radio-item"><input type="radio" name="monthly_budget" value="Not sure"/> Not sure yet</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>When do you want a solution in place?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="timeline" value="ASAP"/> ASAP</label>
+            <label class="radio-item"><input type="radio" name="timeline" value="1 month"/> Within 1 month</label>
+            <label class="radio-item"><input type="radio" name="timeline" value="1–3 months"/> 1–3 months</label>
+            <label class="radio-item"><input type="radio" name="timeline" value="3+ months"/> 3+ months</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Any additional details about budget or timeline?</label>
+          <textarea name="s4_notes" placeholder="e.g. We have a quarterly budget review in September..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-back" onclick="goTo(3)">← Back</button>
+      <button type="button" class="btn btn-next" onclick="goTo(5)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: SERVICE INTEREST -->
+  <div class="stage" id="step5">
+    <div class="stage-title">
+      <h2>Stage 1 of 2 — Master Business Audit</h2>
+      <p>Section 5 of 5 · Service Interest</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>Service Interest</h3>
+        <p>Tell us what you are most interested in — we will confirm the best fit after the audit.</p>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Which AI service are you most interested in? (Select all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="service_interest" value="AI Channel"/> AI Channel (WhatsApp, Website, Email)</label>
+            <label class="check-item"><input type="checkbox" name="service_interest" value="AI Data"/> AI Data (Entry, Reporting, Processing)</label>
+            <label class="check-item"><input type="checkbox" name="service_interest" value="AI Voice"/> AI Voice</label>
+            <label class="check-item"><input type="checkbox" name="service_interest" value="Not sure"/> Not sure — need guidance</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>How did you hear about Prisca Dezigns?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="referral" value="Social Media"/> Social Media</label>
+            <label class="radio-item"><input type="radio" name="referral" value="Referral"/> Referral</label>
+            <label class="radio-item"><input type="radio" name="referral" value="Website"/> Website / Google</label>
+            <label class="radio-item"><input type="radio" name="referral" value="WhatsApp"/> WhatsApp</label>
+            <label class="radio-item"><input type="radio" name="referral" value="Other"/> Other</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Any additional details or questions for our team?</label>
+          <textarea name="s5_notes" placeholder="Anything else before we reach out..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-back" onclick="goTo(4)">← Back</button>
+      <button type="button" class="btn btn-next" onclick="goTo(6)">Continue to AI Channel Audit →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       STAGE 2 — AI CHANNEL AUDIT
+  ═══════════════════════════════════════════ -->
+
+  <!-- STEP 6: GENERAL CHANNEL -->
+  <div class="stage" id="step6">
+    <div class="stage-title">
+      <h2>Stage 2 of 2 — AI Channel Audit</h2>
+      <p>Section 1 of 4 · General Channel Overview</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>General Channel Overview</h3>
+        <p>Help us understand how you currently communicate with customers.</p>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Which channels do you currently use to communicate with customers? (Select all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="active_channels" value="WhatsApp"/> WhatsApp</label>
+            <label class="check-item"><input type="checkbox" name="active_channels" value="Email"/> Email</label>
+            <label class="check-item"><input type="checkbox" name="active_channels" value="Website Chat"/> Website Chat / Chatbot</label>
+            <label class="check-item"><input type="checkbox" name="active_channels" value="Phone"/> Phone Calls</label>
+            <label class="check-item"><input type="checkbox" name="active_channels" value="Social DMs"/> Social Media DMs</label>
+            <label class="check-item"><input type="checkbox" name="active_channels" value="Walk-in"/> Walk-in / In person</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Which channel gets the MOST messages from customers?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="top_channel" value="WhatsApp"/> WhatsApp</label>
+            <label class="radio-item"><input type="radio" name="top_channel" value="Email"/> Email</label>
+            <label class="radio-item"><input type="radio" name="top_channel" value="Website"/> Website</label>
+            <label class="radio-item"><input type="radio" name="top_channel" value="Social DMs"/> Social Media DMs</label>
+            <label class="radio-item"><input type="radio" name="top_channel" value="Phone"/> Phone</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>What is the biggest problem with how you manage your communication channels right now?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="channel_pain" value="Too slow to respond"/> Too slow to respond</label>
+            <label class="radio-item"><input type="radio" name="channel_pain" value="Messages get missed"/> Messages get missed</label>
+            <label class="radio-item"><input type="radio" name="channel_pain" value="No system"/> No system at all</label>
+            <label class="radio-item"><input type="radio" name="channel_pain" value="Inconsistent replies"/> Inconsistent replies</label>
+            <label class="radio-item"><input type="radio" name="channel_pain" value="No after-hours coverage"/> No after-hours coverage</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Any additional details about your channels?</label>
+          <textarea name="s6_notes" placeholder="Describe your overall communication challenges..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-back" onclick="goTo(5)">← Back</button>
+      <button type="button" class="btn btn-next" onclick="goTo(7)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 7: WHATSAPP -->
+  <div class="stage" id="step7">
+    <div class="stage-title">
+      <h2>Stage 2 of 2 — AI Channel Audit</h2>
+      <p>Section 2 of 4 · WhatsApp Automation</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>WhatsApp Automation</h3>
+        <p>Tell us how WhatsApp currently works for your business.</p>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Do you use WhatsApp for business?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="uses_whatsapp" value="Yes — personal number"/> Yes — personal number</label>
+            <label class="radio-item"><input type="radio" name="uses_whatsapp" value="Yes — WhatsApp Business"/> Yes — WhatsApp Business app</label>
+            <label class="radio-item"><input type="radio" name="uses_whatsapp" value="No"/> No</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>How many WhatsApp messages does your business receive per day?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="wa_volume" value="1–10"/> 1–10</label>
+            <label class="radio-item"><input type="radio" name="wa_volume" value="11–30"/> 11–30</label>
+            <label class="radio-item"><input type="radio" name="wa_volume" value="31–50"/> 31–50</label>
+            <label class="radio-item"><input type="radio" name="wa_volume" value="50+"/> 50+</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>What do most WhatsApp messages ask about? (Select all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="wa_topics" value="Pricing"/> Pricing / Quotes</label>
+            <label class="check-item"><input type="checkbox" name="wa_topics" value="Availability"/> Product/Service availability</label>
+            <label class="check-item"><input type="checkbox" name="wa_topics" value="Orders"/> Orders / Bookings</label>
+            <label class="check-item"><input type="checkbox" name="wa_topics" value="Support"/> Support / Complaints</label>
+            <label class="check-item"><input type="checkbox" name="wa_topics" value="Location"/> Location / Hours</label>
+            <label class="check-item"><input type="checkbox" name="wa_topics" value="General info"/> General information</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>How long does it typically take to reply on WhatsApp?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="wa_response_time" value="Within minutes"/> Within minutes</label>
+            <label class="radio-item"><input type="radio" name="wa_response_time" value="Within hours"/> Within hours</label>
+            <label class="radio-item"><input type="radio" name="wa_response_time" value="Next day"/> Next day</label>
+            <label class="radio-item"><input type="radio" name="wa_response_time" value="Inconsistent"/> Inconsistent</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Do you reply to messages after business hours?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="wa_after_hours" value="Yes always"/> Yes always</label>
+            <label class="radio-item"><input type="radio" name="wa_after_hours" value="Sometimes"/> Sometimes</label>
+            <label class="radio-item"><input type="radio" name="wa_after_hours" value="No"/> No</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Any additional details about your WhatsApp usage?</label>
+          <textarea name="s7_notes" placeholder="e.g. We miss a lot of messages on weekends..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-back" onclick="goTo(6)">← Back</button>
+      <button type="button" class="btn btn-next" onclick="goTo(8)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 8: WEBSITE -->
+  <div class="stage" id="step8">
+    <div class="stage-title">
+      <h2>Stage 2 of 2 — AI Channel Audit</h2>
+      <p>Section 3 of 4 · Website Automation</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>Website Automation</h3>
+        <p>Tell us about your website and how visitors interact with it.</p>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Do you have a website?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="has_website" value="Yes — active"/> Yes — active</label>
+            <label class="radio-item"><input type="radio" name="has_website" value="Yes — outdated"/> Yes — but it's outdated</label>
+            <label class="radio-item"><input type="radio" name="has_website" value="No — need one"/> No — I need one</label>
+            <label class="radio-item"><input type="radio" name="has_website" value="No — don't need one"/> No — don't need one</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>What does your website currently do? (Select all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="website_function" value="Shows info only"/> Shows information only</label>
+            <label class="check-item"><input type="checkbox" name="website_function" value="Takes bookings"/> Takes bookings / appointments</label>
+            <label class="check-item"><input type="checkbox" name="website_function" value="Sells products"/> Sells products (e-commerce)</label>
+            <label class="check-item"><input type="checkbox" name="website_function" value="Has contact form"/> Has a contact form</label>
+            <label class="check-item"><input type="checkbox" name="website_function" value="Has chatbot"/> Has a chatbot</label>
+            <label class="check-item"><input type="checkbox" name="website_function" value="Nothing"/> Nothing / placeholder</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>What do you want your website to do that it doesn't do today?</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="website_wants" value="Capture leads"/> Capture leads automatically</label>
+            <label class="check-item"><input type="checkbox" name="website_wants" value="Answer questions"/> Answer customer questions 24/7</label>
+            <label class="check-item"><input type="checkbox" name="website_wants" value="Book appointments"/> Book appointments automatically</label>
+            <label class="check-item"><input type="checkbox" name="website_wants" value="Qualify leads"/> Qualify leads before I speak to them</label>
+            <label class="check-item"><input type="checkbox" name="website_wants" value="Sell products"/> Sell products online</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Any additional details about your website needs?</label>
+          <textarea name="s8_notes" placeholder="e.g. We get a lot of visitors but no one fills out the form..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-back" onclick="goTo(7)">← Back</button>
+      <button type="button" class="btn btn-next" onclick="goTo(9)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 9: EMAIL -->
+  <div class="stage" id="step9">
+    <div class="stage-title">
+      <h2>Stage 2 of 2 — AI Channel Audit</h2>
+      <p>Section 4 of 4 · Email Automation</p>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <h3>Email Automation</h3>
+        <p>Tell us how email fits into your business communication.</p>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Do you use email for business?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="uses_email" value="Yes — business email"/> Yes — business email</label>
+            <label class="radio-item"><input type="radio" name="uses_email" value="Yes — personal email"/> Yes — personal email (Gmail etc.)</label>
+            <label class="radio-item"><input type="radio" name="uses_email" value="No"/> No</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>How many business emails do you receive per day?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="email_volume" value="1–10"/> 1–10</label>
+            <label class="radio-item"><input type="radio" name="email_volume" value="11–30"/> 11–30</label>
+            <label class="radio-item"><input type="radio" name="email_volume" value="31–100"/> 31–100</label>
+            <label class="radio-item"><input type="radio" name="email_volume" value="100+"/> 100+</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>What are emails mostly about? (Select all that apply)</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="email_topics" value="Inquiries"/> Inquiries</label>
+            <label class="check-item"><input type="checkbox" name="email_topics" value="Quotes"/> Quotes</label>
+            <label class="check-item"><input type="checkbox" name="email_topics" value="Support"/> Support / Complaints</label>
+            <label class="check-item"><input type="checkbox" name="email_topics" value="Follow-ups"/> Follow-ups</label>
+            <label class="check-item"><input type="checkbox" name="email_topics" value="Invoices"/> Invoices / Payments</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>How long does it typically take to respond to an email?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="email_response_time" value="Same day"/> Same day</label>
+            <label class="radio-item"><input type="radio" name="email_response_time" value="1–2 days"/> 1–2 days</label>
+            <label class="radio-item"><input type="radio" name="email_response_time" value="3+ days"/> 3+ days</label>
+            <label class="radio-item"><input type="radio" name="email_response_time" value="Inconsistent"/> Inconsistent</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Do you have email templates or standard replies?</label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="email_templates" value="Yes"/> Yes</label>
+            <label class="radio-item"><input type="radio" name="email_templates" value="No"/> No</label>
+            <label class="radio-item"><input type="radio" name="email_templates" value="Partially"/> Partially</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>What outcome do you want from email automation?</label>
+          <div class="check-group">
+            <label class="check-item"><input type="checkbox" name="email_goals" value="Auto-respond"/> Auto-respond to common questions</label>
+            <label class="check-item"><input type="checkbox" name="email_goals" value="Qualify leads"/> Qualify leads from email</label>
+            <label class="check-item"><input type="checkbox" name="email_goals" value="Follow-up sequences"/> Automated follow-up sequences</label>
+            <label class="check-item"><input type="checkbox" name="email_goals" value="Route emails"/> Route emails to the right person</label>
+            <label class="check-item"><input type="checkbox" name="email_goals" value="Reduce volume"/> Reduce email volume overall</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Any additional details about your email setup?</label>
+          <textarea name="s9_notes" placeholder="e.g. I spend 2 hours a day answering the same questions by email..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-back" onclick="goTo(8)">← Back</button>
+      <button type="button" class="btn btn-submit" onclick="submitAudit()">Submit Full Audit →</button>
+    </div>
+  </div>
+
+</form>
+
+<!-- SUCCESS SCREEN -->
+<div id="successScreen">
+  <div class="checkmark">✅</div>
+  <h2>Audit Submitted Successfully</h2>
+  <p>Thank you for completing the audit.<br/>Our team at <strong>Prisca Dezigns</strong> will review your responses and reach out within <strong>1 business day</strong> with your personalized recommendation.</p>
+  <br/>
+  <p style="color:var(--gold); font-weight:600;">priscadezigns.org</p>
+</div>
+
+</div><!-- end form-wrap -->
+
+<div id="toast"></div>
+
+<footer>
+  <p>© 2026 <a href="https://priscadezigns.org">Prisca Dezigns</a> · All responses are strictly confidential</p>
+</footer>
+
+<script>
+const SUPABASE_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwMDA1MzEsImV4cCI6MjA2NDU3NjUzMX0.tLCbvjWBBLFAFV3zCcF2-q8z1Z4dD_R8CXqy7mLCcmE";
+
+let currentStep = 1;
+const totalSteps = 9;
+
+function goTo(step) {
+  // Validate required fields on current step
+  const current = document.getElementById(`step${currentStep}`);
+  const required = current.querySelectorAll('[required]');
+  for (let el of required) {
+    if (!el.value.trim()) {
+      el.focus();
+      el.style.borderColor = '#c0392b';
+      setTimeout(() => el.style.borderColor = 'var(--border)', 2000);
+      showToast("Please fill in all required fields.", true);
+      return;
+    }
+  }
+
+  // Hide current, show next
+  document.getElementById(`step${currentStep}`).classList.remove('active');
+  document.getElementById(`step${step}`).classList.add('active');
+  currentStep = step;
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress() {
+  document.querySelectorAll('.step-item').forEach(el => {
+    const s = parseInt(el.dataset.step);
+    el.classList.remove('active','done');
+    if (s === currentStep) el.classList.add('active');
+    if (s < currentStep)  el.classList.add('done');
+  });
+}
+
+function getChecked(name) {
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
+}
+
+function getVal(name) {
+  const el = document.querySelector(`[name="${name}"]`);
+  if (!el) return null;
+  return el.value || null;
+}
+
+async function submitAudit() {
+  const btn = document.querySelector('.btn-submit');
+  btn.textContent = "Submitting...";
+  btn.disabled = true;
+
+  const payload = {
+    audit_type:         "combined_audit",
+    business_name:      getVal("business_name"),
+    contact_name:       getVal("contact_name"),
+    contact_email:      getVal("contact_email"),
+    contact_phone:      getVal("contact_phone"),
+    industry:           getVal("industry"),
+    business_size:      getVal("business_size"),
+    years_in_operation: getVal("years_in_operation"),
+    monthly_budget:     getVal("monthly_budget"),
+    timeline:           getVal("timeline"),
+    performed_by:       "client-submission",
+    section_data: {
+      // Stage 1
+      tools:              getChecked("tools"),
+      inquiry_method:     getChecked("inquiry_method"),
+      inquiry_volume:     getVal("inquiry_volume"),
+      pain_points:        getChecked("pain"),
+      urgency:            getVal("urgency"),
+      service_interest:   getChecked("service_interest"),
+      referral:           getVal("referral"),
+      // Stage 2
+      active_channels:    getChecked("active_channels"),
+      top_channel:        getVal("top_channel"),
+      channel_pain:       getVal("channel_pain"),
+      // WhatsApp
+      uses_whatsapp:      getVal("uses_whatsapp"),
+      wa_volume:          getVal("wa_volume"),
+      wa_topics:          getChecked("wa_topics"),
+      wa_response_time:   getVal("wa_response_time"),
+      wa_after_hours:     getVal("wa_after_hours"),
+      // Website
+      has_website:        getVal("has_website"),
+      website_function:   getChecked("website_function"),
+      website_wants:      getChecked("website_wants"),
+      // Email
+      uses_email:         getVal("uses_email"),
+      email_volume:       getVal("email_volume"),
+      email_topics:       getChecked("email_topics"),
+      email_response_time:getVal("email_response_time"),
+      email_templates:    getVal("email_templates"),
+      email_goals:        getChecked("email_goals"),
+      // Notes per section
+      notes: {
+        s1: getVal("s1_notes"), s2: getVal("s2_notes"),
+        s3: getVal("s3_notes"), s4: getVal("s4_notes"),
+        s5: getVal("s5_notes"), s6: getVal("s6_notes"),
+        s7: getVal("s7_notes"), s8: getVal("s8_notes"),
+        s9: getVal("s9_notes")
+      }
+    }
+  };
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/audit_responses`, {
+      method: "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "apikey":        SUPABASE_KEY,
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+        "Prefer":        "return=minimal"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok || res.status === 201) {
+      document.getElementById("auditForm").style.display = "none";
+      document.getElementById("successScreen").style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      showToast("Something went wrong. Please try again.", true);
+      btn.textContent = "Submit Full Audit →";
+      btn.disabled = false;
+    }
+  } catch(err) {
+    showToast("Connection error. Please try again.", true);
+    btn.textContent = "Submit Full Audit →";
+    btn.disabled = false;
+  }
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = isError ? "error" : "";
+  t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 4000);
+}
+</script>
+</body>
+</html>
