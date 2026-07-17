@@ -8,7 +8,7 @@
 | **Document ID** | AICM-001 |
 | **Title** | Universal AI Platform Compliance Mandate |
 | **Department** | Operations & AI Infrastructure — Prisca Dezigns |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Effective Date** | 2026-07-15 |
 | **Review Date** | 2027-01-15 |
 | **Owner** | Lead Strategist — Prisca Dezigns |
@@ -69,17 +69,21 @@ All SOPs live at:
 
 | Doc ID | Title | Applies To |
 |---|---|---|
-| **SOP-WD-001** | Website Development | Any web build, landing page, redesign, or deployment |
-| **SOP-AI-000** | General AI Services Master Framework | All AI service engagements — read first |
-| **SOP-AI-001** | WhatsApp AI Automation | WhatsApp bot, 360dialog, WATI, Z-API integrations |
-| **SOP-AI-002** | Email AI Automation | Gmail, Outlook, Make/n8n email flows |
-| **SOP-AI-003** | Website Chat AI Automation | Sierra chatbot, live chat, on-site AI widgets |
-| **SOP-AD-000** | General AI Data Management | All data work — read first |
-| **SOP-AD-001** | AI Data Entry | Document ingestion, field extraction, Supabase writes |
-| **SOP-AD-002** | AI Reporting | Dashboard generation, PDF exports, analytics |
-| **SOP-AD-003** | AI Data Processing | ETL pipelines, transformations, bulk operations |
+| **SOP-WD-001** | Web Design & E-Commerce Standard | Pricing, packages, add-ons, and sales protocol for any web build, landing page, template site, or redesign |
+| **SOP-WD-002** | Website Development Process & Quality Standard | Legal framework, roles, phase-by-phase delivery process, and QA for website development projects |
+| **SOP-CH-000** | General AI Channel Standard | All AI channel automation engagements — read first |
+| **SOP-CH-001** | WhatsApp AI Automation | WhatsApp bot, 360dialog, WATI, Z-API integrations |
+| **SOP-CH-002** | Email AI Automation | Gmail, Outlook, Make/n8n email flows |
+| **SOP-CH-003** | Website Chat AI Automation | Sierra chatbot, live chat, on-site AI widgets |
+| **SOP-DA-000** | General AI Data Standard | All AI data automation work — read first |
+| **SOP-DA-001** | AI Data Entry Standard | Document ingestion, field extraction, Supabase writes |
+| **SOP-DA-002** | AI Reporting Standard | Dashboard generation, PDF exports, analytics |
+| **SOP-DA-003** | AI Data Processing Standard | ETL pipelines, transformations, bulk operations |
+| **SOP-AV-001** | AI Voice Agent Standard | Drew and any future AI voice agents |
 | **DPA-001** | Data Processing Agreement | Required client signature before any data handling |
 | **AUP-001** | Acceptable Use Policy | Required client signature before any service begins |
+
+> **Note (2026-07-17):** SOP-AI-000/001/002/003 and SOP-AD-000/001/002/003 have been retired — they were an earlier naming generation of the documents now covered by SOP-CH-000/001/002/003 and SOP-DA-000/001/002/003 respectively, and their continued presence alongside the newer set created a real risk of an agent reading stale guidance. They have been removed from GitHub and should be trashed in Google Drive as well. SOP-WD-001 was also previously duplicated under two different documents sharing one ID — the process/legal-focused document has been renumbered to SOP-WD-002 to resolve the collision; no content was deleted.
 
 ### 2.2 Future SOPs
 
@@ -112,6 +116,7 @@ These rules apply regardless of platform, model, or task type:
 - **NEVER** push to production without explicit Lead Strategist approval
 - **ALWAYS** test in a staging/preview environment first
 - **ALWAYS** increment version tags when modifying live scripts (e.g., `chatbot.js?v=X.X`)
+- **ALWAYS** tag every commit with the agent's name and a timestamp, so any agent (or the Lead Strategist) can immediately see who changed what and when. Format: prefix the commit message with `[AgentName]` (e.g., `[Claude]`, `[Devin]`, `[Zapia]`) and include an explicit UTC timestamp in the commit body, in addition to git's own commit metadata. This is mandatory for every commit, regardless of size.
 
 ### 3.4 Communication & Decisions
 - **NEVER** contact a client, third party, or external service on behalf of Prisca Dezigns without Lead Strategist authorisation
@@ -144,8 +149,8 @@ PRISCA DEZIGNS PROJECT GATE — AICM-001
 [ ] 2. Applicable SOP(s) mapped: _____________________
 [ ] 3. DPA-001 confirmed signed by client: YES / NO / UNKNOWN
 [ ] 4. AUP-001 confirmed signed by client: YES / NO / UNKNOWN
-[ ] 5. SOP-AD-000 reviewed (if data work): YES / NO / N/A
-[ ] 6. SOP-AI-000 reviewed (if AI service): YES / NO / N/A
+[ ] 5. SOP-DA-000 reviewed (if data work): YES / NO / N/A
+[ ] 6. SOP-CH-000 reviewed (if AI service): YES / NO / N/A
 [ ] 7. Lead Strategist approval to proceed: YES / NO / PENDING
 
 GATE STATUS: CLEARED / BLOCKED — Reason: _______________
@@ -165,7 +170,7 @@ If any item is NO or UNKNOWN → **GATE IS BLOCKED. Stop and escalate to Lead St
 ### 5.2 Drew (Technical Lead / Sales Closer)
 - Never commit to a service tier or price without Lead Strategist confirmation
 - Capture all lead details and route to `client_leads` table in Supabase immediately
-- Always qualify using the SOP-WD-001 or SOP-AI-000 framework before scoping
+- Always qualify using the SOP-WD-001 or SOP-CH-000 framework before scoping
 
 ### 5.3 Kimi (Code & Fiscal Auditor)
 - All Supabase queries must be deterministic — no probabilistic data fills
@@ -227,4 +232,4 @@ By operating on any Prisca Dezigns project, task, or context, the AI platform im
 
 *Lead Strategist — Prisca Dezigns*
 *priscadezigns.org | hello@priscadezigns.org*
-*AICM-001 v1.0 — 2026-07-15*
+*AICM-001 v1.1 — 2026-07-17 (Registry corrected: retired SOP-AI-* and SOP-AD-* series; resolved SOP-WD-001 ID collision; added commit attribution rule — Technical Lead: Claude)*

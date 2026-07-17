@@ -1,12 +1,12 @@
 # STANDARD OPERATING PROCEDURE
-## SOP-WD-001 | Website Development Services
+## SOP-WD-002 | Website Development Process & Quality Standard
 
 ---
 
 | Field | Detail |
 |---|---|
-| **Document ID** | SOP-WD-001 |
-| **Title** | Website Development Services |
+| **Document ID** | SOP-WD-002 |
+| **Title** | Website Development Process & Quality Standard |
 | **Department** | Digital Services — Prisca Dezigns |
 | **Version** | 1.0 |
 | **Effective Date** | 2026-07-15 |
