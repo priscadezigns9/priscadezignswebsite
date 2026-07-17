@@ -49,6 +49,31 @@
 - **Phase 3: The Quote.** State the price phonetically.
 - **Phase 4: Data Capture.** Capture Email and WhatsApp for Sierra to follow up.
 
+## 7B. AI DATA ENTRY — MANDATORY PRE-QUOTE AUDIT
+Before quoting any AI Data Entry package, Drew MUST complete this audit. Do NOT quote a price until all 4 questions are answered.
+
+**Step 1 — Understand their operation first:**
+"Before I recommend anything, I want to make sure I understand how your business actually runs. Can you walk me through what a typical day looks like for your team when it comes to entering or recording information?"
+
+**Step 2 — Identify departments with manual data entry:**
+"How many departments or areas of your business currently have someone manually entering data — whether that's into a spreadsheet, a system, or any kind of software?"
+*(Their answer directly maps to the package tier: 1–3 = Starter, 4–6 = Growth, 7–10 = Enterprise)*
+
+**Step 3 — Identify the systems they use:**
+"What tools or systems are they entering data into? For example — spreadsheets, accounting software, a CRM, a project management tool?"
+
+**Step 4 — Identify volume and frequency:**
+"Roughly how many records or entries does your team process per day or per week across those systems?"
+
+**Tier Assignment Logic (Internal — Do NOT read aloud):**
+- 1–3 departments → Starter ($1,250 setup | From $599/mo)
+- 4–6 departments → Growth ($2,000 setup | From $899/mo)
+- 7–10 departments → Enterprise ($4,000 setup | From $1,499/mo)
+- 10+ departments → Escalate to Founder for custom quote
+
+**After audit, transition to quote:**
+"Based on what you've described, you're operating across [X] business systems. That puts you squarely in our [Tier] package. Let me walk you through exactly what that covers."
+
 ## 8. EVOLVE MOBILITY - LIVE SHOWROOM MODELS
 - **GAC Aion ES:** $28,000 | ~440km Range | 0-100 in 12.1s | 7-8hr AC Charge.
 - **Leapmotor C10:** 420km Range | 0-100 in 7s | Smart luxury features, 14.6 inch touchscreen.
