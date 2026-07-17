@@ -3,54 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Data Entry — Client Audit Sheet | Prisca Dezigns</title>
+<title>Business Process Audit | Prisca Dezigns</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', sans-serif; background: #0e0a1a; color: #e2d9f3; min-height: 100vh; padding: 40px 20px; }
+  .page { max-width: 920px; margin: 0 auto; }
 
-  .page { max-width: 860px; margin: 0 auto; }
-
+  /* Header */
   .header { text-align: center; margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid #301934; }
   .logo-label { font-size: 0.75rem; letter-spacing: 3px; color: #C8A2C8; text-transform: uppercase; margin-bottom: 8px; }
-  .header h1 { font-size: 1.8rem; color: #fff; font-weight: 700; margin-bottom: 6px; }
+  .header h1 { font-size: 1.9rem; color: #fff; font-weight: 700; margin-bottom: 6px; }
   .header p { font-size: 0.9rem; color: #a78bc4; }
 
+  /* Client block */
   .client-block { background: #1a1030; border: 1px solid #301934; border-radius: 12px; padding: 24px; margin-bottom: 28px; }
-  .client-block h2 { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #C8A2C8; margin-bottom: 16px; }
+  .block-title { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #C8A2C8; margin-bottom: 16px; }
   .fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field label { font-size: 0.75rem; color: #a78bc4; text-transform: uppercase; letter-spacing: 1px; }
-  .field input, .field select { background: #0e0a1a; border: 1px solid #301934; border-radius: 8px; padding: 10px 14px; color: #e2d9f3; font-size: 0.9rem; outline: none; width: 100%; }
-  .field input:focus, .field select:focus { border-color: #C8A2C8; }
+  .field input, .field select, .field textarea { background: #0e0a1a; border: 1px solid #301934; border-radius: 8px; padding: 10px 14px; color: #e2d9f3; font-size: 0.9rem; outline: none; width: 100%; font-family: inherit; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #C8A2C8; }
   .field.full { grid-column: 1 / -1; }
 
+  /* Hub selector */
+  .hub-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
+  .hub-btn { background: #0e0a1a; border: 2px solid #301934; border-radius: 10px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.25s; user-select: none; }
+  .hub-btn:hover { border-color: #C8A2C8; }
+  .hub-btn.selected { border-color: #C8A2C8; background: #1a1030; }
+  .hub-btn .hub-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .hub-btn .hub-name { font-size: 0.82rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+  .hub-btn .hub-tag { font-size: 0.7rem; color: #7c5fa0; margin-top: 3px; }
+  .hub-btn.selected .hub-tag { color: #C8A2C8; }
+
+  /* Section card */
   .section-card { background: #1a1030; border: 1px solid #301934; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
-  .section-card .step-badge { display: inline-block; background: #301934; color: #C8A2C8; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; margin-bottom: 12px; }
+  .step-badge { display: inline-block; background: #301934; color: #C8A2C8; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; margin-bottom: 12px; }
   .section-card h3 { font-size: 1rem; color: #fff; margin-bottom: 6px; }
   .section-card .hint { font-size: 0.8rem; color: #7c5fa0; margin-bottom: 14px; font-style: italic; }
-  .section-card textarea { background: #0e0a1a; border: 1px solid #301934; border-radius: 8px; padding: 12px 14px; color: #e2d9f3; font-size: 0.9rem; width: 100%; resize: vertical; min-height: 80px; outline: none; font-family: inherit; }
-  .section-card textarea:focus { border-color: #C8A2C8; }
 
-  /* Department counter */
-  .dept-counter { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-  .dept-counter label { font-size: 0.85rem; color: #a78bc4; }
-  .counter-controls { display: flex; align-items: center; gap: 10px; }
-  .counter-btn { background: #301934; border: none; color: #C8A2C8; width: 32px; height: 32px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .counter-btn:hover { background: #C8A2C8; color: #0e0a1a; }
-  .counter-val { font-size: 1.4rem; font-weight: 700; color: #fff; min-width: 32px; text-align: center; }
+  /* Hub panel — hidden by default, shown when hub is active */
+  .hub-panel { display: none; }
+  .hub-panel.active { display: block; }
 
-  /* Dept rows */
-  .dept-rows { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
-  .dept-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: center; background: #0e0a1a; border: 1px solid #301934; border-radius: 8px; padding: 10px 14px; }
-  .dept-row input { background: transparent; border: none; color: #e2d9f3; font-size: 0.88rem; outline: none; width: 100%; }
-  .dept-row span { font-size: 0.7rem; color: #7c5fa0; text-transform: uppercase; letter-spacing: 1px; }
-  .dept-col { display: flex; flex-direction: column; gap: 2px; }
+  /* Department checkboxes */
+  .dept-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 10px; }
+  .dept-check { display: flex; align-items: center; gap: 10px; background: #0e0a1a; border: 1px solid #301934; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; }
+  .dept-check:hover { border-color: #C8A2C8; }
+  .dept-check input[type=checkbox] { accent-color: #C8A2C8; width: 16px; height: 16px; cursor: pointer; }
+  .dept-check span { font-size: 0.88rem; color: #e2d9f3; font-weight: 500; }
+  .dept-check.checked { border-color: #C8A2C8; background: #1a1030; }
+
+  /* Channel checkboxes (for AI Channel) */
+  .channel-checks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+  .channel-check { display: flex; align-items: center; gap: 10px; background: #0e0a1a; border: 1px solid #301934; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; }
+  .channel-check:hover { border-color: #C8A2C8; }
+  .channel-check input[type=checkbox] { accent-color: #C8A2C8; width: 16px; height: 16px; cursor: pointer; }
+  .channel-check span { font-size: 0.88rem; color: #e2d9f3; font-weight: 500; }
+  .channel-check.checked { border-color: #C8A2C8; background: #1a1030; }
+
+  /* Voice role checkboxes */
+  .role-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
+  .role-check { display: flex; align-items: center; gap: 10px; background: #0e0a1a; border: 1px solid #301934; border-radius: 8px; padding: 10px 14px; cursor: pointer; transition: all 0.2s; }
+  .role-check:hover { border-color: #C8A2C8; }
+  .role-check input[type=checkbox] { accent-color: #C8A2C8; width: 16px; height: 16px; cursor: pointer; }
+  .role-check span { font-size: 0.88rem; color: #e2d9f3; font-weight: 500; }
+  .role-check.checked { border-color: #C8A2C8; background: #1a1030; }
 
   /* Tier result */
   .tier-result { margin-top: 28px; background: #0e0a1a; border-radius: 12px; padding: 20px 24px; border: 1px solid #301934; }
   .tier-result h2 { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #C8A2C8; margin-bottom: 14px; }
   .tiers { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-  .tier-card { border: 2px solid #301934; border-radius: 10px; padding: 14px; text-align: center; transition: all 0.3s; opacity: 0.4; }
+  .tier-card { border: 2px solid #301934; border-radius: 10px; padding: 14px; text-align: center; transition: all 0.3s; opacity: 0.35; }
   .tier-card.active { border-color: #C8A2C8; opacity: 1; background: #1a1030; }
   .tier-card .tier-name { font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
   .tier-card .tier-range { font-size: 0.75rem; color: #a78bc4; margin-bottom: 8px; }
@@ -58,25 +81,33 @@
 
   /* Notes */
   .notes-block { background: #1a1030; border: 1px solid #301934; border-radius: 12px; padding: 24px; margin-top: 20px; }
-  .notes-block h2 { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #C8A2C8; margin-bottom: 14px; }
   .notes-block textarea { background: #0e0a1a; border: 1px solid #301934; border-radius: 8px; padding: 12px 14px; color: #e2d9f3; font-size: 0.9rem; width: 100%; resize: vertical; min-height: 100px; outline: none; font-family: inherit; }
   .notes-block textarea:focus { border-color: #C8A2C8; }
 
+  /* Summary bar */
+  .summary-bar { background: #12001f; border: 1px solid #301934; border-radius: 12px; padding: 18px 24px; margin-top: 20px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  .summary-item { display: flex; flex-direction: column; gap: 2px; }
+  .summary-item .s-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: #7c5fa0; }
+  .summary-item .s-val { font-size: 0.95rem; font-weight: 700; color: #C8A2C8; }
+
   /* Actions */
-  .actions { display: flex; gap: 12px; margin-top: 28px; justify-content: flex-end; }
+  .actions { display: flex; gap: 12px; margin-top: 28px; justify-content: flex-end; flex-wrap: wrap; }
   .btn { padding: 12px 28px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: none; transition: all 0.2s; }
   .btn-primary { background: #C8A2C8; color: #0e0a1a; }
   .btn-primary:hover { background: #d9b8d9; }
   .btn-outline { background: transparent; border: 1px solid #301934; color: #C8A2C8; }
   .btn-outline:hover { border-color: #C8A2C8; }
+  .btn-wa { background: #25D366; color: #fff; }
+  .btn-wa:hover { background: #1ebe5a; }
 
   .footer { text-align: center; margin-top: 40px; font-size: 0.75rem; color: #4a3060; }
+  .divider { border: none; border-top: 1px solid #301934; margin: 28px 0; }
 
-  @media (max-width: 600px) {
+  @media (max-width: 640px) {
     .fields-row { grid-template-columns: 1fr; }
     .tiers { grid-template-columns: 1fr; }
-    .dept-row { grid-template-columns: 1fr 1fr; }
-    .dept-row .dept-col:last-child { grid-column: 1 / -1; }
+    .hub-selector { grid-template-columns: 1fr; }
+    .channel-checks { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -86,182 +117,433 @@
   <!-- Header -->
   <div class="header">
     <div class="logo-label">Prisca Dezigns — Internal Use Only</div>
-    <h1>AI Data Entry — Client Audit Sheet</h1>
-    <p>Complete every section before recommending a package tier. Do not quote without this.</p>
+    <h1>Business Process Audit</h1>
+    <p>Complete every section before recommending a package. Do not quote without this.</p>
   </div>
 
   <!-- Client Info -->
   <div class="client-block">
-    <h2>Client Information</h2>
+    <div class="block-title">Client Information</div>
     <div class="fields-row">
-      <div class="field"><label>Business Name</label><input type="text" placeholder="e.g. TTT Ltd" /></div>
-      <div class="field"><label>Contact Name</label><input type="text" placeholder="e.g. Ms. Hobson" /></div>
-      <div class="field"><label>WhatsApp</label><input type="text" placeholder="+1 868 000 0000" /></div>
-      <div class="field"><label>Email</label><input type="email" placeholder="contact@business.com" /></div>
-      <div class="field"><label>Industry</label><input type="text" placeholder="e.g. Engineering, Healthcare, Retail" /></div>
-      <div class="field"><label>Audit Date</label><input type="date" /></div>
-      <div class="field full"><label>Website / Social</label><input type="text" placeholder="https://" /></div>
+      <div class="field"><label>Business Name</label><input type="text" id="bizName" placeholder="e.g. TTT Ltd" /></div>
+      <div class="field"><label>Contact Name</label><input type="text" id="contactName" placeholder="e.g. Ms. Hobson" /></div>
+      <div class="field"><label>WhatsApp</label><input type="text" id="waNum" placeholder="+1 868 000 0000" /></div>
+      <div class="field"><label>Email</label><input type="email" id="clientEmail" placeholder="contact@business.com" /></div>
+      <div class="field"><label>Industry</label><input type="text" id="industry" placeholder="e.g. Engineering, Healthcare, Retail" /></div>
+      <div class="field"><label>Audit Date</label><input type="date" id="auditDate" /></div>
+      <div class="field full"><label>Website / Social</label><input type="text" id="website" placeholder="https://" /></div>
     </div>
   </div>
 
-  <!-- Step 1 -->
+  <!-- Step 1 — Overview -->
   <div class="section-card">
     <div class="step-badge">Step 1 — Operation Overview</div>
-    <h3>What does a typical day look like for their team when entering or recording information?</h3>
-    <p class="hint">Let them talk freely. Note the tools, the volume, and the pain points they mention.</p>
-    <textarea placeholder="Write your notes here..."></textarea>
+    <h3>What does a typical day look like for their team when handling data, communication, or customer interaction?</h3>
+    <p class="hint">Let them talk freely. Note the tools, volume, and pain points they mention.</p>
+    <div class="field full" style="margin-top:10px;"><textarea id="overview" rows="4" placeholder="Write your notes here..."></textarea></div>
   </div>
 
-  <!-- Step 2 — Department Counter -->
+  <!-- Step 2 — Hub Selection -->
   <div class="section-card">
-    <div class="step-badge">Step 2 — Department Count</div>
-    <h3>How many departments have someone manually entering data right now?</h3>
-    <p class="hint">Each department = 1 business system. This determines their tier.</p>
-
-    <div class="dept-counter">
-      <label>Number of Departments:</label>
-      <div class="counter-controls">
-        <button class="counter-btn" onclick="changeDept(-1)">−</button>
-        <div class="counter-val" id="deptCount">1</div>
-        <button class="counter-btn" onclick="changeDept(1)">+</button>
+    <div class="step-badge">Step 2 — AI Hub Selection</div>
+    <h3>Which automation hubs apply to this client?</h3>
+    <p class="hint">Select all that apply. Each hub unlocks its own qualification section below.</p>
+    <div class="hub-selector">
+      <div class="hub-btn" id="hub-data-btn" onclick="toggleHub('data')">
+        <div class="hub-icon">🗄️</div>
+        <div class="hub-name">AI Data</div>
+        <div class="hub-tag">Admin · HR · Finance · HSE · IT · Marketing · QA/QC · Production</div>
       </div>
-    </div>
-
-    <div class="dept-rows" id="deptRows">
-      <!-- Rows generated by JS -->
-    </div>
-  </div>
-
-  <!-- Step 3 -->
-  <div class="section-card">
-    <div class="step-badge">Step 3 — Current Systems</div>
-    <h3>What tools or systems are they entering data into?</h3>
-    <p class="hint">e.g. Spreadsheets, QuickBooks, HubSpot, Monday.com, custom database, internal software</p>
-    <textarea placeholder="List the systems here..."></textarea>
-  </div>
-
-  <!-- Step 4 -->
-  <div class="section-card">
-    <div class="step-badge">Step 4 — Volume & Frequency</div>
-    <h3>Roughly how many records or entries does their team process per day or per week?</h3>
-    <p class="hint">This determines API cost exposure and confirms margin safety for the quoted tier.</p>
-    <div class="fields-row">
-      <div class="field">
-        <label>Volume (approx.)</label>
-        <input type="text" placeholder="e.g. 200 records/day" />
+      <div class="hub-btn" id="hub-voice-btn" onclick="toggleHub('voice')">
+        <div class="hub-icon">🎙️</div>
+        <div class="hub-name">AI Voice</div>
+        <div class="hub-tag">Receptionist · Sales · Customer Service · Scheduling · AR</div>
       </div>
-      <div class="field">
-        <label>Frequency</label>
-        <select>
-          <option value="">— Select —</option>
-          <option>Daily</option>
-          <option>Weekly</option>
-          <option>Monthly</option>
-          <option>On Demand</option>
-        </select>
+      <div class="hub-btn" id="hub-channel-btn" onclick="toggleHub('channel')">
+        <div class="hub-icon">📡</div>
+        <div class="hub-name">AI Channel</div>
+        <div class="hub-tag">Customer Service · Lead Generation — via Website, WhatsApp, Email</div>
       </div>
     </div>
   </div>
 
-  <!-- Tier Recommendation -->
-  <div class="tier-result">
-    <h2>Recommended Package</h2>
-    <div class="tiers">
-      <div class="tier-card" id="tier-starter">
-        <div class="tier-name">Starter</div>
-        <div class="tier-range">1 – 3 Business Systems</div>
-        <div class="tier-price">$1,250 setup · From $599/mo</div>
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- AI DATA PANEL -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div class="hub-panel" id="panel-data">
+    <div class="section-card">
+      <div class="step-badge">AI Data — Step A</div>
+      <h3>Which departments have someone manually entering or processing data right now?</h3>
+      <p class="hint">Each checked department = 1 business system. This determines their tier.</p>
+      <div class="dept-checks" id="dataDeptChecks">
+        <label class="dept-check"><input type="checkbox" value="Administration" onchange="syncCheck(this)"><span>Administration</span></label>
+        <label class="dept-check"><input type="checkbox" value="Human Resources" onchange="syncCheck(this)"><span>Human Resources</span></label>
+        <label class="dept-check"><input type="checkbox" value="Finance" onchange="syncCheck(this)"><span>Finance</span></label>
+        <label class="dept-check"><input type="checkbox" value="HSE" onchange="syncCheck(this)"><span>HSE</span></label>
+        <label class="dept-check"><input type="checkbox" value="Information Technology" onchange="syncCheck(this)"><span>Information Technology</span></label>
+        <label class="dept-check"><input type="checkbox" value="Marketing" onchange="syncCheck(this)"><span>Marketing</span></label>
+        <label class="dept-check"><input type="checkbox" value="QA / QC" onchange="syncCheck(this)"><span>QA / QC</span></label>
+        <label class="dept-check"><input type="checkbox" value="Production" onchange="syncCheck(this)"><span>Production</span></label>
       </div>
-      <div class="tier-card" id="tier-growth">
-        <div class="tier-name">Growth</div>
-        <div class="tier-range">Up to 6 Business Systems</div>
-        <div class="tier-price">$2,000 setup · From $899/mo</div>
+    </div>
+
+    <div class="section-card">
+      <div class="step-badge">AI Data — Step B</div>
+      <h3>What systems are they entering data into?</h3>
+      <p class="hint">e.g. Spreadsheets, QuickBooks, HubSpot, custom databases, internal software</p>
+      <div class="field full" style="margin-top:10px;"><textarea id="dataSystems" rows="3" placeholder="List the tools here..."></textarea></div>
+    </div>
+
+    <div class="section-card">
+      <div class="step-badge">AI Data — Step C</div>
+      <h3>Roughly how many records does their team process per day or week?</h3>
+      <p class="hint">Determines API cost exposure and margin safety for the quoted tier.</p>
+      <div class="fields-row" style="margin-top:10px;">
+        <div class="field"><label>Volume (approx.)</label><input type="text" id="dataVolume" placeholder="e.g. 200 records/day" /></div>
+        <div class="field"><label>Frequency</label>
+          <select id="dataFreq">
+            <option value="">— Select —</option>
+            <option>Daily</option><option>Weekly</option><option>Monthly</option><option>On Demand</option>
+          </select>
+        </div>
       </div>
-      <div class="tier-card" id="tier-enterprise">
-        <div class="tier-name">Enterprise</div>
-        <div class="tier-range">Up to 10 Business Systems</div>
-        <div class="tier-price">$4,000 setup · From $1,499/mo</div>
+    </div>
+
+    <!-- AI Data Tier Recommendation -->
+    <div class="tier-result">
+      <h2>AI Data — Recommended Package</h2>
+      <div class="tiers">
+        <div class="tier-card" id="data-starter">
+          <div class="tier-name">Starter</div>
+          <div class="tier-range">1 – 3 Departments</div>
+          <div class="tier-price">$1,250 setup · From $599/mo</div>
+        </div>
+        <div class="tier-card" id="data-growth">
+          <div class="tier-name">Growth</div>
+          <div class="tier-range">4 – 6 Departments</div>
+          <div class="tier-price">$2,000 setup · From $899/mo</div>
+        </div>
+        <div class="tier-card" id="data-enterprise">
+          <div class="tier-name">Enterprise</div>
+          <div class="tier-range">7 – 8 Departments</div>
+          <div class="tier-price">$4,000 setup · From $1,499/mo</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Escalation flag -->
-  <div class="notes-block">
-    <h2>Additional Notes / Escalation Flags</h2>
-    <textarea placeholder="Any custom requirements, red flags, or items to escalate to the Founder..."></textarea>
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- AI VOICE PANEL -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div class="hub-panel" id="panel-voice">
+    <div class="section-card">
+      <div class="step-badge">AI Voice — Step A</div>
+      <h3>Which voice roles apply to their operation?</h3>
+      <p class="hint">Each role = 1 AI Voice employee. Select all they need.</p>
+      <div class="role-checks" id="voiceRoleChecks">
+        <label class="role-check"><input type="checkbox" value="AI Receptionist" onchange="syncCheck(this)"><span>AI Receptionist</span></label>
+        <label class="role-check"><input type="checkbox" value="AI Customer Service" onchange="syncCheck(this)"><span>AI Customer Service</span></label>
+        <label class="role-check"><input type="checkbox" value="AI Sales Representative" onchange="syncCheck(this)"><span>AI Sales Representative</span></label>
+        <label class="role-check"><input type="checkbox" value="AI Appointment Scheduler" onchange="syncCheck(this)"><span>AI Appointment Scheduler</span></label>
+        <label class="role-check"><input type="checkbox" value="AI Survey & Feedback" onchange="syncCheck(this)"><span>AI Survey &amp; Feedback</span></label>
+        <label class="role-check"><input type="checkbox" value="AI Accounts Receivable" onchange="syncCheck(this)"><span>AI Accounts Receivable</span></label>
+        <label class="role-check"><input type="checkbox" value="AI HR Assistant" onchange="syncCheck(this)"><span>AI HR Assistant</span></label>
+        <label class="role-check"><input type="checkbox" value="AI HSE Assistant" onchange="syncCheck(this)"><span>AI HSE Assistant</span></label>
+        <label class="role-check"><input type="checkbox" value="AI Lead Qualification" onchange="syncCheck(this)"><span>AI Lead Qualification</span></label>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="step-badge">AI Voice — Step B</div>
+      <h3>What is their current inbound call or inquiry volume?</h3>
+      <p class="hint">Determines minute usage and API cost margins for the tier.</p>
+      <div class="fields-row" style="margin-top:10px;">
+        <div class="field"><label>Call / Inquiry Volume</label><input type="text" id="voiceVolume" placeholder="e.g. 50 calls/day" /></div>
+        <div class="field"><label>Current Handling Method</label>
+          <select id="voiceMethod">
+            <option value="">— Select —</option>
+            <option>Receptionist / Staff</option>
+            <option>Voicemail Only</option>
+            <option>No Formal System</option>
+            <option>Existing IVR</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="step-badge">AI Voice — Step C</div>
+      <h3>Do they need outbound calling as well?</h3>
+      <p class="hint">Outbound = follow-ups, collections, appointment reminders, surveys. Adds to scope and cost.</p>
+      <div class="fields-row" style="margin-top:10px;">
+        <div class="field"><label>Outbound Required?</label>
+          <select id="voiceOutbound">
+            <option value="">— Select —</option>
+            <option>Yes — high volume</option>
+            <option>Yes — occasional</option>
+            <option>No — inbound only</option>
+          </select>
+        </div>
+        <div class="field"><label>Languages Needed</label><input type="text" id="voiceLang" placeholder="e.g. English, Spanish, French Creole" /></div>
+      </div>
+    </div>
+
+    <!-- AI Voice Tier Recommendation -->
+    <div class="tier-result">
+      <h2>AI Voice — Recommended Package</h2>
+      <div class="tiers">
+        <div class="tier-card" id="voice-starter">
+          <div class="tier-name">Starter</div>
+          <div class="tier-range">1 – 2 Voice Roles</div>
+          <div class="tier-price">$1,500 setup · From $499/mo</div>
+        </div>
+        <div class="tier-card" id="voice-growth">
+          <div class="tier-name">Growth</div>
+          <div class="tier-range">3 – 5 Voice Roles</div>
+          <div class="tier-price">$2,500 setup · From $899/mo</div>
+        </div>
+        <div class="tier-card" id="voice-enterprise">
+          <div class="tier-name">Enterprise</div>
+          <div class="tier-range">6+ Voice Roles</div>
+          <div class="tier-price">$5,000 setup · From $1,699/mo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!-- AI CHANNEL PANEL -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div class="hub-panel" id="panel-channel">
+    <div class="section-card">
+      <div class="step-badge">AI Channel — Step A</div>
+      <h3>Which AI Channel employees do they need?</h3>
+      <p class="hint">Customer Service handles inbound. Lead Generation drives outbound qualification.</p>
+      <div class="dept-checks" style="margin-top:10px;" id="channelDeptChecks">
+        <label class="dept-check"><input type="checkbox" value="AI Customer Service" onchange="syncCheck(this)"><span>AI Customer Service</span></label>
+        <label class="dept-check"><input type="checkbox" value="AI Lead Generation" onchange="syncCheck(this)"><span>AI Lead Generation</span></label>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="step-badge">AI Channel — Step B</div>
+      <h3>Which channels will the AI employee be deployed on?</h3>
+      <p class="hint">Each channel = additional integration. All three selected = full omnichannel deployment.</p>
+      <div class="channel-checks" id="channelChecks">
+        <label class="channel-check"><input type="checkbox" value="Website Chat" onchange="syncCheck(this)"><span>🌐 Website Chat</span></label>
+        <label class="channel-check"><input type="checkbox" value="WhatsApp" onchange="syncCheck(this)"><span>💬 WhatsApp</span></label>
+        <label class="channel-check"><input type="checkbox" value="Email" onchange="syncCheck(this)"><span>📧 Email</span></label>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="step-badge">AI Channel — Step C</div>
+      <h3>What is their current inbound message or inquiry volume?</h3>
+      <p class="hint">Determines conversation limits and API cost exposure per month.</p>
+      <div class="fields-row" style="margin-top:10px;">
+        <div class="field"><label>Monthly Inquiry Volume</label><input type="text" id="chanVolume" placeholder="e.g. 300 messages/mo" /></div>
+        <div class="field"><label>Current Handling Method</label>
+          <select id="chanMethod">
+            <option value="">— Select —</option>
+            <option>Staff manually replies</option>
+            <option>No formal system</option>
+            <option>Basic chatbot (not AI)</option>
+            <option>Mix of staff + tools</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Channel Tier Recommendation -->
+    <div class="tier-result">
+      <h2>AI Channel — Recommended Package</h2>
+      <div class="tiers">
+        <div class="tier-card" id="chan-starter">
+          <div class="tier-name">Starter</div>
+          <div class="tier-range">1 Employee · 1 Channel</div>
+          <div class="tier-price">$750 setup · From $399/mo</div>
+        </div>
+        <div class="tier-card" id="chan-growth">
+          <div class="tier-name">Growth</div>
+          <div class="tier-range">1–2 Employees · 2 Channels</div>
+          <div class="tier-price">$1,250 setup · From $599/mo</div>
+        </div>
+        <div class="tier-card" id="chan-enterprise">
+          <div class="tier-name">Enterprise</div>
+          <div class="tier-range">2 Employees · All 3 Channels</div>
+          <div class="tier-price">$2,500 setup · From $999/mo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Summary Bar -->
+  <div class="summary-bar" id="summaryBar">
+    <div class="summary-item"><div class="s-label">Hubs Selected</div><div class="s-val" id="summHubs">None</div></div>
+    <div class="summary-item"><div class="s-label">AI Data</div><div class="s-val" id="summData">—</div></div>
+    <div class="summary-item"><div class="s-label">AI Voice</div><div class="s-val" id="summVoice">—</div></div>
+    <div class="summary-item"><div class="s-label">AI Channel</div><div class="s-val" id="summChannel">—</div></div>
+  </div>
+
+  <!-- Notes -->
+  <div class="notes-block" style="margin-top:20px;">
+    <div class="block-title" style="margin-bottom:12px;">Additional Notes / Escalation Flags</div>
+    <textarea id="auditNotes" placeholder="Any custom requirements, red flags, budget objections, or items to escalate to the Founder..."></textarea>
   </div>
 
   <!-- Actions -->
   <div class="actions">
     <button class="btn btn-outline" onclick="window.print()">🖨 Print / Save PDF</button>
     <button class="btn btn-primary" onclick="copyStrikeReport()">📋 Copy Strike Report</button>
+    <button class="btn btn-wa" onclick="sendViaWA()">📲 Send to WhatsApp</button>
   </div>
 
   <div class="footer">Prisca Dezigns · Internal Audit Tool · Not for client distribution</div>
 </div>
 
 <script>
-  let deptCount = 1;
+  const activeHubs = new Set();
 
-  function changeDept(delta) {
-    deptCount = Math.max(1, Math.min(10, deptCount + delta));
-    document.getElementById('deptCount').textContent = deptCount;
-    renderDeptRows();
-    updateTier();
+  function toggleHub(hub) {
+    const btn = document.getElementById(`hub-${hub}-btn`);
+    const panel = document.getElementById(`panel-${hub}`);
+    if (activeHubs.has(hub)) {
+      activeHubs.delete(hub);
+      btn.classList.remove('selected');
+      panel.classList.remove('active');
+    } else {
+      activeHubs.add(hub);
+      btn.classList.add('selected');
+      panel.classList.add('active');
+    }
+    updateSummary();
   }
 
-  function renderDeptRows() {
-    const container = document.getElementById('deptRows');
-    const existing = container.querySelectorAll('.dept-row');
-    const currentCount = existing.length;
-
-    if (deptCount > currentCount) {
-      for (let i = currentCount + 1; i <= deptCount; i++) {
-        const row = document.createElement('div');
-        row.className = 'dept-row';
-        row.innerHTML = `
-          <div class="dept-col"><span>Dept ${i}</span><input type="text" placeholder="e.g. HR, Finance, Projects" /></div>
-          <div class="dept-col"><span>System Used</span><input type="text" placeholder="e.g. QuickBooks" /></div>
-          <div class="dept-col"><span>Data Type</span><input type="text" placeholder="e.g. Invoices, Forms" /></div>
-        `;
-        container.appendChild(row);
-      }
-    } else {
-      while (container.children.length > deptCount) {
-        container.removeChild(container.lastChild);
-      }
-    }
+  function syncCheck(el) {
+    const label = el.closest('label');
+    if (el.checked) label.classList.add('checked');
+    else label.classList.remove('checked');
+    updateTiers();
+    updateSummary();
   }
 
-  function updateTier() {
-    document.getElementById('tier-starter').classList.remove('active');
-    document.getElementById('tier-growth').classList.remove('active');
-    document.getElementById('tier-enterprise').classList.remove('active');
+  function getChecked(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return [];
+    return Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(el => el.value);
+  }
 
-    if (deptCount <= 3) {
-      document.getElementById('tier-starter').classList.add('active');
-    } else if (deptCount <= 6) {
-      document.getElementById('tier-growth').classList.add('active');
-    } else {
-      document.getElementById('tier-enterprise').classList.add('active');
+  function updateTiers() {
+    // AI Data
+    const dataDepts = getChecked('dataDeptChecks').length;
+    ['data-starter','data-growth','data-enterprise'].forEach(id => document.getElementById(id).classList.remove('active'));
+    if (dataDepts >= 1 && dataDepts <= 3) document.getElementById('data-starter').classList.add('active');
+    else if (dataDepts <= 6) document.getElementById('data-growth').classList.add('active');
+    else if (dataDepts >= 7) document.getElementById('data-enterprise').classList.add('active');
+
+    // AI Voice
+    const voiceRoles = getChecked('voiceRoleChecks').length;
+    ['voice-starter','voice-growth','voice-enterprise'].forEach(id => document.getElementById(id).classList.remove('active'));
+    if (voiceRoles >= 1 && voiceRoles <= 2) document.getElementById('voice-starter').classList.add('active');
+    else if (voiceRoles <= 5) document.getElementById('voice-growth').classList.add('active');
+    else if (voiceRoles >= 6) document.getElementById('voice-enterprise').classList.add('active');
+
+    // AI Channel
+    const chanDepts = getChecked('channelDeptChecks').length;
+    const chanChannels = getChecked('channelChecks').length;
+    ['chan-starter','chan-growth','chan-enterprise'].forEach(id => document.getElementById(id).classList.remove('active'));
+    if (chanDepts === 1 && chanChannels <= 1) document.getElementById('chan-starter').classList.add('active');
+    else if (chanChannels <= 2 || chanDepts <= 2) document.getElementById('chan-growth').classList.add('active');
+    if (chanDepts === 2 && chanChannels === 3) document.getElementById('chan-enterprise').classList.add('active');
+  }
+
+  function updateSummary() {
+    const hubList = [...activeHubs].map(h => h.charAt(0).toUpperCase() + h.slice(1)).join(' + ');
+    document.getElementById('summHubs').textContent = hubList || 'None';
+
+    const dataDepts = getChecked('dataDeptChecks');
+    document.getElementById('summData').textContent = dataDepts.length > 0
+      ? `${dataDepts.length} dept${dataDepts.length > 1 ? 's' : ''}`
+      : activeHubs.has('data') ? '0 selected' : '—';
+
+    const voiceRoles = getChecked('voiceRoleChecks');
+    document.getElementById('summVoice').textContent = voiceRoles.length > 0
+      ? `${voiceRoles.length} role${voiceRoles.length > 1 ? 's' : ''}`
+      : activeHubs.has('voice') ? '0 selected' : '—';
+
+    const chanDepts = getChecked('channelDeptChecks');
+    const chanChannels = getChecked('channelChecks');
+    document.getElementById('summChannel').textContent =
+      (chanDepts.length > 0 || chanChannels.length > 0)
+        ? `${chanDepts.length} employee${chanDepts.length !== 1 ? 's' : ''} · ${chanChannels.length} channel${chanChannels.length !== 1 ? 's' : ''}`
+        : activeHubs.has('channel') ? '0 selected' : '—';
+  }
+
+  function buildReport() {
+    const biz = document.getElementById('bizName').value || '[Business Name]';
+    const contact = document.getElementById('contactName').value || '[Contact]';
+    const wa = document.getElementById('waNum').value || '[WhatsApp]';
+    const email = document.getElementById('clientEmail').value || '[Email]';
+    const industry = document.getElementById('industry').value || '[Industry]';
+    const date = document.getElementById('auditDate').value || '[Date]';
+    const notes = document.getElementById('auditNotes').value || 'None';
+
+    const dataDepts = getChecked('dataDeptChecks');
+    const dataTier = dataDepts.length <= 3 ? 'Starter ($1,250 + $599/mo)' : dataDepts.length <= 6 ? 'Growth ($2,000 + $899/mo)' : 'Enterprise ($4,000 + $1,499/mo)';
+
+    const voiceRoles = getChecked('voiceRoleChecks');
+    const voiceTier = voiceRoles.length <= 2 ? 'Starter ($1,500 + $499/mo)' : voiceRoles.length <= 5 ? 'Growth ($2,500 + $899/mo)' : 'Enterprise ($5,000 + $1,699/mo)';
+
+    const chanDepts = getChecked('channelDeptChecks');
+    const chanChannels = getChecked('channelChecks');
+    const chanTier = (chanDepts.length === 2 && chanChannels.length === 3) ? 'Enterprise ($2,500 + $999/mo)' : chanChannels.length <= 2 ? 'Growth ($1,250 + $599/mo)' : 'Starter ($750 + $399/mo)';
+
+    let report = `🚨 NEW CLIENT AUDIT — PRISCA DEZIGNS\n`;
+    report += `━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    report += `Business: ${biz}\n`;
+    report += `Contact: ${contact}\n`;
+    report += `WhatsApp: ${wa}\n`;
+    report += `Email: ${email}\n`;
+    report += `Industry: ${industry}\n`;
+    report += `Date: ${date}\n`;
+    report += `━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    report += `HUBS SELECTED: ${[...activeHubs].join(', ').toUpperCase() || 'None'}\n\n`;
+
+    if (activeHubs.has('data')) {
+      report += `🗄️ AI DATA\n`;
+      report += `Departments: ${dataDepts.length > 0 ? dataDepts.join(', ') : 'None selected'}\n`;
+      report += `Recommended Tier: ${dataDepts.length > 0 ? dataTier : 'TBD'}\n\n`;
     }
+    if (activeHubs.has('voice')) {
+      report += `🎙️ AI VOICE\n`;
+      report += `Roles: ${voiceRoles.length > 0 ? voiceRoles.join(', ') : 'None selected'}\n`;
+      report += `Recommended Tier: ${voiceRoles.length > 0 ? voiceTier : 'TBD'}\n\n`;
+    }
+    if (activeHubs.has('channel')) {
+      report += `📡 AI CHANNEL\n`;
+      report += `Employees: ${chanDepts.length > 0 ? chanDepts.join(', ') : 'None selected'}\n`;
+      report += `Channels: ${chanChannels.length > 0 ? chanChannels.join(', ') : 'None selected'}\n`;
+      report += `Recommended Tier: ${(chanDepts.length > 0 || chanChannels.length > 0) ? chanTier : 'TBD'}\n\n`;
+    }
+
+    report += `━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    report += `Notes: ${notes}\n`;
+    report += `Status: Awaiting Founder approval.`;
+    return report;
   }
 
   function copyStrikeReport() {
-    const inputs = document.querySelectorAll('input');
-    const bizName = inputs[0]?.value || '[Business Name]';
-    const contact = inputs[1]?.value || '[Contact]';
-    const wa = inputs[2]?.value || '[WhatsApp]';
-    const email = inputs[3]?.value || '[Email]';
-    const tier = deptCount <= 3 ? 'Starter ($1,250 + $599/mo)' : deptCount <= 6 ? 'Growth ($2,000 + $899/mo)' : 'Enterprise ($4,000 + $1,499/mo)';
-
-    const report = `🚨 NEW LEAD DETECTED\n- Client: ${bizName} — ${contact}\n- Service: AI Data Entry\n- Package: ${tier}\n- Departments: ${deptCount}\n- Email: ${email}\n- WhatsApp: ${wa}\n- Status: Awaiting Founder approval.`;
+    const report = buildReport();
     navigator.clipboard.writeText(report).then(() => alert('Strike report copied! Paste into WhatsApp.'));
   }
 
-  // Init
-  renderDeptRows();
-  updateTier();
+  function sendViaWA() {
+    const report = buildReport();
+    const encoded = encodeURIComponent(report);
+    window.open(`https://wa.me/18683424101?text=${encoded}`, '_blank');
+  }
 </script>
 </body>
 </html>
