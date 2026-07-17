@@ -1753,6 +1753,30 @@ window.addEventListener('load', () => {
 
 // ─── SUBMIT ───────────────────────────────────────────────
 async function submitAudit() {
+  // ── Gate: Stage 1 minimum fields ──────────────────────────
+  const required1 = [
+    { name: "business_name",  label: "Business Name" },
+    { name: "contact_name",   label: "Your Name" },
+    { name: "contact_email",  label: "Email Address" },
+    { name: "industry",       label: "Industry" }
+  ];
+  for (let f of required1) {
+    const val = getVal(f.name);
+    if (!val || !val.trim()) {
+      showToast(`Please complete Stage 1 — "${f.label}" is required before submitting.`, true);
+      // Jump back to the step that contains that field
+      const stepMap = { business_name: 1, contact_name: 1, contact_email: 1, industry: 1 };
+      goTo(stepMap[f.name] || 1);
+      const el = document.querySelector(`[name="${f.name}"]`);
+      if (el) {
+        el.style.borderColor = 'var(--error)';
+        el.focus();
+        setTimeout(() => el.style.borderColor = 'var(--border)', 3000);
+      }
+      return;
+    }
+  }
+
   const btn = document.querySelector('.btn-submit');
   btn.textContent = "Submitting...";
   btn.disabled = true;
