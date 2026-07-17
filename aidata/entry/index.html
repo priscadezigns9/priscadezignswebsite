@@ -61,6 +61,18 @@
         <a href="/aidata/" class="back-btn">⬅ BACK TO DATA HUB</a>
     </header>
 
+    <!-- Tier Selection Banner -->
+    <div id="tier-banner" style="display:none; background:white; border-bottom: 2px solid var(--glass-border); padding: 18px 5%; text-align:center;">
+        <span id="tier-banner-text" style="font-size:1rem; font-weight:700; color:#4b5563;"></span>
+        <a href="/aidata/#pricing" style="margin-left:20px; font-size:0.85rem; font-weight:700; color:var(--purple); text-decoration:underline;">Change tier</a>
+    </div>
+
+    <!-- No Tier Warning -->
+    <div id="no-tier-banner" style="display:none; background:#fdf4ff; border-bottom: 2px solid rgba(124,58,237,0.15); padding: 18px 5%; text-align:center;">
+        <span style="font-size:0.95rem; font-weight:600; color:#6b7280;">💡 Not sure which tier fits your business? </span>
+        <a href="/aidata/#pricing" style="font-size:0.95rem; font-weight:800; color:var(--purple); text-decoration:underline;">View Pricing First →</a>
+    </div>
+
     <div class="section">
         <h2>Overview</h2>
         <div class="flex-col" style="background: white;">
@@ -413,5 +425,40 @@
             <div>WHATSAPP DIRECT: +1 (868) 342-4101</div>
         </div>
     </footer>
+
+<script>
+(function() {
+    const params = new URLSearchParams(window.location.search);
+    const tier = params.get('tier');
+
+    const tierLabels = {
+        starter: { label: 'Starter Plan', badge: '⬜ Starter', price: 'From US$1,250 impl. + US$599/mo' },
+        growth:  { label: 'Growth Plan',  badge: '⭐ Growth',  price: 'From US$2,000 impl. + US$899/mo' },
+        enterprise: { label: 'Enterprise Plan', badge: '◼ Enterprise', price: 'From US$4,000 impl. + US$1,499/mo' }
+    };
+
+    if (tier && tierLabels[tier]) {
+        const t = tierLabels[tier];
+        document.getElementById('tier-banner').style.display = 'block';
+        document.getElementById('tier-banner-text').innerHTML =
+            '✅ You selected the <strong style="color:var(--purple);">' + t.label + '</strong> &nbsp;·&nbsp; ' + t.price;
+
+        // Update all HIRE THIS AGENT links to include tier in the WhatsApp message
+        document.querySelectorAll('a.package-btn').forEach(function(btn) {
+            const href = btn.getAttribute('href');
+            if (href && href.includes('wa.me')) {
+                const url = new URL(href);
+                const text = url.searchParams.get('text') || '';
+                const updated = text + ' (' + t.label + ')';
+                url.searchParams.set('text', updated);
+                btn.setAttribute('href', url.toString());
+            }
+        });
+    } else {
+        document.getElementById('no-tier-banner').style.display = 'block';
+    }
+})();
+</script>
+
 </body>
 </html>
