@@ -65,7 +65,9 @@
 
   /* ── HEADER ───────────────────────────────────── */
   header {
-    background: transparent;
+    background: linear-gradient(135deg, #5B0EA6 0%, #7C3AED 50%, #4B0082 100%);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     border-bottom: 1px solid rgba(255,255,255,0.2);
     padding: 52px 24px 38px;
     text-align: center;
@@ -73,18 +75,16 @@
     overflow: hidden;
     box-shadow: 0 8px 40px rgba(91,14,166,0.25);
   }
-  /* Gradient lives on ::before so canvas renders above it */
   header::before {
     content: '';
-    position: absolute; inset: 0; z-index: 0;
-    background: linear-gradient(135deg, #5B0EA6 0%, #7C3AED 50%, #4B0082 100%);
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.15) 0%, transparent 60%);
     pointer-events: none;
   }
-  /* canvas sits at z-index 1, text wrapper at z-index 2 — both declared inline */
   header::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 10%; right: 10%; height: 1px; z-index: 3;
+    bottom: 0; left: 10%; right: 10%; height: 1px;
     background: linear-gradient(90deg, transparent, rgba(201,168,76,0.7), transparent);
   }
   header .logo {
@@ -433,284 +433,7 @@
     font-size: 0.78rem; color: rgba(45,0,87,0.35); letter-spacing: 0.3px;
   }
   footer a { color: rgba(201,168,76,0.8); text-decoration: none; }
-<!-- ── AUDIT HEADER: CSS GLOBE + ORBITAL SATELLITE + ASTRONAUT ──── -->
-<style>
-/* ── Scene wrapper ───────────────────────────────────────── */
-#auditScene {
-  position: absolute; inset: 0; z-index: 1;
-  pointer-events: none; overflow: visible;
-  perspective: 600px;
-}
-
-/* ── Stars ───────────────────────────────────────────────── */
-.star {
-  position: absolute; border-radius: 50%;
-  background: rgba(255,255,255,0.8);
-  animation: twinkle var(--tw,2s) ease-in-out infinite alternate;
-}
-@keyframes twinkle { from{opacity:0.15} to{opacity:1} }
-
-/* ── Globe ───────────────────────────────────────────────── */
-.globe-wrap {
-  position: absolute;
-  right: 9%; top: 50%;
-  transform: translateY(-50%);
-  width: 120px; height: 120px;
-}
-.globe-atmo {
-  position: absolute; inset: -10px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%,
-    transparent 48%, rgba(124,58,237,0.18) 60%, transparent 80%);
-  animation: atmoPulse 4s ease-in-out infinite alternate;
-}
-@keyframes atmoPulse {
-  from { transform: scale(1);   opacity: 0.7; }
-  to   { transform: scale(1.07);opacity: 1;   }
-}
-.globe {
-  width: 100%; height: 100%; border-radius: 50%;
-  background: radial-gradient(circle at 35% 32%,
-    #d8b4fe 0%, #a855f7 18%, #7c3aed 42%, #5B0EA6 68%, #3b0764 100%);
-  box-shadow:
-    0 0 0 2px rgba(192,132,252,0.3),
-    0 0 35px rgba(124,58,237,0.6),
-    0 0 70px rgba(91,14,166,0.3),
-    inset -10px -10px 25px rgba(30,0,60,0.55),
-    inset 6px 6px 18px rgba(216,180,254,0.2);
-  position: relative; overflow: hidden;
-}
-/* Latitude grid lines */
-.globe::before {
-  content: '';
-  position: absolute; inset: 0; border-radius: 50%;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px, transparent 10px,
-    rgba(192,132,252,0.12) 10px, rgba(192,132,252,0.12) 11px
-  );
-}
-/* Continent blobs */
-.globe::after {
-  content: '';
-  position: absolute; inset: 0; border-radius: 50%;
-  background:
-    radial-gradient(ellipse 18px 12px at 38% 40%, rgba(216,180,254,0.22) 0%, transparent 100%),
-    radial-gradient(ellipse 14px 10px at 62% 35%, rgba(216,180,254,0.18) 0%, transparent 100%),
-    radial-gradient(ellipse 10px 14px at 45% 62%, rgba(216,180,254,0.15) 0%, transparent 100%),
-    radial-gradient(ellipse 8px  8px  at 70% 60%, rgba(216,180,254,0.12) 0%, transparent 100%);
-  animation: globeDrift 30s linear infinite;
-}
-@keyframes globeDrift {
-  from { background-position: 0% 0%; transform: rotate(0deg); }
-  to   { background-position: 100% 0%; transform: rotate(360deg); }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   ORBITAL TECHNIQUE
-   - .orbit-ring  : the tilted ellipse container — it ROTATES
-   - .orbit-body  : the orbiting object — it COUNTER-ROTATES
-                    so it stays upright as the ring spins
-   This produces true orbital motion around the globe.
-═══════════════════════════════════════════════════════════ */
-
-/* ── Satellite orbit ─────────────────────────────────────── */
-.orbit-ring-sat {
-  position: absolute;
-  right: calc(9% - 40px); top: 50%;
-  width: 200px; height: 200px;
-  margin-top: -100px;
-  border-radius: 50%;
-  /* Tilt the orbital plane */
-  transform: rotateX(72deg) rotateY(-15deg);
-  transform-style: preserve-3d;
-  animation: ringSpinSat 6s linear infinite;
-}
-@keyframes ringSpinSat {
-  from { transform: rotateX(72deg) rotateY(-15deg) rotateZ(0deg); }
-  to   { transform: rotateX(72deg) rotateY(-15deg) rotateZ(360deg); }
-}
-/* Orbital ring visible line */
-.orbit-ring-sat::before {
-  content: '';
-  position: absolute; inset: 0; border-radius: 50%;
-  border: 1px solid rgba(192,132,252,0.2);
-}
-.orbit-body-sat {
-  position: absolute;
-  /* Start at top of ring */
-  top: -14px; left: 50%;
-  transform: translateX(-50%) rotateX(-72deg) rotateY(15deg);
-  transform-style: preserve-3d;
-  animation: bodyCounterSat 6s linear infinite;
-}
-@keyframes bodyCounterSat {
-  from { transform: translateX(-50%) rotateZ(0deg)    rotateX(-72deg) rotateY(15deg); }
-  to   { transform: translateX(-50%) rotateZ(-360deg) rotateX(-72deg) rotateY(15deg); }
-}
-/* Satellite body */
-.sat-core {
-  width: 18px; height: 11px;
-  background: linear-gradient(135deg, #c8d8f8 0%, #7090cc 100%);
-  border-radius: 3px;
-  position: relative;
-  box-shadow: 0 0 8px rgba(140,180,255,0.6), 0 2px 4px rgba(0,0,40,0.5);
-}
-/* Solar panels */
-.sat-core::before, .sat-core::after {
-  content: '';
-  position: absolute; top: 50%;
-  width: 26px; height: 7px;
-  background: linear-gradient(90deg, #1a3a6a 0%, #2a5cb8 40%, #1a3a6a 100%);
-  border: 1px solid rgba(100,160,255,0.4);
-  transform: translateY(-50%);
-  box-shadow: 0 0 5px rgba(60,120,255,0.4);
-}
-.sat-core::before { right: calc(100% + 2px); }
-.sat-core::after  { left:  calc(100% + 2px); }
-/* Dish */
-.sat-dish {
-  position: absolute;
-  top: -7px; left: 50%; transform: translateX(-50%);
-  width: 8px; height: 5px;
-  border-top: 5px solid rgba(200,220,255,0.7);
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-}
-
-/* ── Astronaut orbit ─────────────────────────────────────── */
-.orbit-ring-astro {
-  position: absolute;
-  right: calc(9% - 55px); top: 50%;
-  width: 230px; height: 230px;
-  margin-top: -115px;
-  border-radius: 50%;
-  transform: rotateX(55deg) rotateY(20deg);
-  transform-style: preserve-3d;
-  animation: ringSpinAstro 9s linear infinite reverse;
-}
-@keyframes ringSpinAstro {
-  from { transform: rotateX(55deg) rotateY(20deg) rotateZ(0deg); }
-  to   { transform: rotateX(55deg) rotateY(20deg) rotateZ(360deg); }
-}
-.orbit-ring-astro::before {
-  content: '';
-  position: absolute; inset: 0; border-radius: 50%;
-  border: 1px solid rgba(201,168,76,0.15);
-}
-.orbit-body-astro {
-  position: absolute;
-  top: -18px; left: 50%;
-  transform: translateX(-50%) rotateX(-55deg) rotateY(-20deg);
-  transform-style: preserve-3d;
-  animation: bodyCounterAstro 9s linear infinite reverse;
-}
-@keyframes bodyCounterAstro {
-  from { transform: translateX(-50%) rotateZ(0deg)    rotateX(-55deg) rotateY(-20deg); }
-  to   { transform: translateX(-50%) rotateZ(-360deg) rotateX(-55deg) rotateY(-20deg); }
-}
-/* Astronaut suit */
-.astro-helmet {
-  width: 20px; height: 20px; border-radius: 50%;
-  background: radial-gradient(circle at 38% 35%,
-    #f0ecff 0%, #c8b8e8 45%, #9070b8 100%);
-  box-shadow: 0 0 10px rgba(192,132,252,0.5), 0 2px 4px rgba(0,0,0,0.4);
-  position: relative; margin: 0 auto;
-}
-/* Gold visor */
-.astro-helmet::after {
-  content: '';
-  position: absolute;
-  top: 25%; left: 20%; width: 60%; height: 40%;
-  border-radius: 40%;
-  background: linear-gradient(135deg,
-    rgba(255,220,80,0.9) 0%, rgba(201,168,76,0.7) 60%, rgba(255,180,0,0.3) 100%);
-  box-shadow: 0 0 6px rgba(255,210,0,0.6);
-}
-/* Suit body */
-.astro-body {
-  width: 14px; height: 12px;
-  background: linear-gradient(180deg, #e8e0f8 0%, #b090d8 100%);
-  border-radius: 4px 4px 3px 3px;
-  margin: 1px auto 0;
-  position: relative;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.35);
-}
-/* Arms */
-.astro-body::before, .astro-body::after {
-  content: '';
-  position: absolute; top: 1px;
-  width: 5px; height: 9px;
-  background: linear-gradient(180deg, #e8e0f8 0%, #b090d8 100%);
-  border-radius: 3px;
-}
-.astro-body::before { right: calc(100% + 1px); transform: rotate(-25deg); }
-.astro-body::after  { left:  calc(100% + 1px); transform: rotate(25deg);  }
-/* Tether */
-.astro-tether {
-  position: absolute;
-  top: 28px; left: 50%;
-  width: 1px; height: 36px;
-  background: linear-gradient(180deg, rgba(201,168,76,0.85), transparent);
-  transform-origin: top center;
-  transform: translateX(-50%) rotate(155deg);
-}
-
-/* ── Responsive ──────────────────────────────────────────── */
-@media (max-width: 700px) {
-  .globe-wrap { width: 80px; height: 80px; right: 5%; }
-  .orbit-ring-sat, .orbit-ring-astro { display: none; }
-}
-@media (max-width: 480px) {
-  .globe-wrap { display: none; }
-}
 </style>
-
-<!-- Scene HTML -->
-<div id="auditScene">
-  <div id="starField"></div>
-
-  <!-- Globe -->
-  <div class="globe-wrap">
-    <div class="globe-atmo"></div>
-    <div class="globe"></div>
-  </div>
-
-  <!-- Satellite: ring rotates, body counter-rotates → true orbit -->
-  <div class="orbit-ring-sat">
-    <div class="orbit-body-sat">
-      <div class="sat-core">
-        <div class="sat-dish"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Astronaut: same technique, opposite direction, different tilt -->
-  <div class="orbit-ring-astro">
-    <div class="orbit-body-astro">
-      <div class="astro-helmet"></div>
-      <div class="astro-body"></div>
-      <div class="astro-tether"></div>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  var sf = document.getElementById('starField');
-  if (!sf) return;
-  var h = '';
-  for (var i = 0; i < 55; i++) {
-    var x  = (Math.random()*100).toFixed(1);
-    var y  = (Math.random()*100).toFixed(1);
-    var sz = (Math.random()*2+0.5).toFixed(1);
-    var tw = (Math.random()*3+1.5).toFixed(1);
-    var dl = (Math.random()*4).toFixed(1);
-    h += '<div class="star" style="left:'+x+'%;top:'+y+'%;width:'+sz+'px;height:'+sz+'px;--tw:'+tw+'s;animation-delay:'+dl+'s"></div>';
-  }
-  sf.innerHTML = h;
-})();
-</script>
 </head>
 <body>
 
@@ -721,48 +444,7 @@
 </div>
 
 <header>
-  <!-- Scene container -->
-<div id="auditScene">
-  <!-- Stars (generated by script below) -->
-  <div id="starField"></div>
-  <!-- Globe -->
-  <div class="globe-wrap">
-    <div class="globe-atmo"></div>
-    <div class="globe"></div>
-  </div>
-  <!-- Satellite orbit ring -->
-  <div class="orbit-sat">
-    <div class="sat-body">
-      <div class="sat-panel-l"></div>
-      <div class="sat-panel-r"></div>
-      <div class="sat-dish"></div>
-    </div>
-  </div>
-  <!-- Astronaut orbit ring -->
-  <div class="orbit-astro">
-    <div class="astro">
-      <div class="astro-helmet"></div>
-      <div class="astro-body"></div>
-      <div class="astro-tether"></div>
-    </div>
-  </div>
-</div>
-<script>
-(function(){
-  var sf = document.getElementById('starField');
-  if (!sf) return;
-  var stars = '';
-  for (var i = 0; i < 60; i++) {
-    var x  = Math.random() * 100;
-    var y  = Math.random() * 100;
-    var sz = (Math.random() * 2 + 0.5).toFixed(1);
-    var tw = (Math.random() * 3 + 1.5).toFixed(1);
-    stars += '<div class="star" style="left:'+x+'%;top:'+y+'%;width:'+sz+'px;height:'+sz+'px;--tw:'+tw+'s;animation-delay:'+(Math.random()*3).toFixed(1)+'s"></div>';
-  }
-  sf.innerHTML = stars;
-})();
-</script>
-
+  <canvas id="auditGlobe" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:0.92;"></canvas>
   <div style="position:relative;z-index:2;">
     <div class="logo">Prisca Dezigns · Confidential Assessment</div>
     <h1>Client Audit</h1>
@@ -3083,25 +2765,255 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ── STEP DOT CLICK NAVIGATION ────────────────────────────
   document.querySelectorAll('.step-item').forEach(function(item) {
-    item.style.cursor = 'pointer';
     item.addEventListener('click', function() {
       const target = parseInt(item.dataset.step);
+      // Only allow jump to completed steps or current active step
       if (item.classList.contains('done') || item.classList.contains('active')) {
         goTo(target);
-      } else {
-        // Flash the dot to indicate it's locked
-        const dot = item.querySelector('.step-dot');
-        if (dot) {
-          dot.style.transition = 'transform 0.1s';
-          dot.style.transform = 'scale(1.25)';
-          setTimeout(function() { dot.style.transform = 'scale(1)'; }, 200);
-        }
       }
     });
+    // Show tooltip hint on unvisited steps
+    const dot = item.querySelector('.step-dot');
+    if (dot && !item.classList.contains('done') && !item.classList.contains('active')) {
+      dot.title = 'Complete previous steps to unlock';
+    }
   });
 });
 </script>
 
 <!-- ── AUDIT HEADER GLOBE + SATELLITE + ASTRONAUT ──────────────── -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function() {
+  const canvas = document.getElementById('auditGlobe');
+  if (!canvas) return;
+
+  const header = canvas.parentElement;
+  const W = header.offsetWidth  || 800;
+  const H = header.offsetHeight || 160;
+  canvas.width  = W;
+  canvas.height = H;
+
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 0);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 200);
+  camera.position.set(0, 0, 9);
+
+  // ── AMBIENT + DIRECTIONAL LIGHTS ───────────────
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  const dir = new THREE.DirectionalLight(0xc084fc, 1.2);
+  dir.position.set(5, 5, 5);
+  scene.add(dir);
+  const rimLight = new THREE.PointLight(0xf5d98a, 1.6, 20);
+  rimLight.position.set(-4, 3, 4);
+  scene.add(rimLight);
+
+  // ── GLOBE ──────────────────────────────────────
+  const globeGroup = new THREE.Group();
+  scene.add(globeGroup);
+
+  // Solid gradient globe via ShaderMaterial
+  const globeMat = new THREE.ShaderMaterial({
+    transparent: true,
+    uniforms: {
+      uTime:   { value: 0 },
+      uColorA: { value: new THREE.Color(0x3b0764) },
+      uColorB: { value: new THREE.Color(0x7c3aed) },
+      uColorC: { value: new THREE.Color(0xc084fc) },
+    },
+    vertexShader: `
+      varying vec3 vNormal; varying vec3 vPos;
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        vPos = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform float uTime; uniform vec3 uColorA, uColorB, uColorC;
+      varying vec3 vNormal; varying vec3 vPos;
+      void main() {
+        float lat  = (vNormal.y + 1.0) * 0.5;
+        float rim  = pow(1.0 - abs(dot(vNormal, vec3(0.0,0.0,1.0))), 2.2);
+        float band = sin(vPos.y * 3.5 + uTime * 0.6) * 0.5 + 0.5;
+        vec3 base  = mix(uColorA, uColorB, lat);
+        vec3 col   = mix(base, uColorC, rim * 0.8 + band * 0.15);
+        float a    = 0.82 + rim * 0.16;
+        gl_FragColor = vec4(col, a);
+      }
+    `
+  });
+  const globeMesh = new THREE.Mesh(new THREE.SphereGeometry(1.4, 48, 48), globeMat);
+  globeGroup.add(globeMesh);
+
+  // Wireframe shell
+  const wireMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(1.42, 18, 18),
+    new THREE.MeshBasicMaterial({ color: 0xc084fc, wireframe: true, transparent: true, opacity: 0.14 })
+  );
+  globeGroup.add(wireMesh);
+
+  // Atmosphere glow ring
+  const atmoMat = new THREE.ShaderMaterial({
+    transparent: true, side: THREE.BackSide,
+    uniforms: { uColor: { value: new THREE.Color(0x9333ea) } },
+    vertexShader: `varying vec3 vN; void main(){ vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+    fragmentShader: `uniform vec3 uColor; varying vec3 vN; void main(){ float f=pow(0.6-dot(vN,vec3(0,0,1)),3.0); gl_FragColor=vec4(uColor,f*0.65); }`
+  });
+  globeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1.65, 32, 32), atmoMat));
+
+  // ── SATELLITE ──────────────────────────────────
+  // Pivot so it orbits independently
+  const satPivot = new THREE.Group();
+  scene.add(satPivot);
+
+  const satBody = new THREE.Mesh(
+    new THREE.BoxGeometry(0.18, 0.12, 0.1),
+    new THREE.MeshPhongMaterial({ color: 0xd4d4d8, emissive: 0x444444, shininess: 80 })
+  );
+
+  // Solar panels (flat rectangles sticking out both sides)
+  const panelMat = new THREE.MeshPhongMaterial({ color: 0x1e40af, emissive: 0x1e3a8a, shininess: 120 });
+  const panelGeo = new THREE.BoxGeometry(0.32, 0.08, 0.01);
+  const panelL = new THREE.Mesh(panelGeo, panelMat); panelL.position.set(-0.25, 0, 0);
+  const panelR = new THREE.Mesh(panelGeo, panelMat); panelR.position.set( 0.25, 0, 0);
+
+  // Antenna
+  const ant = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.005, 0.005, 0.14, 6),
+    new THREE.MeshPhongMaterial({ color: 0xe5e7eb })
+  );
+  ant.position.set(0, 0.12, 0);
+
+  // Dish (cone)
+  const dish = new THREE.Mesh(
+    new THREE.ConeGeometry(0.05, 0.06, 8, 1, true),
+    new THREE.MeshPhongMaterial({ color: 0xfbbf24, side: THREE.DoubleSide })
+  );
+  dish.position.set(0, 0.19, 0);
+
+  const sat = new THREE.Group();
+  sat.add(satBody, panelL, panelR, ant, dish);
+  sat.position.set(2.5, 0.6, 0);
+  satPivot.add(sat);
+
+  // ── ASTRONAUT ──────────────────────────────────
+  const astroPivot = new THREE.Group();
+  scene.add(astroPivot);
+
+  // Body parts with MeshPhongMaterial white suit
+  const suitMat  = new THREE.MeshPhongMaterial({ color: 0xf5f5f5, emissive: 0x333333, shininess: 60 });
+  const helmetMat = new THREE.MeshPhongMaterial({ color: 0xc084fc, emissive: 0x6b21a8, shininess: 120, transparent: true, opacity: 0.9 });
+  const visorMat  = new THREE.MeshPhongMaterial({ color: 0xf5d98a, emissive: 0x92400e, shininess: 200, transparent: true, opacity: 0.85 });
+  const gloveMat  = new THREE.MeshPhongMaterial({ color: 0xe5e7eb, shininess: 40 });
+
+  // Torso
+  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.14, 4, 8), suitMat);
+
+  // Helmet sphere
+  const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), helmetMat);
+  helmet.position.set(0, 0.22, 0);
+
+  // Visor (flat disc on helmet front)
+  const visor = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), visorMat);
+  visor.position.set(0, 0.22, 0.07);
+  visor.scale.set(1, 0.6, 0.5);
+
+  // Arms
+  const armGeo = new THREE.CapsuleGeometry(0.03, 0.1, 4, 6);
+  const armL = new THREE.Mesh(armGeo, suitMat); armL.position.set(-0.13, 0.05, 0); armL.rotation.z = 0.5;
+  const armR = new THREE.Mesh(armGeo, suitMat); armR.position.set( 0.13, 0.05, 0); armR.rotation.z =-0.5;
+
+  // Gloves
+  const gloveL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), gloveMat); gloveL.position.set(-0.19, -0.01, 0);
+  const gloveR = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), gloveMat); gloveR.position.set( 0.19, -0.01, 0);
+
+  // Legs
+  const legGeo = new THREE.CapsuleGeometry(0.035, 0.1, 4, 6);
+  const legL = new THREE.Mesh(legGeo, suitMat); legL.position.set(-0.055, -0.18, 0);
+  const legR = new THREE.Mesh(legGeo, suitMat); legR.position.set( 0.055, -0.18, 0);
+
+  // Backpack (life support)
+  const pack = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.13, 0.05), suitMat);
+  pack.position.set(0, 0.04, -0.09);
+
+  // Tether line (TubeGeometry)
+  const tetherCurve = new THREE.QuadraticBezierCurve3(
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0.6, 0.3, 0.1),
+    new THREE.Vector3(1.4, 0.0, 0)
+  );
+  const tether = new THREE.Mesh(
+    new THREE.TubeGeometry(tetherCurve, 12, 0.004, 4, false),
+    new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
+  );
+
+  const astro = new THREE.Group();
+  astro.add(torso, helmet, visor, armL, armR, gloveL, gloveR, legL, legR, pack, tether);
+
+  // Start astro on far side, different orbit radius
+  astro.position.set(2.2, -0.4, 0.5);
+  astroPivot.add(astro);
+
+  // ── STARS (background particles) ───────────────
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 200;
+  const starPos = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount * 3; i++) starPos[i] = (Math.random() - 0.5) * 28;
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const stars = new THREE.Points(starGeo,
+    new THREE.PointsMaterial({ color: 0xffffff, size: 0.06, transparent: true, opacity: 0.6 })
+  );
+  scene.add(stars);
+
+  // ── ANIMATION LOOP ─────────────────────────────
+  let raf;
+  function animate() {
+    raf = requestAnimationFrame(animate);
+    const t = Date.now() * 0.001;
+
+    // Globe slow spin
+    globeGroup.rotation.y += 0.004;
+    globeMat.uniforms.uTime.value = t;
+
+    // Satellite orbits globe — tilted elliptical plane
+    satPivot.rotation.y  = t * 0.55;
+    satPivot.rotation.x  = 0.35;
+    sat.rotation.y += 0.02; // spin on own axis
+
+    // Astronaut orbits opposite direction, different inclination
+    astroPivot.rotation.y = -t * 0.32;
+    astroPivot.rotation.z =  0.5;
+    // Astronaut tumbles gently
+    astro.rotation.x += 0.008;
+    astro.rotation.z += 0.004;
+
+    // Visor shimmer
+    visorMat.emissiveIntensity = 0.3 + Math.sin(t * 1.5) * 0.2;
+
+    // Orbit rim light
+    rimLight.position.x = Math.cos(t * 0.7) * 5;
+    rimLight.position.z = Math.sin(t * 0.7) * 5;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Resize handler
+  window.addEventListener('resize', function() {
+    const nW = header.offsetWidth;
+    const nH = header.offsetHeight;
+    canvas.width  = nW;
+    canvas.height = nH;
+    renderer.setSize(nW, nH);
+    camera.aspect = nW / nH;
+    camera.updateProjectionMatrix();
+  });
+})();
+</script>
 </body>
 </html>
