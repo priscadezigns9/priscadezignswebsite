@@ -2190,12 +2190,22 @@ function goTo(step) {
 }
 
 function goBackFrom(step) {
-  // Steps 7 (AI Data) and 8 (AI Voice) both go back to step 6 (routing)
+  const interests = getChecked('service_interest');
   document.getElementById(`step${step}`).classList.remove('active');
-  const target = document.getElementById('step6');
+  let targetStep = 5; // default: go back to Interests
+  if (step === 7) {
+    // AI Data: go back to Channel if selected, else Interests
+    targetStep = interests.includes('AI Channel') ? 6 : 5;
+  } else if (step === 8) {
+    // AI Voice: go back to Data if selected, else Channel, else Interests
+    if (interests.includes('AI Data'))    targetStep = 7;
+    else if (interests.includes('AI Channel')) targetStep = 6;
+    else targetStep = 5;
+  }
+  const target = document.getElementById(`step${targetStep}`);
   if (!target) return;
   target.classList.add('active');
-  currentStep = 6;
+  currentStep = targetStep;
   updateProgress();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -2235,6 +2245,13 @@ function goNextFromChannel() {
 function goNextFromData() {
   const interests = getChecked('service_interest');
   if (interests.includes('AI Voice')) { goTo(8); return; }
+  goToTerms();
+}
+
+// Unified dispatcher — called by Continue buttons on steps 6 and 7
+function goNextFrom(step) {
+  if (step === 6) { goNextFromChannel(); return; }
+  if (step === 7) { goNextFromData();    return; }
   goToTerms();
 }
 
