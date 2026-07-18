@@ -1033,10 +1033,21 @@ scene.add(new THREE.AmbientLight(0xffffff, 0.8));
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
 dirLight.position.set(5, 5, 5);
 scene.add(dirLight);
-const globeGeo = new THREE.SphereGeometry(2.8, 64, 64);
-const globeMat = new THREE.MeshPhongMaterial({ color: 0xC8A2C8, wireframe: false, transparent: true, opacity: 0.8 });
+const globeGeo = new THREE.SphereGeometry(2.8, 36, 36);
+const globeMat = new THREE.MeshBasicMaterial({ color: 0x9333ea, wireframe: true, transparent: true, opacity: 0.45 });
 const globe = new THREE.Mesh(globeGeo, globeMat);
 scene.add(globe);
+
+// Inner glow core — solid sphere, very faint, gives the orb depth
+const innerGeo = new THREE.SphereGeometry(2.75, 32, 32);
+const innerMat = new THREE.MeshPhongMaterial({ color: 0x7c3aed, transparent: true, opacity: 0.08, emissive: 0x5b21b6, emissiveIntensity: 0.4 });
+const innerGlobe = new THREE.Mesh(innerGeo, innerMat);
+scene.add(innerGlobe);
+
+// Point light inside the globe so wireframe lines catch the light
+const globeLight = new THREE.PointLight(0xc084fc, 2.5, 8);
+globeLight.position.set(0, 0, 0);
+scene.add(globeLight);
 
 const pointsGeo = new THREE.BufferGeometry();
 const pointsCount = 1000;
@@ -1277,15 +1288,21 @@ function animate() {
     targetX = mouseX * 0.0002;
     targetY = mouseY * 0.0002;
     
-    // Auto-rotation + Interaction
+    // Auto-rotation + Mouse Interaction
     if (!isAnimating) {
         globe.rotation.y += 0.0015 + (targetX * 0.1);
         globe.rotation.x += (targetY - globe.rotation.x) * 0.05;
+        innerGlobe.rotation.y = globe.rotation.y * 0.6;
+        innerGlobe.rotation.x = globe.rotation.x * 0.6;
     }
-    
-    // Subtle Pulse
-    const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.01;
+
+    // Subtle Pulse — globe breathes gently
+    const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.012;
     globe.scale.set(pulse, pulse, pulse);
+    innerGlobe.scale.set(pulse, pulse, pulse);
+
+    // Pulse the inner light
+    globeLight.intensity = 2.2 + Math.sin(Date.now() * 0.0015) * 0.5;
 
     renderer.render(scene, camera); 
 }
