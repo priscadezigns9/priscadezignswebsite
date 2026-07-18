@@ -65,9 +65,7 @@
 
   /* ── HEADER ───────────────────────────────────── */
   header {
-    background: linear-gradient(135deg, #5B0EA6 0%, #7C3AED 50%, #4B0082 100%);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: transparent;
     border-bottom: 1px solid rgba(255,255,255,0.2);
     padding: 52px 24px 38px;
     text-align: center;
@@ -75,16 +73,18 @@
     overflow: hidden;
     box-shadow: 0 8px 40px rgba(91,14,166,0.25);
   }
+  /* Gradient lives on ::before so canvas renders above it */
   header::before {
     content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.15) 0%, transparent 60%);
+    position: absolute; inset: 0; z-index: 0;
+    background: linear-gradient(135deg, #5B0EA6 0%, #7C3AED 50%, #4B0082 100%);
     pointer-events: none;
   }
+  /* canvas sits at z-index 1, text wrapper at z-index 2 — both declared inline */
   header::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 10%; right: 10%; height: 1px;
+    bottom: 0; left: 10%; right: 10%; height: 1px; z-index: 3;
     background: linear-gradient(90deg, transparent, rgba(201,168,76,0.7), transparent);
   }
   header .logo {
@@ -444,7 +444,7 @@
 </div>
 
 <header>
-  <canvas id="auditGlobe" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;opacity:0.92;"></canvas>
+  <canvas id="auditGlobe" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:1;"></canvas>
   <div style="position:relative;z-index:2;">
     <div class="logo">Prisca Dezigns · Confidential Assessment</div>
     <h1>Client Audit</h1>
