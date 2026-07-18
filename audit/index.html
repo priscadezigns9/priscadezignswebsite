@@ -2764,18 +2764,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ── STEP DOT CLICK NAVIGATION ────────────────────────────
   document.querySelectorAll('.step-item').forEach(function(item) {
+    item.style.cursor = 'pointer';
     item.addEventListener('click', function() {
       const target = parseInt(item.dataset.step);
-      // Only allow jump to completed steps or current active step
       if (item.classList.contains('done') || item.classList.contains('active')) {
         goTo(target);
+      } else {
+        // Flash the dot to indicate it's locked
+        const dot = item.querySelector('.step-dot');
+        if (dot) {
+          dot.style.transition = 'transform 0.1s';
+          dot.style.transform = 'scale(1.25)';
+          setTimeout(function() { dot.style.transform = 'scale(1)'; }, 200);
+        }
       }
     });
-    // Show tooltip hint on unvisited steps
-    const dot = item.querySelector('.step-dot');
-    if (dot && !item.classList.contains('done') && !item.classList.contains('active')) {
-      dot.title = 'Complete previous steps to unlock';
-    }
   });
 });
 </script>
@@ -2783,13 +2786,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- ── AUDIT HEADER GLOBE + SATELLITE + ASTRONAUT ──────────────── -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
+window.addEventListener('load', function() {
 (function() {
   const canvas = document.getElementById('auditGlobe');
   if (!canvas) return;
 
-  const header = canvas.parentElement;
-  const W = header.offsetWidth  || 800;
-  const H = header.offsetHeight || 160;
+  const header = canvas.closest('header');
+  const W = header.offsetWidth  || window.innerWidth || 800;
+  const H = header.offsetHeight || 200;
   canvas.width  = W;
   canvas.height = H;
 
@@ -3013,6 +3017,7 @@ document.addEventListener('DOMContentLoaded', function() {
     camera.updateProjectionMatrix();
   });
 })();
+}); // end window.load
 </script>
 </body>
 </html>
