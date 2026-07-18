@@ -710,12 +710,124 @@ footer { padding: 80px 5%; text-align: center; background: var(--glass); backdro
 <section class="story-hero">
   <a href="/" class="story-hero-back">&#8592; BACK TO PORTAL</a>
   <div class="story-hero-bg">
-    <iframe 
-      src="https://www.youtube.com/embed/r3j4GbDFhPo?autoplay=1&mute=1&controls=0&loop=1&playlist=r3j4GbDFhPo&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1"
-      frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:177.78vh;height:56.25vw;transform:translate(-50%,-50%);z-index:1;pointer-events:none;">
-    </iframe>
-    <!-- Blocks all YouTube UI: pause button, logo, title overlay -->
-    <div style="position:absolute;inset:0;z-index:10;pointer-events:all;background:transparent;"></div>
+    <!-- Cinematic animated canvas hero — replaces broken YT embed -->
+    <canvas id="hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;"></canvas>
+    <script>
+    (function(){
+      const canvas = document.getElementById('hero-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, particles = [], grid = [], raf;
+
+      function resize(){
+        W = canvas.width  = canvas.offsetWidth;
+        H = canvas.height = canvas.offsetHeight;
+        buildGrid();
+      }
+
+      // ── Floating data particles ──────────────────────────────────
+      function Particle(){
+        this.reset();
+      }
+      Particle.prototype.reset = function(){
+        this.x  = Math.random() * W;
+        this.y  = Math.random() * H;
+        this.r  = Math.random() * 2 + 0.5;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = -(Math.random() * 0.6 + 0.1);
+        this.alpha = Math.random() * 0.6 + 0.2;
+        this.life  = 0;
+        this.maxLife = Math.random() * 300 + 200;
+        // label: short data strings
+        const labels = ['✓','01','A3','99','—','→','KPI','$','ms','OK'];
+        this.label = Math.random() > 0.7 ? labels[Math.floor(Math.random()*labels.length)] : null;
+        this.color = Math.random() > 0.5 ? '#a78bfa' : '#c4b5fd';
+      };
+      Particle.prototype.update = function(){
+        this.x += this.vx; this.y += this.vy; this.life++;
+        if(this.life > this.maxLife || this.y < -20) this.reset();
+      };
+      Particle.prototype.draw = function(){
+        const fade = Math.min(this.life/40, 1) * Math.min((this.maxLife-this.life)/40, 1);
+        ctx.globalAlpha = this.alpha * fade;
+        if(this.label){
+          ctx.fillStyle = this.color;
+          ctx.font = `${this.r * 5 + 8}px monospace`;
+          ctx.fillText(this.label, this.x, this.y);
+        } else {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      };
+
+      // ── Grid lines ───────────────────────────────────────────────
+      function buildGrid(){
+        grid = [];
+        const cols = Math.ceil(W/80), rows = Math.ceil(H/80);
+        for(let r=0;r<=rows;r++) grid.push({y: r*80, alpha: Math.random()*0.08+0.02});
+        for(let c=0;c<=cols;c++) grid.push({x: c*80, alpha: Math.random()*0.08+0.02});
+      }
+      function drawGrid(){
+        grid.forEach(g => {
+          ctx.strokeStyle = 'rgba(167,139,250,'+g.alpha+')';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          if(g.y !== undefined){ ctx.moveTo(0,g.y); ctx.lineTo(W,g.y); }
+          else                 { ctx.moveTo(g.x,0); ctx.lineTo(g.x,H); }
+          ctx.stroke();
+        });
+      }
+
+      // ── Scanning sweep line ──────────────────────────────────────
+      let sweepY = 0;
+      function drawSweep(){
+        sweepY = (sweepY + 0.8) % H;
+        const grad = ctx.createLinearGradient(0, sweepY-60, 0, sweepY+4);
+        grad.addColorStop(0,'rgba(124,58,237,0)');
+        grad.addColorStop(1,'rgba(124,58,237,0.12)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, sweepY-60, W, 64);
+      }
+
+      // ── Init ────────────────────────────────────────────────────
+      for(let i=0;i<120;i++){
+        const p = new Particle();
+        p.life = Math.floor(Math.random() * p.maxLife); // stagger on load
+        particles.push(p);
+      }
+
+      function loop(){
+        ctx.clearRect(0,0,W,H);
+        drawGrid();
+        drawSweep();
+        particles.forEach(p => { p.update(); p.draw(); });
+        // Connection lines between nearby particles
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+            const dist=Math.sqrt(dx*dx+dy*dy);
+            if(dist<90){
+              ctx.globalAlpha=(1-dist/90)*0.12;
+              ctx.strokeStyle='#a78bfa';
+              ctx.lineWidth=0.5;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x,particles[i].y);
+              ctx.lineTo(particles[j].x,particles[j].y);
+              ctx.stroke();
+              ctx.globalAlpha=1;
+            }
+          }
+        }
+        raf = requestAnimationFrame(loop);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+      loop();
+    })();
+    </script>
     <div class="story-hero-orb story-hero-orb-1"></div>
     <div class="story-hero-orb story-hero-orb-2"></div>
     <div class="story-hero-orb story-hero-orb-3"></div>
