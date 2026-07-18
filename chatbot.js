@@ -777,21 +777,21 @@ const STEPS = {
         ]
     },
     "aidata_products": {
-        "bot": "AI Data covers six specific roles: AI Data Entry, AI Data Processing, AI Records Management, AI Reporting, AI Workflow Automation, and AI Document Processing. Pricing is set at the package level below, not per individual role.",
+        "bot": "AI Data covers six specific roles:\n• AI Data Entry\n• AI Data Processing\n• AI Records Management\n• AI Reporting\n• AI Workflow Automation\n• AI Document Processing\n\nPricing is set at the package level below, not per individual role.",
         "r": [
             { "l": "See AI Data packages", "s": "pkg_aidata", "i": "package" },
             { "l": "← Back", "s": "pkg_ai", "i": "arrow-left" }
         ]
     },
     "aivoice_products": {
-        "bot": "AI Voice covers seven specific roles: AI Receptionist, AI Customer Service Representative, AI Lead Qualifier, AI Appointment Scheduler, AI Survey & Feedback Agent, AI HR Assistant, and AI Accounts Receivable Agent. Pricing is set at the package level below, not per individual role.",
+        "bot": "AI Voice covers seven specific roles:\n• AI Receptionist\n• AI Customer Service Representative\n• AI Lead Qualifier\n• AI Appointment Scheduler\n• AI Survey & Feedback Agent\n• AI HR Assistant\n• AI Accounts Receivable Agent\n\nPricing is set at the package level below, not per individual role.",
         "r": [
             { "l": "See AI Voice packages", "s": "pkg_aivoice", "i": "package" },
             { "l": "← Back", "s": "pkg_ai", "i": "arrow-left" }
         ]
     },
     "aichannel_products": {
-        "bot": "AI Channel covers three specific roles: AI Email Automation Representative, AI Website Automation Representative, and AI WhatsApp Automation Representative. Pricing is set at the package level below, not per individual role.",
+        "bot": "AI Channel covers three specific roles:\n• AI Email Automation Representative\n• AI Website Automation Representative\n• AI WhatsApp Automation Representative\n\nPricing is set at the package level below, not per individual role.",
         "r": [
             { "l": "See AI Channel packages", "s": "pkg_aichannel", "i": "package" },
             { "l": "← Back", "s": "pkg_ai", "i": "arrow-left" }
