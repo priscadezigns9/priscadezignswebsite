@@ -433,6 +433,189 @@
     font-size: 0.78rem; color: rgba(45,0,87,0.35); letter-spacing: 0.3px;
   }
   footer a { color: rgba(201,168,76,0.8); text-decoration: none; }
+<!-- ── AUDIT HEADER: CSS/SVG GLOBE + SATELLITE + ASTRONAUT ──────── -->
+<style>
+/* ── Orbit scene ─────────────────────────────────────────── */
+#auditScene {
+  position: absolute; inset: 0; z-index: 1;
+  pointer-events: none; overflow: hidden;
+}
+
+/* Stars */
+.star {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,0.75);
+  animation: twinkle var(--tw) ease-in-out infinite alternate;
+}
+@keyframes twinkle { from { opacity: 0.2; } to { opacity: 1; } }
+
+/* Globe */
+.globe-wrap {
+  position: absolute;
+  right: 8%; top: 50%; transform: translateY(-50%);
+  width: 110px; height: 110px;
+}
+.globe {
+  width: 100%; height: 100%; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%,
+    #c084fc 0%, #7c3aed 35%, #5B0EA6 65%, #3b0764 100%);
+  box-shadow:
+    0 0 0 2px rgba(192,132,252,0.25),
+    0 0 30px rgba(124,58,237,0.55),
+    inset -8px -8px 20px rgba(59,7,100,0.6),
+    inset 5px 5px 15px rgba(192,132,252,0.25);
+  animation: globeSpin 18s linear infinite;
+  position: relative; overflow: hidden;
+}
+/* Latitude bands */
+.globe::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 14px,
+    rgba(192,132,252,0.12) 14px,
+    rgba(192,132,252,0.12) 15px
+  );
+}
+/* Continent blobs */
+.globe::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(ellipse 22px 14px at 38% 40%, rgba(245,210,255,0.18) 0%, transparent 100%),
+    radial-gradient(ellipse 16px 10px at 62% 55%, rgba(245,210,255,0.14) 0%, transparent 100%),
+    radial-gradient(ellipse 12px 8px  at 48% 70%, rgba(245,210,255,0.12) 0%, transparent 100%);
+}
+/* Atmosphere glow */
+.globe-atmo {
+  position: absolute; inset: -8px; border-radius: 50%;
+  background: radial-gradient(circle, transparent 48%, rgba(192,132,252,0.18) 65%, transparent 80%);
+  animation: atmoBreath 4s ease-in-out infinite alternate;
+}
+@keyframes globeSpin  { to { filter: hue-rotate(8deg); } }
+@keyframes atmoBreath { from { opacity: 0.6; } to { opacity: 1; } }
+
+/* ── Satellite orbit ─────────────────────────────────────── */
+.orbit-sat {
+  position: absolute;
+  right: calc(8% + 55px - 90px); /* centred on globe */
+  top: 50%;
+  width: 180px; height: 130px;
+  transform: translateY(-50%) rotateX(60deg) rotateZ(-15deg);
+  transform-style: preserve-3d;
+  border-radius: 50%;
+  animation: orbitSat 6s linear infinite;
+  pointer-events: none;
+}
+.sat-body {
+  position: absolute;
+  width: 22px; height: 14px;
+  background: linear-gradient(135deg, #d0d8f8, #8899cc);
+  border-radius: 4px;
+  top: -7px; left: 50%; transform: translateX(-50%);
+  box-shadow: 0 2px 8px rgba(0,0,50,0.4);
+}
+.sat-panel-l, .sat-panel-r {
+  position: absolute; top: 50%; width: 28px; height: 8px;
+  background: linear-gradient(90deg, #1e3a8a, #3b82f6, #60a5fa);
+  border: 1px solid rgba(147,197,253,0.5);
+  transform: translateY(-50%);
+  box-shadow: 0 0 6px rgba(96,165,250,0.6);
+  border-radius: 2px;
+}
+.sat-panel-l { right: calc(100% + 2px); }
+.sat-panel-r { left:  calc(100% + 2px); }
+.sat-dish {
+  position: absolute;
+  width: 8px; height: 8px;
+  background: radial-gradient(circle at 30% 30%, #e0e8ff, #8899cc);
+  border-radius: 50% 50% 50% 0;
+  top: -10px; left: 50%; transform: translateX(-50%) rotate(45deg);
+}
+@keyframes orbitSat {
+  from { transform: translateY(-50%) rotateX(60deg) rotateZ(-15deg) rotate(0deg); }
+  to   { transform: translateY(-50%) rotateX(60deg) rotateZ(-15deg) rotate(360deg); }
+}
+
+/* ── Astronaut orbit ─────────────────────────────────────── */
+.orbit-astro {
+  position: absolute;
+  right: calc(8% + 55px - 105px);
+  top: 50%;
+  width: 210px; height: 150px;
+  transform: translateY(-50%) rotateX(40deg) rotateZ(25deg);
+  transform-style: preserve-3d;
+  border-radius: 50%;
+  animation: orbitAstro 9s linear infinite reverse;
+  pointer-events: none;
+}
+.astro {
+  position: absolute;
+  top: -14px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 26px;
+  animation: astroTumble 3s ease-in-out infinite alternate;
+}
+/* Helmet */
+.astro-helmet {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.9), #c084fc 50%, #7c3aed 100%);
+  box-shadow: 0 0 8px rgba(192,132,252,0.8), inset 2px 2px 5px rgba(255,255,255,0.5);
+  margin: 0 auto;
+  position: relative;
+}
+/* Gold visor */
+.astro-helmet::after {
+  content: '';
+  position: absolute;
+  top: 28%; left: 18%; width: 64%; height: 38%;
+  background: linear-gradient(135deg, #f5e6ba, #c9a84c, #f5e6ba);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(201,168,76,0.6);
+}
+/* Body suit */
+.astro-body {
+  width: 14px; height: 10px; border-radius: 4px;
+  background: linear-gradient(135deg, #e8e0f8, #c084fc);
+  margin: 1px auto 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  position: relative;
+}
+/* Arms */
+.astro-body::before, .astro-body::after {
+  content: '';
+  position: absolute; top: 1px;
+  width: 5px; height: 8px;
+  background: linear-gradient(180deg, #e8e0f8, #c084fc);
+  border-radius: 3px;
+}
+.astro-body::before { right: calc(100% + 1px); transform: rotate(-20deg); }
+.astro-body::after  { left:  calc(100% + 1px); transform: rotate(20deg); }
+/* Tether */
+.astro-tether {
+  position: absolute;
+  top: 8px; left: 50%;
+  width: 2px; height: 40px;
+  background: linear-gradient(180deg, rgba(201,168,76,0.8), transparent);
+  transform-origin: top center;
+  transform: translateX(-50%) rotate(160deg);
+}
+@keyframes orbitAstro {
+  from { transform: translateY(-50%) rotateX(40deg) rotateZ(25deg) rotate(0deg); }
+  to   { transform: translateY(-50%) rotateX(40deg) rotateZ(25deg) rotate(360deg); }
+}
+@keyframes astroTumble {
+  from { transform: translateX(-50%) rotate(-8deg); }
+  to   { transform: translateX(-50%) rotate(8deg); }
+}
+
+/* ── Responsive: hide on narrow screens ─────────────────── */
+@media (max-width: 640px) {
+  .globe-wrap, .orbit-sat, .orbit-astro { display: none; }
+}
+</style>
+
 </style>
 </head>
 <body>
@@ -444,7 +627,48 @@
 </div>
 
 <header>
-  <canvas id="auditGlobe" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:1;"></canvas>
+  <!-- Scene container -->
+<div id="auditScene">
+  <!-- Stars (generated by script below) -->
+  <div id="starField"></div>
+  <!-- Globe -->
+  <div class="globe-wrap">
+    <div class="globe-atmo"></div>
+    <div class="globe"></div>
+  </div>
+  <!-- Satellite orbit ring -->
+  <div class="orbit-sat">
+    <div class="sat-body">
+      <div class="sat-panel-l"></div>
+      <div class="sat-panel-r"></div>
+      <div class="sat-dish"></div>
+    </div>
+  </div>
+  <!-- Astronaut orbit ring -->
+  <div class="orbit-astro">
+    <div class="astro">
+      <div class="astro-helmet"></div>
+      <div class="astro-body"></div>
+      <div class="astro-tether"></div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var sf = document.getElementById('starField');
+  if (!sf) return;
+  var stars = '';
+  for (var i = 0; i < 60; i++) {
+    var x  = Math.random() * 100;
+    var y  = Math.random() * 100;
+    var sz = (Math.random() * 2 + 0.5).toFixed(1);
+    var tw = (Math.random() * 3 + 1.5).toFixed(1);
+    stars += '<div class="star" style="left:'+x+'%;top:'+y+'%;width:'+sz+'px;height:'+sz+'px;--tw:'+tw+'s;animation-delay:'+(Math.random()*3).toFixed(1)+'s"></div>';
+  }
+  sf.innerHTML = stars;
+})();
+</script>
+
   <div style="position:relative;z-index:2;">
     <div class="logo">Prisca Dezigns · Confidential Assessment</div>
     <h1>Client Audit</h1>
@@ -2784,240 +3008,5 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- ── AUDIT HEADER GLOBE + SATELLITE + ASTRONAUT ──────────────── -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-window.addEventListener('load', function() {
-(function() {
-  const canvas = document.getElementById('auditGlobe');
-  if (!canvas) return;
-
-  const header = canvas.closest('header');
-  const W = header.offsetWidth  || window.innerWidth || 800;
-  const H = header.offsetHeight || 200;
-  canvas.width  = W;
-  canvas.height = H;
-
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(W, H);
-  renderer.setClearColor(0x000000, 0);
-
-  const scene  = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 200);
-  camera.position.set(0, 0, 9);
-
-  // ── AMBIENT + DIRECTIONAL LIGHTS ───────────────
-  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-  const dir = new THREE.DirectionalLight(0xc084fc, 1.2);
-  dir.position.set(5, 5, 5);
-  scene.add(dir);
-  const rimLight = new THREE.PointLight(0xf5d98a, 1.6, 20);
-  rimLight.position.set(-4, 3, 4);
-  scene.add(rimLight);
-
-  // ── GLOBE ──────────────────────────────────────
-  const globeGroup = new THREE.Group();
-  scene.add(globeGroup);
-
-  // Solid gradient globe via ShaderMaterial
-  const globeMat = new THREE.ShaderMaterial({
-    transparent: true,
-    uniforms: {
-      uTime:   { value: 0 },
-      uColorA: { value: new THREE.Color(0x3b0764) },
-      uColorB: { value: new THREE.Color(0x7c3aed) },
-      uColorC: { value: new THREE.Color(0xc084fc) },
-    },
-    vertexShader: `
-      varying vec3 vNormal; varying vec3 vPos;
-      void main() {
-        vNormal = normalize(normalMatrix * normal);
-        vPos = position;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-      }
-    `,
-    fragmentShader: `
-      uniform float uTime; uniform vec3 uColorA, uColorB, uColorC;
-      varying vec3 vNormal; varying vec3 vPos;
-      void main() {
-        float lat  = (vNormal.y + 1.0) * 0.5;
-        float rim  = pow(1.0 - abs(dot(vNormal, vec3(0.0,0.0,1.0))), 2.2);
-        float band = sin(vPos.y * 3.5 + uTime * 0.6) * 0.5 + 0.5;
-        vec3 base  = mix(uColorA, uColorB, lat);
-        vec3 col   = mix(base, uColorC, rim * 0.8 + band * 0.15);
-        float a    = 0.82 + rim * 0.16;
-        gl_FragColor = vec4(col, a);
-      }
-    `
-  });
-  const globeMesh = new THREE.Mesh(new THREE.SphereGeometry(1.4, 48, 48), globeMat);
-  globeGroup.add(globeMesh);
-
-  // Wireframe shell
-  const wireMesh = new THREE.Mesh(
-    new THREE.SphereGeometry(1.42, 18, 18),
-    new THREE.MeshBasicMaterial({ color: 0xc084fc, wireframe: true, transparent: true, opacity: 0.14 })
-  );
-  globeGroup.add(wireMesh);
-
-  // Atmosphere glow ring
-  const atmoMat = new THREE.ShaderMaterial({
-    transparent: true, side: THREE.BackSide,
-    uniforms: { uColor: { value: new THREE.Color(0x9333ea) } },
-    vertexShader: `varying vec3 vN; void main(){ vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
-    fragmentShader: `uniform vec3 uColor; varying vec3 vN; void main(){ float f=pow(0.6-dot(vN,vec3(0,0,1)),3.0); gl_FragColor=vec4(uColor,f*0.65); }`
-  });
-  globeGroup.add(new THREE.Mesh(new THREE.SphereGeometry(1.65, 32, 32), atmoMat));
-
-  // ── SATELLITE ──────────────────────────────────
-  // Pivot so it orbits independently
-  const satPivot = new THREE.Group();
-  scene.add(satPivot);
-
-  const satBody = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, 0.12, 0.1),
-    new THREE.MeshPhongMaterial({ color: 0xd4d4d8, emissive: 0x444444, shininess: 80 })
-  );
-
-  // Solar panels (flat rectangles sticking out both sides)
-  const panelMat = new THREE.MeshPhongMaterial({ color: 0x1e40af, emissive: 0x1e3a8a, shininess: 120 });
-  const panelGeo = new THREE.BoxGeometry(0.32, 0.08, 0.01);
-  const panelL = new THREE.Mesh(panelGeo, panelMat); panelL.position.set(-0.25, 0, 0);
-  const panelR = new THREE.Mesh(panelGeo, panelMat); panelR.position.set( 0.25, 0, 0);
-
-  // Antenna
-  const ant = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.005, 0.005, 0.14, 6),
-    new THREE.MeshPhongMaterial({ color: 0xe5e7eb })
-  );
-  ant.position.set(0, 0.12, 0);
-
-  // Dish (cone)
-  const dish = new THREE.Mesh(
-    new THREE.ConeGeometry(0.05, 0.06, 8, 1, true),
-    new THREE.MeshPhongMaterial({ color: 0xfbbf24, side: THREE.DoubleSide })
-  );
-  dish.position.set(0, 0.19, 0);
-
-  const sat = new THREE.Group();
-  sat.add(satBody, panelL, panelR, ant, dish);
-  sat.position.set(2.5, 0.6, 0);
-  satPivot.add(sat);
-
-  // ── ASTRONAUT ──────────────────────────────────
-  const astroPivot = new THREE.Group();
-  scene.add(astroPivot);
-
-  // Body parts with MeshPhongMaterial white suit
-  const suitMat  = new THREE.MeshPhongMaterial({ color: 0xf5f5f5, emissive: 0x333333, shininess: 60 });
-  const helmetMat = new THREE.MeshPhongMaterial({ color: 0xc084fc, emissive: 0x6b21a8, shininess: 120, transparent: true, opacity: 0.9 });
-  const visorMat  = new THREE.MeshPhongMaterial({ color: 0xf5d98a, emissive: 0x92400e, shininess: 200, transparent: true, opacity: 0.85 });
-  const gloveMat  = new THREE.MeshPhongMaterial({ color: 0xe5e7eb, shininess: 40 });
-
-  // Torso
-  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.14, 4, 8), suitMat);
-
-  // Helmet sphere
-  const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), helmetMat);
-  helmet.position.set(0, 0.22, 0);
-
-  // Visor (flat disc on helmet front)
-  const visor = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), visorMat);
-  visor.position.set(0, 0.22, 0.07);
-  visor.scale.set(1, 0.6, 0.5);
-
-  // Arms
-  const armGeo = new THREE.CapsuleGeometry(0.03, 0.1, 4, 6);
-  const armL = new THREE.Mesh(armGeo, suitMat); armL.position.set(-0.13, 0.05, 0); armL.rotation.z = 0.5;
-  const armR = new THREE.Mesh(armGeo, suitMat); armR.position.set( 0.13, 0.05, 0); armR.rotation.z =-0.5;
-
-  // Gloves
-  const gloveL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), gloveMat); gloveL.position.set(-0.19, -0.01, 0);
-  const gloveR = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), gloveMat); gloveR.position.set( 0.19, -0.01, 0);
-
-  // Legs
-  const legGeo = new THREE.CapsuleGeometry(0.035, 0.1, 4, 6);
-  const legL = new THREE.Mesh(legGeo, suitMat); legL.position.set(-0.055, -0.18, 0);
-  const legR = new THREE.Mesh(legGeo, suitMat); legR.position.set( 0.055, -0.18, 0);
-
-  // Backpack (life support)
-  const pack = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.13, 0.05), suitMat);
-  pack.position.set(0, 0.04, -0.09);
-
-  // Tether line (TubeGeometry)
-  const tetherCurve = new THREE.QuadraticBezierCurve3(
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(0.6, 0.3, 0.1),
-    new THREE.Vector3(1.4, 0.0, 0)
-  );
-  const tether = new THREE.Mesh(
-    new THREE.TubeGeometry(tetherCurve, 12, 0.004, 4, false),
-    new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
-  );
-
-  const astro = new THREE.Group();
-  astro.add(torso, helmet, visor, armL, armR, gloveL, gloveR, legL, legR, pack, tether);
-
-  // Start astro on far side, different orbit radius
-  astro.position.set(2.2, -0.4, 0.5);
-  astroPivot.add(astro);
-
-  // ── STARS (background particles) ───────────────
-  const starGeo = new THREE.BufferGeometry();
-  const starCount = 200;
-  const starPos = new Float32Array(starCount * 3);
-  for (let i = 0; i < starCount * 3; i++) starPos[i] = (Math.random() - 0.5) * 28;
-  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-  const stars = new THREE.Points(starGeo,
-    new THREE.PointsMaterial({ color: 0xffffff, size: 0.06, transparent: true, opacity: 0.6 })
-  );
-  scene.add(stars);
-
-  // ── ANIMATION LOOP ─────────────────────────────
-  let raf;
-  function animate() {
-    raf = requestAnimationFrame(animate);
-    const t = Date.now() * 0.001;
-
-    // Globe slow spin
-    globeGroup.rotation.y += 0.004;
-    globeMat.uniforms.uTime.value = t;
-
-    // Satellite orbits globe — tilted elliptical plane
-    satPivot.rotation.y  = t * 0.55;
-    satPivot.rotation.x  = 0.35;
-    sat.rotation.y += 0.02; // spin on own axis
-
-    // Astronaut orbits opposite direction, different inclination
-    astroPivot.rotation.y = -t * 0.32;
-    astroPivot.rotation.z =  0.5;
-    // Astronaut tumbles gently
-    astro.rotation.x += 0.008;
-    astro.rotation.z += 0.004;
-
-    // Visor shimmer
-    visorMat.emissiveIntensity = 0.3 + Math.sin(t * 1.5) * 0.2;
-
-    // Orbit rim light
-    rimLight.position.x = Math.cos(t * 0.7) * 5;
-    rimLight.position.z = Math.sin(t * 0.7) * 5;
-
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  // Resize handler
-  window.addEventListener('resize', function() {
-    const nW = header.offsetWidth;
-    const nH = header.offsetHeight;
-    canvas.width  = nW;
-    canvas.height = nH;
-    renderer.setSize(nW, nH);
-    camera.aspect = nW / nH;
-    camera.updateProjectionMatrix();
-  });
-})();
-}); // end window.load
-</script>
 </body>
 </html>
