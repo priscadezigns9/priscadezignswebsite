@@ -816,24 +816,24 @@ const STEPS = {
     },
     "aidata_products": {
         "bot": "AI Data is organised by department — each has 3 specialist AI Employees ready to hire:\n• Administration\n• Human Resources\n• Finance\n• HSE\n• Information Technology\n• Marketing\n• QA / QC\n• Production\n\nDon't see your department? We can build a custom AI Employee. Want a personalised recommendation? Start your free audit at priscadezigns.org/audit, or message us on WhatsApp.",
+        "pkg": "aidata",
         "r": [
-            { "l": "See AI Data packages", "s": "pkg_aidata", "i": "package" },
             { "l": "Start Free Audit", "url": "https://priscadezigns.org/audit/", "i": "clipboard-check" },
             { "l": "← Back", "s": "pkg_ai", "i": "arrow-left" }
         ]
     },
     "aivoice_products": {
         "bot": "AI Voice covers seven specific roles:\n• AI Receptionist\n• AI Customer Service\n• AI Sales Rep\n• AI Scheduler\n• AI Survey & Feedback\n• AI Accounts Receivable\n• AI HSE Assistant\n\nThe pricing below represents the complexity of the agent/employee you choose. Want a personalised recommendation? Start your free audit at priscadezigns.org/audit, or message us on WhatsApp.",
+        "pkg": "aivoice",
         "r": [
-            { "l": "See AI Voice packages", "s": "pkg_aivoice", "i": "package" },
             { "l": "Start Free Audit", "url": "https://priscadezigns.org/audit/", "i": "clipboard-check" },
             { "l": "← Back", "s": "pkg_ai", "i": "arrow-left" }
         ]
     },
     "aichannel_products": {
         "bot": "AI Channel covers three channels, and each one runs the same two AI Employees — AI Customer Service and AI Lead Generation:\n• Website Automation\n• WhatsApp Automation\n• Email Automation\n\nThe pricing below represents the complexity of the agent/employee you choose. Want a personalised recommendation? Start your free audit at priscadezigns.org/audit, or message us on WhatsApp.",
+        "pkg": "aichannel",
         "r": [
-            { "l": "See AI Channel packages", "s": "pkg_aichannel", "i": "package" },
             { "l": "Start Free Audit", "url": "https://priscadezigns.org/audit/", "i": "clipboard-check" },
             { "l": "← Back", "s": "pkg_ai", "i": "arrow-left" }
         ]
@@ -886,8 +886,12 @@ window.go = function(step, label){
         }
         if(s.pkg){
             renderPkgs(PKGS[s.pkg], ['aidata','aivoice','aichannel'].includes(s.pkg) ? PKGS.specializedNote : null);
-            addQR('← Packages', 'pkg_menu');
-            addQR('Contact Team', 'talk');
+            if(s.r){
+                s.r.forEach(r => addQR(r.l, r.s, r.i, r.url));
+            } else {
+                addQR('← Packages', 'pkg_menu');
+                addQR('Contact Team', 'talk');
+            }
             return;
         }
         if(s.url) window.open(s.url, '_blank');
