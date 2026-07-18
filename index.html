@@ -1033,20 +1033,73 @@ scene.add(new THREE.AmbientLight(0xffffff, 0.8));
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
 dirLight.position.set(5, 5, 5);
 scene.add(dirLight);
-const globeGeo = new THREE.SphereGeometry(2.8, 36, 36);
-const globeMat = new THREE.MeshBasicMaterial({ color: 0x9333ea, wireframe: true, transparent: true, opacity: 0.45 });
+// ── GLOBE: ShaderMaterial with purple-to-violet gradient that shifts with rotation ──
+const globeGeo = new THREE.SphereGeometry(2.8, 64, 64);
+const globeMat = new THREE.ShaderMaterial({
+  transparent: true,
+  uniforms: {
+    uTime:    { value: 0.0 },
+    uMouseX:  { value: 0.0 },
+    uMouseY:  { value: 0.0 },
+    uColorA:  { value: new THREE.Color(0x4c1d95) },   // deep violet
+    uColorB:  { value: new THREE.Color(0x7c3aed) },   // core purple
+    uColorC:  { value: new THREE.Color(0xc084fc) },   // bright lilac highlight
+  },
+  vertexShader: `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    void main() {
+      vNormal   = normalize(normalMatrix * normal);
+      vPosition = position;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uTime;
+    uniform float uMouseX;
+    uniform float uMouseY;
+    uniform vec3  uColorA;
+    uniform vec3  uColorB;
+    uniform vec3  uColorC;
+    varying vec3  vNormal;
+    varying vec3  vPosition;
+    void main() {
+      // Fresnel rim glow
+      vec3 viewDir  = normalize(vec3(uMouseX * 0.6, uMouseY * 0.6, 1.0));
+      float fresnel = pow(1.0 - abs(dot(vNormal, viewDir)), 2.5);
+
+      // Latitude gradient (top=bright, bottom=deep)
+      float lat = (vNormal.y + 1.0) * 0.5;
+
+      // Mouse-driven longitude highlight
+      float lon = (vNormal.x + uMouseX * 0.4 + 1.0) * 0.5;
+      float lonHighlight = smoothstep(0.35, 0.65, lon);
+
+      // Blend layers
+      vec3 base   = mix(uColorA, uColorB, lat);
+      vec3 tinted = mix(base, uColorC, lonHighlight * 0.55);
+      vec3 final  = mix(tinted, uColorC, fresnel * 0.7);
+
+      // Pulsing opacity
+      float pulse  = 0.72 + sin(uTime * 1.2) * 0.06;
+      float alpha  = pulse + fresnel * 0.25;
+
+      gl_FragColor = vec4(final, alpha);
+    }
+  `
+});
 const globe = new THREE.Mesh(globeGeo, globeMat);
 scene.add(globe);
 
-// Inner glow core — solid sphere, very faint, gives the orb depth
-const innerGeo = new THREE.SphereGeometry(2.75, 32, 32);
-const innerMat = new THREE.MeshPhongMaterial({ color: 0x7c3aed, transparent: true, opacity: 0.08, emissive: 0x5b21b6, emissiveIntensity: 0.4 });
-const innerGlobe = new THREE.Mesh(innerGeo, innerMat);
-scene.add(innerGlobe);
+// Thin wireframe overlay — same sphere, minimal opacity for grid effect
+const wireGeo  = new THREE.SphereGeometry(2.82, 24, 24);
+const wireMat  = new THREE.MeshBasicMaterial({ color: 0xc084fc, wireframe: true, transparent: true, opacity: 0.12 });
+const wireGlobe = new THREE.Mesh(wireGeo, wireMat);
+scene.add(wireGlobe);
 
-// Point light inside the globe so wireframe lines catch the light
-const globeLight = new THREE.PointLight(0xc084fc, 2.5, 8);
-globeLight.position.set(0, 0, 0);
+// Rim point light that orbits to reinforce the gradient
+const globeLight = new THREE.PointLight(0xc084fc, 1.8, 9);
+globeLight.position.set(3, 2, 3);
 scene.add(globeLight);
 
 const pointsGeo = new THREE.BufferGeometry();
@@ -1289,20 +1342,28 @@ function animate() {
     targetY = mouseY * 0.0002;
     
     // Auto-rotation + Mouse Interaction
+    const t = Date.now() * 0.001;
     if (!isAnimating) {
         globe.rotation.y += 0.0015 + (targetX * 0.1);
         globe.rotation.x += (targetY - globe.rotation.x) * 0.05;
-        innerGlobe.rotation.y = globe.rotation.y * 0.6;
-        innerGlobe.rotation.x = globe.rotation.x * 0.6;
+        wireGlobe.rotation.y = globe.rotation.y;
+        wireGlobe.rotation.x = globe.rotation.x;
     }
 
-    // Subtle Pulse — globe breathes gently
-    const pulse = 1 + Math.sin(Date.now() * 0.001) * 0.012;
-    globe.scale.set(pulse, pulse, pulse);
-    innerGlobe.scale.set(pulse, pulse, pulse);
+    // Feed mouse into shader so gradient shifts visibly with cursor
+    globeMat.uniforms.uTime.value   = t;
+    globeMat.uniforms.uMouseX.value += (targetX * 3.0 - globeMat.uniforms.uMouseX.value) * 0.05;
+    globeMat.uniforms.uMouseY.value += (targetY * 3.0 - globeMat.uniforms.uMouseY.value) * 0.05;
 
-    // Pulse the inner light
-    globeLight.intensity = 2.2 + Math.sin(Date.now() * 0.0015) * 0.5;
+    // Subtle Pulse — globe breathes gently
+    const pulse = 1 + Math.sin(t) * 0.012;
+    globe.scale.set(pulse, pulse, pulse);
+    wireGlobe.scale.set(pulse * 1.005, pulse * 1.005, pulse * 1.005);
+
+    // Orbit the rim light around the globe
+    globeLight.position.x = Math.cos(t * 0.4) * 4;
+    globeLight.position.z = Math.sin(t * 0.4) * 4;
+    globeLight.intensity = 1.6 + Math.sin(t * 1.2) * 0.4;
 
     renderer.render(scene, camera); 
 }
