@@ -821,7 +821,7 @@ again, plus min-width:0 so cards actually shrink to fit their column. */
 </nav>
 </header>
 <main>
-<div class="brand-text-content">
+<div class="brand-text-content glass-panel">
 <div class="brand-label" id="current-sector">SYSTEM ENTRY</div>
 <div id="current-brand" style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-heading); color: #7c3aed !important;">PACKAGES</div>
 <div class="brand-description" id="current-desc">Select a Specialized AI Network below or enter the main package vault.</div>
@@ -987,17 +987,73 @@ scene.add(new THREE.AmbientLight(0xffffff, 0.8));
 const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
 dirLight.position.set(5, 5, 5);
 scene.add(dirLight);
+// ── GLOBE: ShaderMaterial with purple-to-violet gradient that shifts with rotation ──
 const globeGeo = new THREE.SphereGeometry(2.8, 64, 64);
-const globeMat = new THREE.MeshPhongMaterial({ color: 0xC8A2C8, wireframe: false, transparent: true, opacity: 0.8 });
+const globeMat = new THREE.ShaderMaterial({
+  transparent: true,
+  uniforms: {
+    uTime:    { value: 0.0 },
+    uMouseX:  { value: 0.0 },
+    uMouseY:  { value: 0.0 },
+    uColorA:  { value: new THREE.Color(0x4c1d95) },
+    uColorB:  { value: new THREE.Color(0x7c3aed) },
+    uColorC:  { value: new THREE.Color(0xc084fc) },
+  },
+  vertexShader: `
+    varying vec3 vNormal;
+    varying vec3 vPosition;
+    void main() {
+      vNormal   = normalize(normalMatrix * normal);
+      vPosition = position;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform float uTime;
+    uniform float uMouseX;
+    uniform float uMouseY;
+    uniform vec3  uColorA;
+    uniform vec3  uColorB;
+    uniform vec3  uColorC;
+    varying vec3  vNormal;
+    varying vec3  vPosition;
+    void main() {
+      vec3 viewDir  = normalize(vec3(uMouseX * 0.6, uMouseY * 0.6, 1.0));
+      float fresnel = pow(1.0 - abs(dot(vNormal, viewDir)), 2.5);
+      float lat = (vNormal.y + 1.0) * 0.5;
+      float lon = (vNormal.x + uMouseX * 0.4 + 1.0) * 0.5;
+      float lonHighlight = smoothstep(0.35, 0.65, lon);
+      vec3 base   = mix(uColorA, uColorB, lat);
+      vec3 tinted = mix(base, uColorC, lonHighlight * 0.55);
+      vec3 final  = mix(tinted, uColorC, fresnel * 0.7);
+      float pulse  = 0.72 + sin(uTime * 1.2) * 0.06;
+      float alpha  = pulse + fresnel * 0.25;
+      gl_FragColor = vec4(final, alpha);
+    }
+  `
+});
 const globe = new THREE.Mesh(globeGeo, globeMat);
 scene.add(globe);
+
+// Wireframe overlay for grid effect
+const wireGeo   = new THREE.SphereGeometry(2.82, 24, 24);
+const wireMat   = new THREE.MeshBasicMaterial({ color: 0xc084fc, wireframe: true, transparent: true, opacity: 0.12 });
+const wireGlobe = new THREE.Mesh(wireGeo, wireMat);
+scene.add(wireGlobe);
+
+// Rim light
+const globeLight = new THREE.PointLight(0xc084fc, 1.8, 9);
+globeLight.position.set(3, 2, 3);
+scene.add(globeLight);
+
 camera.position.z = 6.5;
 const brands = [
 { name: "YOUR LEADS ARE LEAKING", sector: "PRISCA DEZIGNS", logo: "", desc: "Every unanswered message is revenue walking out the door. We build the system that closes for you — automatically.", type: "cta-services" },
 { name: "AI VOICE AGENTS", sector: "NETWORK", logo: "🎙", desc: "Human-grade AI voice automation for high-volume sales and support.", url: "/aivoice/", type: "external" },
 { name: "AI CUSTOMER RELATIONS", sector: "NETWORK", logo: "🌐", desc: "Autonomous WhatsApp and Social Lead conversion pipelines.", url: "/aichannel/", type: "external" },
 { name: "AI ADMINISTRATION", sector: "NETWORK", logo: "🗂️", desc: "AI-powered administrative staff handling scheduling, documentation, and operations 24/7.", url: "/aidata/admin/", type: "external" },
-{ name: "HUMAN RESOURCES", sector: "NETWORK", logo: "👥", desc: "AI-driven HR operations — onboarding, compliance, and employee support on autopilot.", url: "/hr/", type: "external" },
+{ name: "AI HUMAN RESOURCES", sector: "NETWORK", logo: "👥", desc: "AI-driven HR operations — onboarding, compliance, and employee support on autopilot.", url: "/aidata/hr/", type: "external" },
+{ name: "AI FINANCE", sector: "NETWORK", logo: "💰", desc: "Automated reconciliation, financial reporting, and statements — month-end without the scramble.", url: "/aidata/finance/", type: "external" },
 
 
 
@@ -1156,6 +1212,13 @@ leadForm.reset();
 setTimeout(() => document.body.classList.remove('modal-active'), 2000);
 }
 };
+// Mouse position for ShaderMaterial reactivity
+let targetX = 0, targetY = 0;
+window.addEventListener('mousemove', (e) => {
+  targetX = (e.clientX / window.innerWidth)  * 2 - 1;
+  targetY = (e.clientY / window.innerHeight) * 2 - 1;
+}, { passive: true });
+
 let startX = 0;
 window.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX; });
 window.addEventListener('mousemove', (e) => {
@@ -1202,7 +1265,17 @@ rotateSlices(wheelAccumulator > 0 ? 'next' : 'prev');
 wheelAccumulator = 0;
 }
 }, { passive: true });
-function animate() { requestAnimationFrame(animate); globe.rotation.y += 0.0015; renderer.render(scene, camera); }
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+  globe.rotation.y += 0.0015;
+  wireGlobe.rotation.y += 0.0015;
+  globeMat.uniforms.uTime.value   = t;
+  globeMat.uniforms.uMouseX.value += (targetX * 3.0 - globeMat.uniforms.uMouseX.value) * 0.05;
+  globeMat.uniforms.uMouseY.value += (targetY * 3.0 - globeMat.uniforms.uMouseY.value) * 0.05;
+  renderer.render(scene, camera);
+}
 animate();
 window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 // Mobile Menu Logic
