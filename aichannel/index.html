@@ -78,9 +78,10 @@ footer { padding: 80px 5%; text-align: center; background: var(--glass); backdro
 
 /* Hero */
 .story-hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; background: linear-gradient(160deg, #0f0618 0%, #1a0a2e 50%, #0d1117 100%); }
-.story-hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
-.story-hero-bg iframe { position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%; width: 177.78vh; height: 56.25vw; transform: translate(-50%, -50%); pointer-events: none; }
-.story-hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(10,3,22,0.78) 0%, rgba(26,10,46,0.72) 50%, rgba(13,17,23,0.85) 100%); z-index: 4; pointer-events: none; }
+.story-hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; background: linear-gradient(160deg, #0f0618 0%, #1a0a2e 50%, #0d1117 100%); }
+.story-hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(10,3,22,0.6) 0%, rgba(26,10,46,0.5) 50%, rgba(13,17,23,0.7) 100%); z-index: 4; pointer-events: none; }
+/* Animated neural grid canvas background */
+#hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; opacity: 0.6; }
 .story-hero-orb { position: absolute; border-radius: 50%; filter: blur(80px); }
 .story-hero-orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(124,58,237,0.35) 0%, transparent 70%); top: -100px; left: -100px; }
 .story-hero-orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(192,132,252,0.2) 0%, transparent 70%); bottom: -80px; right: -80px; }
@@ -709,16 +710,69 @@ footer { padding: 80px 5%; text-align: center; background: var(--glass); backdro
 <section class="story-hero">
   <a href="/" class="story-hero-back">&#8592; BACK TO PORTAL</a>
   <div class="story-hero-bg">
-    <iframe 
-      src="https://www.youtube.com/embed/NDA40uJ7DQ8?autoplay=1&mute=1&controls=0&loop=1&playlist=NDA40uJ7DQ8&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&enablejsapi=0"
-      frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:177.78vh;height:56.25vw;transform:translate(-50%,-50%);z-index:1;pointer-events:none;">
-    </iframe>
-    <!-- Hard block: sits above iframe, below hero content — kills all YouTube UI interaction -->
-    <div style="position:absolute;inset:0;z-index:5;pointer-events:all;background:transparent;cursor:default;"></div>
+    <canvas id="hero-canvas"></canvas>
     <div class="story-hero-orb story-hero-orb-1"></div>
     <div class="story-hero-orb story-hero-orb-2"></div>
     <div class="story-hero-orb story-hero-orb-3"></div>
   </div>
+  <script>
+  (function(){
+    const canvas = document.getElementById('hero-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, nodes = [], animId;
+    const NODE_COUNT = 80;
+    const COLORS = ['rgba(124,58,237,', 'rgba(192,132,252,', 'rgba(99,102,241,'];
+
+    function resize(){ W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+
+    function initNodes(){
+      nodes = [];
+      for(let i=0;i<NODE_COUNT;i++){
+        nodes.push({
+          x: Math.random()*W, y: Math.random()*H,
+          vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4,
+          r: Math.random()*2+1,
+          color: COLORS[Math.floor(Math.random()*COLORS.length)]
+        });
+      }
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      // Draw connections
+      for(let i=0;i<nodes.length;i++){
+        for(let j=i+1;j<nodes.length;j++){
+          const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+          const dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist<160){
+            const alpha=(1-dist/160)*0.35;
+            ctx.beginPath();
+            ctx.strokeStyle=`rgba(124,58,237,${alpha})`;
+            ctx.lineWidth=0.8;
+            ctx.moveTo(nodes[i].x,nodes[i].y);
+            ctx.lineTo(nodes[j].x,nodes[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      // Draw nodes
+      nodes.forEach(n=>{
+        ctx.beginPath();
+        ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+        ctx.fillStyle=n.color+'0.8)';
+        ctx.fill();
+        // Move
+        n.x+=n.vx; n.y+=n.vy;
+        if(n.x<0||n.x>W) n.vx*=-1;
+        if(n.y<0||n.y>H) n.vy*=-1;
+      });
+      animId = requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize',()=>{ cancelAnimationFrame(animId); resize(); initNodes(); draw(); });
+    resize(); initNodes(); draw();
+  })();
+  </script>
   <div class="story-hero-content">
     <div class="story-hero-badge">AI Employees — Communication</div>
     <h1>Your Business<br><span>Never Sleeps.</span><br>Neither Does Ours.</h1>
