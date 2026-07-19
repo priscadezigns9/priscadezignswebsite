@@ -186,7 +186,7 @@ border: 2px solid #651fd1 !important;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 #page-wrapper {
-min-min-height: 100vh;
+min-height: 100vh;
 overflow-y: auto;
 scroll-behavior: smooth;
 }
@@ -194,8 +194,8 @@ body {
 font-family: var(--font-body);
 background: var(--ivory);
 color: var(--text);
-overflow-y: auto !important;
-min-min-height: 100vh;
+overflow: hidden;
+min-height: 100vh;
 }
 section {
 min-min-height: 100vh;
@@ -1257,14 +1257,15 @@ window.addEventListener('touchend', () => {
 touchCooldown = setTimeout(() => { touchActive = false; }, 700);
 }, { passive: true });
 window.addEventListener('wheel', (e) => {
-if (touchActive) return; // Block wheel during/after touch gesture
+e.preventDefault(); // stop page scroll — globe owns the wheel
+if (touchActive) return;
 if (isAnimating || document.body.classList.contains('modal-active') || document.body.classList.contains('package-active')) return;
 wheelAccumulator += e.deltaY;
 if (Math.abs(wheelAccumulator) >= WHEEL_THRESHOLD) {
 rotateSlices(wheelAccumulator > 0 ? 'next' : 'prev');
 wheelAccumulator = 0;
 }
-}, { passive: true });
+}, { passive: false });
 const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
