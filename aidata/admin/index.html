@@ -482,17 +482,41 @@ body {
 .week-section .section-title { color: white; }
 .week-section .section-title em { color: var(--lilac); font-style: italic; }
 .week-section .section-sub { color: rgba(255,255,255,0.6); }
-.week-scroll {
-  overflow-x: auto;
-  padding-bottom: 20px;
-  cursor: grab;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--lilac) rgba(255,255,255,0.1);
+.week-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
-.week-scroll::-webkit-scrollbar { height: 4px; }
-.week-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.7); border-radius: 4px; }
-.week-scroll::-webkit-scrollbar-thumb { background: var(--lilac); border-radius: 4px; opacity: 0.5; }
+.week-arrow {
+  flex-shrink: 0;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(192,132,252,0.3);
+  color: var(--lilac);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.22s, border-color 0.22s, transform 0.18s;
+  user-select: none;
+  z-index: 2;
+  flex-shrink: 0;
+}
+.week-arrow:hover {
+  background: rgba(192,132,252,0.15);
+  border-color: rgba(192,132,252,0.6);
+  transform: scale(1.08);
+}
+.week-arrow:active { transform: scale(0.95); }
+.week-arrow svg { pointer-events: none; }
+.week-scroll {
+  flex: 1;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.week-scroll::-webkit-scrollbar { display: none; }
 .week-track {
   display: flex;
   gap: 20px;
@@ -566,15 +590,7 @@ body {
   width: fit-content;
   margin-top: auto;
 }
-.week-hint {
-  text-align: center;
-  font-family: var(--font-ui);
-  font-size: 0.72rem;
-  letter-spacing: 2px;
-  color: #6b7280;
-  margin-top: 20px;
-  text-transform: uppercase;
-}
+.week-hint { display: none; }
 /* drag-scroll JS */
 
 /* ── OLD DAYLIFE (PRESERVED FOR GRACEFUL REMOVAL) ─────── */
@@ -1458,8 +1474,14 @@ footer .ft-contact {
     <p class="section-eyebrow" style="text-align:center;">Always On</p>
     <h2 class="section-title" style="text-align:center; margin-bottom:10px;">Monday to Sunday.<br><em>Your AI never stops.</em></h2>
     <p class="section-sub" style="text-align:center; margin:0 auto 48px;">Every day of the week, your AI Administration team is working — here's what a full week looks like.</p>
-    <div class="week-scroll">
-      <div class="week-track">
+    <div class="week-carousel">
+      <button class="week-arrow" id="weekPrev" aria-label="Previous">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <polyline points="11,4 6,9 11,14" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="week-scroll" id="weekScroll">
+        <div class="week-track">
 
         <div class="week-card fade-in">
           <div class="week-day-badge">MON</div>
@@ -1605,9 +1627,14 @@ footer .ft-contact {
           <div class="week-tag">🔄 System Reset</div>
         </div>
 
-      </div>
-    </div>
-    <p class="week-hint">← Scroll to see full week →</p>
+        </div><!-- /week-track -->
+      </div><!-- /week-scroll -->
+      <button class="week-arrow" id="weekNext" aria-label="Next">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <polyline points="7,4 12,9 7,14" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div><!-- /week-carousel -->
   </div>
 </section>
 
@@ -1878,23 +1905,21 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-// Drag-scroll for week track
-const weekScroll = document.querySelector('.week-scroll');
-if (weekScroll) {
-  let isDown = false, startX, scrollLeft;
-  weekScroll.addEventListener('mousedown', e => {
-    isDown = true; weekScroll.style.cursor = 'grabbing';
-    startX = e.pageX - weekScroll.offsetLeft;
-    scrollLeft = weekScroll.scrollLeft;
-  });
-  weekScroll.addEventListener('mouseleave', () => { isDown = false; weekScroll.style.cursor = 'grab'; });
-  weekScroll.addEventListener('mouseup', () => { isDown = false; weekScroll.style.cursor = 'grab'; });
-  weekScroll.addEventListener('mousemove', e => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - weekScroll.offsetLeft;
-    weekScroll.scrollLeft = scrollLeft - (x - startX) * 1.5;
-  });
+// Arrow scroll for week track
+const weekScroll = document.getElementById('weekScroll');
+const weekPrev   = document.getElementById('weekPrev');
+const weekNext   = document.getElementById('weekNext');
+const STEP = 280;
+if (weekScroll && weekPrev && weekNext) {
+  weekPrev.addEventListener('click', () => { weekScroll.scrollBy({ left: -STEP, behavior: 'smooth' }); });
+  weekNext.addEventListener('click', () => { weekScroll.scrollBy({ left:  STEP, behavior: 'smooth' }); });
+  // Dim arrows at edges
+  function updateArrows() {
+    weekPrev.style.opacity = weekScroll.scrollLeft < 8 ? '0.35' : '1';
+    weekNext.style.opacity = weekScroll.scrollLeft + weekScroll.clientWidth >= weekScroll.scrollWidth - 8 ? '0.35' : '1';
+  }
+  weekScroll.addEventListener('scroll', updateArrows, { passive: true });
+  updateArrows();
 }
 </script>
 </body>
