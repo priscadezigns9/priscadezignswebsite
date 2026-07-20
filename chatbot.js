@@ -815,7 +815,7 @@ const STEPS = {
         ]
     },
     "aidata_products": {
-        "bot": "AI Data is organised by department — each has 3 specialist AI Employees ready to hire:\n• Administration\n• Human Resources\n• Finance\n• HSE\n• Information Technology\n• Marketing\n• QA / QC\n• Production\n\nDon't see your department? We can build a custom AI Employee. Want a personalised recommendation? Start your free audit at priscadezigns.org/audit, or message us on WhatsApp.",
+        "bot": "AI Data is organised by department — each has 3 specialist AI Employees ready to hire:\n\n<b>Administration</b>\n• Admin Assistant\n• Document Controller\n• Records Officer\n\n<b>Human Resources</b>\n• Payroll Assistant\n• HR Assistant\n• Recruitment Screener\n\n<b>Finance</b>\n• Reconciliation Clerk\n• Reports Officer\n• Statements Officer\n\n<b>HSE</b>\n• Incident Logger\n• Compliance Auditor\n• Risk Monitor\n\n<b>Information Technology</b>\n• Help Desk Agent\n• Data Integrity Officer\n• Systems Monitor\n\n<b>Marketing</b>\n• Campaign Analyst\n• Lead Follow-Up Agent\n• Social Media Manager\n\n<b>QA / QC</b>\n• Checklist Officer\n• NCR Logger\n• Corrective Action Tracker\n\n<b>Production</b>\n• Output Monitor\n• Inventory Controller\n• Maintenance Alert Officer\n\nDon't see your department? We can build a custom AI Employee. Want a personalised recommendation? Start your free audit at priscadezigns.org/audit, or message us on WhatsApp.",
         "pkg": "aidata",
         "r": [
             { "l": "Start Free Audit", "url": "https://priscadezigns.org/audit/", "i": "clipboard-check" },
