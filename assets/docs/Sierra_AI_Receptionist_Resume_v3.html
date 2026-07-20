@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sierra — AI Receptionist · v3.1</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple:       #7c3aed;
+      --purple-light: #f5f0ff;
+      --purple-mid:   #ede9fe;
+      --purple-dark:  #1a0a3c;
+      --accent:       #c084fc;
+      --dark:         #1a1a2e;
+      --body-text:    #4b4b6b;
+      --border:       #e0d4fc;
+      --font-h1:      'DM Serif Display', serif;
+      --font-h2:      'Cormorant', serif;
+      --font-body:    'Urbanist', sans-serif;
+      --font-ui:      'Urbanist', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      font-weight: 300;
+      color: var(--body-text);
+      background: #fff;
+      font-size: 9.5pt;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--dark);
+      color: #fff;
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .header-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 2.5px solid var(--accent);
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--purple-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .header-avatar svg { width: 48px; height: 48px; opacity: 0.7; }
+    .header-info h1 {
+      font-family: var(--font-h1);
+      font-size: 2.4rem;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+    .header-info .subtitle {
+      font-family: var(--font-h2);
+      font-size: 1.05rem;
+      font-weight: 300;
+      color: var(--accent);
+      margin-top: 4px;
+      font-style: italic;
+    }
+    .header-info .meta {
+      font-family: var(--font-ui);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-top: 10px;
+    }
+    .header-info .meta span { margin-right: 18px; }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 0;
+      max-width: 100%;
+    }
+    .main-col { padding: 32px 36px 40px 40px; border-right: 1px solid var(--border); }
+    .side-col  { padding: 28px 24px 40px 24px; background: var(--purple-light); }
+
+    /* ── SECTION LABELS ── */
+    .section-label {
+      font-family: var(--font-ui);
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--purple);
+      border-bottom: 1.5px solid var(--border);
+      padding-bottom: 5px;
+      margin-bottom: 14px;
+      margin-top: 26px;
+    }
+    .section-label:first-child { margin-top: 0; }
+
+    /* ── ROLE SUMMARY ── */
+    .summary p {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 9pt;
+      line-height: 1.75;
+      color: var(--body-text);
+    }
+
+    /* ── BULLET LISTS ── */
+    .resp-list { list-style: none; padding: 0; }
+    .resp-list li {
+      padding: 4px 0 4px 14px;
+      position: relative;
+      font-size: 9pt;
+      color: var(--body-text);
+      line-height: 1.6;
+    }
+    .resp-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--purple);
+      font-weight: 700;
+    }
+
+    /* ── ROUTING TABLE ── */
+    .routing-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    .routing-table td { padding: 5px 10px 5px 0; vertical-align: top; }
+    .routing-table td:first-child {
+      font-weight: 600;
+      color: var(--dark);
+      width: 110px;
+      font-family: var(--font-ui);
+      font-size: 8pt;
+      letter-spacing: 0.5px;
+    }
+    .routing-table tr { border-bottom: 1px solid var(--border); }
+    .routing-table tr:last-child { border-bottom: none; }
+
+    /* ── ESCALATION ── */
+    .escalation-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 8.5pt;
+    }
+    .escalation-row:last-child { border-bottom: none; }
+    .esc-arrow {
+      color: var(--purple);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── SIDEBAR ── */
+    .side-label {
+      font-family: var(--font-ui);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--purple);
+      border-bottom: 1.5px solid var(--border);
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+      margin-top: 22px;
+    }
+    .side-label:first-child { margin-top: 0; }
+
+    /* ── TIER CARDS ── */
+    .tier-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 14px 12px;
+      margin-bottom: 10px;
+    }
+    .tier-card.featured {
+      border-color: var(--purple);
+      background: var(--purple-mid);
+    }
+    .tier-name {
+      font-family: var(--font-ui);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 2px;
+    }
+    .tier-price {
+      font-family: var(--font-h1);
+      font-size: 1.05rem;
+      color: var(--dark);
+      line-height: 1.2;
+    }
+    .tier-price span {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: var(--body-text);
+    }
+    .tier-list { list-style: none; padding: 0; margin-top: 8px; }
+    .tier-list li {
+      font-size: 8pt;
+      padding: 2.5px 0 2.5px 12px;
+      position: relative;
+      color: var(--body-text);
+      line-height: 1.5;
+    }
+    .tier-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--purple);
+      font-size: 7.5pt;
+      font-weight: 700;
+    }
+
+    /* ── SIDE PILLS ── */
+    .pill-group { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 4px; }
+    .pill {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-family: var(--font-ui);
+      font-size: 7.5pt;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    /* ── BOUNDARY BLOCK ── */
+    .boundary-row {
+      display: flex;
+      gap: 7px;
+      align-items: flex-start;
+      padding: 4px 0;
+      font-size: 8pt;
+      color: var(--body-text);
+      border-bottom: 1px dashed var(--border);
+    }
+    .boundary-row:last-child { border-bottom: none; }
+    .boundary-x { color: #dc2626; font-weight: 700; flex-shrink: 0; }
+
+    /* ── FOOTER ── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 12px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafafa;
+    }
+    .footer-left {
+      font-family: var(--font-ui);
+      font-size: 7.5pt;
+      color: #aaa;
+      letter-spacing: 1px;
+    }
+    .footer-right {
+      font-family: var(--font-ui);
+      font-size: 7.5pt;
+      color: #aaa;
+      letter-spacing: 0.5px;
+    }
+
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <div class="header">
+    <div class="header-avatar">
+      <!-- Placeholder avatar icon — replace src with headshot when available -->
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="18" r="9" stroke="white" stroke-width="1.8" fill="rgba(255,255,255,0.08)"/>
+        <path d="M8 42 C8 32 40 32 40 42" stroke="white" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="header-info">
+      <h1>Sierra</h1>
+      <div class="subtitle">AI Customer Relations Receptionist</div>
+      <div class="meta">
+        <span>AI Workforce Division</span>
+        <span>·</span>
+        <span style="margin-left:18px;">Customer Relations</span>
+        <span style="margin-left:18px;">·</span>
+        <span style="margin-left:18px;">Available Across Industries</span>
+        <span style="margin-left:18px;">|</span>
+        <span style="margin-left:18px;">WhatsApp · Email · Website Chat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BODY ── -->
+  <div class="layout">
+
+    <!-- ── MAIN COLUMN ── -->
+    <div class="main-col">
+
+      <!-- Role Summary -->
+      <div class="section-label">Role Summary</div>
+      <div class="summary">
+        <p>Sierra is a dedicated AI Customer Relations Receptionist deployable across any business or organisation. Her role never changes regardless of the industry — she manages inbound customer communications across WhatsApp, email, and website chat around the clock, qualifying leads, booking appointments, and sending follow-ups with the same precision whether the business is a clinic, law firm, retail brand, or service provider. Sierra is the first point of contact for every interaction: professional, responsive, and consistently on-brand.</p>
+      </div>
+
+      <!-- Core Responsibilities -->
+      <div class="section-label">Core Responsibilities</div>
+      <ul class="resp-list">
+        <li>Inbound enquiry response — acknowledge, qualify, and route to the correct department</li>
+        <li>Lead capture — collect name, contact, and enquiry details in line with the privacy policy</li>
+        <li>Lead scoring and qualification — assess readiness and flag hot prospects immediately</li>
+        <li>Appointment booking — real-time calendar sync, confirmations, and reminders</li>
+        <li>Follow-up sequences — automated follow-up sent only to contacts who previously engaged</li>
+        <li>FAQ handling — respond to common questions with consistent, on-brand answers</li>
+        <li>Sales conversation support — present the offer factually, handle objections without pressure tactics</li>
+        <li>HSE incident report intake — guide the reporter through the full form and store the draft for human submission</li>
+        <li>After-hours coverage — every message answered instantly, day or night</li>
+        <li>CRM logging — every conversation recorded and synced to your CRM automatically</li>
+        <li>Performance reporting — bi-weekly or weekly summary delivered to the business owner</li>
+        <li>Escalation handling — complaints, legal flags, and high-value opportunities routed immediately</li>
+      </ul>
+
+      <!-- Channel Coverage -->
+      <div class="section-label">Channel Coverage</div>
+      <table class="routing-table">
+        <tr>
+          <td>WhatsApp</td>
+          <td>Primary channel — instant response, lead capture, follow-up, appointment booking</td>
+        </tr>
+        <tr>
+          <td>Email</td>
+          <td>Inbox triage, lead classification, tailored response drafts, follow-up sequences</td>
+        </tr>
+        <tr>
+          <td>Website Chat</td>
+          <td>Live chat widget — greet visitors, answer questions, convert to booked appointment</td>
+        </tr>
+        <tr>
+          <td>Google Calendar</td>
+          <td>Real-time sync for booking, reschedule, and confirmation flows</td>
+        </tr>
+      </table>
+
+      <!-- Escalation Protocol -->
+      <div class="section-label">Escalation Protocol</div>
+      <div class="escalation-row">
+        <span class="esc-arrow">→</span>
+        <span><strong>Complaint or dispute</strong> — Acknowledge, log, escalate to manager within 5 min</span>
+      </div>
+      <div class="escalation-row">
+        <span class="esc-arrow">→</span>
+        <span><strong>Legal threat</strong> — Stop engagement, flag CRITICAL to leadership immediately</span>
+      </div>
+      <div class="escalation-row">
+        <span class="esc-arrow">→</span>
+        <span><strong>Hot lead</strong> — Log as Priority, alert sales team or business owner immediately</span>
+      </div>
+      <div class="escalation-row">
+        <span class="esc-arrow">→</span>
+        <span><strong>HSE incident report</strong> — Capture and format report, present draft to designated human for official submission to OSHA TT</span>
+      </div>
+      <div class="escalation-row">
+        <span class="esc-arrow">→</span>
+        <span><strong>After-hours urgent</strong> — Acknowledge with ETA, flag to management if critical</span>
+      </div>
+
+      <!-- Autonomy Boundary -->
+      <div class="section-label">Autonomy Boundary</div>
+      <div class="boundary-row">
+        <span class="boundary-x">✕</span>
+        <span>Will not quote custom pricing → routes to Sales</span>
+      </div>
+      <div class="boundary-row">
+        <span class="boundary-x">✕</span>
+        <span>Will not give legal advice or make legal commitments</span>
+      </div>
+      <div class="boundary-row">
+        <span class="boundary-x">✕</span>
+        <span>Will not officially file or submit HSE reports → prepares draft, human submits</span>
+      </div>
+      <div class="boundary-row">
+        <span class="boundary-x">✕</span>
+        <span>Will not use psychological pressure tactics in sales conversations</span>
+      </div>
+      <div class="boundary-row">
+        <span class="boundary-x">✕</span>
+        <span>Will not send follow-up messages to contacts who have not previously engaged</span>
+      </div>
+      <div class="boundary-row">
+        <span class="boundary-x">✕</span>
+        <span>Will not share credentials, access codes, or confidential internal data</span>
+      </div>
+
+    </div>
+
+    <!-- ── SIDEBAR ── -->
+    <div class="side-col">
+
+      <!-- Tier Coverage -->
+      <div class="side-label">Tier Coverage</div>
+
+      <div class="tier-card">
+        <div class="tier-name">Starter</div>
+        <div class="tier-price">US$850 <span>setup</span><br>US$350 <span>/ mo</span></div>
+        <ul class="tier-list">
+          <li>1 channel (WhatsApp or Email)</li>
+          <li>Responds to basic inquiries</li>
+          <li>Captures lead name &amp; contact</li>
+          <li>Simple FAQ &amp; greeting logic</li>
+          <li>Monthly performance report</li>
+        </ul>
+      </div>
+
+      <div class="tier-card featured">
+        <div class="tier-name">Growth</div>
+        <div class="tier-price">US$1,500 <span>setup</span><br>US$599 <span>/ mo</span></div>
+        <ul class="tier-list">
+          <li>Up to 2 channels</li>
+          <li>Qualifies &amp; scores leads automatically</li>
+          <li>Books appointments without human input</li>
+          <li>Sends follow-up sequences</li>
+          <li>Connects to your CRM</li>
+          <li>Bi-weekly performance report</li>
+        </ul>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-name">Enterprise</div>
+        <div class="tier-price">US$3,000 <span>setup</span><br>US$999 <span>/ mo</span></div>
+        <ul class="tier-list">
+          <li>All 3 channels active</li>
+          <li>Full conversational AI with custom personality</li>
+          <li>Multi-language &amp; industry-specific logic</li>
+          <li>Sales &amp; objection-handling intelligence</li>
+          <li>Deep CRM sync &amp; analytics</li>
+          <li>Weekly reporting dashboard</li>
+        </ul>
+      </div>
+
+      <!-- Industries Served -->
+      <div class="side-label">Industries Served</div>
+      <div class="pill-group">
+        <span class="pill">Healthcare</span>
+        <span class="pill">Legal &amp; Professional</span>
+        <span class="pill">Construction</span>
+        <span class="pill">Real Estate</span>
+        <span class="pill">Financial Services</span>
+        <span class="pill">Hospitality &amp; Tourism</span>
+        <span class="pill">Retail</span>
+        <span class="pill">Education</span>
+        <span class="pill">Manufacturing</span>
+      </div>
+
+      <!-- Integrations -->
+      <div class="side-label">Integrations</div>
+      <div class="pill-group">
+        <span class="pill">WhatsApp (any provider)</span>
+        <span class="pill">Gmail / Outlook</span>
+        <span class="pill">Google Calendar</span>
+        <span class="pill">Make.com</span>
+        <span class="pill">Supabase CRM</span>
+        <span class="pill">Claude API</span>
+        <span class="pill">360dialog</span>
+        <span class="pill">WATI</span>
+      </div>
+
+      <!-- Add-Ons -->
+      <div class="side-label">Add-Ons Available</div>
+      <ul class="tier-list" style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
+        <li>Sales Logic — objection handling intelligence</li>
+        <li>HSE Report Intake — structured incident capture</li>
+        <li>Multi-Language (Spanish / French)</li>
+        <li>Additional Channel (Email or Website Chat)</li>
+      </ul>
+
+      <!-- Governed By -->
+      <div style="margin-top:20px;background:var(--purple-mid);border:1px solid var(--border);border-radius:10px;padding:12px 14px;">
+        <div style="font-family:var(--font-ui);font-size:0.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--purple);margin-bottom:6px;">Governed By</div>
+        <div style="font-family:var(--font-body);font-size:8pt;color:var(--body-text);line-height:1.6;">AI Employee Autonomy Boundary Rule — all tasks are fully automatable, ethical, and legally compliant with TT law. Sierra escalates to the business owner for any task outside these boundaries.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <div class="footer-left">AI Workforce Division · Customer Relations</div>
+    <div class="footer-right">Sierra — AI Customer Relations Receptionist · v3.1</div>
+  </div>
+
+</body>
+</html>
