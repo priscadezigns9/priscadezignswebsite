@@ -721,89 +721,88 @@
   </div>
 </footer>
 
-<!-- VAPI WEB SDK -->
-<script>
-  (function(d,t){
-    var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-    g.src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js";
-    g.onload=function(){ initVapi(); };
-    s.parentNode.insertBefore(g,s);
-  }(document,'script'));
+<!-- VAPI WEB SDK — ESM module (CJS bundle does not expose window.Vapi) -->
+<script type="module">
+  import Vapi from 'https://esm.sh/@vapi-ai/web@2.6.1';
 
-  var vapi = null;
-  var currentAssistantId = null;
-  var currentCallActive = false;
+  const PUBKEY = 'f310f375-edec-472f-bfb6-ba5992ff623a';
+  let vapi = null;
+  let currentAssistantId = null;
+  let currentCallActive = false;
+
+  function getEl(id) { return document.getElementById(id); }
+
+  function setStatus(txt) { getEl('modalStatus').textContent = txt; }
+
+  function setCallUI(active) {
+    getEl('soundwave').classList.toggle('speaking', active);
+    getEl('btnStart').classList.toggle('hidden', active);
+    getEl('btnEnd').classList.toggle('visible', active);
+  }
 
   function initVapi() {
-    vapi = new window.Vapi('f310f375-edec-472f-bfb6-ba5992ff623a');
+    if (vapi) return;
+    vapi = new Vapi(PUBKEY);
 
-    vapi.on('call-start', function() {
+    vapi.on('call-start', () => {
       currentCallActive = true;
-      document.getElementById('modalStatus').textContent = 'Connected — say hello!';
-      document.getElementById('soundwave').classList.add('speaking');
-      document.getElementById('btnStart').classList.add('hidden');
-      document.getElementById('btnEnd').classList.add('visible');
+      setStatus('Connected — say hello!');
+      setCallUI(true);
     });
 
-    vapi.on('call-end', function() {
+    vapi.on('call-end', () => {
       currentCallActive = false;
-      document.getElementById('modalStatus').textContent = 'Call ended';
-      document.getElementById('soundwave').classList.remove('speaking');
-      document.getElementById('btnStart').classList.remove('hidden');
-      document.getElementById('btnEnd').classList.remove('visible');
-      document.getElementById('btnStart').textContent = 'Call Again';
+      setStatus('Call ended');
+      setCallUI(false);
+      getEl('btnStart').textContent = 'Call Again';
     });
 
-    vapi.on('error', function(e) {
-      document.getElementById('modalStatus').textContent = 'Connection error — please try again';
-      document.getElementById('soundwave').classList.remove('speaking');
-      document.getElementById('btnStart').classList.remove('hidden');
-      document.getElementById('btnEnd').classList.remove('visible');
+    vapi.on('error', (e) => {
+      setStatus('Connection error — please try again');
+      setCallUI(false);
+      getEl('btnStart').classList.remove('hidden');
       console.error('VAPI error:', e);
     });
 
-    vapi.on('speech-start', function() {
-      document.getElementById('soundwave').classList.add('speaking');
-    });
-
-    vapi.on('speech-end', function() {
-      document.getElementById('soundwave').classList.remove('speaking');
-    });
+    vapi.on('speech-start', () => getEl('soundwave').classList.add('speaking'));
+    vapi.on('speech-end',   () => getEl('soundwave').classList.remove('speaking'));
   }
 
-  function openModal(name, role, avatar, assistantId) {
+  // Expose functions globally so onclick attributes can call them
+  window.openModal = function(name, role, avatar, assistantId) {
+    initVapi();
     currentAssistantId = assistantId;
-    document.getElementById('modalAvatar').src = avatar;
-    document.getElementById('modalAvatar').alt = name;
-    document.getElementById('modalName').textContent = name;
-    document.getElementById('modalRole').textContent = role;
-    document.getElementById('modalStatus').textContent = 'Ready to connect';
-    document.getElementById('soundwave').classList.remove('speaking');
-    document.getElementById('btnStart').classList.remove('hidden');
-    document.getElementById('btnStart').textContent = 'Start Call';
-    document.getElementById('btnEnd').classList.remove('visible');
-    document.getElementById('vapiOverlay').classList.add('active');
-  }
+    getEl('modalAvatar').src  = avatar;
+    getEl('modalAvatar').alt  = name;
+    getEl('modalName').textContent = name;
+    getEl('modalRole').textContent = role;
+    setStatus('Ready to connect');
+    getEl('soundwave').classList.remove('speaking');
+    getEl('btnStart').classList.remove('hidden');
+    getEl('btnStart').textContent = 'Start Call';
+    getEl('btnEnd').classList.remove('visible');
+    getEl('vapiOverlay').classList.add('active');
+  };
 
-  function closeModal() {
+  window.closeModal = function() {
     if (currentCallActive && vapi) vapi.stop();
-    document.getElementById('vapiOverlay').classList.remove('active');
+    getEl('vapiOverlay').classList.remove('active');
     currentAssistantId = null;
-    currentCallActive = false;
-  }
+    currentCallActive  = false;
+  };
 
-  function startCall() {
+  window.startCall = function() {
     if (!vapi || !currentAssistantId) return;
-    document.getElementById('modalStatus').textContent = 'Connecting…';
+    setStatus('Connecting…');
     vapi.start(currentAssistantId);
-  }
+  };
 
-  function endCall() {
+  window.endCall = function() {
     if (vapi && currentCallActive) vapi.stop();
-  }
+  };
 
-  document.getElementById('vapiOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
+  getEl('vapiOverlay').addEventListener('click', function(e) {
+    if (e.target === this) window.closeModal();
   });
 </script>
 
