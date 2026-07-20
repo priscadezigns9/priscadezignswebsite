@@ -44,7 +44,7 @@ God Mode is a universal administrative layer for the platform. It provides real-
 
 ## Chatbot Sync Rule (CRITICAL — 2026-07-11)
 **SIERRA is ONE.** All pages across priscadezigns.org (Main site, Services, Template Shop) must use the same master `chatbot.js` architecture.
-- **Unified Branding**: Strictly use the Deep Purple (`#301934`) and Lilac (`#C8A2C8`) design system.
+- **Unified Branding**: Strictly use the Luxury Purple (`#7c3aed`) and Lilac (`#c084fc`) design system. White glassmorphism cards on light lavender gradient body. NOT `#301934` deep purple.
 - **Single Source of Truth**: The master script lives at `/chatbot.js` (root). The file at `/templates/chatbot.js` is now a direct mirror of the root script.
 - **Unified Logic**: Both the general inquiry flow and the template shopping flow are managed within this single script.
 - **Version Control**: When any design or logic change is made, increment the version tag on all pages (e.g., `chatbot.js?v=2.3`).
@@ -53,6 +53,35 @@ God Mode is a universal administrative layer for the platform. It provides real-
   2. `/services/index.html`
   3. `/templates/index.html`
 - **Mandate**: Never create a separate chatbot file for a sub-brand or shop. Integration is the only path.
+
+## Brand Typography System (LOCKED — 2026-07-19)
+All pages, components, and builds for Prisca Dezigns must use this exact type hierarchy. No exceptions.
+
+| Role | Font | Weight | Use |
+| :--- | :--- | :--- | :--- |
+| **H1 / Hero** | DM Serif Display | Regular | Page titles, hero headlines |
+| **H2 / Subheadings** | Cormorant | Light / Italic | Section headings, refined accents |
+| **Body / Paragraphs** | Urbanist | Light (300) | All paragraph and body text |
+| **Labels / UI / Buttons** | Urbanist | Medium + ALL CAPS | Badges, tags, nav items, buttons |
+
+**Google Fonts import (mandatory on every page):**
+```
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+```
+
+**CSS Variables (mandatory):**
+```
+--font-h1: 'DM Serif Display', serif;
+--font-h2: 'Cormorant', serif;
+--font-body: 'Urbanist', sans-serif;
+--font-ui: 'Urbanist', sans-serif;
+```
+
+**Hard rules:**
+- NEVER use Playfair Display — removed from the brand
+- NEVER apply font-weight 700 or 900 to H1 — kills the luxury feel
+- NEVER use serif for body text — illegible on dark backgrounds
+- NEVER mix more than these 2 typefaces on a single page
 
 ## Visual-First Build Protocol (2026-07-10)
 When the user provides a screenshot, image, or URL as a design reference:
