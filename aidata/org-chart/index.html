@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --purple:     #7c3aed;
     --deep:       #3b0764;
@@ -15,49 +14,41 @@
     --lilac-soft: #ede9fe;
     --white:      #ffffff;
     --surface:    #faf8ff;
-    --border:     #e5d9fd;
+    --border:     #ddd6fe;
     --muted:      #6b7280;
-    --font-h1:    'DM Serif Display', serif;
-    --font-h2:    'Cormorant', serif;
-    --font-body:  'Urbanist', sans-serif;
   }
-
   html, body {
-    height: 100%;
     background: var(--surface);
-    font-family: var(--font-body);
+    font-family: 'Urbanist', sans-serif;
     color: #1a0a2e;
   }
-
   .page {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 32px 24px 24px;
-    gap: 24px;
+    padding: 40px 32px 48px;
+    gap: 0;
   }
 
   /* ── HEADER ── */
   .header {
     text-align: center;
+    margin-bottom: 36px;
   }
-  .header-eyebrow {
-    font-family: var(--font-body);
-    font-weight: 500;
+  .eyebrow {
     font-size: 10px;
+    font-weight: 500;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--purple);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   .header h1 {
-    font-family: var(--font-h1);
-    font-size: clamp(22px, 3vw, 34px);
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(24px, 3.5vw, 38px);
     font-weight: 400;
     color: var(--deep);
-    line-height: 1.2;
   }
   .header p {
     font-size: 13px;
@@ -66,366 +57,403 @@
     margin-top: 6px;
   }
 
-  /* ── CHART WRAPPER ── */
-  .chart {
-    width: 100%;
-    max-width: 1100px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
-  }
-
-  /* ── SIERRA ROW ── */
-  .sierra-row {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 0;
-  }
-
-  /* ── CONNECTOR ── */
-  .connector-v {
-    width: 2px;
-    height: 20px;
-    background: var(--lilac);
-    margin: 0 auto;
-  }
-  .connector-h-wrap {
-    width: 100%;
-    max-width: 960px;
+  /* ── ORG CHART CANVAS ── */
+  /* We use a positioned container so SVG lines sit behind cards */
+  .org-canvas {
     position: relative;
-    height: 20px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-  }
-  .connector-h-line {
-    position: absolute;
-    top: 0;
-    left: 10%;
-    right: 10%;
-    height: 2px;
-    background: var(--lilac);
-  }
-  /* tick marks down from h-line to each card */
-  .connector-h-ticks {
     width: 100%;
-    max-width: 960px;
-    display: flex;
-    justify-content: space-around;
+    max-width: 1160px;
   }
-  .connector-tick {
-    width: 2px;
-    height: 20px;
-    background: var(--lilac);
+  .org-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
   }
 
-  /* ── INTERNAL ROW ── */
-  .internal-row {
-    width: 100%;
-    max-width: 1060px;
+  /* ── TIERS ── */
+  .tier {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    flex-wrap: nowrap;
+    gap: 18px;
+    position: relative;
   }
+  .tier-1 { margin-bottom: 60px; }
+  .tier-2 { margin-bottom: 60px; }
+  .tier-3 { /* no bottom margin needed */ }
 
   /* ── EMPLOYEE CARD ── */
   .emp-card {
     background: var(--white);
     border: 1.5px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 10px 12px;
+    border-radius: 16px;
+    padding: 18px 14px 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 7px;
-    width: 108px;
+    gap: 6px;
+    width: 120px;
     flex-shrink: 0;
     position: relative;
-    transition: box-shadow 0.2s, transform 0.2s;
-    cursor: default;
+    z-index: 2;
+    transition: box-shadow 0.22s, transform 0.22s;
   }
   .emp-card:hover {
-    box-shadow: 0 6px 24px rgba(124,58,237,0.13);
-    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(124,58,237,0.14);
+    transform: translateY(-4px);
   }
-
-  /* Sierra special card */
   .emp-card.sierra {
-    background: linear-gradient(135deg, var(--deep) 0%, var(--purple) 100%);
+    background: linear-gradient(145deg, var(--deep) 0%, var(--purple) 100%);
     border-color: var(--purple);
-    width: 130px;
-    padding: 16px 14px 14px;
+    width: 138px;
   }
-  .emp-card.sierra .emp-name,
-  .emp-card.sierra .emp-role,
-  .emp-card.sierra .emp-badge {
-    color: var(--white);
-  }
-  .emp-card.sierra .emp-badge {
-    background: rgba(255,255,255,0.18);
-    border-color: rgba(255,255,255,0.3);
-    color: #e9d5ff;
-  }
-
-  /* Alana — admin hub */
   .emp-card.alana {
+    background: linear-gradient(145deg, #faf5ff 0%, #f3e8ff 100%);
     border-color: var(--lilac);
-    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
   }
 
   .emp-photo {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
     object-position: center top;
-    border: 2px solid var(--lilac-soft);
+    border: 2.5px solid var(--lilac-soft);
+    display: block;
   }
   .emp-card.sierra .emp-photo {
-    width: 60px;
-    height: 60px;
-    border-color: rgba(255,255,255,0.4);
+    width: 64px;
+    height: 64px;
+    border-color: rgba(255,255,255,0.45);
   }
 
   .emp-name {
-    font-family: var(--font-body);
     font-weight: 600;
-    font-size: 12px;
+    font-size: 12.5px;
     color: var(--deep);
     text-align: center;
-    line-height: 1.2;
   }
+  .emp-card.sierra .emp-name { color: #fff; }
+
   .emp-role {
-    font-family: var(--font-body);
     font-weight: 300;
     font-size: 10px;
     color: var(--muted);
     text-align: center;
-    line-height: 1.3;
+    line-height: 1.4;
   }
-  .emp-badge {
-    font-size: 8.5px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+  .emp-card.sierra .emp-role { color: #ddd6fe; }
+
+  .emp-tag {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 2px 7px;
+    padding: 3px 8px;
     border-radius: 20px;
-    border: 1px solid var(--border);
-    color: var(--purple);
     background: var(--lilac-soft);
-    text-align: center;
+    color: var(--purple);
+    border: 1px solid var(--border);
     white-space: nowrap;
+    text-align: center;
+    margin-top: 2px;
+  }
+  .emp-card.sierra .emp-tag {
+    background: rgba(255,255,255,0.15);
+    color: #e9d5ff;
+    border-color: rgba(255,255,255,0.25);
+  }
+  .emp-card.alana .emp-tag {
+    background: var(--lilac);
+    color: var(--white);
+    border-color: var(--lilac);
   }
 
-  /* ── CONNECTION LINES SVG ── */
-  .connections-layer {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── INTERCONNECTIONS SECTION ── */
-  .connections-wrap {
-    width: 100%;
-    max-width: 1060px;
-    margin-top: 20px;
-  }
-  .connections-title {
-    font-family: var(--font-body);
+  /* ── TIER LABEL ── */
+  .tier-label {
+    text-align: center;
+    font-size: 9.5px;
     font-weight: 500;
-    font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  /* ── CONNECTIONS LEGEND ── */
+  .legend-wrap {
+    width: 100%;
+    max-width: 1160px;
+    margin-top: 44px;
+    padding-top: 24px;
+    border-top: 1.5px solid var(--border);
+  }
+  .legend-title {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     color: var(--purple);
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
-  .connections-grid {
+  .legend-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
   }
-  .conn-pill {
+  .legend-pill {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     background: var(--white);
     border: 1.5px solid var(--border);
     border-radius: 40px;
-    padding: 5px 12px 5px 7px;
-    font-size: 11px;
+    padding: 5px 14px 5px 8px;
+    font-size: 11.5px;
     font-weight: 400;
     color: #2d1b5a;
   }
-  .conn-pill .dot {
-    width: 7px;
-    height: 7px;
+  .ldot {
+    width: 8px; height: 8px;
     border-radius: 50%;
-    background: var(--lilac);
     flex-shrink: 0;
   }
-  .conn-pill .dot.all   { background: var(--purple); }
-  .conn-pill .dot.ext   { background: #059669; }
-  .conn-pill .dot.prod  { background: #d97706; }
+  .ldot.purple { background: var(--purple); }
+  .ldot.green  { background: #059669; }
+  .ldot.amber  { background: #d97706; }
+  .ldot.lilac  { background: var(--lilac); }
 
   /* ── FOOTER ── */
   .footer-note {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 300;
     color: var(--muted);
     text-align: center;
-    border-top: 1px solid var(--border);
-    padding-top: 14px;
-    width: 100%;
-    max-width: 700px;
+    margin-top: 20px;
     letter-spacing: 0.02em;
   }
 </style>
 </head>
 <body>
-
 <div class="page">
 
   <!-- HEADER -->
   <div class="header">
-    <div class="header-eyebrow">Prisca Dezigns · AI Employee Architecture</div>
+    <div class="eyebrow">Prisca Dezigns · AI Employee Architecture</div>
     <h1>The Perfect AI Business</h1>
     <p>Every department covered. Zero role overlap. One autonomous operating layer.</p>
   </div>
 
-  <!-- CHART -->
-  <div class="chart">
+  <!-- ORG CHART CANVAS -->
+  <div class="org-canvas" id="orgCanvas">
 
-    <!-- TIER 1: Sierra — External -->
-    <div class="sierra-row">
-      <div class="emp-card sierra">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/sierra_headshot.jpg" alt="Sierra" onerror="this.style.background='#7c3aed';this.style.display='block'">
+    <!-- SVG lines drawn by JS after layout -->
+    <svg class="org-svg" id="orgSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <!-- TIER 1: External (Sierra) -->
+    <div class="tier-label">External · Customer-Facing</div>
+    <div class="tier tier-1" id="tier1">
+      <div class="emp-card sierra" id="card-sierra">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/sierra_headshot.jpg" alt="Sierra">
         <div class="emp-name">Sierra</div>
         <div class="emp-role">Customer Operations</div>
-        <div class="emp-badge">External-Facing</div>
+        <div class="emp-tag">External · Customers</div>
       </div>
     </div>
 
-    <!-- V connector Sierra → H line -->
-    <div class="connector-v"></div>
-
-    <!-- H line spanning internal row -->
-    <div class="connector-h-wrap">
-      <div class="connector-h-line"></div>
-    </div>
-
-    <!-- Tick marks from H line down to cards -->
-    <div class="connector-h-ticks">
-      <div class="connector-tick"></div>
-      <div class="connector-tick"></div>
-      <div class="connector-tick"></div>
-      <div class="connector-tick"></div>
-      <div class="connector-tick"></div>
-      <div class="connector-tick"></div>
-      <div class="connector-tick"></div>
-      <div class="connector-tick"></div>
-    </div>
-
-    <!-- TIER 2: Internal Employees -->
-    <div class="internal-row">
-
-      <!-- Alana — Admin -->
-      <div class="emp-card alana">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/alana_headshot.jpg" alt="Alana" onerror="this.style.background='#c084fc'">
+    <!-- TIER 2: Command Hub (Alana) -->
+    <div class="tier-label">Administration · Command Hub</div>
+    <div class="tier tier-2" id="tier2">
+      <div class="emp-card alana" id="card-alana">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/alana_headshot.jpg" alt="Alana">
         <div class="emp-name">Alana</div>
         <div class="emp-role">General Administration</div>
-        <div class="emp-badge">Internal · All Depts</div>
+        <div class="emp-tag">Hub · All Departments</div>
       </div>
+    </div>
 
-      <!-- Dean — Marketing -->
-      <div class="emp-card">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/dean_headshot.jpg" alt="Dean" onerror="this.style.background='#c084fc'">
+    <!-- TIER 3: Internal Departments -->
+    <div class="tier-label">Internal Departments</div>
+    <div class="tier tier-3" id="tier3">
+
+      <div class="emp-card" id="card-dean">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/dean_headshot.jpg" alt="Dean">
         <div class="emp-name">Dean</div>
         <div class="emp-role">Marketing</div>
-        <div class="emp-badge">Internal · Marketing</div>
+        <div class="emp-tag">Internal</div>
       </div>
 
-      <!-- Jamal — Finance -->
-      <div class="emp-card">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/jamal_headshot.jpg" alt="Jamal" onerror="this.style.background='#c084fc'">
+      <div class="emp-card" id="card-jamal">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/jamal_headshot.jpg" alt="Jamal">
         <div class="emp-name">Jamal</div>
         <div class="emp-role">Finance</div>
-        <div class="emp-badge">Internal · Finance</div>
+        <div class="emp-tag">Internal</div>
       </div>
 
-      <!-- Alice — HR -->
-      <div class="emp-card">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/alice_headshot.jpg" alt="Alice" onerror="this.style.background='#c084fc'">
+      <div class="emp-card" id="card-alice">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/alice_headshot.jpg" alt="Alice">
         <div class="emp-name">Alice</div>
         <div class="emp-role">Human Resources</div>
-        <div class="emp-badge">Internal · All Depts</div>
+        <div class="emp-tag">All Departments</div>
       </div>
 
-      <!-- Sunil — IT -->
-      <div class="emp-card">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/sunil_headshot.jpg" alt="Sunil" onerror="this.style.background='#c084fc'">
+      <div class="emp-card" id="card-sunil">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/sunil_headshot.jpg" alt="Sunil">
         <div class="emp-name">Sunil</div>
         <div class="emp-role">Information Technology</div>
-        <div class="emp-badge">Internal · All Depts</div>
+        <div class="emp-tag">All Departments</div>
       </div>
 
-      <!-- Luna — HSE -->
-      <div class="emp-card">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/luna_headshot.jpg" alt="Luna" onerror="this.style.background='#c084fc'">
+      <div class="emp-card" id="card-luna">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/luna_headshot.jpg" alt="Luna">
         <div class="emp-name">Luna</div>
-        <div class="emp-role">Health, Safety &amp; Environment</div>
-        <div class="emp-badge">Internal · All Depts</div>
+        <div class="emp-role">Health, Safety &amp; Env.</div>
+        <div class="emp-tag">All Departments</div>
       </div>
 
-      <!-- Zara — QA/QC -->
-      <div class="emp-card">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/zara_headshot.jpg" alt="Zara" onerror="this.style.background='#c084fc'">
+      <div class="emp-card" id="card-zara">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/zara_headshot.jpg" alt="Zara">
         <div class="emp-name">Zara</div>
         <div class="emp-role">Quality Assurance &amp; Control</div>
-        <div class="emp-badge">Internal · All Depts</div>
+        <div class="emp-tag">All Departments</div>
       </div>
 
-      <!-- Chan — Production -->
-      <div class="emp-card">
-        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/chan_headshot.jpg" alt="Chan" onerror="this.style.background='#c084fc'">
+      <div class="emp-card" id="card-chan">
+        <img class="emp-photo" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/chan_headshot.jpg" alt="Chan">
         <div class="emp-name">Chan</div>
         <div class="emp-role">Production</div>
-        <div class="emp-badge">Internal · Production</div>
+        <div class="emp-tag">Internal</div>
       </div>
 
     </div>
-    <!-- END internal row -->
+    <!-- END tier 3 -->
 
   </div>
-  <!-- END chart -->
+  <!-- END org canvas -->
 
-  <!-- INTERCONNECTIONS -->
-  <div class="connections-wrap">
-    <div class="connections-title">Department Interconnections</div>
-    <div class="connections-grid">
-      <div class="conn-pill"><span class="dot ext"></span>Sierra → sends leads to Dean &amp; Alana</div>
-      <div class="conn-pill"><span class="dot all"></span>Alana → coordinates all internal departments</div>
-      <div class="conn-pill"><span class="dot all"></span>Alice (HR) → all departments — staff management</div>
-      <div class="conn-pill"><span class="dot all"></span>Sunil (IT) → all departments — digital systems &amp; software</div>
-      <div class="conn-pill"><span class="dot all"></span>Luna (HSE) → all departments — safety &amp; compliance</div>
-      <div class="conn-pill"><span class="dot all"></span>Zara (QA/QC) → all departments — quality standards</div>
-      <div class="conn-pill"><span class="dot prod"></span>Zara (QA/QC) → heavy link to Chan (Production)</div>
-      <div class="conn-pill"><span class="dot prod"></span>Chan (Production) → IT, HSE, QA/QC, Finance</div>
-      <div class="conn-pill"><span class="dot ext"></span>Jamal (Finance) → suppliers &amp; buyers externally</div>
-      <div class="conn-pill"><span class="dot"></span>Dean (Marketing) → Sierra &amp; Alana only</div>
+  <!-- INTERCONNECTIONS LEGEND -->
+  <div class="legend-wrap">
+    <div class="legend-title">Department Interconnections</div>
+    <div class="legend-grid">
+      <div class="legend-pill"><span class="ldot green"></span>Sierra → sends leads to Alana &amp; Dean</div>
+      <div class="legend-pill"><span class="ldot purple"></span>Alana → coordinates all internal departments</div>
+      <div class="legend-pill"><span class="ldot purple"></span>Alice (HR) → all departments · staff management</div>
+      <div class="legend-pill"><span class="ldot purple"></span>Sunil (IT) → all departments · digital systems</div>
+      <div class="legend-pill"><span class="ldot purple"></span>Luna (HSE) → all departments · safety &amp; compliance</div>
+      <div class="legend-pill"><span class="ldot purple"></span>Zara (QA/QC) → all departments · quality standards</div>
+      <div class="legend-pill"><span class="ldot amber"></span>Zara (QA/QC) ↔ Chan (Production) · primary link</div>
+      <div class="legend-pill"><span class="ldot amber"></span>Chan (Production) → IT, HSE, QA/QC, Finance</div>
+      <div class="legend-pill"><span class="ldot green"></span>Jamal (Finance) → suppliers &amp; buyers externally</div>
+      <div class="legend-pill"><span class="ldot lilac"></span>Dean (Marketing) → Sierra &amp; Alana only</div>
     </div>
   </div>
 
-  <!-- FOOTER -->
   <div class="footer-note">
     Client brings the product or service — Prisca Dezigns builds the entire operating layer around it with AI employees.
   </div>
 
 </div>
+
+<script>
+// Draw SVG connector lines between cards after DOM renders
+window.addEventListener('load', () => {
+  const svg   = document.getElementById('orgSvg');
+  const canvas = document.getElementById('orgCanvas');
+  const cr    = canvas.getBoundingClientRect();
+
+  function center(id) {
+    const el = document.getElementById(id);
+    const r  = el.getBoundingClientRect();
+    return {
+      x: r.left - cr.left + r.width / 2,
+      topY: r.top - cr.top,
+      botY: r.top - cr.top + r.height,
+      midY: r.top - cr.top + r.height / 2
+    };
+  }
+
+  function line(x1, y1, x2, y2, color, dash = '') {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    el.setAttribute('x1', x1); el.setAttribute('y1', y1);
+    el.setAttribute('x2', x2); el.setAttribute('y2', y2);
+    el.setAttribute('stroke', color);
+    el.setAttribute('stroke-width', '2');
+    el.setAttribute('stroke-linecap', 'round');
+    if (dash) el.setAttribute('stroke-dasharray', dash);
+    svg.appendChild(el);
+  }
+
+  function path(d, color, dash = '') {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    el.setAttribute('d', d);
+    el.setAttribute('stroke', color);
+    el.setAttribute('stroke-width', '2');
+    el.setAttribute('stroke-linecap', 'round');
+    el.setAttribute('fill', 'none');
+    if (dash) el.setAttribute('stroke-dasharray', dash);
+    svg.appendChild(el);
+  }
+
+  const PURPLE = '#7c3aed';
+  const LILAC  = '#c084fc';
+  const GREEN  = '#059669';
+  const AMBER  = '#d97706';
+
+  const sierra = center('card-sierra');
+  const alana  = center('card-alana');
+  const dean   = center('card-dean');
+  const jamal  = center('card-jamal');
+  const alice  = center('card-alice');
+  const sunil  = center('card-sunil');
+  const luna   = center('card-luna');
+  const zara   = center('card-zara');
+  const chan   = center('card-chan');
+
+  // ── Sierra → Alana (main vertical authority line) ──
+  line(sierra.x, sierra.botY, alana.x, alana.topY, PURPLE);
+
+  // ── Alana → each dept (drops from Alana bottom to dept top via elbows) ──
+  const depts = [dean, jamal, alice, sunil, luna, zara, chan];
+  const midDropY = alana.botY + 30; // horizontal bus line Y
+
+  // vertical drop from Alana to bus
+  line(alana.x, alana.botY, alana.x, midDropY, PURPLE);
+
+  // horizontal bus line spanning leftmost to rightmost dept
+  const leftX  = depts[0].x;
+  const rightX = depts[depts.length - 1].x;
+  line(leftX, midDropY, rightX, midDropY, PURPLE);
+
+  // vertical drops from bus to each dept card top
+  depts.forEach(d => {
+    line(d.x, midDropY, d.x, d.topY, PURPLE);
+  });
+
+  // ── Sierra → Dean (dashed — leads passed to marketing) ──
+  // Elbow: Sierra bottom-right → across → down to Dean top
+  path(
+    `M ${sierra.x + 20} ${sierra.botY + 10} 
+     C ${sierra.x + 20} ${dean.topY - 20}, ${dean.x} ${dean.topY - 20}, ${dean.x} ${dean.topY}`,
+    GREEN, '6 3'
+  );
+
+  // ── Jamal → external (small arrow stub going down-right) ──
+  line(jamal.x, jamal.botY, jamal.x + 28, jamal.botY + 20, GREEN, '5 3');
+
+  // ── Zara ↔ Chan (strong amber link) ──
+  const zaraChanMidY = Math.max(zara.botY, chan.botY) + 18;
+  path(
+    `M ${zara.x} ${zara.botY} L ${zara.x} ${zaraChanMidY} L ${chan.x} ${zaraChanMidY} L ${chan.x} ${chan.botY}`,
+    AMBER
+  );
+
+  // ── Chan → IT (Sunil), HSE (Luna) via dashed lines ──
+  line(chan.x, chan.midY, sunil.x, sunil.midY, AMBER, '5 3');
+  line(chan.x, chan.midY, luna.x,  luna.midY,  AMBER, '5 3');
+});
+</script>
 </body>
 </html>
