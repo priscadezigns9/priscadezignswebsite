@@ -302,3 +302,4 @@ who's in their life.
 - **Concept:** A client-facing dashboard (white-labeled version of the Strategic Portal) for automated data entry.
 - **Workflow:** Client uploads documents (PDFs, images) -> AI (Claude) processes and categorizes -> Data saved to Supabase -> Client exports to Excel/PDF.
 - **UI:** Must match the high-fidelity "Strategic Portal" aesthetic (Dark Indigo/Slate).
+
