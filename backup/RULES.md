@@ -101,6 +101,13 @@ When the user provides a screenshot, image, or URL as a design reference:
 3. **Build immediately** — produce the artifact directly without asking for confirmation on tech choices
 4. **Match fidelity** — colors, spacing, font weight, border radius, shadow depth, motion timing — all extracted from the visual
 
+## Icon Default Rule (2026-07-20) — User Instruction
+**Always use minimalist SVG line icons** (stroke-only, no fills, clean geometry) as the default for ALL pages, cards, sections, and UI elements.
+- Never use emoji as icons unless explicitly requested.
+- Never use filled/solid icon styles unless explicitly requested.
+- Animated icons are allowed ONLY when the user specifically asks for them.
+- Minimalist = stroke-only SVG, 1.5px stroke-width, rounded linecap/linejoin, no decorative fills.
+
 ## Execution Style Rule (2026-07-15) — User Instruction
 - DO NOT chain long multi-step pipelines in a single bash block.
 - If a step fails, chunked execution makes it easier to isolate and fix.
@@ -128,3 +135,21 @@ Every INSERT, UPDATE, or DELETE performed by Claude must include a `performed_by
 Any file modified in the workspace or pushed to GitHub must include a comment or commit tag identifying Claude as the author of that change.
 
 ### Rule: No silent edits. Every Claude action leaves a trace.
+
+## AI Employee Architecture — Golden Rule (2026-07-20)
+
+**Sierra is the ONLY external-facing AI employee. Every other employee is internal-only.**
+
+| Employee | Audience | Never |
+|---|---|---|
+| Sierra (Customer Ops) | Customers (external) | Internal team |
+| Dean (Marketing) | Marketing team only | Customers |
+| Jamal (Finance) | Finance team only | Customers |
+| Alice (HR) | HR / Staff only | Customers |
+| IT / QA / Production | Their department only | Customers |
+
+**Standalone Rule:** Every AI employee must deliver full value alone, without requiring another employee to be purchased. When two or more are purchased, they connect — but never overlap, and never share an audience.
+
+**Data vs. Interaction Rule:** Internal employees (Dean, Jamal, Alice, etc.) may process *data about* customers (lead records, invoice data, etc.) but never *interact with* customers directly.
+
+**The Full Vision:** Sierra faces the customer. Every other employee faces inward. Together they form a fully autonomous business operating layer — client brings the product/service, Prisca Dezigns builds the rest with AI employees.
