@@ -267,6 +267,7 @@
             <div id="drew-status">Ready to connect</div>
             <button id="drew-btn-start" onclick="drewStartCall()">🎙 Start Call</button>
             <button id="drew-btn-end" onclick="drewEndCall()">End Call</button>
+            <button id="drew-btn-text" onclick="enterDrewText()" style="margin-top:10px;background:none;border:none;color:var(--cb-purple);font-weight:700;font-size:0.85rem;cursor:pointer;text-decoration:underline;">💬 Text Instead</button>
         </div>
         <div id="chat-back-bar" onclick="chatBack()"><span>← Return</span></div>
         <div class="chat-msgs" id="chat-msgs"></div>
@@ -783,11 +784,18 @@ const STEPS = {
     "start": {
         "bot": "Hey 👋 I'm Sierra. What brings you here today?",
         "r": [
+            { "l": "About Prisca Dezigns", "s": "about", "i": "info" },
+            { "l": "Talk to Drew about pricing", "s": "__drew_text__", "i": "dollar-sign" },
+            { "l": "General support", "s": "talk", "i": "message-circle" }
+        ]
+    },
+    "drew_start": {
+        "bot": "Hey, I'm Drew — I handle sales and pricing. What are you looking to build or automate?",
+        "r": [
             { "l": "I want a template site", "s": "pkg_templates", "i": "color-swatch" },
             { "l": "I need a custom website", "s": "need_website", "i": "layout" },
             { "l": "I need AI automation", "s": "automation", "i": "cpu" },
-            { "l": "Agency Packages", "s": "pkg_menu", "i": "package" },
-            { "l": "About Prisca Dezigns", "s": "about", "i": "info" }
+            { "l": "Agency Packages", "s": "pkg_menu", "i": "package" }
         ]
     },
     "about": {
@@ -942,6 +950,41 @@ let open = false;
 // ── Active agent: 'selector' | 'sierra' | 'drew'
 var activeAgent = 'selector';
 
+window.enterDrewText = function() {
+    activeAgent = 'drew';
+    var sel = document.getElementById('agent-selector');
+    var sierraUi = document.getElementById('chat-back-bar');
+    var msgs = document.getElementById('chat-msgs');
+    var qr = document.getElementById('chat-qr');
+    var inp = document.querySelector('.chat-inp-row');
+    var drewPanel = document.getElementById('drew-panel');
+    var hdrName = document.querySelector('.chat-hdr-name');
+    var hdrStatus = document.querySelector('.chat-hdr-status');
+    var switchLabel = document.getElementById('switch-btn-label');
+    var voiceBtn = document.getElementById('chat-voice-toggle');
+    var avatar = document.querySelector('.chat-avatar img');
+
+    if (sel) sel.style.display = 'none';
+    if (drewPanel) drewPanel.classList.remove('active');
+    // Stop any active Drew voice call before switching into text mode
+    if (typeof drewVapi !== 'undefined' && drewVapi && drewCallActive) drewVapi.stop();
+
+    if (sierraUi) sierraUi.style.display = '';
+    if (msgs) msgs.style.display = '';
+    if (qr) qr.style.display = '';
+    if (inp) inp.style.display = '';
+    if (voiceBtn) voiceBtn.style.display = '';
+    if (hdrName) hdrName.textContent = 'Drew';
+    if (hdrStatus) hdrStatus.innerHTML = '<div class="chat-sdot"></div> Sales Representative';
+    if (switchLabel) switchLabel.textContent = 'SIERRA';
+    if (avatar) avatar.src = 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/drew_headshot.jpg';
+
+    // Reset history so Drew starts fresh at his own menu, regardless of
+    // whatever step Sierra's conversation was on.
+    hist.length = 0;
+    go('drew_start');
+}
+
 window.selectAgent = function(agent) {
     activeAgent = agent;
     var sel = document.getElementById('agent-selector');
@@ -1028,6 +1071,7 @@ window.toggleChat = function(){
 };
 
 window.go = function(step, label){
+    if (step === '__drew_text__') { enterDrewText(); return; }
     const s = STEPS[step];
     if(!s) return;
     if(label) addMsg(label, 'usr');
