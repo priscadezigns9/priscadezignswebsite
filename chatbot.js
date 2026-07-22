@@ -42,7 +42,7 @@
     
     .chat-hdr { background: linear-gradient(135deg, var(--cb-purple), var(--cb-deep)); padding:24px 28px; display:flex; align-items:center; gap:16px; flex-shrink:0; }
     .chat-avatar { width:48px; height:48px; border-radius:18px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-shrink:0; padding: 4px; overflow: hidden; perspective: 1000px; }
-    .chat-avatar img { width: 100%; height: 100%; object-fit: contain; transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
+    .chat-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
     .chat-avatar:hover img { transform: rotateY(20deg) rotateX(10deg) scale(1.15); filter: drop-shadow(0 12px 20px rgba(0,0,0,0.15)); }
     .chat-hdr-name { font-size:1.1rem; font-weight:800; color:#fff; font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
     .chat-hdr-status { font-size:0.75rem; color:rgba(255,255,255,0.8); display:flex; align-items:center; gap:8px; margin-top:2px; font-weight: 500; }
@@ -1014,7 +1014,7 @@ window.selectAgent = function(agent) {
         if (hdrName) hdrName.textContent = 'Sierra';
         if (hdrStatus) hdrStatus.innerHTML = '<div class="chat-sdot"></div> Active Agent';
         if (switchLabel) switchLabel.textContent = 'DREW';
-        if (avatar) avatar.src = 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/logos/PRISCA_ICON_LOGO.png';
+        if (avatar) avatar.src = 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/sierra_headshot.jpg';
         if (hist.length === 0) go('start');
     } else if (agent === 'drew') {
         if (sierraUi) sierraUi.style.display = 'none';
