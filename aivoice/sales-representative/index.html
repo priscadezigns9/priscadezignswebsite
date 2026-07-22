@@ -189,6 +189,104 @@
             <div>WHATSAPP DIRECT: <a href="https://wa.me/18683424101" style="color: #7c3aed; text-decoration: none;">+1 (868) 342-4101</a></div>
         </div>
     </footer>
+<!-- VAPI MODAL -->
+<div id="vapiOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#1a0533;border:1px solid rgba(192,132,252,0.25);border-radius:24px;padding:40px 32px;width:90%;max-width:360px;text-align:center;position:relative;">
+    <button onclick="closeModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.2rem;cursor:pointer;">&#x2715;</button>
+    <img id="modalAvatar" src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/drew_headshot.jpg" alt="Drew" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #7c3aed;margin-bottom:16px;">
+    <div style="font-family:'Inter',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:4px;" id="modalName">Drew</div>
+    <div style="font-family:'Inter',sans-serif;font-size:0.85rem;color:#c084fc;margin-bottom:20px;" id="modalRole">AI Sales Advisor</div>
+    <div id="soundwave" style="display:flex;align-items:center;justify-content:center;gap:4px;height:36px;margin-bottom:16px;">
+      <span style="display:inline-block;width:4px;background:#7c3aed;border-radius:4px;animation:wave 1.2s ease-in-out infinite;height:12px;"></span>
+      <span style="display:inline-block;width:4px;background:#7c3aed;border-radius:4px;animation:wave 1.2s ease-in-out infinite 0.1s;height:20px;"></span>
+      <span style="display:inline-block;width:4px;background:#7c3aed;border-radius:4px;animation:wave 1.2s ease-in-out infinite 0.2s;height:28px;"></span>
+      <span style="display:inline-block;width:4px;background:#7c3aed;border-radius:4px;animation:wave 1.2s ease-in-out infinite 0.3s;height:20px;"></span>
+      <span style="display:inline-block;width:4px;background:#7c3aed;border-radius:4px;animation:wave 1.2s ease-in-out infinite 0.4s;height:12px;"></span>
+    </div>
+    <div id="modalStatus" style="font-family:'Inter',sans-serif;font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:20px;">Ready to connect</div>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button id="btnStart" onclick="startCall()" style="background:#7c3aed;color:#fff;border:none;border-radius:50px;padding:12px 28px;font-family:'Inter',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">Start Call</button>
+      <button id="btnEnd" onclick="endCall()" style="display:none;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:50px;padding:12px 28px;font-family:'Inter',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">End Call</button>
+    </div>
+  </div>
+</div>
+
+<style>
+@keyframes wave {
+  0%,100% { transform: scaleY(0.5); }
+  50%      { transform: scaleY(1.4); }
+}
+</style>
+
+<!-- Talk to Drew button injected into the hero area via script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var header = document.querySelector('header');
+    if (header) {
+      var btn = document.createElement('button');
+      btn.textContent = '🎙 Talk to Drew';
+      btn.style.cssText = 'margin-top:24px;background:#7c3aed;color:#fff;border:none;border-radius:50px;padding:14px 36px;font-family:Inter,sans-serif;font-weight:700;font-size:1rem;cursor:pointer;letter-spacing:0.5px;box-shadow:0 8px 24px rgba(124,58,237,0.35);';
+      btn.onclick = function() { openModal(); };
+      header.appendChild(btn);
+    }
+  });
+</script>
+
+<script type="module">
+  import Vapi from 'https://esm.sh/@vapi-ai/web@2.6.1';
+
+  const PUBKEY      = 'f310f375-edec-472f-bfb6-ba5992ff623a';
+  const ASSISTANT_ID = 'ddf9f69d-bc14-4909-b057-a8736ef43990';
+  let vapi = null;
+  let callActive = false;
+
+  function getEl(id) { return document.getElementById(id); }
+  function setStatus(txt) { getEl('modalStatus').textContent = txt; }
+
+  function setCallUI(active) {
+    callActive = active;
+    getEl('btnStart').style.display = active ? 'none' : 'inline-block';
+    getEl('btnEnd').style.display   = active ? 'inline-block' : 'none';
+  }
+
+  function initVapi() {
+    if (vapi) return;
+    vapi = new Vapi(PUBKEY);
+    vapi.on('call-start', () => { setStatus('Connected — say hello!'); setCallUI(true); });
+    vapi.on('call-end',   () => { setStatus('Call ended'); setCallUI(false); getEl('btnStart').textContent = 'Call Again'; });
+    vapi.on('error',      () => { setStatus('Connection error — please try again'); setCallUI(false); });
+  }
+
+  window.openModal = function() {
+    initVapi();
+    setStatus('Ready to connect');
+    setCallUI(false);
+    getEl('btnStart').textContent = 'Start Call';
+    var overlay = getEl('vapiOverlay');
+    overlay.style.display = 'flex';
+  };
+
+  window.closeModal = function() {
+    if (callActive && vapi) vapi.stop();
+    getEl('vapiOverlay').style.display = 'none';
+    callActive = false;
+  };
+
+  window.startCall = function() {
+    if (!vapi) return;
+    setStatus('Connecting…');
+    vapi.start(ASSISTANT_ID);
+  };
+
+  window.endCall = function() {
+    if (vapi && callActive) vapi.stop();
+  };
+
+  getEl('vapiOverlay').addEventListener('click', function(e) {
+    if (e.target === getEl('vapiOverlay')) closeModal();
+  });
+</script>
+
 <script src="/chatbot.js?v=3.4"></script>
 </body>
 </html>
