@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE BRIDGE | v2.6</title>
+    <style>
+        body { background: #050810; color: #c084fc; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px; }
+        .box { border: 1px solid #7c3aed; padding: 20px; border-radius: 10px; background: rgba(255,255,255,0.05); width: 80%; max-width: 600px; }
+        .msg { border-bottom: 1px solid #333; padding: 10px 0; font-size: 0.9rem; color: #fff; }
+        .tag { color: #7c3aed; font-weight: bold; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+    <h1>THE BRIDGE v2.6</h1>
+    <div id="status">Connecting...</div>
+    <div id="bus" class="box">Awaiting data...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+        
+        async function load() {
+            try {
+                const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+                const { data, error } = await supabase.from('fleet_comms').select('*').order('created_at', { ascending: false }).limit(10);
+                
+                document.getElementById('status').innerText = error ? "Error: " + error.message : "Online";
+                
+                if (data) {
+                    document.getElementById('bus').innerHTML = data.map(m => `
+                        <div class="msg">
+                            <span class="tag">${m.from_agent}</span> → ${m.to_agent}<br>
+                            ${m.message_body}
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                document.getElementById('status').innerText = "System Error: " + e.message;
+            }
+        }
+        load();
+        setInterval(load, 5000);
+    </script>
+</body>
+</html>
