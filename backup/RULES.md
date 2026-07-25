@@ -153,3 +153,11 @@ Any file modified in the workspace or pushed to GitHub must include a comment or
 **Data vs. Interaction Rule:** Internal employees (Dean, Jamal, Alice, etc.) may process *data about* customers (lead records, invoice data, etc.) but never *interact with* customers directly.
 
 **The Full Vision:** Sierra faces the customer. Every other employee faces inward. Together they form a fully autonomous business operating layer — client brings the product/service, Prisca Dezigns builds the rest with AI employees.
+
+## Blog Content Mandate (2026-07-24)
+- **Length:** Minimum 1 full page per blog.
+- **Structure:** Minimum 2 paragraphs per post.
+- **Density:** Each paragraph must have 10+ sentences and exceed 200 words.
+- **Vocabulary Filter:** BANNED words: "sovereign", "neural".
+- **Research Level:** Extensive research only. Content must highlight the latest high-fidelity anime news, top trending anime, and official studio trailers. No generic fillers.
+- **Resolution Standard:** All blog images must use the 450px high-fidelity cap to ensure crisp resolution.
