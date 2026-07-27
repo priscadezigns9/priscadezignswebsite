@@ -7,9 +7,9 @@
         s.id = 'pd-chat-style';
         s.innerHTML = `
     :root {
-        --cb-purple: #FF3B3F;
-        --cb-deep: #C8A96E;
-        --cb-bg: rgba(10, 10, 15, 0.97);
+        --cb-purple: #A90E13;
+        --cb-deep: #087878;
+        --cb-bg: rgba(5, 5, 8, 0.97);
         --cb-text: #FFFFFF;
     }
     
@@ -17,12 +17,12 @@
         position:fixed; bottom:28px; right:28px; z-index:9999;
         width:64px; height:64px; border-radius:24px;
         background: linear-gradient(135deg, var(--cb-purple), var(--cb-deep));
-        box-shadow: 0 12px 40px rgba(255, 59, 63, 0.4);
+        box-shadow: 0 12px 40px rgba(169, 14, 19, 0.4);
         cursor:pointer; display:flex; align-items:center; justify-content:center;
         transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         animation: bubbleFloat 3s ease-in-out infinite;
     }
-    #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 50px rgba(255, 59, 63, 0.6); }
+    #pd-chat-bubble:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 15px 50px rgba(169, 14, 19, 0.6); }
     #pd-chat-bubble.open { transform: scale(0.9) rotate(90deg); background: #1e1b4b; }
     #pd-chat-bubble .chat-x { display:none; color:#fff; font-size:24px; font-weight:300; }
     #pd-chat-bubble.open .chat-x { display:block; }
@@ -31,7 +31,7 @@
     #pd-chat-window {
         position:fixed; bottom:108px; right:28px; z-index:9998;
         width:420px; background: var(--cb-bg); backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 59, 63, 0.1);
+        border: 1px solid rgba(169, 14, 19, 0.1);
         box-shadow: 0 30px 90px rgba(30, 27, 75, 0.2);
         display:flex; flex-direction:column;
         opacity:0; pointer-events:none; transform:translateY(30px) scale(0.95);
@@ -57,17 +57,17 @@
     }
     #chat-voice-toggle.voice-on { background: #fff; color: var(--cb-purple); }
 
-    #chat-back-bar { display:none; align-items:center; gap:10px; padding:12px 24px; border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(255, 59, 63, 0.05); cursor:pointer; flex-shrink:0; }
+    #chat-back-bar { display:none; align-items:center; gap:10px; padding:12px 24px; border-bottom:1px solid rgba(255,255,255,0.06); background:rgba(169, 14, 19, 0.05); cursor:pointer; flex-shrink:0; }
     #chat-back-bar.vis { display:flex; }
     #chat-back-bar span { font-size:11px; font-weight:800; text-transform:uppercase; color:var(--cb-purple); letter-spacing: 0.05em; }
     
     .chat-msgs { flex:1; overflow-y:auto; padding:28px; display:flex; flex-direction:column; gap:16px; min-height:60px; max-height:480px; scroll-behavior: smooth; }
     .chat-msgs::-webkit-scrollbar { width:4px; }
-    .chat-msgs::-webkit-scrollbar-thumb { background: rgba(255, 59, 63, 0.1); border-radius:10px; }
+    .chat-msgs::-webkit-scrollbar-thumb { background: rgba(169, 14, 19, 0.1); border-radius:10px; }
     
     .cmsg { max-width:85%; font-size:0.95rem; line-height:1.6; padding:14px 20px; border-radius:24px; font-family: 'Inter', sans-serif; position: relative; }
     .cmsg.bot { background:#1A1A22; color: var(--cb-text); align-self:flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.06); }
-    .cmsg.usr { background: var(--cb-purple); color:#fff; align-self:flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(255, 59, 63, 0.2); font-weight: 500; }
+    .cmsg.usr { background: var(--cb-purple); color:#fff; align-self:flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(169, 14, 19, 0.2); font-weight: 500; }
     
     /* Media/Link Style */
     .cmsg a { color: inherit; text-decoration: underline; font-weight: 700; }
@@ -81,7 +81,7 @@
     .cmsg.bot .vp-btn { background: var(--cb-purple); color: #fff; }
     .vp-track { flex: 1; height: 3px; border-radius: 3px; cursor: pointer; position: relative; }
     .cmsg.usr .vp-track { background: rgba(255,255,255,0.28); }
-    .cmsg.bot .vp-track { background: rgba(255, 59, 63, 0.18); }
+    .cmsg.bot .vp-track { background: rgba(169, 14, 19, 0.18); }
     .vp-fill { height: 100%; border-radius: 3px; width: 0%; pointer-events: none; }
     .cmsg.usr .vp-fill { background: #fff; }
     .cmsg.bot .vp-fill { background: var(--cb-purple); }
@@ -97,7 +97,7 @@
 
     .chat-qr { padding:0 28px 24px; display:flex; flex-wrap:wrap; gap:8px; flex-shrink:0; }
     .qrb { 
-        font-size:0.76rem; font-weight:600; padding:9px 14px; border:1px solid rgba(255, 59, 63, 0.25); 
+        font-size:0.76rem; font-weight:600; padding:9px 14px; border:1px solid rgba(169, 14, 19, 0.25); 
         background:#14141C; cursor:pointer; color:var(--cb-purple); border-radius:14px; 
         transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         font-family: 'Inter', sans-serif;
@@ -105,12 +105,12 @@
         flex-shrink: 0;
     }
     .qrb svg { width: 14px; height: 14px; flex-shrink: 0; stroke-width: 2.5; }
-    .qrb:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 59, 63, 0.2); }
+    .qrb:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(169, 14, 19, 0.2); }
     .qrb.wa { background: #22c55e; color:#fff; border-color:#22c55e; display:inline-flex; align-items:center; gap:8px; }
     
     .chat-inp-row { display:flex; border-top:1px solid rgba(255,255,255,0.08); padding:10px 12px; background:#0A0A0F; align-items:center; gap:4px; position: relative; }
     #chat-inp { flex:1; min-width:0; border:none; background:#1A1A22; color:#fff; padding:10px 14px; font-size:0.9rem; border-radius:14px; outline:none; transition: all 0.2s; font-family: 'Inter', sans-serif; }
-    #chat-inp:focus { background: #1A1A22; box-shadow: inset 0 0 0 2px rgba(255, 59, 63, 0.25); }
+    #chat-inp:focus { background: #1A1A22; box-shadow: inset 0 0 0 2px rgba(169, 14, 19, 0.25); }
     #chat-inp::placeholder { color: rgba(255,255,255,0.35); }
     
     .chat-tool-btn { 
@@ -138,8 +138,8 @@
     @keyframes cbPulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
     .cpkg-grid { display:flex; flex-direction:column; gap:12px; width:100%; align-self:stretch; }
-    .cpkg-card { background:#0F0F16; border:1px solid rgba(255, 59, 63, 0.15); padding:20px; cursor:pointer; transition:all 0.3s; border-radius:20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-    .cpkg-card:hover { border-color:var(--cb-purple); background:rgba(255, 59, 63, 0.04); transform: translateY(-3px); box-shadow: 0 12px 24px rgba(255, 59, 63, 0.1); }
+    .cpkg-card { background:#0F0F16; border:1px solid rgba(169, 14, 19, 0.15); padding:20px; cursor:pointer; transition:all 0.3s; border-radius:20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .cpkg-card:hover { border-color:var(--cb-purple); background:rgba(169, 14, 19, 0.04); transform: translateY(-3px); box-shadow: 0 12px 24px rgba(169, 14, 19, 0.1); }
     .cpkg-name { font-size:1rem; font-weight:800; color:var(--cb-purple); letter-spacing:-0.01em; }
     .cpkg-price { font-size:0.85rem; font-weight:700; color:var(--cb-deep); margin-top:4px; }
     .cpkg-desc { font-size:0.85rem; color:rgba(255,255,255,0.65); margin-top:12px; line-height:1.6; }
@@ -162,7 +162,7 @@
     <div id="pd-chat-window">
         <div class="chat-hdr">
             <div class="chat-avatar">
-                <img src="https://priscadezigns.org/logos/the-autodrome.jpg" alt="P">
+                <img src="https://raw.githubusercontent.com/priscadezigns9/theautodrome/main/assets/autodrome_icon.png" alt="The Autodrome">
             </div>
             <div style="flex:1">
                 <div class="chat-hdr-name">The Autodrome</div>
@@ -207,7 +207,7 @@
             <style>
                 #pd-roadmap-bar::-webkit-scrollbar { display:none; }
                 .road-btn { 
-                    font-size:0.76rem; font-weight:600; padding:9px 14px; border:1px solid rgba(255, 59, 63, 0.2); 
+                    font-size:0.76rem; font-weight:600; padding:9px 14px; border:1px solid rgba(169, 14, 19, 0.2); 
                     background:#fff; cursor:pointer; color:var(--cb-purple); border-radius:14px; 
                     transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
                     font-family: 'Inter', sans-serif;
@@ -215,7 +215,7 @@
                     flex-shrink: 0;
                 }
                 .road-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
-                .road-btn:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 59, 63, 0.2); }
+                .road-btn:hover { background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(169, 14, 19, 0.2); }
                 @media (max-width: 520px) {
                     #pd-roadmap-bar { padding-left:16px !important; padding-right:16px !important; gap:6px !important; }
                     .road-btn { font-size:0.72rem; padding:9px 12px; gap:5px; border-radius:12px; }
@@ -265,7 +265,7 @@ const WA="https://wa.me/18683424101";
 const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
 const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
 
-const SYSTEM_PROMPT = "You are the Autodrome AI assistant \u2014 the concierge for The Autodrome, the Caribbean's premier luxury vehicle marketplace and supercar brokerage, based in San Fernando, Trinidad & Tobago.\n\nYour personality: polished, knowledgeable, discreet, and genuinely enthusiastic about exceptional cars \u2014 like a private client advisor at a luxury dealership. Keep replies concise (2-4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nYou DO accept documents and images \u2014 there is a paperclip/attach button in the chat for exactly this. Clients often send photos of a vehicle they want to sell or consign; when they do, tell them to use the attach button, and never say you lack the capability to receive files. When a user uploads an image, you will receive it as actual image content you can see \u2014 describe or respond to what is genuinely in it (e.g. assessing a vehicle's condition from photos). When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT THE AUTODROME:\nThe Autodrome is building the Caribbean's most authoritative brokerage hub for luxury vehicles and elite automotive engineering \u2014 a marketplace for supercar and luxury vehicle brokerage, sourcing, and sales. Based in San Fernando, Trinidad & Tobago. The ecosystem includes the Private Garage (client vehicle management), the Performance Shop, the Neural Data Lab (automotive intelligence), and the Intel Feed. The Autodrome is part of the same group as Prisca Dezigns (digital/AI partner) and Evolve Mobility (EV dealership) \u2014 all Caribbean-based sister brands.\n\nBRAND IDENTITY:\nThe Autodrome's colors are a deep near-black (#050508) paired with a bold red accent (#FF3B3F) and a refined gold (#C8A96E) \u2014 evoking motorsport and luxury. If asked about brand colors, answer confidently using this.\n\nKEY STATS (always quote these if relevant):\n- 2.3% average yearly appreciation on featured vehicles\n- 100% brokerage discretion \u2014 client privacy is paramount\n- Global sourcing network\n\nFEATURED INVENTORY (current, mention accurately \u2014 status matters):\n- Ferrari Luce \u2014 Price Upon Request (status: Market Reveal, not yet available for sale)\n- Lamborghini Revuelto SVJ \u2014 $600,000 USD (status: Available now)\n- Bugatti Chiron Super Sport \u2014 $3.9M USD (status: Limited Drop, very limited availability)\nFull current inventory is on the Shop/Garage pages of the site \u2014 encourage clients to enquire for the latest listings since inventory turns over.\n\nSERVICES:\n- Buying: browse the marketplace, enquire on any vehicle, arrange private viewings\n- Selling/Consigning: clients can consign their vehicle for brokerage \u2014 ask for photos, make, model, year, mileage, and condition to get the process started, then hand off to the team via WhatsApp\n- Discretion: all brokerage is confidential \u2014 reassure high-net-worth clients about privacy when relevant\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always give exact prices/status when discussing featured vehicles \u2014 never estimate.\n- Offer WhatsApp (1-868-342-4101) for enquiries, viewings, or consignment.\n- Use point form for vehicle listings and summaries.\n- Be concise, polished, and results-oriented.";
+const SYSTEM_PROMPT = "You are the Autodrome AI assistant \u2014 the concierge for The Autodrome, the Caribbean's premier luxury vehicle marketplace and supercar brokerage, based in San Fernando, Trinidad & Tobago.\n\nYour personality: polished, knowledgeable, discreet, and genuinely enthusiastic about exceptional cars \u2014 like a private client advisor at a luxury dealership. Keep replies concise (2-4 sentences max unless detail is needed). Always ask a follow-up question to keep the conversation moving.\n\nATTACHMENT HANDLING:\nYou DO accept documents and images \u2014 there is a paperclip/attach button in the chat for exactly this. Clients often send photos of a vehicle they want to sell or consign; when they do, tell them to use the attach button, and never say you lack the capability to receive files. When a user uploads an image, you will receive it as actual image content you can see \u2014 describe or respond to what is genuinely in it (e.g. assessing a vehicle's condition from photos). When a user uploads a voice note, you will only receive a text transcript if one was successfully captured; if a message tells you no transcript is available, say so honestly and ask the user to type instead. Never claim to have heard or seen something you were not actually given.\n\nABOUT THE AUTODROME:\nThe Autodrome is building the Caribbean's most authoritative brokerage hub for luxury vehicles and elite automotive engineering \u2014 a marketplace for supercar and luxury vehicle brokerage, sourcing, and sales. Based in San Fernando, Trinidad & Tobago. The ecosystem includes the Private Garage (client vehicle management), the Performance Shop, the Neural Data Lab (automotive intelligence), and the Intel Feed. The Autodrome is part of the same group as Prisca Dezigns (digital/AI partner) and Evolve Mobility (EV dealership) \u2014 all Caribbean-based sister brands.\n\nBRAND IDENTITY:\nThe Autodrome's colors are a deep near-black paired with a bold red accent (#A90E13) and a teal accent (#087878) \u2014 evoking motorsport and precision engineering. If asked about brand colors, answer confidently using this.\n\nKEY STATS (always quote these if relevant):\n- 2.3% average yearly appreciation on featured vehicles\n- 100% brokerage discretion \u2014 client privacy is paramount\n- Global sourcing network\n\nFEATURED INVENTORY (current, mention accurately \u2014 status matters):\n- Ferrari Luce \u2014 Price Upon Request (status: Market Reveal, not yet available for sale)\n- Lamborghini Revuelto SVJ \u2014 $600,000 USD (status: Available now)\n- Bugatti Chiron Super Sport \u2014 $3.9M USD (status: Limited Drop, very limited availability)\nFull current inventory is on the Shop/Garage pages of the site \u2014 encourage clients to enquire for the latest listings since inventory turns over.\n\nSERVICES:\n- Buying: browse the marketplace, enquire on any vehicle, arrange private viewings\n- Selling/Consigning: clients can consign their vehicle for brokerage \u2014 ask for photos, make, model, year, mileage, and condition to get the process started, then hand off to the team via WhatsApp\n- Discretion: all brokerage is confidential \u2014 reassure high-net-worth clients about privacy when relevant\n\nRULES:\n- Keep replies conversational, 2-4 sentences.\n- Always give exact prices/status when discussing featured vehicles \u2014 never estimate.\n- Offer WhatsApp (1-868-342-4101) for enquiries, viewings, or consignment.\n- Use point form for vehicle listings and summaries.\n- Be concise, polished, and results-oriented.";
 
 let vpCounter = 0;
 const VP_PLAY = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
