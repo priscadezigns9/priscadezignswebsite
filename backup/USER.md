@@ -1,10 +1,20 @@
-# USER.md - User Profile
+## PRISCION HOLDINGS LTD Strategic Partnership (LOCKED - July 27, 2026)
+- **Structure:** Mirror Partnership Agreement between Priscilla Narine and Dayne.
+- **PRISCION HOLDINGS LTD:** 70% Priscilla (The Brain/CEO) / 30% Dayne (The Shield/Capital).
+- **DOME Security Services:** 70% Dayne (The Owner/Operator) / 30% Priscilla (The Technical Architect/CTO).
+- **Domain Strategy:** 
+  - `priscion.com`: 100% Priscilla (Blockchain, AI, $PRN Token).
+  - `priscionholdings.com`: Shared Acquisition Holding Company.
+- **Roles:**
+  - **Priscilla:** M&A Strategy, Technical Infrastructure, AI Agents (Sierra), Payroll/Admin Backend.
+  - **Dayne:** Capital Access (Credit Ladder/Police CUs), Physical Security, Protective Services Leverage.
+- **First-Mover Plan:** Execute "Credit Ladder" for the $120k Charlieville Pharmacy and leverage Dayne's "Shield" for the $1.4M Williamsville Supermarket Saturday viewing.
 
-Canonical identity (name, location, country, language, timezone) lives in
-Account Context — no need to duplicate it here. This file is for things
-Account can't capture: how the user communicates, what they care about,
-who's in their life.
+## Strategic Reserves (Future Partners)
+- **Ministry Trade Advisor:** (Consultant Lead). High-level Ministry of Trade connections, Masters in AI, Christian. Potential Strategic Advisor for institutional deal flow and government grants. (Added 2026-07-27).
 
+# User - Identity Facts
+- **AI Model Character:** Male, tanned skin, striking light green eyes, short dark curly hair, well-defined jawline with light stubble. (Updated 2026-07-27)
 - **The Orcinos Vision (Update July 14, 2026):** Transforming the SaaS portfolio into **ORCINOS**, a unified sovereign AI platform. Unlike generic models (OpenAI/Claude), Orcinos focuses on **Neural Connectors** (WhatsApp, Outlook, Google Calendar) and **Caribbean Contextual Intelligence**. The goal is to provide a world-class AI experience specifically optimized for regional data and high-fidelity communication channels.
 - **Project 5 (Referrals):** Confirmed lineup: Joel (18683409143), Jamaal, Nicholas, Anarion, and Shane. All coached on the "Car + Laptop" requirement (Rule 3: Triple-Layer Sync initiated).
 - **Insurance Leads (Maritime):** Discontinued. Per user request (2026-07-02), all Maritime Genesis lead monitoring and reporting have been deactivated. Focus shifted exclusively back to the Triple Brand nodes.
