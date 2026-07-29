@@ -1,661 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Velloq — Enterprise Fleet Command</title>
-<!-- Zapia [Claude] Build: velloq/index.html | Velloq Vitals Dashboard Prototype v1.0 -->
-
-<!-- Google Fonts: DM Serif Display + Urbanist (Brand Mandate) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Tailwind CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: {
-        'h1': ['DM Serif Display', 'serif'],
-        'body': ['Urbanist', 'sans-serif'],
-      },
-      colors: {
-        'velloq-purple': '#7c3aed',
-        'velloq-lilac': '#c084fc',
-        'velloq-deep': '#1a0b2e',
-        'velloq-night': '#0d0618',
-      }
-    }
-  }
-}
-</script>
-
-<!-- Tailwind Material Icons -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-
-<style>
-  /* ============ CORE TOKENS ============ */
-  :root {
-    --vp: #7c3aed;
-    --vp-lilac: #c084fc;
-    --vp-glow: rgba(124, 58, 237, 0.4);
-    --vp-border: rgba(192, 132, 252, 0.2);
-    --vp-deep: #1a0b2e;
-    --vp-night: #0d0618;
-    --glass-bg: rgba(255, 255, 255, 0.06);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-blur: 18px;
-    --clay-bg: rgba(124, 58, 237, 0.25);
-    --clay-shadow-dark: rgba(10, 5, 20, 0.5);
-    --clay-shadow-light: rgba(192, 132, 252, 0.15);
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    background: radial-gradient(ellipse at top left, #1a0b2e 0%, #0d0618 60%, #06030f 100%);
-    color: #f0e6ff;
-    font-family: 'Urbanist', sans-serif;
-    font-weight: 300;
-    overflow: hidden;
-    height: 100vh;
-  }
-
-  /* ============ GLASSMORPHISM ============ */
-  .glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  }
-
-  .glass-strong {
-    background: rgba(255, 255, 255, 0.09);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-
-  /* ============ CLAYMORPHISM ============ */
-  .clay {
-    background: var(--clay-bg);
-    border: 1px solid rgba(192, 132, 252, 0.3);
-    box-shadow:
-      6px 6px 12px var(--clay-shadow-dark),
-      -3px -3px 8px var(--clay-shadow-light),
-      inset 0 1px 1px rgba(255, 255, 255, 0.12);
-    transition: all 0.3s ease;
-  }
-  .clay:hover {
-    background: rgba(124, 58, 237, 0.38);
-    box-shadow:
-      4px 4px 10px var(--clay-shadow-dark),
-      -2px -2px 6px var(--clay-shadow-light),
-      inset 0 1px 2px rgba(255, 255, 255, 0.18);
-  }
-  .clay:active {
-    box-shadow:
-      inset 3px 3px 8px var(--clay-shadow-dark),
-      inset -2px -2px 6px var(--clay-shadow-light);
-  }
-
-  /* ============ SCROLLBAR ============ */
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(124, 58, 237, 0.4); border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(124, 58, 237, 0.6); }
-
-  /* ============ SIDEBAR NAV ============ */
-  .nav-item {
-    transition: all 0.25s ease;
-    position: relative;
-  }
-  .nav-item:hover {
-    background: rgba(124, 58, 237, 0.18);
-    transform: translateX(3px);
-  }
-  .nav-item.active {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.3), transparent);
-    border-left: 3px solid var(--vp-lilac);
-  }
-  .nav-item.active .material-icons-outlined,
-  .nav-item.active span {
-    color: #fff;
-  }
-
-  /* ============ MAP PLACEHOLDER ============ */
-  .map-canvas {
-    background:
-      radial-gradient(circle at 30% 40%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 70% 60%, rgba(192, 132, 252, 0.06) 0%, transparent 50%),
-      linear-gradient(135deg, #16092a 0%, #0d0618 50%, #1a0b2e 100%);
-    position: relative;
-    overflow: hidden;
-  }
-  .map-grid {
-    position: absolute; inset: 0;
-    background-image:
-      linear-gradient(rgba(124, 58, 237, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124, 58, 237, 0.06) 1px, transparent 1px);
-    background-size: 40px 40px;
-    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
-    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
-  }
-  .map-route {
-    position: absolute;
-    top: 35%; left: 15%;
-    width: 70%; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--vp-lilac), transparent);
-    box-shadow: 0 0 15px var(--vp-glow);
-    transform: rotate(-8deg);
-  }
-  .map-route2 {
-    position: absolute;
-    top: 62%; left: 25%;
-    width: 50%; height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(192, 132, 252, 0.5), transparent);
-    transform: rotate(12deg);
-  }
-  .map-ping {
-    position: absolute;
-    width: 12px; height: 12px;
-    background: var(--vp-lilac);
-    border-radius: 50%;
-    box-shadow: 0 0 0 4px rgba(192, 132, 252, 0.2), 0 0 20px var(--vp-glow);
-  }
-  .map-ping::after {
-    content: '';
-    position: absolute; inset: -8px;
-    border-radius: 50%;
-    border: 1px solid var(--vp-lilac);
-    animation: ping 2s infinite;
-  }
-  @keyframes ping {
-    0% { transform: scale(0.8); opacity: 1; }
-    100% { transform: scale(2.5); opacity: 0; }
-  }
-  .map-blip {
-    position: absolute;
-    width: 8px; height: 8px;
-    background: #c084fc;
-    border-radius: 2px;
-    box-shadow: 0 0 8px var(--vp-glow);
-    transform: rotate(45deg);
-  }
-
-  /* ============ VITAL GAUGES ============ */
-  .gauge-ring {
-    transform: rotate(-90deg);
-  }
-  .gauge-track {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.08);
-    stroke-width: 6;
-  }
-  .gauge-fill {
-    fill: none;
-    stroke-width: 6;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 1s ease;
-  }
-  .gauge-glow {
-    filter: drop-shadow(0 0 6px var(--vp-glow));
-  }
-
-  /* ============ SIERRA CHAT BUTTON ============ */
-  .sierra-fab {
-    position: fixed;
-    bottom: 28px; right: 28px;
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    z-index: 100;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #7c3aed, #5b21b6);
-    box-shadow:
-      0 8px 24px rgba(124, 58, 237, 0.5),
-      0 0 0 0 rgba(124, 58, 237, 0.4);
-    animation: sierra-pulse 2.5s infinite;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 2px solid rgba(192, 132, 252, 0.4);
-  }
-  .sierra-fab:hover {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 12px 36px rgba(124, 58, 237, 0.7);
-  }
-  @keyframes sierra-pulse {
-    0% { box-shadow: 0 8px 24px rgba(124, 58, 237, 0.5), 0 0 0 0 rgba(124, 58, 237, 0.4); }
-    70% { box-shadow: 0 8px 24px rgba(124, 58, 237, 0.5), 0 0 0 18px rgba(124, 58, 237, 0); }
-    100% { box-shadow: 0 8px 24px rgba(124, 58, 237, 0.5), 0 0 0 0 rgba(124, 58, 237, 0); }
-  }
-  .sierra-fab .label {
-    position: absolute;
-    right: 72px;
-    white-space: nowrap;
-    background: rgba(26, 11, 46, 0.95);
-    border: 1px solid var(--vp-border);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-weight: 500;
-    color: var(--vp-lilac);
-    opacity: 0;
-    transform: translateX(10px);
-    transition: all 0.3s ease;
-    pointer-events: none;
-  }
-  .sierra-fab:hover .label {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  /* ============ TOP BAR ============ */
-  .status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #22c55e;
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
-    animation: blink 2s infinite;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  /* ============ TYPOGRAPHY HELPERS ============ */
-  .font-h1 { font-family: 'DM Serif Display', serif; }
-  .label-ui {
-    font-family: 'Urbanist', sans-serif;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.68rem;
-    color: rgba(192, 132, 252, 0.8);
-  }
-
-  /* ============ FLOAT ANIMATION ============ */
-  .float-card {
-    animation: float 6s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-
-  /* ============ ENTRANCE ============ */
-  .fade-in {
-    animation: fadeIn 0.8s ease forwards;
-    opacity: 0;
-  }
-  @keyframes fadeIn {
-    to { opacity: 1; }
-  }
-  .delay-1 { animation-delay: 0.15s; }
-  .delay-2 { animation-delay: 0.3s; }
-  .delay-3 { animation-delay: 0.45s; }
-
-  /* ============ MINI SPARKLINE ============ */
-  .spark {
-    stroke: var(--vp-lilac);
-    stroke-width: 1.5;
-    fill: none;
-    filter: drop-shadow(0 0 3px var(--vp-glow));
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velloq | Sovereign Fleet Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Urbanist:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --purple: #7c3aed;
+            --lilac: #c084fc;
+            --font-h1: 'DM Serif Display', serif;
+            --font-body: 'Urbanist', sans-serif;
+        }
+        body {
+            background: radial-gradient(circle at top right, #1a103d, #000);
+            color: #fff;
+            font-family: var(--font-body);
+            overflow-x: hidden;
+        }
+        h1, h2 { font-family: var(--font-h1); }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #fff, var(--lilac));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-blob {
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: var(--purple);
+            filter: blur(150px);
+            opacity: 0.2;
+            z-index: -1;
+        }
+        .clay-button {
+            background: var(--purple);
+            box-shadow: inset 4px 4px 8px rgba(255,255,255,0.2), 
+                        inset -4px -4px 8px rgba(0,0,0,0.3),
+                        0 10px 20px rgba(124, 58, 237, 0.3);
+            transition: all 0.3s ease;
+        }
+        .clay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.2), 
+                        inset -2px -2px 4px rgba(0,0,0,0.3),
+                        0 15px 30px rgba(124, 58, 237, 0.4);
+        }
+    </style>
 </head>
+<body class="min-h-screen">
+    <div class="hero-blob"></div>
 
-<body class="font-body">
-
-<!-- ============ ROOT LAYOUT ============ -->
-<div class="flex h-screen w-screen">
-
-  <!-- ============ LEFT SIDEBAR ============ -->
-  <aside class="glass flex flex-col" style="width: 260px; min-width: 260px; border-right: 1px solid var(--vp-border);">
-    
-    <!-- Logo -->
-    <div class="px-6 pt-6 pb-4 fade-in">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #7c3aed, #5b21b6); box-shadow: 0 4px 12px var(--vp-glow);">
-          <span class="material-icons-outlined" style="color: #fff; font-size: 20px;">bolt</span>
+    <!-- Nav -->
+    <nav class="p-8 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="text-2xl font-bold tracking-tighter text-gradient">VELLOQ</div>
+        <div class="space-x-8 text-sm uppercase tracking-widest font-medium opacity-70">
+            <a href="#" class="hover:text-purple-400 transition">Strategy</a>
+            <a href="#" class="hover:text-purple-400 transition">Reporting</a>
+            <a href="#" class="hover:text-purple-400 transition">Hardware</a>
         </div>
-        <div>
-          <h1 class="font-h1 text-xl text-white leading-none">Velloq</h1>
-          <p class="label-ui mt-1">Fleet Command</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Search -->
-    <div class="px-4 py-2 fade-in delay-1">
-      <div class="glass rounded-xl flex items-center gap-2 px-3 py-2.5" style="background: rgba(0,0,0,0.2);">
-        <span class="material-icons-outlined" style="color: rgba(192,132,252,0.6); font-size: 18px;">search</span>
-        <input type="text" placeholder="Search fleet…" class="bg-transparent border-none outline-none text-sm flex-1 placeholder-purple-300/40" style="color: #e0d0ff; font-weight: 300;">
-        <kbd class="text-[10px] px-1.5 py-0.5 rounded border" style="border-color: var(--vp-border); color: rgba(192,132,252,0.5);">⌘K</kbd>
-      </div>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="flex-1 px-3 py-3 overflow-y-auto fade-in delay-2">
-      <p class="label-ui px-3 pb-2 pt-2">Navigation</p>
-
-      <a class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer mb-1">
-        <span class="material-icons-outlined" style="color: rgba(192,132,252,0.8); font-size: 20px;">map</span>
-        <span class="text-sm font-medium text-white">Map</span>
-        <span class="ml-auto text-[10px] px-2 py-0.5 rounded-full" style="background: rgba(124,58,237,0.3); color: var(--vp-lilac);">12</span>
-      </a>
-
-      <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer mb-1">
-        <span class="material-icons-outlined" style="color: rgba(192,132,252,0.6); font-size: 20px;">favorite</span>
-        <span class="text-sm" style="color: rgba(240,230,255,0.8); font-weight: 300;">Engine Health</span>
-        <span class="ml-auto w-2 h-2 rounded-full" style="background: #22c55e; box-shadow: 0 0 6px #22c55e;"></span>
-      </a>
-
-      <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer mb-1">
-        <span class="material-icons-outlined" style="color: rgba(192,132,252,0.6); font-size: 20px;">layers</span>
-        <span class="text-sm" style="color: rgba(240,230,255,0.8); font-weight: 300;">Zones</span>
-      </a>
-
-      <a class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer mb-1">
-        <span class="material-icons-outlined" style="color: rgba(192,132,252,0.6); font-size: 20px;">assessment</span>
-        <span class="text-sm" style="color: rgba(240,230,255,0.8); font-weight: 300;">Reports</span>
-      </a>
-
-      <!-- Divider -->
-      <div class="my-4 mx-3" style="height: 1px; background: linear-gradient(90deg, transparent, var(--vp-border), transparent);"></div>
-
-      <p class="label-ui px-3 pb-2">Fleet Status</p>
-
-      <div class="glass rounded-xl p-3 mx-1">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs" style="color: rgba(240,230,255,0.6);">Active Vehicles</span>
-          <span class="font-h1 text-lg text-white">12</span>
-        </div>
-        <!-- Mini bar -->
-        <div class="flex gap-1 h-1.5 rounded-full overflow-hidden">
-          <div style="flex: 10; background: #22c55e;"></div>
-          <div style="flex: 2; background: #f59e0b;"></div>
-          <div style="flex: 1; background: #ef4444;"></div>
-        </div>
-        <div class="flex justify-between mt-2 text-[10px]" style="color: rgba(192,132,252,0.5);">
-          <span>10 Online</span>
-          <span>2 Idle</span>
-          <span>1 Alert</span>
-        </div>
-      </div>
     </nav>
 
-    <!-- User Profile -->
-    <div class="px-4 py-3 border-t fade-in delay-3" style="border-color: var(--vp-border);">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold" style="background: linear-gradient(135deg, #7c3aed, #5b21b6); color: #fff;">PN</div>
-        <div class="flex-1 min-w-0">
-          <p class="text-sm text-white truncate font-medium">Priscilla N.</p>
-          <p class="text-[11px] truncate" style="color: rgba(192,132,252,0.5);">Fleet Director</p>
-        </div>
-        <span class="material-icons-outlined cursor-pointer" style="color: rgba(192,132,252,0.5); font-size: 18px;">settings</span>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ============ MAIN SECTION ============ -->
-  <main class="flex-1 flex flex-col relative overflow-hidden">
-    
-    <!-- Top Bar -->
-    <header class="glass flex items-center justify-between px-6 py-3 fade-in" style="border-bottom: 1px solid var(--vp-border);">
-      <div>
-        <h2 class="font-h1 text-2xl text-white leading-none">Live Fleet Map</h2>
-        <div class="flex items-center gap-2 mt-1">
-          <div class="status-dot"></div>
-          <span class="label-ui">All Systems Operational</span>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <!-- Quick stat -->
-        <div class="glass rounded-xl px-4 py-2 flex items-center gap-3">
-          <span class="material-icons-outlined" style="color: var(--vp-lilac); font-size: 18px;">speed</span>
-          <div>
-            <p class="text-[10px] uppercase tracking-wider" style="color: rgba(192,132,252,0.5);">Avg Speed</p>
-            <p class="text-sm text-white font-medium">62 km/h</p>
-          </div>
-        </div>
-        <div class="glass rounded-xl px-4 py-2 flex items-center gap-3">
-          <span class="material-icons-outlined" style="color: var(--vp-lilac); font-size: 18px;">schedule</span>
-          <div>
-            <p class="text-[10px] uppercase tracking-wider" style="color: rgba(192,132,252,0.5);">Uptime</p>
-            <p class="text-sm text-white font-medium">99.8%</p>
-          </div>
-        </div>
-        <!-- Clay button -->
-        <button class="clay rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm font-medium text-white cursor-pointer">
-          <span class="material-icons-outlined" style="font-size: 18px;">download</span>
-          Export
-        </button>
-      </div>
-    </header>
-
-    <!-- Map Area -->
-    <div class="flex-1 map-canvas relative fade-in delay-1">
-      <div class="map-grid"></div>
-      <div class="map-route"></div>
-      <div class="map-route2"></div>
-      
-      <!-- Map pings -->
-      <div class="map-ping" style="top: 35%; left: 30%;"></div>
-      <div class="map-ping" style="top: 52%; left: 58%;"></div>
-      <div class="map-blip" style="top: 28%; left: 65%;"></div>
-      <div class="map-blip" style="top: 68%; left: 40%;"></div>
-      <div class="map-blip" style="top: 45%; left: 75%;"></div>
-
-      <!-- Map overlay label -->
-      <div class="absolute top-6 left-6 glass rounded-xl px-4 py-2.5">
-        <p class="label-ui">Sector</p>
-        <p class="text-sm text-white font-medium">Port of Spain — North</p>
-      </div>
-
-      <!-- Map legend -->
-      <div class="absolute bottom-6 left-6 glass rounded-xl px-4 py-3 space-y-2">
-        <div class="flex items-center gap-2">
-          <div class="w-2.5 h-2.5 rounded-full" style="background: var(--vp-lilac); box-shadow: 0 0 6px var(--vp-glow);"></div>
-          <span class="text-xs" style="color: rgba(240,230,255,0.7);">Active Vehicle</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-2.5 h-2.5 rounded-sm" style="background: var(--vp-lilac); transform: rotate(45deg); box-shadow: 0 0 6px var(--vp-glow);"></div>
-          <span class="text-xs" style="color: rgba(240,230,255,0.7);">Idle Vehicle</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-0.5" style="background: var(--vp-lilac); box-shadow: 0 0 6px var(--vp-glow);"></div>
-          <span class="text-xs" style="color: rgba(240,230,255,0.7);">Active Route</span>
-        </div>
-      </div>
-
-      <!-- ============ FLOATING VEHICLE CARD: VELLOQ VITALS ============ -->
-      <div class="absolute top-6 right-6 w-80 float-card fade-in delay-2">
-        <div class="glass-strong rounded-2xl p-5">
-          
-          <!-- Header -->
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, rgba(124,58,237,0.4), rgba(91,33,182,0.3)); border: 1px solid var(--vp-border);">
-                <span class="material-icons-outlined" style="color: var(--vp-lilac); font-size: 18px;">directions_car</span>
-              </div>
-              <div>
-                <h3 class="font-h1 text-lg text-white leading-none">Velloq Vitals</h3>
-                <p class="text-[10px] mt-1" style="color: rgba(192,132,252,0.6);">Unit VLOQ-001 · Live</p>
-              </div>
+    <!-- Hero -->
+    <section class="max-w-7xl mx-auto px-8 pt-20 pb-32 grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+            <div class="inline-block px-4 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-xs uppercase tracking-widest text-lilac mb-6">
+                Orcinos Fleet Intelligence
             </div>
-            <div class="flex items-center gap-1.5">
-              <div class="status-dot"></div>
-              <span class="text-[10px] uppercase tracking-wider" style="color: rgba(34,197,94,0.8);">Online</span>
+            <h1 class="text-6xl lg:text-8xl leading-tight mb-8">
+                The <span class="italic text-lilac">Geotab</span><br>Killer.
+            </h1>
+            <p class="text-xl font-light text-gray-400 mb-10 max-w-md leading-relaxed">
+                Professional-grade fleet tracking with zero monthly subscriptions. Total sovereignty for the Caribbean business owner.
+            </p>
+            <div class="flex gap-4">
+                <button class="clay-button px-10 py-4 rounded-xl font-semibold uppercase tracking-widest text-sm">
+                    Pre-Order Hardware
+                </button>
+                <button class="px-10 py-4 rounded-xl border border-white/20 font-semibold uppercase tracking-widest text-sm hover:bg-white/5 transition">
+                    View Specs
+                </button>
             </div>
-          </div>
-
-          <!-- Gauges: Fuel & Battery -->
-          <div class="grid grid-cols-2 gap-3 mb-4">
-            
-            <!-- Fuel Gauge -->
-            <div class="glass rounded-xl p-3 text-center relative">
-              <svg width="80" height="80" viewBox="0 0 80 80" class="gauge-ring mx-auto">
-                <circle class="gauge-track" cx="40" cy="40" r="32"></circle>
-                <circle class="gauge-fill gauge-glow" cx="40" cy="40" r="32"
-                  stroke="#c084fc"
-                  stroke-dasharray="201"
-                  stroke-dashoffset="50"></circle>
-              </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="font-h1 text-xl text-white">75%</span>
-                <span class="label-ui" style="font-size: 0.6rem;">Fuel</span>
-              </div>
-              <div class="flex items-center justify-center gap-1 mt-1">
-                <span class="material-icons-outlined" style="color: var(--vp-lilac); font-size: 14px;">local_gas_station</span>
-                <span class="text-[10px]" style="color: rgba(240,230,255,0.5);">42L remaining</span>
-              </div>
-            </div>
-
-            <!-- Battery Gauge -->
-            <div class="glass rounded-xl p-3 text-center relative">
-              <svg width="80" height="80" viewBox="0 0 80 80" class="gauge-ring mx-auto">
-                <circle class="gauge-track" cx="40" cy="40" r="32"></circle>
-                <circle class="gauge-fill gauge-glow" cx="40" cy="40" r="32"
-                  stroke="#22c55e"
-                  stroke-dasharray="201"
-                  stroke-dashoffset="30"></circle>
-              </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="font-h1 text-xl text-white">85%</span>
-                <span class="label-ui" style="font-size: 0.6rem;">Battery</span>
-              </div>
-              <div class="flex items-center justify-center gap-1 mt-1">
-                <span class="material-icons-outlined" style="color: #22c55e; font-size: 14px;">battery_charging_full</span>
-                <span class="text-[10px]" style="color: rgba(240,230,255,0.5);">68 kWh</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Telemetry Row -->
-          <div class="grid grid-cols-3 gap-2 mb-4">
-            <div class="glass rounded-lg px-2 py-2 text-center">
-              <p class="text-[9px] uppercase tracking-wider" style="color: rgba(192,132,252,0.5);">Temp</p>
-              <p class="text-sm text-white font-medium">74°C</p>
-            </div>
-            <div class="glass rounded-lg px-2 py-2 text-center">
-              <p class="text-[9px] uppercase tracking-wider" style="color: rgba(192,132,252,0.5);">RPM</p>
-              <p class="text-sm text-white font-medium">2,400</p>
-            </div>
-            <div class="glass rounded-lg px-2 py-2 text-center">
-              <p class="text-[9px] uppercase tracking-wider" style="color: rgba(192,132,252,0.5);">ODO</p>
-              <p class="text-sm text-white font-medium">14.2k</p>
-            </div>
-          </div>
-
-          <!-- Sparkline -->
-          <div class="glass rounded-xl p-3">
-            <div class="flex items-center justify-between mb-2">
-              <span class="label-ui">Speed — Last 60s</span>
-              <span class="text-xs text-white font-medium">62 km/h</span>
-            </div>
-            <svg viewBox="0 0 200 40" class="w-full h-10">
-              <polyline class="spark" points="0,30 15,25 30,28 45,18 60,22 75,15 90,20 105,10 120,16 135,8 150,14 165,6 180,12 200,9"></polyline>
-            </svg>
-          </div>
-
-          <!-- Action -->
-          <button class="clay w-full rounded-xl py-2.5 mt-3 text-sm font-medium text-white flex items-center justify-center gap-2 cursor-pointer">
-            <span class="material-icons-outlined" style="font-size: 18px;">tune</span>
-            Diagnostics
-          </button>
         </div>
-      </div>
-
-      <!-- ============ BOTTOM TELEMETRY BAR ============ -->
-      <div class="absolute bottom-6 right-6 glass rounded-xl px-5 py-3 flex items-center gap-6 fade-in delay-3" style="right: 100px;">
-        <div class="flex items-center gap-2">
-          <span class="material-icons-outlined" style="color: var(--vp-lilac); font-size: 18px;">navigation</span>
-          <div>
-            <p class="text-[10px] uppercase tracking-wider" style="color: rgba(192,132,252,0.5);">Heading</p>
-            <p class="text-sm text-white font-medium">NE · 42°</p>
-          </div>
+        
+        <div class="relative">
+            <div class="glass p-8 rounded-3xl relative z-10 overflow-hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xs uppercase tracking-widest opacity-50">Live Monitor</h3>
+                    <div class="flex gap-1">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <div class="w-2 h-2 rounded-full bg-green-500/20"></div>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full bg-purple-500 w-3/4 rounded-full"></div>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <div class="text-4xl font-light">12 <span class="text-sm opacity-30">Active Units</span></div>
+                        <div class="text-right">
+                            <div class="text-lilac text-xs uppercase">Optimization</div>
+                            <div class="text-xl">98.4%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Decorative shadow -->
+            <div class="absolute -bottom-10 -right-10 w-full h-full bg-purple-600/20 blur-3xl rounded-full z-0"></div>
         </div>
-        <div class="w-px h-8" style="background: var(--vp-border);"></div>
-        <div class="flex items-center gap-2">
-          <span class="material-icons-outlined" style="color: var(--vp-lilac); font-size: 18px;">place</span>
-          <div>
-            <p class="text-[10px] uppercase tracking-wider" style="color:rgba(192,132,252,0.5);">Location</p>
-            <p class="text-sm text-white font-medium">10.18°N, 61.55°W</p>
-          </div>
+    </section>
+
+    <!-- Features -->
+    <section class="max-w-7xl mx-auto px-8 py-32 border-t border-white/5">
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="glass p-10 rounded-3xl">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-lilac" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <h4 class="text-xl mb-4">Zero Subscriptions</h4>
+                <p class="text-sm text-gray-500 leading-relaxed">Kill the overhead. One-time hardware cost, lifetime fleet intelligence. No monthly per-vehicle fees, ever.</p>
+            </div>
+            <div class="glass p-10 rounded-3xl">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-lilac" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <h4 class="text-xl mb-4">Engine Vitals</h4>
+                <p class="text-sm text-gray-500 leading-relaxed">Direct OBD-II diagnostics. Monitor fuel theft, engine fault codes, and battery health in real-time.</p>
+            </div>
+            <div class="glass p-10 rounded-3xl">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-6">
+                    <svg class="w-6 h-6 text-lilac" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                </div>
+                <h4 class="text-xl mb-4">Sierra AI Link</h4>
+                <p class="text-sm text-gray-500 leading-relaxed">Control your fleet via WhatsApp. Ask Sierra for reports, location updates, or maintenance alerts instantly.</p>
+            </div>
         </div>
-      </div>
+    </section>
 
-    </div>
-  </main>
-</div>
-
-<!-- ============ FLOATING SIERRA CHAT BUTTON ============ -->
-<div class="sierra-fab" onclick="toggleSierra()" title="Open Sierra AI">
-  <span class="label">Ask Sierra</span>
-  <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-    <path d="M13 2L15.5 9.5L23 12L15.5 14.5L13 22L10.5 14.5L3 12L10.5 9.5L13 2Z" 
-          fill="white" opacity="0.95"/>
-    <circle cx="20" cy="5" r="2" fill="#c084fc"/>
-  </svg>
-</div>
-
-<!-- Sierra Chat Panel (hidden by default) -->
-<div id="sierraPanel" class="fixed bottom-28 right-7 w-80 glass-strong rounded-2xl flex-col z-50" style="display: none; height: 420px;">
-  <!-- Header -->
-  <div class="flex items-center gap-3 px-4 py-3 border-b" style="border-color: var(--vp-border);">
-    <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
-      <span class="material-icons-outlined" style="color: #fff; font-size: 18px;">auto_awesome</span>
-    </div>
-    <div class="flex-1">
-      <p class="text-sm text-white font-medium">Sierra</p>
-      <p class="text-[10px]" style="color: rgba(34,197,94,0.8);">● Online · Velloq Assistant</p>
-    </div>
-    <span class="material-icons-outlined cursor-pointer" onclick="toggleSierra()" style="color: rgba(192,132,252,0.5); font-size: 20px;">close</span>
-  </div>
-  <!-- Messages -->
-  <div class="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-    <div class="flex gap-2">
-      <div class="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center" style="background: linear-gradient(135deg, #7c3aed, #5b21b6);">
-        <span class="material-icons-outlined" style="color: #fff; font-size: 14px;">auto_awesome</span>
-      </div>
-      <div class="glass rounded-2xl rounded-tl-sm px-3 py-2 max-w-[80%]">
-        <p class="text-sm" style="color: rgba(240,230,255,0.9); font-weight: 300;">Good morning, Priscilla. VLOQ-001 is running at optimal levels. Fuel at 75%, battery at 85%. No alerts.</p>
-      </div>
-    </div>
-  </div>
-  <!-- Input -->
-  <div class="p-3 border-t" style="border-color: var(--vp-border);">
-    <div class="glass rounded-xl flex items-center gap-2 px-3 py-2">
-      <input type="text" placeholder="Ask Sierra about your fleet…" class="bg-transparent border-none outline-none text-sm flex-1 placeholder-purple-300/40" style="color: #e0d0ff; font-weight: 300;">
-      <button class="clay rounded-lg px-2.5 py-1.5 cursor-pointer">
-        <span class="material-icons-outlined" style="color: #fff; font-size: 16px;">send</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<script>
-function toggleSierra() {
-  const panel = document.getElementById('sierraPanel');
-  panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
-}
-
-// Nav active toggle
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', function() {
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    this.classList.add('active');
-  });
-});
-</script>
-
+    <!-- Footer -->
+    <footer class="p-12 text-center opacity-30 text-xs tracking-widest border-t border-white/5">
+        PRISCA DEZIGNS &copy; 2026 | PART OF THE ORCINOS NETWORK
+    </footer>
 </body>
 </html>
