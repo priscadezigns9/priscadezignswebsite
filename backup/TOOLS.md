@@ -1,8 +1,8 @@
 | Brand | Primary Niche | Broad Spectrum Search Signals |
 | :--- | :--- | :--- |
 | **The Autodrome** | Luxury Vehicles | Ferrari, Lamborghini, Bugatti newsrooms, luxury supercar marketplace, official reveals. |
-| **Dreaming Anime** | Anime Media | High-fidelity animation trailers, studio production news, otaku culture signals. |
-| **NehNeh** | Art/Fashion | High-fidelity Caribbean art, ancestral authenticity, custom clothing, artistic sewing. |
+| **Dreaming Anime** | Anime Media | Professional animation trailers, studio production news, otaku culture signals. |
+| **NehNeh** | Art/Fashion | Professional Caribbean art, ancestral authenticity, custom clothing, artistic sewing. |
 
 ## Active Social Deployment (LOCKED - July 1, 2026)
 Only the following three brands are authorized for social deployment. All others are strictly **OFF-LINE** or **Website-Only**.
@@ -71,7 +71,7 @@ Full pipeline + AI stack for Prisca Dezigns client service tiers.
 
 ## GitHub — Prisca Dezigns Website
 - Repo: `priscadezigns9/priscadezignswebsite`
-- Credential: `github_pat_sovereign_v5`
+- Credential: `github_pat__v5`
 - Live site: `https://priscadezigns.org`
 - Local working copy: `/app/state/348c474f-a208-44c4-8f27-8fce3e8d6785/work/index.html`
 - Authoritative restore base: `index_fixed.html` (full desktop UI intact)
