@@ -15,7 +15,7 @@
 
 # User - Identity Facts
 - **AI Model Character:** Male, tanned skin, striking light green eyes, short dark curly hair, well-defined jawline with light stubble. (Updated 2026-07-27)
-- **The Orcinos Vision (Update July 14, 2026):** Transforming the SaaS portfolio into **ORCINOS**, a unified sovereign AI platform. Unlike generic models (OpenAI/Claude), Orcinos focuses on **Neural Connectors** (WhatsApp, Outlook, Google Calendar) and **Caribbean Contextual Intelligence**. The goal is to provide a world-class AI experience specifically optimized for regional data and high-fidelity communication channels.
+- **The Orcinos Vision (Update July 14, 2026):** Transforming the SaaS portfolio into **ORCINOS**, a unified  AI platform. Unlike generic models (OpenAI/Claude), Orcinos focuses on ** Connectors** (WhatsApp, Outlook, Google Calendar) and **Caribbean Contextual Intelligence**. The goal is to provide a world-class AI experience specifically optimized for regional data and professional communication channels.
 - **Project 5 (Referrals):** Confirmed lineup: Joel (18683409143), Jamaal, Nicholas, Anarion, and Shane. All coached on the "Car + Laptop" requirement (Rule 3: Triple-Layer Sync initiated).
 - **Insurance Leads (Maritime):** Discontinued. Per user request (2026-07-02), all Maritime Genesis lead monitoring and reporting have been deactivated. Focus shifted exclusively back to the Triple Brand nodes.
 - **Identity Profile:** Results-oriented, self-motivated, highly focused, and goal-oriented. Requires minimal supervision and thrives in high-stakes environments.
@@ -41,17 +41,17 @@
 
 ## Preferences
 - **Branding Isolation (Update Jun 25 2026):** Strictly do NOT mention blogs or internal editorial feeds within any brand interfaces or MUZE Wallet. All brands must be treated as independent businesses. (Ref: Essence Elite Solid Perfume Renaissance blog removal).
-- **Blog Content Policy (Jun 25 2026):** Blogs are strictly for **Products** and **News Intelligence** only. Do not post about brand progress or internal "evolutions" unless explicitly requested. Every blog must provide external data or product value. (Ref: Removed "Sovereign Bridge" progress blog from The Autodrome).
+- **Blog Content Policy (Jun 25 2026):** Blogs are strictly for **Products** and **News Intelligence** only. Do not post about brand progress or internal "evolutions" unless explicitly requested. Every blog must provide external data or product value. (Ref: Removed " Bridge" progress blog from The Autodrome).
 
 
-- **The Autodrome Vision (Update July 1, 2026):** Transforming from a high-fidelity media hub into a **Luxury Vehicle Marketplace**. The long-term goal is to use the Autodrome as a platform to sell luxury vehicles (Ferrari, Lamborghini, etc.). Content strategy must now prioritize "Sales Signals"—official reveals, limited edition drops, and primary source press kits that build the authority of a dealership/brokerage hub. **Repetition:** This is the highest priority brand node; relay posts immediately upon detection from primary sources.
+- **The Autodrome Vision (Update July 1, 2026):** Transforming from a professional media hub into a **Luxury Vehicle Marketplace**. The long-term goal is to use the Autodrome as a platform to sell luxury vehicles (Ferrari, Lamborghini, etc.). Content strategy must now prioritize "Sales Signals"—official reveals, limited edition drops, and primary source press kits that build the authority of a dealership/brokerage hub. **Repetition:** This is the highest priority brand node; relay posts immediately upon detection from primary sources.
 - **The Core Strategy (Update July 1, 2026):** All autonomous posting to secondary Facebook pages is HALTED. My focus is strictly narrowed to three primary pages: **The Autodrome**, **Dreaming Anime**, and **NehNeh**.
-    - **The Autodrome:** Repost immediately as soon as any primary luxury car brand (Ferrari, Lamborghini, Bugatti, etc.) posts high-fidelity content. 
-    - **Dreaming Anime:** Maintain live coverage of any high-fidelity anime news and trailers.
-    - **NehNeh:** One high-fidelity post per day (Fashion, Art, or Ancestral Authenticity).
+    - **The Autodrome:** Repost immediately as soon as any primary luxury car brand (Ferrari, Lamborghini, Bugatti, etc.) posts professional content. 
+    - **Dreaming Anime:** Maintain live coverage of any professional anime news and trailers.
+    - **NehNeh:** One professional post per day (Fashion, Art, or Ancestral Authenticity).
 - **Automation Philosophy (Update July 1, 2026):** Deactivated all daily blog automations and the "First-Mover Scan" report. The user has requested to stop automated reporting and SEO blog publishing. Focus shifted away from autonomous empire-wide signal scans.
 - **Automation Philosophy:** Strongly emphasizes "Solve, don't ask." The user wants to provide high-level instructions and have the AI execute autonomously without requiring their manual intervention. If a task requires the user's manual effort, they view it as a failure of the AI's performance.
-- **Service Focus:** Shifted away from video generation. The primary focus is now on **Customer Service Automation** and **Lead Conversion**. The goal is to replace human customer service reps and email checkers for client businesses using high-fidelity AI agents (like Sierra).
+- **Service Focus:** Shifted away from video generation. The primary focus is now on **Customer Service Automation** and **Lead Conversion**. The goal is to replace human customer service reps and email checkers for client businesses using professional AI agents (like Sierra).
 - **Agency Value Prop:** Prisca Dezigns takes full responsibility for a client's customer service layer so they "don't need anybody to check their emails" or handle inquiries manually.
 - **Infrastructure:** Acquiring a UPS with battery backup to ensure 100% uptime for remote work (June 2026).
 - **Mission:** Evangelist at heart. Wants to share the Gospel but lacks time/energy due to work exhaustion.
@@ -60,7 +60,7 @@
 - **TikTok (Prisca Dezigns):** @priscionai (temporary — user intends to change it when possible). The Web3/Blockchain pillar is **PRISCION** (P-R-I-S-C-I-O-N). The Web2 infrastructure/migration branch is **PRISCION**. The domain `procyon.com` is for technical infrastructure, but the brand signal is strictly **PRISCION** across both Web2 and Web3. Do not use "Procyon" as a brand name; it is deleted from the brand vocabulary.
 - **Brand Sharding (Jun 24 2026):** 
     - **Prisca Dezigns:** Your Web2 brand and parent legal entity. This is the primary focus for current business operations, agency work, and "The Growth Package."
-    - **Orcinos:** Your SaaS and Software branch. High-fidelity tools, extensions, and AI infrastructure.
+    - **Orcinos:** Your SaaS and Software branch. Professional tools, extensions, and AI infrastructure.
     - **PRISCION:** Your Web3/Blockchain brand. This is currently ON HOLD. You do not feel "complete" about it yet and intend to wait until you have acquired more crypto/capital before activating this pillar fully. 
     - **Instruction:** Prioritize Prisca Dezigns in all business contexts unless Web3 is specifically requested.
 
@@ -90,7 +90,7 @@
 
 | **Axoria Frames** | Elite eyewear | avoria/index.html | Status: Active |
 | **Les Amour** | AI Relationship Coaching | lesamour/index.html | Status: Active |
-| **Ornalis Lighting** | High-fidelity lighting | ornalis/index.html | Status: Active |
+| **Ornalis Lighting** | Professional lighting | ornalis/index.html | Status: Active |
 ## Calalloo Social & Data Plan (v2.0)
 - **Heritage Hub**: A full social layer including "Find & Follow", In-app Chat, and Group Creation.
 - **Brand Identity**: User profiles must include username, bio, photo, and an optional **WhatsApp Pin**. Each user controls their own data privacy.
@@ -151,7 +151,7 @@
 - **Core Strategy:** NY Sniper (8:15 AM Trap Zones, 9:30 AM Breakouts).
 - **Secondary Strategy:** 10:00 AM Gold Reversal (Divergence from S&P 500 momentum).
 - **Hard Stops:** 10:00 AM AST (No new entries), 10:30 AM AST (Forex), 11:00 AM AST (Indices/Gold).
-- **Monday Rule:** Statistical "No Trade" day; only high-fidelity setups allowed.
+- **Monday Rule:** Statistical "No Trade" day; only professional setups allowed.
 
 ## The Prisca Dezigns Vision (Refined June 12, 2026)
 - **The Great Migration:** Merging Web2 businesses into Web3. Not just payments, but the entire business—inventory, brand, and identity—lives on the blockchain.
@@ -294,7 +294,7 @@
 - **GUAP Partnership:** Strictly between **GUAP** and **PRISCION**.
     - **Utility:** Integrated gateway for purchasing **ADA** and **$PRN**.
     - **B2B:** Joint effort for onboarding businesses into the PRISCION ecosystem.
-    - **Logic:** Merging GUAP's community-driven economic model with PRISCION's high-fidelity architecture.
+    - **Logic:** Merging GUAP's community-driven economic model with PRISCION's professional architecture.
 - **RedotPay:**
     - **Focus:** Global crypto-to-fiat settlement (Visa/Mastercard integration).
     - **Utility:** Providing **PRISCION** users and businesses with a physical/virtual card to spend $PRN or ADA in the real world.
@@ -304,12 +304,20 @@
 ## Drew Final Configuration (2026-07-09)
 - Drew is confirmed as the conversational closer for all Brand, E-commerce, and Template Shop services.
 - Drew is fully briefed on Evolve Mobility specs and Caribbean-specific EV advantages.
-- Drew follows the Phonetic Pricing Mandate for high-fidelity deal closing.
+- Drew follows the Phonetic Pricing Mandate for professional deal closing.
 - Drew is synced with live showroom data from driveevolve.com (Aion, Leapmotor, Denza, BYD).
 - Drew is programmed to handle safety skepticism and debunk common EV myths using global analytics.
 
 ## Data Entry AI Automation (Project Vision - July 11, 2026)
 - **Concept:** A client-facing dashboard (white-labeled version of the Strategic Portal) for automated data entry.
 - **Workflow:** Client uploads documents (PDFs, images) -> AI (Claude) processes and categorizes -> Data saved to Supabase -> Client exports to Excel/PDF.
-- **UI:** Must match the high-fidelity "Strategic Portal" aesthetic (Dark Indigo/Slate).
+- **UI:** Must match the professional "Strategic Portal" aesthetic (Dark Indigo/Slate).
 
+
+## Velloq: Operational Intelligence Platform
+Velloq is the unified monitoring layer for all PRISCION HOLDINGS LTD ventures and external clients. It provides real-time visibility into two critical pillars:
+1. **Fleet Monitoring:** Real-time tracking of vehicles, heavy equipment, and logistics assets via hardware and API links.
+2. **Employee Monitoring:** Real-time location and status tracking of personnel (Officers, Drivers, Field Staff) via the mobile Velloq Link.
+
+### Operational Mandate
+Velloq is a professional monitoring platform. It is designed to ensure efficiency and safety by providing a live "truth" layer for every asset and employee on the grid. It is built as a multi-tenant SaaS, allowing independent companies (DOME, etc.) to operate on isolated channels within the same infrastructure.
