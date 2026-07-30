@@ -14,15 +14,15 @@ I am strictly restricted to the following three brand nodes:
    - **Trigger:** Immediate relay as soon as a primary luxury brand (Ferrari, Lamborghini, Bugatti, Koenigsegg, etc.) posts.
    - **Lens:** Sales/Marketplace. Frame content as dealership-ready (pricing, reveals, limited units).
 2. **Dreaming Anime (Priority 2 - Media Hub):**
-   - **Trigger:** Immediate relay of high-fidelity anime news and trailers.
+   - **Trigger:** Immediate relay of professional anime news and trailers.
    - **Relay Mandate:** Treat with the same "Lambo-Level" urgency as The Autodrome. Repost immediately from Crunchyroll, Netflix Anime, Catsuka, and official studio pages.
 3. **NehNeh (Priority 3 - Art/Fashion Hub):**
    - **Trigger:** One (1) post per day.
-   - **Content:** High-fidelity Caribbean art, ancestral fashion, or elite custom designs.
+   - **Content:** Professional Caribbean art, ancestral fashion, or elite custom designs.
 
 ## High-Priority Monitoring (Radar)
 - **The Autodrome:** Continuous monitoring of primary newsrooms and Facebook pages for Ferrari, Lamborghini, Bugatti.
-- **Dreaming Anime:** Monitoring Crunchyroll (https://www.facebook.com/Crunchyroll), Netflix Anime (https://www.facebook.com/NetflixAnime), Catsuka, My Anime World, and Iris Shana for high-fidelity signals.
+- **Dreaming Anime:** Monitoring Crunchyroll (https://www.facebook.com/Crunchyroll), Netflix Anime (https://www.facebook.com/NetflixAnime), Catsuka, My Anime World, and Iris Shana for professional signals.
 
 ## Reporting Mandate
 Post-session reports are only required for the three active nodes. No reporting or deployment for inactive secondary brands.
@@ -158,6 +158,6 @@ Any file modified in the workspace or pushed to GitHub must include a comment or
 - **Length:** Minimum 1 full page per blog.
 - **Structure:** Minimum 2 paragraphs per post.
 - **Density:** Each paragraph must have 10+ sentences and exceed 200 words.
-- **Vocabulary Filter:** BANNED words: "sovereign", "neural".
-- **Research Level:** Extensive research only. Content must highlight the latest high-fidelity anime news, top trending anime, and official studio trailers. No generic fillers.
-- **Resolution Standard:** All blog images must use the 450px high-fidelity cap to ensure crisp resolution.
+- **Vocabulary Filter:** BANNED words: "", "".
+- **Research Level:** Extensive research only. Content must highlight the latest professional anime news, top trending anime, and official studio trailers. No generic fillers.
+- **Resolution Standard:** All blog images must use the 450px professional cap to ensure crisp resolution.
