@@ -785,8 +785,9 @@ const STEPS = {
     ]
 },
     "start": {
-        "bot": "Hey 👋 I'm Sierra. What brings you here today?",
+        "bot": "Hi, welcome to Prisca Dezigns. How can I help you? Be the first to get 10% off your website with a chatbot. Don't forget we offer landing pages for only $75 USD.",
         "r": [
+            { "l": "Chat on WhatsApp", "url": "https://wa.me/18683424101?text=Hi!%20I%27d%20like%20to%20know%20more%20about%20the%2010%25%20off%20chatbot%20offer%20and%20the%20%2475%20landing%20page.", "i": "message-circle" },
             { "l": "About Prisca Dezigns", "s": "about", "i": "info" },
             { "l": "Talk to Drew about pricing", "s": "__drew_text__", "i": "dollar-sign" },
             { "l": "General support", "s": "talk", "i": "message-circle" }
@@ -1237,9 +1238,13 @@ window.chatSend = function(){
     });
 };
 
-if(window.location.pathname.includes('/services')){
-    setTimeout(() => { if(!open) toggleChat(); }, 8000);
-}
+// Auto-open on page load, site-wide, so the welcome offer is seen immediately.
+setTimeout(() => {
+    if(!open) {
+        toggleChat();
+        selectAgent('sierra');
+    }
+}, 1200);
 
 // --- Voice Picker: visit any page with ?voicepicker=1 to open this ---
 if (window.location.search.includes('voicepicker=1')) {
