@@ -42,22 +42,22 @@
     }
     #pd-chat-window.open { opacity:1; pointer-events:all; transform:translateY(0) scale(1); }
     
-    .chat-hdr { background: linear-gradient(135deg, var(--cb-purple), var(--cb-deep)); border-bottom: 1px solid rgba(0,0,0,0.08); padding:24px 28px; display:flex; align-items:center; gap:16px; flex-shrink:0; }
+    .chat-hdr { background: linear-gradient(135deg, #9d50bb, #6e48aa); padding:24px 28px; display:flex; align-items:center; gap:16px; flex-shrink:0; }
     .chat-avatar { width:48px; height:48px; border-radius:18px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow: 0 8px 16px rgba(0,0,0,0.1); flex-shrink:0; overflow: hidden; perspective: 1000px; }
     .chat-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
     .chat-avatar:hover img { transform: rotateY(20deg) rotateX(10deg) scale(1.15); filter: drop-shadow(0 12px 20px rgba(0,0,0,0.15)); }
-    .chat-hdr-name { font-size:1.1rem; font-weight:800; color:var(--cb-text); font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
-    .chat-hdr-status { font-size:0.75rem; color:rgba(30,27,75,0.6); display:flex; align-items:center; gap:8px; margin-top:2px; font-weight: 500; }
+    .chat-hdr-name { font-size:1.1rem; font-weight:800; color:#fff; font-family: 'Inter', sans-serif; letter-spacing: -0.02em; }
+    .chat-hdr-status { font-size:0.75rem; color:rgba(255,255,255,0.8); display:flex; align-items:center; gap:8px; margin-top:2px; font-weight: 500; }
     .chat-sdot { width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow: 0 0 10px #22c55e; animation: pgr 2s infinite; }
     @keyframes pgr { 0%,100%{opacity:1; transform: scale(1);} 50%{opacity:0.6; transform: scale(1.2);} }
 
     .chat-hdr-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
     #chat-voice-toggle {
-        background: rgba(30,27,75,0.06); border: 1px solid rgba(30,27,75,0.12);
-        color: var(--cb-text); border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase;
+        background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
+        color: #fff; border-radius: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase;
         padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;
     }
-    #chat-voice-toggle.voice-on { background: var(--cb-text); color: #fff; }
+    #chat-voice-toggle.voice-on { background: #fff; color: #9d50bb; }
 
     /* ── Agent Selector ── */
     #agent-selector {
