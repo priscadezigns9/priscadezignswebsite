@@ -311,6 +311,7 @@ function updateTurn(dt){
   }
 }
 
+let scrollGoal=0,scrollSpring=0;addEventListener('scroll',()=>{const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);scrollGoal=Math.min(1,Math.max(0,scrollY/max))},{passive:true});
 const clock=new THREE.Clock();
 let lastT=0;
 function animate(){
@@ -318,8 +319,8 @@ function animate(){
   const t=clock.getElapsedTime();
   const dt=Math.min(.05,t-lastT);lastT=t;   // getDelta() is consumed by getElapsedTime()
   updateTurn(dt);
-  system.rotation.y+=(targetY-system.rotation.y)*.06+.0030;
-  system.rotation.x+=(targetX-system.rotation.x)*.06;
+  scrollSpring+=(scrollGoal-scrollSpring)*.075;const springAngle=scrollSpring*Math.PI*2.15;const springX=innerWidth>760?1.55+Math.sin(springAngle)*.72:0;const springY=innerWidth>760?Math.cos(springAngle)*.34:Math.sin(springAngle)*.18;system.position.x+=(springX-system.position.x)*.08;system.position.y+=(springY-system.position.y)*.08;system.rotation.y+=(targetY-system.rotation.y)*.06+.0030+Math.sin(springAngle)*.0018;
+  system.rotation.x+=(targetX-system.rotation.x)*.06;system.rotation.z+=(Math.sin(springAngle)*.08-system.rotation.z)*.06;
   cage.rotation.y+=.0016;
 
   // per-cube motion: lateral drift + radial breathing + slow tumble
