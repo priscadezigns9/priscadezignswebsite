@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Merka Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#FF3366;--bg:#08080A;--surface:#0F0F12;--surface2:#14141A;--border:#FF336618;--text:#F0EDF4;--muted:#F0EDF460}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+.sidebar{width:230px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform 0.3s}
+.sidebar-brand{padding:20px 18px;border-bottom:1px solid var(--border)}
+.brand-name{font-size:1.35rem;font-weight:700;color:var(--accent);letter-spacing:-0.5px}
+.brand-sub{font-size:0.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-family:'Inter',sans-serif;margin-top:2px}
+.nav-section{padding:16px 14px 5px;font-size:0.6rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;font-family:'Inter',sans-serif;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:5px;cursor:pointer;margin:2px 8px;transition:all 0.15s;font-size:0.87rem;font-weight:500;color:var(--muted)}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:#FF336618;color:var(--accent)}
+.nav-icon{width:16px;height:16px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:9px}
+.avatar{width:30px;height:30px;background:#FF336625;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--accent);flex-shrink:0}
+.user-name{font-size:0.82rem;font-weight:600}
+.user-role{font-size:0.68rem;color:var(--muted);font-family:'Inter',sans-serif}
+.logout-btn{margin-top:9px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px;font-family:'Space Grotesk',sans-serif;font-size:0.74rem;cursor:pointer;border-radius:4px;transition:all 0.2s}
+.logout-btn:hover{border-color:var(--accent);color:var(--accent)}
+.main{margin-left:230px;flex:1}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:50}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.hamburger{display:none;background:none;border:none;cursor:pointer;color:var(--text)}
+.page-title{font-size:1.1rem;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge{background:#FF336618;color:var(--accent);padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600}
+.date-chip{font-size:0.76rem;color:var(--muted);font-family:'Inter',sans-serif}
+.content{padding:22px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:19px;border-radius:6px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.stat-card:hover{border-color:#FF336640}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0.6}
+.stat-label{font-size:0.67rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px;font-weight:600;font-family:'Inter',sans-serif}
+.stat-val{font-size:1.9rem;font-weight:700;color:var(--text);line-height:1}
+.stat-sub{font-size:0.74rem;color:var(--muted);margin-top:5px;font-family:'Inter',sans-serif}
+.stat-icon{position:absolute;top:14px;right:14px;font-size:1.3rem;opacity:0.2}
+.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:18px}
+.grid-2b{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.widget{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:0.97rem;font-weight:700}
+.view-all{font-size:0.74rem;color:var(--accent);cursor:pointer;font-family:'Inter',sans-serif}
+
+/* Sparkline */
+.sparkline-wrap{display:flex;align-items:flex-end;gap:4px;height:60px;margin-bottom:14px}
+.spark-bar{flex:1;background:#FF336620;border-radius:2px 2px 0 0;transition:height 0.5s;position:relative;cursor:pointer}
+.spark-bar:hover{background:#FF336640}
+.spark-bar::after{content:attr(data-val);position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--accent);white-space:nowrap;opacity:0;transition:opacity 0.2s}
+.spark-bar:hover::after{opacity:1}
+.spark-labels{display:flex;gap:4px;margin-bottom:14px}
+.spark-label{flex:1;text-align:center;font-size:0.6rem;color:var(--muted);font-family:'Inter',sans-serif}
+.sales-total{display:flex;align-items:baseline;gap:8px}
+.sales-amount{font-size:2rem;font-weight:700;color:var(--accent)}
+.sales-change{font-size:0.8rem;color:#22C55E;font-family:'Inter',sans-serif}
+
+/* Low stock */
+.stock-list{display:flex;flex-direction:column;gap:8px}
+.stock-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:4px;border-left:2px solid #FF3366}
+.stock-name{font-size:0.85rem;font-weight:600;flex:1}
+.stock-sku{font-size:0.68rem;color:var(--muted);font-family:'Inter',monospace}
+.stock-qty{font-size:0.75rem;font-weight:600;color:#FF3366;background:#FF336618;padding:2px 8px;border-radius:3px}
+.stock-thresh{font-size:0.68rem;color:var(--muted);font-family:'Inter',sans-serif}
+
+/* Top products */
+.prod-list{display:flex;flex-direction:column;gap:8px}
+.prod-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.prod-item:last-child{border-bottom:none}
+.prod-rank{font-size:0.72rem;font-weight:700;color:var(--accent);width:22px;flex-shrink:0;font-family:'Inter',sans-serif}
+.prod-name{font-size:0.85rem;font-weight:600;flex:1}
+.prod-sales{font-size:0.78rem;color:var(--muted);font-family:'Inter',sans-serif}
+.prod-rev{font-size:0.9rem;font-weight:700;color:var(--text)}
+.prod-bar{height:4px;background:#FF336615;border-radius:2px;margin-top:4px;overflow:hidden}
+.prod-fill{height:100%;background:var(--accent);border-radius:2px}
+
+/* Transactions */
+.tx-list{display:flex;flex-direction:column;gap:0}
+.tx-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.tx-item:last-child{border-bottom:none}
+.tx-icon{width:28px;height:28px;border-radius:50%;background:#FF336615;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+.tx-info{flex:1}
+.tx-name{font-size:0.83rem;font-weight:600}
+.tx-time{font-size:0.68rem;color:var(--muted);font-family:'Inter',sans-serif}
+.tx-amount{font-size:0.93rem;font-weight:700}
+.tx-amount.pos{color:#22C55E}
+.tx-amount.neg{color:#FF3366}
+
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:90}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}.hamburger{display:block}
+  .stats-row{grid-template-columns:1fr 1fr}.grid-2,.grid-2b{grid-template-columns:1fr}
+  .overlay.show{display:block}
+}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr 1fr}.content{padding:13px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">Merka</div>
+    <div class="brand-sub">Retail & POS</div>
+  </div>
+  <div class="nav-section">Main</div>
+  <div class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Sales</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Inventory</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>Products</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Customers</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</div>
+  <div class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>Settings</div>
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">SB</div>
+      <div><div class="user-name">Stacey Belford</div><div class="user-role">Store Manager</div></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="badge">POS Active</span>
+      <span class="date-chip" id="dateChip"></span>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Sales Today</div><div class="stat-val">TTD 14,820</div><div class="stat-sub">↑ 12% vs yesterday</div><div class="stat-icon">💳</div></div>
+      <div class="stat-card"><div class="stat-label">Transactions</div><div class="stat-val">142</div><div class="stat-sub">Avg TTD 104/sale</div><div class="stat-icon">🧾</div></div>
+      <div class="stat-card"><div class="stat-label">Low Stock Items</div><div class="stat-val">5</div><div class="stat-sub">Needs reorder</div><div class="stat-icon">⚠️</div></div>
+      <div class="stat-card"><div class="stat-label">Top Category</div><div class="stat-val">Groceries</div><div class="stat-sub">TTD 5,400 today</div><div class="stat-icon">🏆</div></div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Sales sparkline -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Sales Today — Hourly</span><span class="view-all">Details →</span></div>
+        <div class="sales-total"><span class="sales-amount">TTD 14,820</span><span class="sales-change">↑ 12% from yesterday</span></div>
+        <div style="margin-top:16px">
+          <div class="sparkline-wrap" id="sparkWrap"></div>
+          <div class="spark-labels" id="sparkLabels"></div>
+        </div>
+      </div>
+      <!-- Low Stock -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Low Stock Alerts</span><span class="view-all">Reorder →</span></div>
+        <div class="stock-list" id="stockList"></div>
+      </div>
+    </div>
+
+    <div class="grid-2b">
+      <!-- Top Products -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Top Products</span><span class="view-all">All Products →</span></div>
+        <div class="prod-list" id="prodList"></div>
+      </div>
+      <!-- Recent Transactions -->
+      <div class="widget">
+        <div class="section-header"><span class="section-title">Recent Transactions</span><span class="view-all">All →</span></div>
+        <div class="tx-list" id="txList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+if(!localStorage.getItem('merka_auth')){window.location.href='../';}
+document.getElementById('dateChip').textContent=new Date().toLocaleDateString('en-TT',{weekday:'short',day:'numeric',month:'short'});
+
+// Sparkline
+const hourlyData=[
+  {h:'7am',v:420},{h:'8am',v:880},{h:'9am',v:1240},{h:'10am',v:1560},{h:'11am',v:1820},
+  {h:'12pm',v:2100},{h:'1pm',v:1680},{h:'2pm',v:1440},{h:'3pm',v:980},{h:'4pm',v:760},
+  {h:'5pm',v:600},{h:'6pm',v:340}
+];
+const maxV=Math.max(...hourlyData.map(d=>d.v));
+const sw=document.getElementById('sparkWrap');
+const sl=document.getElementById('sparkLabels');
+hourlyData.forEach(d=>{
+  const pct=(d.v/maxV)*100;
+  sw.innerHTML+=`<div class="spark-bar" style="height:${pct}%;background:linear-gradient(#FF3366,#FF336640)" data-val="TTD ${d.v}"></div>`;
+  sl.innerHTML+=`<div class="spark-label">${d.h}</div>`;
+});
+
+// Stock
+const stockItems=[
+  {name:'Carib Lager 6-pack',sku:'SKU-0441',qty:4,min:20},
+  {name:'White Rice 5kg',sku:'SKU-1102',qty:7,min:25},
+  {name:'Coconut Milk 400ml',sku:'SKU-2318',qty:2,min:15},
+  {name:'Chubby Soda 24pk',sku:'SKU-3301',qty:6,min:18},
+  {name:'Condensed Milk',sku:'SKU-4405',qty:9,min:30},
+];
+const stl=document.getElementById('stockList');
+stockItems.forEach(s=>{
+  stl.innerHTML+=`<div class="stock-item">
+    <div style="flex:1"><div class="stock-name">${s.name}</div><div class="stock-sku">${s.sku}</div></div>
+    <div style="text-align:right"><span class="stock-qty">${s.qty} left</span><div class="stock-thresh">Min: ${s.min}</div></div>
+  </div>`;
+});
+
+// Top products
+const products=[
+  {rank:1,name:'Carib Lager 6-pack',sales:38,rev:2812,pct:100},
+  {rank:2,name:'White Rice 5kg',sales:29,rev:1740,pct:62},
+  {rank:3,name:'Sunshine Chicken',sales:24,rev:2040,pct:73},
+  {rank:4,name:'Breeze Detergent',sales:21,rev:945,pct:34},
+  {rank:5,name:'Chubby Soda Mix',sales:18,rev:630,pct:22},
+];
+const pl=document.getElementById('prodList');
+products.forEach(p=>{
+  pl.innerHTML+=`<div class="prod-item">
+    <span class="prod-rank">#${p.rank}</span>
+    <div style="flex:1"><div class="prod-name">${p.name}</div><div class="prod-sales">${p.sales} units sold</div><div class="prod-bar"><div class="prod-fill" style="width:${p.pct}%"></div></div></div>
+    <span class="prod-rev">TTD ${p.rev.toLocaleString()}</span>
+  </div>`;
+});
+
+// Transactions
+const txs=[
+  {name:'Cash Sale',time:'6:42 PM',amount:'+TTD 248',type:'pos'},
+  {name:'Card Payment',time:'6:31 PM',amount:'+TTD 1,140',type:'pos'},
+  {name:'Cash Sale',time:'6:18 PM',amount:'+TTD 85',type:'pos'},
+  {name:'Cash Refund',time:'5:57 PM',amount:'-TTD 120',type:'refund'},
+  {name:'Card Payment',time:'5:44 PM',amount:'+TTD 360',type:'pos'},
+  {name:'Cash Sale',time:'5:30 PM',amount:'+TTD 56',type:'pos'},
+];
+const txl=document.getElementById('txList');
+txs.forEach(t=>{
+  const isPos=t.type==='pos';
+  txl.innerHTML+=`<div class="tx-item">
+    <div class="tx-icon">${isPos?'💳':'↩️'}</div>
+    <div class="tx-info"><div class="tx-name">${t.name}</div><div class="tx-time">${t.time}</div></div>
+    <span class="tx-amount ${isPos?'pos':'neg'}">${t.amount}</span>
+  </div>`;
+});
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+function logout(){localStorage.removeItem('merka_auth');window.location.href='../';}
+</script>
+</body>
+</html>

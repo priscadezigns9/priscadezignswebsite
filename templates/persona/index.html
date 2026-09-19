@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Your Name — Creative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<!-- ABCSocialMono equiv: Space Mono | BOW display serif equiv: Playfair Display -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════════
+   PERSONA — Extracted from bow.no
+   ══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --font-base-px: 20px;
+  --container-padding: 3vw;
+  --bg-dark: #000;
+  --bg-light: #fff;
+  --bg-warm:  #f9f7f4;
+  --text:     #1a1a1a;
+  --muted:    #929292;
+  --border:   rgba(0,0,0,0.12);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-mono:    'Space Mono', monospace;         /* ABCSocialMono */
+  --vp-100vh: 100vh;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-light);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: var(--font-base-px);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* ── arrow-span hover animations (exact bow.no) ── */
+span[class^=arrow-] {
+  transition: all .15s ease;
+  display: inline-block;
+  backface-visibility: hidden;
+}
+a:hover span.arrow-r  { transform: translate(5px); }
+a:hover span.arrow-l  { transform: translate(-5px); }
+a:hover span.arrow-u  { transform: translateY(-5px); }
+a:hover span.arrow-d  { transform: translateY(5px); }
+a:hover span.arrow-ne { transform: translateY(-5px) translate(5px); }
+
+/* ── backdrop blur (exact bow.no .backdrop) ── */
+.backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 80;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.backdrop.show { opacity: 1; pointer-events: all; }
+
+/* ══════════════════════════════════════
+   HEADER / NAV — exact bow.no
+   ══════════════════════════════════════ */
+[data-nav] {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 var(--container-padding);
+}
+
+nav#menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  position: relative;
+}
+
+/* BOW brand figure — exact SVG wordmark in nav */
+figure.brand a {
+  display: block;
+  text-decoration: none;
+}
+figure.brand svg {
+  width: 60px; height: auto;
+  display: block;
+  transition: opacity .2s;
+}
+figure.brand svg:hover { opacity: 0.7; }
+
+/* Nav links section */
+nav#menu .main {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(380px, 85vw);
+  background: var(--bg-light);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  padding: 5rem 3rem;
+  transform: translateX(100%);
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+}
+nav#menu .main.open {
+  transform: translateX(0);
+}
+nav#menu .main ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+}
+nav#menu .main ul li a {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-style: italic;
+  color: var(--text);
+  text-decoration: none;
+  transition: color .2s;
+  display: block;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+nav#menu .main ul li a:hover { color: var(--muted); }
+nav#menu .main ul li:last-child a { border-bottom: none; }
+
+/* Hamburger — exact bow.no */
+figure.menu-button { z-index: 101; }
+.hamburger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  text-decoration: none;
+  color: var(--bg-light);
+  transition: color .2s;
+}
+.hamburger span:not(.hamburger-label) {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.hamburger .hamburger-box {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.hamburger .hamburger-inner {
+  display: block; width: 22px; height: 1.5px;
+  background: currentColor;
+  transition: all .25s;
+  position: relative;
+}
+.hamburger .hamburger-inner::before,
+.hamburger .hamburger-inner::after {
+  content: '';
+  display: block;
+  width: 22px; height: 1.5px;
+  background: currentColor;
+  position: absolute;
+  transition: all .25s;
+}
+.hamburger .hamburger-inner::before { top: -6px; }
+.hamburger .hamburger-inner::after  { top:  6px; }
+
+.hamburger.is-dark { color: var(--text); }
+.hamburger.close-btn {
+  position: absolute; top: 1.5rem; right: 1.5rem;
+  color: var(--text);
+}
+
+/* ══════════════════════════════════════
+   [b-tpl=hero] — exact bow.no
+   fullscreen bg video/image + tagline top + arrow+logo bottom
+   ══════════════════════════════════════ */
+[b-tpl=hero] {
+  padding-top: 0 !important;
+  height: 100svh; height: var(--vp-100vh);
+  position: relative;
+  background-color: var(--bg-dark);
+  overflow: hidden;
+}
+
+/* Background */
+[b-tpl=hero] .bg {
+  position: absolute; inset: 0;
+  height: 100%; z-index: 0;
+}
+[b-tpl=hero] .bg img,
+[b-tpl=hero] .bg video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: brightness(0.45);
+}
+
+/* Cycling slides */
+.hero-slide {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.hero-slide.active { opacity: 1; }
+
+/* Inner — flex column, space-between (exact bow.no) */
+[b-tpl=hero] .inner {
+  height: var(--vp-100vh);
+  display: flex; z-index: 3;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--container-padding);
+  padding-top: 6rem;
+  padding-bottom: 2rem;
+}
+
+/* Tagline — top (exact bow.no) */
+[b-tpl=hero] .inner .top .tagline {
+  position: relative; color: #fff;
+}
+[b-tpl=hero] .inner .top .tagline p {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  font-weight: 400;
+  max-width: 480px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.8);
+}
+[b-tpl=hero] .inner .top .tagline p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  color: #fff;
+}
+
+/* Bottom: arrow left + BOW logo centered (exact bow.no) */
+[b-tpl=hero] .inner .bottom {
+  display: flex;
+  position: relative;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+[b-tpl=hero] .inner .bottom .arrow {
+  position: relative;
+  bottom: 0; z-index: 3;
+}
+[b-tpl=hero] .inner .bottom .arrow a {
+  display: flex; align-items: center; gap: 10px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.arrow-animated {
+  animation: arrowBounce 2s infinite ease-in-out;
+}
+@keyframes arrowBounce {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(6px); }
+}
+
+/* BOW-style wordmark centered in hero bottom */
+[b-tpl=hero] .inner .bottom .logo {
+  margin: 0 auto;
+}
+.hero-wordmark {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 18vw, 16rem);
+  font-style: italic;
+  font-weight: 700;
+  color: rgba(255,255,255,0.06);
+  letter-spacing: -4px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0; right: 0;
+  text-align: center;
+  z-index: 2;
+}
+
+/* ══════════════════════════════════════
+   [b-tpl="about + links"] — exact bow.no
+   Full-height white section, preamble + 3 buttons (squircle, circle, square)
+   ══════════════════════════════════════ */
+[b-tpl="about + links"] {
+  padding-top: 0 !important;
+  height: var(--vp-100vh);
+  position: relative;
+  background-color: var(--bg-light);
+}
+[b-tpl="about + links"] .inner {
+  min-height: var(--vp-100vh);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--container-padding);
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+}
+[b-tpl="about + links"] .inner .preamble p {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.4;
+  max-width: 700px;
+  color: var(--text);
+}
+[b-tpl="about + links"] .inner .preamble p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+}
+/* Exact bow.no three button shapes */
+[b-tpl="about + links"] .inner .buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+[b-tpl="about + links"] .inner .buttons a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--text);
+  padding: 14px 28px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  transition: border-radius .35s ease, background .2s;
+}
+[b-tpl="about + links"] .inner .buttons a:hover { background: rgba(0,0,0,0.04); }
+/* squircle — rounded, hovers to circle */
+[b-tpl="about + links"] .inner .buttons a:first-of-type {
+  border-radius: 3vw;
+}
+[b-tpl="about + links"] .inner .buttons a:first-of-type:hover {
+  border-radius: 50%;
+}
+/* circle — starts circle, hovers to square */
+[b-tpl="about + links"] .inner .buttons a:nth-of-type(2) {
+  border-radius: 50%;
+}
+[b-tpl="about + links"] .inner .buttons a:nth-of-type(2):hover {
+  border-radius: 0;
+}
+/* square — stays square, hovers to circle */
+[b-tpl="about + links"] .inner .buttons a:nth-of-type(3):hover {
+  border-radius: 50%;
+}
+
+/* ══════════════════════════════════════
+   [b-tpl="datasource intros"] — exact bow.no
+   Stacked full-height project panels, each with --bg color,
+   2 media figs (landscape video + portrait photo), text overlay
+   ══════════════════════════════════════ */
+[b-tpl="datasource intros"] { padding-top: 0 !important; }
+[b-tpl="datasource intros"] .inner .intros {
+  display: flex; flex-direction: column;
+}
+/* Each intro panel */
+[b-tpl="datasource intros"] .inner .intros .intro > article {
+  padding-top: 0 !important;
+  height: var(--vp-100vh);
+  position: relative;
+  background-color: var(--bg);
+  overflow: hidden;
+}
+/* Case link — full overlay (exact bow.no) */
+[b-tpl="datasource intros"] .inner .intros .intro > article a.case-link {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 3;
+  cursor: pointer;
+}
+
+/* Inner grid: 2 figs + text (exact bow.no) */
+[b-tpl="datasource intros"] .inner .intros .intro > article .inner {
+  position: relative; z-index: 2;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+}
+/* Background figs */
+[b-tpl="datasource intros"] .inner .intros .intro > article .bg {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  height: 100%;
+  z-index: 0;
+}
+.fig1, .fig2 {
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+}
+.fig1 img, .fig2 img,
+.fig1 video, .fig2 video {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Text overlay — full height, flex column space-between (exact bow.no) */
+[b-tpl="datasource intros"] .inner .intros .intro > article .text {
+  height: var(--vp-100vh);
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  position: relative; z-index: 3;
+  grid-column: 1 / -1;
+  padding: var(--container-padding);
+  padding-top: 5rem;
+  padding-bottom: 2rem;
+  pointer-events: none;
+}
+[b-tpl="datasource intros"] .inner .intros .intro > article .text .top p {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.3;
+  max-width: 600px;
+}
+[b-tpl="datasource intros"] .inner .intros .intro > article .text .top p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+}
+[b-tpl="datasource intros"] .inner .intros .intro > article .text .bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+/* Footer tags — exact bow.no: glassmorphism pills, mono font */
+.footer-text { color: #fff; }
+.footer-text ul {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  list-style: none;
+}
+.footer-text ul li {
+  background-color: rgba(255,255,255,0.2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background-blend-mode: overlay;
+  padding: 4px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+}
+/* Index counter (exact bow.no X/X) */
+.index {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ══════════════════════════════════════
+   [b-tpl="datasource clients"] — exact bow.no
+   Preamble + client list with hover image reveal
+   ══════════════════════════════════════ */
+[b-tpl="datasource clients"] { padding-top: 0 !important; }
+[b-tpl="datasource clients"] .inner {
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  min-height: var(--vp-100vh);
+  padding: var(--container-padding);
+  padding-top: 6rem;
+  padding-bottom: 3rem;
+}
+[b-tpl="datasource clients"] .inner .preamble p {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  max-width: 600px;
+  line-height: 1.5;
+  margin-bottom: 3rem;
+}
+[b-tpl="datasource clients"] .inner .preamble p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+}
+/* Client rows — exact bow.no: large text, hover to reveal image */
+[b-tpl="datasource clients"] .inner .clients {
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.client {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+  position: relative;
+  transition: background .2s;
+}
+.client:first-child { border-top: 1px solid var(--border); }
+.client:hover { background: var(--bg-warm); }
+.client p {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.5vw, 2rem);
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0;
+}
+.client p strong {
+  font-weight: 400;
+  font-variant: small-caps;
+  text-transform: lowercase;
+}
+/* Hover image — exact bow.no: floating preview follows cursor */
+.client-hover-img {
+  position: fixed;
+  top: 0; left: 0;
+  width: 260px;
+  aspect-ratio: 4/3;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity .25s ease;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.client-hover-img img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* squircle CTA at bottom of clients */
+[b-tpl="datasource clients"] .inner .squircle {
+  margin-top: 3rem;
+  display: block;
+}
+[b-tpl="datasource clients"] .inner .squircle a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--text);
+  padding: 14px 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 3vw;
+  transition: border-radius .35s ease;
+}
+[b-tpl="datasource clients"] .inner .squircle a:hover {
+  border-radius: 50%;
+}
+
+/* ══════════════════════════════════════
+   FOOTER — exact bow.no
+   fullscreen dark video bg + contact info grid
+   ══════════════════════════════════════ */
+footer {
+  position: relative;
+  height: var(--vp-100vh);
+  background: var(--bg-dark);
+  overflow: hidden;
+}
+footer .bg {
+  position: absolute; inset: 0;
+  z-index: 0;
+}
+footer .bg img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: brightness(0.35);
+}
+footer .inner {
+  position: relative; z-index: 2;
+  height: 100%;
+  display: flex; align-items: flex-end;
+  padding: var(--container-padding);
+  padding-bottom: 3rem;
+}
+footer .inner .wrapper {
+  width: 100%;
+  display: flex; flex-direction: column;
+  gap: 2.5rem;
+}
+footer .inner .wrapper .top p {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.5rem);
+  font-weight: 400;
+  font-style: italic;
+  color: #fff;
+  line-height: 1.35;
+}
+footer .inner .wrapper .bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+footer .contact {
+  display: flex; flex-wrap: wrap; gap: 3rem;
+}
+footer .contact p {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  line-height: 2;
+  color: rgba(255,255,255,0.65);
+}
+footer .contact p a {
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  transition: color .2s;
+  display: block;
+}
+footer .contact p a:hover { color: #fff; }
+/* footer of footer (exact bow.no) */
+.footer-has-a-footer-dear-god p {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ══════════════════════════════════════
+   BOW SVG wordmark (extracted exact SVG from bow.no)
+   Repositioned as corner watermark
+   ══════════════════════════════════════ */
+.BOW {
+  position: fixed;
+  bottom: 2rem; left: var(--container-padding);
+  z-index: 200;
+  width: 44px;
+  opacity: 0;
+  transition: opacity .5s .5s;
+  pointer-events: none;
+}
+.BOW.visible { opacity: 1; }
+.BOW svg { width: 100%; height: auto; }
+
+/* ── BADGE ── */
+.template-badge {
+  position: fixed; bottom: 24px; right: 24px; z-index: 99999;
+  background: var(--text);
+  color: var(--bg-light);
+  padding: 12px 22px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+  transition: opacity .2s;
+}
+.template-badge:hover { opacity: 0.8; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  :root { --container-padding: 5vw; }
+  [b-tpl="datasource intros"] .inner .intros .intro > article .bg {
+    grid-template-columns: 1fr;
+  }
+  .fig2 { display: none; }
+  [b-tpl="about + links"] { height: auto; }
+  [b-tpl="datasource clients"] .inner { min-height: auto; }
+  footer { height: auto; padding-top: 40vw; }
+  .hero-wordmark { font-size: clamp(3rem, 18vw, 8rem); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   UNIVERSAL RESPONSIVE PATCH — Prisca Dezigns Templates
+   Applied: 2026-07-06
+   ═══════════════════════════════════════════════════════ */
+
+/* 1. Every image in a photo container must cover its box
+      and keep faces at the top so heads never get cropped */
+.hero img, .hero video,
+.hero-img img, .hero-image img,
+.about-img img, .about-image img,
+.feat-img img, .feature-img img,
+.slide-img img, .gallery-img img,
+.project-img img, .case-img img,
+.profile-img img, .portrait img,
+.team-img img, .headshot img,
+.fig1 img, .fig2 img,
+.bg img, .bg video,
+.card-img img, .card img > img,
+.media-panel img, .reel-panel img,
+[class*="-photo"] img,
+[class*="-image"] img,
+[class*="img-wrap"] img,
+section img:not([class*="logo"]):not([class*="icon"]):not([class*="brand"]) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;  /* keeps faces — top of frame */
+  display: block;
+}
+
+/* 2. Image wrapper containers must have a defined height
+      so object-fit has something to fill */
+.hero, .hero-wrap,
+.hero-img, .hero-image,
+.about-img, .feat-img,
+.slide-img, .gallery-img,
+.project-img, .case-img,
+.profile-img, .portrait,
+.fig1, .fig2,
+.card-img,
+[class*="-photo"],
+[class*="-image"]:not(section):not(article) {
+  overflow: hidden;
+  position: relative;
+}
+
+/* 3. Max-width containers: replace fixed px with responsive max */
+.container, .inner, .wrapper, .content,
+[class*="container"], [class*="inner"],
+[class*="wrapper"] {
+  max-width: min(100%, var(--container-max, 1200px));
+  width: 100%;
+}
+
+/* ── MOBILE: ≤ 768px ────────────────────────────── */
+@media (max-width: 768px) {
+  /* Reset any fixed pixel widths on sections */
+  section, article, header, footer, main,
+  .container, .inner, .wrapper, .content,
+  [class*="container"], [class*="inner"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+
+  /* Hero: full viewport height, never cropped */
+  .hero, [class*="hero"],
+  [b-tpl="hero"] {
+    min-height: 100svh;
+    height: auto !important;
+  }
+
+  /* Stack any 2-col or multi-col grid to single column */
+  [class*="grid"],
+  [class*="two-col"],
+  [class*="split"],
+  [class*="columns"],
+  .stats, .stat-row,
+  .services-grid, .service-grid,
+  .cards, .card-row,
+  .team-grid, .gallery-grid,
+  .features-grid, .work-grid,
+  .about-grid, .contact-grid {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+
+  /* Remove fixed pixel heights on images — let them scale */
+  .hero-img, .hero-image,
+  .about-img, .feat-img,
+  .slide-img, .project-img,
+  .case-img, .profile-img,
+  .fig1, .fig2,
+  [class*="-photo"],
+  [class*="-image"]:not(section):not(article) {
+    height: 56vw !important;   /* 16:9ish — safe for any face shot */
+    min-height: 220px;
+    max-height: 480px;
+  }
+
+  /* Full-height panel images (Velocity reel, Persona panels) */
+  [class*="panel"] img,
+  [class*="reel"] img,
+  .intro > article .bg img,
+  .intro > article .bg video {
+    height: 100% !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    object-position: center center;
+  }
+
+  /* Nav: stack or shrink */
+  nav ul {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  /* Typography scaling — clamp already handles most, but enforce min */
+  h1 { font-size: clamp(2rem, 10vw, 4rem) !important; }
+  h2 { font-size: clamp(1.4rem, 7vw, 2.5rem) !important; }
+  h3 { font-size: clamp(1.1rem, 5vw, 1.8rem) !important; }
+  p  { font-size: clamp(0.95rem, 4vw, 1.1rem) !important; }
+
+  /* Hide decorative side-by-side second fig on small screens */
+  .fig2 { display: none; }
+  .fig1 { width: 100% !important; }
+
+  /* Buttons: full width on mobile */
+  .cta-btn, .btn, .button,
+  [class*="btn"], [class*="cta"],
+  .squircle a, .bubble-cta {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Ticker/marquee: reduce gap */
+  .ticker-track { gap: 2rem !important; }
+
+  /* Footer grid → stack */
+  footer .grid,
+  footer .inner,
+  footer .wrapper,
+  footer .contact {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+  }
+}
+
+/* ── SMALL PHONES: ≤ 480px ──────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --container-padding: 4vw !important;
+  }
+
+  .hero-img, .hero-image,
+  .about-img, .feat-img,
+  .slide-img, .project-img,
+  [class*="-photo"],
+  [class*="-image"]:not(section):not(article) {
+    height: 70vw !important;
+    min-height: 200px;
+  }
+
+  /* Hazel May speech bubbles — shrink on tiny screens */
+  .bubble-word {
+    font-size: clamp(1.6rem, 9vw, 3rem) !important;
+  }
+}
+
+/* ── TABLET: 769px – 1024px ─────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container, .inner, .wrapper {
+    padding-left: 4vw;
+    padding-right: 4vw;
+  }
+  /* 3-col grids → 2-col on tablet */
+  [class*="grid-3"],
+  .three-col,
+  .services-grid:has(> :nth-child(3)),
+  .cards:has(> :nth-child(3)) {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════ */
+</style>
+</head>
+<body id="top">
+
+<!-- HOVER IMAGE FOLLOWER (bow.no client list hover effect) -->
+<div class="client-hover-img" id="hoverImg">
+  <img src="" alt="" id="hoverImgEl"/>
+</div>
+
+<!-- BACKDROP -->
+<div class="backdrop" id="backdrop" onclick="closeNav()"></div>
+
+<!-- ══ HEADER / NAV ══ -->
+<header data-nav>
+  <nav id="menu" aria-label="Menu" role="navigation">
+
+    <!-- Brand — BOW SVG wordmark (exact extracted SVG) -->
+    <figure class="brand">
+      <a href="#">
+        <h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden">Your Name</h1>
+        <svg viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="80" height="27">
+          <!-- Extracted BOW-style letterform in white -->
+          <text x="0" y="30" font-family="Georgia,serif" font-style="italic" font-size="32" fill="#fff" letter-spacing="-1">YN</text>
+        </svg>
+      </a>
+    </figure>
+
+    <!-- Slide-in menu -->
+    <section class="main" id="mainNav">
+      <button class="hamburger close-btn" onclick="closeNav()" aria-label="Close menu">
+        <span style="font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a;">Close</span>
+        <span class="hamburger-box">
+          <span class="hamburger-inner" style="transform:rotate(45deg);top:0;">
+          </span>
+        </span>
+      </button>
+      <ul>
+        <li><a href="#about">About <span class="arrow-ne">&nearr;</span></a></li>
+        <li><a href="#work">Work <span class="arrow-ne">&nearr;</span></a></li>
+        <li><a href="#clients">Clients <span class="arrow-ne">&nearr;</span></a></li>
+        <li><a href="#contact">Contact <span class="arrow-ne">&nearr;</span></a></li>
+      </ul>
+    </section>
+
+    <!-- Hamburger button -->
+    <figure class="menu-button">
+      <a href="#" class="hamburger noanim" aria-label="Menu" onclick="openNav(); return false;">
+        <span>Menu</span>
+        <span class="hamburger-box">
+          <span class="hamburger-inner"></span>
+        </span>
+      </a>
+    </figure>
+
+  </nav>
+</header>
+
+<!-- ══ HERO — fullscreen cycling images, tagline top, wordmark bottom ══ -->
+<article b-tpl="hero">
+  <!-- Background image slides -->
+  <div class="bg">
+    <div class="hero-slide active">
+      <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1800&q=80" alt=""/>
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1509395176047-4a66953fd231?w=1800&q=80" alt=""/>
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=1800&q=80" alt=""/>
+    </div>
+    <div class="hero-slide">
+      <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1800&q=80" alt=""/>
+    </div>
+  </div>
+
+  <!-- Inner: tagline top + arrow+logo bottom (exact bow.no structure) -->
+  <div class="inner">
+    <div class="top">
+      <div class="tagline">
+        <p>With <strong>photo, film &amp; strategy</strong> I sharpen your message — so you reach the people you want to reach.</p>
+      </div>
+    </div>
+    <div class="bottom">
+      <div class="arrow">
+        <a href="#about">
+          <span style="sr-only">To content</span>
+          <svg class="arrow-animated" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"><path d="M19 9l-7 7-7-7"/></svg>
+        </a>
+      </div>
+      <div class="logo">
+        <!-- ghost wordmark (bow.no style: giant faint behind) -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Giant ghost wordmark centered at bottom (exact bow.no) -->
+  <div class="hero-wordmark">Your Name</div>
+</article>
+
+<!-- ══ ABOUT + LINKS — full height white, preamble + 3 shape buttons ══ -->
+<article b-tpl="about + links" id="about" data-moonwalk-section>
+  <div class="inner">
+    <div class="preamble">
+      <p>I work long-term, strategically and creatively — always reaching for the best result. I like challenges, big and small, and I guide and advise from beginning to end.</p>
+    </div>
+    <div class="buttons">
+      <!-- squircle → circle on hover -->
+      <a href="#about">
+        Who am I? <span class="arrow-ne">&nearr;</span>
+      </a>
+      <!-- circle → square on hover -->
+      <a href="https://wa.me/18683424101?text=Hi!%20I%27m%20interested%20in%20working%20together." target="_blank">
+        Work with me <span class="arrow-ne">&nearr;</span>
+      </a>
+      <!-- square → circle on hover -->
+      <a href="#work">
+        See some of what I've done <span class="arrow-d">&darr;</span>
+      </a>
+    </div>
+  </div>
+</article>
+
+<!-- ══ PROJECT INTROS — stacked full-height panels with --bg color ══ -->
+<article b-tpl="datasource intros" id="work">
+  <div class="inner">
+    <div class="intros">
+
+      <!-- Project 1 — dark warm bg -->
+      <div class="intro">
+        <article style="--bg: #1a1a2e">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80" alt="Brand Identity"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?w=900&q=80" alt="Brand Identity detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>With <strong>Luminary Studio</strong> I crafted a visual identity that speaks before words do.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Brand Identity</li>
+                  <li>Art Direction</li>
+                  <li>Photography</li>
+                </ul>
+              </div>
+              <div class="index"><span>1</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+      <!-- Project 2 — rich dark green -->
+      <div class="intro">
+        <article style="--bg: #1d3c34">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=900&q=80" alt="Campaign"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1200&q=80" alt="Campaign detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>Together with <strong>Apex Ventures</strong> I marked a milestone with a campaign that mattered.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Campaign Strategy</li>
+                  <li>Film</li>
+                  <li>Copy</li>
+                </ul>
+              </div>
+              <div class="index"><span>2</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+      <!-- Project 3 — warm amber -->
+      <div class="intro">
+        <article style="--bg: #42342a">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=900&q=80" alt="Content"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1464207687429-7505649dae38?w=1200&q=80" alt="Content detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>With <strong>Meridian</strong> I told everyday stories that built long-term trust.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Content Strategy</li>
+                  <li>Photography</li>
+                  <li>Copywriting</li>
+                </ul>
+              </div>
+              <div class="index"><span>3</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+      <!-- Project 4 — gold -->
+      <div class="intro">
+        <article style="--bg: #2c2100">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=900&q=80" alt="Coaching"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1200&q=80" alt="Coaching detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>I helped <strong>Nova Collective</strong> communicate a decade of craft to a new generation.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Brand Direction</li>
+                  <li>Film</li>
+                  <li>Web</li>
+                </ul>
+              </div>
+              <div class="index"><span>4</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+      <!-- Project 5 — deep burgundy -->
+      <div class="intro">
+        <article style="--bg: #490f13">
+          <div class="bg">
+            <div class="fig1">
+              <img src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=900&q=80" alt="Speaking"/>
+            </div>
+            <div class="fig2">
+              <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1200&q=80" alt="Speaking detail"/>
+            </div>
+          </div>
+          <div class="text">
+            <div class="top">
+              <p>With <strong>Foundry Agency</strong> I brought warmth and precision to a global rebrand.</p>
+            </div>
+            <div class="bottom">
+              <div class="footer-text">
+                <ul>
+                  <li>Strategy</li>
+                  <li>Identity</li>
+                  <li>Photography</li>
+                </ul>
+              </div>
+              <div class="index"><span>5</span>/<span>5</span></div>
+            </div>
+          </div>
+          <a href="#work" class="case-link"><span style="position:absolute;width:1px;height:1px;overflow:hidden">View project</span></a>
+        </article>
+      </div>
+
+    </div>
+  </div>
+</article>
+
+<!-- ══ CLIENTS — preamble + hover-image list + squircle CTA ══ -->
+<article b-tpl="datasource clients" id="clients">
+  <div class="inner">
+    <div class="preamble">
+      <p>Together with my clients I focus on creating <strong>content that means something</strong>. I have:</p>
+    </div>
+    <div class="clients">
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80">
+        <p>Built a complete content partnership for <span style="color:#a00347"><strong>Luminary Studio.</strong></span></p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80">
+        <p>Focused on the human story behind <span style="color:#0400e0"><strong>Apex Ventures</strong></span></p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80">
+        <p>Elevated everyday moments for <span style="color:#497902"><strong>Meridian.</strong></span></p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&q=80">
+        <p>Helped <span style="color:#c46d22"><strong>Nova Collective</strong></span> connect craft to culture.</p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&q=80">
+        <p>Brought warmth and precision to the <span style="color:#ea986c"><strong>Foundry Agency</strong></span> rebrand.</p>
+      </div>
+      <div class="client"
+           data-hover-cover="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80">
+        <p>Communicated the value of expertise with <span style="color:#0905eb"><strong>The Atelier.</strong></span></p>
+      </div>
+    </div>
+    <div class="squircle">
+      <a href="#contact">Get to know me better <span class="arrow-ne">&nearr;</span></a>
+    </div>
+  </div>
+</article>
+
+<!-- ══ FOOTER — fullscreen dark with bg image + contact grid ══ -->
+<footer id="contact">
+  <div class="bg">
+    <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1800&q=80" alt=""/>
+  </div>
+  <div class="inner">
+    <div class="wrapper">
+      <div class="top">
+        <p>Have a project you want to tell?<br>Let's talk.</p>
+      </div>
+      <div class="bottom">
+        <div class="contact">
+          <p>
+            <a href="mailto:hello@yourname.com">hello@yourname.com</a>
+            <a href="https://wa.me/18683424101" target="_blank">+1 868 342 4101</a>
+          </p>
+          <p>
+            <a href="https://www.instagram.com/priscillanarine/" target="_blank">Instagram</a>
+            <a href="https://priscadezigns.org/templates/" target="_blank">Template Shop</a>
+          </p>
+        </div>
+        <div class="footer-has-a-footer-dear-god">
+          <p>©2026 Your Name · Built by <a href="https://priscadezigns.org" target="_blank" style="color:rgba(255,255,255,0.3);text-decoration:none;">Prisca Dezigns</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- BOW-style corner SVG mark (exact extracted SVG paths from bow.no — rebranded as YN) -->
+<div class="BOW" id="bowMark">
+  <svg viewBox="0 0 80 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <text x="0" y="30" font-family="Georgia,serif" font-style="italic" font-size="28" fill="#fff" letter-spacing="-1" opacity="0.6">YN</text>
+  </svg>
+</div>
+
+<!-- BADGE -->
+<a href="https://wa.me/18683424101?text=Hi!%20I%27m%20interested%20in%20the%20Persona%20template." target="_blank" class="template-badge">
+  Choose This Template — $149.99
+</a>
+
+<script>
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function openNav() {
+  document.getElementById('mainNav').classList.add('open');
+  document.getElementById('backdrop').classList.add('show');
+}
+function closeNav() {
+  document.getElementById('mainNav').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('show');
+}
+
+// ── HERO SLIDESHOW (exact bow.no: cycling images with 1.4s fade) ──────────
+(function() {
+  const slides = document.querySelectorAll('.hero-slide');
+  let cur = 0;
+  setInterval(() => {
+    slides[cur].classList.remove('active');
+    cur = (cur + 1) % slides.length;
+    slides[cur].classList.add('active');
+  }, 4500);
+})();
+
+// ── BOW MARK: show after scroll (exact bow.no opacity reveal) ────────────
+window.addEventListener('scroll', () => {
+  const bow = document.getElementById('bowMark');
+  if (window.scrollY > window.innerHeight * 0.5) {
+    bow.classList.add('visible');
+  } else {
+    bow.classList.remove('visible');
+  }
+}, { passive: true });
+
+// ── CLIENT HOVER IMAGE FOLLOWER (exact bow.no data-hover-cover pattern) ──
+(function() {
+  const hoverBox = document.getElementById('hoverImg');
+  const hoverEl  = document.getElementById('hoverImgEl');
+  let mouseX = 0, mouseY = 0;
+  let posX = 0, posY = 0;
+  let ticking = false;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        posX += (mouseX - posX) * 0.12;
+        posY += (mouseY - posY) * 0.12;
+        hoverBox.style.transform = `translate(${posX + 24}px, ${posY - 60}px)`;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  document.querySelectorAll('.client[data-hover-cover]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const src = el.getAttribute('data-hover-cover');
+      hoverEl.src = src;
+      hoverBox.style.opacity = '1';
+    });
+    el.addEventListener('mouseleave', () => {
+      hoverBox.style.opacity = '0';
+    });
+  });
+})();
+
+// ── SMOOTH SCROLL for anchor links ───────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href').slice(1);
+    const target = document.getElementById(id);
+    if (target) {
+      e.preventDefault();
+      closeNav();
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINEMA | DREAMING ANIME</title>
+    <link rel="icon" type="image/png" href="/logos/dreaming-anime-logo-round.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #FF6B00; 
+            --bg: #000; 
+            --accent: #111; 
+            --success: #00ff88; 
+            --danger: #ff4444; 
+            --glass: rgba(255, 107, 0, 0.1);
+        }
+        body { margin:0; background:var(--bg); color:#fff; font-family:'Inter', sans-serif; overflow-x: hidden; }
+        
+        /* Navigation */
+        nav { 
+            padding: 20px 5%; 
+            display:flex; 
+            justify-content:space-between; 
+            align-items:center; 
+            border-bottom:1px solid #222; 
+            position: sticky; 
+            top: 0; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 100; 
+            backdrop-filter: blur(10px); 
+        }
+        .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--primary); font-family:'Bangers', cursive; font-size:1.5rem; }
+        .logo img { height:35px; border-radius:50%; border:1px solid var(--primary); }
+        
+        /* Hero Section */
+        .hero { 
+            height: 40vh; 
+            display:flex; 
+            flex-direction: column;
+            align-items:center; 
+            justify-content:center; 
+            text-align:center; 
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://priscadezigns.org/assets/cinema_bg.jpg'); 
+            background-size:cover; 
+            background-position: center;
+            border-bottom: 2px solid var(--primary); 
+            position: relative;
+        }
+        .theater-title { font-family:'Bangers', cursive; font-size:5rem; margin:0; letter-spacing: 2px; text-shadow: 0 0 20px var(--primary); }
+        .mimi-badge { 
+            position: absolute; bottom: -15px; background: var(--primary); color: #000; 
+            padding: 5px 20px; font-family: 'Space Mono'; font-weight: 700; border-radius: 20px;
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .main-container { padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
+
+        /* Theater View */
+        #theater-view { 
+            display: none; 
+            margin-bottom: 50px; 
+            background: #080808; 
+            border-radius: 15px; 
+            border: 1px solid #222; 
+            overflow: hidden; 
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .player-container { position: relative; width: 100%; background: #000; }
+        .video-wrapper { position:relative; padding-bottom:56.25%; height:0; background: #000; }
+        .video-wrapper iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+
+        .theater-info { padding: 30px; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; border-top: 1px solid #222; }
+        .info-content h2 { font-family: 'Bangers'; font-size: 2.5rem; color: var(--primary); margin: 0 0 10px 0; }
+        .info-content p { color: #ccc; line-height: 1.6; font-size: 1rem; margin-bottom: 20px; }
+        .meta-tags { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tag { background: #1a1a1a; padding: 4px 12px; border-radius: 4px; font-size: 0.8rem; color: #888; font-family: 'Space Mono'; border: 1px solid #333; }
+
+        .player-controls { background: #111; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        .node-status { display: flex; align-items: center; gap: 15px; }
+        .health-badge { padding: 4px 10px; border-radius: 4px; font-family: 'Space Mono'; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .online { background: rgba(0,255,136,0.1); color: var(--success); border: 1px solid var(--success); }
+        .switching { background: rgba(255,107,0,0.1); color: var(--primary); border: 1px solid var(--primary); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .action-btns { display: flex; gap: 15px; }
+        .btn { 
+            background: var(--primary); color: #000; border: none; padding: 10px 20px; 
+            border-radius: 6px; font-family: 'Space Mono'; font-weight: 700; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; gap: 8px; text-transform: uppercase;
+        }
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px var(--primary); }
+        .btn-secondary { background: #222; color: #fff; border: 1px solid #444; }
+
+        select.source-selector { 
+            background: #222; color: #fff; border: 1px solid #444; padding: 10px; 
+            border-radius: 6px; font-family: 'Space Mono'; cursor: pointer;
+        }
+
+        /* Grid */
+        .grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .grid-header h2 { font-family: 'Bangers'; color: var(--primary); font-size: 2.5rem; margin: 0; }
+        .broadcast-status { font-family: 'Space Mono'; font-size: 0.8rem; color: var(--success); display: flex; align-items: center; gap: 8px; }
+        .broadcast-status::before { content: ''; width: 8px; height: 8px; background: var(--success); border-radius: 50%; display: inline-block; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+
+        .theater-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:25px; }
+        .video-card { background:#111; border-radius:12px; overflow:hidden; border:1px solid #222; transition: 0.3s; cursor: pointer; position: relative; }
+        .video-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .card-img { width: 100%; height: 400px; object-fit: cover; opacity: 0.8; transition: 0.3s; }
+        .video-card:hover .card-img { opacity: 1; }
+        .card-body { padding:20px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); position: absolute; bottom: 0; width: 100%; box-sizing: border-box; }
+        .card-body h3 { font-family:'Bangers', cursive; color:#fff; font-size:1.4rem; margin:0 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .live-tag { font-family: 'Space Mono'; font-size: 0.6rem; background: var(--primary); color: #000; padding: 2px 8px; border-radius: 3px; font-weight: 700; display: inline-block; margin-bottom: 8px; }
+
+        .loading-mimi { text-align: center; padding: 100px; font-family: 'Bangers'; color: var(--primary); font-size: 2rem; }
+
+        @media (max-width: 768px) {
+            .theater-title { font-size: 3rem; }
+            .theater-info { grid-template-columns: 1fr; }
+            .player-controls { flex-direction: column; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <img src="/logos/dreaming-anime-logo-round.png" alt="Logo">
+            DREAMING ANIME
+        </a>
+        <div style="display: flex; gap: 20px;">
+            <a href="/manga/" style="color:#fff; text-decoration:none; font-family:'Space Mono';">Manga</a>
+            <a href="/shop/" style="color:#fff; text-decoration:none; font-family:'Space Mono';">Shop</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="theater-title">SOVEREIGN CINEMA</h1>
+        <div class="mimi-badge">DIRECT STREAM ENABLED</div>
+    </section>
+
+    <div class="main-container">
+        <!-- Theater View -->
+        <div id="theater-view">
+            <div class="player-controls">
+                <div class="node-status">
+                    <span id="health-monitor" class="health-badge online">Node 1: Optimal</span>
+                    <select id="node-selector" class="source-selector" onchange="switchNode(this.value)">
+                        <option value="ipfs" disabled>⛓️ IPFS Sovereign (auto)</option>
+                        <option value="0">Node 1: vidsrc.me</option>
+                        <option value="1">Node 2: vidsrc.to</option>
+                        <option value="2">Node 3: vidsrc.xyz</option>
+                        <option value="3">Node 4: embed.su</option>
+                        <option value="4">Node 5: vidsrc.net</option>
+                        <option value="5">Node 6: vidsrc.icu</option>
+                    </select>
+                </div>
+                <div class="action-btns">
+                    <button id="next-ep-btn" class="btn" onclick="nextEpisode()"><i class="fas fa-forward"></i> Next Episode</button>
+                    <button class="btn btn-secondary" onclick="closeTheater()"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+            <div class="player-container">
+                <div class="video-wrapper">
+                    <iframe id="main-player" allowfullscreen referrerpolicy="no-referrer"></iframe>
+                </div>
+            </div>
+            <div class="theater-info">
+                <div class="info-content">
+                    <div class="meta-tags" id="anime-tags"></div>
+                    <h2 id="playing-title">SELECT A BROADCAST</h2>
+                    <p id="playing-synopsis">The sovereign gateway is synchronized. Choose a feed below to begin the direct stream experience.</p>
+                </div>
+                <div class="info-sidebar" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="tag" style="text-align: center; border-color: var(--primary); color: var(--primary);">EPISODE CONTROL</div>
+                    <div id="episode-list" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px;">
+                        <!-- Episodes would be populated here if we had them -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-header">
+            <h2>LIVE BROADCASTS</h2>
+            <div class="broadcast-status">AUTO-NODE SWITCHING ACTIVE</div>
+        </div>
+
+        <div id="live-cinema" class="theater-grid">
+            <div class="loading-mimi">INITIALIZING SOVEREIGN NODES...</div>
+        </div>
+    </div>
+
+    <script>
+        // ⛓️ SOVEREIGN IPFS MANIFEST — Pinata-hosted anime content
+        // Format: { malId: { episodes: { "1": "ipfs://CID", "2": "ipfs://CID" }, title, poster } }
+        // Add entries here as content is uploaded to IPFS via Pinata
+        const SOVEREIGN_MANIFEST = {};
+
+        // IPFS Gateway priority list (fastest public gateways)
+        const IPFS_GATEWAYS = [
+            "https://gateway.pinata.cloud/ipfs/",
+            "https://cloudflare-ipfs.com/ipfs/",
+            "https://ipfs.io/ipfs/",
+            "https://dweb.link/ipfs/"
+        ];
+
+        // Fallback vidsrc nodes (used if no IPFS content available)
+        const nodes = [
+            "https://vidsrc.me/embed/anime/",
+            "https://vidsrc.to/embed/anime/",
+            "https://vidsrc.xyz/embed/anime/",
+            "https://embed.su/embed/anime/",
+            "https://vidsrc.net/embed/anime/",
+            "https://vidsrc.icu/embed/anime/"
+        ];
+
+        let currentNodeIndex = 0;
+        let currentMalId = null;
+        let healthCheckTimeout = null;
+        let currentEpisode = 1;
+        let currentIpfsGateway = 0;
+        let usingIPFS = false;
+
+        async function loadLiveCinema() {
+            const grid = document.getElementById('live-cinema');
+            try {
+                const res = await fetch('https://api.jikan.moe/v4/seasons/now?limit=24');
+                const data = await res.json();
+                
+                grid.innerHTML = '';
+                data.data.forEach(anime => {
+                    const card = document.createElement('div');
+                    card.className = 'video-card';
+                    card.onclick = () => playAnime(anime);
+                    card.innerHTML = `
+                        <img src="${anime.images.jpg.large_image_url}" class="card-img" alt="${anime.title}" loading="lazy">
+                        <div class="card-body">
+                            <span class="live-tag">DIRECT FEED</span>
+                            <h3>${anime.title}</h3>
+                            <div style="display:flex; gap:10px;">
+                                <span class="tag">${anime.type}</span>
+                                <span class="tag">${anime.score || 'N/A'}</span>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (e) {
+                console.error("Cinema API Sync Error:", e);
+                grid.innerHTML = '<div class="loading-mimi">SYNC DELAYED... RECONNECTING.</div>';
+            }
+        }
+
+        function playAnime(anime) {
+            currentMalId = anime.mal_id;
+            currentNodeIndex = 0;
+            currentEpisode = 1;
+            
+            document.getElementById('theater-view').style.display = 'block';
+            document.getElementById('playing-title').innerText = anime.title;
+            document.getElementById('playing-synopsis').innerText = anime.synopsis || "No synopsis available.";
+            document.getElementById('node-selector').value = "0";
+            
+            // Populate Tags
+            const tagsCont = document.getElementById('anime-tags');
+            tagsCont.innerHTML = `<span class="tag">${anime.type}</span><span class="tag">${anime.status}</span><span class="tag">${anime.season} ${anime.year}</span>`;
+            
+            loadNode(currentMalId, 0);
+            window.scrollTo({ top: document.getElementById('theater-view').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        async function loadNode(malId, nodeIdx) {
+            const iframe = document.getElementById('main-player');
+            const health = document.getElementById('health-monitor');
+            clearTimeout(healthCheckTimeout);
+
+            // ⛓️ IPFS SOVEREIGN CHECK — Try Priscion IPFS manifest first
+            const manifest = SOVEREIGN_MANIFEST[malId];
+            if (manifest && manifest.episodes && manifest.episodes[currentEpisode]) {
+                const cid = manifest.episodes[currentEpisode].replace('ipfs://', '');
+                usingIPFS = true;
+                health.className = "health-badge online";
+                health.innerText = "⛓️ Sovereign IPFS: Active";
+
+                // Try IPFS gateways in order
+                const tryGateway = async (gwIdx) => {
+                    if (gwIdx >= IPFS_GATEWAYS.length) {
+                        // All IPFS gateways failed — fall through to vidsrc
+                        usingIPFS = false;
+                        loadVidsrcNode(malId, 0);
+                        return;
+                    }
+                    const url = IPFS_GATEWAYS[gwIdx] + cid;
+                    try {
+                        const test = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(4000) });
+                        if (test.ok) {
+                            // Use video element for direct IPFS playback
+                            iframe.src = '';
+                            iframe.style.display = 'none';
+                            let vid = document.getElementById('ipfs-video-player');
+                            if (!vid) {
+                                vid = document.createElement('video');
+                                vid.id = 'ipfs-video-player';
+                                vid.controls = true;
+                                vid.autoplay = true;
+                                vid.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;background:#000;';
+                                iframe.parentNode.appendChild(vid);
+                            }
+                            vid.src = url;
+                            vid.style.display = 'block';
+                            health.innerText = "⛓️ Sovereign IPFS: Streaming";
+                        } else {
+                            tryGateway(gwIdx + 1);
+                        }
+                    } catch(e) {
+                        tryGateway(gwIdx + 1);
+                    }
+                };
+                tryGateway(0);
+                return;
+            }
+
+            // FALLBACK — No IPFS content yet, use vidsrc nodes
+            usingIPFS = false;
+            loadVidsrcNode(malId, nodeIdx);
+        }
+
+        function loadVidsrcNode(malId, nodeIdx) {
+            const iframe = document.getElementById('main-player');
+            const health = document.getElementById('health-monitor');
+            const baseUrl = nodes[nodeIdx];
+
+            // Hide IPFS player if visible
+            const vid = document.getElementById('ipfs-video-player');
+            if (vid) vid.style.display = 'none';
+            iframe.style.display = 'block';
+
+            health.className = "health-badge switching";
+            health.innerText = `Node ${nodeIdx + 1}: Synchronizing...`;
+
+            iframe.src = `${baseUrl}${malId}/${currentEpisode}`;
+
+            healthCheckTimeout = setTimeout(() => {
+                console.warn(`Node ${nodeIdx + 1} timed out. Attempting failover.`);
+                autoSwitchNode();
+            }, 5000);
+
+            setTimeout(() => {
+                if(currentNodeIndex === nodeIdx && !usingIPFS) {
+                    health.className = "health-badge online";
+                    health.innerText = `Node ${nodeIdx + 1}: Optimal`;
+                }
+            }, 3000);
+        }
+
+        function autoSwitchNode() {
+            if (currentNodeIndex < nodes.length - 1) {
+                currentNodeIndex++;
+                const health = document.getElementById('health-monitor');
+                health.className = "health-badge switching";
+                health.innerText = `Failover: Switching to Node ${currentNodeIndex + 1}...`;
+                
+                document.getElementById('node-selector').value = currentNodeIndex;
+                loadNode(currentMalId, currentNodeIndex);
+            } else {
+                const health = document.getElementById('health-monitor');
+                health.className = "health-badge health-badge-error";
+                health.style.background = "rgba(255,68,68,0.1)";
+                health.style.color = "var(--danger)";
+                health.style.border = "1px solid var(--danger)";
+                health.innerText = "All Nodes Exhausted";
+            }
+        }
+
+        function switchNode(idx) {
+            currentNodeIndex = parseInt(idx);
+            loadNode(currentMalId, currentNodeIndex);
+        }
+
+        function nextEpisode() {
+            currentEpisode++;
+            loadNode(currentMalId, currentNodeIndex);
+            // In a real app, we'd check if next episode exists
+        }
+
+        function closeTheater() {
+            document.getElementById('theater-view').style.display = 'none';
+            document.getElementById('main-player').src = '';
+            clearTimeout(healthCheckTimeout);
+        }
+
+        window.onload = loadLiveCinema;
+    </script>
+</body>
+</html>

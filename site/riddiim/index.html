@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Riddiim — Hear It. Find It. Create It.</title>
+  <meta name="description" content="The music super-app. Discover tracks, identify songs, and create music with AI." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #080808;
+      color: #F5F0E8;
+      font-family: 'Inter', sans-serif;
+      cursor: none;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── CUSTOM CURSOR ────────────────────────────────────────── */
+    #cursor {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid #C8FF00;
+      border-radius: 50%;
+      background: transparent;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, left 0.08s linear, top 0.08s linear;
+      mix-blend-mode: normal;
+    }
+
+    /* ── NOISE OVERLAY ────────────────────────────────────────── */
+    #noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9000;
+      opacity: 0.035;
+    }
+
+    /* ── NAV ──────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 800;
+      background: rgba(8,8,8,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(245,240,232,0.06);
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 2px;
+      color: #F5F0E8;
+      line-height: 1;
+    }
+    .nav-logo img {
+      height: 32px;
+      width: auto;
+    }
+    .nav-logo .logo-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #C8FF00;
+      margin-left: 2px;
+      flex-shrink: 0;
+      align-self: flex-end;
+      margin-bottom: 4px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: lowercase;
+      font-variant: small-caps;
+      color: #F5F0E8;
+      opacity: 0.75;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; color: #C8FF00; }
+    .nav-links a.waitlist-link { color: #C8FF00; opacity: 1; }
+
+    /* ── HERO ─────────────────────────────────────────────────── */
+    #spin {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      overflow: hidden;
+    }
+    /* Vinyl record — CSS only */
+    .vinyl-record {
+      position: absolute;
+      right: -180px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 680px;
+      height: 680px;
+      border-radius: 50%;
+      background: #111;
+      animation: spin-vinyl 60s linear infinite;
+      box-shadow:
+        0 0 0 4px #1a1a1a,
+        0 0 0 16px #0f0f0f,
+        0 0 0 20px #1c1c1c,
+        0 0 0 40px #0f0f0f,
+        0 0 0 44px #1c1c1c,
+        0 0 0 64px #0f0f0f,
+        0 0 0 68px #1a1a1a,
+        0 0 0 88px #0f0f0f,
+        0 0 0 92px #1c1c1c,
+        0 0 0 110px #0f0f0f,
+        0 0 0 114px #1a1a1a,
+        0 0 0 132px #0f0f0f,
+        0 0 0 136px #1c1c1c,
+        0 0 0 154px #0f0f0f,
+        0 0 0 158px #181818,
+        0 0 0 175px #0a0a0a,
+        0 0 0 178px #1c1c1c,
+        0 0 0 195px #0a0a0a,
+        0 0 0 198px #171717,
+        0 0 0 215px #0a0a0a,
+        0 0 0 218px #1c1c1c,
+        0 0 0 235px #0a0a0a,
+        0 0 0 238px #171717,
+        0 0 0 255px #080808,
+        0 0 0 260px #222,
+        0 0 0 280px #0a0a0a,
+        0 0 0 284px #1c1c1c,
+        0 0 0 300px #080808;
+      flex-shrink: 0;
+    }
+    .vinyl-record::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: #080808;
+      box-shadow: 0 0 0 6px #1a1a1a, 0 0 0 9px #080808, 0 0 0 11px #222;
+    }
+    @keyframes spin-vinyl {
+      from { transform: translateY(-50%) rotate(0deg); }
+      to   { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    .hero-headline {
+      position: relative;
+      z-index: 2;
+    }
+    .hero-headline .line {
+      display: block;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(100px, 14vw, 220px);
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      color: #F5F0E8;
+      text-transform: uppercase;
+    }
+    .hero-headline .line:nth-child(1) { margin-left: 0px; }
+    .hero-headline .line:nth-child(2) { margin-left: 80px; }
+    .hero-headline .line:nth-child(3) { margin-left: 40px; }
+
+    .hero-sub {
+      margin-top: 32px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: rgba(245,240,232,0.45);
+      max-width: 380px;
+      line-height: 1.6;
+      position: relative;
+      z-index: 2;
+    }
+    .btn-cta {
+      display: inline-block;
+      margin-top: 40px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 0.12em;
+      background: #C8FF00;
+      color: #080808;
+      padding: 16px 40px;
+      border: none;
+      border-radius: 0;
+      cursor: none;
+      transition: background 0.2s, color 0.2s;
+      position: relative;
+      z-index: 2;
+    }
+    .btn-cta:hover { background: #d9ff33; }
+
+    /* ── DIVIDER ──────────────────────────────────────────────── */
+    .hr-full {
+      width: 100%;
+      height: 1px;
+      background: rgba(245,240,232,0.08);
+      border: none;
+    }
+
+    /* ── THE PULSE — MARQUEE ──────────────────────────────────── */
+    #pulse {
+      background: #0d0d0d;
+      padding: 22px 0;
+      overflow: hidden;
+      border-top: 1px solid rgba(245,240,232,0.06);
+      border-bottom: 1px solid rgba(245,240,232,0.06);
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 25s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-content {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.6);
+      padding-right: 0;
+    }
+    .marquee-content span.genre { padding: 0 20px; }
+    .marquee-content span.sep {
+      color: #C8FF00;
+      font-size: 10px;
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── SECTION COMMONS ──────────────────────────────────────── */
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #C8FF00;
+      margin-bottom: 24px;
+    }
+    .section-label-right {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #C8FF00;
+      text-align: right;
+      margin-bottom: 24px;
+    }
+
+    /* scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── HEAR IT ──────────────────────────────────────────────── */
+    #hear-it {
+      padding: 100px 48px;
+      display: grid;
+      grid-template-columns: 60fr 40fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .hear-left h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(60px, 7vw, 110px);
+      line-height: 0.9;
+      color: #F5F0E8;
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+    .hear-left p {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.75;
+      color: rgba(245,240,232,0.55);
+      max-width: 440px;
+    }
+
+    /* Track Cards */
+    .track-cards { display: flex; flex-direction: column; gap: 1px; }
+    .track-card {
+      background: #0d0d0d;
+      border: 1px solid rgba(245,240,232,0.07);
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.2s;
+    }
+    .track-card:hover { border-color: rgba(200,255,0,0.25); }
+    .track-info { display: flex; align-items: baseline; justify-content: space-between; }
+    .track-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      color: #F5F0E8;
+    }
+    .track-artist {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      color: rgba(245,240,232,0.4);
+      letter-spacing: 0.06em;
+    }
+    .track-genre {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: #C8FF00;
+      letter-spacing: 0.1em;
+    }
+
+    /* Waveform bars */
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 36px;
+    }
+    .waveform .bar {
+      width: 3px;
+      border-radius: 1px;
+      background: rgba(200,255,0,0.6);
+      animation: wave 0.8s ease infinite alternate;
+    }
+    .waveform .bar:nth-child(1)  { height: 14px; animation-delay: 0s; }
+    .waveform .bar:nth-child(2)  { height: 28px; animation-delay: 0.07s; }
+    .waveform .bar:nth-child(3)  { height: 20px; animation-delay: 0.14s; }
+    .waveform .bar:nth-child(4)  { height: 32px; animation-delay: 0.21s; }
+    .waveform .bar:nth-child(5)  { height: 10px; animation-delay: 0.28s; }
+    .waveform .bar:nth-child(6)  { height: 24px; animation-delay: 0.35s; }
+    .waveform .bar:nth-child(7)  { height: 36px; animation-delay: 0.42s; }
+    .waveform .bar:nth-child(8)  { height: 18px; animation-delay: 0.49s; }
+    .waveform .bar:nth-child(9)  { height: 30px; animation-delay: 0.56s; }
+    .waveform .bar:nth-child(10) { height: 12px; animation-delay: 0.63s; }
+    .waveform .bar:nth-child(11) { height: 22px; animation-delay: 0.70s; }
+    .waveform .bar:nth-child(12) { height: 16px; animation-delay: 0.77s; }
+    @keyframes wave {
+      from { transform: scaleY(1); }
+      to   { transform: scaleY(0.25); }
+    }
+
+    /* ── FIND IT ──────────────────────────────────────────────── */
+    #find-it {
+      background: #0d0d0d;
+      padding: 100px 48px;
+      clip-path: polygon(0 0, 100% 3%, 100% 100%, 0 97%);
+      margin: 0;
+      position: relative;
+    }
+    #find-it .inner {
+      position: relative;
+      z-index: 1;
+    }
+    #find-it h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 8vw, 130px);
+      line-height: 0.9;
+      color: #F5F0E8;
+      text-transform: uppercase;
+      max-width: 800px;
+      margin-bottom: 60px;
+    }
+    .stats-row {
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .stat-box {
+      flex: 1;
+      min-width: 180px;
+      border-left: 1px solid rgba(245,240,232,0.08);
+      padding: 24px 40px 24px 32px;
+    }
+    .stat-box:first-child { border-left: none; padding-left: 0; }
+    .stat-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 6vw, 96px);
+      line-height: 1;
+      color: #C8FF00;
+      display: block;
+    }
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.45);
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── CREATE IT ────────────────────────────────────────────── */
+    #create-it {
+      padding: 100px 48px;
+    }
+    #create-it h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(60px, 7.5vw, 120px);
+      line-height: 0.88;
+      color: #F5F0E8;
+      text-transform: uppercase;
+      max-width: 780px;
+      margin-bottom: 48px;
+    }
+
+    /* Terminal UI */
+    .terminal-card {
+      background: #0a0a0a;
+      border: 1px solid rgba(245,240,232,0.1);
+      padding: 32px 36px;
+      max-width: 680px;
+      margin-bottom: 32px;
+    }
+    .terminal-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .terminal-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .terminal-dot.red   { background: #ff5f57; }
+    .terminal-dot.yel   { background: #febc2e; }
+    .terminal-dot.grn   { background: #28c840; }
+    .terminal-input {
+      font-family: 'Space Mono', monospace;
+      font-size: 14px;
+      color: rgba(245,240,232,0.7);
+      border-top: 1px solid rgba(245,240,232,0.06);
+      padding-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+    .terminal-prompt { color: #C8FF00; margin-right: 4px; }
+    .terminal-text { color: rgba(245,240,232,0.7); }
+    .terminal-cursor {
+      display: inline-block;
+      width: 9px;
+      height: 16px;
+      background: #C8FF00;
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
+      vertical-align: middle;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* Generated waveform (output) */
+    .terminal-output {
+      margin-top: 20px;
+      border-top: 1px solid rgba(245,240,232,0.06);
+      padding-top: 20px;
+    }
+    .output-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: rgba(245,240,232,0.3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .gen-waveform {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      height: 48px;
+    }
+    .gen-waveform .gbar {
+      flex: 1;
+      border-radius: 1px;
+      background: linear-gradient(to top, rgba(200,255,0,0.4), rgba(200,255,0,0.1));
+      animation: gwave 1.2s ease infinite alternate;
+    }
+    .gen-waveform .gbar:nth-child(odd)  { animation-delay: 0.1s; }
+    .gen-waveform .gbar:nth-child(even) { animation-delay: 0.3s; }
+    .gen-waveform .gbar:nth-child(3n)   { animation-delay: 0.6s; }
+    @keyframes gwave {
+      from { transform: scaleY(0.2); }
+      to   { transform: scaleY(1); }
+    }
+
+    /* Feature pills */
+    .feature-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .pill {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      border: 1px solid #C8FF00;
+      color: #C8FF00;
+      padding: 10px 20px;
+      background: transparent;
+      border-radius: 0;
+      cursor: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .pill:hover { background: #C8FF00; color: #080808; }
+
+    /* ── WAITLIST CTA ─────────────────────────────────────────── */
+    #waitlist {
+      min-height: 100vh;
+      background: #C8FF00;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 48px;
+      clip-path: polygon(0 4%, 100% 0, 100% 96%, 0 100%);
+      margin: -2px 0;
+    }
+    #waitlist h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 11vw, 160px);
+      line-height: 0.88;
+      color: #080808;
+      text-transform: uppercase;
+      max-width: 900px;
+      margin-bottom: 48px;
+    }
+    .waitlist-form {
+      display: flex;
+      gap: 0;
+      max-width: 540px;
+    }
+    .waitlist-input {
+      flex: 1;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      padding: 18px 20px;
+      border: 2px solid #080808;
+      border-right: none;
+      background: transparent;
+      color: #080808;
+      outline: none;
+      border-radius: 0;
+    }
+    .waitlist-input::placeholder { color: rgba(8,8,8,0.45); }
+    .waitlist-btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 0.1em;
+      padding: 18px 28px;
+      background: #080808;
+      color: #F5F0E8;
+      border: 2px solid #080808;
+      border-radius: 0;
+      cursor: none;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .waitlist-btn:hover { background: #111; }
+    .waitlist-sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: rgba(8,8,8,0.55);
+      margin-top: 16px;
+    }
+
+    /* ── FOOTER ───────────────────────────────────────────────── */
+    footer {
+      background: #080808;
+      padding: 60px 48px 40px;
+      border-top: 1px solid rgba(245,240,232,0.06);
+    }
+    .footer-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 2px;
+      color: #F5F0E8;
+    }
+    .footer-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.45);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #F5F0E8; }
+    .footer-bottom {
+      border-top: 1px solid rgba(245,240,232,0.06);
+      padding-top: 24px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: rgba(245,240,232,0.25);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── FLOATING ELEMENTS ────────────────────────────────────── */
+    .float-group {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      z-index: 700;
+    }
+    .float-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: none;
+      transition: transform 0.2s;
+    }
+    .float-btn:hover { transform: scale(1.1); }
+    .float-wa {
+      background: #25D366;
+    }
+    .float-wa svg { width: 24px; height: 24px; fill: #fff; }
+    .float-top {
+      background: #C8FF00;
+    }
+    .float-top svg { width: 18px; height: 18px; fill: #080808; }
+
+    /* Google Translate pill */
+    .translate-pill {
+      background: rgba(8,8,8,0.8);
+      border: 1px solid rgba(245,240,232,0.15);
+      border-radius: 24px;
+      padding: 8px 14px;
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: rgba(245,240,232,0.5);
+      cursor: none;
+      white-space: nowrap;
+      transition: border-color 0.2s;
+      text-decoration: none;
+    }
+    .translate-pill:hover { border-color: rgba(200,255,0,0.4); color: #C8FF00; }
+
+    /* ── RESPONSIVE ───────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      .nav-links { gap: 20px; }
+      .nav-links a { font-size: 10px; }
+
+      #spin { padding: 100px 24px 60px; }
+      .hero-headline .line { font-size: clamp(64px, 18vw, 120px); }
+      .hero-headline .line:nth-child(2) { margin-left: 32px; }
+      .hero-headline .line:nth-child(3) { margin-left: 16px; }
+      .vinyl-record { width: 420px; height: 420px; right: -160px; }
+
+      #hear-it { grid-template-columns: 1fr; gap: 40px; padding: 80px 24px; }
+      #find-it { padding: 100px 24px; }
+      #find-it h2 { font-size: clamp(48px, 10vw, 90px); }
+      .stat-box { padding: 20px 24px; }
+
+      #create-it { padding: 80px 24px; }
+      #waitlist { padding: 80px 24px; clip-path: polygon(0 2%, 100% 0, 100% 98%, 0 100%); }
+      #waitlist h2 { font-size: clamp(56px, 14vw, 100px); }
+      .waitlist-form { flex-direction: column; }
+      .waitlist-input { border-right: 2px solid #080808; border-bottom: none; }
+
+      footer { padding: 40px 24px 32px; }
+      .footer-top { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 600px) {
+      .stats-row { flex-direction: column; gap: 0; }
+      .stat-box { border-left: none; border-top: 1px solid rgba(245,240,232,0.08); padding: 20px 0; }
+      .stat-box:first-child { border-top: none; }
+      .nav-links { display: none; }
+    }
+  </style>
+  <!-- SEO: Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Riddiim — Caribbean Music Culture, Soca, Dancehall & Island Vibes">
+  <meta property="og:description" content="Riddiim is the pulse of Caribbean music culture. Soca, dancehall, reggae — the sound, the artists, and the movement that keeps the islands alive.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/logos/riddiim.jpg">
+  <meta property="og:url" content="https://priscadezigns.org/riddiim/">
+  <meta property="og:site_name" content="Riddiim">
+  <!-- SEO: Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Riddiim — Caribbean Music Culture, Soca, Dancehall & Island Vibes">
+  <meta name="twitter:description" content="Riddiim is the pulse of Caribbean music culture. Soca, dancehall, reggae — the sound, the artists, and the movement that keeps the islands alive.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/logos/riddiim.jpg">
+  <!-- SEO: Canonical + Robots -->
+  <link rel="canonical" href="https://priscadezigns.org/riddiim/">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="Caribbean music, soca music, dancehall, Trinidad culture, Caribbean artists">
+  <!-- SEO: Schema.org Structured Data -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MusicGroup",
+  "name": "Riddiim",
+  "url": "https://priscadezigns.org/riddiim/",
+  "description": "Riddiim is the pulse of Caribbean music culture. Soca, dancehall, reggae \u2014 the sound, the artists, and the movement that keeps the islands alive.",
+  "image": "https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/logos/riddiim.jpg"
+}
+  </script>
+</head>
+<body>
+
+  <!-- Custom cursor -->
+  <div id="cursor"></div>
+
+  <!-- Noise overlay -->
+  <svg id="noise" xmlns="http://www.w3.org/2000/svg">
+    <filter id="noiseFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+  </svg>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <a href="#spin" class="nav-logo">
+      <img src="/logos/riddiim-wordmark.png" alt="RIDDIIM" 
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+      <span style="display:none;">RIDDIIM</span>
+      <span class="logo-dot"></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#hear-it">Hear It</a></li>
+      <li><a href="#find-it">Find It</a></li>
+      <li><a href="#create-it">Create It</a></li>
+      <li><a href="#waitlist" class="waitlist-link">Waitlist</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── HERO / SPIN ── -->
+  <section id="spin">
+    <div class="vinyl-record"></div>
+    <div class="hero-headline reveal">
+      <span class="line">HEAR IT.</span>
+      <span class="line">FIND IT.</span>
+      <span class="line">CREATE IT.</span>
+    </div>
+    <p class="hero-sub reveal">The music super-app. Discover tracks, identify songs, create with AI.</p>
+    <a href="#waitlist" class="btn-cta reveal">JOIN THE WAITLIST →</a>
+  </section>
+
+  <hr class="hr-full" />
+
+  <!-- ── THE PULSE ── -->
+  <section id="pulse" aria-label="Genre ticker">
+    <div class="marquee-track">
+      <!-- First copy -->
+      <div class="marquee-content">
+        <span class="genre">DRUM &amp; BASS</span><span class="sep">·</span>
+        <span class="genre">AFROBEATS</span><span class="sep">·</span>
+        <span class="genre">SOCA</span><span class="sep">·</span>
+        <span class="genre">HIP-HOP</span><span class="sep">·</span>
+        <span class="genre">AMAPIANO</span><span class="sep">·</span>
+        <span class="genre">DANCEHALL</span><span class="sep">·</span>
+        <span class="genre">RIDDIM</span><span class="sep">·</span>
+        <span class="genre">TRAP</span><span class="sep">·</span>
+        <span class="genre">HOUSE</span><span class="sep">·</span>
+        <span class="genre">JUNGLE</span><span class="sep">·</span>
+        <span class="genre">GRIME</span><span class="sep">·</span>
+        <span class="genre">R&amp;B</span><span class="sep">·</span>
+      </div>
+      <!-- Duplicate for seamless loop -->
+      <div class="marquee-content" aria-hidden="true">
+        <span class="genre">DRUM &amp; BASS</span><span class="sep">·</span>
+        <span class="genre">AFROBEATS</span><span class="sep">·</span>
+        <span class="genre">SOCA</span><span class="sep">·</span>
+        <span class="genre">HIP-HOP</span><span class="sep">·</span>
+        <span class="genre">AMAPIANO</span><span class="sep">·</span>
+        <span class="genre">DANCEHALL</span><span class="sep">·</span>
+        <span class="genre">RIDDIM</span><span class="sep">·</span>
+        <span class="genre">TRAP</span><span class="sep">·</span>
+        <span class="genre">HOUSE</span><span class="sep">·</span>
+        <span class="genre">JUNGLE</span><span class="sep">·</span>
+        <span class="genre">GRIME</span><span class="sep">·</span>
+        <span class="genre">R&amp;B</span><span class="sep">·</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="hr-full" />
+
+  <!-- ── HEAR IT ── -->
+  <section id="hear-it">
+    <div class="hear-left reveal">
+      <p class="section-label">01 — HEAR IT</p>
+      <h2>DISCOVER<br/>WHAT'S NEXT</h2>
+      <p>Riddiim surfaces the tracks you didn't know you needed — powered by deep listening algorithms tuned to your ear. From underground soca edits to Afrobeats deep cuts, the record room never closes.</p>
+    </div>
+    <div class="track-cards reveal">
+      <!-- Track 1 -->
+      <div class="track-card">
+        <div class="track-info">
+          <span class="track-name">NEON RIDDIM</span>
+          <span class="track-genre">SOCA</span>
+        </div>
+        <span class="track-artist">Machel Montano × AI Collective</span>
+        <div class="waveform">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+      </div>
+      <!-- Track 2 -->
+      <div class="track-card">
+        <div class="track-info">
+          <span class="track-name">DARK WAVE</span>
+          <span class="track-genre">AMAPIANO</span>
+        </div>
+        <span class="track-artist">Sun-El Musician × Rema</span>
+        <div class="waveform">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+      </div>
+      <!-- Track 3 -->
+      <div class="track-card">
+        <div class="track-info">
+          <span class="track-name">BLOCK PARTY</span>
+          <span class="track-genre">DANCEHALL</span>
+        </div>
+        <span class="track-artist">Popcaan × Skillibeng</span>
+        <div class="waveform">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FIND IT ── -->
+  <section id="find-it">
+    <div class="inner">
+      <p class="section-label-right reveal">02 — FIND IT</p>
+      <h2 class="reveal">SHAZAM CAN'T<br/>KEEP UP.</h2>
+      <div class="stats-row reveal">
+        <div class="stat-box">
+          <span class="stat-number">0.3s</span>
+          <span class="stat-label">ID Speed</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">99%</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-number">100M+</span>
+          <span class="stat-label">Track Database</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CREATE IT ── -->
+  <section id="create-it">
+    <p class="section-label reveal">03 — CREATE IT</p>
+    <h2 class="reveal">DESCRIBE A VIBE.<br/>HEAR IT IN SECONDS.</h2>
+
+    <!-- Terminal UI -->
+    <div class="terminal-card reveal">
+      <div class="terminal-top">
+        <div class="terminal-dot red"></div>
+        <div class="terminal-dot yel"></div>
+        <div class="terminal-dot grn"></div>
+      </div>
+      <div class="terminal-input">
+        <span class="terminal-prompt">&gt;</span>
+        <span class="terminal-text">&nbsp;describe your track... </span>
+        <span class="terminal-cursor"></span>
+      </div>
+      <div class="terminal-output">
+        <div class="output-label">// generated output</div>
+        <div class="gen-waveform">
+          <div class="gbar" style="height:60%"></div>
+          <div class="gbar" style="height:80%"></div>
+          <div class="gbar" style="height:40%"></div>
+          <div class="gbar" style="height:100%"></div>
+          <div class="gbar" style="height:55%"></div>
+          <div class="gbar" style="height:70%"></div>
+          <div class="gbar" style="height:90%"></div>
+          <div class="gbar" style="height:45%"></div>
+          <div class="gbar" style="height:75%"></div>
+          <div class="gbar" style="height:60%"></div>
+          <div class="gbar" style="height:85%"></div>
+          <div class="gbar" style="height:50%"></div>
+          <div class="gbar" style="height:95%"></div>
+          <div class="gbar" style="height:35%"></div>
+          <div class="gbar" style="height:70%"></div>
+          <div class="gbar" style="height:80%"></div>
+          <div class="gbar" style="height:55%"></div>
+          <div class="gbar" style="height:65%"></div>
+          <div class="gbar" style="height:45%"></div>
+          <div class="gbar" style="height:90%"></div>
+          <div class="gbar" style="height:60%"></div>
+          <div class="gbar" style="height:75%"></div>
+          <div class="gbar" style="height:40%"></div>
+          <div class="gbar" style="height:85%"></div>
+          <div class="gbar" style="height:55%"></div>
+          <div class="gbar" style="height:70%"></div>
+          <div class="gbar" style="height:100%"></div>
+          <div class="gbar" style="height:50%"></div>
+          <div class="gbar" style="height:65%"></div>
+          <div class="gbar" style="height:80%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-pills reveal">
+      <span class="pill">TEXT-TO-MUSIC</span>
+      <span class="pill">STYLE TRANSFER</span>
+      <span class="pill">EXPORT TO DAW</span>
+    </div>
+  </section>
+
+  <!-- ── WAITLIST CTA ── -->
+  <section id="waitlist">
+    <h2 class="reveal">THE FUTURE<br/>OF MUSIC<br/>IS HERE.</h2>
+    <form class="waitlist-form reveal" onsubmit="return false;">
+      <input type="email" class="waitlist-input" placeholder="your@email.com" aria-label="Email address" />
+      <button type="submit" class="waitlist-btn">GET EARLY ACCESS</button>
+    </form>
+    <p class="waitlist-sub reveal">Join 10,000+ music creators and fans on the waitlist.</p>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-top">
+      <span class="footer-logo">RIDDIIM</span>
+      <ul class="footer-links">
+        <li><a href="#hear-it">Hear It</a></li>
+        <li><a href="#find-it">Find It</a></li>
+        <li><a href="#create-it">Create It</a></li>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">Terms</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      © 2026 Riddiim. Built for music.
+    </div>
+  </footer>
+
+  <!-- ── FLOATING BUTTONS ── -->
+  <div class="float-group">
+    <a href="https://wa.me/447576505652" class="float-btn float-wa" target="_blank" rel="noopener" aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+    </a>
+    <a href="https://translate.google.com/translate?sl=en&u=https://priscadezigns.org/riddiim/" 
+       class="translate-pill" target="_blank" rel="noopener" aria-label="Translate">
+      🌐 Translate
+    </a>
+    <button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="float-btn float-top" aria-label="Back to top">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ── JS ── -->
+  <script>
+    // ── Custom cursor ──
+    const cursor = document.getElementById('cursor');
+    let cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    document.addEventListener('mousemove', e => {
+      cx = e.clientX;
+      cy = e.clientY;
+      cursor.style.left = cx + 'px';
+      cursor.style.top  = cy + 'px';
+      // Invert cursor colour on lime sections
+      const el = document.elementFromPoint(cx, cy);
+      if (el) {
+        const inLime = !!el.closest('#waitlist') || !!el.closest('.btn-cta') ||
+                       window.getComputedStyle(el).backgroundColor === 'rgb(200, 255, 0)';
+        cursor.style.borderColor = inLime ? '#080808' : '#C8FF00';
+        cursor.style.backgroundColor = inLime ? 'rgba(8,8,8,0.12)' : 'transparent';
+      }
+    });
+    document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; });
+    document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
+
+    // ── Scroll reveal (IntersectionObserver) ──
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+
+    // ── Waitlist form ──
+    const wForm = document.querySelector('.waitlist-form');
+    if (wForm) {
+      wForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const inp = this.querySelector('.waitlist-input');
+        if (inp && inp.value.trim()) {
+          const btn = this.querySelector('.waitlist-btn');
+          if (btn) {
+            btn.textContent = 'YOU\'RE IN ✓';
+            btn.style.background = '#222';
+          }
+          inp.value = '';
+          inp.placeholder = 'See you on the inside.';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

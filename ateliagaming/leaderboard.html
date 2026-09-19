@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Score Room | Atelia Gaming Lab</title>
+    <link href='https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&display=swap' rel='stylesheet'>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/atelia_supabase.js"></script>
+    <style>
+        :root { --red: #D32F2F; --orange: #FF6B00; --purple: #A020F0; --blue: #00BFFF; --white: #FFFFFF; --black: #050505; }
+        body { margin: 0; background: var(--black); color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        nav { padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 5px solid var(--red); background: #000; position: relative; z-index: 2000; }
+        .logo { height: 50px; }
+        .back-btn { color: white; text-decoration: none; font-family: 'Russo One'; font-size: 1.2rem; border: 2px solid var(--orange); padding: 5px 15px; transition: 0.3s; }
+        .back-btn:hover { background: var(--orange); }
+        
+        .container { max-width: 800px; margin: 60px auto; padding: 0 20px; }
+        h1 { font-family: 'Russo One'; font-size: 4rem; color: var(--orange); text-transform: uppercase; text-align: center; margin-bottom: 40px; border-bottom: 3px solid var(--red); padding-bottom: 20px; }
+        
+        .board { background: rgba(255,255,255,0.05); border: 2px solid var(--orange); border-radius: 15px; overflow: hidden; }
+        .row { display: flex; justify-content: space-between; padding: 20px 30px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem; }
+        .row:last-child { border-bottom: none; }
+        .row.header { background: var(--orange); color: black; font-family: 'Russo One'; text-transform: uppercase; font-size: 1.4rem; }
+        .rank { width: 50px; font-weight: bold; color: var(--red); }
+        .user { flex: 1; margin-left: 20px; }
+        .score { font-family: 'Bangers'; font-size: 1.8rem; color: var(--white); }
+        .char { color: #888; font-size: 0.9rem; margin-left: 15px; text-transform: uppercase; }
+
+        .loader { text-align: center; font-family: 'Bangers'; font-size: 2rem; padding: 50px; color: var(--red); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+<nav>
+    <img src="https://priscadezigns.org/logos/atelia-logo.png" class="logo" alt="Atelia Gaming">
+    <a href="game.html" class="back-btn">RETURN TO ARENA</a>
+</nav>
+
+<div class="container">
+    <h1>THE VANGUARD</h1>
+    <div class="board" id="leaderboard">
+        <div class="loader">SYNCHRONIZING DATA CORE...</div>
+    </div>
+</div>
+
+<script>
+    async function loadBoard() {
+        const board = document.getElementById('leaderboard');
+        try {
+            const data = await Atelia.arena.getLeaderboard();
+            board.innerHTML = `
+                <div class="row header">
+                    <div class="rank">#</div>
+                    <div class="user">CHAMPION</div>
+                    <div class="score">SCORE</div>
+                </div>
+            `;
+            
+            if (data.length === 0) {
+                board.innerHTML += '<div class="row"><div class="user" style="text-align:center">NO PROCLAMATIONS RECORDED YET.</div></div>';
+            }
+
+            data.forEach((entry, i) => {
+                board.innerHTML += `
+                    <div class="row">
+                        <div class="rank">${i + 1}</div>
+                        <div class="user">${entry.username || 'Anonymous Vanguard'} <span class="char">${entry.char_used}</span></div>
+                        <div class="score">${entry.score.toString().padStart(3, '0')}</div>
+                    </div>
+                `;
+            });
+        } catch (e) {
+            console.error(e);
+            board.innerHTML = '<div class="loader">UPLINK FAILED: CHECK DATA CORE SCHEMA.</div>';
+        }
+    }
+    loadBoard();
+</script>
+</body>
+</html>

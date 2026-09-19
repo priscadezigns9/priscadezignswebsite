@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neural Snake 3D | Atelia Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; touch-action: none;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--red); }
+        .logo-img { height: 40px; filter: drop-shadow(0 0 5px var(--red)); }
+
+        #game-area {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: radial-gradient(circle, #1a1a1a 0%, #050505 100%);
+            perspective: 1000px;
+        }
+
+        #game-canvas-wrap {
+            position: relative;
+            transform: rotateX(10deg);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            border: 4px solid #222;
+        }
+
+        canvas {
+            background: #080808;
+            display: block;
+        }
+
+        #ui {
+            position: absolute; top: 20px; right: 20px; text-align: right;
+            background: rgba(0,0,0,0.8); padding: 10px 20px; border-left: 3px solid var(--red);
+        }
+        .score-box { font-family: 'Bangers'; font-size: 2.5rem; color: var(--white); line-height: 1; }
+        .atlr-box { font-family: 'Russo One'; font-size: 0.9rem; color: var(--orange); margin-top: 5px; }
+
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px;
+        }
+        .btn {
+            padding: 15px 40px; background: var(--red); color: white;
+            border: 3px solid white; font-family: 'Russo One'; font-size: 1.5rem;
+            cursor: pointer; margin-top: 25px; transition: 0.3s;
+        }
+        .btn:hover { background: var(--orange); transform: scale(1.05); }
+
+        .hint { margin-top: 15px; font-family: 'Russo One'; font-size: 0.7rem; color: #666; letter-spacing: 2px; }
+        
+        #char-select { display: flex; gap: 15px; margin-bottom: 25px; }
+        .char-btn {
+            width: 70px; height: 70px; border: 2px solid #333; cursor: pointer; padding: 5px; background: #111;
+            transition: 0.3s;
+        }
+        .char-btn.active { border-color: var(--red); background: #222; box-shadow: 0 0 15px var(--red); }
+        .char-btn img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* How to Play */
+        #htp-btn { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--red); color: white; border: 2px solid white; border-radius: 50%; font-family: 'Russo One'; cursor: pointer; z-index: 5000; font-size: 1.4rem; box-shadow: 0 0 15px var(--red); }
+        #htp-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .htp-content { max-width: 500px; font-family: 'Inter', sans-serif; }
+        .htp-title { font-family: 'Bangers'; font-size: 4rem; color: var(--orange); margin-bottom: 20px; text-shadow: 0 0 20px var(--red); }
+        .htp-section { margin-bottom: 20px; }
+        .htp-label { font-family: 'Russo One'; color: var(--red); font-size: 1.2rem; margin-bottom: 5px; letter-spacing: 2px; }
+        .htp-text { color: #ccc; font-size: 1rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.1rem; color:var(--orange);">NEURAL SNAKE 3D</div>
+    </nav>
+
+    <div id="game-area">
+        <div id="ui">
+            <div class="score-box" id="score">00</div>
+            <div class="atlr-box"><img src="https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp" height="18"> <span id="atlr">0</span> ATLR</div>
+        </div>
+
+        <div id="game-canvas-wrap">
+            <canvas id="snakeGame"></canvas>
+        </div>
+        
+        <div class="hint">SWIPE TO NAVIGATE ON MOBILE</div>
+
+        <div id="overlay">
+            <h1 style="font-family:'Bangers'; font-size:4rem; margin:0; letter-spacing:3px;">NEURAL SNAKE</h1>
+            <p style="font-family:'Russo One'; color:var(--orange); margin:10px 0 30px; font-size:0.9rem;">CHIBI VANGUARD PROTOCOL</p>
+            
+            <div id="char-select">
+                <div class="char-btn active" id="sel-astra" onclick="setChar('astra')"><img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp"></div>
+                <div class="char-btn" id="sel-mimi" onclick="setChar('mimi')"><img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp"></div>
+                <div class="char-btn" id="sel-nova" onclick="setChar('nova')"><img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp"></div>
+                <div class="char-btn" id="sel-echo" onclick="setChar('echo')"><img src="https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp"></div>
+            </div>
+
+            <button class="btn" onclick="start()">INITIATE LINK</button>
+        </div>
+    </div>
+
+    <button id="htp-btn" onclick="toggleHTP()">?</button>
+    <div id="htp-modal" onclick="toggleHTP()">
+        <div class="htp-content">
+            <h2 class="htp-title">HOW TO PLAY</h2>
+            <div class="htp-section">
+                <div class="htp-label">OBJECTIVE</div>
+                <div class="htp-text">Consume ATLR tokens to grow your neural link. Avoid hitting the walls or your own tail.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">CONTROLS (DESKTOP)</div>
+                <div class="htp-text">Use ARROW KEYS to steer your Vanguard.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">CONTROLS (MOBILE)</div>
+                <div class="htp-text">SWIPE in any direction to steer. Optimized for fluid mobile gestures.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">REWARDS</div>
+                <div class="htp-text">Earn +0.5 ATLR for every token consumed. Longer links yield higher prestige.</div>
+            </div>
+            <button class="btn" style="font-size: 1rem; padding: 10px 30px;">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        const canvas = document.getElementById('snakeGame');
+        const ctx = canvas.getContext('2d');
+        
+        let box = 25;
+        let canvasSize = 400;
+        if(window.innerWidth < 500) {
+            canvasSize = Math.floor(window.innerWidth * 0.9 / 25) * 25;
+        }
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+
+        let snake, food, direction, game, score = 0, atlr = 0, active = false;
+        let char = 'astra';
+
+        const heads = {
+            astra: new Image(), mimi: new Image(), nova: new Image(), echo: new Image()
+        };
+        heads.astra.src = 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp';
+        heads.mimi.src = 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp';
+        heads.nova.src = 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp';
+        heads.echo.src = 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp';
+
+        const coin = new Image();
+        coin.src = 'https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp';
+
+        function toggleHTP() {
+            const m = document.getElementById('htp-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function setChar(c) {
+            char = c;
+            document.querySelectorAll('.char-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('sel-'+c).classList.add('active');
+        }
+
+        // Keyboard Controls
+        document.addEventListener("keydown", e => {
+            if(!active) return;
+            if(e.keyCode == 37 && direction != "RIGHT") direction = "LEFT";
+            else if(e.keyCode == 38 && direction != "DOWN") direction = "UP";
+            else if(e.keyCode == 39 && direction != "LEFT") direction = "RIGHT";
+            else if(e.keyCode == 40 && direction != "UP") direction = "DOWN";
+        });
+
+        // Swipe Controls
+        let touchStartX = 0, touchStartY = 0;
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, false);
+
+        document.addEventListener('touchmove', e => {
+            if(!active) return;
+            e.preventDefault();
+            let x = e.touches[0].clientX;
+            let y = e.touches[0].clientY;
+            let dx = x - touchStartX;
+            let dy = y - touchStartY;
+
+            if(Math.abs(dx) > Math.abs(dy)) {
+                if(dx > 30 && direction != "LEFT") direction = "RIGHT";
+                else if(dx < -30 && direction != "RIGHT") direction = "LEFT";
+            } else {
+                if(dy > 30 && direction != "UP") direction = "DOWN";
+                else if(dy < -30 && direction != "DOWN") direction = "UP";
+            }
+        }, {passive: false});
+
+        function start() {
+            score = 0; atlr = 0; direction = "RIGHT"; active = true;
+            snake = [{x: 5 * box, y: 5 * box}];
+            spawnFood();
+            document.getElementById('overlay').style.display = 'none';
+            if(game) clearInterval(game);
+            game = setInterval(draw, 120);
+        }
+
+        function spawnFood() {
+            food = {
+                x: Math.floor(Math.random() * (canvas.width/box)) * box,
+                y: Math.floor(Math.random() * (canvas.height/box)) * box
+            };
+        }
+
+        function draw() {
+            ctx.fillStyle = "#080808";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            // Grid Lines
+            ctx.strokeStyle = "rgba(211, 47, 47, 0.1)";
+            for(let i=0; i<canvas.width; i+=box) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+
+            // Food
+            ctx.shadowBlur = 15; ctx.shadowColor = "rgba(255,107,0,0.5)";
+            ctx.drawImage(coin, food.x, food.y, box, box);
+            ctx.shadowBlur = 0;
+
+            // Snake
+            for(let i=0; i<snake.length; i++) {
+                if(i==0) {
+                    ctx.drawImage(heads[char], snake[i].x-2, snake[i].y-2, box+4, box+4);
+                } else {
+                    ctx.fillStyle = (i%2==0) ? "#D32F2F" : "#FF6B00";
+                    ctx.beginPath();
+                    ctx.roundRect(snake[i].x+2, snake[i].y+2, box-4, box-4, 5);
+                    ctx.fill();
+                }
+            }
+
+            let sX = snake[0].x;
+            let sY = snake[0].y;
+
+            if(direction == "LEFT") sX -= box;
+            if(direction == "UP") sY -= box;
+            if(direction == "RIGHT") sX += box;
+            if(direction == "DOWN") sY += box;
+
+            if(sX == food.x && sY == food.y) {
+                score++;
+                atlr = Math.floor(score / 2);
+                document.getElementById('score').innerText = score.toString().padStart(2, '0');
+                document.getElementById('atlr').innerText = atlr;
+                spawnFood();
+            } else {
+                snake.pop();
+            }
+
+            let newHead = { x: sX, y: sY };
+
+            if(sX < 0 || sX >= canvas.width || sY < 0 || sY >= canvas.height || collision(newHead, snake)) {
+                return end();
+            }
+
+            snake.unshift(newHead);
+        }
+
+        function collision(head, array) {
+            for(let i=0; i<array.length; i++) {
+                if(head.x == array[i].x && head.y == array[i].y) return true;
+            }
+            return false;
+        }
+
+        async function end() {
+            clearInterval(game);
+            active = false;
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('overlay').querySelector('h1').innerText = 'LINK SEVERED';
+            document.getElementById('overlay').querySelector('p').innerText = 'TOTAL ATLR EARNED: ' + atlr;
+            if(window.Atelia) {
+                const u = await Atelia.auth.getUser();
+                if(u.data.user) await Atelia.arena.updatePrestige(u.data.user.id, atlr);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse The Yard | D'Panyard</title>
+    <link rel="stylesheet" href="../shared/dpanyard.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase.js"></script>
+    <style>
+        .directory-layout { display: grid; grid-template-columns: 250px 1fr; gap: 2rem; }
+        .filters { background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--gray-200); align-self: flex-start; }
+        @media (max-width: 768px) { .directory-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="../landing/index.html" class="logo">D'PANYARD</a>
+        <nav>
+            <a href="directory.html">Browse</a>
+            <a href="../business/register.html" class="btn btn-primary">List Your Business</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="directory-layout">
+            <aside class="filters">
+                <h3>Filters</h3>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="filter-category" onchange="applyFilters()">
+                        <option value="">All Categories</option>
+                        <!-- Options injected -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>District</label>
+                    <select id="filter-district" onchange="applyFilters()">
+                        <option value="">All Districts</option>
+                        <option value="Port of Spain">Port of Spain</option>
+                        <option value="San Fernando">San Fernando</option>
+                        <option value="Chaguanas">Chaguanas</option>
+                        <option value="Arima">Arima</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="filter-verified" onchange="applyFilters()"> Verified Only</label>
+                </div>
+            </aside>
+
+            <section>
+                <div class="search-box" style="margin-top: 0; margin-bottom: 2rem;">
+                    <input type="text" id="search-input" placeholder="Search businesses..." onkeyup="if(event.key==='Enter') applyFilters()">
+                    <button class="btn btn-navy" onclick="applyFilters()">Search</button>
+                </div>
+                <div id="results-count" style="margin-bottom: 1rem; font-weight: bold;"></div>
+                <div class="yard-grid" id="directory-grid">
+                    <!-- Results injected here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const categories = ["Mechanic", "Plumber", "Electrician", "Catering", "Bakery", "Seamstress", "Cleaning Services", "Florist", "IT Services", "Taxi"];
+        
+        function getParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                category: params.get('category') || '',
+                district: params.get('district') || '',
+                query: params.get('query') || ''
+            };
+        }
+
+        function applyFilters() {
+            const cat = document.getElementById('filter-category').value;
+            const dist = document.getElementById('filter-district').value;
+            const query = document.getElementById('search-input').value;
+            const verified = document.getElementById('filter-verified').checked;
+            
+            loadBusinesses(cat, dist, query, verified);
+        }
+
+        async function loadBusinesses(cat, dist, query, verified) {
+            const grid = document.getElementById('directory-grid');
+            grid.innerHTML = '<p>Loading The Yard...</p>';
+
+            try {
+                let businesses = await window.dpapi.searchBusinesses(cat, dist, query);
+                if (verified) {
+                    businesses = businesses.filter(b => b.is_verified);
+                }
+
+                document.getElementById('results-count').textContent = `${businesses.length} businesses found`;
+                grid.innerHTML = '';
+
+                if (businesses.length === 0) {
+                    grid.innerHTML = '<p>No businesses found in this part of the yard. Try adjusting your filters.</p>';
+                    return;
+                }
+
+                businesses.forEach(biz => {
+                    grid.innerHTML += `
+                        <div class="business-card">
+                            <div class="card-content">
+                                <span class="badge badge-category">${biz.category}</span>
+                                ${biz.is_verified ? '<span class="badge badge-verified">Verified</span>' : ''}
+                                ${biz.is_premium ? '<span class="badge badge-premium">Featured</span>' : ''}
+                                <h3>${biz.name}</h3>
+                                <p style="color: #666; font-size: 0.9rem;">${biz.district}</p>
+                                <div class="stars">★★★★★ ${biz.rating}</div>
+                                <p>${biz.description ? biz.description.substring(0, 100) + '...' : ''}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="../business/profile.html?id=${biz.id}" class="btn btn-navy">Contact</a>
+                                <a href="https://wa.me/${biz.whatsapp}" target="_blank" class="btn btn-whatsapp">WhatsApp</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                grid.innerHTML = '<p>Error loading directory. Please try again later.</p>';
+            }
+        }
+
+        function init() {
+            const catSelect = document.getElementById('filter-category');
+            categories.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                catSelect.appendChild(opt);
+            });
+
+            const params = getParams();
+            document.getElementById('filter-category').value = params.category;
+            document.getElementById('filter-district').value = params.district;
+            document.getElementById('search-input').value = params.query;
+
+            loadBusinesses(params.category, params.district, params.query);
+        }
+
+        init();
+    </script>
+</body>
+</html>

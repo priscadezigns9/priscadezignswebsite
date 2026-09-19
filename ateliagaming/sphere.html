@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neural Sphere 3D | Atelia Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+            --cyber: #00ffff;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; touch-action: none;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--orange); z-index: 1000; }
+        .logo-img { height: 35px; filter: drop-shadow(0 0 5px var(--orange)); }
+
+        #game-viewport { flex: 1; width: 100%; height: 100%; position: relative; }
+
+        #ui-stats {
+            position: absolute; top: 20px; right: 20px; text-align: right; z-index: 500;
+            background: rgba(0,0,0,0.7); padding: 10px 20px; border-left: 3px solid var(--orange);
+            backdrop-filter: blur(10px);
+        }
+        .stat-label { font-family: 'Russo One'; font-size: 0.7rem; color: #888; }
+        .stat-value { font-family: 'Bangers'; font-size: 2rem; color: var(--white); }
+
+        #overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+        }
+        .btn {
+            padding: 15px 45px; background: var(--orange); color: white;
+            border: 3px solid white; font-family: 'Russo One'; font-size: 1.5rem;
+            cursor: pointer; margin-top: 25px; transition: 0.3s;
+        }
+        .btn:hover { background: var(--red); transform: scale(1.05); }
+
+        /* How to Play */
+        #htp-btn { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--orange); color: white; border: 2px solid white; border-radius: 50%; font-family: 'Russo One'; cursor: pointer; z-index: 5000; font-size: 1.4rem; }
+        #htp-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .htp-content { max-width: 500px; }
+        .htp-title { font-family: 'Bangers'; font-size: 4rem; color: var(--orange); margin-bottom: 20px; }
+        .htp-label { font-family: 'Russo One'; color: var(--white); font-size: 1.2rem; margin-bottom: 5px; }
+        .htp-text { color: #ccc; font-size: 1rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="arena.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.1rem; color:var(--orange);">NEURAL SPHERE 3D</div>
+    </nav>
+
+    <div id="game-viewport">
+        <div id="ui-stats">
+            <div class="stat-label">LINK STRENGTH</div>
+            <div class="stat-value" id="score-val">0</div>
+            <div class="stat-label" style="margin-top:5px;">ATLR PRESTIGE</div>
+            <div class="stat-value" id="atlr-val" style="color:var(--orange);">0</div>
+        </div>
+
+        <div id="overlay">
+            <h1 style="font-family:'Bangers'; font-size:5rem; margin:0;">NEURAL SPHERE</h1>
+            <p style="font-family:'Russo One'; color:var(--orange); letter-spacing:2px;">ENGINE: THREE.JS · TRUE WEBGL 3D</p>
+            <button class="btn" onclick="start()">INITIATE LINK</button>
+        </div>
+    </div>
+
+    <button id="htp-btn" onclick="toggleHTP()">?</button>
+    <div id="htp-modal" onclick="toggleHTP()">
+        <div class="htp-content">
+            <h2 class="htp-title">HOW TO PLAY</h2>
+            <div class="htp-section">
+                <div class="htp-label">OBJECTIVE</div>
+                <div class="htp-text">Navigate the 3D void. Collect the spinning Data Cubes while dodging the static Corruption Nodes.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">CONTROLS</div>
+                <div class="htp-text">DRAG your finger (mobile) or use your MOUSE (desktop) to steer the sphere through the 3D environment.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">REWARDS</div>
+                <div class="htp-text">Every 5 cubes harvested secure +10 ATLR. Maintain high Link Strength for maximum rewards.</div>
+            </div>
+            <button class="btn" style="font-size: 1rem; padding: 10px 30px;">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        let scene, camera, renderer, player, objects = [], enemies = [], active = false, score = 0, atlr = 0;
+        let targetX = 0, targetY = 0;
+
+        function toggleHTP() {
+            const m = document.getElementById('htp-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function start() {
+            document.getElementById('overlay').style.display = 'none';
+            init3D();
+            active = true;
+            animate();
+        }
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / (window.innerHeight - 70), 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight - 70);
+            document.getElementById('game-viewport').appendChild(renderer.domElement);
+
+            // Lighting
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(0, 0, 10);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0x404040));
+
+            // Player Sphere
+            const geometry = new THREE.SphereGeometry(1, 32, 32);
+            const material = new THREE.MeshPhongMaterial({ color: 0xff6b00, emissive: 0xaa4400, shininess: 100 });
+            player = new THREE.Mesh(geometry, material);
+            scene.add(player);
+
+            camera.position.z = 15;
+
+            // Spawn loop
+            setInterval(() => {
+                if(!active) return;
+                spawnObject();
+                if(Math.random() > 0.5) spawnEnemy();
+            }, 1000);
+
+            // Input handlers
+            window.addEventListener('mousemove', (e) => {
+                targetX = (e.clientX / window.innerWidth) * 2 - 1;
+                targetY = -( (e.clientY - 70) / (window.innerHeight - 70) ) * 2 + 1;
+            });
+            window.addEventListener('touchmove', (e) => {
+                targetX = (e.touches[0].clientX / window.innerWidth) * 2 - 1;
+                targetY = -( (e.touches[0].clientY - 70) / (window.innerHeight - 70) ) * 2 + 1;
+            }, {passive: false});
+        }
+
+        function spawnObject() {
+            const geo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+            const mat = new THREE.MeshPhongMaterial({ color: 0x00ffff });
+            const cube = new THREE.Mesh(geo, mat);
+            cube.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20, -50);
+            scene.add(cube);
+            objects.push(cube);
+        }
+
+        function spawnEnemy() {
+            const geo = new THREE.TetrahedronGeometry(1.2);
+            const mat = new THREE.MeshPhongMaterial({ color: 0xd32f2f });
+            const enemy = new THREE.Mesh(geo, mat);
+            enemy.position.set((Math.random() - 0.5) * 25, (Math.random() - 0.5) * 25, -60);
+            scene.add(enemy);
+            enemies.push(enemy);
+        }
+
+        function animate() {
+            if(!active) return;
+            requestAnimationFrame(animate);
+
+            // Player following mouse
+            player.position.x += (targetX * 10 - player.position.x) * 0.1;
+            player.position.y += (targetY * 8 - player.position.y) * 0.1;
+            player.rotation.y += 0.05;
+
+            // Objects movement
+            for(let i = objects.length - 1; i >= 0; i--) {
+                const obj = objects[i];
+                obj.position.z += 0.5;
+                obj.rotation.x += 0.02;
+                obj.rotation.y += 0.02;
+
+                if(obj.position.z > 15) {
+                    scene.remove(obj);
+                    objects.splice(i, 1);
+                }
+
+                // Collision
+                const dist = player.position.distanceTo(obj.position);
+                if(dist < 1.5) {
+                    score += 10;
+                    atlr = Math.floor(score / 5) * 10;
+                    document.getElementById('score-val').innerText = score;
+                    document.getElementById('atlr-val').innerText = atlr;
+                    scene.remove(obj);
+                    objects.splice(i, 1);
+                }
+            }
+
+            // Enemies movement
+            for(let i = enemies.length - 1; i >= 0; i--) {
+                const en = enemies[i];
+                en.position.z += 0.6;
+                en.rotation.z += 0.05;
+
+                if(en.position.z > 15) {
+                    scene.remove(en);
+                    enemies.splice(i, 1);
+                }
+
+                const dist = player.position.distanceTo(en.position);
+                if(dist < 1.8) gameOver();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        async function gameOver() {
+            active = false;
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('overlay').querySelector('h1').innerText = 'LINK SEVERED';
+            document.getElementById('overlay').querySelector('p').innerText = `TOTAL ATLR EARNED: ${atlr}`;
+            
+            if(window.Atelia) {
+                const u = await Atelia.auth.getUser();
+                if(u.data.user) Atelia.arena.updatePrestige(u.data.user.id, atlr);
+            }
+        }
+    </script>
+</body>
+</html>

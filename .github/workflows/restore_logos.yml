@@ -1,0 +1,43 @@
+name: Restore Logos
+on:
+  push:
+    paths:
+      - 'logos/parts/**'
+      - '.github/workflows/restore_logos.yml'
+  workflow_dispatch:
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Assemble Logos
+        run: |
+          mkdir -p logos
+          
+          # Axoria
+          cat logos/parts/axoria.part* > axoria.b64
+          base64 -d axoria.b64 > logos/AXORIA_DEFINITIVE_HF.png
+          
+          # Les Amour
+          cat logos/parts/les_amour.part* > les_amour.b64
+          base64 -d les_amour.b64 > logos/LES_AMOUR_DEFINITIVE_HF.png
+          
+          # Ornalis
+          cat logos/parts/ornalis.part* > ornalis.b64
+          base64 -d ornalis.b64 > logos/ORNALIS_DEFINITIVE_HF.png
+          
+          # Cleanup
+          rm -rf logos/parts
+          rm *.b64
+      
+      - name: Commit and Push
+        run: |
+          git config --global user.name "Zapia Restoration"
+          git config --global user.email "zapia@users.noreply.github.com"
+          git add logos/
+          git rm -r logos/parts || true
+          git commit -m "Restore high-fidelity logos via Action"
+          git push

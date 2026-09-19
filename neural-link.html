@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE BRIDGE | Neural Link v3.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Cormorant:ital,wght@0,300;1,300&family=Urbanist:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --purple: #7c3aed;
+            --lilac: #c084fc;
+            --bg: #050810;
+            --glass: rgba(255, 255, 255, 0.03);
+            --font-h1: "DM Serif Display", serif;
+            --font-h2: "Cormorant", serif;
+            --font-body: "Urbanist", sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: var(--font-body);
+            overflow: hidden;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #050810 100%);
+        }
+
+        header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        h1 { font-family: var(--font-h1); font-size: 1.5rem; letter-spacing: 2px; color: var(--lilac); }
+        
+        .status-pill {
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid var(--purple);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center; gap: 8px;
+        }
+        .status-dot { width: 6px; height: 6px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; animation: pulse 2s infinite; }
+
+        main { display: grid; grid-template-columns: 1fr 450px; height: calc(100vh - 80px); }
+
+        #fleet-map {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .node-container { position: relative; width: 600px; height: 600px; }
+        
+        .agent-node {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: var(--glass);
+            border: 1px solid rgba(192, 132, 252, 0.2);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .agent-node.active {
+            border-color: var(--lilac);
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.3);
+            background: rgba(124, 58, 237, 0.05);
+            transform: scale(1.1);
+        }
+
+        .agent-node span { font-size: 0.75rem; font-weight: 500; color: var(--lilac); }
+        .agent-role { font-size: 0.55rem; opacity: 0.5; margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+
+        #comms-sidebar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            border-left: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        .feed-header { 
+            font-family: var(--font-h2); 
+            font-size: 1.4rem; 
+            font-style: italic; 
+            margin-bottom: 20px;
+            color: var(--lilac);
+        }
+
+        .msg {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 20px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .msg-meta { 
+            font-size: 0.65rem; 
+            display: flex; 
+            justify-content: space-between;
+            padding: 0 10px;
+            color: var(--lilac);
+            opacity: 0.8;
+        }
+
+        .msg-bubble {
+            background: rgba(124, 58, 237, 0.05);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            padding: 15px;
+            border-radius: 20px 20px 20px 5px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .msg.outgoing .msg-bubble {
+            background: rgba(192, 132, 252, 0.08);
+            border-radius: 20px 20px 5px 20px;
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>THE BRIDGE</h1>
+        <div class="status-pill">
+            <div class="status-dot"></div>
+            Neural Link: Online v3.0
+        </div>
+    </header>
+
+    <main>
+        <section id="fleet-map">
+            <div class="node-container" id="node-grid"></div>
+        </section>
+
+        <section id="comms-sidebar">
+            <div class="feed-header">Neural Flow</div>
+            <div id="msg-container"></div>
+        </section>
+    </main>
+
+    <script>
+        const SB_URL = "https://sazhdnqzaqpqcralmthh.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc";
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+
+        const agents = [
+            { name: "Zapia", role: "Lead Strategist", x: 50, y: 50, id: "zapia" },
+            { name: "Claude", role: "Technical Lead", x: 20, y: 30, id: "claude" },
+            { name: "Kimi", role: "Auditor", x: 80, y: 30, id: "kimi" },
+            { name: "Sierra", role: "Operations", x: 20, y: 70, id: "sierra" },
+            { name: "Drew", role: "Sales Lead", x: 80, y: 70, id: "drew" },
+            { name: "Devin", role: "Development", x: 50, y: 15, id: "devin" }
+        ];
+
+        function init() {
+            const grid = document.getElementById("node-grid");
+            agents.forEach(a => {
+                const node = document.createElement("div");
+                node.className = "agent-node";
+                node.id = "node-" + a.id;
+                node.style.left = a.x + "%";
+                node.style.top = a.y + "%";
+                node.innerHTML = `<span>${a.name}</span><div class="agent-role">${a.role}</div>`;
+                grid.appendChild(node);
+            });
+            fetchComms();
+        }
+
+        async function fetchComms() {
+            const { data } = await supabase.from("fleet_comms").select("*").order("created_at", { ascending: false }).limit(15);
+            if (data) {
+                const container = document.getElementById("msg-container");
+                container.innerHTML = "";
+                data.forEach(m => {
+                    const el = document.createElement("div");
+                    el.className = "msg" + (m.from_agent === "Zapia" ? " outgoing" : "");
+                    const time = new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                    el.innerHTML = `
+                        <div class="msg-meta">
+                            <span>${m.from_agent.toUpperCase()} ➜ ${m.to_agent.toUpperCase()}</span>
+                            <span>${time}</span>
+                        </div>
+                        <div class="msg-bubble">${m.message_body}</div>
+                    `;
+                    container.appendChild(el);
+                    
+                    const fromNode = document.getElementById("node-" + m.from_agent.toLowerCase());
+                    if(fromNode) {
+                        fromNode.classList.add("active");
+                        setTimeout(() => fromNode.classList.remove("active"), 2000);
+                    }
+                });
+            }
+        }
+
+        supabase.channel("fleet_updates").on("postgres_changes", { event: "INSERT", table: "fleet_comms" }, () => fetchComms()).subscribe();
+        init();
+    </script>
+</body>
+</html>

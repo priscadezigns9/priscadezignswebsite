@@ -1,0 +1,2905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Business Architecture — Prisca Dezigns</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --purple:    #7c3aed;
+  --deep:      #3b0764;
+  --lilac:     #c084fc;
+  --soft:      #ede9fe;
+  --surface:   #faf8ff;
+  --border:    #ddd6fe;
+  --muted:     #6b7280;
+  --amber:     #d97706;
+  --green:     #059669;
+  --font-h1:   'DM Serif Display', serif;
+  --font-h2:   'Cormorant', serif;
+  --font-ui:   'Urbanist', sans-serif;
+}
+
+html, body {
+  background: var(--surface);
+  font-family: var(--font-ui);
+  color: #1a0a2e;
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 48px 32px 64px;
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.header h1 {
+  font-family: var(--font-h1);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  color: var(--deep);
+  margin-bottom: 8px;
+}
+.header p {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.header-pill {
+  display: inline-block;
+  margin-top: 12px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+
+/* ── ZONE LABELS ── */
+.zone-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.zone-label span {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.zone-label .line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.z-presale span  { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.z-ops span      { background: var(--soft); color: var(--deep); border: 1px solid var(--border); }
+.z-silent span   { background: #f0fdf4; color: #065f46; border: 1px solid #86efac; }
+
+/* ── ZONE ROWS ── */
+.zone {
+  margin-bottom: 16px;
+}
+
+/* Row that holds cards */
+.card-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+  position: relative;
+}
+
+/* ── CARD FLIP ── */
+.card-wrap {
+  position: relative;
+  width: 148px;
+  height: 190px;
+  perspective: 900px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: width 0.35s ease, height 0.35s ease, z-index 0s;
+  z-index: 1;
+}
+.card-wrap:hover {
+  width: 260px;
+  height: 340px;
+  z-index: 100;
+}
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease, width 0.35s ease, height 0.35s ease;
+  border-radius: 14px;
+}
+.card-wrap:hover .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* FRONT */
+.card-front {
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 12px rgba(124,58,237,0.07);
+  justify-content: center;
+  padding: 16px 12px;
+  text-align: center;
+}
+.card-front img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid var(--lilac);
+  margin-bottom: 10px;
+}
+.card-front .emp-name {
+  font-family: var(--font-h1);
+  font-size: 1rem;
+  color: var(--deep);
+  margin-bottom: 2px;
+}
+.card-front .emp-role {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.card-front .emp-tag {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.tag-ext  { background: #fce7f3; color: #9d174d; border: 1px solid #f9a8d4; }
+.tag-ops  { background: var(--soft); color: var(--deep); border: 1px solid var(--border); }
+.tag-sil  { background: #f0fdf4; color: #065f46; border: 1px solid #86efac; }
+
+/* Sierra front — special */
+.sierra-front {
+  background: linear-gradient(145deg, var(--deep) 0%, var(--purple) 100%);
+  border-color: var(--lilac);
+}
+.sierra-front .emp-name { color: #fff; }
+.sierra-front .emp-role { color: var(--lilac); }
+
+/* BACK */
+.card-back {
+  background: var(--deep);
+  border: 1.5px solid var(--lilac);
+  box-shadow: 0 8px 32px rgba(124,58,237,0.25);
+  transform: rotateY(180deg);
+  justify-content: flex-start;
+  padding: 20px 16px 16px;
+  text-align: left;
+  gap: 0;
+}
+.card-back .back-name {
+  font-family: var(--font-h1);
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 4px;
+  width: 100%;
+}
+.card-back .back-dept {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lilac);
+  margin-bottom: 12px;
+  width: 100%;
+}
+.card-back .duties-title {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lilac);
+  margin-bottom: 6px;
+  width: 100%;
+}
+.card-back ul {
+  list-style: none;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.card-back ul li {
+  font-size: 0.7rem;
+  font-weight: 300;
+  color: #e2d9f3;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(192,132,252,0.15);
+  line-height: 1.35;
+  display: flex;
+  gap: 6px;
+}
+.card-back ul li::before {
+  content: '›';
+  color: var(--lilac);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.stack-title {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lilac);
+  margin-top: 2px;
+  margin-bottom: 4px;
+  width: 100%;
+}
+.stack-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+}
+.stack-pill {
+  font-size: 0.58rem;
+  font-weight: 500;
+  background: rgba(192,132,252,0.15);
+  border: 1px solid rgba(192,132,252,0.3);
+  color: #c084fc;
+  border-radius: 4px;
+  padding: 2px 6px;
+  letter-spacing: 0.04em;
+}
+.visit-link {
+  display: inline-block;
+  margin-top: auto;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--deep);
+  background: var(--lilac);
+  border-radius: 6px;
+  padding: 5px 12px;
+  text-decoration: none;
+  width: 100%;
+  text-align: center;
+}
+.visit-link:hover { background: #fff; color: var(--deep); }
+
+/* ── SVG CONNECTOR LAYER ── */
+#connector-svg {
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+
+.chart-area {
+  position: relative;
+}
+
+/* ── COMPLIANCE FOOTER ── */
+.compliance {
+  margin-top: 60px;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 32px;
+  background: #fff;
+}
+.compliance h3 {
+  font-family: var(--font-h2);
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--deep);
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+}
+.compliance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.compliance-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.compliance-item svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.compliance-item p {
+  font-size: 0.78rem;
+  font-weight: 300;
+  color: #374151;
+  line-height: 1.5;
+}
+.compliance-item strong {
+  font-weight: 600;
+  color: var(--deep);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.footer-note {
+  text-align: center;
+  margin-top: 32px;
+  font-size: 0.78rem;
+  font-weight: 300;
+  color: var(--muted);
+  font-style: italic;
+  letter-spacing: 0.03em;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>AI Business Architecture</h1>
+    <p>Nine AI employees. One fully autonomous operating layer.</p>
+    <span class="header-pill">Hover any card to expand · Click to visit department</span>
+  </div>
+
+  <!-- CHART AREA -->
+  <div class="chart-area" id="chartArea">
+    <svg id="connector-svg" id="connSvg"></svg>
+
+    <!-- ZONE 1: PRE-SALE -->
+    <div class="zone">
+      <div class="zone-label z-presale">
+        <span>Pre-Sale — Lead Generation</span>
+        <div class="line"></div>
+      </div>
+      <div class="card-row" id="row-presale">
+
+        <!-- DEAN -->
+        <div class="card-wrap" id="card-dean">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/dean_headshot.jpg" alt="Dean" onerror="this.src='https://ui-avatars.com/api/?name=Dean&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Dean</div>
+              <div class="emp-role">Marketing Intelligence</div>
+              <span class="emp-tag tag-ops">Internal · Marketing</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Dean</div>
+              <div class="back-dept">Marketing Department</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>Lead generation &amp; scoring</li>
+                <li>Campaign performance analysis</li>
+                <li>Meta Ads data reporting</li>
+                <li>Marketing data quality control</li>
+                <li>Audience segmentation</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">Meta Ads</span>
+                <span class="stack-pill">Make.com</span>
+                <span class="stack-pill">Claude API</span>
+                <span class="stack-pill">Supabase</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/marketing/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- DREW -->
+        <div class="card-wrap" id="card-drew">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/drew_headshot.jpg" alt="Drew" onerror="this.src='https://ui-avatars.com/api/?name=Drew&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Drew</div>
+              <div class="emp-role">Sales Agent</div>
+              <span class="emp-tag tag-ops">Internal · Sales</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Drew</div>
+              <div class="back-dept">Sales &amp; Customer Service</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>High-fidelity voice interactions</li>
+                <li>Technical qualifying &amp; deal closing</li>
+                <li>Customizable AI voice integration</li>
+                <li>Strategic client onboarding</li>
+                <li>Capture client details &amp; WhatsApp relay</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">WhatsApp</span>
+                <span class="stack-pill">Supabase</span>
+                <span class="stack-pill">Claude API</span>
+                <span class="stack-pill">Make.com</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/sales/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ZONE 2: OPERATIONAL -->
+    <div class="zone">
+      <div class="zone-label z-ops">
+        <span>Operational — Active Cycle</span>
+        <div class="line"></div>
+      </div>
+      <div class="card-row" id="row-ops">
+
+        <!-- SIERRA -->
+        <div class="card-wrap" id="card-sierra">
+          <div class="card-inner">
+            <div class="card-front sierra-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/sierra_headshot.jpg" alt="Sierra" onerror="this.src='https://ui-avatars.com/api/?name=Sierra&background=c084fc&color=3b0764&size=64'">
+              <div class="emp-name">Sierra</div>
+              <div class="emp-role">Customer Operations</div>
+              <span class="emp-tag tag-ext">External · Client-Facing</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Sierra</div>
+              <div class="back-dept">Customer Operations — External</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>First &amp; last client contact point</li>
+                <li>Order intake &amp; qualification</li>
+                <li>Payment receipt forwarding</li>
+                <li>Delivery confirmation &amp; receipts</li>
+                <li>WhatsApp &amp; website channel management</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">360dialog</span>
+                <span class="stack-pill">Make.com</span>
+                <span class="stack-pill">Claude API</span>
+                <span class="stack-pill">Supabase</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/channel/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALANA -->
+        <div class="card-wrap" id="card-alana">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/alana_headshot.jpg" alt="Alana" onerror="this.src='https://ui-avatars.com/api/?name=Alana&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Alana</div>
+              <div class="emp-role">General Administration</div>
+              <span class="emp-tag tag-ops">Internal · All Departments</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Alana</div>
+              <div class="back-dept">Administration — Central Hub</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>Routes all internal department handoffs</li>
+                <li>Tracks project &amp; order status</li>
+                <li>Schedules &amp; coordinates workflows</li>
+                <li>Confirms production completion to Sierra</li>
+                <li>Records management &amp; filing</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">n8n</span>
+                <span class="stack-pill">Google Drive</span>
+                <span class="stack-pill">Supabase</span>
+                <span class="stack-pill">Claude API</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/admin/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- JAMAL -->
+        <div class="card-wrap" id="card-jamal">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/jamal_headshot.jpg" alt="Jamal" onerror="this.src='https://ui-avatars.com/api/?name=Jamal&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Jamal</div>
+              <div class="emp-role">Finance &amp; Accounts</div>
+              <span class="emp-tag tag-ops">Internal · Finance</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Jamal</div>
+              <div class="back-dept">Finance Department</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>Invoice &amp; quote generation</li>
+                <li>Payment logging &amp; confirmation</li>
+                <li>Supplier &amp; vendor management</li>
+                <li>Budget tracking &amp; payroll data</li>
+                <li>Financial reporting</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">Supabase</span>
+                <span class="stack-pill">Make.com</span>
+                <span class="stack-pill">Claude API</span>
+                <span class="stack-pill">Google Sheets</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/finance/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHAN -->
+        <div class="card-wrap" id="card-chan">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/chan_headshot.jpg" alt="Chan" onerror="this.src='https://ui-avatars.com/api/?name=Chan&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Chan</div>
+              <div class="emp-role">Production &amp; Delivery</div>
+              <span class="emp-tag tag-ops">Internal · Production</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Chan</div>
+              <div class="back-dept">Production Department</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>Builds &amp; configures the deliverable</li>
+                <li>Coordinates with QA/QC, IT &amp; HSE</li>
+                <li>Notifies Admin on completion</li>
+                <li>Version control &amp; change logs</li>
+                <li>Deployment &amp; handover prep</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">GitHub</span>
+                <span class="stack-pill">Vercel</span>
+                <span class="stack-pill">Supabase</span>
+                <span class="stack-pill">Claude API</span>
+                <span class="stack-pill">n8n</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/production/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ZONE 3: ORCINOS SAAS -->
+    <div class="zone">
+      <div class="zone-label" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <span style="background: #1e293b; color: #fff; border: 1px solid #334155; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 12px; border-radius: 999px; white-space: nowrap;">Orcinos — Software &amp; SaaS Infrastructure</span>
+        <div class="line" style="flex: 1; height: 1px; background: var(--border);"></div>
+      </div>
+      <div class="card-row" id="row-orcinos">
+
+        <!-- VELLOQ -->
+        <div class="card-wrap" id="card-velloq">
+          <div class="card-inner">
+            <div class="card-front" style="background: linear-gradient(135deg, #080d1f 0%, #2563eb 100%); border-color: #60a5fa;">
+              <img src="https://priscadezigns.org/vela/vela_logo.png" alt="Velloq" style="height: 48px; width: 48px; margin-bottom: 10px; border-radius: 8px; object-fit: contain;">
+              <div class="emp-name" style="color: #fff;">Velloq</div>
+              <div class="emp-role" style="color: #60a5fa;">Operational Intel</div>
+              <span class="emp-tag" style="background: rgba(96,165,250,0.2); color: #fff; border: 1px solid #60a5fa;">Truth Layer · SaaS</span>
+            </div>
+            <div class="card-back" style="background: #080d1f; border-color: #2563eb;">
+              <div class="back-name">Velloq Platform</div>
+              <div class="back-dept">Operational Intelligence</div>
+              <div class="duties-title">Core Features</div>
+              <ul>
+                <li>Multi-Tenant Fleet Tracking</li>
+                <li>Personnel Monitoring (Velloq Link)</li>
+                <li>200m GPS-Kill Privacy Zones</li>
+                <li>Triple-Lock Handshake Security</li>
+                <li>Role-Based UI Shredding</li>
+              </ul>
+              <div class="stack-title">Infrastructure</div>
+              <div class="stack-pills">
+                <span class="stack-pill">Supabase RLS</span>
+                <span class="stack-pill">Tailwind CSS</span>
+                <span class="stack-pill">Claude Code</span>
+                <span class="stack-pill">Google Maps API</span>
+              </div>
+              <a class="visit-link" href="https://orcinos.com/velloq/" target="_blank" style="background: #2563eb; color: #fff;">Open Dashboard →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ZONE 3: SILENT RUNNING -->
+    <div class="zone">
+      <div class="zone-label z-silent">
+        <span>Silent Running — Always On</span>
+        <div class="line"></div>
+      </div>
+      <div class="card-row" id="row-silent">
+
+        <!-- ALICE -->
+        <div class="card-wrap" id="card-alice">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/alice_headshot.jpg" alt="Alice" onerror="this.src='https://ui-avatars.com/api/?name=Alice&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Alice</div>
+              <div class="emp-role">Human Resources</div>
+              <span class="emp-tag tag-sil">Internal · All Staff</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Alice</div>
+              <div class="back-dept">Human Resources</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>AI employee payroll management</li>
+                <li>Policy &amp; compliance enforcement</li>
+                <li>Performance audits for all staff</li>
+                <li>Onboarding &amp; offboarding records</li>
+                <li>HR documentation &amp; reporting</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">Supabase</span>
+                <span class="stack-pill">Claude API</span>
+                <span class="stack-pill">Google Drive</span>
+                <span class="stack-pill">Make.com</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/hr/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUNIL -->
+        <div class="card-wrap" id="card-sunil">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/sunil_headshot.jpg" alt="Sunil" onerror="this.src='https://ui-avatars.com/api/?name=Sunil&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Sunil</div>
+              <div class="emp-role">Information Technology</div>
+              <span class="emp-tag tag-sil">Internal · All Systems</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Sunil</div>
+              <div class="back-dept">IT Department</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>Software uptime &amp; system auditing</li>
+                <li>Cybersecurity monitoring</li>
+                <li>Integration &amp; API maintenance</li>
+                <li>Data backup &amp; recovery</li>
+                <li>Department software access control</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">GitHub</span>
+                <span class="stack-pill">Supabase</span>
+                <span class="stack-pill">n8n</span>
+                <span class="stack-pill">Claude API</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/it/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- LUNA -->
+        <div class="card-wrap" id="card-luna">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/luna_headshot.jpg" alt="Luna" onerror="this.src='https://ui-avatars.com/api/?name=Luna&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Luna</div>
+              <div class="emp-role">Health, Safety &amp; Environment</div>
+              <span class="emp-tag tag-sil">Internal · All Departments</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Luna</div>
+              <div class="back-dept">HSE Department</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>Employee safety environment monitoring</li>
+                <li>HSE policy compliance checks</li>
+                <li>Incident &amp; risk reporting</li>
+                <li>Environmental standards adherence</li>
+                <li>Safety training record management</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">Supabase</span>
+                <span class="stack-pill">Claude API</span>
+                <span class="stack-pill">Make.com</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/hse/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- ZARA -->
+        <div class="card-wrap" id="card-zara">
+          <div class="card-inner">
+            <div class="card-front">
+              <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/zara_headshot.jpg" alt="Zara" onerror="this.src='https://ui-avatars.com/api/?name=Zara&background=7c3aed&color=fff&size=64'">
+              <div class="emp-name">Zara</div>
+              <div class="emp-role">Quality Assurance &amp; Control</div>
+              <span class="emp-tag tag-sil">Internal · Standards</span>
+            </div>
+            <div class="card-back">
+              <div class="back-name">Zara</div>
+              <div class="back-dept">QA / QC Department</div>
+              <div class="duties-title">Key Duties</div>
+              <ul>
+                <li>Product &amp; service quality auditing</li>
+                <li>ISO standards compliance monitoring</li>
+                <li>Document control management</li>
+                <li>QA reporting to all departments</li>
+                <li>Production QC sign-off with Chan</li>
+              </ul>
+              <div class="stack-title">Tech Stack</div>
+              <div class="stack-pills">
+                <span class="stack-pill">VAPI</span>
+                <span class="stack-pill">Supabase</span>
+                <span class="stack-pill">Claude API</span>
+                <span class="stack-pill">Google Drive</span>
+                <span class="stack-pill">Make.com</span>
+              </div>
+              <a class="visit-link" href="https://priscadezigns.org/aidata/qaqc/" target="_blank">View Full Profile →</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- end chart-area -->
+
+  <!-- COMPLIANCE MANDATE -->
+  <div class="compliance">
+    <h3>AI Employee Compliance Mandate</h3>
+    <div class="compliance-grid">
+      <div class="compliance-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p><strong>Legal Compliance</strong>All AI employees operate within the laws of Trinidad &amp; Tobago and CARICOM regional standards.</p>
+      </div>
+      <div class="compliance-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        <p><strong>Fully Autonomous</strong>Every employee executes their role without requiring human intervention. Humans enhance — AI executes.</p>
+      </div>
+      <div class="compliance-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <p><strong>Repetitive Tasks Only</strong>AI employees handle high-frequency, repeatable tasks. One-off or rare tasks remain human-led.</p>
+      </div>
+      <div class="compliance-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        <p><strong>Ethical by Design</strong>All actions must be transparent, fair, and non-deceptive. No AI employee misrepresents itself as human.</p>
+      </div>
+      <div class="compliance-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <p><strong>Fully Auditable</strong>Every action is logged, traceable, and reviewable. No silent edits. Every employee leaves a trace.</p>
+      </div>
+      <div class="compliance-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <p><strong>Human + AI Partnership</strong>AI employees empower your human team — they do not replace human judgement, creativity, or leadership.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Client brings the product or service — Prisca Dezigns builds the entire autonomous operating layer around it.
+  </div>
+
+</div><!-- end page -->
+
+<script>
+// ── STRAIGHT-LINE SVG CONNECTOR ENGINE ──
+// Draws after layout settles so positions are accurate
+document.addEventListener('DOMContentLoaded', () => {
+
+  function drawConnectors() {
+    const svg = document.getElementById('connector-svg');
+    const area = document.getElementById('chartArea');
+    const areaRect = area.getBoundingClientRect();
+
+    // Resize SVG to match chart area
+    svg.setAttribute('width',  area.offsetWidth);
+    svg.setAttribute('height', area.offsetHeight);
+    svg.innerHTML = ''; // clear old lines
+
+    // Helper: get center-top and center-bottom of a card relative to chartArea
+    function pts(id) {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return {
+        cx:  r.left - areaRect.left + r.width / 2,
+        top: r.top  - areaRect.top,
+        bot: r.top  - areaRect.top + r.height,
+        mid: r.top  - areaRect.top + r.height / 2,
+        left:  r.left - areaRect.left,
+        right: r.right - areaRect.left,
+        w: r.width
+      };
+    }
+
+    function line(x1, y1, x2, y2, color, width, dash) {
+      const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+      l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+      l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+      l.setAttribute('stroke', color);
+      l.setAttribute('stroke-width', width || 1.5);
+      if (dash) l.setAttribute('stroke-dasharray', dash);
+      l.setAttribute('stroke-linecap','square');
+      svg.appendChild(l);
+    }
+
+    // Elbow: go down from (x1,y1), across at midY, then up/down to (x2,y2)
+    function elbow(x1, y1, x2, y2, midY, color, width, dash) {
+      line(x1, y1, x1, midY,  color, width, dash);
+      line(x1, midY, x2, midY, color, width, dash);
+      line(x2, midY, x2, y2,  color, width, dash);
+    }
+
+    const PURPLE = '#7c3aed';
+    const AMBER  = '#d97706';
+    const GREEN  = '#059669';
+
+    const dean   = pts('card-dean');
+    const drew   = pts('card-drew');
+    const sierra = pts('card-sierra');
+    const alana  = pts('card-alana');
+    const sierra = pts('card-sierra');
+    const alana  = pts('card-alana');
+    const jamal  = pts('card-jamal');
+    const chan   = pts('card-chan');
+    const alice  = pts('card-alice');
+    const sunil  = pts('card-sunil');
+    const luna   = pts('card-luna');
+    const zara   = pts('card-zara');
+    const velloq = pts('card-velloq');
+
+    if (!dean || !drew || !sierra || !alana || !jamal || !chan || !alice || !sunil || !luna || !zara || !velloq) return;
+
+    // ── Dean → Drew (lead hand-off, green dashed) ──
+    const deanDrewY = dean.bot + 12;
+    elbow(dean.cx, dean.bot, drew.cx, drew.top, deanDrewY, GREEN, 1.5, '5 3');
+
+    // ── Drew → Sierra (qualified lead, green dashed) ──
+    const drewSierraY = drew.bot + 20;
+    elbow(drew.cx, drew.bot, sierra.cx, sierra.top, drewSierraY, GREEN, 1.5, '5 3');
+
+    // ── Sierra → Alana (purple solid) ──
+    const sierraAlanaY = sierra.bot + 20;
+    elbow(sierra.cx, sierra.bot, alana.cx, alana.top, sierraAlanaY, PURPLE, 2);
+
+    // ── Alana → horizontal bus → all operational-zone cards (Jamal, Chan) ──
+    const busY = alana.bot + 32;
+    line(alana.cx, alana.bot, alana.cx, busY, PURPLE, 2);
+    elbow(alana.cx, busY, jamal.cx,  jamal.top,  busY, PURPLE, 1.5);
+    elbow(alana.cx, busY, chan.cx,   chan.top,   busY, PURPLE, 1.5);
+
+    // ── Alana → Orcinos/Velloq Node ──
+    const orcinosBusY = alana.bot + 160; 
+    line(alana.cx, alana.bot, alana.cx, orcinosBusY, PURPLE, 1.5);
+    elbow(alana.cx, orcinosBusY, velloq.cx, velloq.top, orcinosBusY, PURPLE, 1.5);
+
+    // ── Alana → silent row (alice, sunil, luna, zara) via bus ──
+    const silentBusY = alana.bot + 350; // Drop down further
+    line(alana.cx, alana.bot, alana.cx, silentBusY, PURPLE, 1.5);
+
+    const leftX  = Math.min(alice.cx, sunil.cx, luna.cx, zara.cx);
+    const rightX = Math.max(alice.cx, sunil.cx, luna.cx, zara.cx);
+    line(leftX, silentBusY, rightX, silentBusY, PURPLE, 1.5);
+
+    [alice, sunil, luna, zara].forEach(c => {
+      line(c.cx, silentBusY, c.cx, c.top, PURPLE, 1.5);
+    });
+
+    // ── Velloq → Sunil (Blue link - data sync) ──
+    const VELLOQ_BLUE = '#2563eb';
+    elbow(velloq.cx, velloq.bot, sunil.cx, sunil.top, velloq.bot + 10, VELLOQ_BLUE, 1.5, '3 2');
+
+    // ── Velloq → Alice (Blue link - HR monitoring) ──
+    elbow(velloq.cx, velloq.bot, alice.cx, alice.top, velloq.bot + 10, VELLOQ_BLUE, 1.5, '3 2');
+
+    // ── Chan ↔ Zara (amber solid — production QC link) ──
+    const chanZaraY = Math.max(chan.bot, zara.bot) + 22;
+    elbow(chan.cx, chan.bot, zara.cx, zara.bot, chanZaraY, AMBER, 2);
+
+    // ── Chan → Sunil (amber dashed) ──
+    const chanSunilY = Math.max(chan.bot, sunil.bot) + 42;
+    elbow(chan.cx, chan.bot, sunil.cx, sunil.bot, chanSunilY, AMBER, 1.5, '5 3');
+
+    // ── Chan → Luna (amber dashed) ──
+    const chanLunaY = Math.max(chan.bot, luna.bot) + 62;
+    elbow(chan.cx, chan.bot, luna.cx, luna.bot, chanLunaY, AMBER, 1.5, '5 3');
+  }
+
+  // Wait a tick for layout, then draw
+  setTimeout(drawConnectors, 120);
+  window.addEventListener('resize', () => setTimeout(drawConnectors, 120));
+});
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- WORKFLOW FLOWS SECTION — INTERNAL ONLY                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<style>
+.flow-section { padding: 80px 32px; max-width: 1100px; margin: 0 auto; }
+.flow-section-title { font-family: var(--font-h1); font-size: clamp(1.6rem, 2.5vw, 2.2rem); color: var(--deep); text-align: center; margin-bottom: 8px; }
+.flow-section-sub { text-align: center; font-size: 0.9rem; color: var(--muted); font-weight: 300; margin-bottom: 56px; }
+.flow-divider { height: 1px; background: var(--border); margin: 64px 0; }
+.flow-employee-label { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+.flow-employee-label .emp-name { font-family: var(--font-h1); font-size: 1.3rem; color: var(--deep); white-space: nowrap; }
+.flow-employee-label .emp-role { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 12px; border-radius: 999px; background: var(--soft); color: var(--purple); border: 1px solid var(--border); white-space: nowrap; }
+.flow-employee-label .line { flex: 1; height: 1px; background: var(--border); }
+.flow-track { display: flex; align-items: flex-start; gap: 0; flex-wrap: wrap; row-gap: 16px; }
+.flow-step { display: flex; align-items: flex-start; gap: 0; }
+.flow-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; min-width: 148px; max-width: 180px; text-align: center; }
+.flow-box .step-num { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--purple); margin-bottom: 4px; }
+.flow-box .step-title { font-size: 0.82rem; font-weight: 600; color: #1a0a2e; line-height: 1.4; margin-bottom: 4px; }
+.flow-box .step-detail { font-size: 0.72rem; color: var(--muted); font-weight: 300; line-height: 1.4; }
+.flow-box.highlight { border-color: var(--purple); background: var(--soft); }
+.flow-box.output { border-color: #059669; background: #f0fdf4; }
+.flow-box.input { border-color: #d97706; background: #fffbeb; }
+.flow-arrow { display: flex; align-items: center; padding: 0 6px; padding-top: 22px; color: var(--border); font-size: 1.1rem; flex-shrink: 0; }
+.flow-channels { display: flex; gap: 6px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+.flow-ch { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: #ede9fe; color: var(--purple); border: 1px solid var(--border); }
+.flow-ch.email { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+.flow-ch.wa    { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+.flow-ch.sop   { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+</style>
+
+<div style="height:1px; background:var(--border); margin: 0 32px;"></div>
+
+<!-- GENERAL FLOW -->
+<div class="flow-section">
+  <h2 class="flow-section-title">How the Business Runs</h2>
+  <p class="flow-section-sub">General flow — every customer interaction follows this path before reaching any department.</p>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Start</div>
+        <div class="step-title">Customer</div>
+        <div class="step-detail">Reaches out with a question, lead, or request</div>
+        <div class="flow-channels"><span class="flow-ch wa">WhatsApp</span><span class="flow-ch email">Email</span><span class="flow-ch">Web Chat</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Sierra</div>
+        <div class="step-detail">Receives, qualifies, and captures the lead</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Alana</div>
+        <div class="step-detail">Sierra hands off internally — Alana routes to the right department</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Department</div>
+        <div class="step-detail">The relevant AI employee processes the task</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box">
+        <div class="step-num">Step 4</div>
+        <div class="step-title">Report to Alana</div>
+        <div class="step-detail">Department logs output and sends report back to Alana</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">End</div>
+        <div class="step-title">Owner</div>
+        <div class="step-detail">Alana delivers consolidated report — nothing missed</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIERRA -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Sierra</span>
+    <span class="emp-role">Customer Operations Rep</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">Customer Contacts</div>
+        <div class="step-detail">Inquiry, lead, complaint, or booking request</div>
+        <div class="flow-channels"><span class="flow-ch wa">WhatsApp</span><span class="flow-ch email">Email</span><span class="flow-ch">Web Chat</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Sierra Receives</div>
+        <div class="step-detail">Reads message, identifies intent, pulls customer context</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Qualifies</div>
+        <div class="step-detail">Asks qualifying questions, captures name, contact &amp; need</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Responds</div>
+        <div class="step-detail">Answers FAQ, quotes pricing, or books appointment — no human needed</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">Logs &amp; Routes</div>
+        <div class="step-detail">Lead logged to CRM. Handed off to Alana for internal routing</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALANA -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Alana</span>
+    <span class="emp-role">Admin &amp; Internal Router</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">Receives Input</div>
+        <div class="step-detail">From Sierra, incoming email, or staff request</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Reads &amp; Categorizes</div>
+        <div class="step-detail">Sorts emails, documents, requests by type and priority</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Routes</div>
+        <div class="step-detail">Sends to the correct department — Finance, HR, QA, etc.</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Pulls Reports</div>
+        <div class="step-detail">Collects output logs from all connected departments</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">Owner Report</div>
+        <div class="step-detail">Consolidated daily/weekly admin report delivered to owner</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZARA -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Zara</span>
+    <span class="emp-role">QA / Non-Conformance</span>
+    <span class="line"></span>
+  </div>
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:24px;">⚠ Requires SOPs uploaded to function correctly.</p>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">Staff Sends NCR</div>
+        <div class="step-detail">Employee reports a non-conformance</div>
+        <div class="flow-channels"><span class="flow-ch wa">WhatsApp</span><span class="flow-ch email">Email</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Zara Receives &amp; Logs</div>
+        <div class="step-detail">Confirms receipt, assigns NCR number, logs to database</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Analyzes vs SOP</div>
+        <div class="step-detail">Cross-references the incident against uploaded SOPs</div>
+        <div class="flow-channels"><span class="flow-ch sop">SOP Required</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Assigns Corrective Action</div>
+        <div class="step-detail">Generates corrective action with deadline and responsible party</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 4</div>
+        <div class="step-title">Compliance Check &amp; Re-Inspection</div>
+        <div class="step-detail">Runs compliance flag, schedules re-inspection date</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">Report Delivered</div>
+        <div class="step-detail">Full NCR report via Email. Summary ping via WhatsApp</div>
+        <div class="flow-channels"><span class="flow-ch email">Email — Full Report</span><span class="flow-ch wa">WhatsApp — Summary</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEAN -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Dean</span>
+    <span class="emp-role">Marketing Department</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">Marketing Brief</div>
+        <div class="step-detail">Campaign brief received from Alana or owner</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Dean Processes</div>
+        <div class="step-detail">Captures leads, segments audiences, and tracks campaign performance data</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Data Organised</div>
+        <div class="step-detail">Lead data cleaned, scored, and segmented by source and behaviour</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Performance Tracked</div>
+        <div class="step-detail">Meta Ads performance data pulled and structured for reporting</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">Report Emailed</div>
+        <div class="step-detail">Meta Ads performance report sent via email to the marketing team or business owner on schedule.</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DREW -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Drew</span>
+    <span class="emp-role">Sales Agent</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">Qualified Lead</div>
+        <div class="step-detail">Lead received from Dean or Sierra requiring technical vetting</div>
+        <div class="flow-channels"><span class="flow-ch wa">WhatsApp</span><span class="flow-ch">VAPI</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Requirements Analysis</div>
+        <div class="step-detail">Analyzes project requirements, AI complexity, and business needs</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Voice Consultation</div>
+        <div class="step-detail">Executes high-fidelity voice call to demo value and close deal</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Deal Finalized</div>
+        <div class="step-detail">Locks in pricing, captures project specifics, and confirms buy-in</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">Hand-off to Alana</div>
+        <div class="step-detail">Project brief and confirmation sent to Alana for production routing</div>
+        <div class="flow-channels"><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAMAL -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Jamal</span>
+    <span class="emp-role">Finance Department</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">Financial Input</div>
+        <div class="step-detail">Invoice, expense, or payment document submitted</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Jamal Logs</div>
+        <div class="step-detail">Records transaction, categorizes by type and department</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Flags Anomalies</div>
+        <div class="step-detail">Detects duplicate entries, missing invoices, or overruns</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">Financial Report</div>
+        <div class="step-detail">Weekly financial summary routed to Alana and owner</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALICE -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Alice</span>
+    <span class="emp-role">HR Department</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">Staff Request</div>
+        <div class="step-detail">Onboarding, leave request, policy query, or HR form</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Alice Receives</div>
+        <div class="step-detail">Reads request, identifies category (onboarding / leave / policy)</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Processes</div>
+        <div class="step-detail">Executes the standard HR workflow for that request type</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Logs &amp; Notifies</div>
+        <div class="step-detail">Updates HR records, notifies staff of outcome</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">Report to Alana</div>
+        <div class="step-detail">HR activity log sent to Alana for consolidation</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LUNA -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Luna</span>
+    <span class="emp-role">HSE Department</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">HSE Incident / Inspection</div>
+        <div class="step-detail">Safety incident reported or scheduled inspection due</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Luna Logs</div>
+        <div class="step-detail">Records incident details, location, and personnel involved</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Risk Assessment</div>
+        <div class="step-detail">Evaluates severity, flags high-risk items immediately</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Corrective Flag</div>
+        <div class="step-detail">Issues corrective action, compliance deadline set</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">HSE Report</div>
+        <div class="step-detail">Full compliance report to Alana. WhatsApp alert for urgent flags</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUNIL -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Sunil</span>
+    <span class="emp-role">IT Department</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">IT Request</div>
+        <div class="step-detail">Staff submits a technical issue or system request</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Sunil Receives &amp; Triages</div>
+        <div class="step-detail">Categorizes by priority — critical, standard, or low</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Resolves or Escalates</div>
+        <div class="step-detail">Handles standard issues; flags critical ones immediately</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">IT Log to Alana</div>
+        <div class="step-detail">Ticket resolved, logged, and report sent to Alana</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAN -->
+  <div class="flow-divider"></div>
+  <div class="flow-employee-label">
+    <span class="emp-name">Chan</span>
+    <span class="emp-role">Production Department</span>
+    <span class="line"></span>
+  </div>
+  <div class="flow-track">
+    <div class="flow-step">
+      <div class="flow-box input">
+        <div class="step-num">Trigger</div>
+        <div class="step-title">Production Input</div>
+        <div class="step-detail">Output log, inventory update, or maintenance alert submitted</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span><span class="flow-ch wa">WhatsApp</span></div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Chan Logs</div>
+        <div class="step-detail">Records production output, batch details, and inventory levels</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Tracks &amp; Flags Deviations</div>
+        <div class="step-detail">Compares output against targets, flags underperformance or waste</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box highlight">
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Maintenance Alert</div>
+        <div class="step-detail">Issues maintenance flag when thresholds hit — routes to Zara if QA needed</div>
+      </div>
+      <div class="flow-arrow">→</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-box output">
+        <div class="step-num">Output</div>
+        <div class="step-title">Production Report to Alana</div>
+        <div class="step-detail">Daily production summary sent to Alana for consolidation</div>
+        <div class="flow-channels"><span class="flow-ch email">Email</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /flow-section -->
+
+
+<!-- VOICE AGENT INFRASTRUCTURE SECTION -->
+<div class="flow-divider" style="margin: 60px 0 0;"></div>
+
+<div style="max-width: 860px; margin: 0 auto; padding: 60px 24px 0;">
+  <p style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">Infrastructure</p>
+  <h2 style="font-family: var(--font-h1); font-size: 2rem; color: var(--deep); margin: 0 0 12px;">Voice Agent Call Flow</h2>
+  <p style="font-family: var(--font-body); font-size: 0.95rem; color: var(--body-text); margin: 0 0 48px; max-width: 560px;">How an inbound customer call travels from a phone number through to a live AI voice agent — and how the request gets fulfilled.</p>
+</div>
+
+<!-- Flow Track -->
+<div style="max-width: 980px; margin: 0 auto; padding: 0 24px 80px; overflow-x: auto;">
+  <div style="display: flex; align-items: flex-start; gap: 0; min-width: 700px;">
+
+    <!-- Step 0: Customer Calls -->
+    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+      <div style="background: linear-gradient(135deg, var(--deep), #5b21b6); border-radius: 16px; padding: 24px 18px; text-align: center; width: 100%; box-sizing: border-box;">
+        <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Trigger</div>
+        <div style="font-size: 1.6rem; margin-bottom: 8px;">📞</div>
+        <div style="font-family: var(--font-h2); font-size: 1rem; color: #fff; font-weight: 600; margin-bottom: 6px;">Customer Calls</div>
+        <div style="font-family: var(--font-body); font-size: 0.78rem; color: rgba(255,255,255,0.75); line-height: 1.5;">Dials a landline or virtual number assigned to the business</div>
+      </div>
+      <div style="font-family: var(--font-ui); font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 10px;">Entry Point</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; padding: 0 8px; padding-top: 28px;">
+      <svg width="32" height="16" viewBox="0 0 32 16" fill="none"><path d="M0 8h28M22 2l8 6-8 6" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Step 1: DID / SIP Trunk -->
+    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+      <div style="background: #f5f3ff; border: 1.5px solid rgba(124,58,237,0.25); border-radius: 16px; padding: 24px 18px; text-align: center; width: 100%; box-sizing: border-box;">
+        <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Step 1</div>
+        <div style="font-size: 1.6rem; margin-bottom: 8px;">🔁</div>
+        <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 12px;">DID / SIP Trunk</div>
+        <div style="font-family: var(--font-body); font-size: 0.78rem; color: var(--body-text); line-height: 1.5; margin-bottom: 16px;">Virtual number receives the call and routes it via SIP to the voice platform</div>
+        <!-- Provider Options -->
+        <div style="display: flex; flex-direction: column; gap: 8px; text-align: left;">
+          <div style="background: #fff; border: 1px solid rgba(124,58,237,0.18); border-radius: 10px; padding: 10px 12px;">
+            <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #7c3aed; margin-bottom: 3px;">DIDWW</div>
+            <div style="font-family: var(--font-body); font-size: 0.72rem; color: var(--body-text);">Caribbean &amp; international clients — strong regional coverage, clean SIP</div>
+          </div>
+          <div style="background: #fff; border: 1px solid rgba(124,58,237,0.18); border-radius: 10px; padding: 10px 12px;">
+            <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #7c3aed; margin-bottom: 3px;">Telnyx</div>
+            <div style="font-family: var(--font-body); font-size: 0.72rem; color: var(--body-text);">Budget-conscious clients — low cost, developer-friendly, solid SIP</div>
+          </div>
+          <div style="background: #fff; border: 1px solid rgba(124,58,237,0.18); border-radius: 10px; padding: 10px 12px;">
+            <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #7c3aed; margin-bottom: 3px;">Twilio</div>
+            <div style="font-family: var(--font-body); font-size: 0.72rem; color: var(--body-text);">Clients already on Twilio — easy integration, wider API ecosystem</div>
+          </div>
+          <div style="background: #fff; border: 1px solid rgba(124,58,237,0.18); border-radius: 10px; padding: 10px 12px;">
+            <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #7c3aed; margin-bottom: 3px;">Vonage</div>
+            <div style="font-family: var(--font-body); font-size: 0.72rem; color: var(--body-text);">Enterprise clients — high volume, global reach, SLA-backed</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family: var(--font-ui); font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 10px;">Call Routing</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; padding: 0 8px; padding-top: 28px;">
+      <svg width="32" height="16" viewBox="0 0 32 16" fill="none"><path d="M0 8h28M22 2l8 6-8 6" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Step 2: Vapi -->
+    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+      <div style="background: #f5f3ff; border: 1.5px solid rgba(124,58,237,0.25); border-radius: 16px; padding: 24px 18px; text-align: center; width: 100%; box-sizing: border-box;">
+        <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Step 2</div>
+        <div style="font-size: 1.6rem; margin-bottom: 8px;">⚡</div>
+        <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 6px;">Vapi</div>
+        <div style="font-family: var(--font-body); font-size: 0.78rem; color: var(--body-text); line-height: 1.5;">Voice AI platform handles the real-time call session and connects to the assigned agent</div>
+      </div>
+      <div style="font-family: var(--font-ui); font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 10px;">Voice Platform</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; padding: 0 8px; padding-top: 28px;">
+      <svg width="32" height="16" viewBox="0 0 32 16" fill="none"><path d="M0 8h28M22 2l8 6-8 6" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Step 3: AI Voice Agent -->
+    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+      <div style="background: #f5f3ff; border: 1.5px solid rgba(124,58,237,0.25); border-radius: 16px; padding: 24px 18px; text-align: center; width: 100%; box-sizing: border-box;">
+        <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Step 3</div>
+        <div style="font-size: 1.6rem; margin-bottom: 8px;">🤖</div>
+        <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 6px;">AI Voice Agent</div>
+        <div style="font-family: var(--font-body); font-size: 0.78rem; color: var(--body-text); line-height: 1.5;">Agent answers, understands the caller's request using LLM + voice synthesis</div>
+      </div>
+      <div style="font-family: var(--font-ui); font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 10px;">Intelligence Layer</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; padding: 0 8px; padding-top: 28px;">
+      <svg width="32" height="16" viewBox="0 0 32 16" fill="none"><path d="M0 8h28M22 2l8 6-8 6" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Output: Request Fulfilled -->
+    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+      <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 1.5px solid rgba(16,185,129,0.3); border-radius: 16px; padding: 24px 18px; text-align: center; width: 100%; box-sizing: border-box;">
+        <div style="font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #065f46; margin-bottom: 8px;">Output</div>
+        <div style="font-size: 1.6rem; margin-bottom: 8px;">✅</div>
+        <div style="font-family: var(--font-h2); font-size: 1rem; color: #065f46; font-weight: 600; margin-bottom: 6px;">Request Fulfilled</div>
+        <div style="font-family: var(--font-body); font-size: 0.78rem; color: #064e3b; line-height: 1.5;">Caller receives a response, booking, or information — no human required</div>
+      </div>
+      <div style="font-family: var(--font-ui); font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-top: 10px;">Resolution</div>
+    </div>
+
+  </div>
+
+  <!-- Tech Stack Pills -->
+  <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 40px;">
+    <span style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; background: rgba(124,58,237,0.08); color: var(--deep); border: 1px solid rgba(124,58,237,0.2); border-radius: 20px; padding: 6px 14px;">DID Provider</span>
+    <span style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; background: rgba(124,58,237,0.08); color: var(--deep); border: 1px solid rgba(124,58,237,0.2); border-radius: 20px; padding: 6px 14px;">SIP Trunk</span>
+    <span style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; background: rgba(124,58,237,0.08); color: var(--deep); border: 1px solid rgba(124,58,237,0.2); border-radius: 20px; padding: 6px 14px;">Vapi</span>
+    <span style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; background: rgba(124,58,237,0.08); color: var(--deep); border: 1px solid rgba(124,58,237,0.2); border-radius: 20px; padding: 6px 14px;">ElevenLabs Voice</span>
+    <span style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; background: rgba(124,58,237,0.08); color: var(--deep); border: 1px solid rgba(124,58,237,0.2); border-radius: 20px; padding: 6px 14px;">LLM (Claude / GPT)</span>
+  </div>
+
+</div>
+<!-- END VOICE AGENT INFRASTRUCTURE SECTION -->
+
+
+<!-- TOOLS SECTION -->
+<div class="flow-divider" style="margin: 60px 0 0;"></div>
+
+<style>
+.clay-section { max-width: 1100px; margin: 0 auto; padding: 60px 24px 100px; }
+.clay-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-top: 48px; }
+.clay-card {
+  background: linear-gradient(145deg, #ffffff, #f0ebff);
+  border-radius: 24px;
+  padding: 28px 26px;
+  box-shadow: 8px 8px 20px rgba(124,58,237,0.13), -4px -4px 12px rgba(255,255,255,0.9), inset 0 1px 0 rgba(255,255,255,0.8);
+  border: 1.5px solid rgba(255,255,255,0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.clay-card:hover { transform: translateY(-3px); box-shadow: 10px 12px 28px rgba(124,58,237,0.17), -4px -4px 14px rgba(255,255,255,0.95); }
+.clay-icon-wrap {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, #7c3aed, #c084fc);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 4px 4px 10px rgba(124,58,237,0.3), -2px -2px 6px rgba(255,255,255,0.8);
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+.clay-tag {
+  display: inline-block;
+  background: rgba(124,58,237,0.08);
+  border: 1px solid rgba(124,58,237,0.18);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #7c3aed;
+  margin-bottom: 10px;
+}
+.clay-tool-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(124,58,237,0.12);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin-bottom: 7px;
+  box-shadow: 2px 2px 6px rgba(124,58,237,0.06);
+}
+.clay-tool-pill svg { flex-shrink: 0; }
+.clay-pill-text { font-family: var(--font-body); font-size: 0.78rem; color: var(--body-text); }
+.clay-pill-label { font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #7c3aed; display: block; margin-bottom: 1px; }
+
+/* Infrastructure cards */
+.clay-infra-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 48px; }
+.clay-infra-card {
+  background: linear-gradient(145deg, #faf7ff, #ede9fe);
+  border-radius: 22px;
+  padding: 26px 24px;
+  box-shadow: 6px 6px 18px rgba(124,58,237,0.12), -3px -3px 10px rgba(255,255,255,0.9);
+  border: 1.5px solid rgba(255,255,255,0.75);
+}
+.clay-infra-icon {
+  width: 42px; height: 42px;
+  background: white;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 3px 3px 8px rgba(124,58,237,0.18), -2px -2px 5px rgba(255,255,255,0.9);
+  margin-bottom: 14px;
+}
+/* Orcinos stack card */
+.clay-orcinos {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  border-radius: 24px;
+  padding: 32px 28px;
+  margin-top: 24px;
+  box-shadow: 8px 8px 24px rgba(124,58,237,0.35), -3px -3px 10px rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.2);
+}
+.clay-orcinos-pill {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  backdrop-filter: blur(4px);
+}
+</style>
+
+<div class="clay-section">
+  <p style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">Stack</p>
+  <h2 style="font-family: var(--font-h1); font-size: 2rem; color: var(--deep); margin: 0 0 12px;">Tools & Platform Stack</h2>
+  <p style="font-family: var(--font-body); font-size: 0.95rem; color: var(--body-text); max-width: 580px; margin: 0;">Every tool each AI employee needs to operate — from voice and messaging to data and automation.</p>
+
+  <!-- Per-Employee Tool Cards -->
+  <div class="clay-grid">
+
+    <!-- Sierra -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="clay-tag">Customer Relations</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Sierra</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.1 6.1l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+        <div><span class="clay-pill-label">Vapi Voice</span><span class="clay-pill-text">Inbound voice + call routing</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div><span class="clay-pill-label">WhatsApp API — 360dialog</span><span class="clay-pill-text">Customer messaging & follow-up</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Lead & conversation records</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <div><span class="clay-pill-label">Make.com / n8n</span><span class="clay-pill-text">Automate inquiry & escalation flows</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <div><span class="clay-pill-label">Website Chat Widget</span><span class="clay-pill-text">Embedded customer chat interface</span></div>
+      </div>
+    </div>
+
+    <!-- Drew -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      </div>
+      <div class="clay-tag">Sales & Customer Service</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Drew</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.1 6.1l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/></svg>
+        <div><span class="clay-pill-label">Vapi Voice</span><span class="clay-pill-text">Primary sales call channel</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div><span class="clay-pill-label">WhatsApp API</span><span class="clay-pill-text">Lead capture & deal follow-up</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Log qualified leads & client data</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
+        <div><span class="clay-pill-label">GPT-4o — LLM</span><span class="clay-pill-text">Advanced deal-closing reasoning</span></div>
+      </div>
+    </div>
+
+    <!-- Dean -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <div class="clay-tag">Marketing</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Dean</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div><span class="clay-pill-label">Gmail / SMTP</span><span class="clay-pill-text">Email reports to owner & team</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        <div><span class="clay-pill-label">Meta Ads API</span><span class="clay-pill-text">Campaign performance data</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Store campaign & lead data</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <div><span class="clay-pill-label">Maxun</span><span class="clay-pill-text">Web scraping for market signals</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <div><span class="clay-pill-label">Make.com / n8n</span><span class="clay-pill-text">Automate reporting pipelines</span></div>
+      </div>
+    </div>
+
+    <!-- Jamal -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="clay-tag">Finance</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Jamal</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Invoices, expenses, financial records</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <div><span class="clay-pill-label">Google Sheets / Excel</span><span class="clay-pill-text">Financial report exports</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div><span class="clay-pill-label">Gmail / SMTP</span><span class="clay-pill-text">Weekly financial summary to owner</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <div><span class="clay-pill-label">Make.com / n8n</span><span class="clay-pill-text">Trigger reports, flag anomalies</span></div>
+      </div>
+    </div>
+
+    <!-- Alice -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="clay-tag">Human Resources</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Alice</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Staff records, leave logs, onboarding</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div><span class="clay-pill-label">Gmail / SMTP</span><span class="clay-pill-text">HR notices, policy updates</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div><span class="clay-pill-label">Google Forms / Typeform</span><span class="clay-pill-text">Staff intake & onboarding forms</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <div><span class="clay-pill-label">Make.com / n8n</span><span class="clay-pill-text">Automate leave & HR workflows</span></div>
+      </div>
+    </div>
+
+    <!-- Luna -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="clay-tag">Health, Safety & Environment</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Luna</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Incident logs, inspection records</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div><span class="clay-pill-label">Gmail / SMTP</span><span class="clay-pill-text">HSE reports & compliance alerts</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div><span class="clay-pill-label">WhatsApp API</span><span class="clay-pill-text">Urgent safety alerts</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <div><span class="clay-pill-label">Make.com / n8n</span><span class="clay-pill-text">Inspection & compliance workflows</span></div>
+      </div>
+    </div>
+
+    <!-- Zara -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      <div class="clay-tag">QA / QC</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Zara</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Inspection logs & NCR records</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div><span class="clay-pill-label">Client SOP Upload</span><span class="clay-pill-text">PDF/Doc SOP from client business</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div><span class="clay-pill-label">Gmail / SMTP</span><span class="clay-pill-text">NCR reports to management</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div><span class="clay-pill-label">WhatsApp API</span><span class="clay-pill-text">Ping after inspection completion</span></div>
+      </div>
+    </div>
+
+    <!-- Sunil -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <div class="clay-tag">Information Technology</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Sunil</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">IT ticket log & resolution tracking</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div><span class="clay-pill-label">Gmail / SMTP</span><span class="clay-pill-text">Ticket confirmation & resolution</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div><span class="clay-pill-label">WhatsApp API</span><span class="clay-pill-text">Critical system & escalation alerts</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <div><span class="clay-pill-label">Make.com / n8n</span><span class="clay-pill-text">Auto-triage & ticket routing</span></div>
+      </div>
+    </div>
+
+    <!-- Alana -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+      </div>
+      <div class="clay-tag">Administration</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Alana</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Central hub — receives all agent logs</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div><span class="clay-pill-label">Gmail / SMTP</span><span class="clay-pill-text">Daily/weekly digest to owner</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div><span class="clay-pill-label">Google Calendar</span><span class="clay-pill-text">Schedule & appointment management</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <div><span class="clay-pill-label">Make.com / n8n</span><span class="clay-pill-text">Cross-agent coordination & handoffs</span></div>
+      </div>
+    </div>
+
+    <!-- Chan -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      </div>
+      <div class="clay-tag">Production</div>
+      <div style="font-family: var(--font-h2); font-size: 1.15rem; color: var(--deep); font-weight: 600; margin-bottom: 16px;">Chan</div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        <div><span class="clay-pill-label">Supabase</span><span class="clay-pill-text">Output logs, inventory, batch records</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div><span class="clay-pill-label">Gmail / SMTP</span><span class="clay-pill-text">Daily production summary to Alana</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <div><span class="clay-pill-label">WhatsApp API</span><span class="clay-pill-text">Maintenance & deviation alerts</span></div>
+      </div>
+      <div class="clay-tool-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <div><span class="clay-pill-label">Make.com / n8n</span><span class="clay-pill-text">Auto-log output & QA handoff</span></div>
+      </div>
+    </div>
+
+  </div><!-- /clay-grid -->
+
+  <!-- Infrastructure Tools Header -->
+  <p style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin: 72px 0 12px;">Platform Infrastructure</p>
+  <h3 style="font-family: var(--font-h1); font-size: 1.5rem; color: var(--deep); margin: 0 0 8px;">Shared Infrastructure Tools</h3>
+  <p style="font-family: var(--font-body); font-size: 0.9rem; color: var(--body-text); max-width: 520px; margin: 0 0 36px;">The backbone all AI employees run on — self-hosted, open-source, and built to scale.</p>
+
+  <div class="clay-infra-grid">
+
+    <!-- Coolify -->
+    <div class="clay-infra-card">
+      <div class="clay-infra-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <div class="clay-tag">Hosting Layer</div>
+      <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 8px;">Coolify</div>
+      <div style="font-family: var(--font-body); font-size: 0.8rem; color: var(--body-text); line-height: 1.6;">Self-hosted deployment platform on a VPS (Hetzner / DigitalOcean). Hosts n8n, Supabase, Open WebUI, and backend services — replacing per-service SaaS costs with one flat server fee (~$6–$10/mo).</div>
+    </div>
+
+    <!-- OpenHands -->
+    <div class="clay-infra-card">
+      <div class="clay-infra-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <div class="clay-tag">AI Dev Agent</div>
+      <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 8px;">OpenHands</div>
+      <div style="font-family: var(--font-body); font-size: 0.8rem; color: var(--body-text); line-height: 1.6;">Open-source autonomous AI software agent. Writes code, runs it, fixes bugs, and executes terminal commands without manual intervention. Builds and maintains backend logic, APIs, and automation scripts for the full AI employee stack.</div>
+    </div>
+
+    <!-- Maxun -->
+    <div class="clay-infra-card">
+      <div class="clay-infra-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+      <div class="clay-tag">Web Data Extraction</div>
+      <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 8px;">Maxun</div>
+      <div style="font-family: var(--font-body); font-size: 0.8rem; color: var(--body-text); line-height: 1.6;">No-code web scraping platform. Point, click, and train a robot to extract structured data from any website automatically. Powers Dean's competitor research, lead intelligence, and market signal feeds into Supabase.</div>
+    </div>
+
+    <!-- Open WebUI -->
+    <div class="clay-infra-card">
+      <div class="clay-infra-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="clay-tag">AI Interface Layer</div>
+      <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 8px;">Open WebUI</div>
+      <div style="font-family: var(--font-body); font-size: 0.8rem; color: var(--body-text); line-height: 1.6;">Self-hosted ChatGPT-style interface connecting to any AI model (Claude, GPT-4o, Ollama). Serves as the internal AI control panel and the foundation UI layer for the Orcinos platform. Runs fully offline if needed.</div>
+    </div>
+
+    <!-- Browser Use -->
+    <div class="clay-infra-card">
+      <div class="clay-infra-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </div>
+      <div class="clay-tag">Web Agent / Browser Automation</div>
+      <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 8px;">Browser Use</div>
+      <div style="font-family: var(--font-body); font-size: 0.8rem; color: var(--body-text); line-height: 1.6;">AI agent that controls a real browser — opens pages, clicks, fills forms, and completes tasks like a human. Gives Sierra, Dean, and Alana hands on the web for form submissions, research, and admin tasks across any portal.</div>
+    </div>
+
+    <!-- Langflow -->
+    <div class="clay-infra-card">
+      <div class="clay-infra-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </div>
+      <div class="clay-tag">AI Workflow Builder</div>
+      <div style="font-family: var(--font-h2); font-size: 1rem; color: var(--deep); font-weight: 600; margin-bottom: 8px;">Langflow</div>
+      <div style="font-family: var(--font-body); font-size: 0.8rem; color: var(--body-text); line-height: 1.6;">Low-code drag-and-drop builder for AI agents and RAG pipelines. Connect LLMs, vector databases, memory, and tools visually — no code required. Used to build and deploy the logic flows that power each AI employee's brain and decision-making.</div>
+    </div>
+
+  </div><!-- /clay-infra-grid -->
+
+  <!-- Orcinos Platform Stack -->
+  <div class="clay-orcinos" style="margin-top: 48px;">
+    <p style="font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.65); margin: 0 0 8px;">Orcinos</p>
+    <h3 style="font-family: var(--font-h1); font-size: 1.4rem; color: white; margin: 0 0 10px;">Unified Platform Stack</h3>
+    <p style="font-family: var(--font-body); font-size: 0.85rem; color: rgba(255,255,255,0.8); margin: 0 0 24px; max-width: 520px;">All tools combine to form the backbone of Orcinos — a sovereign AI platform with Caribbean Contextual Intelligence and Neural Connectors (WhatsApp, Outlook, Google Calendar).</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;">
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">UI / Chat Layer</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">Open WebUI</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">AI Dev Agent</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">OpenHands</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">Workflow Builder</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">Langflow</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">Web Automation</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">Browser Use</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">Data Intelligence</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">Maxun → Supabase</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">Automation Engine</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">n8n (self-hosted)</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">Hosting</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">Coolify on VPS</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">Agent Builder</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">Langflow</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">Document Engine</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">Stirling PDF</div>
+      </div>
+      <div class="clay-orcinos-pill">
+        <div style="font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px;">AI Web Crawler</div>
+        <div style="font-family: var(--font-body); font-size: 0.82rem; color: white;">Crawl4AI</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New tool cards row -->
+  <div class="clay-grid" style="margin-top: 24px;">
+
+    <!-- Langflow card -->
+    <div class="clay-card">
+      <div class="clay-card-header">
+        <div class="clay-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/>
+            <line x1="7" y1="6" x2="17" y2="6"/><line x1="5" y1="8" x2="12" y2="16"/><line x1="19" y1="8" x2="12" y2="16"/>
+          </svg>
+        </div>
+        <div>
+          <div class="clay-tool-name">Langflow</div>
+          <div class="clay-tool-role">Visual AI Agent Builder</div>
+        </div>
+      </div>
+      <p class="clay-tool-desc">Drag-and-drop pipeline builder for AI agents. Connect LLMs, memory, RAG knowledge bases, and tools visually — no coding required. Powers the decision logic for every AI employee.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">Agent Orchestration</span>
+        <span class="clay-pill">RAG / Memory</span>
+        <span class="clay-pill">Self-Hosted</span>
+        <span class="clay-pill">Multi-Agent</span>
+      </div>
+    </div>
+
+    <!-- Stirling PDF card -->
+    <div class="clay-card">
+      <div class="clay-card-header">
+        <div class="clay-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="12" y2="17"/>
+          </svg>
+        </div>
+        <div>
+          <div class="clay-tool-name">Stirling PDF</div>
+          <div class="clay-tool-role">Private Document Engine</div>
+        </div>
+      </div>
+      <p class="clay-tool-desc">Self-hosted PDF platform with 60+ tools — edit, OCR, redact, convert, merge, split. Jamal processes invoices here. Sierra extracts client briefs. Zero documents leave your server.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">OCR Extraction</span>
+        <span class="clay-pill">PDF → Text</span>
+        <span class="clay-pill">Self-Hosted</span>
+        <span class="clay-pill">Jamal / Sierra</span>
+      </div>
+    </div>
+
+    <!-- Crawl4AI card -->
+    <div class="clay-card">
+      <div class="clay-card-header">
+        <div class="clay-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="clay-tool-name">Crawl4AI</div>
+          <div class="clay-tool-role">AI-Ready Web Crawler</div>
+        </div>
+      </div>
+      <p class="clay-tool-desc">Open-source web crawler built specifically for LLMs and AI pipelines. Outputs clean markdown — no noise, no ads, just structured data ready for Claude to read. 62K+ GitHub stars.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">LLM-Ready Output</span>
+        <span class="clay-pill">Market Intelligence</span>
+        <span class="clay-pill">Dean / Alana</span>
+        <span class="clay-pill">62K ★ GitHub</span>
+      </div>
+    </div>
+
+
+    <!-- Dify -->
+    <div class="clay-card">
+      <div class="clay-card-header">
+        <div class="clay-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <path d="M14 17.5h7M17.5 14v7"/>
+          </svg>
+        </div>
+        <div>
+          <div class="clay-tool-name">Dify</div>
+          <div class="clay-tool-role">AI Agent & RAG Platform</div>
+        </div>
+      </div>
+      <p class="clay-tool-desc">Production-ready platform for building AI agents, knowledge pipelines, and agentic workflows — all on one visual canvas. Like Langflow but with built-in RAG, model management, and a cleaner UI. 100K+ GitHub stars. Self-hostable on Coolify.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">Visual Agent Builder</span>
+        <span class="clay-pill">RAG Pipelines</span>
+        <span class="clay-pill">All Employees</span>
+        <span class="clay-pill">100K ★ GitHub</span>
+      </div>
+    </div>
+
+    <!-- Evolution API -->
+    <div class="clay-card">
+      <div class="clay-card-header">
+        <div class="clay-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <line x1="9" y1="10" x2="9" y2="10"/>
+            <line x1="12" y1="10" x2="12" y2="10"/>
+            <line x1="15" y1="10" x2="15" y2="10"/>
+          </svg>
+        </div>
+        <div>
+          <div class="clay-tool-name">Evolution API</div>
+          <div class="clay-tool-role">Open-Source WhatsApp API</div>
+        </div>
+      </div>
+      <p class="clay-tool-desc">Production-ready REST API that connects directly to WhatsApp without paying Meta's official API fees. Multi-instance, multi-device, webhook-ready. Pairs natively with n8n and Langflow — making Sierra's WhatsApp channel essentially free to run.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">Free WhatsApp Channel</span>
+        <span class="clay-pill">n8n / Langflow</span>
+        <span class="clay-pill">Sierra</span>
+        <span class="clay-pill">Self-Hosted</span>
+      </div>
+    </div>
+
+    <!-- Camoufox -->
+    <div class="clay-card">
+      <div class="clay-card-header">
+        <div class="clay-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+            <path d="M8 12s1-2 4-2 4 2 4 2"/>
+            <circle cx="9" cy="9" r="1" fill="white" stroke="none"/>
+            <circle cx="15" cy="9" r="1" fill="white" stroke="none"/>
+          </svg>
+        </div>
+        <div>
+          <div class="clay-tool-name">Camoufox</div>
+          <div class="clay-tool-role">Anti-Detect Browser</div>
+        </div>
+      </div>
+      <p class="clay-tool-desc">Open-source anti-detect browser built specifically for AI agents and web scraping. Masks browser fingerprints so your agents aren't blocked by bot detection systems. Works with Browser Use and Crawl4AI to give your agents stealth access to any site.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">Bot Detection Bypass</span>
+        <span class="clay-pill">Browser Use Pair</span>
+        <span class="clay-pill">Dean / Alana</span>
+        <span class="clay-pill">Open Source</span>
+      </div>
+    </div>
+
+    <!-- OpenWA -->
+    <div class="clay-card">
+      <div class="clay-card-header">
+        <div class="clay-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="clay-tool-name">OpenWA</div>
+          <div class="clay-tool-role">Self-Hosted WhatsApp Gateway</div>
+        </div>
+      </div>
+      <p class="clay-tool-desc">Free, open-source WhatsApp API gateway you run entirely on your own server. Unlimited messages, unlimited accounts, zero per-message fees, zero vendor lock-in. Full HTTP API — connects directly to n8n, Langflow, and Dify for Sierra's messaging layer.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">Unlimited Messages</span>
+        <span class="clay-pill">Zero Fees</span>
+        <span class="clay-pill">Sierra</span>
+        <span class="clay-pill">n8n / Langflow</span>
+      </div>
+    </div>
+
+    <!-- HyperFrames -->
+    <div class="clay-card">
+      <div class="clay-card-header">
+        <div class="clay-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="3"/>
+            <polygon points="10,8 16,12 10,16"/>
+          </svg>
+        </div>
+        <div>
+          <div class="clay-tool-name">HyperFrames</div>
+          <div class="clay-tool-role">AI Video Generation Framework</div>
+        </div>
+      </div>
+      <p class="clay-tool-desc">Open-source framework by HeyGen that lets AI agents compose professional videos by writing HTML, CSS & JS — rendered to deterministic MP4. No timeline editor, no drag-and-drop. Your agent writes the scene, HyperFrames renders it. Apache 2.0 licensed.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">AI Video Generation</span>
+        <span class="clay-pill">HTML → MP4</span>
+        <span class="clay-pill">Dean / Content</span>
+        <span class="clay-pill">Apache 2.0</span>
+      </div>
+    </div>
+
+  </div>
+
+    <!-- Chatwoot Card -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="13" y2="14"/></svg>
+      </div>
+      <div class="clay-card-header">
+        <div>
+          <div class="clay-card-name">Chatwoot</div>
+          <div class="clay-card-role">Unified Client Inbox</div>
+        </div>
+        <span class="clay-tag">Open Source</span>
+      </div>
+      <p class="clay-card-desc">Self-hosted customer support inbox. All WhatsApp, email, website chat, Instagram, and Facebook conversations land in one dashboard. Sierra's command center for client deployments — one AI brain managing every channel.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">Omnichannel Inbox</span>
+        <span class="clay-pill">Sierra Integration</span>
+        <span class="clay-pill">Client Deployments</span>
+        <span class="clay-pill">MIT License</span>
+      </div>
+    </div>
+
+    <!-- Hetzner Card -->
+    <div class="clay-card">
+      <div class="clay-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="6" rx="2"/><rect x="2" y="10" width="20" height="6" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="13" x2="6.01" y2="13"/></svg>
+      </div>
+      <div class="clay-card-header">
+        <div>
+          <div class="clay-card-name">Hetzner VPS</div>
+          <div class="clay-card-role">Sovereign Server Infrastructure</div>
+        </div>
+        <span class="clay-tag">$12/mo</span>
+      </div>
+      <p class="clay-card-desc">The physical foundation of the entire Orcinos stack. A dedicated VPS in a European data center running 24/7. Coolify installs on it in one command — then every tool (n8n, Dify, Evolution API, Chatwoot, Ollama) deploys from the Coolify dashboard. Replaces ~$400/mo in SaaS with one $12/mo server.</p>
+      <div class="clay-pill-row">
+        <span class="clay-pill">Always On</span>
+        <span class="clay-pill">Coolify Integration</span>
+        <span class="clay-pill">Full Stack Host</span>
+        <span class="clay-pill">~$12/mo</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<!-- END TOOLS SECTION -->
+
+<!-- ORCINOS SECTION -->
+<div class="flow-divider" style="margin: 60px 0 0;"></div>
+
+<style>
+.orcinos-section { max-width: 1100px; margin: 0 auto; padding: 60px 24px 100px; }
+.orcinos-header { text-align: center; margin-bottom: 48px; }
+.orcinos-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7c3aed;
+  margin-bottom: 12px;
+}
+.orcinos-title {
+  font-family: var(--font-h1);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  color: #1e1b4b;
+  margin: 0 0 14px;
+}
+.orcinos-subtitle {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 1.05rem;
+  color: #6b7280;
+  max-width: 620px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+.orcinos-layer {
+  margin-bottom: 48px;
+}
+.orcinos-layer-label {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7c3aed;
+  margin-bottom: 16px;
+  padding-left: 4px;
+  border-left: 3px solid #c084fc;
+  padding-left: 10px;
+}
+.orcinos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.orcinos-card {
+  background: linear-gradient(145deg, #0f0a1e, #1a1040);
+  border-radius: 20px;
+  padding: 26px 24px;
+  box-shadow: 8px 8px 24px rgba(0,0,0,0.4), -2px -2px 8px rgba(124,58,237,0.12), inset 0 1px 0 rgba(192,132,252,0.08);
+  border: 1px solid rgba(124,58,237,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.orcinos-card:hover { transform: translateY(-3px); box-shadow: 10px 14px 32px rgba(0,0,0,0.5), 0 0 20px rgba(124,58,237,0.15); }
+.orcinos-card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.orcinos-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, #4c1d95, #7c3aed);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(124,58,237,0.4);
+  flex-shrink: 0;
+}
+.orcinos-tool-name { font-family: var(--font-ui); font-size: 0.95rem; font-weight: 500; color: #e9d5ff; letter-spacing: 0.02em; }
+.orcinos-tool-role { font-family: var(--font-body); font-size: 0.75rem; color: #7c3aed; font-weight: 300; margin-top: 2px; }
+.orcinos-tool-desc { font-family: var(--font-body); font-size: 0.85rem; color: #a78bfa; font-weight: 300; line-height: 1.65; margin-bottom: 16px; }
+.orcinos-pill-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.orcinos-pill {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(124,58,237,0.15);
+  border: 1px solid rgba(124,58,237,0.3);
+  color: #c084fc;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+.orcinos-sovereign-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(192,132,252,0.1));
+  border: 1px solid rgba(192,132,252,0.3);
+  border-radius: 30px;
+  padding: 6px 16px;
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c084fc;
+  margin-bottom: 32px;
+}
+</style>
+
+<div class="orcinos-section">
+  <div class="orcinos-header">
+    <div class="orcinos-eyebrow">Sovereign AI Platform</div>
+    <h2 class="orcinos-title">Orcinos Platform Stack</h2>
+    <p class="orcinos-subtitle">A fully self-hosted AI platform — built like Zapia, owned by you. One VPS. One sovereign stack. Caribbean-first intelligence.</p>
+    <div style="display:flex; justify-content:center; margin-top: 20px;">
+      <div class="orcinos-sovereign-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        No SaaS. No Vendor Lock-in. Full Ownership.
+      </div>
+    </div>
+  </div>
+
+  <!-- Layer 1: The Face -->
+  <div class="orcinos-layer">
+    <div class="orcinos-layer-label">Layer 1 — The Face (What Users See)</div>
+    <div class="orcinos-grid">
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Orcinos UI</div>
+            <div class="orcinos-tool-role">Platform Frontend</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">The web app users interact with. Custom-branded, Caribbean-first. Built with the Prisca Dezigns design system — users never see the engine underneath.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">React / Next.js</span>
+          <span class="orcinos-pill">Coolify Hosted</span>
+          <span class="orcinos-pill">Custom Domain</span>
+        </div>
+      </div>
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">ElevenLabs</div>
+            <div class="orcinos-tool-role">Voice Layer</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Gives Orcinos AI employees a real voice — human-grade speech synthesis. Each employee (Sierra, Drew, Dean) has their own cloned or generated voice persona.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Voice Cloning</span>
+          <span class="orcinos-pill">Sierra / Drew</span>
+          <span class="orcinos-pill">Vapi Integration</span>
+        </div>
+      </div>
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Vapi</div>
+            <div class="orcinos-tool-role">Voice Agent Infrastructure</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Handles real-time voice calls for AI employees. Drew and Sierra can answer phone calls, qualify leads, and close deals — fully autonomous, no human rep needed.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Live Voice Calls</span>
+          <span class="orcinos-pill">Drew / Sierra</span>
+          <span class="orcinos-pill">Lead Qualifying</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Layer 2: The Brain -->
+  <div class="orcinos-layer">
+    <div class="orcinos-layer-label">Layer 2 — The Brain (AI Engine)</div>
+    <div class="orcinos-grid">
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Ollama</div>
+            <div class="orcinos-tool-role">Self-Hosted LLM Engine</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Runs open-source LLMs (Llama 3.3, Mistral, Qwen) locally on your VPS. This is the sovereign brain of Orcinos — no API bills, no token limits, no third-party access to your users' data.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Llama 3.3</span>
+          <span class="orcinos-pill">Mistral</span>
+          <span class="orcinos-pill">Zero API Cost</span>
+          <span class="orcinos-pill">Full Ownership</span>
+        </div>
+      </div>
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.44-4.12Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.44-4.12Z"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Claude / Gemini API</div>
+            <div class="orcinos-tool-role">Premium AI Fallback</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Used as the premium tier when tasks require top-tier reasoning. Orcinos routes complex queries to Claude or Gemini API — clients on higher tiers get this engine. Pay only when needed.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Premium Tier</span>
+          <span class="orcinos-pill">Claude API</span>
+          <span class="orcinos-pill">Gemini API</span>
+          <span class="orcinos-pill">On-Demand</span>
+        </div>
+      </div>
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17.5h7M17.5 14v7"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Dify</div>
+            <div class="orcinos-tool-role">Agent Logic & RAG</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Visual canvas for building the agent logic, memory, and RAG pipelines that power each Orcinos employee. Sierra's conversation flow, Dean's content rules, Jamal's finance logic — all defined here.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Agent Memory</span>
+          <span class="orcinos-pill">RAG Pipelines</span>
+          <span class="orcinos-pill">Caribbean Context</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Layer 3: The Pipes -->
+  <div class="orcinos-layer">
+    <div class="orcinos-layer-label">Layer 3 — The Pipes (Connectors & Channels)</div>
+    <div class="orcinos-grid">
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h6"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">n8n</div>
+            <div class="orcinos-tool-role">Workflow Automation</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">The trigger layer — listens for WhatsApp messages, form submissions, emails, and calendar events, then routes them to the right Orcinos employee. Self-hosted, unlimited workflows.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Triggers</span>
+          <span class="orcinos-pill">Routing</span>
+          <span class="orcinos-pill">Self-Hosted</span>
+          <span class="orcinos-pill">Unlimited</span>
+        </div>
+      </div>
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Evolution API</div>
+            <div class="orcinos-tool-role">WhatsApp Channel</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Free, open-source WhatsApp REST API. Connects Orcinos employees directly to WhatsApp — multi-instance, webhook-ready. Sierra handles client messages at zero channel cost.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">WhatsApp</span>
+          <span class="orcinos-pill">Multi-Instance</span>
+          <span class="orcinos-pill">Zero Cost</span>
+        </div>
+      </div>
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Supabase</div>
+            <div class="orcinos-tool-role">User Data & Memory</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Stores all user profiles, conversation history, and platform data. Every Orcinos user's context lives here — enabling persistent memory across sessions without any third-party data exposure.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">User Profiles</span>
+          <span class="orcinos-pill">Conversation Memory</span>
+          <span class="orcinos-pill">Self-Hostable</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Layer 4: The Infrastructure -->
+  <div class="orcinos-layer">
+    <div class="orcinos-layer-label">Layer 4 — The Infrastructure (Hosting & Ops)</div>
+    <div class="orcinos-grid">
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Coolify</div>
+            <div class="orcinos-tool-role">Self-Hosted Deployment Engine</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">One VPS. One dashboard. Deploys and manages every Orcinos service — Ollama, Dify, n8n, Supabase, Evolution API — all from a single control panel. Replaces 6–8 SaaS subscriptions.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">One VPS</span>
+          <span class="orcinos-pill">~$90/mo</span>
+          <span class="orcinos-pill">Full Stack</span>
+          <span class="orcinos-pill">Open Source</span>
+        </div>
+      </div>
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Stirling PDF</div>
+            <div class="orcinos-tool-role">Document Intelligence</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Self-hosted document processing — OCR, signing, editing, extraction. Orcinos handles client documents (contracts, invoices, onboarding forms) without any file leaving your sovereign server.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">OCR</span>
+          <span class="orcinos-pill">Document Signing</span>
+          <span class="orcinos-pill">Private & Sovereign</span>
+        </div>
+      </div>
+
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Crawl4AI + Camoufox</div>
+            <div class="orcinos-tool-role">Intelligence Layer</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Feeds Orcinos with real-world data — market intelligence, competitor pricing, Caribbean news. Crawl4AI outputs clean LLM-ready markdown. Camoufox keeps agents invisible to bot detection.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Web Intelligence</span>
+          <span class="orcinos-pill">Anti-Detect</span>
+          <span class="orcinos-pill">RAG Feeding</span>
+        </div>
+      </div>
+
+    </div>
+
+      <!-- Fonoster Card -->
+      <div class="orcinos-tool-card">
+        <div class="orcinos-tool-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.39 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.69a16 16 0 0 0 5.79 5.79l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/><path d="M14.05 2a9 9 0 0 1 8 7.94"/><path d="M14.05 6A5 5 0 0 1 18 10"/></svg>
+        </div>
+        <div class="orcinos-tool-body">
+          <div class="orcinos-tool-name">Fonoster</div>
+          <div class="orcinos-tool-role">Open-Source Twilio Alternative</div>
+          <p class="orcinos-tool-desc">Self-hosted programmable voice and SMS stack. Replaces Twilio entirely — pair it with a DIDWW SIP trunk and you own the full voice layer. Eliminates Vapi per-minute billing for client deployments. Sovereign voice calls, SMS, and IVR with zero recurring API cost.</p>
+          <div class="orcinos-pill-row">
+            <span class="orcinos-pill">Voice Calls</span>
+            <span class="orcinos-pill">SMS</span>
+            <span class="orcinos-pill">SIP / VoIP</span>
+            <span class="orcinos-pill">Twilio Replacement</span>
+            <span class="orcinos-pill">MIT License</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+  <!-- Layer 5: Orcinos Drive — AI Vision Training Pipeline -->
+  <div class="orcinos-layer">
+    <div class="orcinos-layer-label">Layer 5 — Orcinos Drive (AI Vision Training Pipeline)</div>
+    <div class="orcinos-grid">
+
+      <!-- Orcinos Drive App -->
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Orcinos Drive</div>
+            <div class="orcinos-tool-role">Smart Dashcam PWA</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">The data collection layer. Records dashcam footage, detects ADAS events (tailgate, lane departure, red light), timestamps flagged clips with GPS, and stores everything locally in IndexedDB. The first Caribbean-trained road intelligence app.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">TensorFlow.js</span>
+          <span class="orcinos-pill">YOLOv8</span>
+          <span class="orcinos-pill">IndexedDB</span>
+          <span class="orcinos-pill">PWA Offline</span>
+          <span class="orcinos-pill">GPS Tagged</span>
+        </div>
+      </div>
+
+      <!-- Google Drive -->
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Google Drive</div>
+            <div class="orcinos-tool-role">Raw Footage Archive</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">User's own Google Drive stores all raw dashcam clips and flagged frames. Zero Orcinos server cost for video storage. Clips upload automatically when WiFi is detected — structured into Clips, Plates, Trips, and Traffic Data folders.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">15GB Free</span>
+          <span class="orcinos-pill">Auto-Upload</span>
+          <span class="orcinos-pill">User Owned</span>
+          <span class="orcinos-pill">Zero Cost</span>
+        </div>
+      </div>
+
+      <!-- Roboflow -->
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 17h7M17 14v7"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Roboflow</div>
+            <div class="orcinos-tool-role">Data Labeling Platform</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Labels dashcam footage for AI training. Upload clips from Google Drive, annotate objects (red light, green light, tailgate, lane marking, pothole), and export structured datasets. Free tier supports the full Caribbean road training pipeline.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Free Tier</span>
+          <span class="orcinos-pill">Browser Based</span>
+          <span class="orcinos-pill">YOLO Export</span>
+          <span class="orcinos-pill">Dataset Manager</span>
+        </div>
+      </div>
+
+      <!-- Google Colab -->
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">Google Colab</div>
+            <div class="orcinos-tool-role">Free GPU Training</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">Trains the YOLOv8 model on labeled T&T road footage using free cloud GPUs. Connects directly to Roboflow datasets. A fine-tune run takes 20–40 minutes and produces a model that understands Caribbean roads — something no global AI company has.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Free GPU</span>
+          <span class="orcinos-pill">YOLOv8 Fine-tune</span>
+          <span class="orcinos-pill">T&T Road Data</span>
+          <span class="orcinos-pill">TF.js Export</span>
+        </div>
+      </div>
+
+      <!-- IndexedDB / Local Storage -->
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">IndexedDB</div>
+            <div class="orcinos-tool-role">On-Device Storage</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">The offline-first data layer inside the browser. Stores trip logs, traffic light timing data, flagged event clips, and intersection learning data — all on the user's device. No account needed. No server. Persists across sessions and app restarts.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">100% Offline</span>
+          <span class="orcinos-pill">Phase 1 Storage</span>
+          <span class="orcinos-pill">TL Learning DB</span>
+          <span class="orcinos-pill">No Account Needed</span>
+        </div>
+      </div>
+
+      <!-- GitHub -->
+      <div class="orcinos-card">
+        <div class="orcinos-card-header">
+          <div class="orcinos-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          </div>
+          <div>
+            <div class="orcinos-tool-name">GitHub</div>
+            <div class="orcinos-tool-role">Model Deployment</div>
+          </div>
+        </div>
+        <p class="orcinos-tool-desc">After each training cycle, the new YOLOv8 model is exported to TensorFlow.js format and pushed to the Orcinos repo via GitHub. The Drive PWA auto-pulls the latest model on next load — zero manual reinstall needed by users.</p>
+        <div class="orcinos-pill-row">
+          <span class="orcinos-pill">Auto Deploy</span>
+          <span class="orcinos-pill">Model Versioning</span>
+          <span class="orcinos-pill">priscadezigns9/orcinos</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- END ORCINOS SECTION -->
+
+
+</body>
+</html>
+
+

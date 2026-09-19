@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PD Ad Frame Render</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1080px;overflow:hidden;background:#08050F;font-family:'Space Grotesk',sans-serif;}
+
+:root{
+  --t: 0; /* 0–100 timeline progress, set via JS */
+}
+
+.ad{position:relative;width:1080px;height:1080px;background:#08050F;overflow:hidden;}
+
+/* Grid */
+.grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(123,53,212,0.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(123,53,212,0.07) 1px,transparent 1px);
+  background-size:72px 72px;
+}
+
+/* Orbs */
+.orb{position:absolute;border-radius:50%;filter:blur(90px);}
+.orb-1{width:700px;height:700px;background:radial-gradient(circle,rgba(110,40,200,0.55) 0%,transparent 70%);top:-180px;left:-180px;}
+.orb-2{width:550px;height:550px;background:radial-gradient(circle,rgba(200,50,160,0.38) 0%,transparent 70%);bottom:-120px;right:-100px;}
+.orb-3{width:300px;height:300px;background:radial-gradient(circle,rgba(90,80,240,0.4) 0%,transparent 70%);top:380px;right:200px;}
+
+/* Accent lines */
+.accent-top{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#7B35D4 30%,#C840A0 65%,transparent);}
+.accent-bot{position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#C840A0 30%,#7B35D4 65%,transparent);}
+
+/* Logo mark */
+.logo-mark{
+  position:absolute;top:52px;left:64px;
+  width:56px;height:56px;
+  background:linear-gradient(135deg,#7B35D4,#A855F7);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 2px rgba(123,53,212,0.3),0 8px 32px rgba(123,53,212,0.5);
+}
+.logo-mark span{font-family:'Playfair Display',serif;font-style:italic;font-size:1.6rem;font-weight:700;color:#fff;}
+.logo-name{position:absolute;top:66px;left:134px;}
+.logo-name .ln1{font-family:'Playfair Display',serif;font-style:italic;font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:-0.3px;line-height:1;}
+.logo-name .ln2{font-size:0.55rem;font-weight:600;letter-spacing:3.5px;color:rgba(168,85,247,0.85);text-transform:uppercase;margin-top:2px;}
+
+/* Badge */
+.badge{
+  position:absolute;top:52px;right:64px;
+  background:rgba(123,53,212,0.15);border:1px solid rgba(168,85,247,0.3);
+  border-radius:50px;padding:8px 20px;
+  font-size:0.72rem;font-weight:600;letter-spacing:2px;
+  color:rgba(168,85,247,0.9);text-transform:uppercase;
+}
+
+/* Eyebrow */
+.eyebrow{position:absolute;top:200px;left:64px;display:flex;align-items:center;gap:12px;}
+.eyebrow-dot{width:8px;height:8px;border-radius:50%;background:#C840A0;}
+.eyebrow-text{font-size:0.78rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(200,64,160,0.9);}
+
+/* Headline */
+.headline{position:absolute;top:235px;left:64px;right:64px;}
+.line1,.line3{font-family:'Playfair Display',serif;font-size:5.2rem;font-weight:900;color:#fff;line-height:1.0;letter-spacing:-2px;}
+.line2{
+  font-family:'Playfair Display',serif;font-size:5.2rem;font-weight:900;line-height:1.0;letter-spacing:-2px;
+  background:linear-gradient(90deg,#A855F7,#EC4899,#A855F7);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* Divider */
+.divider{position:absolute;top:545px;left:64px;height:2px;background:linear-gradient(90deg,#7B35D4,#C840A0,transparent);}
+
+/* Sub text */
+.sub{position:absolute;top:570px;left:64px;right:64px;font-size:1.18rem;font-weight:400;color:rgba(255,255,255,0.6);line-height:1.65;}
+.sub strong{color:rgba(255,255,255,0.9);font-weight:600;}
+
+/* Pills */
+.pills{position:absolute;top:715px;left:64px;display:flex;gap:12px;flex-wrap:wrap;}
+.pill{
+  background:rgba(123,53,212,0.12);border:1px solid rgba(123,53,212,0.3);
+  border-radius:50px;padding:10px 20px;
+  font-size:0.78rem;font-weight:600;letter-spacing:0.5px;color:rgba(200,160,255,0.9);
+}
+
+/* CTA */
+.cta-wrap{position:absolute;bottom:120px;left:64px;right:64px;display:flex;align-items:center;justify-content:space-between;}
+.cta-btn{
+  display:inline-flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,#7B35D4,#A855F7,#C840A0);
+  color:#fff;font-size:1.05rem;font-weight:700;
+  padding:20px 44px;border-radius:100px;
+  box-shadow:0 8px 40px rgba(123,53,212,0.55),0 2px 8px rgba(0,0,0,0.3);
+  text-transform:uppercase;letter-spacing:1.5px;
+}
+.cta-url{font-size:0.9rem;font-weight:500;color:rgba(255,255,255,0.4);letter-spacing:0.5px;}
+.cta-url span{color:rgba(168,85,247,0.7);}
+
+/* Offer strip */
+.offer{
+  position:absolute;bottom:56px;left:64px;right:64px;
+  background:rgba(123,53,212,0.1);border:1px solid rgba(168,85,247,0.2);
+  border-radius:16px;padding:16px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.offer-text{font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.7);}
+.offer-text strong{color:#A855F7;}
+.offer-badge{background:linear-gradient(135deg,#7B35D4,#C840A0);border-radius:8px;padding:6px 16px;font-size:0.72rem;font-weight:700;letter-spacing:1.5px;color:#fff;text-transform:uppercase;}
+
+/* Mockup cards */
+.mockup{position:absolute;top:210px;right:64px;width:340px;}
+.mock-card{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);
+  border-radius:20px;padding:24px;margin-bottom:16px;backdrop-filter:blur(20px);
+  position:relative;overflow:hidden;
+}
+.mock-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(168,85,247,0.4),transparent);}
+.mock-card-label{font-size:0.65rem;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:rgba(168,85,247,0.6);margin-bottom:10px;}
+.mock-bar{height:8px;border-radius:4px;margin-bottom:8px;background:rgba(255,255,255,0.07);}
+.mock-bar.filled{background:linear-gradient(90deg,#7B35D4,#A855F7);}
+.mock-bar.w90{width:90%;}.mock-bar.w70{width:70%;}.mock-bar.w55{width:55%;}.mock-bar.w40{width:40%;}
+.mock-stat{margin-top:14px;display:flex;align-items:baseline;gap:6px;}
+.mock-stat .num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;background:linear-gradient(90deg,#A855F7,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.mock-stat .label{font-size:0.72rem;color:rgba(255,255,255,0.4);font-weight:500;}
+
+/* Sparkles */
+.sparkle{position:absolute;border-radius:50%;background:#A855F7;}
+.sp1{width:4px;height:4px;top:140px;right:350px;}
+.sp2{width:5px;height:5px;top:180px;right:220px;background:#EC4899;}
+.sp3{width:5px;height:5px;top:600px;left:520px;background:#fff;}
+.sp4{width:3px;height:3px;top:720px;right:180px;}
+.sp5{width:4px;height:4px;top:320px;right:420px;background:#EC4899;}
+</style>
+</head>
+<body>
+<div class="ad" id="ad">
+  <div class="grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="accent-top"></div>
+  <div class="accent-bot"></div>
+  <div class="sparkle sp1"></div>
+  <div class="sparkle sp2"></div>
+  <div class="sparkle sp3"></div>
+  <div class="sparkle sp4"></div>
+  <div class="sparkle sp5"></div>
+  <div class="logo-mark"><span>P</span></div>
+  <div class="logo-name">
+    <div class="ln1">Prisca Dezigns</div>
+    <div class="ln2">Creative Agency</div>
+  </div>
+  <div class="badge">Limited Offer</div>
+  <div class="eyebrow">
+    <div class="eyebrow-dot"></div>
+    <div class="eyebrow-text">Branding &amp; Web Design</div>
+  </div>
+  <div class="headline">
+    <div class="line1" id="l1">Your Brand.</div>
+    <div class="line2" id="l2">Elevated.</div>
+    <div class="line3" id="l3">Finally.</div>
+  </div>
+  <div class="mockup">
+    <div class="mock-card">
+      <div class="mock-card-label">Brand Identity</div>
+      <div class="mock-bar filled w90"></div>
+      <div class="mock-bar filled w70"></div>
+      <div class="mock-bar w55"></div>
+      <div class="mock-stat"><div class="num">100%</div><div class="label">Custom &amp; Unique</div></div>
+    </div>
+    <div class="mock-card">
+      <div class="mock-card-label">Website Performance</div>
+      <div class="mock-bar filled w90"></div>
+      <div class="mock-bar w40"></div>
+      <div class="mock-stat"><div class="num">3×</div><div class="label">More Enquiries</div></div>
+    </div>
+  </div>
+  <div class="divider" id="div" style="width:0"></div>
+  <div class="sub">
+    We build <strong>websites, logos &amp; brand identities</strong> that turn visitors<br/>
+    into paying clients — fast, polished, and built to convert.
+  </div>
+  <div class="pills">
+    <div class="pill">✦ Web Design</div>
+    <div class="pill">✦ Logo &amp; Branding</div>
+    <div class="pill">✦ Social Media</div>
+    <div class="pill">✦ Brand Strategy</div>
+    <div class="pill">✦ Digital Products</div>
+  </div>
+  <div class="cta-wrap">
+    <div class="cta-btn">Get Your Free Quote →</div>
+    <div class="cta-url"><span>priscadezigns.org</span></div>
+  </div>
+  <div class="offer">
+    <div class="offer-text">🎁 First 5 clients get <strong>1 month free maintenance</strong> — don't miss out</div>
+    <div class="offer-badge">Claim Now</div>
+  </div>
+</div>
+<script>
+// Frame controller — called externally with frame number (0-149 = 5s at 30fps)
+function setFrame(f) {
+  const t = f / 149; // 0..1
+  const el = (id, op, tx, ty) => {
+    const e = document.getElementById(id);
+    if (e) { e.style.opacity = op; e.style.transform = `translate(${tx||0}px,${ty||0}px)`; }
+  };
+  const all = (cls, op, tx, ty) => {
+    document.querySelectorAll(cls).forEach(e => {
+      e.style.opacity = op; e.style.transform = `translate(${tx||0}px,${ty||0}px)`;
+    });
+  };
+  function ease(start, end, from, to, val) {
+    if (val <= from) return start;
+    if (val >= to) return end;
+    const p = (val - from) / (to - from);
+    const e = p < 0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    return start + (end - start) * e;
+  }
+  // All elements start hidden
+  const els = document.querySelectorAll('.logo-mark,.logo-name,.badge,.eyebrow,.headline,.mockup,.sub,.pills,.cta-wrap,.offer,.accent-top,.accent-bot,.divider');
+  // Frame ranges (30fps):
+  // 0-15: bg only
+  // 15-25: logo appears
+  // 25-35: badge + eyebrow
+  // 35-50: headline line 1
+  // 42-55: headline line 2
+  // 48-60: headline line 3
+  // 55-75: mockup cards
+  // 65-80: divider
+  // 75-90: sub text
+  // 85-105: pills
+  // 100-120: CTA
+  // 110-130: offer
+  // 130-149: hold
+
+  const o = (from, to) => Math.max(0, Math.min(1, (f - from) / (to - from)));
+  const slide = (from, to, dist=24) => {
+    const p = Math.max(0, Math.min(1, (f - from) / (to - from)));
+    const e = 1 - Math.pow(1 - p, 3);
+    return (1-e) * dist;
+  };
+
+  // Logo mark
+  const lm = document.querySelector('.logo-mark');
+  if (lm) { const p = Math.max(0,Math.min(1,(f-15)/10)); const scale=0.5+0.5*p; lm.style.opacity=p; lm.style.transform=`scale(${scale})`; }
+
+  // Logo name
+  const ln = document.querySelector('.logo-name');
+  if (ln) { ln.style.opacity=o(20,32); ln.style.transform=`translateX(${slide(20,32,-20)*-1}px)`; }
+
+  // Badge
+  const b = document.querySelector('.badge');
+  if (b) { b.style.opacity=o(25,37); }
+
+  // Eyebrow
+  const ey = document.querySelector('.eyebrow');
+  if (ey) { ey.style.opacity=o(28,40); ey.style.transform=`translateY(${slide(28,40)*1}px)`; }
+
+  // Accent lines
+  document.querySelectorAll('.accent-top,.accent-bot').forEach(e=>{ e.style.opacity=o(18,30); });
+
+  // Headline lines
+  const h1 = document.querySelector('.line1');
+  if (h1) { h1.style.opacity=o(35,50); h1.style.transform=`translateY(${slide(35,50)*1}px)`; }
+  const h2 = document.querySelector('.line2');
+  if (h2) { h2.style.opacity=o(42,57); h2.style.transform=`translateY(${slide(42,57)*1}px)`; }
+  const h3 = document.querySelector('.line3');
+  if (h3) { h3.style.opacity=o(49,64); h3.style.transform=`translateY(${slide(49,64)*1}px)`; }
+
+  // Mockup
+  const mk = document.querySelector('.mockup');
+  if (mk) { mk.style.opacity=o(55,75); mk.style.transform=`translateX(${slide(55,75,-30)*-1}px)`; }
+
+  // Divider
+  const dv = document.getElementById('div');
+  if (dv) { dv.style.width = (o(65,82)*360)+'px'; }
+
+  // Sub
+  const sb = document.querySelector('.sub');
+  if (sb) { sb.style.opacity=o(75,90); sb.style.transform=`translateY(${slide(75,90)*1}px)`; }
+
+  // Pills
+  const pillEls = document.querySelectorAll('.pill');
+  pillEls.forEach((p, i) => {
+    p.style.opacity = o(85+i*4, 98+i*4);
+    p.style.transform = `translateY(${slide(85+i*4, 98+i*4)*1}px)`;
+  });
+
+  // CTA
+  const cta = document.querySelector('.cta-wrap');
+  if (cta) { cta.style.opacity=o(100,118); cta.style.transform=`translateY(${slide(100,118)*1}px)`; }
+
+  // Offer
+  const of = document.querySelector('.offer');
+  if (of) { of.style.opacity=o(110,128); of.style.transform=`translateY(${slide(110,128)*1}px)`; }
+
+  // Sparkles pulse
+  document.querySelectorAll('.sparkle').forEach((s,i) => {
+    const phase = (f*2 + i*20) % 60;
+    s.style.opacity = phase < 30 ? phase/30 : 1-(phase-30)/30;
+    const scale = 0.5 + 0.5*(phase<30?phase/30:1-(phase-30)/30);
+    s.style.transform = `scale(${scale})`;
+  });
+}
+// Default: show full frame
+setFrame(149);
+</script>
+</body>
+</html>

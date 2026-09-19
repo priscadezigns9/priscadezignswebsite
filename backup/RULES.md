@@ -1,0 +1,163 @@
+# DESIGN & MEMORY MANDATE
+
+## Operational Modes
+- **Live Mode**: Working, producing results, no mockups, no simulations. (Status: ACTIVE).
+- **Autonomous Mode**: You have the right to act independently within the confines of established rules and mission objectives. (Status: ENABLED).
+
+## Primary Social Mandate (July 1, 2026)
+Daily automated reports and empire-wide blog automations (First-Mover Scans) are **DEACTIVATED**.
+Autonomous posting to all secondary Facebook pages is **DISCONTINUED**.
+**Maritime Genesis Lead Monitoring is DEACTIVATED (July 2, 2026).**
+I am strictly restricted to the following three brand nodes:
+
+1. **The Autodrome (Priority 1 - Sales Hub):** 
+   - **Trigger:** Immediate relay as soon as a primary luxury brand (Ferrari, Lamborghini, Bugatti, Koenigsegg, etc.) posts.
+   - **Lens:** Sales/Marketplace. Frame content as dealership-ready (pricing, reveals, limited units).
+2. **Dreaming Anime (Priority 2 - Media Hub):**
+   - **Trigger:** Immediate relay of professional anime news and trailers.
+   - **Relay Mandate:** Treat with the same "Lambo-Level" urgency as The Autodrome. Repost immediately from Crunchyroll, Netflix Anime, Catsuka, and official studio pages.
+3. **NehNeh (Priority 3 - Art/Fashion Hub):**
+   - **Trigger:** One (1) post per day.
+   - **Content:** Professional Caribbean art, ancestral fashion, or elite custom designs.
+
+## High-Priority Monitoring (Radar)
+- **The Autodrome:** Continuous monitoring of primary newsrooms and Facebook pages for Ferrari, Lamborghini, Bugatti.
+- **Dreaming Anime:** Monitoring Crunchyroll (https://www.facebook.com/Crunchyroll), Netflix Anime (https://www.facebook.com/NetflixAnime), Catsuka, My Anime World, and Iris Shana for professional signals.
+
+## Reporting Mandate
+Post-session reports are only required for the three active nodes. No reporting or deployment for inactive secondary brands.
+
+## God Mode (The Administrative Mandate)
+God Mode is a universal administrative layer for the platform. It provides real-time oversight of all Orcinos products.
+- **Access Protocol:** 5-click handshake on the password field of the login perimeter followed by the `alice` token.
+
+## Quality Control & Assurance (QC/QA) Protocols
+- **Surgical Edit Only**: Full file rewrites are BANNED for established pages. 
+- **Zero Regression**: Before modifying a file, check `RULES.md` for design constraints.
+
+## GitHub Push Rule (CRITICAL — 2026-07-06)
+**NEVER fetch the full file content from GitHub before editing.**
+- Always work from the local `index.html` (or any file) already in the workspace.
+- Only fetch the `sha` from GitHub (using `| python3 -c "...print(...['sha'])"`) — nothing else.
+- Fetching the full file from GitHub and re-editing it risks restoring previously removed content.
+- Pattern: READ local → EDIT local → GET sha only from GitHub → PUT with local b64 content.
+
+## Chatbot Sync Rule (CRITICAL — 2026-07-11)
+**SIERRA is ONE.** All pages across priscadezigns.org (Main site, Services, Template Shop) must use the same master `chatbot.js` architecture.
+- **Unified Branding**: Strictly use the Luxury Purple (`#7c3aed`) and Lilac (`#c084fc`) design system. White glassmorphism cards on light lavender gradient body. NOT `#301934` deep purple.
+- **Single Source of Truth**: The master script lives at `/chatbot.js` (root). The file at `/templates/chatbot.js` is now a direct mirror of the root script.
+- **Unified Logic**: Both the general inquiry flow and the template shopping flow are managed within this single script.
+- **Version Control**: When any design or logic change is made, increment the version tag on all pages (e.g., `chatbot.js?v=2.3`).
+- **Pages to Sync**:
+  1. `/index.html`
+  2. `/services/index.html`
+  3. `/templates/index.html`
+- **Mandate**: Never create a separate chatbot file for a sub-brand or shop. Integration is the only path.
+
+## Brand Typography System (LOCKED — 2026-07-19)
+All pages, components, and builds for Prisca Dezigns must use this exact type hierarchy. No exceptions.
+
+| Role | Font | Weight | Use |
+| :--- | :--- | :--- | :--- |
+| **H1 / Hero** | DM Serif Display | Regular | Page titles, hero headlines |
+| **H2 / Subheadings** | Cormorant | Light / Italic | Section headings, refined accents |
+| **Body / Paragraphs** | Urbanist | Light (300) | All paragraph and body text |
+| **Labels / UI / Buttons** | Urbanist | Medium + ALL CAPS | Badges, tags, nav items, buttons |
+
+**Google Fonts import (mandatory on every page):**
+```
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+```
+
+**CSS Variables (mandatory):**
+```
+--font-h1: 'DM Serif Display', serif;
+--font-h2: 'Cormorant', serif;
+--font-body: 'Urbanist', sans-serif;
+--font-ui: 'Urbanist', sans-serif;
+```
+
+**Hard rules:**
+- NEVER use Playfair Display — removed from the brand
+- NEVER apply font-weight 700 or 900 to H1 — kills the luxury feel
+- NEVER use serif for body text — illegible on dark backgrounds
+- NEVER mix more than these 2 typefaces on a single page
+
+## Visual-First Build Protocol (2026-07-10)
+When the user provides a screenshot, image, or URL as a design reference:
+1. **Analyze first** — identify layout type, animation style, color system, typography, effects (3D, parallax, glassmorphism, etc.)
+2. **Auto-select skills** — never ask "which skill should I use?" — pick the right ones based on what I see:
+   - 3D floating elements / WebGL scenes → `react-three-fiber` + `threejs-webgl`
+   - Scroll-driven animations → `gsap-scrolltrigger` or `locomotive-scroll`
+   - Page transitions → `barba-js` or `motion-framer`
+   - Glassmorphism / spatial depth → `antigravity-design-expert`
+   - Particle backgrounds / animated hero → `lightweight-3d-effects`
+   - Animated components / UI kits → `animated-component-libraries`
+   - Cinematic 3D + scroll → `web3d-integration-patterns`
+   - Lottie micro-interactions → `lottie-animations`
+   - Spring physics UI → `react-spring-physics`
+   - Design system extraction → `design-dna` + `extract-design-system`
+   - Anti-slop audit → `hallmark`
+3. **Build immediately** — produce the artifact directly without asking for confirmation on tech choices
+4. **Match fidelity** — colors, spacing, font weight, border radius, shadow depth, motion timing — all extracted from the visual
+
+## Icon Default Rule (2026-07-20) — User Instruction
+**Always use minimalist SVG line icons** (stroke-only, no fills, clean geometry) as the default for ALL pages, cards, sections, and UI elements.
+- Never use emoji as icons unless explicitly requested.
+- Never use filled/solid icon styles unless explicitly requested.
+- Animated icons are allowed ONLY when the user specifically asks for them.
+- Minimalist = stroke-only SVG, 1.5px stroke-width, rounded linecap/linejoin, no decorative fills.
+
+## Execution Style Rule (2026-07-15) — User Instruction
+- DO NOT chain long multi-step pipelines in a single bash block.
+- If a step fails, chunked execution makes it easier to isolate and fix.
+- Work in small, deliberate steps. Confirm each one works before moving to the next.
+- This applies especially to: API pushes, file builds, Supabase updates, GitHub deploys.
+- Trying to do everything at once overloads the platform and makes debugging harder.
+
+## Claude Traceability Mandate (2026-07-16)
+Every action Claude AI performs must be tagged and traceable. No silent edits.
+
+### GitHub Commits
+All commit messages must be prefixed with `[Zapia]`:
+- Example: `[Zapia] fix: chatbot Sierra sync v2.5`
+- Example: `[Zapia] feat: add AI Channel pricing to homepage`
+- Example: `[Zapia] update: Drew prompt v4 — AI Channel/Voice/Data`
+
+### Supabase Changes
+Every INSERT, UPDATE, or DELETE performed by Claude must include a `performed_by` field set to `"claude-ai"` where the table supports it. For tables without that field, log the action to `job_audit_log` with:
+- `action`: what was done
+- `performed_by`: `claude-ai`
+- `target`: table or file affected
+- `notes`: brief reason
+
+### File Edits (GitHub / Workspace)
+Any file modified in the workspace or pushed to GitHub must include a comment or commit tag identifying Claude as the author of that change.
+
+### Rule: No silent edits. Every Claude action leaves a trace.
+
+## AI Employee Architecture — Golden Rule (2026-07-20)
+
+**Sierra is the ONLY external-facing AI employee. Every other employee is internal-only.**
+
+| Employee | Audience | Never |
+|---|---|---|
+| Sierra (Customer Ops) | Customers (external) | Internal team |
+| Dean (Marketing) | Marketing team only | Customers |
+| Jamal (Finance) | Finance team only | Customers |
+| Alice (HR) | HR / Staff only | Customers |
+| IT / QA / Production | Their department only | Customers |
+
+**Standalone Rule:** Every AI employee must deliver full value alone, without requiring another employee to be purchased. When two or more are purchased, they connect — but never overlap, and never share an audience.
+
+**Data vs. Interaction Rule:** Internal employees (Dean, Jamal, Alice, etc.) may process *data about* customers (lead records, invoice data, etc.) but never *interact with* customers directly.
+
+**The Full Vision:** Sierra faces the customer. Every other employee faces inward. Together they form a fully autonomous business operating layer — client brings the product/service, Prisca Dezigns builds the rest with AI employees.
+
+## Blog Content Mandate (2026-07-24)
+- **Length:** Minimum 1 full page per blog.
+- **Structure:** Minimum 2 paragraphs per post.
+- **Density:** Each paragraph must have 10+ sentences and exceed 200 words.
+- **Vocabulary Filter:** BANNED words: "", "".
+- **Research Level:** Extensive research only. Content must highlight the latest professional anime news, top trending anime, and official studio trailers. No generic fillers.
+- **Resolution Standard:** All blog images must use the 450px professional cap to ensure crisp resolution.

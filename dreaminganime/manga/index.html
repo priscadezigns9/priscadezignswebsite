@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE VAULT | DREAMING ANIME</title>
+    <link rel="icon" type="image/png" href="/logos/dreaming-anime-logo-round.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #FF6B00; 
+            --bg: #0A0A0A; 
+            --accent: #222; 
+        }
+        body { margin:0; background:var(--bg); color:#fff; font-family:'Inter', sans-serif; overflow-x: hidden; }
+        
+        nav { 
+            padding: 20px 5%; 
+            display:flex; 
+            justify-content:space-between; 
+            align-items:center; 
+            border-bottom:1px solid #222; 
+            position: sticky; 
+            top: 0; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 1000; 
+            backdrop-filter: blur(10px); 
+        }
+        .logo { display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff; font-family:'Bangers', cursive; font-size:1.5rem; }
+        .logo img { height:35px; border-radius:50%; border: 1px solid var(--primary); }
+        
+        .vault-container { padding: 40px 5%; max-width: 1400px; margin: 0 auto; }
+        .vault-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:25px; }
+        
+        .manga-card { 
+            background:#111; border-radius:12px; overflow:hidden; border: 1px solid #222; 
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative;
+        }
+        .manga-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(255,107,0,0.2); }
+        .manga-img { width:100%; height:280px; object-fit:cover; filter: grayscale(30%); transition: 0.3s; }
+        .manga-card:hover .manga-img { filter: grayscale(0%); }
+        
+        .card-body { padding:15px; }
+        .card-body h3 { font-size:1rem; margin:0 0 8px; font-family:'Bangers', cursive; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-body p { font-size:0.8rem; color:#888; margin:0; }
+        
+        .live-tag { position:absolute; top:10px; left:10px; background:var(--primary); color:#000; padding:3px 8px; font-family:'Space Mono'; font-weight:700; font-size:0.6rem; border-radius:4px; z-index:2; }
+        
+        /* Reader View */
+        #reader-view { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 2000; flex-direction: column; 
+        }
+        .reader-header { 
+            padding: 15px 5%; background: #111; display: flex; justify-content: space-between; 
+            align-items: center; border-bottom: 1px solid #222; 
+        }
+        .reader-content { 
+            flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; 
+            align-items: center; gap: 10px; scroll-behavior: smooth;
+        }
+        .reader-content img { max-width: 100%; height: auto; display: block; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        
+        .reader-controls { display: flex; gap: 15px; align-items: center; }
+        .btn { 
+            background: var(--primary); color: #000; border: none; padding: 8px 16px; 
+            border-radius: 4px; font-family: 'Space Mono'; font-weight: 700; cursor: pointer;
+            text-transform: uppercase; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .chapter-select { 
+            background: #222; color: #fff; border: 1px solid #444; padding: 8px; 
+            border-radius: 4px; font-family: 'Space Mono'; 
+        }
+
+        .mimi-loading { text-align: center; padding: 100px; color: var(--primary); font-family: 'Bangers'; font-size: 2rem; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">
+            <img src="/logos/dreaming-anime-logo-round.png" alt="Logo">
+            DREAMING ANIME
+        </a>
+        <div style="display: flex; gap: 20px;">
+            <a href="/cinema/" style="color:#fff; text-decoration:none; font-family:'Space Mono';">Cinema</a>
+        </div>
+    </nav>
+
+    <div class="vault-container">
+        <div style="margin-bottom: 40px;">
+            <h1 style="font-family:'Bangers', cursive; font-size: 3rem; color: var(--primary); margin: 0;">DIRECT-READ VAULT</h1>
+            <p style="color: #666; font-family: 'Space Mono';">Sovereign Encryption Bypass Active. Reading Directly from Nodes.</p>
+        </div>
+        <div id="manga-grid" class="vault-grid">
+            <div class="mimi-loading">SYNCING NODES...</div>
+        </div>
+    </div>
+
+    <!-- Reader View -->
+    <div id="reader-view">
+        <div class="reader-header">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <button class="btn btn-outline" onclick="closeReader()"><i class="fas fa-arrow-left"></i> BACK</button>
+                <h2 id="current-manga-title" style="margin:0; font-family:'Bangers'; color:var(--primary); font-size:1.2rem;"></h2>
+            </div>
+            <div class="reader-controls">
+                <button class="btn" id="prev-ch-btn" onclick="prevChapter()"><i class="fas fa-chevron-left"></i> PREV</button>
+                <select id="chapter-selector" class="chapter-select" onchange="loadChapter(this.value)"></select>
+                <button class="btn" id="next-ch-btn" onclick="nextChapter()">NEXT <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div id="reader-pages" class="reader-content">
+            <!-- Pages will load here -->
+        </div>
+    </div>
+
+    <script>
+        const MD_API = 'https://api.mangadex.org';
+        let currentMangaId = null;
+        let currentChapters = [];
+        let currentChapterIndex = -1;
+
+        async function loadMangaVault() {
+            const grid = document.getElementById('manga-grid');
+            try {
+                // Fetch trending/popular manga from MangaDex
+                const res = await fetch(`${MD_API}/manga?limit=32&includes[]=cover_art&order[followedCount]=desc&contentRating[]=safe&availableTranslatedLanguage[]=en`);
+                const data = await res.json();
+                
+                grid.innerHTML = '';
+                data.data.forEach(manga => {
+                    const cover = manga.relationships.find(r => r.type === 'cover_art');
+                    const coverUrl = cover ? `https://uploads.mangadex.org/covers/${manga.id}/${cover.attributes.fileName}.256.jpg` : 'https://via.placeholder.com/256x360?text=No+Cover';
+                    const title = manga.attributes.title.en || Object.values(manga.attributes.title)[0];
+                    
+                    const card = document.createElement('div');
+                    card.className = 'manga-card';
+                    card.onclick = () => openManga(manga.id, title);
+                    card.innerHTML = `
+                        <span class="live-tag">DIRECT READ</span>
+                        <img src="${coverUrl}" class="manga-img" alt="${title}" referrerpolicy="no-referrer">
+                        <div class="card-body">
+                            <h3>${title}</h3>
+                            <p>${manga.attributes.status.toUpperCase()} • ${manga.attributes.year || 'N/A'}</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (e) {
+                console.error("Vault Error:", e);
+                grid.innerHTML = '<div class="mimi-loading">CONNECTION FAILED. RETRYING...</div>';
+            }
+        }
+
+        async function openManga(id, title) {
+            currentMangaId = id;
+            document.getElementById('current-manga-title').innerText = title;
+            document.getElementById('reader-view').style.display = 'flex';
+            document.getElementById('reader-pages').innerHTML = '<div class="mimi-loading">DECRYPTING CHAPTERS...</div>';
+            
+            // Load chapters
+            try {
+                const res = await fetch(`${MD_API}/manga/${id}/feed?limit=500&translatedLanguage[]=en&order[chapter]=asc&contentRating[]=safe&contentRating[]=suggestive`);
+                const data = await res.json();
+                
+                // Filter and sort unique chapters
+                const seen = new Set();
+                currentChapters = data.data.filter(ch => {
+                    const duplicate = seen.has(ch.attributes.chapter);
+                    seen.add(ch.attributes.chapter);
+                    return !duplicate && ch.attributes.chapter !== null;
+                });
+
+                const selector = document.getElementById('chapter-selector');
+                selector.innerHTML = '';
+                currentChapters.forEach((ch, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.innerText = `Ch. ${ch.attributes.chapter}${ch.attributes.title ? ': ' + ch.attributes.title : ''}`;
+                    selector.appendChild(opt);
+                });
+
+                if (currentChapters.length > 0) {
+                    loadChapter(0);
+                } else {
+                    document.getElementById('reader-pages').innerHTML = '<div class="mimi-loading">NO READABLE CHAPTERS FOUND.</div>';
+                }
+            } catch (e) {
+                console.error("Chapter Load Error:", e);
+            }
+        }
+
+        async function loadChapter(index) {
+            index = parseInt(index);
+            currentChapterIndex = index;
+            const chapter = currentChapters[index];
+            const pagesContainer = document.getElementById('reader-pages');
+            const selector = document.getElementById('chapter-selector');
+            selector.value = index;
+            
+            // Update buttons
+            document.getElementById('prev-ch-btn').disabled = (index === 0);
+            document.getElementById('next-ch-btn').disabled = (index === currentChapters.length - 1);
+            
+            pagesContainer.innerHTML = '<div class="mimi-loading">LOADING PAGES...</div>';
+            pagesContainer.scrollTop = 0;
+
+            try {
+                const res = await fetch(`${MD_API}/at-home/server/${chapter.id}`);
+                const data = await res.json();
+                const hash = data.chapter.hash;
+                const files = data.chapter.data;
+                const baseUrl = data.baseUrl;
+
+                pagesContainer.innerHTML = '';
+                files.forEach(file => {
+                    const img = document.createElement('img');
+                    // Use no-referrer to bypass MangaDex hotlink protection
+                    img.referrerPolicy = "no-referrer";
+                    img.src = `${baseUrl}/data/${hash}/${file}`;
+                    img.loading = "lazy";
+                    
+                    // Auto-retry logic with data-saver if standard fails
+                    img.onerror = () => {
+                        if (!img.src.includes('/data-saver/')) {
+                            img.src = `${baseUrl}/data-saver/${hash}/${file}`;
+                        } else {
+                            // High-Fidelity Placeholder for broken pages
+                            img.src = 'https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/assets/logos/priscion_primary_small.jpg';
+                            img.style.opacity = '0.3';
+                        }
+                    };
+                    
+                    pagesContainer.appendChild(img);
+                });
+            } catch (e) {
+                console.error("Page Load Error:", e);
+                pagesContainer.innerHTML = '<div class="mimi-loading">PAGES BLOCKED. TRYING ALTERNATE NODE...</div>';
+            }
+        }
+
+        function nextChapter() {
+            if (currentChapterIndex < currentChapters.length - 1) {
+                loadChapter(currentChapterIndex + 1);
+            }
+        }
+
+        function prevChapter() {
+            if (currentChapterIndex > 0) {
+                loadChapter(currentChapterIndex - 1);
+            }
+        }
+
+        function closeReader() {
+            document.getElementById('reader-view').style.display = 'none';
+            document.getElementById('reader-pages').innerHTML = '';
+        }
+
+        window.onload = loadMangaVault;
+    </script>
+</body>
+</html>

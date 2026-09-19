@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BillFlow Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="bg-black text-white font-inter">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 border-r border-gray-800 flex flex-col">
+            <div class="p-6 text-2xl font-bold text-emerald-400">BILLFLOW</div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" class="flex items-center space-x-3 p-3 bg-emerald-500/10 text-emerald-400 rounded-xl"><span>📊</span><span>Overview</span></a>
+                <a href="#" class="flex items-center space-x-3 p-3 text-gray-500 hover:text-white rounded-xl"><span>📄</span><span>Invoices</span></a>
+                <a href="#" class="flex items-center space-x-3 p-3 text-gray-500 hover:text-white rounded-xl"><span>💸</span><span>Expenses</span></a>
+                <a href="#" class="flex items-center space-x-3 p-3 text-gray-500 hover:text-white rounded-xl"><span>🏛️</span><span>Taxes</span></a>
+            </nav>
+            <div class="p-4 border-t border-gray-800">
+                <div class="p-3 bg-gray-900 rounded-xl text-xs">
+                    <div class="font-bold mb-1">Trial Ends in 4 days</div>
+                    <div class="w-full bg-gray-800 h-1 rounded-full"><div class="bg-emerald-500 h-1 w-2/3 rounded-full"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            <!-- Header Stats -->
+            <div class="grid grid-cols-4 gap-6 mb-10">
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                    <div class="text-gray-500 text-xs mb-1">TOTAL EARNED</div>
+                    <div class="text-2xl font-bold">$12,450.00</div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                    <div class="text-gray-500 text-xs mb-1">EXPENSES</div>
+                    <div class="text-2xl font-bold">$3,120.40</div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                    <div class="text-gray-500 text-xs mb-1">OUTSTANDING</div>
+                    <div class="text-2xl font-bold text-orange-400">$2,400.00</div>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800">
+                    <div class="text-gray-500 text-xs mb-1">TAX ESTIMATE</div>
+                    <div class="text-2xl font-bold text-emerald-400">$2,100.00</div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Quick Invoice -->
+                <div class="bg-gray-900 p-8 rounded-3xl border border-gray-800">
+                    <h3 class="text-xl font-bold mb-6">Quick Invoice (AI)</h3>
+                    <div class="space-y-4">
+                        <textarea id="aiInput" placeholder="e.g. 3 hours consulting for Sarah at $150/hr" class="w-full bg-black border border-gray-700 p-4 rounded-xl focus:border-emerald-500 outline-none h-24"></textarea>
+                        <button onclick="parseInvoice()" class="w-full accent-bg text-black font-bold py-3 rounded-xl">Generate Invoice Draft</button>
+                    </div>
+                    <div id="invoicePreview" class="hidden mt-6 p-4 border border-dashed border-gray-700 rounded-xl">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Client: <span id="prevClient" class="text-white">Sarah</span></span>
+                            <span class="text-gray-500">Total: <span id="prevTotal" class="text-emerald-400">$450.00</span></span>
+                        </div>
+                        <button class="mt-4 text-xs text-emerald-400 font-bold uppercase tracking-wider">Send Now →</button>
+                    </div>
+                </div>
+
+                <!-- Unpaid Invoices -->
+                <div class="bg-gray-900 p-8 rounded-3xl border border-gray-800">
+                    <h3 class="text-xl font-bold mb-6">Unpaid Invoices</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-black rounded-xl border border-gray-800">
+                            <div>
+                                <div class="font-bold">TechVibe Studio</div>
+                                <div class="text-xs text-gray-500">Due: 14 days ago</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold">$1,200.00</div>
+                                <button class="text-xs text-emerald-400 font-bold underline">Send Reminder</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-black rounded-xl border border-gray-800">
+                            <div>
+                                <div class="font-bold">Global Design Co.</div>
+                                <div class="text-xs text-gray-500">Due: 2 days ago</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold">$850.00</div>
+                                <button class="text-xs text-emerald-400 font-bold underline">Send Reminder</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Feed -->
+            <div class="mt-10 bg-gray-900 rounded-3xl border border-gray-800 p-8">
+                <h3 class="text-xl font-bold mb-6">Recent Expenses</h3>
+                <div class="space-y-1">
+                    <div class="grid grid-cols-4 py-4 px-4 hover:bg-black/50 rounded-xl transition cursor-pointer">
+                        <div class="flex items-center space-x-3 font-bold"><span>☁️</span><span>AWS</span></div>
+                        <div class="text-gray-500">Infrastructure</div>
+                        <div class="text-gray-400 italic text-sm">Auto-categorized</div>
+                        <div class="text-right font-bold text-red-400">-$42.10</div>
+                    </div>
+                    <div class="grid grid-cols-4 py-4 px-4 hover:bg-black/50 rounded-xl transition cursor-pointer">
+                        <div class="flex items-center space-x-3 font-bold"><span>☕</span><span>Starbucks</span></div>
+                        <div class="text-gray-500">Business Meal</div>
+                        <div class="text-gray-400 italic text-sm">Manual verification</div>
+                        <div class="text-right font-bold text-red-400">-$12.50</div>
+                    </div>
+                    <div class="grid grid-cols-4 py-4 px-4 hover:bg-black/50 rounded-xl transition cursor-pointer">
+                        <div class="flex items-center space-x-3 font-bold"><span>💻</span><span>Apple Store</span></div>
+                        <div class="text-gray-500">Hardware</div>
+                        <div class="text-gray-400 italic text-sm">Tax Deductible</div>
+                        <div class="text-right font-bold text-red-400">-$2,499.00</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+</html>

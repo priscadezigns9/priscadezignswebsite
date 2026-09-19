@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calorie Log — Callaloo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:ital,wght@0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#E87722;--primary-light:#F5A623;--bg:#FFF8F0;--card:#FFFFFF;--text:#1A0D00;--muted:rgba(26,13,0,0.45);--border:rgba(232,119,34,0.18);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;padding-bottom:90px;min-height:100vh}
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,248,240,0.95);backdrop-filter:blur(12px);z-index:100}
+.nav-logo{font-size:1.2rem;font-weight:900;color:var(--primary);text-decoration:none;font-family:'Fraunces',serif}
+.nav-logo span{color:#1A0D00}
+.nav-back{font-size:.85rem;color:var(--primary);text-decoration:none;font-weight:600}
+.page-header{padding:20px 20px 0}
+.page-title{font-size:1.6rem;font-weight:900;font-family:'Fraunces',serif;color:var(--text)}
+.page-date{font-size:.85rem;color:var(--muted);margin-top:4px}
+
+/* GOAL BAR */
+.goal-card{margin:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px}
+.goal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.goal-label{font-size:.82rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.goal-edit{font-size:.78rem;color:var(--primary);cursor:pointer;font-weight:600}
+.goal-numbers{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.goal-consumed{font-size:2.2rem;font-weight:900;color:var(--text);font-family:'Fraunces',serif}
+.goal-total{font-size:1rem;color:var(--muted);font-weight:600}
+.goal-bar-wrap{height:10px;background:rgba(232,119,34,0.15);border-radius:10px;overflow:hidden}
+.goal-bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:10px;transition:width .5s}
+.macro-row{display:flex;gap:12px;margin-top:14px}
+.macro-item{flex:1;text-align:center}
+.macro-val{font-size:1rem;font-weight:800;color:var(--text)}
+.macro-lbl{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase}
+.macro-bar{height:4px;border-radius:4px;margin-top:4px}
+
+/* LOG LIST */
+.section-title{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:0 20px;margin:20px 0 10px}
+.log-list{padding:0 20px;display:flex;flex-direction:column;gap:10px}
+.log-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.log-emoji{font-size:1.6rem;flex-shrink:0}
+.log-info{flex:1}
+.log-name{font-size:.95rem;font-weight:700;color:var(--text)}
+.log-meta{font-size:.75rem;color:var(--muted);margin-top:2px}
+.log-cal{font-size:1rem;font-weight:800;color:var(--primary);flex-shrink:0}
+.log-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:4px;flex-shrink:0}
+.log-del:hover{color:#E01B24}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:3rem;margin-bottom:12px}
+.empty-text{font-size:.95rem;font-weight:600}
+.empty-sub{font-size:.82rem;margin-top:6px;opacity:.7}
+
+/* ADD BUTTON */
+.add-btn{position:fixed;bottom:80px;right:20px;z-index:200;background:linear-gradient(135deg,var(--primary),var(--primary-light));color:white;border:none;border-radius:50px;padding:14px 24px;font-size:.9rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;box-shadow:0 4px 20px rgba(232,119,34,0.4);display:flex;align-items:center;gap:8px}
+.add-btn:hover{transform:translateY(-2px)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:24px 24px 0 0;padding:24px 20px 40px;width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
+.modal-title{font-size:1.1rem;font-weight:800;font-family:'Fraunces',serif;margin-bottom:16px}
+.modal-search{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;font-size:.9rem;font-family:'Inter',sans-serif;color:var(--text);outline:none;margin-bottom:14px}
+.modal-search:focus{border-color:var(--primary)}
+.result-list{display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow-y:auto}
+.result-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;cursor:pointer}
+.result-item:hover{border-color:var(--primary)}
+.result-name{font-size:.88rem;font-weight:600}
+.result-cal{font-size:.82rem;color:var(--primary);font-weight:700}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
+
+/* GOAL EDIT MODAL */
+.goal-input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;font-size:1.1rem;font-family:'Inter',sans-serif;color:var(--text);outline:none;text-align:center;font-weight:700;margin:10px 0 16px}
+.save-btn{width:100%;background:var(--primary);color:white;border:none;border-radius:12px;padding:14px;font-size:.95rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,248,240,0.97);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;z-index:300}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;text-decoration:none;color:var(--muted);font-size:.62rem;font-weight:600;gap:3px}
+.bn-item.active{color:var(--primary)}
+.bn-icon{font-size:1.2rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/callaloo/" class="nav-logo">Calla<span>loo</span></a>
+  <a href="/callaloo/" class="nav-back">← Home</a>
+</nav>
+
+<div class="page-header">
+  <div class="page-title">Daily Log</div>
+  <div class="page-date" id="todayDate"></div>
+</div>
+
+<!-- GOAL CARD -->
+<div class="goal-card">
+  <div class="goal-header">
+    <span class="goal-label">Calories Today</span>
+    <span class="goal-edit" onclick="openGoalModal()">Edit Goal</span>
+  </div>
+  <div class="goal-numbers">
+    <span class="goal-consumed" id="totalCal">0</span>
+    <span class="goal-total">/ <span id="goalDisplay">2000</span> kcal</span>
+  </div>
+  <div class="goal-bar-wrap"><div class="goal-bar-fill" id="goalBar" style="width:0%"></div></div>
+  <div class="macro-row">
+    <div class="macro-item">
+      <div class="macro-val" id="totalPro">0g</div>
+      <div class="macro-lbl">Protein</div>
+      <div class="macro-bar" style="background:#4CAF50" id="proBar"></div>
+    </div>
+    <div class="macro-item">
+      <div class="macro-val" id="totalCarb">0g</div>
+      <div class="macro-lbl">Carbs</div>
+      <div class="macro-bar" style="background:#FF9800" id="carbBar"></div>
+    </div>
+    <div class="macro-item">
+      <div class="macro-val" id="totalFat">0g</div>
+      <div class="macro-lbl">Fat</div>
+      <div class="macro-bar" style="background:#F44336" id="fatBar"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section-title">Today's Meals</div>
+<div class="log-list" id="logList"></div>
+
+<button class="add-btn" onclick="openAddModal()">
+  <span>+</span> Add Meal
+</button>
+
+<!-- ADD MEAL MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeAddModal()">✕</button>
+    <div class="modal-title">Add to Log</div>
+    <input class="modal-search" id="modalSearch" placeholder="Search recipes or ingredients..." oninput="searchItems(this.value)" autocomplete="off">
+    <div class="result-list" id="resultList"></div>
+  </div>
+</div>
+
+<!-- GOAL EDIT MODAL -->
+<div class="modal-overlay" id="goalModal">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeGoalModal()">✕</button>
+    <div class="modal-title">Daily Calorie Goal</div>
+    <input class="goal-input" id="goalInput" type="number" placeholder="2000" value="2000">
+    <button class="save-btn" onclick="saveGoal()">Save Goal</button>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="/callaloo/" class="bn-item"><span class="bn-icon">🏠</span>Home</a>
+  <a href="/callaloo/feed/" class="bn-item"><span class="bn-icon">🍽</span>Recipes</a>
+  <a href="/callaloo/scan/" class="bn-item"><span class="bn-icon">📷</span>Scan</a>
+  <a href="/callaloo/log/" class="bn-item active"><span class="bn-icon">📊</span>Log</a>
+  <a href="/callaloo/profile/" class="bn-item"><span class="bn-icon">👤</span>Me</a>
+</nav>
+
+<script src="/callaloo/data/nutrition.js"></script>
+<script>
+var _goal = parseInt(localStorage.getItem('callaloo_goal')||'2000');
+var _log  = JSON.parse(localStorage.getItem('callaloo_log_'+getToday())||'[]');
+
+// Demo recipes for search
+var DEMO_ITEMS = [
+  {name:"Doubles",cal:420,pro:12,carb:68,fat:12,emoji:"🫓"},
+  {name:"Chicken Pelau",cal:520,pro:32,carb:58,fat:14,emoji:"🍗"},
+  {name:"Callaloo Soup",cal:180,pro:8,carb:22,fat:6,emoji:"🍲"},
+  {name:"Stewed Chicken",cal:310,pro:35,carb:8,fat:14,emoji:"🍗"},
+  {name:"Macaroni Pie",cal:380,pro:14,carb:52,fat:14,emoji:"🥗"},
+  {name:"Fried Bake",cal:290,pro:6,carb:42,fat:11,emoji:"🫓"},
+  {name:"Pholourie (4pc)",cal:290,pro:8,carb:38,fat:12,emoji:"🟡"},
+  {name:"Dhalpuri Roti",cal:350,pro:10,carb:58,fat:9,emoji:"🫓"},
+  {name:"Curry Chicken",cal:340,pro:34,carb:10,fat:16,emoji:"🍛"},
+  {name:"Corn Soup",cal:280,pro:10,carb:42,fat:8,emoji:"🍲"},
+  {name:"Buljol",cal:180,pro:22,carb:4,fat:8,emoji:"🐟"},
+  {name:"Coconut Sweet Bread",cal:340,pro:6,carb:52,fat:12,emoji:"🍰"},
+  {name:"Black Cake (slice)",cal:380,pro:4,carb:64,fat:12,emoji:"🍰"},
+  {name:"Sorrel Drink",cal:90,pro:0,carb:22,fat:0,emoji:"🥤"},
+  {name:"Ponche de Creme",cal:220,pro:4,carb:28,fat:10,emoji:"🥤"},
+  {name:"Geera Pork",cal:310,pro:28,carb:4,fat:20,emoji:"🍽"},
+  {name:"Boiled Provisions",cal:220,pro:3,carb:52,fat:0,emoji:"🥗"},
+  {name:"Pepper Sauce (tsp)",cal:5,pro:0,carb:1,fat:0,emoji:"🫙"},
+  {name:"Steamed Rice (cup)",cal:206,pro:4,carb:45,fat:0,emoji:"🍚"},
+  {name:"Plantain (ripe, fried)",cal:240,pro:2,carb:48,fat:6,emoji:"🍌"},
+];
+
+// Also build items from nutrition DB
+var DB_ITEMS = [];
+if(typeof CALLALOO_NUTRITION !== 'undefined'){
+  Object.keys(CALLALOO_NUTRITION).forEach(function(k){
+    var n=CALLALOO_NUTRITION[k];
+    var servingCal=Math.round(n.cal*(n.ug/100));
+    DB_ITEMS.push({name:k.charAt(0).toUpperCase()+k.slice(1),cal:servingCal,pro:Math.round(n.pro*(n.ug/100)*10)/10,carb:Math.round(n.carb*(n.ug/100)*10)/10,fat:Math.round(n.fat*(n.ug/100)*10)/10,emoji:'🥘',unit:n.unit});
+  });
+}
+var ALL_ITEMS = DEMO_ITEMS.concat(DB_ITEMS);
+
+function getToday(){var d=new Date();return d.toISOString().split('T')[0];}
+
+function saveLog(){localStorage.setItem('callaloo_log_'+getToday(),JSON.stringify(_log));}
+
+function renderLog(){
+  var list=document.getElementById('logList');
+  var totCal=0,totPro=0,totCarb=0,totFat=0;
+  _log.forEach(function(e){totCal+=e.cal||0;totPro+=e.pro||0;totCarb+=e.carb||0;totFat+=e.fat||0;});
+  document.getElementById('totalCal').textContent=Math.round(totCal);
+  document.getElementById('totalPro').textContent=Math.round(totPro)+'g';
+  document.getElementById('totalCarb').textContent=Math.round(totCarb)+'g';
+  document.getElementById('totalFat').textContent=Math.round(totFat)+'g';
+  var pct=Math.min(100,Math.round((totCal/_goal)*100));
+  document.getElementById('goalBar').style.width=pct+'%';
+  document.getElementById('goalBar').style.background=pct>100?'#E01B24':'linear-gradient(90deg,#E87722,#F5A623)';
+  if(_log.length===0){
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">🍽</div><div class="empty-text">Nothing logged yet today</div><div class="empty-sub">Tap + Add Meal to start tracking</div></div>';
+    return;
+  }
+  list.innerHTML=_log.map(function(e,i){
+    return '<div class="log-item"><div class="log-emoji">'+(e.emoji||'🍽')+'</div><div class="log-info"><div class="log-name">'+e.name+'</div><div class="log-meta">'+(e.time||'')+' · '+Math.round(e.pro||0)+'g protein · '+Math.round(e.carb||0)+'g carbs</div></div><div class="log-cal">'+Math.round(e.cal||0)+' kcal</div><button class="log-del" onclick="deleteEntry('+i+')">✕</button></div>';
+  }).join('');
+}
+
+function deleteEntry(i){_log.splice(i,1);saveLog();renderLog();}
+
+function addEntry(item){
+  var now=new Date();
+  var time=now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+  _log.push({name:item.name,cal:item.cal,pro:item.pro||0,carb:item.carb||0,fat:item.fat||0,emoji:item.emoji||'🍽',time:time});
+  saveLog();renderLog();closeAddModal();
+}
+
+function searchItems(q){
+  var list=document.getElementById('resultList');
+  if(!q.trim()){list.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px;font-size:.85rem">Type to search recipes or ingredients</div>';return;}
+  var low=q.toLowerCase();
+  var results=ALL_ITEMS.filter(function(i){return i.name.toLowerCase().includes(low);}).slice(0,12);
+  if(!results.length){list.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px;font-size:.85rem">No results found</div>';return;}
+  list.innerHTML=results.map(function(r,i){
+    return '<div class="result-item" onclick="addEntryFromSearch('+i+',''+encodeURIComponent(JSON.stringify(r))+'')"><span class="result-name">'+(r.emoji||'🍽')+' '+r.name+(r.unit?' ('+r.unit+')':'')+'</span><span class="result-cal">'+Math.round(r.cal)+' kcal</span></div>';
+  }).join('');
+  window._searchResults=results;
+}
+
+function addEntryFromSearch(i,encoded){
+  var item=window._searchResults&&window._searchResults[i];
+  if(item)addEntry(item);
+}
+
+function openAddModal(){
+  document.getElementById('addModal').classList.add('open');
+  document.getElementById('modalSearch').value='';
+  document.getElementById('resultList').innerHTML='<div style="text-align:center;color:var(--muted);padding:20px;font-size:.85rem">Type to search recipes or ingredients</div>';
+  setTimeout(function(){document.getElementById('modalSearch').focus();},300);
+}
+function closeAddModal(){document.getElementById('addModal').classList.remove('open');}
+
+function openGoalModal(){
+  document.getElementById('goalInput').value=_goal;
+  document.getElementById('goalModal').classList.add('open');
+}
+function closeGoalModal(){document.getElementById('goalModal').classList.remove('open');}
+function saveGoal(){
+  var v=parseInt(document.getElementById('goalInput').value)||2000;
+  _goal=v;
+  localStorage.setItem('callaloo_goal',v);
+  document.getElementById('goalDisplay').textContent=v;
+  closeGoalModal();
+  renderLog();
+}
+
+// Init
+var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var now=new Date();
+document.getElementById('todayDate').textContent=days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+document.getElementById('goalDisplay').textContent=_goal;
+renderLog();
+
+// Close modals on overlay click
+document.getElementById('addModal').addEventListener('click',function(e){if(e.target===this)closeAddModal();});
+document.getElementById('goalModal').addEventListener('click',function(e){if(e.target===this)closeGoalModal();});
+</script>
+</body>
+</html>

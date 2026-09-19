@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QueueSmart — Virtual Waitlist Management</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --white:#FAFAFA;--off:#F4F4F5;--light:#E8E8EC;--mid:#C4C4CC;
+  --text:#18181B;--muted:#71717A;--blue:#2563EB;--blue-light:#EFF6FF;
+  --blue-mid:#DBEAFE;--border:#E4E4E7;
+}
+body{background:var(--white);color:var(--text);font-family:'DM Sans',sans-serif;line-height:1.6;}
+
+/* NAV */
+nav{background:rgba(250,250,250,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5%;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;height:64px;}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.9rem;}
+.logo-name{font-weight:700;font-size:1.05rem;color:var(--text);}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-links a{text-decoration:none;color:var(--muted);font-size:0.88rem;font-weight:500;transition:color 0.2s;}
+.nav-links a:hover{color:var(--text);}
+.btn{padding:9px 20px;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{background:#1D4ED8;}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+
+/* HERO */
+.hero{padding:100px 5% 80px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1200px;margin:0 auto;}
+.hero-label{display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid);border-radius:50px;padding:5px 14px;font-size:0.78rem;font-weight:600;margin-bottom:24px;}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,4vw,3.4rem);line-height:1.15;color:var(--text);margin-bottom:20px;}
+.hero h1 em{color:var(--blue);font-style:italic;}
+.hero p{font-size:1.02rem;color:var(--muted);margin-bottom:32px;max-width:480px;line-height:1.7;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.hero-visual{background:var(--off);border:1px solid var(--border);border-radius:20px;padding:28px;position:relative;}
+.queue-widget{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.queue-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.queue-title{font-weight:700;font-size:0.95rem;}
+.queue-count{background:var(--blue);color:#fff;border-radius:50px;padding:3px 10px;font-size:0.75rem;font-weight:700;}
+.queue-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.queue-item:last-child{border:none;padding-bottom:0;}
+.q-num{width:28px;height:28px;background:var(--blue-light);color:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;}
+.q-name{font-size:0.85rem;font-weight:600;}
+.q-wait{font-size:0.75rem;color:var(--muted);}
+.q-status{margin-left:auto;font-size:0.72rem;font-weight:600;padding:3px 8px;border-radius:4px;}
+.q-status.now{background:#DCFCE7;color:#16A34A;}
+.q-status.soon{background:#FEF9C3;color:#CA8A04;}
+.q-status.wait{background:var(--blue-light);color:var(--blue);}
+
+/* STATS STRIP */
+.stats{background:var(--off);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:40px 5%;}
+.stats-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--blue);}
+.stat-label{font-size:0.82rem;color:var(--muted);margin-top:4px;}
+
+/* FEATURES */
+.features{padding:90px 5%;max-width:1200px;margin:0 auto;}
+.section-label{text-align:center;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:14px;}
+.section-title{text-align:center;font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,3vw,2.6rem);margin-bottom:12px;}
+.section-sub{text-align:center;color:var(--muted);max-width:520px;margin:0 auto 60px;}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.feat-card{background:var(--off);border:1px solid var(--border);border-radius:16px;padding:28px;transition:box-shadow 0.2s;}
+.feat-card:hover{box-shadow:0 8px 30px rgba(37,99,235,0.08);}
+.feat-icon{width:44px;height:44px;background:var(--blue-light);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:16px;}
+.feat-title{font-weight:700;margin-bottom:8px;}
+.feat-desc{font-size:0.87rem;color:var(--muted);line-height:1.65;}
+
+/* HOW IT WORKS */
+.how{padding:80px 5%;background:var(--blue);color:#fff;}
+.how-inner{max-width:1000px;margin:0 auto;}
+.how .section-label{color:rgba(255,255,255,0.6);}
+.how .section-title{color:#fff;}
+.how .section-sub{color:rgba(255,255,255,0.7);}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;margin-top:50px;}
+.step{text-align:center;}
+.step-num{width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.3rem;margin:0 auto 16px;border:2px solid rgba(255,255,255,0.3);}
+.step-title{font-weight:700;margin-bottom:8px;}
+.step-desc{font-size:0.87rem;opacity:0.75;line-height:1.65;}
+
+/* PRICING */
+.pricing{padding:90px 5%;max-width:1100px;margin:0 auto;}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:50px;}
+.price-card{background:var(--off);border:1px solid var(--border);border-radius:20px;padding:32px;}
+.price-card.featured{background:var(--blue);border-color:var(--blue);color:#fff;}
+.price-name{font-weight:700;margin-bottom:8px;}
+.price-val{font-family:'DM Serif Display',serif;font-size:2.6rem;margin:12px 0 4px;}
+.price-period{font-size:0.82rem;opacity:0.6;}
+.price-desc{font-size:0.85rem;opacity:0.7;margin:12px 0 20px;padding-bottom:20px;border-bottom:1px solid rgba(0,0,0,0.06);}
+.price-card.featured .price-desc{border-color:rgba(255,255,255,0.15);}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.price-features li{font-size:0.85rem;display:flex;align-items:center;gap:8px;}
+.price-features li::before{content:'✓';font-weight:700;color:var(--blue);}
+.price-card.featured .price-features li::before{color:#93C5FD;}
+.price-card.featured .btn{background:#fff;color:var(--blue);}
+
+/* CTA */
+.cta{padding:80px 5%;background:var(--off);border-top:1px solid var(--border);text-align:center;}
+.cta h2{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,3vw,2.4rem);margin-bottom:16px;}
+.cta p{color:var(--muted);margin-bottom:32px;}
+
+/* FOOTER */
+footer{background:var(--text);color:rgba(255,255,255,0.5);text-align:center;padding:28px;font-size:0.82rem;}
+footer a{color:rgba(255,255,255,0.7);text-decoration:none;}
+
+@media(max-width:768px){.hero{grid-template-columns:1fr;}.features-grid,.pricing-grid,.steps,.stats-inner{grid-template-columns:1fr 1fr;}.hero-visual{display:none;}}
+@media(max-width:480px){.features-grid,.pricing-grid,.steps,.stats-inner{grid-template-columns:1fr;}}
+.theme-toggle{background:none;border:none;cursor:pointer;font-size:1.1rem;padding:6px 8px;border-radius:50%;transition:all 0.2s;opacity:0.7;line-height:1}
+.theme-toggle:hover{opacity:1;background:rgba(128,128,128,0.15)}
+body.light-mode{background:#FFFFFF!important;color:#111111!important}
+body.light-mode nav{background:rgba(255,255,255,0.95)!important;border-bottom:1px solid #e0e0e0!important}
+body.light-mode .card,body.light-mode section,body.light-mode .hero{background:#FFFFFF!important}
+body.light-mode .theme-icon::before{content:'🌙'}
+.theme-icon::before{content:''}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="logo-mark">Q</div>
+    <div class="logo-name">QueueSmart</div>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#" class="btn btn-outline">Log in</a>
+    <a href="#" class="btn btn-primary">Start free</a>
+  </div>
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <span class="theme-icon">☀️</span>
+</button>
+</nav>
+
+<section class="hero">
+  <div>
+    <div class="hero-label">🇹🇹 Built for Caribbean businesses</div>
+    <h1>End the line.<br>Start the <em>queue.</em></h1>
+    <p>QueueSmart replaces physical lineups with a virtual waitlist your customers join from their phone. No app download. No chaos. Just smooth flow.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn btn-primary">Get started free</a>
+      <a href="#how" class="btn btn-outline">See how it works</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="queue-widget">
+      <div class="queue-header">
+        <div class="queue-title">Today's Queue</div>
+        <div class="queue-count">8 waiting</div>
+      </div>
+      <div class="queue-item">
+        <div class="q-num">1</div>
+        <div><div class="q-name">Marcus T.</div><div class="q-wait">Joined 9:02 AM</div></div>
+        <div class="q-status now">Now</div>
+      </div>
+      <div class="queue-item">
+        <div class="q-num">2</div>
+        <div><div class="q-name">Simone B.</div><div class="q-wait">~5 min wait</div></div>
+        <div class="q-status soon">Soon</div>
+      </div>
+      <div class="queue-item">
+        <div class="q-num">3</div>
+        <div><div class="q-name">Devon H.</div><div class="q-wait">~12 min wait</div></div>
+        <div class="q-status wait">Waiting</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stats-inner">
+    <div><div class="stat-num">94%</div><div class="stat-label">Customer satisfaction</div></div>
+    <div><div class="stat-num">3x</div><div class="stat-label">Faster service flow</div></div>
+    <div><div class="stat-num">60%</div><div class="stat-label">Fewer no-shows</div></div>
+    <div><div class="stat-num">2 min</div><div class="stat-label">Setup time</div></div>
+  </div>
+</div>
+
+<section class="features" id="features">
+  <div class="section-label">Features</div>
+  <h2 class="section-title">Everything you need to manage your queue</h2>
+  <p class="section-sub">Simple tools that actually work for small businesses, salons, clinics, and government offices.</p>
+  <div class="features-grid">
+    <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Join by phone or QR</div><div class="feat-desc">Customers scan a QR code or text a number to join. No app required — works on any phone.</div></div>
+    <div class="feat-card"><div class="feat-icon">🔔</div><div class="feat-title">SMS notifications</div><div class="feat-desc">Customers get a text when it's almost their turn, so they can wait anywhere — not in your lobby.</div></div>
+    <div class="feat-card"><div class="feat-icon">📊</div><div class="feat-title">Live dashboard</div><div class="feat-desc">See your full queue in real time. Call the next customer, add notes, and track wait times.</div></div>
+    <div class="feat-card"><div class="feat-icon">📅</div><div class="feat-title">Appointment booking</div><div class="feat-desc">Let customers book specific time slots so you can plan your day in advance.</div></div>
+    <div class="feat-card"><div class="feat-icon">⭐</div><div class="feat-title">After-visit reviews</div><div class="feat-desc">Automatically send a review request after each visit. Build your reputation on autopilot.</div></div>
+    <div class="feat-card"><div class="feat-icon">📈</div><div class="feat-title">Analytics & reports</div><div class="feat-desc">Track peak hours, average wait times, and busiest days to staff your business smarter.</div></div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Up and running in minutes</h2>
+    <p class="section-sub">No tech skills needed. If you can send a WhatsApp, you can run QueueSmart.</p>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-title">Create your queue</div><div class="step-desc">Sign up and set up your business profile. Paste your QR code at the door or share your link online.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-num" style="display:none"></div><div class="step-title">Customers join</div><div class="step-desc">They scan, enter their name and number, and they're in. They get a confirmation text instantly.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-title">You call them in</div><div class="step-desc">When ready, tap "Next" on your dashboard. They get a text alert and walk in — no shouting required.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="section-label">Pricing</div>
+  <h2 class="section-title">Simple, honest pricing</h2>
+  <p class="section-sub">Pay in TTD. No hidden fees. Cancel anytime.</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-name">Starter</div>
+      <div class="price-val">Free</div>
+      <div class="price-period">forever</div>
+      <div class="price-desc">For small businesses just getting started</div>
+      <ul class="price-features">
+        <li>Up to 20 customers/day</li>
+        <li>QR code check-in</li>
+        <li>Basic dashboard</li>
+        <li>Email support</li>
+      </ul>
+      <a href="#" class="btn btn-outline" style="width:100%;text-align:center;">Get started</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-name">Pro</div>
+      <div class="price-val">$149</div>
+      <div class="price-period">TTD / month</div>
+      <div class="price-desc">For busy businesses ready to scale</div>
+      <ul class="price-features">
+        <li>Unlimited customers</li>
+        <li>SMS notifications</li>
+        <li>Appointment booking</li>
+        <li>Analytics dashboard</li>
+        <li>Auto review requests</li>
+      </ul>
+      <a href="#" class="btn btn-primary" style="width:100%;text-align:center;">Start free trial</a>
+    </div>
+    <div class="price-card">
+      <div class="price-name">Business</div>
+      <div class="price-val">$349</div>
+      <div class="price-period">TTD / month</div>
+      <div class="price-desc">For multi-location operations</div>
+      <ul class="price-features">
+        <li>Multiple locations</li>
+        <li>Staff accounts</li>
+        <li>Priority SMS delivery</li>
+        <li>Custom branding</li>
+        <li>Dedicated support</li>
+      </ul>
+      <a href="#" class="btn btn-outline" style="width:100%;text-align:center;">Contact sales</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <h2>Your customers deserve better than standing in line.</h2>
+  <p>Join hundreds of Caribbean businesses already using QueueSmart.</p>
+  <a href="#" class="btn btn-primary">Start for free — no card required</a>
+</section>
+
+<footer>
+  <p>© 2025 QueueSmart · A <a href="https://priscadezigns.org">Prisca Dezigns</a> product · Trinidad & Tobago</p>
+</footer>
+
+<script>
+function toggleTheme(){
+  document.body.classList.toggle('light-mode');
+  localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+}
+(function(){
+  if(localStorage.getItem('theme')==='light') document.body.classList.add('light-mode');
+})();
+</script>
+</body>
+</html>

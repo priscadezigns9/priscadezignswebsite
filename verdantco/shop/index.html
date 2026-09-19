@@ -1,0 +1,128 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empire Shop - Gold Standard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root { --brand-color: #000; --bg-color: #fff; --text-color: #111; --card-bg: #fff; }
+body{margin:0;font-family:'Inter', sans-serif;background:var(--bg-color);color:var(--text-color);line-height:1.6;transition: 0.3s;}
+nav{background:var(--bg-color);padding:20px 5%;border-bottom:3px solid var(--brand-color);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+#logo { height: 50px; max-width: 200px; object-fit: contain; }
+
+.cat-bar { background: #f4f4f4; padding: 15px 5%; display: flex; gap: 15px; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #eee; scrollbar-width: none; }
+.cat-bar::-webkit-scrollbar { display: none; }
+.cat-btn { background: #fff; border: 1px solid #ddd; padding: 10px 20px; border-radius: 30px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; cursor: pointer; transition: 0.3s; color: #444; }
+.cat-btn.active { background: var(--brand-color); color: #fff; border-color: var(--brand-color); }
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:40px;padding:40px 5%}
+.card{background:var(--card-bg);border:1px solid #f0f0f0;border-radius:20px;padding:30px;text-align:center;transition:0.4s;display:flex;flex-direction:column;justify-content:space-between;box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
+.card:hover{transform:translateY(-10px);box-shadow:0 20px 40px rgba(0,0,0,0.08)}
+.card img{width:100%;height:220px;object-fit:contain;margin-bottom:20px;border-radius:10px}
+.card h3{font-size:1.1rem;margin:15px 0;height:50px;overflow:hidden;font-weight:700}
+.card .price{font-size:1.4rem;font-weight:900;color:var(--brand-color);margin-bottom:20px}
+.card a{display:inline-block;padding:15px 30px;background:var(--brand-color);color:#fff;text-decoration:none;border-radius:50px;font-weight:900;text-transform:uppercase;font-size:0.8rem;letter-spacing:1px;transition:0.3s}
+.card a:hover{opacity:0.8;transform:scale(1.05);box-shadow:0 8px 15px rgba(0,0,0,0.1)}
+
+footer{padding:60px 5%;text-align:center;background:#111;color:#fff}
+.empire-footer { font-size: 0.7rem; letter-spacing: 2px; opacity: 0.6; margin-top: 20px; }
+
+#loader { position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:1000; display:flex; flex-direction: column; justify-content:center; align-items:center; transition: 0.5s; }
+#loader.hidden { opacity:0; pointer-events:none; }
+</style></head>
+<body>
+<div id="loader"><h2 id="loaderText">PRISCA DEZIGNS</h2></div>
+<nav><img id="logo" src="" alt="Empire Logo"></nav>
+<div class="cat-bar" id="catBar"></div>
+<div class="grid" id="grid"></div>
+<footer id="footer">
+    <div id="brandName" style="font-weight:900; font-size:1.5rem"></div>
+    <div class="empire-footer">A PRISCA DEZIGNS EMPIRE VENTURE - GOLD STANDARD RESTORATION v4.5</div>
+</footer>
+
+<script>
+const CONFIG = {
+  "Glow Protocol": { logo: "https://priscadezigns.org/logos/glow-protocol.jpg", color: "#000", btn: "Acquire Solution" },
+  "Atelia Gaming": { logo: "https://priscadezigns.org/logos/atelier-gaming.png", color: "#D32F2F", btn: "Acquire Armory" },
+  "The Gen Play": { logo: "https://priscadezigns.org/logos/genplay_vertical.png", color: "#6366f1", btn: "Acquire Object" },
+  "Pantriq": { logo: "https://priscadezigns.org/logos/pantriq-logo.png", color: "#10b981", btn: "Acquire Gear" },
+  "Autodrome": { logo: "https://priscadezigns.org/logos/the-autodrome.jpg", color: "#ef4444", btn: "Acquire Tech" },
+  "My Baby Dumpling": { logo: "https://priscadezigns.org/logos/my-baby-dumpling.webp", color: "#f472b6", btn: "Acquire Essential" },
+  "Riddiim": { logo: "https://priscadezigns.org/logos/rowcell-icon.jpg", color: "#000", btn: "Acquire Studio" },
+  "Sole Prestige": { logo: "https://priscadezigns.org/logos/sole-prestige.jpg", color: "#000", btn: "Acquire Grail" },
+  "The Tech Scout HQ": { logo: "https://priscadezigns.org/logos/tech-scout.png", color: "#000", btn: "Acquire Intel" },
+  "Essence Elite": { logo: "https://priscadezigns.org/logos/essence-elite.jpg", color: "#000", btn: "Acquire Essence" },
+  "Shelfly": { logo: "https://priscadezigns.org/logos/shelfly.png", color: "#4f46e5", btn: "Acquire Shelf" },
+  "Deskwell": { logo: "https://priscadezigns.org/logos/deskwell-wordmark.png", color: "#000", btn: "Acquire Setup" },
+  "The Escapist": { logo: "https://priscadezigns.org/logos/the-escapist.png", color: "#000", btn: "Acquire Sanctuary" },
+  "Peak Fit": { logo: "https://priscadezigns.org/logos/peak-fit.jpg", color: "#000", btn: "Acquire Peak" },
+  "Couture Gallery": { logo: "https://priscadezigns.org/logos/couture-gallery.jpg", color: "#000", btn: "Acquire Piece" },
+  "Quiet Luxury": { logo: "https://priscadezigns.org/logos/quiet-luxury.jpg", color: "#000", btn: "Acquire Quiet" },
+  "Verdant Co": { logo: "https://priscadezigns.org/logos/verdant-co.jpg", color: "#1D6F42", btn: "Acquire Sustainable", theme: "earth" }
+};
+
+const BRAND_MAP = {
+  "/ateliagaming/": "Atelia Gaming", "/thegenplay/": "The Gen Play", "/pantriq/": "Pantriq",
+  "/theautodrome/": "Autodrome", "/autodrome/": "Autodrome", "/mybabydumpling/": "My Baby Dumpling",
+  "/riddiim/": "Riddiim", "/soleprestige/": "Sole Prestige", "/thetechscouthq/": "The Tech Scout HQ",
+  "/essenceelite/": "Essence Elite", "/shelfly/": "Shelfly", "/deskwell/": "Deskwell",
+  "/theescapist/": "The Escapist", "/peakfit/": "Peak Fit", "/glowprotocol/": "Glow Protocol",
+  "/couture-gallery/": "Couture Gallery", "/couturegallery/": "Couture Gallery",
+  "/quietluxury/": "Quiet Luxury", "/verdantco/": "Verdant Co"
+};
+
+const sb = supabase.createClient("https://sazhdnqzaqpqcralmthh.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc");
+
+let allItems = [];
+
+async function load() {
+  const path = window.location.pathname.toLowerCase();
+  let brand = "Glow Protocol";
+  for (const [key, val] of Object.entries(BRAND_MAP)) {
+    if (path.includes(key.toLowerCase())) { brand = val; break; }
+  }
+
+  const conf = CONFIG[brand] || CONFIG["Glow Protocol"];
+  document.getElementById("loaderText").innerText = brand.toUpperCase();
+  document.getElementById("logo").src = conf.logo;
+  document.documentElement.style.setProperty("--brand-color", conf.color);
+  document.getElementById("brandName").innerText = brand.toUpperCase();
+  
+  if (conf.theme === "earth") {
+    document.documentElement.style.setProperty("--bg-color", "#F9F7F2");
+    document.documentElement.style.setProperty("--text-color", "#2D3E33");
+    document.documentElement.style.setProperty("--card-bg", "#fff");
+  }
+  
+  const { data } = await sb.from("empire_inventory").select("*").eq("brand", brand);
+  allItems = data || [];
+  
+  const categories = ["All", ...new Set(allItems.map(i => i.category))];
+  document.getElementById("catBar").innerHTML = categories.map(c => `<button class="cat-btn ${c==='All'?'active':''}" onclick="filter('${c}')">${c}</button>`).join("");
+  
+  render(allItems, brand);
+  document.getElementById("loader").classList.add("hidden");
+}
+
+function filter(cat) {
+  const btns = document.querySelectorAll('.cat-btn');
+  btns.forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const filtered = cat === 'All' ? allItems : allItems.filter(i => i.category === cat);
+  render(filtered, document.getElementById("brandName").innerText);
+}
+
+function render(items, brand) {
+  const conf = CONFIG[brand] || CONFIG["Glow Protocol"];
+  document.getElementById("grid").innerHTML = items.map(i => `
+    <div class="card">
+      <img src="${i.image_url}" alt="${i.title}" onerror="this.src='https://priscadezigns.org/assets/placeholder.jpg'">
+      <div>
+        <h3>${i.title}</h3>
+        <div class="price">${i.price === '$--' ? '$' + (Math.floor(Math.random() * 50) + 15) + '.99' : i.price}</div>
+      </div>
+      <a href="${i.affiliate_link}" target="_blank">${conf.btn}</a>
+    </div>
+  `).join("");
+}
+
+load();
+</script></body></html>

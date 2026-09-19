@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'Panyard | Trinidad's Business Directory</title>
+    <link rel="stylesheet" href="../shared/dpanyard.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase.js"></script>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">D'PANYARD</a>
+        <nav>
+            <a href="../browse/directory.html">Browse</a>
+            <a href="../business/register.html" class="btn btn-primary">List Your Business</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Connect with Every Corner of the Yard</h1>
+                <p>From plumbers to parlours, find exactly what you need in Trinidad & Tobago.</p>
+                <div class="search-box">
+                    <input type="text" id="search-query" placeholder="What are you looking for? (e.g. Mechanic)">
+                    <select id="search-district">
+                        <option value="">All Districts</option>
+                        <option value="Port of Spain">Port of Spain</option>
+                        <option value="San Fernando">San Fernando</option>
+                        <option value="Chaguanas">Chaguanas</option>
+                        <option value="Arima">Arima</option>
+                        <option value="Point Fortin">Point Fortin</option>
+                    </select>
+                    <button class="btn btn-navy" onclick="handleSearch()">Search The Yard</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="container">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Browse by Category</h2>
+            <div class="category-grid" id="category-grid">
+                <!-- Categories will be injected here -->
+            </div>
+        </section>
+
+        <section class="container">
+            <h2 style="margin-bottom: 2rem;">Featured in The Yard</h2>
+            <div class="yard-grid" id="featured-grid">
+                <!-- Featured businesses will be injected here -->
+            </div>
+        </section>
+    </main>
+
+    <footer style="background: var(--deep-navy); color: white; padding: 3rem 2rem; margin-top: 4rem; text-align: center;">
+        <p>&copy; 2026 D'Panyard. Built for Trinidad & Tobago.</p>
+    </footer>
+
+    <script>
+        const categories = [
+            "Mechanic", "Plumber", "Electrician", "Catering", "Bakery", 
+            "Seamstress", "Cleaning Services", "Florist", "IT Services", "Taxi"
+        ];
+
+        function handleSearch() {
+            const query = document.getElementById('search-query').value;
+            const district = document.getElementById('search-district').value;
+            window.location.href = `../browse/directory.html?query=${encodeURIComponent(query)}&district=${encodeURIComponent(district)}`;
+        }
+
+        async function init() {
+            // Inject Categories
+            const catGrid = document.getElementById('category-grid');
+            categories.forEach(cat => {
+                const a = document.createElement('a');
+                a.href = `../browse/directory.html?category=${encodeURIComponent(cat)}`;
+                a.className = 'category-item';
+                a.textContent = cat;
+                catGrid.appendChild(a);
+            });
+
+            // Load Featured
+            const featuredGrid = document.getElementById('featured-grid');
+            try {
+                const businesses = await window.dpapi.searchBusinesses();
+                const featured = businesses.slice(0, 4);
+                featured.forEach(biz => {
+                    featuredGrid.innerHTML += `
+                        <div class="business-card">
+                            <div class="card-content">
+                                <span class="badge badge-category">${biz.category}</span>
+                                ${biz.is_verified ? '<span class="badge badge-verified">Verified</span>' : ''}
+                                <h3>${biz.name}</h3>
+                                <p style="color: #666; font-size: 0.9rem;">${biz.district}</p>
+                                <div class="stars">★★★★★ ${biz.rating}</div>
+                                <p>${biz.description}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="../business/profile.html?id=${biz.id}" class="btn btn-navy">View Profile</a>
+                                <a href="https://wa.me/${biz.whatsapp}" class="btn btn-whatsapp">WhatsApp</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Shop | AXORIA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #FFFFFF; --text: #111111; --muted: #777777; --gold: #D4AF37; --border: rgba(0,0,0,0.06); --btn-text: #FFFFFF; --header-bg: #FFFFFF; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
+        header { padding: 25px 6%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: var(--header-bg); position: sticky; top: 0; z-index: 100; }
+        .logo img { height: 50px; width: auto; object-fit: contain; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { text-decoration: none; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text); transition: 0.3s; }
+        nav a:hover { color: var(--gold); }
+        .hero { padding: 80px 6% 40px; text-align: center; max-width: 900px; margin: 0 auto; }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 15px; }
+        .hero p { color: var(--muted); font-size: 1.1rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; padding: 40px 6%; }
+        .card { border: 1px solid var(--border); padding: 20px; transition: 0.4s; background: var(--header-bg); display: flex; flex-direction: column; }
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .p-img { aspect-ratio: 1/1; margin-bottom: 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; }
+        .p-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .p-info h3 { font-family: 'Playfair Display', serif; font-size: 0.9rem; margin-bottom: 10px; color: var(--text); }
+        .p-info .price { color: var(--gold); font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 20px; }
+        .btn { display: inline-block; background: var(--gold); color: var(--btn-text); padding: 12px 20px; text-decoration: none; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; border-radius: 2px; transition: 0.3s; text-align: center; width: 100%; }
+        .btn:hover { opacity: 0.9; }
+        footer { padding: 60px 6%; text-align: center; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); letter-spacing: 2px; background: var(--header-bg); }
+        footer img { height: 40px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><a href="index.html"><img src="/logos/AXORIA_LOGO.png" alt="axoriaframes"></a></div>
+        <nav><ul><li><a href="index.html">Home</a></li><li><a href="shop.html" style="color: var(--gold);">Shop</a></li><li><a href="blog.html">Blog</a></li></ul></nav>
+    </header>
+    <section class="hero">
+        <h1>Elite Precision Collection</h1>
+        <p>Curated excellence for the modern visionary. High-fidelity craftsmanship anchored in heritage.</p>
+    </section>
+    <div class="grid" id="g"></div>
+    <script>
+        const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        async function load() {
+            try {
+                const { data, error } = await sb.from('axoriaframes_products').select('*');
+                if (error) throw error;
+                const g = document.getElementById('g');
+                data.forEach(p => {
+                    g.innerHTML += `
+                        <div class='card'>
+                            <div class='p-img'><img src='${p.image}' loading="lazy"></div>
+                            <div class='p-info'>
+                                <h3>${p.name}</h3>
+                                <span class='price'>${p.price}</span>
+                                <a href='${p.link}' target='_blank' class='btn'>Buy on Amazon</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) { console.error(err); }
+        }
+        load();
+    </script>
+    <footer>
+        <img src='/logos/AXORIA_LOGO.png'><br>
+        © 2026 AXORIA · AUTHENTIC QUALITY
+    </footer>
+</body>
+</html>

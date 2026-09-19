@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #050508; display: flex; align-items: center; justify-content: center; min-height: 100vh; gap: 60px; flex-wrap: wrap; padding: 60px; }
+.wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.label { font-family: sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #4B5563; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="320" height="320">
+  <rect width="400" height="400" fill="#0A0A0F" rx="80"/>
+
+  <!--
+    CONCEPT: Vinyl record where the groove lines form an R.
+    The record has concentric circular arcs (grooves).
+    On the LEFT side of the record, the grooves are normal arcs.
+    On the RIGHT side, the grooves deviate — they collectively
+    trace the shape of the letter R:
+      - The vertical stem of R = grooves stack closely on left
+      - The bowl of R = grooves arc outward in a bump on upper right
+      - The leg of R = grooves break and flow diagonally down-right
+
+    Center hole of vinyl = the dot/center of the R concept
+  -->
+
+  <!-- 
+    Build groove lines as paths.
+    Each groove = one continuous path that starts on left as a near-circle,
+    but on the right side bends to trace part of the R.
+
+    R shape reference (centered around 200,200, height ~160px, width ~100px):
+    - Stem: x=150, y=120 to y=280
+    - Bowl top: (150,120) curves right to (220,120) arcs down to (220,190) back to (150,190)
+    - Leg: from ~(185,190) diagonal down-right to (240,270) with slight outward flow
+  -->
+
+  <!-- OUTER RING decoration -->
+  <circle cx="200" cy="200" r="175" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+
+  <!-- 
+    GROOVE LINES — 12 grooves, each a path
+    Left half: normal arc
+    Right half: deviates to trace R outline
+    
+    The R lives in the right half of the record.
+    Grooves trace from bottom-left, around left arc, then on right side
+    they collectively outline the R shape.
+    
+    Groove spacing: ~11px apart, from r=60 to r=160
+  -->
+
+  <!-- 
+    Strategy: Each groove line is a full circle EXCEPT on the right side
+    where it breaks to follow the R contour at that vertical position.
+    
+    y positions mapped to R anatomy:
+    y=120-130: top of R (top of stem + top of bowl)
+    y=130-190: bowl curves right
+    y=190-200: bowl bottom / junction
+    y=200-270: leg flows diagonally right-down
+    y=270-280: base of stem
+  -->
+
+  <g fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.9">
+
+    <!-- 
+      Groove 1 — outermost r≈160
+      At this radius the R outline is at the very edges.
+      Top: y≈120 → x_right ≈ 200+√(160²-(200-120)²) = 200+√(25600-6400)=200+√19200≈338 — too wide
+      Let's scale R to fit within r=155 max.
+      
+      R dimensions: stem at x=170, bowl right edge at x=240, leg goes to x=255, y=265
+      Let's define R keypoints:
+      Stem left: x=168
+      Stem right / bowl left: x=178  
+      Bowl right: x=242
+      Bowl top: y=128
+      Bowl bottom: y=198
+      Leg end: x=256, y=268
+    -->
+
+    <!-- 
+      For each groove at radius r, going clockwise from bottom:
+      Left side: normal arc
+      Right side: follows R contour at matching y
+      
+      I'll draw each groove as two arcs joined:
+      - Left arc: from bottom-left around to the y-level of R on the right
+      - Right segment: follows R outline at that height
+      
+      Let me simplify: draw grooves as full circles but with the RIGHT portion
+      replaced by the R contour segments.
+    -->
+
+    <!-- Groove set — I'll draw them as individual paths -->
+    <!-- Each groove hugs the R shape on its right side -->
+
+    <!-- GROOVE 1 - r=65, center zone, forms center hole area -->
+    <circle cx="200" cy="200" r="18" fill="#0A0A0F" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+    <circle cx="200" cy="200" r="10" fill="#0A0A0F" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+    <circle cx="200" cy="200" r="4" fill="white" opacity="0.6"/>
+
+    <!-- 
+      Now the actual R-forming grooves.
+      I'll trace the R as the RIGHT edge of groove paths.
+      
+      The R (in record space, centered 200,200):
+      Stem: vertical line at x=172, from y=130 to y=272
+      Bowl outer right: arc from (172,130) → peak right at (238,168) → back (172,198)  
+      Leg: diagonal from ~(200,198) curving to (248,265) then slight tail curl
+      
+      Each "groove" is actually a concentric arc on the left,
+      that on the right side follows a line parallel to the R outline.
+    -->
+
+    <!-- I'll draw the R outline in groove-width parallel lines -->
+    <!-- 
+      STEM grooves: vertical parallel lines, spacing 8px
+      From x=163 to x=181 (stem width), y=130 to y=272
+      But curved as arcs on the left/bottom
+    -->
+
+    <!-- Left-side normal groove arcs (these look like a normal record) -->
+    <!-- Using large arc flags to draw the left semicircle portions -->
+
+    <!-- r=75 -->
+    <path d="M 200 275 A 75 75 0 1 1 200 125" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+    <!-- right side at r=75: connects from y=125 down the stem to y=275 -->
+    <!-- stem segment -->
+    <line x1="200" y1="125" x2="200" y2="275" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+
+    <!-- r=88 — bowl starts to appear -->
+    <path d="M 200 288 A 88 88 0 1 1 200 112" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>
+    <!-- right side traces outer stem edge at x=200, then at bowl level arcs right -->
+    <path d="M 200 112 L 200 148 Q 248 162 200 198 L 200 288" stroke="rgba(255,255,255,0.55)" stroke-width="2"/>
+
+    <!-- r=100 -->
+    <path d="M 200 300 A 100 100 0 1 1 200 100" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+    <path d="M 200 100 L 200 142 Q 260 162 200 200 L 210 215 Q 242 248 256 272 L 200 300" stroke="rgba(255,255,255,0.6)" stroke-width="2"/>
+
+    <!-- r=112 -->
+    <path d="M 193 311 A 112 112 0 1 1 207 88" stroke="rgba(255,255,255,0.65)" stroke-width="2.2"/>
+    <path d="M 207 88 L 207 136 Q 268 158 207 200 L 218 218 Q 252 252 264 275 L 193 311" stroke="rgba(255,255,255,0.65)" stroke-width="2.2"/>
+
+    <!-- r=124 -->
+    <path d="M 184 322 A 124 124 0 1 1 216 78" stroke="rgba(255,255,255,0.7)" stroke-width="2.2"/>
+    <path d="M 216 78 L 216 130 Q 276 155 216 202 L 228 222 Q 264 258 272 278 L 184 322" stroke="rgba(255,255,255,0.7)" stroke-width="2.2"/>
+
+    <!-- r=136 -->
+    <path d="M 174 333 A 136 136 0 1 1 226 67" stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
+    <path d="M 226 67 L 226 124 Q 284 150 224 204 L 238 226 Q 274 264 280 282 L 174 333" stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
+
+    <!-- r=148 — outermost groove, R most visible -->
+    <path d="M 163 342 A 148 148 0 1 1 237 55" stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+    <path d="M 237 55 L 236 118 Q 292 146 232 206 L 248 230 Q 284 270 288 286 L 163 342" stroke="rgba(255,255,255,0.85)" stroke-width="2.5"/>
+
+  </g>
+
+  <!-- Outer edge ring -->
+  <circle cx="200" cy="200" r="170" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+
+</svg>
+<div class="label">Riddim — grooves form the R</div>
+</div>
+
+<!-- CLEANER VERSION - SVG R drawn as groove lines more explicitly -->
+<div class="wrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="320" height="320">
+  <rect width="400" height="400" fill="#0A0A0F" rx="80"/>
+
+  <defs>
+    <!-- Clip to circle -->
+    <clipPath id="recordClip">
+      <circle cx="200" cy="200" r="168"/>
+    </clipPath>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="200" cy="200" r="170" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+  <circle cx="200" cy="200" r="168" fill="#0A0A0F"/>
+
+  <!-- Groove lines clipped to circle -->
+  <g clip-path="url(#recordClip)" fill="none" stroke-linecap="round">
+
+    <!-- 
+      R shape grooves — each line is one groove that
+      on the LEFT half curves normally as a record groove,
+      but on the RIGHT half follows the R letterform.
+      
+      The R letterform (right half of record):
+      Stem right edge: x=215, y=118→278
+      Bowl: arc peak x=258, apex y=168, returns at y=208
+      Leg: from x=215,y=208 diagonal to x=268,y=272, with outward curve
+    -->
+
+    <!-- I'll draw the R as a series of parallel offset contours -->
+    <!-- Each contour = one vinyl groove -->
+
+    <!-- Groove lines forming the R — 9 grooves, each offset inward by ~10px from previous -->
+
+    <!-- Groove 1 (outermost R trace, r≈155 area) -->
+    <path d="M 45 200 A 155 155 0 0 1 200 45
+             L 222 45 L 222 118
+             Q 290 140 278 175 Q 268 208 222 210
+             L 236 228 Q 272 262 278 278
+             L 222 318 A 155 155 0 0 1 45 200 Z"
+      stroke="rgba(255,255,255,0.8)" stroke-width="2" fill="none"/>
+
+    <!-- Groove 2 -->
+    <path d="M 55 200 A 145 145 0 0 1 200 55
+             L 214 56 L 214 124
+             Q 278 146 266 178 Q 256 206 214 208
+             L 228 226 Q 263 260 268 274
+             L 213 309 A 145 145 0 0 1 55 200 Z"
+      stroke="rgba(255,255,255,0.75)" stroke-width="2" fill="none"/>
+
+    <!-- Groove 3 -->
+    <path d="M 67 200 A 133 133 0 0 1 200 67
+             L 208 68 L 208 130
+             Q 265 152 254 180 Q 244 204 208 206
+             L 220 224 Q 254 256 258 270
+             L 207 300 A 133 133 0 0 1 67 200 Z"
+      stroke="rgba(255,255,255,0.72)" stroke-width="2" fill="none"/>
+
+    <!-- Groove 4 -->
+    <path d="M 80 200 A 120 120 0 0 1 200 80
+             L 202 81 L 202 136
+             Q 252 158 242 182 Q 232 202 202 204
+             L 212 222 Q 244 252 248 266
+             L 200 291 A 120 120 0 0 1 80 200 Z"
+      stroke="rgba(255,255,255,0.68)" stroke-width="2" fill="none"/>
+
+    <!-- Groove 5 -->
+    <path d="M 94 200 A 106 106 0 0 1 200 94
+             L 196 96 L 196 140
+             Q 238 162 229 184 Q 220 200 196 202
+             L 204 220 Q 233 248 237 262
+             L 192 281 A 106 106 0 0 1 94 200 Z"
+      stroke="rgba(255,255,255,0.62)" stroke-width="2" fill="none"/>
+
+    <!-- Groove 6 — inner, R still visible but tighter -->
+    <path d="M 108 200 A 92 92 0 0 1 200 108
+             L 190 110 L 190 144
+             Q 222 164 216 184 Q 210 198 190 200
+             L 196 216 Q 220 242 224 256
+             L 184 270 A 92 92 0 0 1 108 200 Z"
+      stroke="rgba(255,255,255,0.55)" stroke-width="2" fill="none"/>
+
+    <!-- Groove 7 — getting close to center -->
+    <path d="M 122 200 A 78 78 0 0 1 200 122
+             L 184 124 L 184 148
+             Q 206 165 202 184 Q 198 196 184 198
+             L 188 212 Q 207 234 210 248
+             L 176 258 A 78 78 0 0 1 122 200 Z"
+      stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>
+
+    <!-- Groove 8 -->
+    <path d="M 136 200 A 64 64 0 0 1 200 136
+             L 178 138 L 178 152
+             Q 190 164 188 182 Q 186 192 178 194
+             L 180 206 Q 194 224 196 238
+             L 168 248 A 64 64 0 0 1 136 200 Z"
+      stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none"/>
+
+  </g>
+
+  <!-- Center hole -->
+  <circle cx="200" cy="200" r="20" fill="#0A0A0F" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  <circle cx="200" cy="200" r="5" fill="rgba(255,255,255,0.4)"/>
+
+  <!-- Outer ring -->
+  <circle cx="200" cy="200" r="170" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+
+</svg>
+<div class="label">Riddim — grooves are the R (v2)</div>
+</div>
+
+</body>
+</html>

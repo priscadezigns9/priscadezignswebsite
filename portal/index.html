@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PORTAL.EXE — Enter the Digital Dream</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--green:#00ff41;--amber:#ffb700;--cyan:#00f5ff;--pink:#ff2d78;--purple:#9d00ff}
+body{background:#000;color:#fff;font-family:'Courier New',monospace;overflow-x:hidden}
+
+#loading{position:fixed;inset:0;background:#000;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity 1.2s}
+#loading.hide{opacity:0;pointer-events:none}
+.load-ascii{color:var(--green);font-size:0.42rem;letter-spacing:1px;line-height:1.3;margin-bottom:24px;white-space:pre}
+.load-txt{color:var(--green);font-size:0.85rem;letter-spacing:3px;text-transform:uppercase}
+.load-bar{width:260px;height:1px;background:#0a0a0a;margin-top:14px;overflow:hidden;border:none}
+.load-fill{height:100%;background:var(--green);width:0;transition:width 3.5s ease-out}
+#load-status{color:rgba(0,255,65,0.3);font-size:0.5rem;letter-spacing:2px;margin-top:10px;text-transform:uppercase}
+
+#c{display:block;position:fixed;inset:0;z-index:0}
+#scroll-driver{position:relative;z-index:1;height:700vh;pointer-events:none}
+
+#scanlines{position:fixed;inset:0;z-index:5;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.05) 3px,rgba(0,0,0,0.05) 4px)}
+#vignette{position:fixed;inset:0;z-index:4;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.9) 100%)}
+
+/* HUD */
+#hud{position:fixed;inset:0;z-index:10;pointer-events:none}
+.hud-c{position:absolute;font-size:0.5rem;letter-spacing:1.5px;color:rgba(0,255,65,0.3);text-transform:uppercase;line-height:2}
+.hud-tl{top:20px;left:22px}.hud-tr{top:20px;right:22px;text-align:right}
+.hud-bl{bottom:20px;left:22px}.hud-br{bottom:20px;right:22px;text-align:right}
+.hud-line{position:absolute;background:rgba(0,255,65,0.07)}
+.hud-line.h{height:1px;left:0;right:0}.hud-line.v{width:1px;top:0;bottom:0}
+.hud-line.top{top:48px}.hud-line.bot{bottom:48px}
+.hud-line.lft{left:58px}.hud-line.rgt{right:58px}
+
+/* Scene labels */
+.slabel{position:fixed;z-index:20;opacity:0;transition:opacity 0.7s ease;pointer-events:none;left:50%;transform:translateX(-50%)}
+.slabel.on{opacity:1}
+#l0{bottom:100px;text-align:center}
+#l1,#l2,#l3,#l4{top:50%;transform:translate(-50%,-50%);text-align:center}
+.slabel h2{font-size:clamp(2rem,6vw,5rem);letter-spacing:5px;text-transform:uppercase;font-weight:900;line-height:1}
+.slabel p{font-size:0.6rem;letter-spacing:3px;margin-top:14px;opacity:0.45;text-transform:uppercase}
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;display:inline-block}
+.glitch::before{color:var(--cyan);clip-path:polygon(0 0,100% 0,100% 33%,0 33%);animation:g1 4s infinite}
+.glitch::after{color:var(--pink);clip-path:polygon(0 67%,100% 67%,100% 100%,0 100%);animation:g2 4s infinite}
+@keyframes g1{0%,87%,100%{transform:translate(0)}88%{transform:translate(-6px)}90%{transform:translate(5px)}92%{transform:translate(-3px)}}
+@keyframes g2{0%,87%,100%{transform:translate(0)}88%{transform:translate(6px)}90%{transform:translate(-5px)}92%{transform:translate(3px)}}
+
+/* Scroll hint */
+#shint{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:30;text-align:center;transition:opacity 1s}
+#shint.hide{opacity:0;pointer-events:none}
+.sa{width:18px;height:18px;border-right:1.5px solid var(--green);border-bottom:1.5px solid var(--green);transform:rotate(45deg);margin:0 auto;animation:ab 1.5s infinite}
+.st{font-size:0.55rem;letter-spacing:3px;color:var(--green);margin-bottom:8px}
+@keyframes ab{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(7px)}}
+
+/* Enter button */
+#ebtn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:30;opacity:0;transition:opacity 0.7s;pointer-events:none}
+#ebtn.on{opacity:1;pointer-events:all}
+#ebtn button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-family:'Courier New',monospace;font-size:0.68rem;letter-spacing:4px;padding:14px 44px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+#ebtn button::before{content:'';position:absolute;inset:0;background:var(--cyan);transform:scaleX(0);transform-origin:left;transition:transform 0.3s;z-index:-1}
+#ebtn button:hover{color:#000}
+#ebtn button:hover::before{transform:scaleX(1)}
+
+/* Cursor spark */
+.spark{position:fixed;pointer-events:none;z-index:100;border-radius:50%;animation:sf 0.7s forwards}
+@keyframes sf{0%{opacity:1;transform:scale(1) translate(0,0)}100%{opacity:0;transform:scale(0) translate(var(--dx),var(--dy))}}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="load-ascii">
+ ██████╗  ██████╗ ██████╗ ████████╗ █████╗ ██╗      
+ ██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔══██╗██║      
+ ██████╔╝██║   ██║██████╔╝   ██║   ███████║██║      
+ ██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══██║██║      
+ ██║     ╚██████╔╝██║  ██║   ██║   ██║  ██║███████╗ 
+ ╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
+  </div>
+  <div class="load-txt">INITIALIZING PORTAL.EXE</div>
+  <div class="load-bar"><div class="load-fill" id="lfill"></div></div>
+  <div id="load-status">LOADING ASSETS...</div>
+</div>
+
+<canvas id="c"></canvas>
+<div id="scanlines"></div>
+<div id="vignette"></div>
+
+<div id="hud">
+  <div class="hud-c hud-tl">PORTAL.EXE v3.0<br><span id="htime"></span></div>
+  <div class="hud-c hud-tr">DEPTH: <span id="hdepth">00.00</span>%<br>REALITY: <span id="hreal">STABLE</span></div>
+  <div class="hud-c hud-bl">PRISCA DEZIGNS<br>CREATIVE SYSTEMS · TT</div>
+  <div class="hud-c hud-br">SIGNAL: ████████░░<br>UPLINK: ACTIVE</div>
+  <div class="hud-line h top"></div><div class="hud-line h bot"></div>
+  <div class="hud-line v lft"></div><div class="hud-line v rgt"></div>
+</div>
+
+<div class="slabel" id="l0">
+  <div class="glitch" data-text="PORTAL.EXE" style="color:var(--green);font-size:clamp(3rem,10vw,8rem);letter-spacing:6px;font-weight:900">PORTAL.EXE</div>
+  <p style="color:var(--green)">Scroll to enter the machine</p>
+</div>
+<div class="slabel" id="l1"><h2 class="glitch" data-text="JACK IN" style="color:var(--cyan)">JACK IN</h2><p style="color:var(--cyan)">The monitor awakens</p></div>
+<div class="slabel" id="l2"><h2 class="glitch" data-text="THE GRID" style="color:var(--amber)">THE GRID</h2><p style="color:var(--amber)">1000 miles of nothing. Beautiful.</p></div>
+<div class="slabel" id="l3"><h2 class="glitch" data-text="DEEP SPACE" style="color:var(--pink)">DEEP SPACE</h2><p style="color:var(--pink)">You weren't supposed to get this far</p></div>
+<div class="slabel" id="l4"><h2 class="glitch" data-text="YOU MADE IT" style="color:var(--purple)">YOU MADE IT</h2><p style="color:var(--purple)">Most people turn back at the keyboard</p></div>
+
+<div id="scroll-driver"></div>
+<div id="shint"><div class="st">Scroll to enter</div><div class="sa"></div></div>
+<div id="ebtn"><button onclick="location.href='https://priscadezigns.org'">ENTER THE STUDIO</button></div>
+
+<!-- Three.js r128 + GLTFLoader + DRACOLoader + GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── Loading sequence ─────────────────────────────────────────────────────────
+const msgs=['LOADING ASSETS...','CALIBRATING DEPTH...','WARMING UP CRT...','INJECTING NOSTALGIA...','REALITY CHECK... FAILED.','PROCEEDING ANYWAY.'];
+let mi=0;
+const lStatus=document.getElementById('load-status');
+document.getElementById('lfill').style.width='100%';
+const lInt=setInterval(()=>{ mi++; if(mi<msgs.length) lStatus.textContent=msgs[mi]; else { clearInterval(lInt); } },500);
+
+// ─── Globals ──────────────────────────────────────────────────────────────────
+let renderer, scene, camera, clock;
+let computer, screenMesh, screenCtx, screenCanvas, screenTex;
+let deskGroup, deskLight, screenLight;
+let stars, scene3, scene4;
+let floaters=[];
+const S={p:0};
+
+window.addEventListener('load', initThree);
+
+function initThree() {
+  clock = new THREE.Clock();
+
+  renderer = new THREE.WebGLRenderer({ canvas:document.getElementById('c'), antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.physicallyCorrectLights = true;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.4;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.setClearColor(0x000000);
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x000000, 25, 80);
+
+  camera = new THREE.PerspectiveCamera(52, window.innerWidth/window.innerHeight, 0.01, 600);
+  camera.position.set(0, 2, 10);
+  camera.lookAt(0, 0.5, 0);
+
+  buildLights();
+  buildDesk();
+  buildScreen();
+  loadComputer();   // async — loads real GLB
+  buildStars();
+  buildGridWorld();
+  buildWarpTunnel();
+  buildFloaters();
+  setupHUD();
+  setupCursor();
+  window.addEventListener('resize', onResize);
+  requestAnimationFrame(animate);
+}
+
+// ─── Lights ───────────────────────────────────────────────────────────────────
+function buildLights() {
+  scene.add(new THREE.AmbientLight(0x050810, 1));
+
+  // Key — cool blue-white, casts shadows
+  const key = new THREE.DirectionalLight(0x99bbff, 2);
+  key.position.set(-5, 8, 5);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.left = -10; key.shadow.camera.right = 10;
+  key.shadow.camera.top = 10; key.shadow.camera.bottom = -6;
+  key.shadow.camera.far = 30; key.shadow.bias = -0.0005;
+  scene.add(key);
+
+  // Rim — green from behind
+  const rim = new THREE.DirectionalLight(0x00ff88, 0.5);
+  rim.position.set(4, 3, -8);
+  scene.add(rim);
+
+  // Screen emission point
+  screenLight = new THREE.PointLight(0x00ff41, 5, 8);
+  screenLight.position.set(0, 1.5, 2);
+  scene.add(screenLight);
+
+  // Desk fill — warm underlight
+  deskLight = new THREE.PointLight(0x331800, 0.6, 6);
+  deskLight.position.set(0, -1.5, 2);
+  scene.add(deskLight);
+
+  // Subtle right fill
+  scene.add(Object.assign(new THREE.DirectionalLight(0x0a1520, 0.5), { position: new THREE.Vector3(6, 2, 3) }));
+}
+
+// ─── Desk ─────────────────────────────────────────────────────────────────────
+function buildDesk() {
+  deskGroup = new THREE.Group();
+
+  // Desk top — dark wood procedural texture
+  const dc = document.createElement('canvas'); dc.width=1024; dc.height=256;
+  const x = dc.getContext('2d');
+  const g = x.createLinearGradient(0,0,1024,0);
+  g.addColorStop(0,'#161008'); g.addColorStop(.4,'#1e140a'); g.addColorStop(.7,'#181008'); g.addColorStop(1,'#120c06');
+  x.fillStyle=g; x.fillRect(0,0,1024,256);
+  for(let i=0;i<80;i++){
+    x.strokeStyle=`rgba(${70+~~(Math.random()*50)},${40+~~(Math.random()*20)},${8+~~(Math.random()*8)},${.2+Math.random()*.3})`;
+    x.lineWidth=.4+Math.random()*.8;
+    x.beginPath(); let px=Math.random()*1024; x.moveTo(px,0);
+    for(let y=0;y<256;y+=6){ px+=(Math.random()-.5)*5; x.lineTo(px,y); }
+    x.stroke();
+  }
+  // Subtle sheen
+  const sg=x.createLinearGradient(0,0,0,256);
+  sg.addColorStop(0,'rgba(255,255,255,0.04)'); sg.addColorStop(.5,'rgba(255,255,255,0.0)'); sg.addColorStop(1,'rgba(0,0,0,0.1)');
+  x.fillStyle=sg; x.fillRect(0,0,1024,256);
+  const dt=new THREE.CanvasTexture(dc); dt.wrapS=dt.wrapT=THREE.RepeatWrapping; dt.repeat.set(5,1);
+
+  const top = new THREE.Mesh(
+    new THREE.BoxGeometry(22, 0.07, 9),
+    new THREE.MeshStandardMaterial({ map:dt, roughness:0.3, metalness:0.02, envMapIntensity:0.4 })
+  );
+  top.position.set(0,-2.1,0.5); top.receiveShadow=true;
+  deskGroup.add(top);
+
+  // Front edge bevel
+  const bevel = new THREE.Mesh(
+    new THREE.BoxGeometry(22,0.09,0.08),
+    new THREE.MeshStandardMaterial({ color:0x2a1c0c, roughness:0.2 })
+  );
+  bevel.position.set(0,-2.07,5.03); deskGroup.add(bevel);
+
+  // Screen glow on desk (additive green pool)
+  const gp = new THREE.Mesh(
+    new THREE.PlaneGeometry(5, 2.5),
+    new THREE.MeshBasicMaterial({ color:0x00ff41, transparent:true, opacity:0.05, blending:THREE.AdditiveBlending, depthWrite:false })
+  );
+  gp.rotation.x=-Math.PI/2; gp.position.set(0,-2.07,1.5); deskGroup.add(gp);
+
+  // Desk legs
+  const legMat=new THREE.MeshStandardMaterial({color:0x080808,roughness:.8,metalness:.6});
+  [[-8,3.5],[8,3.5],[-8,-2.5],[8,-2.5]].forEach(([lx,lz])=>{
+    const leg=new THREE.Mesh(new THREE.BoxGeometry(.12,2.2,.12),legMat);
+    leg.position.set(lx,-3.2,lz); deskGroup.add(leg);
+  });
+
+  scene.add(deskGroup);
+}
+
+// ─── Live screen canvas ───────────────────────────────────────────────────────
+function buildScreen() {
+  screenCanvas=document.createElement('canvas'); screenCanvas.width=640; screenCanvas.height=480;
+  screenCtx=screenCanvas.getContext('2d');
+  screenTex=new THREE.CanvasTexture(screenCanvas);
+  drawScreen(0);
+}
+
+function drawScreen(t) {
+  const w=screenCanvas.width, h=screenCanvas.height;
+  const c=screenCtx;
+  // Deep phosphor black
+  c.fillStyle='#010802'; c.fillRect(0,0,w,h);
+  // Scanlines
+  for(let y=0;y<h;y+=3){ c.fillStyle='rgba(0,0,0,0.2)'; c.fillRect(0,y,w,1); }
+  // Vignette
+  const sv=c.createRadialGradient(w/2,h/2,80,w/2,h/2,320);
+  sv.addColorStop(0,'transparent'); sv.addColorStop(1,'rgba(0,0,0,0.6)');
+  c.fillStyle=sv; c.fillRect(0,0,w,h);
+  // Phosphor lines
+  c.font='bold 15px Courier New'; c.fillStyle='#00e836';
+  c.fillText('C:\\> PORTAL.EXE',28,44);
+  c.font='12px Courier New'; c.fillStyle='#00be2a';
+  const lines=[
+    'PRISCA DEZIGNS CREATIVE OS v3.0',
+    'COPYRIGHT 1987\u20132026 \xb7 ALL DIMENSIONS',
+    '',
+    'MEMORY: 640K CONVENTIONAL',
+    'EXTENDED: UNDEFINED (TOO MUCH)',
+    '',
+    'LOADING IMAGINATION.DLL ......... OK',
+    'LOADING NOSTALGIA.SYS ........... OK',
+    'LOADING REALITY.EXE ............. FAILED',
+    'PROCEEDING ANYWAY.',
+    '',
+    'WARNING: ENTERING THIS SYSTEM',
+    'MAY ALTER YOUR PERCEPTION OF',
+    'WHAT IS POSSIBLE ON THE WEB.',
+    '',
+    'ARE YOU SURE? [Y/N]',
+    t%1.2<0.6?'C:\\> _':'C:\\> ',
+  ];
+  lines.forEach((l,i)=>{ if(Math.random()<.02) c.fillStyle=`rgba(0,230,54,${.5+Math.random()*.5})`; else c.fillStyle='#00be2a'; const jx=Math.random()<.025?(Math.random()-.5)*3:0; c.fillText(l,28+jx,76+i*22); });
+  // Occasional glitch line
+  if(Math.random()<.05){ c.fillStyle=`rgba(0,255,65,${Math.random()*.2})`; c.fillRect(0,Math.random()*h,w,1+Math.random()*3); }
+  // Phosphor bloom glow
+  const pb=c.createRadialGradient(w/2,h/2,60,w/2,h/2,300);
+  pb.addColorStop(0,'rgba(0,255,65,0.04)'); pb.addColorStop(1,'transparent');
+  c.fillStyle=pb; c.fillRect(0,0,w,h);
+}
+
+// ─── Load real 3D computer model (GLTF) ──────────────────────────────────────
+function loadComputer() {
+  const loader = new THREE.GLTFLoader();
+  loader.load(
+    'https://static.poly.pizza/4fd289d6-e578-4466-863c-8f6f3a5e6a9d.glb',
+    (gltf) => {
+      computer = gltf.scene;
+
+      // Center + scale
+      const box = new THREE.Box3().setFromObject(computer);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 5.5 / maxDim;
+      computer.scale.setScalar(scale);
+      computer.position.sub(center.multiplyScalar(scale));
+      computer.position.y += 0.05;
+
+      // PBR upgrade — remap all materials to proper PBR
+      computer.traverse(node => {
+        if(!node.isMesh) return;
+        node.castShadow = true;
+        node.receiveShadow = true;
+
+        const name = (node.name || '').toLowerCase();
+
+        if(name.includes('monitor') || name.includes('system') || name.includes('drive')) {
+          // Aged cream/beige CRT plastic
+          node.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0xc8c0aa),
+            roughness: 0.78,
+            metalness: 0.0,
+            envMapIntensity: 0.25
+          });
+        } else if(name.includes('keyboard')) {
+          node.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0xbbb4a0),
+            roughness: 0.82,
+            metalness: 0.0,
+            envMapIntensity: 0.2
+          });
+        } else if(name.includes('mouse')) {
+          node.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0xccc4ae),
+            roughness: 0.65,
+            metalness: 0.0,
+            envMapIntensity: 0.35
+          });
+        } else {
+          // Default — slightly darker plastic
+          node.material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(0xb0a890),
+            roughness: 0.80,
+            metalness: 0.0
+          });
+        }
+      });
+
+      // Attach live screen texture to the monitor mesh face
+      computer.traverse(node => {
+        if(!node.isMesh) return;
+        if((node.name||'').toLowerCase().includes('monitor')) {
+          // Add a screen plane in front of the monitor face
+          const monBox = new THREE.Box3().setFromObject(node);
+          const monSize = monBox.getSize(new THREE.Vector3());
+          const monCenter = monBox.getCenter(new THREE.Vector3());
+
+          const screenPlane = new THREE.Mesh(
+            new THREE.PlaneGeometry(monSize.x * 0.62, monSize.y * 0.55),
+            new THREE.MeshStandardMaterial({
+              map: screenTex,
+              emissiveMap: screenTex,
+              emissive: new THREE.Color(0xffffff),
+              emissiveIntensity: 1.0,
+              roughness: 0,
+              metalness: 0
+            })
+          );
+          screenMesh = screenPlane;
+          screenPlane.position.set(monCenter.x, monCenter.y * 1.05, monBox.max.z + 0.02);
+          computer.add(screenPlane);
+
+          // Glass reflection overlay
+          const glass = new THREE.Mesh(
+            new THREE.PlaneGeometry(monSize.x * 0.63, monSize.y * 0.56),
+            new THREE.MeshStandardMaterial({
+              color: 0x000000, roughness: 0.0, metalness: 0.1,
+              transparent: true, opacity: 0.18, envMapIntensity: 2
+            })
+          );
+          glass.position.set(monCenter.x, monCenter.y * 1.05, monBox.max.z + 0.025);
+          computer.add(glass);
+
+          // Screen glow point
+          const sg = new THREE.PointLight(0x00ff41, 3, 5);
+          sg.position.set(monCenter.x, monCenter.y * 1.05, monBox.max.z + 0.5);
+          computer.add(sg);
+        }
+      });
+
+      scene.add(computer);
+      setupScroll();
+
+      // Hide loader
+      document.getElementById('loading').classList.add('hide');
+      document.getElementById('l0').classList.add('on');
+    },
+    (xhr) => {
+      const pct = (xhr.loaded / xhr.total * 100).toFixed(0);
+      lStatus.textContent = `LOADING MODEL... ${pct}%`;
+    },
+    (err) => {
+      console.error('GLB load error:', err);
+      // Fallback — just hide loader and continue
+      document.getElementById('loading').classList.add('hide');
+      document.getElementById('l0').classList.add('on');
+      setupScroll();
+    }
+  );
+}
+
+// ─── Stars ────────────────────────────────────────────────────────────────────
+function buildStars() {
+  const geo=new THREE.BufferGeometry(), n=5000;
+  const pos=new Float32Array(n*3), col=new Float32Array(n*3);
+  for(let i=0;i<n;i++){
+    pos[i*3]=(Math.random()-.5)*500; pos[i*3+1]=(Math.random()-.5)*500; pos[i*3+2]=(Math.random()-.5)*500;
+    const c=Math.random();
+    if(c<.3){col[i*3]=0;col[i*3+1]=1;col[i*3+2]=.25;}
+    else if(c<.6){col[i*3]=0;col[i*3+1]=.96;col[i*3+2]=1;}
+    else{col[i*3]=1;col[i*3+1]=1;col[i*3+2]=1;}
+  }
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(col,3));
+  stars=new THREE.Points(geo,new THREE.PointsMaterial({size:.5,vertexColors:true,transparent:true,opacity:0}));
+  scene.add(stars);
+}
+
+// ─── Grid World ───────────────────────────────────────────────────────────────
+function buildGridWorld() {
+  scene3=new THREE.Group(); scene3.visible=false;
+  scene3.add(new THREE.GridHelper(200,40,0x00f5ff,0x003344));
+  const g2=new THREE.GridHelper(200,40,0x9d00ff,0x220033);
+  g2.rotation.x=Math.PI/2; g2.position.z=-100; scene3.add(g2);
+
+  // Retro sun + rings
+  scene3.add(Object.assign(new THREE.Mesh(new THREE.SphereGeometry(8,32,16,0,Math.PI*2,0,Math.PI/2),new THREE.MeshBasicMaterial({color:0xff2d78})),{position:new THREE.Vector3(0,-3,-100)}));
+  for(let i=0;i<7;i++){
+    const r=new THREE.Mesh(new THREE.RingGeometry(8+i*2.2,8.5+i*2.2,64),new THREE.MeshBasicMaterial({color:new THREE.Color().setHSL(.9-i*.05,1,.55),side:THREE.DoubleSide,transparent:true,opacity:.85-i*.1}));
+    r.position.set(0,-3,-100); r.rotation.x=Math.PI/2; scene3.add(r);
+  }
+  // Floating geo
+  for(let i=0;i<12;i++){
+    const geos=[new THREE.ConeGeometry(.7,2,4),new THREE.OctahedronGeometry(.6,0),new THREE.IcosahedronGeometry(.6,0)];
+    const m=new THREE.Mesh(geos[i%3],new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(.7+Math.random()*.2,1,.55),emissive:new THREE.Color().setHSL(.7+Math.random()*.2,1,.3),emissiveIntensity:.8,roughness:.2,wireframe:i%3===0}));
+    m.position.set((Math.random()-.5)*60,-5+Math.random()*12,-20-Math.random()*80);
+    m.rotation.set(Math.random()*6,Math.random()*6,Math.random()*6);
+    m.userData={rs:(Math.random()-.5)*.02,fs:.4+Math.random()*.8,fo:Math.random()*Math.PI*2,by:m.position.y};
+    scene3.add(m); floaters.push(m);
+  }
+  scene3.position.y=-6; scene.add(scene3);
+}
+
+// ─── Warp Tunnel ──────────────────────────────────────────────────────────────
+function buildWarpTunnel() {
+  scene4=new THREE.Group(); scene4.visible=false;
+  for(let i=0;i<90;i++){
+    const r=new THREE.Mesh(
+      new THREE.TorusGeometry(4+Math.sin(i*.22)*2,.04,8,80),
+      new THREE.MeshBasicMaterial({color:new THREE.Color().setHSL((i/90+.5)%1,1,.65),transparent:true,opacity:.85})
+    );
+    r.position.z=-i*3.8; r.rotation.z=i*.1; scene4.add(r);
+  }
+  const wp=new Float32Array(1200*3);
+  for(let i=0;i<1200;i++){const a=Math.random()*Math.PI*2,rad=2+Math.random()*3.5;wp[i*3]=Math.cos(a)*rad;wp[i*3+1]=Math.sin(a)*rad;wp[i*3+2]=-Math.random()*340;}
+  const wg=new THREE.BufferGeometry(); wg.setAttribute('position',new THREE.BufferAttribute(wp,3));
+  scene4.add(new THREE.Points(wg,new THREE.PointsMaterial({size:.14,color:0x00f5ff,transparent:true,opacity:.9})));
+  scene.add(scene4);
+}
+
+// ─── Floating objects (mid journey) ──────────────────────────────────────────
+function buildFloaters() {
+  const geos=[()=>new THREE.BoxGeometry(.4,.4,.05),()=>new THREE.IcosahedronGeometry(.3,0),()=>new THREE.OctahedronGeometry(.35,0),()=>new THREE.TorusGeometry(.3,.08,8,20),()=>new THREE.TetrahedronGeometry(.4,0)];
+  const pal=[0x00ff41,0x00f5ff,0xff2d78,0x9d00ff,0xffb700];
+  for(let i=0;i<20;i++){
+    const col=pal[i%pal.length];
+    const m=new THREE.Mesh(geos[i%geos.length](),new THREE.MeshStandardMaterial({color:col,emissive:new THREE.Color(col),emissiveIntensity:.4,roughness:.3,metalness:.1,wireframe:i%3===0,transparent:true,opacity:.85}));
+    m.position.set((Math.random()-.5)*24,(Math.random()-.5)*14,-6-Math.random()*32);
+    m.rotation.set(Math.random()*6,Math.random()*6,Math.random()*6);
+    m.userData={rx:(Math.random()-.5)*.022,ry:(Math.random()-.5)*.022,fs:.4+Math.random()*.8,fo:Math.random()*Math.PI*2,by:m.position.y};
+    m.visible=false; scene.add(m); floaters.push(m);
+  }
+}
+
+// ─── Scroll setup (called after model loads) ──────────────────────────────────
+function setupScroll() {
+  const tl=gsap.timeline({
+    scrollTrigger:{
+      trigger:'#scroll-driver',start:'top top',end:'bottom bottom',
+      scrub:2,
+      onUpdate:self=>{ S.p=self.progress; syncScene(self.progress); }
+    }
+  });
+  tl.to(camera.position,{z:13,y:2.5,duration:.15},0);
+  if(computer) tl.to(computer.rotation,{y:.28,x:-.04,duration:.15},0);
+  tl.to('#shint',{opacity:0,duration:.05},.02);
+  tl.to(camera.position,{z:2.8,y:1.0,x:0,duration:.2},.15);
+  if(computer) tl.to(computer.rotation,{y:0,x:0,duration:.2},.15);
+  tl.to(camera.position,{z:-1.8,y:.3,duration:.2},.35);
+  tl.to(camera.position,{z:-14,y:5,duration:.2},.55);
+  tl.to(camera.rotation,{x:-.22,duration:.2},.55);
+  tl.to(camera.position,{z:-100,y:0,duration:.25},.75);
+  tl.to(camera.rotation,{x:0,duration:.25},.75);
+}
+
+function syncScene(p) {
+  [['l0',p<.08],['l1',p>=.15&&p<.32],['l2',p>=.55&&p<.72],['l3',p>=.75&&p<.9],['l4',p>=.92]].forEach(([id,show])=>{
+    document.getElementById(id).classList.toggle('on',show);
+  });
+  document.getElementById('ebtn').classList.toggle('on',p>=.95);
+
+  if(computer) computer.visible=p<.56;
+  if(deskGroup) deskGroup.visible=p<.56;
+  if(scene3) scene3.visible=p>=.42;
+  if(scene4) scene4.visible=p>=.72;
+  if(stars) stars.material.opacity=p>.28?Math.min(1,(p-.28)*3.5):0;
+  floaters.forEach(o=>{ if(o.userData.by!==undefined) o.visible=p>=.3&&p<.72; });
+  if(screenLight) screenLight.intensity=p<.5?5*(1-p*1.8):0;
+
+  const rs=['STABLE','NOMINAL','BENDING','WARPING','CRITICAL','VOID'];
+  const ri=Math.min(5,Math.floor(p*6));
+  const rEl=document.getElementById('hreal');
+  rEl.textContent=rs[ri];
+  rEl.style.color=p>.7?'#ff2d78':p>.4?'#ffb700':'#00ff41';
+  document.getElementById('hdepth').textContent=(p*100).toFixed(2);
+}
+
+// ─── Animate ──────────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  const t=clock.getElapsedTime();
+
+  // Live screen
+  if(screenMesh && S.p<.44){ drawScreen(t); screenTex.needsUpdate=true; }
+
+  // Computer breathe
+  if(computer && computer.visible){
+    computer.position.y=.05+Math.sin(t*.55)*.04;
+    computer.rotation.z=Math.sin(t*.3)*.005;
+  }
+
+  // Floating objects
+  floaters.forEach(o=>{
+    if(!o.visible) return;
+    o.rotation.x+=o.userData.rx||.01;
+    o.rotation.y+=o.userData.ry||.01;
+    o.position.y=o.userData.by+Math.sin(t*o.userData.fs+o.userData.fo)*.38;
+  });
+
+  if(stars) stars.rotation.y=t*.007;
+
+  if(scene3&&scene3.visible) scene3.children.forEach(c=>{ if(c.userData.rs) c.rotation.y+=c.userData.rs; });
+
+  if(scene4&&scene4.visible){
+    scene4.children.forEach((c,i)=>{
+      if(c.geometry&&c.geometry.type==='TorusGeometry') c.rotation.z+=.013*(i%2?1:-1);
+    });
+  }
+
+  renderer.render(scene, camera);
+}
+
+// ─── HUD clock ────────────────────────────────────────────────────────────────
+function setupHUD(){
+  setInterval(()=>{ document.getElementById('htime').textContent=new Date().toLocaleTimeString('en-US',{hour12:false}); },1000);
+}
+
+// ─── Cursor sparks ────────────────────────────────────────────────────────────
+function setupCursor(){
+  let last=0;
+  document.addEventListener('mousemove',e=>{
+    const now=Date.now(); if(now-last<55) return; last=now;
+    const s=document.createElement('div'); s.className='spark';
+    const pal=['#00ff41','#00f5ff','#ff2d78','#9d00ff','#ffb700'];
+    const sz=3+Math.random()*5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-sz/2}px;top:${e.clientY-sz/2}px;background:${pal[~~(Math.random()*5)]};--dx:${(Math.random()-.5)*28}px;--dy:${-8-Math.random()*18}px`;
+    document.body.appendChild(s); setTimeout(()=>s.remove(),700);
+  });
+}
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+function onResize(){
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+}
+</script>
+</body>
+</html>

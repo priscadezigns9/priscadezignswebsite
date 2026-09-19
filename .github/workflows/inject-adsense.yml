@@ -1,0 +1,50 @@
+name: Inject Google AdSense
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inject AdSense into all niche hubs
+        run: |
+          ADSENSE='<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7468056855295045" crossorigin="anonymous"></script>'
+          PAGES=(
+            "index.html"
+            "dreaming-anime/index.html"
+            "atelier-gaming/index.html"
+            "sole-prestige/index.html"
+            "glow-protocol/index.html"
+            "essence-elite/index.html"
+            "peak-fit/index.html"
+            "quiet-luxury/index.html"
+            "the-watch-list/index.html"
+            "the-autodrome/index.html"
+            "the-escapist/index.html"
+            "verdant-co/index.html"
+            "paw-vault/index.html"
+            "couture-gallery/index.html"
+          )
+          for page in "${PAGES[@]}"; do
+            if [ -f "$page" ]; then
+              if ! grep -q "ca-pub-7468056855295045" "$page"; then
+                sed -i "s|<head>|<head>\n  ${ADSENSE}|" "$page"
+                echo "Injected: $page"
+              else
+                echo "Already has AdSense: $page"
+              fi
+            else
+              echo "Not found: $page"
+            fi
+          done
+      - name: Commit changes
+        run: |
+          git config user.name "Zapia"
+          git config user.email "zapia@priscadezigns.org"
+          git add -A
+          git diff --staged --quiet || git commit -m "Add Google AdSense to all niche hubs"
+          git push

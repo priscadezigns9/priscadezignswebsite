@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astra Wings | Atelia Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh;
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        #arena-header {
+            background: #000; padding: 10px 5%; display: flex;
+            justify-content: space-between; align-items: center; border-bottom: 2px solid var(--red);
+        }
+        .logo-img { height: 40px; filter: drop-shadow(0 0 5px var(--red)); }
+        
+        #game-container {
+            flex: 1; width: 100%; background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%);
+            position: relative; overflow: hidden;
+        }
+        
+        #bird {
+            width: 70px; height: 70px;
+            position: absolute; left: 100px; top: 50%;
+            z-index: 100; filter: drop-shadow(0 0 10px rgba(255,107,0,0.5));
+            transition: transform 0.1s;
+            object-fit: contain;
+        }
+
+        .pipe {
+            position: absolute; width: 80px;
+            background: linear-gradient(90deg, #111, #222, #111);
+            border: 2px solid var(--red); z-index: 50;
+        }
+        .pipe-cap {
+            position: absolute; width: 90px; height: 20px;
+            background: var(--red); left: -5px;
+        }
+
+        #score-ui {
+            position: absolute; top: 20px; right: 40px;
+            font-family: 'Bangers'; font-size: 4rem; color: white;
+            text-shadow: 0 0 20px var(--red); z-index: 200;
+        }
+
+        #select-screen, #results-modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .selection-grid { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 30px 0; }
+        .char-opt {
+            text-align: center; cursor: pointer; transition: 0.3s; padding: 10px;
+            border: 2px solid transparent; width: 120px;
+        }
+        .char-opt:hover { background: #111; border-color: var(--orange); }
+        .char-opt.active { background: #222; border-color: white; box-shadow: 0 0 15px var(--red); }
+        .char-opt img { height: 120px; width: 100%; object-fit: contain; }
+        .char-opt p { font-family: 'Bangers'; font-size: 1.2rem; margin-top: 10px; }
+
+        .btn {
+            padding: 15px 40px; background: var(--red); color: white;
+            border: 3px solid white; font-family: 'Russo One'; font-size: 1.5rem;
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn:hover { background: var(--orange); transform: scale(1.05); }
+
+        #profile-hub {
+            position: absolute; top: 20px; left: 20px; z-index: 100;
+            display: flex; align-items: center; gap: 15px;
+            background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 12px;
+            border: 1px solid rgba(255,107,0,0.3);
+        }
+        #p-avatar { height: 50px; filter: drop-shadow(0 0 5px var(--orange)); }
+        #p-username { font-family: 'Russo One'; font-size: 0.9rem; color: #fff; }
+        #p-prestige { font-family: 'Bangers'; font-size: 1.1rem; color: var(--orange); }
+
+        /* How to Play */
+        #htp-btn { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--red); color: white; border: 2px solid white; border-radius: 50%; font-family: 'Russo One'; cursor: pointer; z-index: 5000; font-size: 1.4rem; box-shadow: 0 0 15px var(--red); }
+        #htp-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .htp-content { max-width: 500px; font-family: 'Inter', sans-serif; }
+        .htp-title { font-family: 'Bangers'; font-size: 4rem; color: var(--orange); margin-bottom: 20px; text-shadow: 0 0 20px var(--red); }
+        .htp-section { margin-bottom: 20px; }
+        .htp-label { font-family: 'Russo One'; color: var(--red); font-size: 1.2rem; margin-bottom: 5px; letter-spacing: 2px; }
+        .htp-text { color: #ccc; font-size: 1rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <header id="arena-header">
+        <a href="index.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.2rem; color:var(--red);">ASTRA WINGS PRO</div>
+    </header>
+
+    <div id="game-container">
+        <div id="profile-hub" style="display: none;">
+            <img id="p-avatar" src="" alt="Avatar">
+            <div>
+                <div id="p-username">VANGUARD</div>
+                <div id="p-prestige">0 ATLR</div>
+            </div>
+        </div>
+
+        <div id="score-ui">00</div>
+        <img id="bird" src="">
+
+        <div id="select-screen">
+            <h2 style="font-family:'Bangers'; font-size:4rem; margin:0;">ASTRA WINGS</h2>
+            <p style="font-family:'Russo One'; color:var(--orange);">SELECT YOUR CHIBI VANGUARD</p>
+            <div class="selection-grid">
+                <div class="char-opt active" onclick="sel('astra')" id="o-astra"><img src="https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp"><p>ASTRA</p></div>
+                <div class="char-opt" onclick="sel('mimi')" id="o-mimi"><img src="https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp"><p>MIMI</p></div>
+                <div class="char-opt" onclick="sel('nova')" id="o-nova"><img src="https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp"><p>NOVA</p></div>
+                <div class="char-opt" onclick="sel('echo')" id="o-echo"><img src="https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp"><p>ECHO</p></div>
+            </div>
+            <button class="btn" onclick="startGame()">INITIATE FLIGHT</button>
+        </div>
+
+        <div id="results-modal" style="display:none;">
+            <h2 style="font-family:'Bangers'; font-size:5rem; color:var(--red); margin:0;">ALTITUDE LOST</h2>
+            <p style="font-family:'Russo One'; font-size:2rem;">SCORE: <span id="final-score">0</span></p>
+            <div style="display:flex; align-items:center; gap:15px; margin:20px 0;">
+                <img src="https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp" height="60">
+                <span style="font-family:'Bangers'; font-size:2.5rem; color:var(--orange);">+<span id="atlr-earned">0</span> ATLR</span>
+            </div>
+            <button class="btn" onclick="resetGame()">RE-ENTRY</button>
+        </div>
+    </div>
+
+    <button id="htp-btn" onclick="toggleHTP()">?</button>
+    <div id="htp-modal" onclick="toggleHTP()">
+        <div class="htp-content">
+            <h2 class="htp-title">HOW TO PLAY</h2>
+            <div class="htp-section">
+                <div class="htp-label">OBJECTIVE</div>
+                <div class="htp-text">Pilot your Vanguard through the neural gates. Avoid collisions with the data pipes.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">CONTROLS (DESKTOP)</div>
+                <div class="htp-text">Press [SPACE] or CLICK to flap.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">CONTROLS (MOBILE)</div>
+                <div class="htp-text">TAP anywhere on the screen to flap. Designed for high-fidelity mobile response.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">REWARDS</div>
+                <div class="htp-text">Earn +1 ATLR for every gate cleared. Precision flight yields maximum prestige.</div>
+            </div>
+            <button class="btn" style="font-size: 1rem; padding: 10px 30px;">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        const cloud = 'https://res.cloudinary.com/davvgg5sy/image/fetch/f_auto,q_auto/';
+        const charAssets = {
+            astra: {
+                idle: cloud + 'https://priscadezigns.org/ateliagaming/assets/astra/astra_running.webp',
+                jump: cloud + 'https://priscadezigns.org/ateliagaming/assets/astra/astra_jumping.webp'
+            },
+            mimi: {
+                idle: cloud + 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_running.webp',
+                jump: cloud + 'https://priscadezigns.org/ateliagaming/assets/mimi/mimi_jumping.webp'
+            },
+            nova: {
+                idle: cloud + 'https://priscadezigns.org/ateliagaming/assets/nova/nova_running.webp',
+                jump: cloud + 'https://priscadezigns.org/ateliagaming/assets/nova/nova_jumping.webp'
+            },
+            echo: {
+                idle: cloud + 'https://priscadezigns.org/ateliagaming/assets/echo/echo_running.webp',
+                jump: cloud + 'https://priscadezigns.org/ateliagaming/assets/echo/echo_jumping.webp'
+            }
+        };
+
+        let char = 'astra', active = false, score = 0;
+        let birdY = 50, velocity = 0, gravity = 0.5, jumpPower = -10;
+        let pipes = [], frame = 0;
+
+        const bird = document.getElementById('bird');
+        const scoreUI = document.getElementById('score-ui');
+        const container = document.getElementById('game-container');
+
+        sel('astra');
+
+        function toggleHTP() {
+            const m = document.getElementById('htp-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        Atelia.auth.onAuthStateChange(async (e, session) => {
+            if (session?.user) {
+                document.getElementById('profile-hub').style.display = 'flex';
+                const p = await Atelia.arena.getProfile(session.user.id);
+                document.getElementById('p-username').innerText = (p.username || 'VANGUARD').toUpperCase();
+                document.getElementById('p-prestige').innerText = (p.atlr_prestige || 0) + ' ATLR';
+                document.getElementById('p-avatar').src = charAssets[char].idle;
+            }
+        });
+
+        function sel(c) {
+            char = c;
+            document.querySelectorAll('.char-opt').forEach(o => o.classList.remove('active'));
+            document.getElementById('o-'+c).classList.add('active');
+            bird.src = charAssets[c].idle;
+            if(document.getElementById('p-avatar')) document.getElementById('p-avatar').src = charAssets[c].idle;
+        }
+
+        function startGame() {
+            active = true; score = 0;
+            birdY = container.clientHeight / 2;
+            velocity = 0;
+            pipes.forEach(p => { p.top.remove(); p.bot.remove(); });
+            pipes = [];
+            document.getElementById('select-screen').style.display = 'none';
+            document.getElementById('results-modal').style.display = 'none';
+            scoreUI.innerText = '00';
+            requestAnimationFrame(gameLoop);
+        }
+
+        function flap() {
+            if(active) {
+                velocity = jumpPower;
+                bird.src = charAssets[char].jump;
+                setTimeout(() => { if(active) bird.src = charAssets[char].idle; }, 300);
+            }
+        }
+
+        function createPipe() {
+            const gap = 200;
+            const minHeight = 50;
+            const maxHeight = container.clientHeight - gap - minHeight;
+            const topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
+
+            const topPipe = document.createElement('div');
+            topPipe.className = 'pipe';
+            topPipe.style.height = topHeight + 'px';
+            topPipe.style.top = '0';
+            topPipe.style.right = '-80px';
+            const topCap = document.createElement('div');
+            topCap.className = 'pipe-cap';
+            topCap.style.bottom = '0';
+            topPipe.appendChild(topCap);
+            container.appendChild(topPipe);
+
+            const bottomPipe = document.createElement('div');
+            bottomPipe.className = 'pipe';
+            bottomPipe.style.height = (container.clientHeight - topHeight - gap) + 'px';
+            bottomPipe.style.bottom = '0';
+            bottomPipe.style.right = '-80px';
+            const botCap = document.createElement('div');
+            botCap.className = 'pipe-cap';
+            botCap.style.top = '0';
+            bottomPipe.appendChild(botCap);
+            container.appendChild(bottomPipe);
+
+            pipes.push({ top: topPipe, bot: bottomPipe, x: -80, passed: false });
+        }
+
+        function gameLoop() {
+            if(!active) return;
+            frame++;
+
+            velocity += gravity;
+            birdY += velocity;
+            bird.style.top = birdY + 'px';
+            bird.style.transform = `rotate(${velocity * 2}deg)`;
+
+            if(birdY < 0 || birdY > container.clientHeight - 70) return gameOver();
+
+            if(frame % 100 === 0) createPipe();
+
+            for(let i = pipes.length - 1; i >= 0; i--) {
+                const p = pipes[i];
+                p.x += 5;
+                p.top.style.right = p.x + 'px';
+                p.bot.style.right = p.x + 'px';
+
+                const bRect = bird.getBoundingClientRect();
+                const tRect = p.top.getBoundingClientRect();
+                const dRect = p.bot.getBoundingClientRect();
+
+                if ( (bRect.right > tRect.left + 5 && bRect.left < tRect.right - 5 && bRect.top < tRect.bottom - 5) ||
+                     (bRect.right > dRect.left + 5 && bRect.left < dRect.right - 5 && bRect.bottom > dRect.top + 5) ) {
+                    return gameOver();
+                }
+
+                if(!p.passed && p.x > container.clientWidth - 100) {
+                    p.passed = true;
+                    score++;
+                    scoreUI.innerText = score.toString().padStart(2, '0');
+                }
+
+                if(p.x > container.clientWidth + 100) {
+                    p.top.remove(); p.bot.remove();
+                    pipes.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            active = false;
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('atlr-earned').innerText = score;
+            document.getElementById('results-modal').style.display = 'flex';
+            if(window.Atelia) Atelia.arena.saveScore(score, char);
+        }
+
+        function resetGame() {
+            document.getElementById('results-modal').style.display = 'none';
+            document.getElementById('select-screen').style.display = 'flex';
+        }
+
+        window.addEventListener('keydown', e => { if(e.code === 'Space') flap(); });
+        container.addEventListener('mousedown', flap);
+        container.addEventListener('touchstart', e => { e.preventDefault(); flap(); });
+    </script>
+</body>
+</html>

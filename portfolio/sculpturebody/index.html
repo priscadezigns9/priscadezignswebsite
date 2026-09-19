@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <title>SculptureBody | Train. Shop. Transform.</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #E8FF00;
+            --dark: #0A0A0A;
+            --card: #141414;
+            --text: #FFFFFF;
+            --muted: #888888;
+            --accent: #FF3B3B;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); }
+
+        /* NAV */
+        nav { background: #000; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--primary); }
+        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--primary); letter-spacing: 2px; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-auth { display: flex; gap: 10px; align-items: center; }
+        .btn { padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none; text-transform: uppercase; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: #000; }
+        .btn-primary:hover { background: #d4eb00; }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: #000; }
+
+        /* PAGES */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* HERO */
+        .hero { background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=2000') center/cover; min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; }
+        .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; line-height: 1; color: var(--primary); }
+        .hero p { font-size: 1.2rem; color: #ccc; max-width: 550px; margin: 1rem auto 2rem; }
+        .hero-btns { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+
+        /* SECTIONS */
+        .section { padding: 4rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+        .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; margin-bottom: 2rem; border-left: 5px solid var(--primary); padding-left: 1rem; }
+
+        /* COURSES */
+        .course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .course-card { background: var(--card); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; border: 1px solid #222; }
+        .course-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+        .course-thumb { width: 100%; aspect-ratio: 16/9; background: #222; position: relative; }
+        .course-thumb iframe { width: 100%; height: 100%; border: none; }
+        .course-info { padding: 1rem; }
+        .course-info h3 { font-weight: 700; margin-bottom: 0.3rem; }
+        .course-info p { color: var(--muted); font-size: 0.85rem; }
+        .course-tag { display: inline-block; background: var(--primary); color: #000; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-bottom: 0.5rem; text-transform: uppercase; }
+
+        /* SHOP */
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+        .product-card { background: var(--card); border-radius: 8px; overflow: hidden; border: 1px solid #222; transition: 0.2s; }
+        .product-card:hover { border-color: var(--primary); }
+        .product-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #222; display: flex; align-items: center; justify-content: center; font-size: 4rem; }
+        .product-info { padding: 1rem; }
+        .product-info h3 { font-weight: 700; margin-bottom: 0.3rem; }
+        .product-price { color: var(--primary); font-weight: 700; font-size: 1.1rem; margin-bottom: 0.8rem; }
+        .size-select { width: 100%; padding: 0.4rem; background: #222; border: 1px solid #333; color: #fff; border-radius: 4px; margin-bottom: 0.8rem; }
+        .btn-cart { width: 100%; background: var(--primary); color: #000; border: none; padding: 0.6rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+
+        /* CHECKOUT MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--card); border: 1px solid var(--primary); border-radius: 12px; padding: 2rem; width: 90%; max-width: 450px; }
+        .modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--primary); margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 0.3rem; }
+        .form-group input, .form-group select { width: 100%; padding: 0.7rem; background: #222; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.95rem; }
+        .order-summary { background: #1a1a1a; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        .order-summary p { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+        .btn-place-order { width: 100%; background: var(--primary); color: #000; border: none; padding: 0.9rem; font-weight: 700; font-size: 1rem; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+        .btn-cancel { width: 100%; background: transparent; color: var(--muted); border: none; padding: 0.6rem; cursor: pointer; margin-top: 0.5rem; }
+
+        /* LOGIN PAGE */
+        .auth-page { min-height: 90vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .auth-box { background: var(--card); border: 1px solid #222; border-radius: 12px; padding: 2.5rem; width: 100%; max-width: 400px; }
+        .auth-box h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .auth-box p { color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem; }
+        .auth-toggle { text-align: center; margin-top: 1rem; font-size: 0.9rem; color: var(--muted); }
+        .auth-toggle span { color: var(--primary); cursor: pointer; font-weight: 700; }
+
+        /* PROFILE */
+        .profile-header { background: var(--card); padding: 2rem 1.5rem; border-bottom: 1px solid #222; display: flex; align-items: center; gap: 1.5rem; }
+        .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; color: #000; flex-shrink: 0; }
+        .profile-name { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; }
+        .profile-email { color: var(--muted); font-size: 0.9rem; }
+        .profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 1.5rem; }
+        .stat-box { background: var(--card); border-radius: 8px; padding: 1rem; text-align: center; border: 1px solid #222; }
+        .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; color: var(--muted); }
+
+        /* SUCCESS */
+        .success-msg { display: none; background: #0a2a0a; border: 1px solid #00aa00; color: #00ff00; padding: 1rem; border-radius: 6px; margin-top: 1rem; text-align: center; }
+
+        /* INSTALL BANNER */
+        #install-banner { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--primary); color: #000; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; z-index: 300; }
+        #install-banner p { font-weight: 700; }
+        #install-btn { background: #000; color: var(--primary); border: none; padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: 700; cursor: pointer; }
+        #dismiss-banner { background: transparent; border: none; color: #000; font-size: 1.2rem; cursor: pointer; }
+
+        @media (max-width: 600px) { .hero h1 { font-size: 3rem; } .nav-links { display: none; } }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-logo">SculptureBody</div>
+    <div class="nav-links">
+        <a onclick="showPage('home')">Home</a>
+        <a onclick="showPage('courses')">Courses</a>
+        <a onclick="showPage('shop')">Shop</a>
+        <a onclick="showPage('profile')">My Account</a>
+    </div>
+    <div class="nav-auth" id="nav-auth">
+        <button class="btn btn-outline" onclick="showPage('login')">Login</button>
+        <button class="btn btn-primary" onclick="showPage('signup')">Sign Up</button>
+    </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+    <div class="hero">
+        <h1>Build Your<br>Sculpture</h1>
+        <p>Elite workout programs, premium gear, and a community built for those who are serious about their transformation.</p>
+        <div class="hero-btns">
+            <button class="btn btn-primary" onclick="showPage('courses')">Start Training</button>
+            <button class="btn btn-outline" onclick="showPage('shop')">Shop Gear</button>
+        </div>
+    </div>
+    <div class="section">
+        <h2 class="section-title">Why SculptureBody</h2>
+        <div class="course-grid">
+            <div class="course-card" style="cursor:default">
+                <div class="product-img" style="aspect-ratio:auto;padding:2rem;font-size:2.5rem">💪</div>
+                <div class="course-info">
+                    <h3>Elite Programs</h3>
+                    <p>Structured workout courses built for real results, not just aesthetics.</p>
+                </div>
+            </div>
+            <div class="course-card" style="cursor:default">
+                <div class="product-img" style="aspect-ratio:auto;padding:2rem;font-size:2.5rem">👕</div>
+                <div class="course-info">
+                    <h3>Premium Gear</h3>
+                    <p>High-fidelity clothing designed for performance and lifestyle.</p>
+                </div>
+            </div>
+            <div class="course-card" style="cursor:default">
+                <div class="product-img" style="aspect-ratio:auto;padding:2rem;font-size:2.5rem">📱</div>
+                <div class="course-info">
+                    <h3>Install As App</h3>
+                    <p>Add SculptureBody to your home screen and access it like a native app.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- COURSES PAGE -->
+<div id="page-courses" class="page">
+    <div class="section">
+        <h2 class="section-title">Workout Courses</h2>
+        <div class="course-grid">
+            <div class="course-card">
+                <div class="course-thumb">
+                    <iframe src="https://www.youtube.com/embed/UoC_O3HzsH0" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="course-info">
+                    <span class="course-tag">Beginner</span>
+                    <h3>Full Body Strength Foundations</h3>
+                    <p>Build your base. No equipment needed. Perfect starting point.</p>
+                </div>
+            </div>
+            <div class="course-card">
+                <div class="course-thumb">
+                    <iframe src="https://www.youtube.com/embed/vc1E5CfRfos" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="course-info">
+                    <span class="course-tag">Intermediate</span>
+                    <h3>Chest & Back Hypertrophy</h3>
+                    <p>Targeted upper body mass building with progressive overload principles.</p>
+                </div>
+            </div>
+            <div class="course-card">
+                <div class="course-thumb">
+                    <iframe src="https://www.youtube.com/embed/oAPCPjnU1wA" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="course-info">
+                    <span class="course-tag">Advanced</span>
+                    <h3>Legs & Glutes Power Circuit</h3>
+                    <p>Elite lower body conditioning. High intensity, maximum output.</p>
+                </div>
+            </div>
+            <div class="course-card">
+                <div class="course-thumb">
+                    <iframe src="https://www.youtube.com/embed/cbKkB3POqaY" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="course-info">
+                    <span class="course-tag">Fat Loss</span>
+                    <h3>HIIT Shred Protocol</h3>
+                    <p>Burn maximum calories in minimal time. Science-backed fat loss.</p>
+                </div>
+            </div>
+            <div class="course-card">
+                <div class="course-thumb">
+                    <iframe src="https://www.youtube.com/embed/DHD1-2P94DI" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="course-info">
+                    <span class="course-tag">Nutrition</span>
+                    <h3>Meal Prep Masterclass</h3>
+                    <p>Fuel your transformation with high-performance nutrition strategies.</p>
+                </div>
+            </div>
+            <div class="course-card">
+                <div class="course-thumb">
+                    <iframe src="https://www.youtube.com/embed/IODxDxX7oi4" allowfullscreen loading="lazy"></iframe>
+                </div>
+                <div class="course-info">
+                    <span class="course-tag">Mobility</span>
+                    <h3>Recovery & Mobility Flow</h3>
+                    <p>Protect your joints. Improve flexibility and reduce injury risk.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SHOP PAGE -->
+<div id="page-shop" class="page">
+    <div class="section">
+        <h2 class="section-title">Shop Gear</h2>
+        <div class="shop-grid">
+            <div class="product-card">
+                <div class="product-img">👕</div>
+                <div class="product-info">
+                    <h3>SculptureBody Classic Tee</h3>
+                    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.5rem">Premium cotton. Oversized fit.</p>
+                    <div class="product-price">TTD $150</div>
+                    <select class="size-select" id="size-tee-classic">
+                        <option value="">Select Size</option>
+                        <option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
+                    </select>
+                    <button class="btn-cart" onclick="openCheckout('SculptureBody Classic Tee', 150, 'size-tee-classic')">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img">🖤</div>
+                <div class="product-info">
+                    <h3>SculptureBody Performance Tee</h3>
+                    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.5rem">Moisture-wicking. Slim fit.</p>
+                    <div class="product-price">TTD $180</div>
+                    <select class="size-select" id="size-tee-perf">
+                        <option value="">Select Size</option>
+                        <option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
+                    </select>
+                    <button class="btn-cart" onclick="openCheckout('SculptureBody Performance Tee', 180, 'size-tee-perf')">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img">🩳</div>
+                <div class="product-info">
+                    <h3>SculptureBody Shorts</h3>
+                    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.5rem">Lightweight training shorts.</p>
+                    <div class="product-price">TTD $160</div>
+                    <select class="size-select" id="size-shorts">
+                        <option value="">Select Size</option>
+                        <option>S</option><option>M</option><option>L</option><option>XL</option>
+                    </select>
+                    <button class="btn-cart" onclick="openCheckout('SculptureBody Shorts', 160, 'size-shorts')">Add to Cart</button>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-img">🧢</div>
+                <div class="product-info">
+                    <h3>SculptureBody Cap</h3>
+                    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:0.5rem">Structured snapback. One size.</p>
+                    <div class="product-price">TTD $120</div>
+                    <select class="size-select" id="size-cap">
+                        <option value="One Size">One Size</option>
+                    </select>
+                    <button class="btn-cart" onclick="openCheckout('SculptureBody Cap', 120, 'size-cap')">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LOGIN PAGE -->
+<div id="page-login" class="page">
+    <div class="auth-page">
+        <div class="auth-box">
+            <h2>Welcome Back</h2>
+            <p>Login to access your programs and orders.</p>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="login-email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-pass" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" style="width:100%;padding:0.8rem;margin-top:0.5rem" onclick="doLogin()">Login</button>
+            <div class="auth-toggle">Don't have an account? <span onclick="showPage('signup')">Sign Up</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- SIGNUP PAGE -->
+<div id="page-signup" class="page">
+    <div class="auth-page">
+        <div class="auth-box">
+            <h2>Create Account</h2>
+            <p>Join SculptureBody. Start your transformation today.</p>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="signup-name" placeholder="Your full name">
+            </div>
+            <div class="form-group">
+                <label>WhatsApp Number</label>
+                <input type="tel" id="signup-phone" placeholder="+1 868 XXX XXXX">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="signup-email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="signup-pass" placeholder="Create a password">
+            </div>
+            <button class="btn btn-primary" style="width:100%;padding:0.8rem;margin-top:0.5rem" onclick="doSignup()">Create Account</button>
+            <div class="auth-toggle">Already have an account? <span onclick="showPage('login')">Login</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div id="page-profile" class="page">
+    <div id="profile-content">
+        <div class="profile-header">
+            <div class="avatar" id="profile-avatar">S</div>
+            <div>
+                <div class="profile-name" id="profile-name">Sculptor</div>
+                <div class="profile-email" id="profile-email">—</div>
+            </div>
+        </div>
+        <div class="profile-stats">
+            <div class="stat-box">
+                <div class="stat-num" id="stat-courses">6</div>
+                <div class="stat-label">Courses Available</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num" id="stat-orders">0</div>
+                <div class="stat-label">Orders Placed</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-num">∞</div>
+                <div class="stat-label">Potential</div>
+            </div>
+        </div>
+        <div class="section" style="padding-top:0">
+            <button class="btn btn-outline" onclick="doLogout()" style="margin-right:10px">Logout</button>
+        </div>
+    </div>
+</div>
+
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkout-modal">
+    <div class="modal">
+        <h2>Place Order</h2>
+        <div class="order-summary" id="order-summary"></div>
+        <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="order-name" placeholder="Full name">
+        </div>
+        <div class="form-group">
+            <label>WhatsApp Number</label>
+            <input type="tel" id="order-phone" placeholder="+1 868 XXX XXXX">
+        </div>
+        <div class="form-group">
+            <label>Delivery Address</label>
+            <input type="text" id="order-address" placeholder="Your address">
+        </div>
+        <button class="btn-place-order" onclick="placeOrder()">Confirm Order via WhatsApp</button>
+        <div class="success-msg" id="order-success">✅ Order sent! You'll be contacted on WhatsApp shortly.</div>
+        <button class="btn-cancel" onclick="closeCheckout()">Cancel</button>
+    </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+    <p>📱 Install SculptureBody on your phone!</p>
+    <button id="install-btn">Install App</button>
+    <button id="dismiss-banner" onclick="document.getElementById('install-banner').style.display='none'">✕</button>
+</div>
+
+<script>
+    // ---- PAGE ROUTING ----
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + id).classList.add('active');
+        window.scrollTo(0,0);
+    }
+
+    // ---- SIMPLE LOCAL AUTH ----
+    let currentUser = JSON.parse(localStorage.getItem('sb_user') || 'null');
+    let orderCount = parseInt(localStorage.getItem('sb_orders') || '0');
+
+    function updateNavAuth() {
+        const navAuth = document.getElementById('nav-auth');
+        if (currentUser) {
+            navAuth.innerHTML = `<span style="color:#888;font-size:0.85rem">Hi, <strong style="color:var(--primary)">${currentUser.name.split(' ')[0]}</strong></span>
+            <button class="btn btn-outline" onclick="showPage('profile')">My Account</button>`;
+            document.getElementById('profile-name').textContent = currentUser.name;
+            document.getElementById('profile-email').textContent = currentUser.email;
+            document.getElementById('profile-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('stat-orders').textContent = orderCount;
+        }
+    }
+
+    function doLogin() {
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-pass').value;
+        if (!email || !pass) { alert('Please fill in all fields.'); return; }
+        const stored = JSON.parse(localStorage.getItem('sb_accounts') || '{}');
+        if (stored[email] && stored[email].pass === pass) {
+            currentUser = stored[email];
+            localStorage.setItem('sb_user', JSON.stringify(currentUser));
+            updateNavAuth();
+            showPage('home');
+        } else {
+            alert('Incorrect email or password.');
+        }
+    }
+
+    function doSignup() {
+        const name = document.getElementById('signup-name').value;
+        const phone = document.getElementById('signup-phone').value;
+        const email = document.getElementById('signup-email').value;
+        const pass = document.getElementById('signup-pass').value;
+        if (!name || !phone || !email || !pass) { alert('Please fill in all fields.'); return; }
+        const accounts = JSON.parse(localStorage.getItem('sb_accounts') || '{}');
+        if (accounts[email]) { alert('An account with this email already exists.'); return; }
+        const user = { name, phone, email, pass };
+        accounts[email] = user;
+        localStorage.setItem('sb_accounts', JSON.stringify(accounts));
+        currentUser = user;
+        localStorage.setItem('sb_user', JSON.stringify(user));
+        updateNavAuth();
+        showPage('home');
+    }
+
+    function doLogout() {
+        currentUser = null;
+        localStorage.removeItem('sb_user');
+        document.getElementById('nav-auth').innerHTML = `
+            <button class="btn btn-outline" onclick="showPage('login')">Login</button>
+            <button class="btn btn-primary" onclick="showPage('signup')">Sign Up</button>`;
+        showPage('home');
+    }
+
+    // ---- SHOP CHECKOUT ----
+    let currentOrder = {};
+
+    function openCheckout(product, price, sizeId) {
+        const size = document.getElementById(sizeId).value;
+        if (!size) { alert('Please select a size.'); return; }
+        currentOrder = { product, price, size };
+        document.getElementById('order-summary').innerHTML = `
+            <p><span>Product</span><strong>${product}</strong></p>
+            <p><span>Size</span><strong>${size}</strong></p>
+            <p><span>Total</span><strong style="color:var(--primary)">TTD $${price}</strong></p>`;
+        if (currentUser) {
+            document.getElementById('order-name').value = currentUser.name;
+            document.getElementById('order-phone').value = currentUser.phone || '';
+        }
+        document.getElementById('order-success').style.display = 'none';
+        document.getElementById('checkout-modal').classList.add('open');
+    }
+
+    function closeCheckout() {
+        document.getElementById('checkout-modal').classList.remove('open');
+    }
+
+    function placeOrder() {
+        const name = document.getElementById('order-name').value;
+        const phone = document.getElementById('order-phone').value;
+        const address = document.getElementById('order-address').value;
+        if (!name || !phone || !address) { alert('Please fill in all fields.'); return; }
+
+        // Send WhatsApp notification to Sculpture Boy
+        const ownerNumber = '18687923967';
+        const msg = encodeURIComponent(
+            `🔔 *NEW ORDER — SculptureBody*\n\n` +
+            `📦 *Product:* ${currentOrder.product}\n` +
+            `📏 *Size:* ${currentOrder.size}\n` +
+            `💰 *Total:* TTD $${currentOrder.price}\n\n` +
+            `👤 *Customer:* ${name}\n` +
+            `📱 *WhatsApp:* ${phone}\n` +
+            `📍 *Address:* ${address}\n\n` +
+            `Reply to this message or contact the customer directly on WhatsApp.`
+        );
+        const waUrl = `https://wa.me/${ownerNumber}?text=${msg}`;
+
+        // Update order count
+        orderCount++;
+        localStorage.setItem('sb_orders', orderCount);
+        if (currentUser) document.getElementById('stat-orders').textContent = orderCount;
+
+        document.getElementById('order-success').style.display = 'block';
+        setTimeout(() => {
+            window.open(waUrl, '_blank');
+            closeCheckout();
+        }, 1200);
+    }
+
+    // ---- PWA INSTALL ----
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('install-banner').style.display = 'flex';
+    });
+    document.getElementById('install-btn').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            document.getElementById('install-banner').style.display = 'none';
+        }
+    });
+
+    // Init
+    updateNavAuth();
+</script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Phaser Arena | Atelia Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+            --cyber: #00ffff;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; touch-action: none;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--cyber); }
+        .logo-img { height: 35px; filter: drop-shadow(0 0 5px var(--cyber)); }
+
+        #game-container {
+            flex: 1; width: 100%; height: 100%; position: relative;
+        }
+
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+        }
+        .btn {
+            padding: 15px 45px; background: var(--cyber); color: black;
+            border: 3px solid white; font-family: 'Russo One'; font-size: 1.5rem;
+            cursor: pointer; margin-top: 25px; transition: 0.3s;
+        }
+        .btn:hover { background: var(--white); transform: scale(1.05); }
+
+        /* How to Play */
+        #htp-btn { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--cyber); color: black; border: 2px solid white; border-radius: 50%; font-family: 'Russo One'; cursor: pointer; z-index: 5000; font-size: 1.4rem; }
+        #htp-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .htp-content { max-width: 500px; font-family: 'Inter', sans-serif; }
+        .htp-title { font-family: 'Bangers'; font-size: 4rem; color: var(--cyber); margin-bottom: 20px; }
+        .htp-label { font-family: 'Russo One'; color: var(--white); font-size: 1.2rem; margin-bottom: 5px; }
+        .htp-text { color: #ccc; font-size: 1rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="arena.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.1rem; color:var(--cyber);">PHASER COSMIC RUN</div>
+    </nav>
+
+    <div id="game-container">
+        <div id="overlay">
+            <h1 style="font-family:'Bangers'; font-size:5rem; margin:0; color:var(--cyber);">PHASER COSMIC RUN</h1>
+            <p style="font-family:'Russo One'; color:var(--white); letter-spacing:2px;">ENGINE: PHASER v3 · HIGH FIDELITY PHYSICS</p>
+            <button class="btn" onclick="start()">IGNITE ENGINES</button>
+        </div>
+    </div>
+
+    <button id="htp-btn" onclick="toggleHTP()">?</button>
+    <div id="htp-modal" onclick="toggleHTP()">
+        <div class="htp-content">
+            <h2 class="htp-title">HOW TO PLAY</h2>
+            <div class="htp-section">
+                <div class="htp-label">OBJECTIVE</div>
+                <div class="htp-text">Pilot the cosmic collector through space. Avoid debris and harvest glowing ATLR cores.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">CONTROLS</div>
+                <div class="htp-text">TAP or CLICK and DRAG to guide the ship. Fully optimized for responsive mobile touch devices.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">REWARDS</div>
+                <div class="htp-text">Earn +5 ATLR for every 10 cosmic cores harvested.</div>
+            </div>
+            <button class="btn" style="font-size: 1rem; padding: 10px 30px;">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        let gameInstance = null;
+
+        function toggleHTP() {
+            const m = document.getElementById('htp-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function start() {
+            document.getElementById('overlay').style.display = 'none';
+            if (gameInstance) return;
+
+            const config = {
+                type: Phaser.AUTO,
+                width: window.innerWidth,
+                height: window.innerHeight - 70,
+                parent: 'game-container',
+                physics: {
+                    default: 'arcade',
+                    arcade: { gravity: { y: 0 }, debug: false }
+                },
+                scene: { preload: preload, create: create, update: update }
+            };
+
+            gameInstance = new Phaser.Game(config);
+        }
+
+        let player;
+        let stars;
+        let obstacles;
+        let score = 0;
+        let scoreText;
+        let active = true;
+
+        function preload() {
+            this.load.image('ship', 'https://priscadezigns.org/logos/cupyx_logo_small.png');
+            this.load.image('star', 'https://priscadezigns.org/ateliagaming/assets/coins/atlr_coin_separate.webp');
+            this.load.image('obstacle', 'https://priscadezigns.org/logos/pd_mark_sq.png');
+        }
+
+        function create() {
+            active = true;
+            score = 0;
+
+            // Space Dust (Stars)
+            stars = this.physics.add.group({
+                key: 'star',
+                repeat: 5,
+                setXY: { x: 100, y: 0, stepX: window.innerWidth / 6 }
+            });
+
+            stars.children.iterate(function (child) {
+                child.y = Phaser.Math.Between(0, window.innerHeight - 200);
+                child.setVelocityY(Phaser.Math.Between(100, 200));
+                child.setScale(0.5);
+            });
+
+            // Obstacles
+            obstacles = this.physics.add.group({
+                key: 'obstacle',
+                repeat: 3,
+                setXY: { x: 200, y: -100, stepX: window.innerWidth / 4 }
+            });
+
+            obstacles.children.iterate(function (child) {
+                child.setVelocityY(Phaser.Math.Between(150, 300));
+                child.setScale(0.8);
+            });
+
+            // Player
+            player = this.physics.add.sprite(window.innerWidth / 2, window.innerHeight - 200, 'ship');
+            player.setCollideWorldBounds(true);
+            player.setScale(0.6);
+
+            // Collisions
+            this.physics.add.overlap(player, stars, collectStar, null, this);
+            this.physics.add.collider(player, obstacles, hitObstacle, null, this);
+
+            // Score UI
+            scoreText = this.add.text(20, 20, 'SCORE: 0', { 
+                fontSize: '32px', 
+                fill: '#00ffff', 
+                fontFamily: '"Russo One", sans-serif' 
+            });
+
+            // Touch input
+            this.input.on('pointermove', function (pointer) {
+                if (active) {
+                    player.x = pointer.x;
+                }
+            });
+        }
+
+        function update() {
+            if (!active) return;
+
+            // Loop stars
+            stars.children.iterate(function (child) {
+                if (child.y > window.innerHeight) {
+                    child.y = -50;
+                    child.x = Phaser.Math.Between(50, window.innerWidth - 50);
+                    child.setVelocityY(Phaser.Math.Between(100, 200));
+                }
+            });
+
+            // Loop obstacles
+            obstacles.children.iterate(function (child) {
+                if (child.y > window.innerHeight) {
+                    child.y = -50;
+                    child.x = Phaser.Math.Between(50, window.innerWidth - 50);
+                    child.setVelocityY(Phaser.Math.Between(150, 300));
+                }
+            });
+        }
+
+        function collectStar(player, star) {
+            star.y = -50;
+            star.x = Phaser.Math.Between(50, window.innerWidth - 50);
+            score += 10;
+            scoreText.setText('SCORE: ' + score);
+        }
+
+        function hitObstacle(player, obstacle) {
+            this.physics.pause();
+            active = false;
+            
+            const earnedAtlr = Math.floor(score / 2);
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('overlay').querySelector('h1').innerText = 'CORE WRECKED';
+            document.getElementById('overlay').querySelector('p').innerText = 'TOTAL ATLR SECURED: ' + earnedAtlr;
+
+            if (window.Atelia) {
+                Atelia.auth.getUser().then(u => {
+                    if (u.data.user) Atelia.arena.updatePrestige(u.data.user.id, earnedAtlr);
+                });
+            }
+
+            // Clean up game instance for retry
+            setTimeout(() => {
+                gameInstance.destroy(true);
+                gameInstance = null;
+            }, 500);
+        }
+    </script>
+</body>
+</html>

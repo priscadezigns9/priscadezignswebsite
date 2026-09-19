@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Stamven — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#E63946;--bg:#080808;--surface:#141414;--border:#E6394618;--text:#F5F5F5;--muted:#F5F5F555;--success:#4CAF50;--warning:#FFD740;--info:#40C4FF;--orange:#FF6B35}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+
+.sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;transition:transform 0.3s}
+.sidebar-logo{padding:20px 20px 18px;border-bottom:1px solid var(--border)}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);letter-spacing:2px;line-height:1}
+.logo-sub{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+.nav-section{padding:20px 0;flex:1;overflow-y:auto}
+.nav-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 20px 8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;font-size:0.85rem;font-weight:500;color:var(--muted);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{color:var(--text);background:#E6394608;border-left-color:#E6394644}
+.nav-item.active{color:var(--accent);background:#E6394611;border-left-color:var(--accent)}
+.nav-item .icon{width:18px;height:18px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.nav-badge{background:var(--warning);color:#080808;font-size:0.6rem;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:auto}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px}
+.user-avatar{width:34px;height:34px;background:var(--accent);color:#F5F5F5;font-weight:700;font-size:0.78rem;display:flex;align-items:center;justify-content:center}
+.user-name{font-size:0.82rem;font-weight:600}
+.user-role{font-size:0.7rem;color:var(--muted)}
+
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1.5px;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text)}
+.live-chip{display:flex;align-items:center;gap:6px;font-size:0.73rem;color:var(--success);font-weight:600}
+.live-dot{width:8px;height:8px;background:var(--success);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.content{padding:28px;flex:1}
+.page-header{margin-bottom:24px}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:1px;color:var(--text);line-height:1;margin-bottom:4px}
+.page-sub{font-size:0.83rem;color:var(--muted)}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden}
+.stat-card.red-accent{border-color:#E6394633}
+.stat-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.stat-card.red-accent::before{background:var(--accent)}
+.stat-card.green-accent::before{background:var(--success)}
+.stat-card.yellow-accent::before{background:var(--warning)}
+.stat-card.blue-accent::before{background:var(--info)}
+.stat-icon{font-size:1.8rem;margin-bottom:12px;display:block}
+.stat-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:8px}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;line-height:1;margin-bottom:6px;letter-spacing:1px}
+.stat-card.red-accent .stat-value{color:var(--accent)}
+.stat-card.green-accent .stat-value{color:var(--success)}
+.stat-card.yellow-accent .stat-value{color:var(--warning)}
+.stat-card.blue-accent .stat-value{color:var(--info)}
+.stat-change{font-size:0.73rem;color:var(--muted)}
+
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.widget{background:var(--surface);border:1px solid var(--border);overflow:hidden}
+.widget.full-width{grid-column:1/-1}
+.widget-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.widget-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;color:var(--text)}
+.widget-badge{font-size:0.65rem;font-weight:700;padding:3px 10px;text-transform:uppercase;letter-spacing:0.5px}
+.badge-red{background:#E6394622;color:var(--accent);border:1px solid #E6394644}
+.badge-green{background:#4CAF5022;color:var(--success);border:1px solid #4CAF5044}
+.badge-yellow{background:#FFD74022;color:var(--warning);border:1px solid #FFD74044}
+.badge-blue{background:#40C4FF22;color:var(--info);border:1px solid #40C4FF44}
+.widget-body{padding:16px 20px}
+.view-all{font-size:0.73rem;color:var(--accent);cursor:pointer;font-weight:600}
+
+/* Check-ins Live Feed */
+.checkin-counter{text-align:center;padding:20px 0 16px}
+.checkin-big{font-family:'Bebas Neue',sans-serif;font-size:5rem;color:var(--accent);line-height:1;letter-spacing:2px}
+.checkin-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:3px;color:var(--muted)}
+.checkin-bar{height:4px;background:#E6394622;margin:16px 0;overflow:hidden}
+.checkin-bar-fill{height:100%;background:var(--accent);width:62%;transition:width 1s}
+.checkin-sublabel{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted)}
+.recent-checkins{margin-top:16px}
+.checkin-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.checkin-item:last-child{border-bottom:none}
+.checkin-dot{width:8px;height:8px;background:var(--success);border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+.checkin-name{font-size:0.83rem;font-weight:600;color:var(--text);flex:1}
+.checkin-time{font-size:0.72rem;color:var(--muted)}
+
+/* Classes */
+.gym-class-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.gym-class-item:last-child{border-bottom:none}
+.class-time-col{width:58px;flex-shrink:0;text-align:center}
+.class-time-val{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:1px;color:var(--accent)}
+.class-time-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase}
+.class-color-bar{width:4px;height:50px;flex-shrink:0}
+.class-details{flex:1}
+.class-title-gym{font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:3px}
+.class-meta{font-size:0.72rem;color:var(--muted)}
+.class-spots{font-size:0.75rem;font-weight:600;white-space:nowrap}
+.spots-open{color:var(--success)}
+.spots-full{color:var(--accent)}
+
+/* Membership Expiry */
+.member-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.member-item:last-child{border-bottom:none}
+.member-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;color:#F5F5F5}
+.member-info{flex:1}
+.member-name{font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.member-plan{font-size:0.72rem;color:var(--muted)}
+.member-expiry{font-size:0.75rem;font-weight:700;padding:3px 10px;white-space:nowrap}
+.exp-urgent{color:var(--accent);background:#E6394622;border:1px solid #E6394644}
+.exp-soon{color:var(--warning);background:#FFD74022;border:1px solid #FFD74033}
+
+/* Revenue Chart */
+.rev-month{text-align:center;padding:16px 0}
+.rev-month-val{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:var(--accent);line-height:1;letter-spacing:1px}
+.rev-month-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-top:4px}
+.rev-bars{display:flex;align-items:flex-end;gap:8px;height:70px;margin:16px 0 8px}
+.rev-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.rev-bar{width:100%;background:var(--accent);opacity:0.5;border-radius:2px 2px 0 0;min-height:4px}
+.rev-bar.current{opacity:1;background:var(--accent)}
+.rev-bar-label{font-size:0.62rem;color:var(--muted)}
+.rev-breakdown-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.rev-breakdown-row:last-child{border-bottom:none}
+.rev-bk-label{font-size:0.78rem;color:var(--muted)}
+.rev-bk-val{font-size:0.85rem;font-weight:600;color:var(--text)}
+
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:45}
+@media(max-width:960px){.dashboard-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.hamburger{display:flex}.overlay.show{display:block}}
+@media(max-width:440px){.stats-row{grid-template-columns:1fr}.content{padding:16px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Stamven</div>
+    <div class="logo-sub">Fitness Management</div>
+  </div>
+  <nav class="nav-section">
+    <div class="nav-label">Menu</div>
+    <div class="nav-item active" onclick="setPage(this,'Dashboard')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Members')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Members
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Classes')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Classes
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Trainers')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Trainers
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Payments')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Payments
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Reports')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Reports
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Settings')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">KB</div>
+      <div>
+        <div class="user-name" id="user-name">Kyle Baptiste</div>
+        <div class="user-role">Gym Manager</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+      <span class="topbar-title" id="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <div class="live-chip"><div class="live-dot"></div>Live</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="page-title">GYM OVERVIEW</div>
+      <div class="page-sub">Stamven Fitness POS · Wednesday, May 6, 2026</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card red-accent">
+        <span class="stat-icon">🏃</span>
+        <div class="stat-label">Check-ins Today</div>
+        <div class="stat-value">47</div>
+        <div class="stat-change">12 currently in gym</div>
+      </div>
+      <div class="stat-card green-accent">
+        <span class="stat-icon">💰</span>
+        <div class="stat-label">Revenue This Month</div>
+        <div class="stat-value">$38.4k</div>
+        <div class="stat-change">TTD · ↑ 14% vs April</div>
+      </div>
+      <div class="stat-card yellow-accent">
+        <span class="stat-icon">🏋️</span>
+        <div class="stat-label">Classes Today</div>
+        <div class="stat-value">3</div>
+        <div class="stat-change">1 in progress</div>
+      </div>
+      <div class="stat-card blue-accent">
+        <span class="stat-icon">⚠️</span>
+        <div class="stat-label">Expiring Memberships</div>
+        <div class="stat-value">5</div>
+        <div class="stat-change">Within 7 days</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Check-ins Today</span>
+          <div class="live-chip" style="font-size:0.72rem"><div class="live-dot"></div>Live</div>
+        </div>
+        <div class="widget-body">
+          <div class="checkin-counter">
+            <div class="checkin-big" id="counter">47</div>
+            <div class="checkin-label">Check-ins</div>
+          </div>
+          <div class="checkin-bar"><div class="checkin-bar-fill"></div></div>
+          <div class="checkin-sublabel"><span>0</span><span>Peak: 75 (Tuesdays)</span><span>75</span></div>
+          <div class="recent-checkins" style="margin-top:20px">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;font-weight:600">Recent Check-ins</div>
+            <div id="checkin-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="widget">
+          <div class="widget-header">
+            <span class="widget-title">Classes Today</span>
+            <span class="widget-badge badge-red">3 Scheduled</span>
+          </div>
+          <div class="widget-body" id="classes-widget"></div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">
+            <span class="widget-title">Revenue This Month</span>
+            <span class="widget-badge badge-green">May 2026</span>
+          </div>
+          <div class="widget-body" id="revenue-widget"></div>
+        </div>
+      </div>
+
+      <div class="widget full-width">
+        <div class="widget-header">
+          <span class="widget-title">Membership Expiry Alerts</span>
+          <span class="view-all">Send Renewals →</span>
+        </div>
+        <div class="widget-body" id="expiry-widget"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const recentCheckins = [
+  {name:'Marcus Phillip', time:'9:42 AM'},
+  {name:'Aisha Williams', time:'9:38 AM'},
+  {name:'Derron Baptiste', time:'9:31 AM'},
+  {name:'Kezia Narine', time:'9:28 AM'},
+  {name:'Tony Ramkissoon', time:'9:22 AM'},
+];
+
+const gymClasses = [
+  {time:'7:00', ampm:'AM', name:'Bootcamp HIIT', trainer:'J. Charles', spots:'Full', color:'#E63946', full:true},
+  {time:'10:30', ampm:'AM', name:'Yoga & Stretch', trainer:'Ms. L. Ali', spots:'4 spots left', color:'#40C4FF', full:false},
+  {time:'6:00', ampm:'PM', name:'Strength Training', trainer:'K. Thomas', spots:'8 spots left', color:'#4CAF50', full:false},
+];
+
+const expiring = [
+  {name:'Darius Joseph', plan:'Monthly Premium', exp:'May 8, 2026', days:2, color:'#E63946'},
+  {name:'Sharon Ramesar', plan:'Monthly Standard', exp:'May 9, 2026', days:3, color:'#FF6B35'},
+  {name:'Kevin Maharaj', plan:'Quarterly Premium', exp:'May 10, 2026', days:4, color:'#E63946'},
+  {name:'Patrice Charles', plan:'Monthly Standard', exp:'May 11, 2026', days:5, color:'#FFD740'},
+  {name:'Andre Williams', plan:'Monthly Premium', exp:'May 12, 2026', days:6, color:'#FFD740'},
+];
+
+const revBars = [
+  {mon:'Jan', val:28000, cur:false},{mon:'Feb', val:31000, cur:false},{mon:'Mar', val:34500, cur:false},
+  {mon:'Apr', val:33700, cur:false},{mon:'May', val:38400, cur:true}
+];
+
+document.getElementById('checkin-list').innerHTML = recentCheckins.map(c => `
+  <div class="checkin-item">
+    <div class="checkin-dot"></div>
+    <span class="checkin-name">${c.name}</span>
+    <span class="checkin-time">${c.time}</span>
+  </div>
+`).join('');
+
+document.getElementById('classes-widget').innerHTML = gymClasses.map(c => `
+  <div class="gym-class-item">
+    <div class="class-time-col">
+      <div class="class-time-val">${c.time}</div>
+      <div class="class-time-label">${c.ampm}</div>
+    </div>
+    <div class="class-color-bar" style="background:${c.color}"></div>
+    <div class="class-details">
+      <div class="class-title-gym">${c.name}</div>
+      <div class="class-meta">${c.trainer}</div>
+    </div>
+    <span class="class-spots ${c.full ? 'spots-full' : 'spots-open'}">${c.spots}</span>
+  </div>
+`).join('');
+
+const maxRev = Math.max(...revBars.map(r => r.val));
+document.getElementById('revenue-widget').innerHTML = `
+  <div class="rev-month">
+    <div class="rev-month-val">$38,400</div>
+    <div class="rev-month-label">TTD · May 2026 (to date)</div>
+  </div>
+  <div class="rev-bars">
+    ${revBars.map(r => `
+      <div class="rev-bar-wrap">
+        <div class="rev-bar ${r.cur ? 'current' : ''}" style="height:${Math.round(r.val/maxRev*60)}px"></div>
+        <div class="rev-bar-label">${r.mon}</div>
+      </div>
+    `).join('')}
+  </div>
+  <div class="rev-breakdown-row"><span class="rev-bk-label">Memberships</span><span class="rev-bk-val">$28,200</span></div>
+  <div class="rev-breakdown-row"><span class="rev-bk-label">Class Fees</span><span class="rev-bk-val">$6,800</span></div>
+  <div class="rev-breakdown-row"><span class="rev-bk-label">Personal Training</span><span class="rev-bk-val">$3,400</span></div>
+`;
+
+document.getElementById('expiry-widget').innerHTML = expiring.map(m => `
+  <div class="member-item">
+    <div class="member-avatar" style="background:${m.color}">${m.name.split(' ').map(n=>n[0]).join('')}</div>
+    <div class="member-info">
+      <div class="member-name">${m.name}</div>
+      <div class="member-plan">${m.plan}</div>
+    </div>
+    <span class="member-expiry ${m.days <= 3 ? 'exp-urgent' : 'exp-soon'}">Exp: ${m.exp}</span>
+  </div>
+`).join('');
+
+const user = JSON.parse(localStorage.getItem('stamven_user') || '{}');
+if(user.name) document.getElementById('user-name').textContent = user.name;
+
+function setPage(el, name){ document.getElementById('page-title').textContent = name; document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active'); closeSidebar(); }
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
+</body>
+</html>

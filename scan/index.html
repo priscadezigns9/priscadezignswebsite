@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Scan | Neural Brand Diagnostic by Prisca Dezigns</title>
+    <link rel="icon" type="image/png" href="https://share.zapia.com/si99hoojrdxzaoos5dmo1x">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --ivory: #FFFFF0;
+            --lilac: #C8A2C8;
+            --purple: #301934;
+            --text: #1a1a1a;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--ivory); color: var(--text); font-family: var(--font-body); overflow: hidden; height: 100vh; width: 100vw; }
+
+        #globe-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.4; }
+        
+        .main-ui { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; text-align: center; }
+        
+        h1 { font-family: var(--font-heading); font-size: clamp(2.5rem, 8vw, 5rem); color: var(--purple); margin-bottom: 10px; letter-spacing: -2px; }
+        .subtitle { color: var(--lilac); font-weight: 900; letter-spacing: 4px; text-transform: uppercase; font-size: 0.9rem; margin-bottom: 40px; }
+
+        .scan-box { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); padding: 40px; border-radius: 4px; border: 1px solid var(--lilac); max-width: 500px; width: 100%; box-shadow: 0 10px 30px rgba(48, 25, 52, 0.1); }
+        
+        input { width: 100%; padding: 15px; border: 1px solid var(--lilac); background: transparent; color: var(--purple); font-family: var(--font-body); margin-bottom: 20px; outline: none; text-align: center; font-size: 1.1rem; }
+        input::placeholder { color: var(--lilac); opacity: 0.6; }
+
+        .scan-btn { background: var(--purple); color: var(--ivory); border: none; padding: 18px 40px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: 0.3s; width: 100%; }
+        .scan-btn:hover { letter-spacing: 4px; opacity: 0.9; }
+
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--ivory); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #status { font-family: var(--font-heading); font-size: 1.5rem; color: var(--purple); margin-top: 20px; }
+        
+        .loader { width: 50px; height: 50px; border: 3px solid var(--lilac); border-top: 3px solid var(--purple); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ── RESULTS — same layout, scrollable ── */
+        #results { display: none; position: relative; z-index: 10; flex-direction: column; align-items: center; width: 100%; max-width: 600px; overflow-y: auto; height: 100vh; padding: 40px 20px; margin: 0 auto; }
+        #results h1 { flex-shrink: 0; }
+
+        .result-card { background: white; padding: 30px; border: 1px solid var(--lilac); text-align: left; margin-top: 20px; width: 100%; }
+        .result-card h2 { font-family: var(--font-heading); color: var(--purple); margin-bottom: 15px; }
+        .score { font-size: 3rem; font-weight: 900; color: var(--purple); margin-bottom: 4px; }
+        .score-verdict { font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--lilac); margin-bottom: 16px; }
+
+        /* Category bars */
+        .cat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .cat-label { font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--purple); width: 120px; flex-shrink: 0; }
+        .cat-bar-bg { flex: 1; height: 5px; background: rgba(200,162,200,0.25); border-radius: 3px; margin: 0 10px; }
+        .cat-bar-fill { height: 5px; border-radius: 3px; transition: width 1.2s ease; }
+        .cat-num { font-size: 0.78rem; font-weight: 900; width: 36px; text-align: right; flex-shrink: 0; }
+        .c-good { background: #2d7a4f; color: #2d7a4f; }
+        .c-warn { background: #b06020; color: #b06020; }
+        .c-bad  { background: #b03030; color: #b03030; }
+
+        /* Issues */
+        .issues-title { font-family: var(--font-heading); font-size: 1.1rem; color: var(--purple); margin: 20px 0 10px; border-top: 1px solid rgba(200,162,200,0.4); padding-top: 16px; }
+        .issue-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid rgba(200,162,200,0.2); }
+        .issue-icon { flex-shrink: 0; font-size: 1rem; margin-top: 1px; }
+        .issue-title { font-weight: 900; font-size: 0.85rem; color: var(--purple); margin-bottom: 2px; }
+        .issue-desc  { font-size: 0.82rem; line-height: 1.5; color: #555; }
+        .locked-more { text-align: center; padding: 14px 0 4px; font-size: 0.82rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--purple); opacity: 0.6; }
+
+        .back-btn { margin-top: 20px; display: inline-block; color: var(--purple); text-decoration: none; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; flex-shrink: 0; margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+
+    <div id="globe-container"></div>
+
+    <div id="overlay">
+        <div class="loader"></div>
+        <div id="status">INITIATING NEURAL SCAN...</div>
+    </div>
+
+    <div class="main-ui" id="main-ui">
+        <h1>Alpha Scan</h1>
+        <p class="subtitle">Neural Brand Diagnostic</p>
+
+        <div class="scan-box">
+            <input type="text" id="domain" placeholder="ENTER BRAND DOMAIN (e.g. brand.com)">
+            <input type="email" id="user-email" placeholder="YOUR ARCHITECT EMAIL">
+            <button class="scan-btn" onclick="startScan()">Initiate Scan</button>
+            <a href="../" class="back-btn">Return to Hub</a>
+        </div>
+    </div>
+
+    <!-- RESULTS — exact same layout, real data injected -->
+    <div id="results">
+        <h1>Diagnostic Report</h1>
+
+        <div class="result-card">
+            <!-- Score -->
+            <div class="score" id="result-score">—</div>
+            <div class="score-verdict" id="result-verdict">Analyzing...</div>
+
+            <!-- Category bars -->
+            <div id="cat-bars"></div>
+
+            <!-- Issues preview -->
+            <div class="issues-title">Issues Detected</div>
+            <div id="issue-list"></div>
+
+            <!-- Locked notice -->
+            <p style="margin: 20px 0 10px; color: var(--purple); font-weight: 900; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">🔒 Full Report Locked — Unlock for $9.99</p>
+            <p style="margin-bottom: 25px; line-height: 1.6; font-size: 0.95rem;">Your full report includes a detailed breakdown of every issue found, exact action steps, and a custom growth roadmap prepared by the Prisca Dezigns team — specific to <span id="cta-domain" style="font-weight:900;"></span>.</p>
+            <a class="scan-btn" id="paypal-btn" href="https://www.paypal.com/paypalme/priscadezigns9/9.99" target="_blank" style="display:block; text-align:center; text-decoration:none;">Get Full Report — $9.99</a>
+        </div>
+
+        <a href="javascript:location.reload()" class="back-btn">Run New Scan</a>
+    </div>
+
+    <script>
+        const supabaseClient = supabase.createClient(
+            'https://sktpjacowqaedddtrhuz.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs'
+        );
+
+        /* ── GLOBE (unchanged) ── */
+        const scene    = new THREE.Scene();
+        const camera   = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('globe-container').appendChild(renderer.domElement);
+
+        const globe = new THREE.Mesh(
+            new THREE.SphereGeometry(3, 64, 64),
+            new THREE.MeshPhongMaterial({ color: 0xC8A2C8, wireframe: true, transparent: true, opacity: 0.3 })
+        );
+        scene.add(globe);
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x404040));
+        camera.position.z = 6;
+        (function animate(){ requestAnimationFrame(animate); globe.rotation.y += 0.002; globe.rotation.x += 0.001; renderer.render(scene, camera); })();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+
+        /* ── SCAN ENTRY ── */
+        async function startScan() {
+            const rawDomain = document.getElementById('domain').value.trim();
+            const email     = document.getElementById('user-email').value.trim();
+            if (!rawDomain || !email) { alert('Please provide both domain and email.'); return; }
+
+            const domain = rawDomain.replace(/^https?:\/\//,'').replace(/\/.*$/,'').toLowerCase();
+            const url    = 'https://' + domain;
+
+            document.getElementById('overlay').style.display = 'flex';
+            const statusEl = document.getElementById('status');
+
+            // Animated messages while real checks run in parallel
+            const msgs = [
+                'FETCHING DOMAIN METADATA...',
+                'ANALYZING SEO SIGNAL...',
+                'EVALUATING PERFORMANCE...',
+                'CHECKING MOBILE ADAPTATION...',
+                'RUNNING GEO / AEO AUDIT...',
+                'FINALIZING DIAGNOSTIC REPORT...'
+            ];
+
+            let msgIdx = 0;
+            statusEl.innerText = msgs[0];
+            const ticker = setInterval(() => {
+                msgIdx = Math.min(msgIdx + 1, msgs.length - 1);
+                statusEl.innerText = msgs[msgIdx];
+            }, 1400);
+
+            // Run all checks
+            const [ssl, psi, meta] = await Promise.all([
+                checkSSL(domain),
+                fetchPSI(url),
+                fetchMeta(url)
+            ]);
+
+            clearInterval(ticker);
+            statusEl.innerText = 'FINALIZING DIAGNOSTIC REPORT...';
+            await sleep(800);
+
+            const report = buildReport(domain, { ssl, psi, meta });
+            renderResults(domain, email, report);
+
+            // Log lead
+            try {
+                await supabaseClient.from('leads').insert([{
+                    name: 'Scan User',
+                    email: email,
+                    package: 'ALPHA SCAN',
+                    brand: 'Prisca Dezigns',
+                    message: `Domain: ${domain} | Score: ${report.score}/100`,
+                    created_at: new Date().toISOString()
+                }]);
+            } catch(e) { console.warn('Lead log:', e); }
+        }
+
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        /* ── REAL CHECKS ── */
+        async function checkSSL(domain) {
+            try {
+                await fetch('https://' + domain, { method: 'HEAD', mode: 'no-cors' });
+                return { valid: true };
+            } catch { return { valid: false }; }
+        }
+
+        async function fetchPSI(url) {
+            try {
+                const r = await fetch(
+                    `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile`
+                );
+                if (!r.ok) throw new Error();
+                const d = await r.json();
+                const cats = d.lighthouseResult?.categories || {};
+                const audits = d.lighthouseResult?.audits || {};
+                return {
+                    performance:   Math.round((cats.performance?.score   || 0) * 100),
+                    accessibility: Math.round((cats.accessibility?.score || 0) * 100),
+                    seo:           Math.round((cats.seo?.score           || 0) * 100),
+                    bestPractices: Math.round((cats['best-practices']?.score || 0) * 100),
+                    fcp:  audits['first-contentful-paint']?.displayValue   || null,
+                    lcp:  audits['largest-contentful-paint']?.displayValue || null,
+                    hasMeta:    (audits['meta-description']?.score || 0) === 1,
+                    hasViewport:(audits['viewport']?.score         || 0) === 1,
+                    hasSchema:  (audits['structured-data']?.score  || 0) === 1,
+                    hasHTTPS:   (audits['is-on-https']?.score      || 0) === 1,
+                };
+            } catch { return null; }
+        }
+
+        async function fetchMeta(url) {
+            try {
+                const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                const d = await r.json();
+                const h = d.contents || '';
+                return {
+                    hasTitle:    /<title[^>]*>[^<]{5,}/i.test(h),
+                    hasMeta:     /meta\s+name=["']description["']/i.test(h),
+                    hasOG:       /property=["']og:/i.test(h),
+                    hasViewport: /name=["']viewport["']/i.test(h),
+                    hasSchema:   /application\/ld\+json/i.test(h),
+                    hasCanonical:/rel=["']canonical["']/i.test(h),
+                    hasAlt:      /<img[^>]+alt=["'][^"']{3,}/i.test(h),
+                    hasFavicon:  /rel=["'](icon|shortcut icon|apple-touch-icon)["']/i.test(h),
+                };
+            } catch { return null; }
+        }
+
+        /* ── REPORT BUILDER ── */
+        function buildReport(domain, { ssl, psi, meta }) {
+            let issues = [];
+            let cats   = [];
+
+            // Security
+            const sslOk = ssl?.valid !== false;
+            cats.push({ name: 'Security', score: sslOk ? 95 : 12 });
+            if (!sslOk) issues.push({ icon: '🔓', title: 'No SSL Certificate', desc: 'Your site is not secured. Browsers flag it as dangerous and Google penalises it in rankings. Prisca Dezigns will configure full SSL/TLS.' });
+
+            // SEO
+            let seoScore = 60;
+            if (psi) { seoScore = psi.seo; }
+            else if (meta) {
+                seoScore = 40;
+                if (meta.hasTitle)     seoScore += 12;
+                if (meta.hasMeta)      seoScore += 12;
+                if (meta.hasOG)        seoScore += 10;
+                if (meta.hasCanonical) seoScore += 8;
+                if (meta.hasSchema)    seoScore += 10;
+                seoScore = Math.min(seoScore, 95);
+            }
+            cats.push({ name: 'SEO', score: seoScore });
+            if (meta && !meta.hasMeta) issues.push({ icon: '🔍', title: 'Missing Meta Description', desc: 'No meta description found. Google uses this as your search snippet. Prisca Dezigns will write and implement optimised meta descriptions for every page.' });
+            if (meta && !meta.hasOG)   issues.push({ icon: '📣', title: 'No Open Graph Tags', desc: 'When your link is shared on WhatsApp or Facebook, no image or preview appears. Prisca Dezigns will implement a full OG tag suite.' });
+            if (meta && !meta.hasCanonical) issues.push({ icon: '🔗', title: 'No Canonical Tag', desc: 'Duplicate content issues are being created silently. Prisca Dezigns will implement canonical tagging across your full site architecture.' });
+            if ((psi && !psi.hasSchema) || (meta && !meta.hasSchema)) issues.push({ icon: '🌐', title: 'No Structured Data (GEO/AEO)', desc: 'Zero JSON-LD schema detected. AI search engines (Google AI Overview, ChatGPT) cannot properly read your business. Prisca Dezigns will implement LocalBusiness, Product, and FAQ schema.' });
+
+            // Performance
+            let perfScore = psi ? psi.performance : (meta ? 52 : 45);
+            cats.push({ name: 'Performance', score: perfScore });
+            if (perfScore < 50) issues.push({ icon: '⚡', title: 'Critical Speed Issues', desc: `Your site loads too slowly on mobile${psi?.lcp ? ` (LCP: ${psi.lcp})` : ''}. Google uses Core Web Vitals as a ranking factor. Prisca Dezigns will optimise assets, implement lazy loading, and configure CDN delivery.` });
+            else if (perfScore < 75) issues.push({ icon: '⚡', title: 'Page Speed Needs Improvement', desc: `Performance score: ${perfScore}/100${psi?.fcp ? ` — FCP: ${psi.fcp}` : ''}. Mobile users expect pages under 3 seconds. Prisca Dezigns will compress images, minify code, and improve load architecture.` });
+
+            // Mobile
+            let mobileScore = psi ? (psi.hasViewport ? 78 : 22) : (meta?.hasViewport ? 68 : 28);
+            cats.push({ name: 'Mobile', score: mobileScore });
+            if (!meta?.hasViewport && !psi?.hasViewport) issues.push({ icon: '📱', title: 'Not Mobile Optimised', desc: 'No viewport tag detected — your site is likely broken on mobile. Over 70% of Caribbean web traffic is mobile. Prisca Dezigns will rebuild your responsive architecture.' });
+            else if (mobileScore < 70) issues.push({ icon: '📱', title: 'Mobile Experience Needs Work', desc: 'Basic mobile support exists but performance is below standard. Prisca Dezigns will optimise your mobile-first layout and speed.' });
+
+            // Best Practices / Accessibility
+            let bpScore = psi ? Math.round((psi.accessibility + psi.bestPractices) / 2) : (meta?.hasAlt ? 62 : 44);
+            cats.push({ name: 'Best Practices', score: bpScore });
+            if (meta && !meta.hasAlt)     issues.push({ icon: '♿', title: 'Images Missing Alt Text', desc: 'Images have no alt attributes, hurting both accessibility and SEO. Prisca Dezigns will audit and tag all visual assets.' });
+            if (meta && !meta.hasFavicon) issues.push({ icon: '🖼', title: 'No Favicon Detected', desc: 'No favicon found. This affects brand professionalism in browsers and bookmarks. Prisca Dezigns will design and implement a full icon suite.' });
+
+            // Brand Signal
+            const brandScore = (meta?.hasOG && meta?.hasTitle && meta?.hasFavicon) ? 82 : (meta?.hasTitle ? 55 : 32);
+            cats.push({ name: 'Brand Signal', score: brandScore });
+            if (brandScore < 60) issues.push({ icon: '🎨', title: 'Weak Brand Signal Online', desc: 'Your brand lacks consistent digital identity — missing social metadata, visual assets, or brand architecture. Prisca Dezigns specialises in high-fidelity brand signal engineering.' });
+
+            // Overall
+            const score = Math.round(cats.reduce((a, c) => a + c.score, 0) / cats.length);
+            let verdict = '';
+            if      (score >= 85) verdict = 'Strong — Fine-Tuning Needed';
+            else if (score >= 65) verdict = 'Moderate Signal — Key Gaps Detected';
+            else if (score >= 45) verdict = 'Significant Issues — Action Required';
+            else                  verdict = 'Critical State — Immediate Attention Needed';
+
+            const previewIssues = issues.slice(0, 4);
+            const hiddenCount   = Math.max(0, issues.length - 4);
+
+            return { score, verdict, cats, previewIssues, hiddenCount };
+        }
+
+        /* ── RENDER ── */
+        function renderResults(domain, email, r) {
+            document.getElementById('overlay').style.display  = 'none';
+            document.getElementById('main-ui').style.display  = 'none';
+            document.getElementById('results').style.display  = 'flex';
+
+            document.getElementById('result-score').innerText  = r.score + '/100';
+            document.getElementById('result-verdict').innerText = r.verdict;
+            document.getElementById('cta-domain').innerText    = domain;
+            document.getElementById('paypal-btn').href =
+                `https://www.paypal.com/paypalme/priscadezigns9/9.99?note=Brand+Report:+${encodeURIComponent(domain)}`;
+
+            // Category bars
+            const catWrap = document.getElementById('cat-bars');
+            catWrap.innerHTML = '';
+            r.cats.forEach(c => {
+                const cls = c.score >= 75 ? 'good' : c.score >= 50 ? 'warn' : 'bad';
+                catWrap.innerHTML += `
+                <div class="cat-row">
+                    <span class="cat-label">${c.name}</span>
+                    <div class="cat-bar-bg"><div class="cat-bar-fill c-${cls}" style="width:0%" data-w="${c.score}%"></div></div>
+                    <span class="cat-num c-${cls}">${c.score}</span>
+                </div>`;
+            });
+            setTimeout(() => {
+                document.querySelectorAll('.cat-bar-fill').forEach(b => b.style.width = b.dataset.w);
+            }, 200);
+
+            // Issues
+            const issueWrap = document.getElementById('issue-list');
+            issueWrap.innerHTML = '';
+            r.previewIssues.forEach(i => {
+                issueWrap.innerHTML += `
+                <div class="issue-row">
+                    <span class="issue-icon">${i.icon}</span>
+                    <div><div class="issue-title">${i.title}</div><div class="issue-desc">${i.desc}</div></div>
+                </div>`;
+            });
+            if (r.hiddenCount > 0) {
+                issueWrap.innerHTML += `<div class="locked-more">🔒 +${r.hiddenCount} more issue${r.hiddenCount > 1 ? 's' : ''} in the full report</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

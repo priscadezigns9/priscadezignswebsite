@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio — Portfolio Template | Prisca Dezigns</title>
+  <meta name="description" content="A clean white editorial portfolio template with a giant hover-image project list. For consultants, artists, freelancers, coaches & photographers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ─── TOKENS ─── */
+    :root {
+      --bg:      #ffffff;
+      --text:    #0a0a0a;
+      --muted:   rgba(10,10,10,0.42);
+      --dim:     rgba(10,10,10,0.18);
+      --border:  rgba(10,10,10,0.10);
+      --serif:   'Cormorant Garamond', Georgia, serif;
+      --sans:    'Inter', system-ui, sans-serif;
+      --track:   0.14em;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--serif);
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; }
+
+    /* ─────────────────────────────────────────────
+       HEADER — fixed, minimal
+    ───────────────────────────────────────────── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(16px, 3vh, 28px) clamp(18px, 3.5vw, 40px);
+      background: var(--bg);
+    }
+
+    .wordmark {
+      font-family: var(--sans);
+      font-weight: 400;
+      font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+      letter-spacing: var(--track);
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    nav {
+      display: flex;
+      gap: clamp(20px, 4vw, 48px);
+      align-items: center;
+    }
+    nav a {
+      font-family: var(--sans);
+      font-size: clamp(0.62rem, 1vw, 0.72rem);
+      font-weight: 400;
+      letter-spacing: var(--track);
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    nav a:hover,
+    nav a.active { color: var(--text); }
+
+    /* ─────────────────────────────────────────────
+       PAGE VIEWS — SPA-style toggling
+    ───────────────────────────────────────────── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ─────────────────────────────────────────────
+       OVERVIEW — the giant project list
+    ───────────────────────────────────────────── */
+    #view-overview {
+      padding-top: clamp(70px, 10vh, 100px);
+    }
+
+    .project-list {
+      width: 100%;
+    }
+
+    .project-item {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: clamp(4px, 0.8vh, 10px) clamp(18px, 3vw, 40px);
+      cursor: pointer;
+      position: relative;
+      /* Hairline border between rows */
+      border-bottom: 1px solid var(--border);
+      transition: color 0.22s;
+      /* No background by default */
+    }
+    .project-list .project-item:first-child {
+      border-top: 1px solid var(--border);
+    }
+
+    .project-title {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(2.8rem, 7.5vw, 8rem);
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      transition: opacity 0.22s;
+      display: block;
+    }
+
+    /* On hover: title fades slightly, image appears at cursor */
+    .project-item:hover .project-title { opacity: 0.45; }
+
+    /* Category tag — small, sits to the right inline */
+    .project-cat {
+      position: absolute;
+      right: clamp(18px, 4vw, 48px);
+      bottom: clamp(8px, 1.5vh, 18px);
+      font-family: var(--sans);
+      font-size: clamp(0.56rem, 0.9vw, 0.65rem);
+      font-weight: 400;
+      letter-spacing: var(--track);
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: opacity 0.22s;
+    }
+    .project-item:hover .project-cat { opacity: 0; }
+
+    /* Index number — top-left of each row */
+    .project-num {
+      position: absolute;
+      left: clamp(18px, 4vw, 48px);
+      bottom: clamp(8px, 1.5vh, 18px);
+      font-family: var(--sans);
+      font-size: clamp(0.56rem, 0.9vw, 0.65rem);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      color: var(--dim);
+      transition: opacity 0.22s;
+    }
+    .project-item:hover .project-num { opacity: 0; }
+
+    /* ─────────────────────────────────────────────
+       CURSOR-FOLLOWING PREVIEW IMAGE
+       Appears on project row hover, follows mouse
+    ───────────────────────────────────────────── */
+    .cursor-img {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9000;
+      width: clamp(180px, 22vw, 340px);
+      aspect-ratio: 2/3;
+      overflow: hidden;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.92) rotate(-2deg);
+      transition: opacity 0.28s ease, transform 0.28s ease;
+      will-change: transform, opacity;
+    }
+    .cursor-img.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+    .cursor-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    /* ─────────────────────────────────────────────
+       ABOUT VIEW
+    ───────────────────────────────────────────── */
+    #view-about {
+      padding: clamp(80px, 14vh, 120px) clamp(18px, 5vw, 80px) clamp(60px, 10vh, 100px);
+      max-width: 900px;
+    }
+
+    .about-eyebrow {
+      font-family: var(--sans);
+      font-size: clamp(0.62rem, 1vw, 0.7rem);
+      font-weight: 400;
+      letter-spacing: var(--track);
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: clamp(24px, 5vh, 48px);
+    }
+
+    .about-headline {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(1.3rem, 3vw, 2.2rem);
+      line-height: 1.55;
+      letter-spacing: 0.01em;
+      color: var(--text);
+      margin-bottom: clamp(28px, 5vh, 56px);
+      max-width: 800px;
+    }
+
+    .about-body {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
+      line-height: 1.75;
+      color: rgba(10,10,10,0.72);
+      max-width: 720px;
+      margin-bottom: clamp(28px, 5vh, 48px);
+    }
+
+    .about-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin: clamp(28px,5vh,56px) 0;
+    }
+
+    .about-info-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 32px;
+      border-top: 1px solid var(--border);
+      padding-top: clamp(24px, 4vh, 40px);
+      margin-top: clamp(24px, 4vh, 40px);
+    }
+    .about-info-label {
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      letter-spacing: var(--track);
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .about-info-val {
+      font-family: var(--serif);
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      font-weight: 300;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .about-info-val a { border-bottom: 1px solid var(--border); transition: border-color 0.2s; }
+    .about-info-val a:hover { border-color: var(--text); }
+
+    /* ─────────────────────────────────────────────
+       CONTACT CTA (bottom of about)
+    ───────────────────────────────────────────── */
+    .about-cta-block {
+      margin-top: clamp(48px, 8vh, 96px);
+      border-top: 1px solid var(--border);
+      padding-top: clamp(32px, 5vh, 56px);
+    }
+    .about-cta-label {
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      letter-spacing: var(--track);
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: clamp(16px, 3vh, 28px);
+    }
+    .about-cta-link {
+      display: block;
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(2rem, 5vw, 4.5rem);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      transition: opacity 0.2s;
+    }
+    .about-cta-link:hover { opacity: 0.4; }
+
+    /* ─────────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 18px clamp(18px, 3.5vw, 40px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      letter-spacing: var(--track);
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    footer a { transition: color 0.2s; }
+    footer a:hover { color: var(--text); }
+
+    /* ─────────────────────────────────────────────
+       DEMO BAR
+    ───────────────────────────────────────────── */
+    .demo-bar {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 8000;
+      background: rgba(10,10,10,0.82);
+      backdrop-filter: blur(10px);
+      border-radius: 100px;
+      padding: 7px 20px;
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .demo-bar a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      pointer-events: auto;
+    }
+
+    /* ─────────────────────────────────────────────
+       MOBILE
+    ───────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .project-title { font-size: clamp(2rem, 10vw, 4rem); }
+      .project-cat { display: none; }
+      .about-info-grid { grid-template-columns: 1fr 1fr; }
+      .cursor-img { display: none; } /* mobile: no cursor image, tap instead */
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .about-info-grid { grid-template-columns: 1fr; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ── DEMO BAR ── -->
+<div class="demo-bar">
+  ✦ Template Demo — Studio List by Prisca Dezigns &nbsp;·&nbsp;
+  <a href="https://priscadezigns.org/templates/">Choose This Template →</a>
+</div>
+
+<!-- ── CURSOR IMAGE (follows mouse) ── -->
+<div class="cursor-img" id="cursorImg">
+  <img id="cursorImgSrc" src="" alt="">
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <a class="wordmark" href="#" onclick="showView('overview');return false;">[Your Name]</a>
+  <nav>
+    <a href="#" id="nav-overview" class="active" onclick="showView('overview');return false;">Overview</a>
+    <a href="#" id="nav-about"    onclick="showView('about');return false;">About</a>
+  </nav>
+</header>
+
+<!-- ══════════════════════════════════
+     OVERVIEW — project title list
+══════════════════════════════════ -->
+<div id="view-overview" class="view active">
+
+  <div class="project-list" id="projectList">
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">01</span>
+      <span class="project-title">[Project Title One]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">02</span>
+      <span class="project-title">[Project Title Two]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">03</span>
+      <span class="project-title">[Project Title Three]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">04</span>
+      <span class="project-title">[Project Title Four]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1488716820095-cbe80883c496?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">05</span>
+      <span class="project-title">[Project Title Five]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">06</span>
+      <span class="project-title">[Project Title Six]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1519638399535-1b036603ac77?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">07</span>
+      <span class="project-title">[Project Title Seven]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">08</span>
+      <span class="project-title">[Project Title Eight]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">09</span>
+      <span class="project-title">[Project Title Nine]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">10</span>
+      <span class="project-title">[Project Title Ten]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1519058082700-08a0b56da9b4?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">11</span>
+      <span class="project-title">[Project Title Eleven]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+    <div class="project-item"
+         data-img="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=900&q=80&fit=crop&crop=top">
+      <span class="project-num">12</span>
+      <span class="project-title">[Project Title Twelve]</span>
+      <span class="project-cat">[Category]</span>
+    </div>
+
+  </div>
+
+  <footer>
+    <span>[Your Name] © 2026</span>
+    <span>All rights reserved</span>
+    <span>Built by <a href="https://priscadezigns.org" target="_blank">Prisca Dezigns</a></span>
+  </footer>
+
+</div>
+
+<!-- ══════════════════════════════════
+     ABOUT VIEW
+══════════════════════════════════ -->
+<div id="view-about" class="view">
+
+  <div id="view-about-inner">
+    <p class="about-eyebrow">An aesthetic and an ethic</p>
+
+    <p class="about-headline">
+      [Your Name] is a [your discipline] based in [your city] —
+      working at the intersection of [field one], [field two],
+      and [field three] with a constant emphasis on quality,
+      precision, and human connection.
+    </p>
+
+    <div class="about-divider"></div>
+
+    <p class="about-body">
+      Every project begins with listening. Understanding what is needed,
+      what is missing, and what only you can bring to the world.
+      The work is tailor-made — built around each client's vision,
+      not a formula.
+    </p>
+
+    <p class="about-body">
+      The practice supports both established names and emerging
+      voices, adapting methods and approach to each brief.
+      At the heart of the work is a passion for images and the
+      care given to those who make them.
+    </p>
+
+    <div class="about-info-grid">
+      <div>
+        <p class="about-info-label">Based in</p>
+        <p class="about-info-val">[Your City]<br>[Your Country]</p>
+      </div>
+      <div>
+        <p class="about-info-label">Disciplines</p>
+        <p class="about-info-val">[Field One]<br>[Field Two]<br>[Field Three]</p>
+      </div>
+      <div>
+        <p class="about-info-label">Available for</p>
+        <p class="about-info-val">Commissions<br>Collaborations<br>Consulting</p>
+      </div>
+    </div>
+
+    <div class="about-cta-block">
+      <p class="about-cta-label">Get in touch</p>
+      <a class="about-cta-link" href="mailto:hello@yourdomain.com">
+        hello@yourdomain.com
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <span>[Your Name] © 2026</span>
+    <span><a href="#" onclick="showView('overview');return false;">Overview</a></span>
+    <span>Built by <a href="https://priscadezigns.org" target="_blank">Prisca Dezigns</a></span>
+  </footer>
+
+</div>
+
+<script>
+/* ── SPA view switcher ── */
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+/* ── Cursor-following image ── */
+(function () {
+  const cursorImg    = document.getElementById('cursorImg');
+  const cursorImgSrc = document.getElementById('cursorImgSrc');
+  const items        = document.querySelectorAll('.project-item');
+
+  let mx = 0, my = 0;
+  let cx = 0, cy = 0;
+  let raf;
+  let active = false;
+
+  /* Pre-load images */
+  const cache = {};
+  items.forEach(item => {
+    const src = item.dataset.img;
+    if (src && !cache[src]) {
+      const img = new Image();
+      img.src = src;
+      cache[src] = img;
+    }
+  });
+
+  /* Smooth follow via RAF lerp */
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function tick() {
+    cx = lerp(cx, mx, 0.12);
+    cy = lerp(cy, my, 0.12);
+    cursorImg.style.left = cx + 'px';
+    cursorImg.style.top  = cy + 'px';
+    raf = requestAnimationFrame(tick);
+  }
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+  });
+
+  items.forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      const src = item.dataset.img;
+      if (src) {
+        cursorImgSrc.src = src;
+        cursorImg.classList.add('visible');
+        if (!active) { active = true; tick(); }
+      }
+    });
+
+    item.addEventListener('mouseleave', () => {
+      cursorImg.classList.remove('visible');
+    });
+  });
+
+  /* Stop RAF when nothing is hovered */
+  document.addEventListener('mouseleave', () => {
+    cursorImg.classList.remove('visible');
+  });
+})();
+</script>
+
+</body>
+</html>

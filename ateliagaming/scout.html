@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scout Interceptor | Atelia Arena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+            --cyber: #00ffff;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white); height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; touch-action: none;
+        }
+        nav { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--cyber); }
+        .logo-img { height: 35px; filter: drop-shadow(0 0 5px var(--cyber)); }
+
+        #game-area {
+            flex: 1; position: relative; overflow: hidden;
+            background: url('https://images.unsplash.com/photo-1506318137071-a8e063b4b6c1?w=1600&q=80');
+            background-size: cover;
+        }
+
+        #ship {
+            width: 80px; height: 80px; position: absolute;
+            bottom: 50px; left: 50%; transform: translateX(-50%);
+            z-index: 100; filter: drop-shadow(0 0 15px var(--cyber));
+            transition: transform 0.1s;
+        }
+        #ship img { width: 100%; height: 100%; object-fit: contain; }
+
+        .bullet {
+            position: absolute; width: 4px; height: 20px; background: var(--cyber);
+            box-shadow: 0 0 10px var(--cyber); z-index: 90;
+        }
+
+        .enemy {
+            position: absolute; width: 50px; height: 50px;
+            filter: drop-shadow(0 0 10px var(--red));
+            z-index: 80;
+        }
+        .enemy img { width: 100%; height: 100%; object-fit: contain; }
+
+        #ui {
+            position: absolute; top: 20px; right: 20px; text-align: right;
+            background: rgba(0,0,0,0.8); padding: 10px 20px; border-right: 3px solid var(--cyber);
+        }
+        .score-box { font-family: 'Bangers'; font-size: 2.5rem; color: var(--white); }
+        .atlr-box { font-family: 'Russo One'; font-size: 0.9rem; color: var(--orange); }
+
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+        }
+        .btn {
+            padding: 15px 45px; background: var(--cyber); color: black;
+            border: 3px solid white; font-family: 'Russo One'; font-size: 1.5rem;
+            cursor: pointer; margin-top: 25px; transition: 0.3s;
+        }
+        .btn:hover { background: var(--white); transform: scale(1.05); }
+
+        /* How to Play */
+        #htp-btn { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: var(--cyber); color: black; border: 2px solid white; border-radius: 50%; font-family: 'Russo One'; cursor: pointer; z-index: 5000; font-size: 1.4rem; }
+        #htp-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .htp-content { max-width: 500px; font-family: 'Inter', sans-serif; }
+        .htp-title { font-family: 'Bangers'; font-size: 4rem; color: var(--cyber); margin-bottom: 20px; }
+        .htp-label { font-family: 'Russo One'; color: var(--white); font-size: 1.2rem; margin-bottom: 5px; }
+        .htp-text { color: #ccc; font-size: 1rem; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="arena.html"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div style="font-family:'Russo One'; font-size:1.1rem; color:var(--cyber);">SCOUT INTERCEPTOR</div>
+    </nav>
+
+    <div id="game-area">
+        <div id="ui">
+            <div class="score-box" id="score">000</div>
+            <div class="atlr-box">+<span id="atlr">0</span> ATLR</div>
+        </div>
+
+        <div id="ship">
+            <img src="https://priscadezigns.org/logos/the-tech-scout.png" alt="Interceptor Ship">
+        </div>
+
+        <div id="overlay">
+            <h1 style="font-family:'Bangers'; font-size:5rem; margin:0; color:var(--cyber);">SCOUT INTERCEPTOR</h1>
+            <p style="font-family:'Russo One'; color:var(--white); letter-spacing:2px;">TECH SCOUT DEFENSE PROTOCOL</p>
+            <button class="btn" onclick="start()">INITIATE LINK</button>
+        </div>
+    </div>
+
+    <button id="htp-btn" onclick="toggleHTP()">?</button>
+    <div id="htp-modal" onclick="toggleHTP()">
+        <div class="htp-content">
+            <h2 class="htp-title">HOW TO PLAY</h2>
+            <div class="htp-section">
+                <div class="htp-label">OBJECTIVE</div>
+                <div class="htp-text">Intercept data anomalies and protect the Tech Scout network.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">CONTROLS</div>
+                <div class="htp-text">DRAG or SLIDE your finger (mobile) or use your MOUSE (desktop) to steer. The ship fires automatically.</div>
+            </div>
+            <div class="htp-section">
+                <div class="htp-label">REWARDS</div>
+                <div class="htp-text">Earn +2 ATLR for every 10 anomalies destroyed.</div>
+            </div>
+            <button class="btn" style="font-size: 1rem; padding: 10px 30px;">CLOSE</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/ateliagaming/js/atelia_supabase.js"></script>
+    <script>
+        let score = 0, atlr = 0, active = false;
+        const ship = document.getElementById('ship');
+        const area = document.getElementById('game-area');
+        const enemies = [];
+        const enemyAssets = [
+            'https://priscadezigns.org/logos/pd_mark_sq.png',
+            'https://priscadezigns.org/logos/cupyx_logo_small.png'
+        ];
+
+        function toggleHTP() {
+            const m = document.getElementById('htp-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function start() {
+            score = 0; atlr = 0; active = true;
+            document.getElementById('overlay').style.display = 'none';
+            gameLoop();
+            setInterval(spawnEnemy, 1000);
+            setInterval(fire, 250);
+        }
+
+        function moveShip(x) {
+            if(!active) return;
+            const limit = area.clientWidth - 80;
+            let nx = x - area.offsetLeft - 40;
+            if(nx < 0) nx = 0;
+            if(nx > limit) nx = limit;
+            ship.style.left = nx + 'px';
+        }
+
+        area.addEventListener('mousemove', e => moveShip(e.clientX));
+        area.addEventListener('touchmove', e => {
+            e.preventDefault();
+            moveShip(e.touches[0].clientX);
+        }, {passive: false});
+
+        function fire() {
+            if(!active) return;
+            const b = document.createElement('div');
+            b.className = 'bullet';
+            b.style.left = (ship.offsetLeft + 38) + 'px';
+            b.style.bottom = '130px';
+            area.appendChild(b);
+
+            let bPos = 130;
+            const moveB = setInterval(() => {
+                if(!active) { b.remove(); clearInterval(moveB); return; }
+                bPos += 15;
+                b.style.bottom = bPos + 'px';
+                if(bPos > area.clientHeight) { b.remove(); clearInterval(moveB); }
+
+                // Collision
+                const currentEnemies = document.querySelectorAll('.enemy');
+                currentEnemies.forEach(e => {
+                    const er = e.getBoundingClientRect();
+                    const br = b.getBoundingClientRect();
+                    if(br.top < er.bottom && br.left < er.right && br.right > er.left && br.bottom > er.top) {
+                        e.remove(); b.remove(); clearInterval(moveB);
+                        score += 10;
+                        updateUI();
+                    }
+                });
+            }, 20);
+        }
+
+        function spawnEnemy() {
+            if(!active) return;
+            const e = document.createElement('div');
+            e.className = 'enemy';
+            e.style.top = '-60px';
+            e.style.left = Math.random() * (area.clientWidth - 50) + 'px';
+            e.innerHTML = `<img src="${enemyAssets[Math.floor(Math.random()*enemyAssets.length)]}">`;
+            area.appendChild(e);
+
+            let ePos = -60;
+            const moveE = setInterval(() => {
+                if(!active) { e.remove(); clearInterval(moveE); return; }
+                ePos += (3 + score/100);
+                e.style.top = ePos + 'px';
+                
+                if(ePos > area.clientHeight) { e.remove(); clearInterval(moveE); }
+
+                const sr = ship.getBoundingClientRect();
+                const er = e.getBoundingClientRect();
+                if(er.bottom > sr.top && er.left < sr.right && er.right > sr.left && er.top < sr.bottom) {
+                    gameOver();
+                }
+            }, 20);
+        }
+
+        function updateUI() {
+            document.getElementById('score').innerText = score.toString().padStart(3, '0');
+            atlr = Math.floor(score / 5);
+            document.getElementById('atlr').innerText = atlr;
+        }
+
+        function gameOver() {
+            active = false;
+            document.getElementById('overlay').style.display = 'flex';
+            document.getElementById('overlay').querySelector('h1').innerText = 'LINK SEVERED';
+            document.getElementById('overlay').querySelector('p').innerText = 'TOTAL ATLR SECURED: ' + atlr;
+            if(window.Atelia) {
+                Atelia.auth.getUser().then(u => {
+                    if(u.data.user) Atelia.arena.updatePrestige(u.data.user.id, atlr);
+                });
+            }
+        }
+
+        function gameLoop() { if(active) requestAnimationFrame(gameLoop); }
+    </script>
+</body>
+</html>

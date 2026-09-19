@@ -1,0 +1,61 @@
+name: Weekly Dead Link Audit
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday 9 AM UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run dead link check
+        run: |
+          python3 -c "
+          import urllib.request, urllib.error, re, json, os, time
+
+          base = 'https://priscadezigns.org'
+          site_dir = 'site'
+          broken = []
+
+          for niche in os.listdir(site_dir):
+              html_path = f'{site_dir}/{niche}/index.html'
+              if not os.path.isfile(html_path):
+                  continue
+              with open(html_path) as f:
+                  html = f.read()
+              links = re.findall(r'https?://(?:www\.)?(?:amazon\.[a-z.]+)/[^\s"<>]+', html)
+              for lnk in links[:3]:
+                  try:
+                      req = urllib.request.Request(lnk, method='HEAD', headers={'User-Agent': 'Mozilla/5.0'})
+                      with urllib.request.urlopen(req, timeout=8) as r:
+                          if r.status == 404:
+                              broken.append({'niche': niche, 'url': lnk, 'code': 404})
+                  except:
+                      pass
+                  time.sleep(0.2)
+
+          print(f'Broken links found: {len(broken)}')
+          for b in broken:
+              print(f'  {b["niche"]}: {b["url"]}')
+
+          if broken:
+              with open('broken_links_report.json', 'w') as f:
+                  json.dump(broken, f, indent=2)
+          "
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dead-link-report
+          path: broken_links_report.json
+          if-no-files-found: ignore

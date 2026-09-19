@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[Your Name] — [Your Discipline]</title>
+<meta name="description" content="[Your Name] — [Photographer / Director / Artist] based in [Your City].">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --text: #111111;
+    --muted: #999999;
+    --border: rgba(0,0,0,0.08);
+    --font: 'Inter', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV — Julia Noni style: fixed, hairline, all lowercase ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 52px;
+    background: rgba(255,255,255,0.97);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-size: 0.82rem; font-weight: 400;
+    color: var(--text); text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
+    font-size: 0.78rem; font-weight: 400;
+    letter-spacing: 0.02em;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links .nav-contact {
+    color: var(--text);
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 1px;
+  }
+
+  /* ── MAIN WRAPPER ── */
+  main { padding-top: 52px; }
+
+  /* ── MASONRY GRID — Julia Noni style: mixed columns, natural flow ── */
+  .grid-wrap {
+    padding: 0;
+    column-count: 3;
+    column-gap: 4px;
+  }
+  .grid-item {
+    break-inside: avoid;
+    display: block;
+    margin-bottom: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+  }
+  .grid-item-inner {
+    display: block;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Placeholder aspect ratios — alternate to create natural masonry feel */
+  .grid-item:nth-child(3n+1) .grid-item-inner { aspect-ratio: 3/4; }
+  .grid-item:nth-child(3n+2) .grid-item-inner { aspect-ratio: 4/3; }
+  .grid-item:nth-child(3n)   .grid-item-inner { aspect-ratio: 2/3; }
+  .grid-item:nth-child(7)    .grid-item-inner { aspect-ratio: 16/9; }
+  .grid-item:nth-child(10)   .grid-item-inner { aspect-ratio: 1/1; }
+  .grid-item:nth-child(13)   .grid-item-inner { aspect-ratio: 4/5; }
+
+  /* Placeholder backgrounds — varied grays to simulate photos */
+  .grid-item-bg {
+    position: absolute; inset: 0;
+    transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .grid-item:nth-child(1)  .grid-item-bg { background: #d0cec8; }
+  .grid-item:nth-child(2)  .grid-item-bg { background: #c8c4bc; }
+  .grid-item:nth-child(3)  .grid-item-bg { background: #e0ddd8; }
+  .grid-item:nth-child(4)  .grid-item-bg { background: #cac6c0; }
+  .grid-item:nth-child(5)  .grid-item-bg { background: #d8d4ce; }
+  .grid-item:nth-child(6)  .grid-item-bg { background: #c0bcb6; }
+  .grid-item:nth-child(7)  .grid-item-bg { background: #e4e1dc; }
+  .grid-item:nth-child(8)  .grid-item-bg { background: #ccc8c0; }
+  .grid-item:nth-child(9)  .grid-item-bg { background: #d4d0c8; }
+  .grid-item:nth-child(10) .grid-item-bg { background: #c4c0b8; }
+  .grid-item:nth-child(11) .grid-item-bg { background: #dcdad4; }
+  .grid-item:nth-child(12) .grid-item-bg { background: #c8c4be; }
+
+  .grid-item:hover .grid-item-bg { transform: scale(1.025); }
+
+  /* Hover caption */
+  .grid-item-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 32px 16px 14px;
+    background: linear-gradient(to top, rgba(0,0,0,0.32) 0%, transparent 100%);
+    display: flex; justify-content: space-between; align-items: flex-end;
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .grid-item:hover .grid-item-caption { opacity: 1; }
+  .caption-title { font-size: 0.72rem; color: rgba(255,255,255,0.9); font-weight: 400; letter-spacing: 0.04em; }
+  .caption-cat   { font-size: 0.65rem; color: rgba(255,255,255,0.55); letter-spacing: 0.06em; }
+
+  /* Image placeholder label */
+  .img-placeholder-lbl {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(0,0,0,0.2); white-space: nowrap;
+  }
+
+  /* ── ABOUT — Julia Noni style: minimal, bottom of page ── */
+  .about {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  .about-left {
+    padding: 64px 40px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .about-name {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+  .about-discipline {
+    font-size: 0.78rem; color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 40px;
+  }
+  .about-body {
+    font-size: 0.82rem; color: var(--muted);
+    line-height: 1.85; max-width: 360px;
+  }
+  .about-right {
+    padding: 64px 40px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .about-contact-head { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 28px; }
+  .about-contact-link {
+    display: block;
+    font-size: 0.82rem; color: var(--text); text-decoration: none;
+    border-bottom: 1px solid var(--border); padding: 14px 0;
+    transition: color 0.15s;
+  }
+  .about-contact-link:hover { color: var(--muted); }
+  .about-contact-link:first-of-type { border-top: 1px solid var(--border); }
+
+  /* ── SERVICES — listed plainly, Julia Noni editorial feel ── */
+  .services {
+    border-top: 1px solid var(--border);
+    padding: 64px 40px;
+    display: grid; grid-template-columns: 1fr 2fr; gap: 48px;
+  }
+  .services-label { font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); padding-top: 4px; }
+  .services-list { }
+  .svc-row {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+    gap: 24px;
+  }
+  .svc-row:first-child { border-top: 1px solid var(--border); }
+  .svc-name { font-size: 0.88rem; font-weight: 400; color: var(--text); flex: 1; }
+  .svc-desc { font-size: 0.75rem; color: var(--muted); max-width: 220px; text-align: center; }
+  .svc-price { font-size: 0.82rem; font-weight: 500; color: var(--text); white-space: nowrap; }
+
+  /* ── CTA ── */
+  .cta-row {
+    border-top: 1px solid var(--border);
+    padding: 40px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
+  }
+  .cta-text { font-size: 0.82rem; color: var(--muted); }
+  .btn-book {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--text); color: var(--bg);
+    padding: 12px 24px;
+    font-size: 0.72rem; font-weight: 400; letter-spacing: 0.06em;
+    text-decoration: none; transition: opacity 0.2s;
+  }
+  .btn-book:hover { opacity: 0.7; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .footer-name { font-size: 0.75rem; color: var(--muted); }
+  .footer-note { font-size: 0.72rem; color: var(--muted); }
+  .footer-pd { font-size: 0.72rem; color: var(--muted); }
+  .footer-pd a { color: var(--text); text-decoration: none; }
+
+  /* ── TEMPLATE BADGE ── */
+  .template-badge {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--text); color: var(--bg);
+    padding: 10px 18px;
+    font-size: 0.65rem; font-weight: 400; letter-spacing: 0.06em;
+    text-decoration: none; z-index: 9999;
+    display: flex; align-items: center; gap: 7px;
+    transition: opacity 0.2s;
+  }
+  .template-badge:hover { opacity: 0.75; }
+  .badge-dot { width: 5px; height: 5px; background: var(--muted); border-radius: 50%; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 900px) {
+    .grid-wrap { column-count: 2; }
+  }
+  @media (max-width: 600px) {
+    nav { padding: 0 20px; }
+    .nav-links { gap: 18px; }
+    .nav-links a:not(.nav-contact) { display: none; }
+    .grid-wrap { column-count: 2; column-gap: 3px; }
+    .grid-item { margin-bottom: 3px; }
+    .about { grid-template-columns: 1fr; }
+    .about-left { border-right: none; border-bottom: 1px solid var(--border); padding: 40px 24px; }
+    .about-right { padding: 40px 24px; }
+    .services { grid-template-columns: 1fr; gap: 24px; padding: 40px 24px; }
+    .svc-desc { display: none; }
+    .cta-row { padding: 32px 24px; }
+    footer { padding: 20px 24px; }
+  }
+
+/* ═══════════════════════════════════════════════════════
+   UNIVERSAL RESPONSIVE PATCH — Prisca Dezigns Templates
+   Applied: 2026-07-06
+   ═══════════════════════════════════════════════════════ */
+
+/* 1. Every image in a photo container must cover its box
+      and keep faces at the top so heads never get cropped */
+.hero img, .hero video,
+.hero-img img, .hero-image img,
+.about-img img, .about-image img,
+.feat-img img, .feature-img img,
+.slide-img img, .gallery-img img,
+.project-img img, .case-img img,
+.profile-img img, .portrait img,
+.team-img img, .headshot img,
+.fig1 img, .fig2 img,
+.bg img, .bg video,
+.card-img img, .card img > img,
+.media-panel img, .reel-panel img,
+[class*="-photo"] img,
+[class*="-image"] img,
+[class*="img-wrap"] img,
+section img:not([class*="logo"]):not([class*="icon"]):not([class*="brand"]) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;  /* keeps faces — top of frame */
+  display: block;
+}
+
+/* 2. Image wrapper containers must have a defined height
+      so object-fit has something to fill */
+.hero, .hero-wrap,
+.hero-img, .hero-image,
+.about-img, .feat-img,
+.slide-img, .gallery-img,
+.project-img, .case-img,
+.profile-img, .portrait,
+.fig1, .fig2,
+.card-img,
+[class*="-photo"],
+[class*="-image"]:not(section):not(article) {
+  overflow: hidden;
+  position: relative;
+}
+
+/* 3. Max-width containers: replace fixed px with responsive max */
+.container, .inner, .wrapper, .content,
+[class*="container"], [class*="inner"],
+[class*="wrapper"] {
+  max-width: min(100%, var(--container-max, 1200px));
+  width: 100%;
+}
+
+/* ── MOBILE: ≤ 768px ────────────────────────────── */
+@media (max-width: 768px) {
+  /* Reset any fixed pixel widths on sections */
+  section, article, header, footer, main,
+  .container, .inner, .wrapper, .content,
+  [class*="container"], [class*="inner"] {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+
+  /* Hero: full viewport height, never cropped */
+  .hero, [class*="hero"],
+  [b-tpl="hero"] {
+    min-height: 100svh;
+    height: auto !important;
+  }
+
+  /* Stack any 2-col or multi-col grid to single column */
+  [class*="grid"],
+  [class*="two-col"],
+  [class*="split"],
+  [class*="columns"],
+  .stats, .stat-row,
+  .services-grid, .service-grid,
+  .cards, .card-row,
+  .team-grid, .gallery-grid,
+  .features-grid, .work-grid,
+  .about-grid, .contact-grid {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+  }
+
+  /* Remove fixed pixel heights on images — let them scale */
+  .hero-img, .hero-image,
+  .about-img, .feat-img,
+  .slide-img, .project-img,
+  .case-img, .profile-img,
+  .fig1, .fig2,
+  [class*="-photo"],
+  [class*="-image"]:not(section):not(article) {
+    height: 56vw !important;   /* 16:9ish — safe for any face shot */
+    min-height: 220px;
+    max-height: 480px;
+  }
+
+  /* Full-height panel images (Velocity reel, Persona panels) */
+  [class*="panel"] img,
+  [class*="reel"] img,
+  .intro > article .bg img,
+  .intro > article .bg video {
+    height: 100% !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    object-position: center center;
+  }
+
+  /* Nav: stack or shrink */
+  nav ul {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  /* Typography scaling — clamp already handles most, but enforce min */
+  h1 { font-size: clamp(2rem, 10vw, 4rem) !important; }
+  h2 { font-size: clamp(1.4rem, 7vw, 2.5rem) !important; }
+  h3 { font-size: clamp(1.1rem, 5vw, 1.8rem) !important; }
+  p  { font-size: clamp(0.95rem, 4vw, 1.1rem) !important; }
+
+  /* Hide decorative side-by-side second fig on small screens */
+  .fig2 { display: none; }
+  .fig1 { width: 100% !important; }
+
+  /* Buttons: full width on mobile */
+  .cta-btn, .btn, .button,
+  [class*="btn"], [class*="cta"],
+  .squircle a, .bubble-cta {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Ticker/marquee: reduce gap */
+  .ticker-track { gap: 2rem !important; }
+
+  /* Footer grid → stack */
+  footer .grid,
+  footer .inner,
+  footer .wrapper,
+  footer .contact {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    gap: 2rem !important;
+  }
+}
+
+/* ── SMALL PHONES: ≤ 480px ──────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --container-padding: 4vw !important;
+  }
+
+  .hero-img, .hero-image,
+  .about-img, .feat-img,
+  .slide-img, .project-img,
+  [class*="-photo"],
+  [class*="-image"]:not(section):not(article) {
+    height: 70vw !important;
+    min-height: 200px;
+  }
+
+  /* Hazel May speech bubbles — shrink on tiny screens */
+  .bubble-word {
+    font-size: clamp(1.6rem, 9vw, 3rem) !important;
+  }
+}
+
+/* ── TABLET: 769px – 1024px ─────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container, .inner, .wrapper {
+    padding-left: 4vw;
+    padding-right: 4vw;
+  }
+  /* 3-col grids → 2-col on tablet */
+  [class*="grid-3"],
+  .three-col,
+  .services-grid:has(> :nth-child(3)),
+  .cards:has(> :nth-child(3)) {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+/* ═══════════════════════════════════════════════════════ */
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">[Your Name]</a>
+  <div class="nav-links">
+    <a href="#work">work</a>
+    <a href="#about">about</a>
+    <a href="#services">services</a>
+    <a href="https://wa.me/18683424101?text=Hi!%20I%27m%20interested%20in%20the%20Folio%20template." target="_blank" class="nav-contact">contact</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- MASONRY GRID — replace bg divs with <img> tags when going live -->
+  <div class="grid-wrap" id="work">
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1504703395950-b89145a5425b?w=600&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1512361436605-a484bdb34b5f?w=800&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item-inner">
+        <img src="https://images.unsplash.com/photo-1463453091185-61582044d556?w=800&q=80" alt="Portfolio work" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+        
+        <div class="grid-item-caption">
+          <span class="caption-title">[Project Title]</span>
+          <span class="caption-cat">[Category]</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid-wrap -->
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="about-left">
+      <div>
+        <h1 class="about-name">[Your Name]</h1>
+        <p class="about-discipline">[Your Discipline] &nbsp;·&nbsp; [Your City]</p>
+        <p class="about-body">I am a [photographer / director / artist] based in [Your City]. My work explores [themes or subject] — a visual practice shaped by [your influence or approach].<br><br>Available for commissions, editorial, and commercial projects worldwide.</p>
+      </div>
+    </div>
+    <div class="about-right">
+      <div>
+        <p class="about-contact-head">Get in touch</p>
+        <a class="about-contact-link" href="https://wa.me/18683424101?text=Hi!%20I%27m%20interested%20in%20the%20Folio%20template." target="_blank">WhatsApp</a>
+        <a class="about-contact-link" href="mailto:[your@email.com]">Email</a>
+        <a class="about-contact-link" href="https://instagram.com/[yourhandle]" target="_blank">Instagram</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="services" id="services">
+    <div class="services-label">services</div>
+    <div class="services-list">
+      <div class="svc-row">
+        <span class="svc-name">[Service One]</span>
+        <span class="svc-desc">[Short description]</span>
+        <span class="svc-price">From $[Price]</span>
+      </div>
+      <div class="svc-row">
+        <span class="svc-name">[Service Two]</span>
+        <span class="svc-desc">[Short description]</span>
+        <span class="svc-price">From $[Price]</span>
+      </div>
+      <div class="svc-row">
+        <span class="svc-name">[Service Three]</span>
+        <span class="svc-desc">[Short description]</span>
+        <span class="svc-price">From $[Price]</span>
+      </div>
+      <div class="svc-row">
+        <span class="svc-name">[Service Four]</span>
+        <span class="svc-desc">[Short description]</span>
+        <span class="svc-price">From $[Price]</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA ROW -->
+  <div class="cta-row" id="contact">
+    <p class="cta-text">Open for new projects — let's make something together.</p>
+    <a href="https://wa.me/18683424101?text=Hi!%20I%27m%20interested%20in%20the%20Folio%20template." target="_blank" class="btn-book">📱 WhatsApp Me Now</a>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-name">[Your Name]</span>
+  <span class="footer-note">© 2026 · All rights reserved</span>
+  <span class="footer-pd">Site by <a href="https://priscadezigns.org" target="_blank">Prisca Dezigns</a> · <a href="https://priscadezigns.org/templates/terms/" target="_blank">Terms</a> · <a href="https://priscadezigns.org/templates/privacy/" target="_blank">Privacy</a></span>
+</footer>
+
+<!-- TEMPLATE BADGE -->
+<a href="https://wa.me/18683424101?text=Hi!%20I%27m%20interested%20in%20the%20Folio%20template." target="_blank" class="template-badge">
+  <span class="badge-dot"></span>
+  Choose This Template — $149.99
+</a>
+
+</body>
+</html>

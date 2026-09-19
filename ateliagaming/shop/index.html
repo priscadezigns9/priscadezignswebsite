@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelia Gaming | Armory (Shop)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Bangers&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --red: #D32F2F;
+            --orange: #FF6B00;
+            --white: #FFFFFF;
+            --black: #050505;
+            --cyber: #00ffff;
+        }
+        body, html {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background-color: var(--black); color: var(--white);
+            overflow-x: hidden; scroll-behavior: smooth;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 10000;
+            background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px);
+            padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--red);
+        }
+        .logo-img { height: 45px; filter: drop-shadow(0 0 5px var(--red)); }
+        .nav-links a {
+            color: #888; text-decoration: none; font-family: 'Russo One', sans-serif;
+            font-size: 0.9rem; margin-left: 25px; transition: 0.3s; text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .nav-links a:hover { color: var(--white); text-shadow: 0 0 10px var(--white); }
+        
+        .hero-armory {
+            height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, #1a0a0a 0%, #000 100%);
+            text-align: center; border-bottom: 2px solid #111; position: relative;
+        }
+        .hero-armory h1 { font-family: 'Bangers'; font-size: 6rem; margin: 0; color: var(--white); letter-spacing: 5px; }
+        .hero-armory h1 span { color: var(--red); }
+        .hero-intel { font-family: 'Russo One'; color: var(--cyber); font-size: 0.8rem; letter-spacing: 3px; max-width: 600px; margin-top: 20px; line-height: 1.6; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 60px 5%; }
+        
+        /* Stats Bar */
+        #shop-stats {
+            display: flex; gap: 30px; justify-content: center; margin-bottom: 40px;
+            background: rgba(255,255,255,0.02); padding: 20px; border: 1px solid #111;
+        }
+        .stat-item { text-align: center; border-left: 2px solid var(--red); padding-left: 20px; }
+        .stat-label { font-family: 'Russo One'; font-size: 0.6rem; color: #666; letter-spacing: 1px; }
+        .stat-val { font-family: 'Bangers'; font-size: 1.5rem; color: var(--white); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        
+        .product-card {
+            background: #0a0a0a; border: 1px solid #1a1a1a; padding: 25px;
+            text-align: center; transition: 0.4s; position: relative; overflow: hidden;
+            border-radius: 4px;
+        }
+        .product-card:hover { border-color: var(--red); transform: translateY(-10px); box-shadow: 0 15px 30px rgba(211,47,47,0.2); }
+        .product-card::before {
+            content: 'VANGUARD_SPEC'; position: absolute; top: 15px; left: 15px;
+            font-size: 9px; color: var(--red); font-family: 'Russo One'; letter-spacing: 1px;
+        }
+        .product-image {
+            width: 100%; height: 280px; object-fit: contain; margin-bottom: 25px;
+            filter: grayscale(0.2) brightness(0.9); transition: 0.4s;
+        }
+        .product-card:hover .product-image { filter: grayscale(0) brightness(1.1); transform: scale(1.05); }
+        
+        .product-card h3 { font-family: 'Russo One'; font-size: 1.1rem; margin: 15px 0; height: 3.5rem; overflow: hidden; color: var(--white); line-height: 1.4; }
+        .price { display: block; font-family: 'Bangers'; font-size: 1.8rem; color: var(--orange); margin-bottom: 25px; }
+        
+        .buy-link {
+            display: block; background: var(--red); color: white; text-decoration: none;
+            padding: 15px; font-family: 'Russo One'; font-size: 0.9rem; text-transform: uppercase;
+            transition: 0.3s; border: 2px solid var(--red);
+        }
+        .buy-link:hover { background: transparent; color: var(--red); }
+
+        footer { background: #000; padding: 80px 10%; border-top: 2px solid #111; text-align: center; }
+        .footer-logo { height: 50px; filter: brightness(0) invert(1); opacity: 0.5; margin-bottom: 25px; }
+
+        #back-to-top {
+            position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px;
+            background: var(--red); color: white; display: none; align-items: center; justify-content: center;
+            border-radius: 50%; cursor: pointer; z-index: 1000; box-shadow: 0 0 20px var(--red);
+        }
+
+        #empire-mandate {
+            background: #000; color: #4682B4; padding: 15px 0; text-align: center; font-size: 11px;
+            letter-spacing: 2px; border-top: 1px solid #111; font-family: 'Inter', sans-serif;
+            font-weight: 700; text-transform: uppercase;
+        }
+
+        /* 3D Background Grid */
+        .hero-armory::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(211,47,47,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(211,47,47,0.03) 1px, transparent 1px);
+            background-size: 60px 60px; transform: perspective(500px) rotateX(65deg) translateY(-50px);
+            opacity: 0.5; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/ateliagaming/"><img src="https://priscadezigns.org/logos/atelier-gaming.png" class="logo-img" alt="Atelia Logo"></a>
+        <div class="nav-links">
+            <a href="/ateliagaming/">HQ</a>
+            <a href="/ateliagaming/arena.html">Arena</a>
+            <a href="/ateliagaming/game.html">Games</a>
+            <a href="/ateliagaming/shop/" style="color:var(--red);">Armory</a>
+        </div>
+    </nav>
+
+    <section class="hero-armory">
+        <h1>THE <span>ARMORY</span></h1>
+        <div class="hero-intel" id="welcome-msg">
+            PREPARE FOR THE BATTLES AHEAD, WARRIOR, AS YOU ENTER THE ATELIA GAMING ARMORY, WHERE THE FINEST GEAR AWAITS TO BE FORGED AND WIELDED BY THE FEARLESS VANGUARD.
+        </div>
+    </section>
+
+    <div class="container">
+        <div id="shop-stats">
+            <div class="stat-item"><div class="stat-label">Network Pulse</div><div class="stat-val" id="block-val">13529973</div></div>
+            <div class="stat-item"><div class="stat-label">Active Stock</div><div class="stat-val">56 UNITS</div></div>
+            <div class="stat-item"><div class="stat-label">Signal Integrity</div><div class="stat-val">98.2%</div></div>
+        </div>
+
+        <div id="grid" class="grid">
+            <p style="grid-column: 1/-1; text-align: center; font-family: 'Russo One'; color: var(--red);">Synchronizing with Empire Vault...</p>
+        </div>
+    </div>
+
+    <footer>
+        <img src="https://priscadezigns.org/logos/PRISCION_sovereign_2026.png" class="footer-logo">
+        <p style="font-family:'Courier New'; font-size:0.7rem; color:#444; letter-spacing:2px;">A NODE OF THE PRISCION INFRASTRUCTURE · ARCHITECTED BY ZAPIA</p>
+    </section>
+
+    <div id="empire-mandate">
+        EMPIRE MANDATE: 10% OF EVERY PURCHASE SUPPORTS <a href="https://priscadezigns.org/thewaymadeknown/" style="color: #4682B4; text-decoration:none;">THE WAY MADE KNOWN</a> MISSION.
+    </div>
+
+    <div id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</div>
+
+    <script>
+        const CLOUD_URL = 'https://res.cloudinary.com/davvgg5sy/image/fetch/f_auto,q_auto/';
+
+        async function loadInventory() {
+            const grid = document.getElementById('grid');
+            try {
+                const sb = supabase.createClient('https://sazhdnqzaqpqcralmthh.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc');
+
+                const { data, error } = await sb.from('empire_inventory')
+                    .select('*')
+                    .ilike('brand', 'Atelia Gaming')
+                    .neq('category', 'Internal');
+                
+                if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    grid.innerHTML = data.map(p => {
+                        // Apply Cloudinary optimization to image URL
+                        const optimizedImg = CLOUD_URL + p.image_url;
+                        return `
+                        <div class="product-card">
+                            <img src="${optimizedImg}" class="product-image" loading="lazy" onerror="this.src='https://priscadezigns.org/logos/pd_mark_sq.png'">
+                            <h3>${p.title}</h3>
+                            <span class="price">${(p.price === '$--' || !p.price) ? 'Price Signal Pending' : p.price}</span>
+                            <a href="${p.affiliate_link}" class="buy-link" target="_blank">Acquire Item</a>
+                        </div>
+                    `}).join('');
+                } else {
+                    grid.innerHTML = '<p>No items found in the Armory.</p>';
+                }
+            } catch (err) {
+                grid.innerHTML = `<p style="color: var(--red); font-family: 'Russo One';">CRITICAL ERROR: Connection to Armory Vault failed.</p>`;
+            }
+        }
+
+        window.addEventListener('load', loadInventory);
+
+        window.onscroll = function() {
+            const btn = document.getElementById('back-to-top');
+            btn.style.display = (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) ? 'flex' : 'none';
+        };
+    </script>
+</body>
+</html>

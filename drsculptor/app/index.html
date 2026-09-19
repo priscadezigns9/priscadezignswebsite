@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dr Sculptor — Member Portal</title>
+<meta name="description" content="Dr Sculptor Member App — Access your workouts, programs, and shop."/>
+<link rel="manifest" href="../manifest.json"/>
+<meta name="theme-color" content="#0a0a0a"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --black:#0a0a0a;
+  --dark:#111;
+  --card:#181818;
+  --border:#2a2a2a;
+  --red:#e31c1c;
+  --red-dark:#b51515;
+  --gold:#f5c518;
+  --white:#fff;
+  --muted:#888;
+  --font-head:'Bebas Neue',sans-serif;
+  --font-body:'Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--white);font-family:var(--font-body);min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button{font-family:var(--font-body);cursor:pointer;}
+
+/* ===== AUTH SCREEN ===== */
+#auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#0a0a0a 0%,#180000 60%,#0a0a0a 100%);}
+#auth-screen.hidden{display:none;}
+
+.auth-card{width:100%;max-width:420px;}
+.auth-logo-wrap{text-align:center;margin-bottom:32px;}
+.auth-logo{font-family:var(--font-head);font-size:2.8rem;letter-spacing:4px;}
+.auth-logo span{color:var(--red);}
+.auth-sub{font-size:0.68rem;text-transform:uppercase;letter-spacing:3px;color:var(--muted);margin-top:4px;}
+
+.auth-box{background:var(--dark);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);}
+.auth-tab{flex:1;padding:15px;text-align:center;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);cursor:pointer;transition:.2s;border:none;background:none;display:flex;align-items:center;justify-content:center;gap:7px;}
+.auth-tab svg{width:14px;height:14px;}
+.auth-tab.active{color:var(--red);border-bottom:2px solid var(--red);background:rgba(227,28,28,0.04);}
+
+.auth-body{padding:28px;}
+.field{margin-bottom:16px;}
+.field label{display:flex;align-items:center;gap:6px;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:7px;}
+.field label svg{width:11px;height:11px;}
+.input-wrap{position:relative;}
+.input-wrap svg.input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);}
+.input-wrap input{width:100%;background:#0d0d0d;border:1px solid var(--border);color:var(--white);padding:13px 13px 13px 42px;border-radius:9px;font-size:0.85rem;outline:none;transition:.2s;}
+.input-wrap input:focus{border-color:var(--red);background:#0f0f0f;}
+.input-wrap input::placeholder{color:#444;}
+
+.auth-btn{width:100%;border:none;padding:14px;border-radius:9px;font-size:0.82rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;justify-content:center;gap:9px;transition:.2s;margin-top:8px;}
+.auth-btn svg{width:16px;height:16px;}
+.auth-btn-primary{background:var(--red);color:var(--white);}
+.auth-btn-primary:hover{background:var(--red-dark);}
+.auth-btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-divider span{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+
+.auth-btn-wa{background:#25D366;color:#fff;}
+.auth-btn-wa:hover{background:#1fb85a;}
+
+.auth-error{background:rgba(227,28,28,0.08);border:1px solid rgba(227,28,28,0.3);color:#ff6b6b;padding:10px 14px;border-radius:8px;font-size:0.78rem;margin-bottom:14px;display:none;align-items:center;gap:8px;}
+.auth-error.show{display:flex;}
+.auth-error svg{width:14px;height:14px;flex-shrink:0;}
+
+.auth-success{background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.3);color:#4ade80;padding:10px 14px;border-radius:8px;font-size:0.78rem;margin-bottom:14px;display:none;align-items:center;gap:8px;}
+.auth-success.show{display:flex;}
+.auth-success svg{width:14px;height:14px;flex-shrink:0;}
+
+.back-link{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:20px;font-size:0.72rem;color:var(--muted);transition:.2s;}
+.back-link svg{width:13px;height:13px;}
+.back-link:hover{color:var(--white);}
+
+/* ===== DASHBOARD ===== */
+#dashboard{display:none;min-height:100vh;}
+#dashboard.visible{display:block;}
+
+/* DASH NAV */
+.dash-nav{background:rgba(10,10,10,0.98);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:60px;}
+.dash-logo{font-family:var(--font-head);font-size:1.3rem;letter-spacing:3px;}
+.dash-logo span{color:var(--red);}
+.dash-user{display:flex;align-items:center;gap:10px;}
+.dash-avatar{width:32px;height:32px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:800;flex-shrink:0;}
+.dash-username{font-size:0.78rem;color:var(--muted);}
+.signout-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);color:var(--muted);padding:7px 13px;border-radius:7px;font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;transition:.2s;}
+.signout-btn svg{width:13px;height:13px;}
+.signout-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* DASH TABS */
+.dash-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;background:var(--dark);padding:0 5%;}
+.dash-tab{display:flex;align-items:center;gap:7px;padding:14px 20px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:.2s;}
+.dash-tab svg{width:14px;height:14px;}
+.dash-tab.active{color:var(--red);border-bottom-color:var(--red);}
+.dash-tab:hover{color:var(--white);}
+
+/* DASH CONTENT */
+.dash-content{padding:32px 5%;}
+.dash-panel{display:none;}
+.dash-panel.active{display:block;}
+
+/* WELCOME CARD */
+.welcome-card{background:linear-gradient(135deg,#1a0000,#111);border:1px solid rgba(227,28,28,0.2);border-radius:12px;padding:28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.welcome-card h2{font-family:var(--font-head);font-size:1.8rem;}
+.welcome-card h2 span{color:var(--red);}
+.welcome-card p{font-size:0.82rem;color:var(--muted);margin-top:4px;}
+.welcome-stats{display:flex;gap:20px;flex-wrap:wrap;}
+.w-stat{text-align:center;}
+.w-stat strong{display:block;font-family:var(--font-head);font-size:1.6rem;color:var(--red);}
+.w-stat span{font-size:0.62rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+
+/* GRID CARDS */
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:20px;}
+.panel-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s,transform .2s;}
+.panel-card:hover{border-color:var(--red);transform:translateY(-2px);}
+.panel-card img{width:100%;height:150px;object-fit:cover;}
+.panel-card-body{padding:16px;}
+.panel-card-tag{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--red);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+.panel-card-tag svg{width:10px;height:10px;}
+.panel-card-body h4{font-family:var(--font-head);font-size:1.3rem;margin-bottom:5px;}
+.panel-card-body p{font-size:0.75rem;color:var(--muted);line-height:1.55;margin-bottom:12px;}
+.panel-btn{display:flex;align-items:center;gap:7px;width:100%;background:var(--red);color:#fff;border:none;padding:10px 14px;border-radius:7px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;justify-content:center;transition:.2s;}
+.panel-btn svg{width:13px;height:13px;}
+.panel-btn:hover{background:var(--red-dark);}
+.panel-btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.panel-btn-outline:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,0.05);}
+
+/* WORKOUT ROW */
+.workout-row{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s;}
+.workout-row:hover{border-color:rgba(227,28,28,0.4);}
+.workout-icon{width:42px;height:42px;border-radius:8px;background:rgba(227,28,28,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.workout-icon svg{width:18px;height:18px;color:var(--red);}
+.workout-info{flex:1;}
+.workout-info h4{font-size:0.85rem;font-weight:700;margin-bottom:2px;}
+.workout-info span{font-size:0.7rem;color:var(--muted);}
+.workout-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.badge{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:4px 9px;border-radius:20px;}
+.badge-red{background:rgba(227,28,28,0.12);color:var(--red);border:1px solid rgba(227,28,28,0.25);}
+.badge-gold{background:rgba(245,197,24,0.1);color:var(--gold);border:1px solid rgba(245,197,24,0.25);}
+.play-btn{width:34px;height:34px;border-radius:50%;background:var(--red);border:none;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.play-btn svg{width:13px;height:13px;color:#fff;}
+.play-btn:hover{background:var(--red-dark);}
+
+/* SHOP GRID */
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:16px;}
+.shop-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:transform .2s,border-color .2s;}
+.shop-card:hover{transform:translateY(-2px);border-color:rgba(245,197,24,0.3);}
+.shop-card img{width:100%;height:180px;object-fit:cover;}
+.shop-card-body{padding:12px;}
+.shop-card-body h4{font-size:0.82rem;font-weight:700;margin-bottom:3px;}
+.shop-price{color:var(--gold);font-weight:800;font-size:0.95rem;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.shop-price svg{width:12px;height:12px;}
+.order-btn{width:100%;background:rgba(245,197,24,0.1);border:1px solid rgba(245,197,24,0.3);color:var(--gold);padding:8px;border-radius:6px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:5px;transition:.2s;}
+.order-btn svg{width:11px;height:11px;}
+.order-btn:hover{background:var(--gold);color:var(--black);}
+
+/* SECTION HEADER */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.section-hdr-left h3{font-family:var(--font-head);font-size:1.6rem;}
+.section-hdr-left span{font-size:0.72rem;color:var(--muted);}
+
+/* ACCOUNT */
+.account-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+@media(max-width:600px){.account-grid{grid-template-columns:1fr;}}
+.account-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.account-card h4{display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
+.account-card h4 svg{width:14px;height:14px;color:var(--red);}
+.account-card p{font-size:0.82rem;color:rgba(255,255,255,0.75);line-height:1.6;}
+.account-card a{color:var(--red);font-size:0.78rem;display:inline-flex;align-items:center;gap:5px;margin-top:10px;}
+.account-card a svg{width:12px;height:12px;}
+</style>
+</head>
+<body>
+
+<!-- ===== AUTH SCREEN ===== -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo-wrap">
+      <div class="auth-logo">DR <span>SCULPTOR</span></div>
+      <div class="auth-sub">Member Portal</div>
+    </div>
+    <div class="auth-box">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">
+          <i data-lucide="log-in"></i> Sign In
+        </button>
+        <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">
+          <i data-lucide="user-plus"></i> Create Account
+        </button>
+      </div>
+      <div class="auth-body">
+        <div class="auth-error" id="auth-error"><i data-lucide="alert-circle"></i><span id="err-text"></span></div>
+        <div class="auth-success" id="auth-success"><i data-lucide="check-circle"></i><span id="ok-text"></span></div>
+
+        <!-- LOGIN -->
+        <div id="form-login">
+          <div class="field">
+            <label><i data-lucide="mail"></i> Email Address</label>
+            <div class="input-wrap">
+              <i data-lucide="mail" class="input-icon"></i>
+              <input type="email" id="l-email" placeholder="your@email.com" autocomplete="email"/>
+            </div>
+          </div>
+          <div class="field">
+            <label><i data-lucide="lock"></i> Password</label>
+            <div class="input-wrap">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="l-pass" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+            </div>
+          </div>
+          <button class="auth-btn auth-btn-primary" id="login-btn" onclick="doLogin()">
+            <i data-lucide="log-in"></i> Sign In to My Account
+          </button>
+          <div class="auth-divider"><span>or</span></div>
+          <button class="auth-btn auth-btn-wa" onclick="waEnquire()">
+            <i data-lucide="message-circle"></i> Enquire on WhatsApp
+          </button>
+        </div>
+
+        <!-- SIGNUP -->
+        <div id="form-signup" style="display:none;">
+          <div class="field">
+            <label><i data-lucide="user"></i> Full Name</label>
+            <div class="input-wrap">
+              <i data-lucide="user" class="input-icon"></i>
+              <input type="text" id="s-name" placeholder="Your full name"/>
+            </div>
+          </div>
+          <div class="field">
+            <label><i data-lucide="mail"></i> Email Address</label>
+            <div class="input-wrap">
+              <i data-lucide="mail" class="input-icon"></i>
+              <input type="email" id="s-email" placeholder="your@email.com" autocomplete="email"/>
+            </div>
+          </div>
+          <div class="field">
+            <label><i data-lucide="lock"></i> Create Password</label>
+            <div class="input-wrap">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="s-pass" placeholder="Min. 6 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter')doSignup()"/>
+            </div>
+          </div>
+          <button class="auth-btn auth-btn-primary" id="signup-btn" onclick="doSignup()">
+            <i data-lucide="user-plus"></i> Create My Account
+          </button>
+          <div class="auth-divider"><span>or</span></div>
+          <button class="auth-btn auth-btn-wa" onclick="waEnquire()">
+            <i data-lucide="message-circle"></i> Enquire on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+    <a href="../" class="back-link"><i data-lucide="arrow-left"></i> Back to Dr Sculptor Website</a>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard">
+
+  <!-- DASH NAV -->
+  <nav class="dash-nav">
+    <div class="dash-logo">DR <span>SCULPTOR</span></div>
+    <div class="dash-user">
+      <div class="dash-avatar" id="dash-avatar">?</div>
+      <span class="dash-username" id="dash-username">Member</span>
+      <button class="signout-btn" onclick="doSignout()"><i data-lucide="log-out"></i> Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- DASH TABS -->
+  <div class="dash-tabs">
+    <button class="dash-tab active" onclick="showPanel('home')"><i data-lucide="home"></i> Home</button>
+    <button class="dash-tab" onclick="showPanel('programs')"><i data-lucide="dumbbell"></i> My Programs</button>
+    <button class="dash-tab" onclick="showPanel('workouts')"><i data-lucide="play-circle"></i> Workouts</button>
+    <button class="dash-tab" onclick="showPanel('shop')"><i data-lucide="shopping-bag"></i> Shop</button>
+    <button class="dash-tab" onclick="showPanel('account')"><i data-lucide="user"></i> Account</button>
+  </div>
+
+  <!-- DASH CONTENT -->
+  <div class="dash-content">
+
+    <!-- HOME -->
+    <div class="dash-panel active" id="panel-home">
+      <div class="welcome-card">
+        <div>
+          <h2>WELCOME BACK, <span id="welcome-name">MEMBER</span></h2>
+          <p>Your transformation is in progress. Stay consistent. Stay disciplined.</p>
+        </div>
+        <div class="welcome-stats">
+          <div class="w-stat"><strong>90</strong><span>Day Goal</span></div>
+          <div class="w-stat"><strong>6</strong><span>Workouts</span></div>
+          <div class="w-stat"><strong>3</strong><span>Programs</span></div>
+        </div>
+      </div>
+      <div class="section-hdr">
+        <div class="section-hdr-left">
+          <h3>QUICK ACCESS</h3>
+          <span>Jump into your training</span>
+        </div>
+      </div>
+      <div class="panel-grid">
+        <div class="panel-card">
+          <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&q=80" alt="Programs"/>
+          <div class="panel-card-body">
+            <div class="panel-card-tag"><i data-lucide="dumbbell"></i> Training</div>
+            <h4>MY PROGRAMS</h4>
+            <p>View your active training program and track your weekly progress.</p>
+            <button class="panel-btn" onclick="showPanel('programs')"><i data-lucide="arrow-right"></i> View Programs</button>
+          </div>
+        </div>
+        <div class="panel-card">
+          <img src="https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?w=500&q=80" alt="Workouts"/>
+          <div class="panel-card-body">
+            <div class="panel-card-tag"><i data-lucide="play-circle"></i> Library</div>
+            <h4>WORKOUT LIBRARY</h4>
+            <p>Access all your workout videos and training guides on demand.</p>
+            <button class="panel-btn" onclick="showPanel('workouts')"><i data-lucide="arrow-right"></i> Start Training</button>
+          </div>
+        </div>
+        <div class="panel-card">
+          <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80" alt="Shop"/>
+          <div class="panel-card-body">
+            <div class="panel-card-tag"><i data-lucide="shopping-bag"></i> Apparel</div>
+            <h4>MEMBER SHOP</h4>
+            <p>Order official Dr Sculptor apparel directly from your account.</p>
+            <button class="panel-btn" onclick="showPanel('shop')"><i data-lucide="arrow-right"></i> Shop Now</button>
+          </div>
+        </div>
+        <div class="panel-card" style="border-color:rgba(37,211,102,0.3);">
+          <div style="height:150px;background:linear-gradient(135deg,#064e3b,#0a0a0a);display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="message-circle" style="width:48px;height:48px;color:#25D366;"></i>
+          </div>
+          <div class="panel-card-body">
+            <div class="panel-card-tag"><i data-lucide="zap"></i> Direct Line</div>
+            <h4>CONTACT COACH</h4>
+            <p>Message Dr Sculptor directly on WhatsApp for questions or check-ins.</p>
+            <button class="panel-btn" style="background:#25D366;" onclick="waEnquire()"><i data-lucide="message-circle"></i> WhatsApp Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRAMS -->
+    <div class="dash-panel" id="panel-programs">
+      <div class="section-hdr">
+        <div class="section-hdr-left">
+          <h3>MY PROGRAMS</h3>
+          <span>Your active and available training programs</span>
+        </div>
+        <a href="https://wa.me/18687923967?text=Hi%20Dr%20Sculptor!%20I%20want%20to%20upgrade%20my%20program." target="_blank" class="panel-btn" style="width:auto;padding:10px 16px;font-size:0.7rem;display:inline-flex;text-decoration:none;border-radius:7px;">
+          <i data-lucide="plus"></i> Upgrade Program
+        </a>
+      </div>
+      <div class="workout-row" style="border-color:rgba(227,28,28,0.4);">
+        <div class="workout-icon"><i data-lucide="flame"></i></div>
+        <div class="workout-info">
+          <h4>90-Day Transformation Protocol</h4>
+          <span>Weeks 1–4 · Fat Loss &amp; Foundation Phase</span>
+        </div>
+        <div class="workout-meta">
+          <span class="badge badge-red">Active</span>
+          <button class="play-btn" onclick="waEnquire()"><i data-lucide="arrow-right"></i></button>
+        </div>
+      </div>
+      <div class="workout-row">
+        <div class="workout-icon"><i data-lucide="zap"></i></div>
+        <div class="workout-info">
+          <h4>Custom 1-on-1 Plan</h4>
+          <span>Available on upgrade · Personalized coaching</span>
+        </div>
+        <div class="workout-meta">
+          <span class="badge badge-gold">Upgrade</span>
+          <button class="play-btn" onclick="waEnquire()"><i data-lucide="plus"></i></button>
+        </div>
+      </div>
+      <div class="workout-row">
+        <div class="workout-icon"><i data-lucide="users"></i></div>
+        <div class="workout-info">
+          <h4>Group Training Sessions</h4>
+          <span>Gulf City &amp; Gulf View · Available to join</span>
+        </div>
+        <div class="workout-meta">
+          <span class="badge badge-gold">Join</span>
+          <button class="play-btn" onclick="waEnquire()"><i data-lucide="plus"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKOUTS -->
+    <div class="dash-panel" id="panel-workouts">
+      <div class="section-hdr">
+        <div class="section-hdr-left">
+          <h3>WORKOUT LIBRARY</h3>
+          <span>6 workouts available · Updated weekly</span>
+        </div>
+      </div>
+      <div class="workout-row">
+        <div class="workout-icon"><i data-lucide="zap"></i></div>
+        <div class="workout-info"><h4>Fat Burn Circuit — Week 1</h4><span>45 min · Full Body · Beginner–Intermediate</span></div>
+        <div class="workout-meta"><span class="badge badge-red">New</span><button class="play-btn" onclick="waEnquire()"><i data-lucide="play"></i></button></div>
+      </div>
+      <div class="workout-row">
+        <div class="workout-icon"><i data-lucide="activity"></i></div>
+        <div class="workout-info"><h4>Upper Body Hypertrophy</h4><span>55 min · Chest / Back / Shoulders</span></div>
+        <div class="workout-meta"><button class="play-btn" onclick="waEnquire()"><i data-lucide="play"></i></button></div>
+      </div>
+      <div class="workout-row">
+        <div class="workout-icon"><i data-lucide="trending-up"></i></div>
+        <div class="workout-info"><h4>Leg Day: Quad Focus</h4><span>50 min · Lower Body · Intermediate</span></div>
+        <div class="workout-meta"><button class="play-btn" onclick="waEnquire()"><i data-lucide="play"></i></button></div>
+      </div>
+      <div class="workout-row">
+        <div class="workout-icon"><i data-lucide="target"></i></div>
+        <div class="workout-info"><h4>Core Conditioning</h4><span>30 min · Core / Abs · All Levels</span></div>
+        <div class="workout-meta"><button class="play-btn" onclick="waEnquire()"><i data-lucide="play"></i></button></div>
+      </div>
+      <div class="workout-row">
+        <div class="workout-icon"><i data-lucide="flame"></i></div>
+        <div class="workout-info"><h4>HIIT Cardio Blast</h4><span>25 min · Cardio · Intermediate</span></div>
+        <div class="workout-meta"><button class="play-btn" onclick="waEnquire()"><i data-lucide="play"></i></button></div>
+      </div>
+      <div class="workout-row">
+        <div class="workout-icon"><i data-lucide="shield"></i></div>
+        <div class="workout-info"><h4>Shoulder &amp; Arms Day</h4><span>50 min · Upper Body · All Levels</span></div>
+        <div class="workout-meta"><button class="play-btn" onclick="waEnquire()"><i data-lucide="play"></i></button></div>
+      </div>
+    </div>
+
+    <!-- SHOP -->
+    <div class="dash-panel" id="panel-shop">
+      <div class="section-hdr">
+        <div class="section-hdr-left">
+          <h3>MEMBER SHOP</h3>
+          <span>Official Dr Sculptor Apparel — Order via WhatsApp</span>
+        </div>
+      </div>
+      <div class="shop-grid">
+        <div class="shop-card">
+          <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80" alt="Classic Sculpt Tee"/>
+          <div class="shop-card-body">
+            <h4>Classic Sculpt Tee</h4>
+            <div class="shop-price"><i data-lucide="tag"></i> TT $180</div>
+            <button class="order-btn" onclick="orderItem('Classic Sculpt Tee — TT $180')"><i data-lucide="shopping-cart"></i> Order</button>
+          </div>
+        </div>
+        <div class="shop-card">
+          <img src="https://images.unsplash.com/photo-1611911813383-67769b37a149?w=400&q=80" alt="Sculpt Hoodie"/>
+          <div class="shop-card-body">
+            <h4>Sculpt Hoodie</h4>
+            <div class="shop-price"><i data-lucide="tag"></i> TT $320</div>
+            <button class="order-btn" onclick="orderItem('Sculpt Hoodie — TT $320')"><i data-lucide="shopping-cart"></i> Order</button>
+          </div>
+        </div>
+        <div class="shop-card">
+          <img src="https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&q=80" alt="Performance Shorts"/>
+          <div class="shop-card-body">
+            <h4>Performance Shorts</h4>
+            <div class="shop-price"><i data-lucide="tag"></i> TT $220</div>
+            <button class="order-btn" onclick="orderItem('Performance Shorts — TT $220')"><i data-lucide="shopping-cart"></i> Order</button>
+          </div>
+        </div>
+        <div class="shop-card">
+          <img src="https://images.unsplash.com/photo-1588361861040-ac9b1018f6d5?w=400&q=80" alt="Gym Bag"/>
+          <div class="shop-card-body">
+            <h4>Sculpt Gym Bag</h4>
+            <div class="shop-price"><i data-lucide="tag"></i> TT $380</div>
+            <button class="order-btn" onclick="orderItem('Sculpt Gym Bag — TT $380')"><i data-lucide="shopping-cart"></i> Order</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="dash-panel" id="panel-account">
+      <div class="section-hdr">
+        <div class="section-hdr-left">
+          <h3>MY ACCOUNT</h3>
+          <span>Manage your membership</span>
+        </div>
+      </div>
+      <div class="account-grid">
+        <div class="account-card">
+          <h4><i data-lucide="user"></i> Profile</h4>
+          <p id="acct-name">Name: —</p>
+          <p id="acct-email">Email: —</p>
+          <a href="https://wa.me/18687923967?text=Hi%20Dr%20Sculptor!%20I%20need%20to%20update%20my%20account%20details." target="_blank"><i data-lucide="edit"></i> Update via WhatsApp</a>
+        </div>
+        <div class="account-card">
+          <h4><i data-lucide="dumbbell"></i> Membership</h4>
+          <p>Active Member</p>
+          <p style="margin-top:6px;color:var(--muted);font-size:0.75rem;">To upgrade your program or change your plan, contact Dr Sculptor directly.</p>
+          <a href="https://wa.me/18687923967?text=Hi%20Dr%20Sculptor!%20I%27d%20like%20to%20upgrade%20my%20membership." target="_blank"><i data-lucide="arrow-up-right"></i> Upgrade Plan</a>
+        </div>
+        <div class="account-card">
+          <h4><i data-lucide="message-circle"></i> Direct Coach Line</h4>
+          <p>WhatsApp Dr Sculptor directly for check-ins, questions, and support.</p>
+          <a href="https://wa.me/18687923967" target="_blank"><i data-lucide="external-link"></i> Open WhatsApp</a>
+        </div>
+        <div class="account-card">
+          <h4><i data-lucide="instagram"></i> Follow on Instagram</h4>
+          <p>Stay up to date with tips, transformations, and training content.</p>
+          <a href="https://www.instagram.com/_drsculptor/" target="_blank"><i data-lucide="external-link"></i> @_drsculptor</a>
+        </div>
+      </div>
+      <div style="margin-top:20px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <p style="font-size:0.82rem;font-weight:700;">Sign out of your account</p>
+          <p style="font-size:0.72rem;color:var(--muted);">You can sign back in anytime.</p>
+        </div>
+        <button class="signout-btn" onclick="doSignout()"><i data-lucide="log-out"></i> Sign Out</button>
+      </div>
+    </div>
+
+  </div><!-- end dash-content -->
+</div><!-- end dashboard -->
+
+<script>
+// ===== SUPABASE =====
+const { createClient } = supabase;
+const sb = createClient(
+  'https://SUPABASE_PROJECT_URL.supabase.co',
+  'SUPABASE_ANON_KEY'
+);
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', async () => {
+  lucide.createIcons();
+  const { data: { session } } = await sb.auth.getSession();
+  if(session){ showDashboard(session.user); } else { showAuth(); }
+});
+
+sb.auth.onAuthStateChange((event, session) => {
+  if(event === 'SIGNED_IN' && session){ showDashboard(session.user); }
+  if(event === 'SIGNED_OUT'){ showAuth(); }
+});
+
+// ===== AUTH TOGGLE =====
+function showAuth(){
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('dashboard').classList.remove('visible');
+  document.getElementById('dashboard').style.display = 'none';
+  lucide.createIcons();
+}
+
+function showDashboard(user){
+  document.getElementById('auth-screen').classList.add('hidden');
+  const dash = document.getElementById('dashboard');
+  dash.style.display = 'block';
+  dash.classList.add('visible');
+  const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Member';
+  const initial = name.charAt(0).toUpperCase();
+  document.getElementById('dash-avatar').textContent = initial;
+  document.getElementById('dash-username').textContent = name;
+  document.getElementById('welcome-name').textContent = name.toUpperCase();
+  document.getElementById('acct-name').textContent = 'Name: ' + name;
+  document.getElementById('acct-email').textContent = 'Email: ' + (user.email || '—');
+  lucide.createIcons();
+}
+
+// ===== SWITCH TAB =====
+function switchTab(tab){
+  clearMessages();
+  document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('form-signup').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+}
+
+// ===== LOGIN =====
+async function doLogin(){
+  clearMessages();
+  const email = document.getElementById('l-email').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  if(!email || !pass){ showError('Please enter your email and password.'); return; }
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.innerHTML = '<i data-lucide="loader"></i> Signing in…'; lucide.createIcons();
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if(error){ showError(error.message); btn.disabled = false; btn.innerHTML = '<i data-lucide="log-in"></i> Sign In to My Account'; lucide.createIcons(); }
+}
+
+// ===== SIGNUP =====
+async function doSignup(){
+  clearMessages();
+  const name = document.getElementById('s-name').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const pass = document.getElementById('s-pass').value;
+  if(!name || !email || !pass){ showError('Please fill in all fields.'); return; }
+  if(pass.length < 6){ showError('Password must be at least 6 characters.'); return; }
+  const btn = document.getElementById('signup-btn');
+  btn.disabled = true; btn.innerHTML = '<i data-lucide="loader"></i> Creating account…'; lucide.createIcons();
+  const { error } = await sb.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
+  if(error){ showError(error.message); }
+  else { showSuccess('Account created! Check your email to confirm, then sign in.'); switchTab('login'); }
+  btn.disabled = false; btn.innerHTML = '<i data-lucide="user-plus"></i> Create My Account'; lucide.createIcons();
+}
+
+// ===== SIGN OUT =====
+async function doSignout(){
+  await sb.auth.signOut();
+}
+
+// ===== MESSAGES =====
+function showError(msg){ document.getElementById('err-text').textContent = msg; document.getElementById('auth-error').classList.add('show'); }
+function showSuccess(msg){ document.getElementById('ok-text').textContent = msg; document.getElementById('auth-success').classList.add('show'); }
+function clearMessages(){ document.getElementById('auth-error').classList.remove('show'); document.getElementById('auth-success').classList.remove('show'); }
+
+// ===== DASH PANELS =====
+function showPanel(id){
+  document.querySelectorAll('.dash-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  const tabs = document.querySelectorAll('.dash-tab');
+  const order = ['home','programs','workouts','shop','account'];
+  const idx = order.indexOf(id);
+  if(idx >= 0) tabs[idx].classList.add('active');
+}
+
+// ===== HELPERS =====
+function waEnquire(){ window.open('https://wa.me/18687923967?text=Hi%20Dr%20Sculptor!%20I%20have%20a%20question%20about%20my%20membership.','_blank'); }
+function orderItem(item){ window.open('https://wa.me/18687923967?text='+encodeURIComponent('Hi Dr Sculptor! I\'d like to order: '+item),'_blank'); }
+
+if('serviceWorker' in navigator){ navigator.serviceWorker.register('../sw.js').catch(()=>{}); }
+</script>
+</body>
+</html>

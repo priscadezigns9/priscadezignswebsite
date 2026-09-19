@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Your Brand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/*──────────────────────────────────
+  BASE
+──────────────────────────────────*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;}
+body{
+  background:#f2f1ed;
+  color:#111;
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:14px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none;}
+img{display:block;max-width:100%;height:auto;}
+
+/*──────────────────────────────────
+  NAV
+──────────────────────────────────*/
+.site-nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 22px;height:46px;
+  background:rgba(242,241,237,0.94);
+  backdrop-filter:blur(10px);
+}
+.nav-logo{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:13px;font-weight:600;letter-spacing:0.04em;
+  text-transform:uppercase;color:#111;
+}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-links a{
+  font-size:13px;font-weight:400;color:#555;
+  padding:5px 11px;border-radius:100px;
+  transition:color .15s,background .15s;
+  letter-spacing:0.01em;
+}
+.nav-links a:hover{color:#111;}
+.nav-links a.active{
+  background:#111;color:#f2f1ed;
+  font-weight:500;
+}
+
+/*──────────────────────────────────
+  MAIN LAYOUT
+  Left col: images  |  Right col: info
+──────────────────────────────────*/
+.main-wrap{
+  padding-top:46px;
+  display:grid;
+  grid-template-columns:42% 1fr;
+  min-height:100vh;
+}
+
+/*──────────────────────────────────
+  LEFT — stacked project images
+──────────────────────────────────*/
+.col-images{
+  border-right:1px solid #dddcd8;
+}
+.proj-img-wrap{
+  position:relative;
+  border-bottom:1px solid #dddcd8;
+  overflow:hidden;
+  cursor:pointer;
+  background:#e0dfd9;
+}
+.proj-img-wrap img{
+  width:100%;
+  aspect-ratio:4/3;
+  object-fit:cover;
+  display:block;
+  transition:transform .7s cubic-bezier(0.16,1,0.3,1),filter .4s;
+  filter:grayscale(6%);
+}
+.proj-img-wrap:hover img{
+  transform:scale(1.04);
+  filter:grayscale(0%);
+}
+/* project label overlay — bottom left */
+.proj-label{
+  position:absolute;bottom:14px;left:14px;
+  font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;
+  color:rgba(255,255,255,0.75);
+  background:rgba(0,0,0,0.28);backdrop-filter:blur(4px);
+  padding:4px 10px;border-radius:100px;
+}
+
+/*──────────────────────────────────
+  RIGHT — sticky info column
+──────────────────────────────────*/
+.col-info{
+  position:sticky;
+  top:46px;
+  height:calc(100vh - 46px);
+  display:flex;flex-direction:column;
+  justify-content:space-between;
+  padding:0;
+  overflow:hidden;
+}
+
+/* Project entries — revealed on scroll via JS */
+.proj-entries{flex:1;position:relative;overflow:hidden;}
+.proj-entry{
+  position:absolute;inset:0;
+  padding:36px 32px;
+  display:flex;flex-direction:column;justify-content:flex-start;
+  opacity:0;
+  transform:translateY(14px);
+  transition:opacity .4s ease, transform .4s ease;
+  pointer-events:none;
+}
+.proj-entry.visible{
+  opacity:1;transform:translateY(0);pointer-events:auto;
+}
+.proj-entry-num{
+  font-size:11px;color:#aaa;letter-spacing:0.08em;
+  text-transform:uppercase;margin-bottom:20px;
+}
+.proj-entry-title{
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:clamp(26px,3vw,42px);
+  font-weight:300;
+  letter-spacing:-0.5px;
+  line-height:1.1;
+  color:#111;
+  margin-bottom:20px;
+}
+.proj-entry-services{
+  display:flex;flex-wrap:wrap;gap:7px;
+}
+.svc-tag{
+  font-size:11px;font-weight:500;letter-spacing:0.06em;
+  text-transform:uppercase;color:#777;
+  border:1px solid #ccc;
+  padding:4px 12px;border-radius:100px;
+  background:transparent;
+  transition:border-color .2s,color .2s;
+}
+.proj-entry:hover .svc-tag{border-color:#111;color:#111;}
+
+/* About block — bottom of right col */
+.about-block{
+  padding:32px;
+  border-top:1px solid #dddcd8;
+}
+.about-block p{
+  font-size:13px;
+  font-weight:300;
+  color:#555;
+  line-height:1.75;
+  max-width:440px;
+}
+.about-block p strong{color:#111;font-weight:500;}
+.about-link{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:14px;
+  font-size:12px;font-weight:500;color:#111;
+  border-bottom:1px solid #bbb;padding-bottom:1px;
+  transition:border-color .2s;
+}
+.about-link:hover{border-color:#111;}
+
+/*──────────────────────────────────
+  SERVICES SECTION (below fold)
+──────────────────────────────────*/
+.services-section{
+  display:grid;
+  grid-template-columns:42% 1fr;
+  border-top:1px solid #dddcd8;
+}
+.services-label-col{
+  padding:52px 32px;
+  border-right:1px solid #dddcd8;
+}
+.services-label-col h2{
+  font-size:11px;font-weight:500;letter-spacing:0.1em;
+  text-transform:uppercase;color:#aaa;
+}
+.services-list-col{
+  padding:52px 32px;
+}
+.svc-row{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:16px 0;
+  border-bottom:1px solid #e0dfd9;
+  cursor:default;
+  transition:padding-left .2s;
+}
+.svc-row:last-child{border-bottom:none;}
+.svc-row:hover{padding-left:8px;}
+.svc-row-name{
+  font-size:clamp(18px,2.2vw,28px);
+  font-weight:300;letter-spacing:-0.3px;color:#111;
+}
+.svc-row-cat{
+  font-size:11px;font-weight:500;letter-spacing:0.08em;
+  text-transform:uppercase;color:#bbb;
+}
+
+/*──────────────────────────────────
+  CONTACT STRIP
+──────────────────────────────────*/
+.contact-strip{
+  display:grid;
+  grid-template-columns:42% 1fr;
+  border-top:1px solid #dddcd8;
+  background:#111;
+  color:#f2f1ed;
+}
+.contact-left{
+  padding:52px 32px;
+  border-right:1px solid #2a2a2a;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.contact-left h2{
+  font-size:clamp(32px,5vw,72px);
+  font-weight:300;letter-spacing:-2px;line-height:1;
+  color:#f2f1ed;
+}
+.contact-left a{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:32px;
+  background:#f2f1ed;color:#111;
+  padding:12px 24px;border-radius:100px;
+  font-size:13px;font-weight:500;
+  width:fit-content;
+  transition:opacity .2s;
+}
+.contact-left a:hover{opacity:.8;}
+.contact-right{
+  padding:52px 32px;
+}
+.contact-right h3{
+  font-size:11px;font-weight:500;letter-spacing:0.1em;
+  text-transform:uppercase;color:#555;
+  margin-bottom:24px;
+}
+.contact-links{display:flex;flex-direction:column;gap:10px;}
+.contact-links a{
+  font-size:22px;font-weight:300;letter-spacing:-0.3px;
+  color:#999;transition:color .2s;
+}
+.contact-links a:hover{color:#f2f1ed;}
+
+/*──────────────────────────────────
+  FOOTER
+──────────────────────────────────*/
+.site-footer{
+  background:#111;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;
+  border-top:1px solid #1e1e1e;
+}
+.site-footer p{font-size:11px;color:#444;}
+.site-footer a{font-size:11px;color:#444;transition:color .2s;}
+.site-footer a:hover{color:#f2f1ed;}
+.footer-links{display:flex;gap:16px;}
+
+/*──────────────────────────────────
+  MOBILE
+──────────────────────────────────*/
+@media(max-width:768px){
+  .main-wrap{grid-template-columns:1fr;}
+  .col-info{
+    position:relative;top:auto;height:auto;
+  }
+  .proj-entries{height:auto;position:relative;}
+  .proj-entry{
+    position:relative;inset:auto;
+    opacity:1;transform:none;
+    padding:24px 18px;
+    border-bottom:1px solid #dddcd8;
+  }
+  .about-block{padding:24px 18px;}
+  .services-section{grid-template-columns:1fr;}
+  .services-label-col{padding:28px 18px 8px;border-right:none;border-bottom:1px solid #dddcd8;}
+  .services-list-col{padding:16px 18px 32px;}
+  .contact-strip{grid-template-columns:1fr;}
+  .contact-left{padding:36px 18px;}
+  .contact-right{padding:32px 18px;border-top:1px solid #2a2a2a;}
+  .site-footer{flex-direction:column;gap:8px;text-align:center;}
+  .site-nav{padding:0 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav class="site-nav">
+  <a class="nav-logo" href="#">Your Brand</a>
+  <div class="nav-links">
+    <a href="#" class="active">Work</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Contact</a>
+    <a href="https://www.instagram.com/" target="_blank">Insta</a>
+    <a href="https://wa.me/18683424101?text=Hi%2C+I%27m+interested+in+working+together" target="_blank">WhatsApp</a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN: images left | info right ═══ -->
+<div class="main-wrap">
+
+  <!-- LEFT: stacked images -->
+  <div class="col-images" id="col-images">
+
+    <div class="proj-img-wrap" data-proj="0">
+      <img src="https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?w=900&q=85&auto=format&fit=crop" alt="Project 01" loading="eager"/>
+      <span class="proj-label">Project 01</span>
+    </div>
+
+    <div class="proj-img-wrap" data-proj="1">
+      <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=85&auto=format&fit=crop" alt="Project 02" loading="lazy"/>
+      <span class="proj-label">Project 02</span>
+    </div>
+
+    <div class="proj-img-wrap" data-proj="2">
+      <img src="https://images.unsplash.com/photo-1609709295948-17d77cb2a69b?w=900&q=85&auto=format&fit=crop" alt="Project 03" loading="lazy"/>
+      <span class="proj-label">Project 03</span>
+    </div>
+
+    <div class="proj-img-wrap" data-proj="3">
+      <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=900&q=85&auto=format&fit=crop" alt="Project 04" loading="lazy"/>
+      <span class="proj-label">Project 04</span>
+    </div>
+
+    <div class="proj-img-wrap" data-proj="4">
+      <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=900&q=85&auto=format&fit=crop" alt="Project 05" loading="lazy"/>
+      <span class="proj-label">Project 05</span>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: sticky info column -->
+  <div class="col-info">
+
+    <div class="proj-entries" id="proj-entries">
+
+      <div class="proj-entry visible" data-entry="0">
+        <div class="proj-entry-num">01 / 05</div>
+        <div class="proj-entry-title">Brand Identity<br>& Visual Direction</div>
+        <div class="proj-entry-services">
+          <span class="svc-tag">Strategy</span>
+          <span class="svc-tag">Visual Identity</span>
+          <span class="svc-tag">Digital</span>
+          <span class="svc-tag">Print</span>
+        </div>
+      </div>
+
+      <div class="proj-entry" data-entry="1">
+        <div class="proj-entry-num">02 / 05</div>
+        <div class="proj-entry-title">Web Design<br>& Brand Experience</div>
+        <div class="proj-entry-services">
+          <span class="svc-tag">Web Design</span>
+          <span class="svc-tag">Copywriting</span>
+          <span class="svc-tag">Creative Direction</span>
+        </div>
+      </div>
+
+      <div class="proj-entry" data-entry="2">
+        <div class="proj-entry-num">03 / 05</div>
+        <div class="proj-entry-title">Campaign<br>& Content Creation</div>
+        <div class="proj-entry-services">
+          <span class="svc-tag">Photography</span>
+          <span class="svc-tag">Social Media</span>
+          <span class="svc-tag">Motion</span>
+        </div>
+      </div>
+
+      <div class="proj-entry" data-entry="3">
+        <div class="proj-entry-num">04 / 05</div>
+        <div class="proj-entry-title">Product Launch<br>& Go-To-Market</div>
+        <div class="proj-entry-services">
+          <span class="svc-tag">Brand Strategy</span>
+          <span class="svc-tag">Packaging</span>
+          <span class="svc-tag">Digital</span>
+          <span class="svc-tag">Signage</span>
+        </div>
+      </div>
+
+      <div class="proj-entry" data-entry="4">
+        <div class="proj-entry-num">05 / 05</div>
+        <div class="proj-entry-title">Full Brand<br>Build & Deployment</div>
+        <div class="proj-entry-services">
+          <span class="svc-tag">Web Design</span>
+          <span class="svc-tag">AI Chatbot</span>
+          <span class="svc-tag">Identity</span>
+          <span class="svc-tag">Copywriting</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- About -->
+    <div class="about-block">
+      <p>
+        <strong>Your Brand</strong> is a compact, results-driven creative studio working with ambitious businesses across every industry. We specialise in brand identity, digital experiences, and visual storytelling — built with care and precision for those ready to stand out.
+      </p>
+      <a class="about-link" href="https://wa.me/18683424101?text=Hi%2C+I%27d+like+to+know+more+about+your+services" target="_blank">Work with us →</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SERVICES ═══ -->
+<section class="services-section" id="services">
+  <div class="services-label-col">
+    <h2>What we do</h2>
+  </div>
+  <div class="services-list-col">
+    <div class="svc-row">
+      <span class="svc-row-name">Brand Strategy</span>
+      <span class="svc-row-cat">Foundation</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-row-name">Visual Identity</span>
+      <span class="svc-row-cat">Design</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-row-name">Web Design</span>
+      <span class="svc-row-cat">Digital</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-row-name">Copywriting</span>
+      <span class="svc-row-cat">Content</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-row-name">AI Chatbot Setup</span>
+      <span class="svc-row-cat">Automation</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-row-name">Social Media</span>
+      <span class="svc-row-cat">Growth</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-row-name">Photography Direction</span>
+      <span class="svc-row-cat">Visual</span>
+    </div>
+    <div class="svc-row">
+      <span class="svc-row-name">Online Store</span>
+      <span class="svc-row-cat">eCommerce</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+<section class="contact-strip" id="contact">
+  <div class="contact-left">
+    <h2>Let's build<br>something<br>together.</h2>
+    <a href="https://wa.me/18683424101?text=Hi%2C+I%27m+ready+to+start+a+project" target="_blank">
+      Start a project ↗
+    </a>
+  </div>
+  <div class="contact-right">
+    <h3>Find us</h3>
+    <div class="contact-links">
+      <a href="https://www.instagram.com/priscadezigns" target="_blank">Instagram</a>
+      <a href="https://www.facebook.com/priscadezigns" target="_blank">Facebook</a>
+      <a href="https://wa.me/18683424101" target="_blank">WhatsApp</a>
+      <a href="https://priscadezigns.org/templates/" target="_blank">Browse Templates</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="site-footer">
+  <p>© 2025 Your Brand. Built by <a href="https://priscadezigns.org" target="_blank">Prisca Dezigns</a>.</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="https://wa.me/18683424101?text=Hi%2C+I%27d+like+a+Crew+website" target="_blank">Get This Template</a>
+  </div>
+</footer>
+
+<script>
+// Scroll-synced right column: as user scrolls through left images,
+// right panel swaps to matching project entry
+(function(){
+  const images = document.querySelectorAll('.proj-img-wrap');
+  const entries = document.querySelectorAll('.proj-entry');
+  if(!images.length || !entries.length) return;
+
+  let current = 0;
+
+  function showEntry(idx){
+    if(idx === current) return;
+    entries[current].classList.remove('visible');
+    current = idx;
+    entries[current].classList.add('visible');
+  }
+
+  const obs = new IntersectionObserver((evts)=>{
+    evts.forEach(ev=>{
+      if(ev.isIntersecting){
+        const idx = parseInt(ev.target.dataset.proj, 10);
+        if(!isNaN(idx)) showEntry(idx);
+      }
+    });
+  },{threshold:0.5});
+
+  images.forEach(img => obs.observe(img));
+
+  // also highlight nav "Work" on scroll up, services on scroll down
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const servicesSection = document.getElementById('services');
+
+  window.addEventListener('scroll', ()=>{
+    if(!servicesSection) return;
+    const inServices = window.scrollY >= servicesSection.offsetTop - 100;
+    navLinks.forEach(a=>{
+      a.classList.remove('active');
+      if(inServices && a.getAttribute('href')==='#services') a.classList.add('active');
+      if(!inServices && a.getAttribute('href')==='#') a.classList.add('active');
+    });
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

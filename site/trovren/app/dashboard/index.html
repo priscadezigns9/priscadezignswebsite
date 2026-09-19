@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Trovren — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#7C4DFF;--bg:#07050F;--surface:#110E1F;--border:#7C4DFF18;--text:#EEE9FF;--muted:#EEE9FF55;--success:#4CAF50;--danger:#FF5252;--warning:#FFD740;--info:#40C4FF}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+
+.sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;transition:transform 0.3s}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.logo-text{font-family:'Nunito',sans-serif;font-size:1.4rem;font-weight:900;color:var(--accent);letter-spacing:-0.3px}
+.logo-sub{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:2px;font-weight:700}
+.nav-section{padding:20px 0;flex:1;overflow-y:auto}
+.nav-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 20px 8px;font-weight:700}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;font-size:0.85rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.15s;border-radius:0 24px 24px 0;margin-right:12px;border-left:3px solid transparent}
+.nav-item:hover{color:var(--text);background:#7C4DFF11}
+.nav-item.active{color:var(--accent);background:#7C4DFF18;border-left-color:var(--accent)}
+.nav-item .icon{width:18px;height:18px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.nav-badge{background:var(--warning);color:#07050F;font-size:0.6rem;font-weight:800;padding:2px 7px;border-radius:10px;margin-left:auto}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#07050F;font-weight:800;font-size:0.78rem;display:flex;align-items:center;justify-content:center}
+.user-name{font-size:0.82rem;font-weight:700}
+.user-role{font-size:0.7rem;color:var(--muted)}
+
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+.topbar{height:60px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:40}
+.topbar-title{font-size:1.05rem;font-weight:800;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text)}
+.content{padding:28px;flex:1}
+.page-header{margin-bottom:24px}
+.page-title{font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:4px}
+.page-sub{font-size:0.85rem;color:var(--muted);font-weight:600}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;border-radius:4px;overflow:hidden}
+.stat-card::before{content:'';position:absolute;inset:0;opacity:0.03}
+.stat-card.purple::before{background:var(--accent)}
+.stat-card.green::before{background:var(--success)}
+.stat-card.yellow::before{background:var(--warning)}
+.stat-card.blue::before{background:var(--info)}
+.stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.stat-icon-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px;font-weight:700}
+.stat-value{font-size:2rem;font-weight:900;line-height:1;margin-bottom:6px}
+.stat-card.purple .stat-value{color:var(--accent)}
+.stat-card.green .stat-value{color:var(--success)}
+.stat-card.yellow .stat-value{color:var(--warning)}
+.stat-card.blue .stat-value{color:var(--info)}
+.stat-change{font-size:0.73rem;color:var(--muted);font-weight:600}
+
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.widget{background:var(--surface);border:1px solid var(--border);overflow:hidden;border-radius:4px}
+.widget.full-width{grid-column:1/-1}
+.widget-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.widget-title{font-size:0.95rem;font-weight:800;color:var(--text)}
+.widget-badge{font-size:0.65rem;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px}
+.badge-purple{background:#7C4DFF22;color:var(--accent);border:1px solid #7C4DFF44}
+.badge-green{background:#4CAF5022;color:var(--success);border:1px solid #4CAF5044}
+.badge-yellow{background:#FFD74022;color:var(--warning);border:1px solid #FFD74044}
+.badge-blue{background:#40C4FF22;color:var(--info);border:1px solid #40C4FF44}
+.badge-red{background:#FF525222;color:var(--danger);border:1px solid #FF525244}
+.widget-body{padding:16px 20px}
+.view-all{font-size:0.73rem;color:var(--accent);cursor:pointer;font-weight:700}
+
+/* Classes */
+.class-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.class-item:last-child{border-bottom:none}
+.class-time{font-size:0.78rem;font-weight:700;color:var(--accent);width:52px;flex-shrink:0}
+.class-color{width:4px;height:40px;border-radius:2px;flex-shrink:0}
+.class-info{flex:1}
+.class-name{font-size:0.88rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.class-teacher{font-size:0.72rem;color:var(--muted)}
+.class-room{font-size:0.72rem;color:var(--accent);font-weight:600;background:#7C4DFF22;padding:2px 8px;border-radius:20px}
+
+/* Attendance Ring */
+.attendance-ring{text-align:center;padding:20px 0}
+.ring-wrap{position:relative;width:140px;height:140px;margin:0 auto 16px}
+.ring-svg{transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:#7C4DFF22;stroke-width:12}
+.ring-fill{fill:none;stroke:var(--accent);stroke-width:12;stroke-linecap:round;stroke-dasharray:376;stroke-dashoffset:22;transition:stroke-dashoffset 1s}
+.ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-size:2rem;font-weight:900;color:var(--accent)}
+.ring-sublabel{font-size:0.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.att-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.att-item{text-align:center;background:#07050F;border:1px solid var(--border);padding:10px;border-radius:3px}
+.att-val{font-size:1.2rem;font-weight:900;margin-bottom:2px}
+.att-lab{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}
+
+/* Assignments */
+.assign-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
+.assign-item:last-child{border-bottom:none}
+.assign-info{flex:1}
+.assign-title{font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.assign-meta{font-size:0.72rem;color:var(--muted)}
+.assign-due{font-size:0.75rem;font-weight:700;padding:3px 10px}
+.due-today{color:var(--danger);background:#FF525222;border:1px solid #FF525244;border-radius:20px}
+.due-soon{color:var(--warning);background:#FFD74022;border:1px solid #FFD74033;border-radius:20px}
+.due-later{color:var(--muted);background:#EEE9FF11;border:1px solid #EEE9FF22;border-radius:20px}
+
+/* Fees */
+.fee-progress{margin-bottom:14px}
+.fee-header-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.fee-class{font-size:0.83rem;font-weight:700;color:var(--text)}
+.fee-pct{font-size:0.83rem;font-weight:700;color:var(--accent)}
+.fee-track{height:10px;background:#7C4DFF18;border-radius:5px;overflow:hidden}
+.fee-fill{height:100%;background:var(--accent);border-radius:5px;transition:width 1s}
+.fee-detail{font-size:0.7rem;color:var(--muted);margin-top:4px;font-weight:600}
+
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:45}
+@media(max-width:960px){.dashboard-grid{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.hamburger{display:flex}.overlay.show{display:block}}
+@media(max-width:440px){.stats-row{grid-template-columns:1fr}.content{padding:16px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">Trovren</div>
+    <div class="logo-sub">School Management</div>
+  </div>
+  <nav class="nav-section">
+    <div class="nav-label">Menu</div>
+    <div class="nav-item active" onclick="setPage(this,'Dashboard')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Classes')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      Classes
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Students')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Students
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Teachers')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Teachers
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Timetable')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Timetable
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Fees')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+      Fees
+      <span class="nav-badge">!</span>
+    </div>
+    <div class="nav-item" onclick="setPage(this,'Reports')">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Reports
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">DR</div>
+      <div>
+        <div class="user-name" id="user-name">Mrs. D. Ramesar</div>
+        <div class="user-role">Principal</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+      <span class="topbar-title" id="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size:0.78rem;color:var(--muted);font-weight:600">Term 3 · 2025–2026</span>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div class="page-title">Good Morning! 👋</div>
+      <div class="page-sub">Trinity Secondary School · Today's Overview</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card purple">
+        <div class="stat-top"><span class="stat-icon-circle" style="background:#7C4DFF22;color:var(--accent)">📚</span></div>
+        <div class="stat-label">Classes Today</div>
+        <div class="stat-value">6</div>
+        <div class="stat-change">2 in progress now</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-top"><span class="stat-icon-circle" style="background:#4CAF5022;color:var(--success)">✅</span></div>
+        <div class="stat-label">Attendance Rate</div>
+        <div class="stat-value">94%</div>
+        <div class="stat-change">428 / 455 students</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-top"><span class="stat-icon-circle" style="background:#FFD74022;color:var(--warning)">📝</span></div>
+        <div class="stat-label">Assignments Due</div>
+        <div class="stat-value">8</div>
+        <div class="stat-change">3 due today</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-top"><span class="stat-icon-circle" style="background:#40C4FF22;color:var(--info)">💰</span></div>
+        <div class="stat-label">Fees Collected</div>
+        <div class="stat-value">78%</div>
+        <div class="stat-change">TTD $1.16M of $1.49M</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Today's Classes</span>
+          <span class="widget-badge badge-purple">6 Scheduled</span>
+        </div>
+        <div class="widget-body" id="classes-widget"></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Student Attendance</span>
+          <span class="widget-badge badge-green">94% Today</span>
+        </div>
+        <div class="widget-body">
+          <div class="attendance-ring">
+            <div class="ring-wrap">
+              <svg class="ring-svg" width="140" height="140" viewBox="0 0 140 140">
+                <circle class="ring-track" cx="70" cy="70" r="60"/>
+                <circle class="ring-fill" cx="70" cy="70" r="60"/>
+              </svg>
+              <div class="ring-label">
+                <div class="ring-pct">94%</div>
+                <div class="ring-sublabel">Present</div>
+              </div>
+            </div>
+            <div class="att-breakdown">
+              <div class="att-item"><div class="att-val" style="color:var(--success)">428</div><div class="att-lab">Present</div></div>
+              <div class="att-item"><div class="att-val" style="color:var(--danger)">18</div><div class="att-lab">Absent</div></div>
+              <div class="att-item"><div class="att-val" style="color:var(--warning)">9</div><div class="att-lab">Late</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Assignments Due</span>
+          <span class="widget-badge badge-red">3 Due Today</span>
+        </div>
+        <div class="widget-body" id="assignments-widget"></div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span class="widget-title">Fee Collection Status</span>
+          <span class="view-all">Send Reminders →</span>
+        </div>
+        <div class="widget-body" id="fees-widget"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const classes = [
+  {time:'7:50 AM', name:'Form 4 Mathematics', teacher:'Mr. T. Ramlogan', room:'Lab 1', color:'#7C4DFF'},
+  {time:'8:50 AM', name:'Form 5 English Literature', teacher:'Ms. C. Joseph', room:'Room 12', color:'#40C4FF'},
+  {time:'9:50 AM', name:'Form 3 Biology', teacher:'Mrs. P. Ali', room:'Lab 2', color:'#4CAF50'},
+  {time:'11:00 AM', name:'Form 2 Spanish', teacher:'Ms. L. Gonzalez', room:'Room 7', color:'#FFD740'},
+  {time:'12:00 PM', name:'Form 1 ICT', teacher:'Mr. D. Maharaj', room:'Computer Lab', color:'#FF5252'},
+  {time:'1:00 PM', name:'Form 4 Chemistry', teacher:'Mr. K. Persad', room:'Lab 3', color:'#7C4DFF'},
+];
+
+const assignments = [
+  {title:'Form 5 Maths — Past Paper Practice', meta:'Mr. Ramlogan · 455 students', due:'today'},
+  {title:'Form 4 English Essay — Draft 2', meta:'Ms. Joseph · 82 students', due:'today'},
+  {title:'Form 3 Biology Lab Report', meta:'Mrs. Ali · 96 students', due:'today'},
+  {title:'Form 2 Spanish Oral Recording', meta:'Ms. Gonzalez · 88 students', due:'soon'},
+  {title:'Form 5 Chemistry Titration', meta:'Mr. Persad · 78 students', due:'soon'},
+  {title:'Form 1 ICT Project Part 1', meta:'Mr. Maharaj · 111 students', due:'later'},
+];
+
+const fees = [
+  {class:'Form 5 (5A–5C)', pct:92, paid:'$248,400', total:'$270,000'},
+  {class:'Form 4 (4A–4C)', pct:85, paid:'$214,200', total:'$252,000'},
+  {class:'Form 3 (3A–3C)', pct:78, paid:'$187,200', total:'$240,000'},
+  {class:'Form 2 (2A–2C)', pct:71, paid:'$163,800', total:'$230,800'},
+  {class:'Form 1 (1A–1C)', pct:65, paid:'$149,500', total:'$229,800'},
+];
+
+document.getElementById('classes-widget').innerHTML = classes.map(c => `
+  <div class="class-item">
+    <span class="class-time">${c.time}</span>
+    <div class="class-color" style="background:${c.color}"></div>
+    <div class="class-info">
+      <div class="class-name">${c.name}</div>
+      <div class="class-teacher">${c.teacher}</div>
+    </div>
+    <span class="class-room">${c.room}</span>
+  </div>
+`).join('');
+
+document.getElementById('assignments-widget').innerHTML = assignments.map(a => `
+  <div class="assign-item">
+    <div class="assign-info">
+      <div class="assign-title">${a.title}</div>
+      <div class="assign-meta">${a.meta}</div>
+    </div>
+    <span class="assign-due due-${a.due}">${a.due === 'today' ? 'Due Today' : a.due === 'soon' ? 'This Week' : 'Next Week'}</span>
+  </div>
+`).join('');
+
+document.getElementById('fees-widget').innerHTML = `
+  <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-size:1.8rem;font-weight:900;color:var(--accent)">78%</div>
+      <div style="font-size:0.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px">Collected · TTD $1,163,100 of $1,222,600</div>
+    </div>
+    <div style="font-size:0.75rem;color:var(--warning);font-weight:700;background:#FFD74022;border:1px solid #FFD74044;padding:6px 12px;border-radius:20px">$268,250 outstanding</div>
+  </div>
+  ${fees.map(f => `
+    <div class="fee-progress">
+      <div class="fee-header-row"><span class="fee-class">${f.class}</span><span class="fee-pct">${f.pct}%</span></div>
+      <div class="fee-track"><div class="fee-fill" style="width:${f.pct}%"></div></div>
+      <div class="fee-detail">TTD ${f.paid} of ${f.total}</div>
+    </div>
+  `).join('')}
+`;
+
+const user = JSON.parse(localStorage.getItem('trovren_user') || '{}');
+if(user.name) document.getElementById('user-name').textContent = user.name;
+
+function setPage(el, name){ document.getElementById('page-title').textContent = name; document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); el.classList.add('active'); closeSidebar(); }
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
+</script>
+</body>
+</html>

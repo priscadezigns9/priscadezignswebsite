@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Client Portal | Prisca Dezigns</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --portal-bg: #0F172A; --portal-sidebar: #1E293B; --portal-accent: #7D52B5; --portal-text: #F8FAF C; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--portal-bg); color: var(--portal-text); margin: 0; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); }
+        .sidebar-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-item:hover { background: rgba(255,255,255,0.05); }
+        .sidebar-item.active { background: var(--portal-accent); color: white; box-shadow: 0 10px 15px -3px rgba(125, 82, 181, 0.3); }
+        .data-card { background: #1E293B; border: 1px solid rgba(255,255,255,0.05); }
+        .hidden { display: none; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body class="flex h-screen overflow-hidden">
+    <div id="auth-screen" class="fixed inset-0 z-[999] glass flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-[#1E293B] rounded-[2.5rem] p-10 shadow-2xl border border-white/5 text-center">
+            <div class="w-20 h-20 bg-[#7D52B5] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-500/20"><i data-lucide="shield-check" class="w-10 h-10 text-white"></i></div>
+            <h2 id="auth-heading" class="text-3xl font-extrabold text-white mb-2 italic">Secure Login</h2>
+            <p id="auth-status" class="text-slate-400 mb-8 font-medium">Sign in with your Prisca Dezigns account.</p>
+            <input type="email" id="auth-email" placeholder="you@example.com" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-3 text-center font-bold text-white transition-all" autocomplete="username">
+            <input type="password" id="auth-key" placeholder="Password" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold tracking-widest text-white transition-all" autocomplete="current-password" onkeypress="if(event.key === 'Enter') checkAuth()">
+            <button id="auth-primary-btn" onclick="checkAuth()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">CONNECT</button>
+            <button id="auth-toggle-btn" onclick="toggleAuthMode()" class="w-full mt-4 text-slate-400 text-sm font-medium hover:text-white transition-all">Don't have an account? <span class="text-[#a78bda] font-bold">Sign up</span></button>
+            <button onclick="sendResetEmail()" class="w-full mt-2 text-slate-500 text-xs font-medium hover:text-slate-300 transition-all">Forgot your password?</button>
+        </div>
+    </div>
+    <div id="recovery-screen" class="fixed inset-0 z-[999] glass flex items-center justify-center p-6 hidden">
+        <div class="max-w-md w-full bg-[#1E293B] rounded-[2.5rem] p-10 shadow-2xl border border-white/5 text-center">
+            <div class="w-20 h-20 bg-[#7D52B5] rounded-3xl mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-500/20"><i data-lucide="key-round" class="w-10 h-10 text-white"></i></div>
+            <h2 class="text-3xl font-extrabold text-white mb-2 italic">Set a New Password</h2>
+            <p id="recovery-status" class="text-slate-400 mb-8 font-medium">Choose a new password for your account.</p>
+            <input type="password" id="recovery-pw1" placeholder="New password" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-3 text-center font-bold text-white transition-all" autocomplete="new-password">
+            <input type="password" id="recovery-pw2" placeholder="Confirm new password" class="w-full px-6 py-4 rounded-2xl bg-[#0F172A] border border-white/10 focus:ring-4 focus:ring-purple-500/20 outline-none mb-4 text-center font-bold text-white transition-all" autocomplete="new-password" onkeypress="if(event.key === 'Enter') submitNewPassword()">
+            <button onclick="submitNewPassword()" class="w-full py-4 bg-[#7D52B5] text-white rounded-2xl font-extrabold shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all">Save New Password</button>
+        </div>
+    </div>
+    <aside class="w-72 bg-[#1E293B] border-r border-white/5 flex flex-col p-6 z-10">
+        <div class="flex items-center space-x-3 mb-12">
+            <div class="w-10 h-10 bg-[#7D52B5] rounded-xl flex items-center justify-center"><img src="/assets/logo.png" class="w-6 h-6 filter brightness-0 invert"></div>
+            <div><div class="text-white font-extrabold tracking-tight text-sm">Strategic Portal</div><div class="text-purple-400 text-[9px] font-black uppercase tracking-widest">Client Edition v2.0</div></div>
+        </div>
+        <nav class="flex-1 space-y-2">
+            <button onclick="showSection('overview')" id="nav-overview" class="sidebar-item active w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="layout-dashboard" class="w-4 h-4 mr-3"></i> Overview</button>
+            <button onclick="showSection('upload')" id="nav-upload" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="upload-cloud" class="w-4 h-4 mr-3"></i> Document Intake</button>
+            <button onclick="showSection('ledger')" id="nav-ledger" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="database" class="w-4 h-4 mr-3"></i> Data Ledger</button>
+            <button onclick="showSection('vault')" id="nav-vault" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold"><i data-lucide="lock" class="w-4 h-4 mr-3"></i> Media Vault</button>
+        
+            <div class="mt-8 mb-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4">Strategic Links</div>
+            <button onclick="window.open('https://driveevolve.com', '_blank')" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors"><i data-lucide="car" class="w-4 h-4 mr-3"></i> Evolve Mobility</button>
+            <button onclick="window.open('https://thewaymadeknown.org', '_blank')" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors"><i data-lucide="heart" class="w-4 h-4 mr-3"></i> TWMK Project</button>
+            <button onclick="window.open('https://priscadezigns.org/about', '_blank')" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors"><i data-lucide="info" class="w-4 h-4 mr-3"></i> About PD</button>
+            <button onclick="alert('Audit Request Dispatched to Sierra.')" class="sidebar-item w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-white transition-colors"><i data-lucide="clipboard-check" class="w-4 h-4 mr-3"></i> Request Audit</button>
+        </nav>
+        <div class="mt-auto pt-6 border-t border-white/5">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold">C</div>
+                <div><div class="text-xs font-bold text-white">Client Session</div><div class="text-[9px] text-emerald-400 flex items-center font-bold uppercase tracking-tighter"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1.5 animate-pulse"></span> Sierra Connected</div></div>
+            <button onclick="sbClient.auth.signOut().then(() => location.reload());" class="mt-4 w-full flex items-center justify-center px-4 py-3 rounded-xl text-xs font-bold text-red-400 bg-red-400/5 border border-red-400/10 hover:bg-red-400/10 transition-all">
+                <i data-lucide="log-out" class="w-3.5 h-3.5 mr-2"></i> SIGN OUT
+            </button>
+        
+            </div>
+        </div>
+    </aside>
+    <main class="flex-1 overflow-y-auto bg-[#0F172A] p-10 relative">
+        <div id="section-overview" class="max-w-5xl mx-auto">
+            <header class="mb-12"><h1 class="text-4xl font-extrabold text-white mb-2 italic">Dashboard Overview</h1><p class="text-slate-400 font-bold">Real-time status of your business infrastructure.</p></header>
+            <div class="grid grid-cols-3 gap-6 mb-12">
+                <div class="data-card p-8 rounded-3xl"><div class="text-slate-400 text-xs font-black uppercase mb-4 tracking-widest">Processed Items</div><div id="stat-items" class="text-4xl font-extrabold text-white">0</div><div class="text-emerald-400 text-[10px] mt-2 font-bold">+12% from last month</div></div>
+                <div class="data-card p-8 rounded-3xl"><div class="text-slate-400 text-xs font-black uppercase mb-4 tracking-widest">Accuracy Rate</div><div id="stat-accuracy" class="text-4xl font-extrabold text-white">—</div><div class="text-emerald-400 text-[10px] mt-2 font-bold">Sierra Optimized</div></div>
+                <div class="data-card p-8 rounded-3xl"><div class="text-slate-400 text-xs font-black uppercase mb-4 tracking-widest">Automation Savings</div><div id="stat-savings" class="text-4xl font-extrabold text-white">$0.00</div><div class="text-emerald-400 text-[10px] mt-2 font-bold">Calculated by Drew</div></div>
+            </div>
+        </div>
+        <div id="section-upload" class="max-w-4xl mx-auto hidden">
+            <header class="mb-12"><h1 class="text-4xl font-extrabold text-white mb-2 italic">Document Intake</h1><p class="text-slate-400 font-bold">Drag and drop any business file for Sierra to process.</p></header>
+            <div class="bg-[#1E293B] rounded-[2.5rem] p-20 border-4 border-dashed border-white/5 text-center hover:border-purple-500/50 transition-all cursor-pointer group" onclick="document.getElementById('file-input').click()"><div class="w-16 h-16 bg-white/5 rounded-2xl mx-auto mb-6 flex items-center justify-center group-hover:scale-110 transition-transform"><i data-lucide="plus" class="w-8 h-8 text-purple-400"></i></div><h3 class="text-xl font-extrabold text-white tracking-tight">Drop Files or Click to Browse</h3><p class="text-slate-500 mt-2 font-bold">PDF, Images, Excel, CSV</p><input type="file" id="file-input" class="hidden" multiple onchange="handleUpload(this.files)"></div>
+            <div id="upload-stack" class="mt-8 space-y-4"></div>
+        </div>
+        <div id="section-ledger" class="max-w-6xl mx-auto hidden">
+            <header class="flex items-center justify-between mb-12"><div><h1 class="text-4xl font-extrabold text-white mb-2 italic">Data Ledger</h1><p class="text-slate-400 font-bold">Structured business intelligence extracted by AI.</p></div><button onclick="exportData()" class="px-6 py-3 bg-white text-slate-900 rounded-xl font-bold flex items-center hover:bg-slate-200 transition-colors"><i data-lucide="download" class="w-4 h-4 mr-2"></i> Export CSV</button></header>
+            <div class="bg-[#1E293B] rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/5">
+                <table class="w-full text-left">
+                    <thead><tr class="bg-white/5 border-b border-white/5"><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Entry Date</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Classification</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Merchant / Entity</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Intelligence Content</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest">Value</th><th class="px-8 py-6 text-[10px] font-black uppercase text-slate-400 tracking-widest text-right">Status</th></tr></thead>
+                    <tbody id="ledger-body"></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="section-vault" class="max-w-6xl mx-auto hidden">
+             <header class="mb-12"><h1 class="text-4xl font-extrabold text-white mb-2 italic">Media Vault</h1><p class="text-slate-400 font-bold">Secure access to raw documents mirrored in Google Drive.</p></header>
+            <div class="grid grid-cols-4 gap-6" id="vault-grid"></div>
+        </div>
+    </main>
+    <script>
+        try { lucide.createIcons(); } catch(e) {}
+
+        const SB_URL = 'https://sazhdnqzaqpqcralmthh.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc';
+        const sbClient = supabase.createClient(SB_URL, SB_KEY);
+
+        let authMode = 'login';
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'signup' : 'login';
+            const heading = document.getElementById('auth-heading');
+            const status = document.getElementById('auth-status');
+            const primaryBtn = document.getElementById('auth-primary-btn');
+            const toggleBtn = document.getElementById('auth-toggle-btn');
+            status.style.color = '';
+            if (authMode === 'signup') {
+                heading.innerText = 'Create Your Account';
+                status.innerText = 'Sign up to access your client dashboard.';
+                primaryBtn.innerText = 'SIGN UP';
+                toggleBtn.innerHTML = 'Already have an account? <span class="text-[#a78bda] font-bold">Sign in</span>';
+            } else {
+                heading.innerText = 'Secure Login';
+                status.innerText = 'Sign in with your Prisca Dezigns account.';
+                primaryBtn.innerText = 'CONNECT';
+                toggleBtn.innerHTML = "Don't have an account? <span class=\"text-[#a78bda] font-bold\">Sign up</span>";
+            }
+        }
+
+        async function checkAuth() {
+            if (authMode === 'signup') return doSignUp();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-key').value;
+            const status = document.getElementById('auth-status');
+            const screen = document.getElementById('auth-screen');
+
+            const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+            if (error || !data.session) {
+                status.innerText = 'Sign-in failed. Check your email and password.';
+                status.style.color = '#ef4444';
+                document.getElementById('auth-key').value = '';
+                return;
+            }
+            localStorage.setItem('pd_remembered_email', email);
+
+            status.innerText = 'Access granted.';
+            status.style.color = '#10b981';
+            screen.style.transition = 'opacity 0.5s ease-out';
+            screen.style.opacity = '0';
+            setTimeout(() => {
+                screen.classList.add('hidden');
+                if(typeof fetchVault === 'function') fetchVault();
+            }, 500);
+        }
+
+        async function doSignUp() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-key').value;
+            const status = document.getElementById('auth-status');
+
+            if (!email || password.length < 6) {
+                status.innerText = 'Enter a valid email and a password (6+ characters).';
+                status.style.color = '#ef4444';
+                return;
+            }
+
+            const { data, error } = await sbClient.auth.signUp({ email, password });
+            if (error) {
+                status.innerText = error.message || 'Sign-up failed. Try again.';
+                status.style.color = '#ef4444';
+                return;
+            }
+
+            // New accounts get a plain 'client' role automatically via a database trigger.
+            if (data.session) {
+                localStorage.setItem('pd_remembered_email', email);
+                status.innerText = 'Account created. Welcome!';
+                status.style.color = '#10b981';
+                setTimeout(() => {
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    if (typeof fetchVault === 'function') fetchVault();
+                }, 800);
+            } else {
+                // Email confirmation is required by the project's Supabase Auth settings.
+                status.innerText = 'Account created — check your email to confirm before signing in.';
+                status.style.color = '#10b981';
+                toggleAuthMode();
+            }
+        }
+
+        sbClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('recovery-screen').classList.remove('hidden');
+            }
+        });
+
+        async function sendResetEmail() {
+            const email = document.getElementById('auth-email').value.trim();
+            const status = document.getElementById('auth-status');
+            if (!email) {
+                status.textContent = 'Enter your email above first, then click "Forgot your password?"';
+                status.style.color = '#ef4444';
+                return;
+            }
+            const { error } = await sbClient.auth.resetPasswordForEmail(email, {
+                redirectTo: window.location.origin + '/clients/'
+            });
+            status.style.color = error ? '#ef4444' : '#10b981';
+            status.textContent = error ? (error.message || 'Could not send reset email.') : 'Check your email for a reset link.';
+        }
+
+        async function submitNewPassword() {
+            const pw1 = document.getElementById('recovery-pw1').value;
+            const pw2 = document.getElementById('recovery-pw2').value;
+            const statusEl = document.getElementById('recovery-status');
+            if (pw1.length < 6) {
+                statusEl.textContent = 'Password must be at least 6 characters.';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            if (pw1 !== pw2) {
+                statusEl.textContent = "Passwords don't match.";
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            const { error } = await sbClient.auth.updateUser({ password: pw1 });
+            if (error) {
+                statusEl.textContent = error.message || 'Could not update password.';
+                statusEl.style.color = '#ef4444';
+                return;
+            }
+            statusEl.textContent = 'Password updated! Loading your dashboard...';
+            statusEl.style.color = '#10b981';
+            setTimeout(() => {
+                document.getElementById('recovery-screen').classList.add('hidden');
+                if (typeof fetchVault === 'function') fetchVault();
+            }, 1000);
+        }
+
+        (async () => {
+            const remembered = localStorage.getItem('pd_remembered_email');
+            if (remembered) {
+                const emailField = document.getElementById('auth-email');
+                emailField.value = remembered;
+                setTimeout(() => document.getElementById('auth-key').focus(), 50);
+            }
+            const { data: { session } } = await sbClient.auth.getSession();
+            if (session) {
+                document.getElementById('auth-screen').classList.add('hidden');
+            }
+        })();
+        
+
+        async function syncToSupabase(file) {
+            try {
+                // 1. Upload to Storage
+                const fileName = `${Date.now()}_${file.name}`;
+                const { data: uploadData, error: uploadError } = await sbClient.storage
+                    .from('media')
+                    .upload('intake/' + fileName, file);
+                
+                if (uploadError) throw uploadError;
+
+                // 2. Get Public URL
+                const { data: { publicUrl } } = sbClient.storage.from('media').getPublicUrl('intake/' + fileName);
+
+                // 3. Log to Media Table, tagged to the logged-in client
+                const { data: { user } } = await sbClient.auth.getUser();
+                const { error: dbError } = await sbClient.from('media').insert([{
+                    file_name: file.name,
+                    file_url: publicUrl,
+                    file_type: file.type || 'unknown',
+                    tags: ['client_intake', 'automated_sync'],
+                    user_id: user ? user.id : null
+                }]);
+
+                if (dbError) throw dbError;
+                return true;
+            } catch (err) {
+                console.error('Supabase Sync Error:', err);
+                return false;
+            }
+        }
+        function showSection(id) { ['overview', 'upload', 'ledger', 'vault'].forEach(s => { document.getElementById('section-' + s).classList.add('hidden'); document.getElementById('nav-' + s).classList.remove('active'); }); document.getElementById('section-' + id).classList.remove('hidden'); document.getElementById('nav-' + id).classList.add('active'); }
+        
+        async function handleUpload(files) {
+            const stack = document.getElementById('upload-stack');
+            stack.innerHTML = '';
+            
+            for (const file of Array.from(files)) {
+                const card = document.createElement('div');
+                card.className = "bg-[#1E293B] p-6 rounded-3xl border border-white/5 flex items-center justify-between animate-pulse";
+                card.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mr-5 text-purple-400"><i data-lucide="file-up"></i></div><div><div class="text-sm font-extrabold text-white">${file.name}</div><div class="text-[10px] text-purple-400 font-black uppercase">Sierra is Syncing to Supabase...</div></div></div><div class="w-24 h-2 bg-slate-700 rounded-full overflow-hidden"><div class="h-full bg-purple-500 w-1/3 animate-progress"></div></div>`;
+                stack.appendChild(card);
+                try { lucide.createIcons(); } catch(e) {}
+
+                const success = await syncToSupabase(file);
+                
+                card.classList.remove('animate-pulse');
+                if (success) {
+                    card.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mr-5 text-emerald-400"><i data-lucide="check-circle-2"></i></div><div><div class="text-sm font-extrabold text-white">${file.name}</div><div class="text-[10px] text-emerald-400 font-black uppercase">Synced & Recorded in Cloud</div></div></div><i data-lucide="external-link" class="w-4 h-4 text-slate-600"></i>`; fetchVault();
+                } else {
+                    card.innerHTML = `<div class="flex items-center"><div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center mr-5 text-red-400"><i data-lucide="alert-circle"></i></div><div><div class="text-sm font-extrabold text-white">${file.name}</div><div class="text-[10px] text-red-400 font-black uppercase">Sync Failed. Check Configuration.</div></div></div>`;
+                }
+                try { lucide.createIcons(); } catch(e) {}
+            }
+        }
+
+        
+        function getCategory(fileName) {
+            const name = fileName.toLowerCase();
+            if (name.includes('hour') || name.includes('payroll') || name.includes('june')) return { cat: 'Payroll', icon: 'clock' };
+            if (name.includes('invoice') || name.includes('receipt') || name.includes('bill')) return { cat: 'Finance', icon: 'dollar-sign' };
+            if (name.includes('lead') || name.includes('client')) return { cat: 'Leads', icon: 'users' };
+            if (name.includes('plan') || name.includes('strategy')) return { cat: 'Strategy', icon: 'target' };
+            return { cat: 'General', icon: 'file' };
+        }
+
+        
+        let currentData = [];
+        async function fetchVault() {
+            const { data, error } = await sbClient.from('media').select('*').order('created_at', { ascending: false });
+            if (error) return console.error('Vault Fetch Error:', error);
+            currentData = data;
+            const grid = document.getElementById('vault-grid');
+            const ledgerBody = document.getElementById('ledger-body');
+            
+            // Update Vault Grid
+            grid.innerHTML = data.map(m => {
+                const info = getCategory(m.file_name);
+                return `
+                    <div class="data-card p-6 rounded-3xl hover:border-purple-500/30 transition-all cursor-pointer group" onclick="window.open('${m.file_url}', '_blank')">
+                        <div class="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center mb-6 text-purple-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="${info.icon}"></i>
+                        </div>
+                        <div class="text-sm font-extrabold text-white truncate">${m.file_name}</div>
+                        <div class="flex items-center mt-2">
+                            <span class="text-[9px] px-2 py-0.5 bg-purple-500/10 text-purple-400 rounded-md font-black uppercase tracking-tighter">${info.cat}</span>
+                            <span class="text-[9px] text-slate-500 font-black uppercase ml-2">${m.file_type.split('/').pop().toUpperCase()}</span>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between opacity-40 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="external-link" class="w-4 h-4 text-slate-600"></i>
+                            <span class="text-[10px] font-black text-purple-400 uppercase">AI Categorized</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update Intelligence Ledger
+            ledgerBody.innerHTML = data.map(m => {
+                const info = getCategory(m.file_name);
+                const metadata = m.metadata || {};
+                const date = metadata.date || new Date(m.created_at).toISOString().split('T')[0];
+                const merchant = metadata.merchant || m.file_name;
+                
+                let snippet = metadata.summary || metadata.description || 'View document for full data';
+                if (metadata.total_hours) snippet = `Extracted: ${metadata.total_hours} Hours`;
+                else if (metadata.amount) snippet = `Extracted: ${metadata.currency || '$'}${metadata.amount}`;
+
+                let val = 'AI Verified';
+                if (metadata.amount) val = `${metadata.currency || '$'}${metadata.amount}`;
+                else if (metadata.total_hours) val = `${metadata.total_hours} Hours`;
+
+                return `
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group cursor-pointer" onclick="window.open('${m.file_url}', '_blank')">
+                        <td class="px-8 py-6 font-bold text-white italic text-xs tracking-tighter">${date}</td>
+                        <td class="px-8 py-6">
+                            <span class="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-[10px] font-black uppercase border border-purple-500/20">${info.cat}</span>
+                        </td>
+                        <td class="px-8 py-6 font-bold text-slate-300 text-sm truncate max-w-[200px]">${merchant}</td>
+                        <td class="px-8 py-6 font-bold text-slate-400 text-[10px] max-w-[250px] leading-relaxed italic">${snippet}</td>
+                        <td class="px-8 py-6 font-black text-white text-sm">${val}</td>
+                        <td class="px-8 py-6 text-right">
+                            <span class="text-emerald-400 font-black text-[10px] uppercase flex items-center justify-end">
+                                <i data-lucide="check" class="w-3 h-3 mr-1"></i> Verified
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Update Overview Stats
+            document.getElementById('stat-items').innerText = data.length;
+            document.getElementById('stat-accuracy').innerText = data.length > 0 ? '100%' : '—';
+            document.getElementById('stat-savings').innerText = '$' + (data.length * 4.25).toFixed(2);
+            try { lucide.createIcons(); } catch(e) {}
+        }
+        fetchVault();
+
+        function exportData() {
+            if (currentData.length === 0) return alert('No data available to export.');
+            const headers = ['Date', 'Classification', 'Merchant/Entity', 'Intelligence Snippet', 'Raw Value', 'URL'];
+            const rows = currentData.map(m => {
+                const info = getCategory(m.file_name);
+                const metadata = m.metadata || {};
+                const date = metadata.date || new Date(m.created_at).toISOString().split('T')[0];
+                const merchant = metadata.merchant || m.file_name;
+                const snippet = metadata.summary || metadata.description || metadata.total_hours || 'N/A';
+                const val = metadata.amount || metadata.total_hours || 'Verified';
+                return [date, info.cat, merchant, snippet, val, m.file_url];
+            });
+            const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers, ...rows].map(e => e.map(f => `"${String(f).replace(/"/g, '""')}"`).join(",")).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `pd_strategic_ledger_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

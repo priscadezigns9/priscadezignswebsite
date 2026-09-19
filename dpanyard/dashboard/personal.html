@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Hub | dpanyard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,900&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/dpanyard/favicon.ico?v=2">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #E01B24; --primary-dark: #0D1B2A; --primary-soft: #F8FAFC;
+            --bg: #FFFFFF; --text: #0F172A; --text-muted: #64748B;
+            --grey-light: #F8FAFC; --border: #F1F5F9;
+            --font-display: 'Fraunces', serif; --font-sans: 'Inter', sans-serif;
+            --white: #FFFFFF;
+            --radius-xl: 24px; --radius-lg: 16px;
+        }
+
+        /* Checkout Modal Styles */
+        .checkout-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            padding: 20px;
+        }
+        .checkout-card {
+            background: var(--white);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 32px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .payment-method-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .payment-method-btn {
+            padding: 20px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            background: var(--grey-light);
+            color: var(--text);
+        }
+        .payment-method-btn.active {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+        }
+        .stripe-form, .crypto-info {
+            display: none;
+            margin-top: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+        .stripe-form.active, .crypto-info.active {
+            display: block;
+        }
+        .crypto-address-box {
+            background: var(--grey-light);
+            padding: 16px;
+            border-radius: 12px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 12px 0;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+        .status-escrow { background: #E0F2FE; color: #0369A1; }
+        .status-pending-crypto { background: #FEF3C7; color: #92400E; }
+        .status-released { background: #DCFCE7; color: #166534; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        [data-theme="dark"] {
+            --bg: #0F172A; --text: #F1F5F9; --text-muted: #94A3B8;
+            --grey-light: #1E293B; --border: #334155; --white: #1E293B;
+            --primary-soft: rgba(232, 119, 34, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background 0.3s, color 0.3s; }
+        body { font-family: var(--font-sans); background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; -webkit-font-smoothing: antialiased; }
+
+        .sidebar { width: 280px; border-right: 1px solid var(--border); padding: 40px 24px; display: flex; flex-direction: column; gap: 40px; background: var(--white); z-index: 10; }
+        .logo { font-family: var(--font-display); font-size: 26px; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 12px; font-weight: 900; }
+        .logo-d { background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        
+        .nav-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; }
+        .nav-list { display: flex; flex-direction: column; gap: 4px; }
+        .nav-item { padding: 12px 16px; border-radius: var(--radius-lg); cursor: pointer; transition: 0.2s; font-weight: 600; font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 12px; }
+        .nav-item:hover { background: var(--grey-light); color: var(--text); }
+        .nav-item.active { background: var(--primary-soft); color: var(--primary); }
+
+        .main { flex: 1; display: flex; flex-direction: column; background: var(--bg); position: relative; }
+        .topbar { height: 80px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; flex-shrink: 0; }
+        
+        .section { padding: 40px; display: none; height: calc(100vh - 80px); overflow-y: auto; }
+        .section.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .discovery-grid { display: flex; height: 100%; overflow: hidden; }
+        .list-view { width: 420px; padding: 32px; overflow-y: auto; background: var(--white); border-right: 1px solid var(--border); }
+        .map-view { flex: 1; position: relative; border-radius: 30px 0 0 0; overflow: hidden; }
+        #map { width: 100%; height: 100%; }
+
+        .card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 30px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .input-group label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+        input, select, textarea { padding: 14px; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--grey-light); color: var(--text); outline: none; width: 100%; font-size: 15px; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+
+        .btn-main { padding: 14px 24px; border-radius: var(--radius-lg); border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 14px rgba(232, 119, 34, 0.25); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232, 119, 34, 0.35); }
+        .btn-secondary { background: var(--grey-light); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+
+        .biz-card { padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 16px; cursor: pointer; transition: 0.2s; background: var(--white); }
+        .biz-card:hover { border-color: var(--primary); transform: translateX(4px); background: var(--primary-soft); }
+
+        #detail-overlay { position: fixed; top: 0; right: 0; width: 500px; height: 100%; background: var(--white); z-index: 1000; box-shadow: -20px 0 60px rgba(0,0,0,0.1); transform: translateX(100%); transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); padding: 48px; overflow-y: auto; }
+        #detail-overlay.active { transform: translateX(0); }
+
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        #error-log { position: fixed; bottom: 20px; right: 20px; background: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 8px; font-size: 12px; display: none; z-index: 9999; }
+
+        .status-badge { padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-online, .status-confirmed { background: #E8F5E9; color: #2E7D32; }
+        .status-away, .status-pending { background: #FFF3E0; color: #EF6C00; }
+        .status-offline, .status-cancelled { background: #F5F5F5; color: #757575; }
+        .status-request_release { background: #DBEAFE; color: #1E40AF; }
+        .status-completed_released { background: #E8F5E9; color: #2E7D32; }
+        .status-disputed { background: #FFEBEE; color: #C62828; }
+
+        .slot-btn { padding: 10px; border: 1px solid var(--border); border-radius: 8px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; transition: 0.2s; }
+        .slot-btn:hover { border-color: var(--primary); background: var(--primary-soft); }
+        .slot-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Messaging Styles */
+        .messages-grid { display: flex; height: 100%; background: var(--white); border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border); }
+        .contact-list { width: 320px; border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
+        .contact-item { padding: 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px; }
+        .contact-item:hover, .contact-item.active { background: var(--primary-soft); }
+        .contact-info { flex: 1; }
+        .contact-name { font-weight: 800; font-size: 15px; margin-bottom: 2px; }
+        .contact-last-msg { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg); }
+        .chat-header { padding: 20px 30px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .chat-messages { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .msg { max-width: 70%; padding: 12px 18px; border-radius: 18px; font-size: 14px; line-height: 1.5; position: relative; }
+        .msg-sent { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .msg-received { align-self: flex-start; background: var(--white); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+        .msg-time { font-size: 10px; opacity: 0.6; margin-top: 4px; text-align: right; }
+        
+        .chat-input { padding: 20px 30px; background: var(--white); border-top: 1px solid var(--border); display: flex; gap: 12px; }
+        .chat-input input { flex: 1; }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div id="error-log"></div>
+
+    <aside class="sidebar">
+        <a href="../index.html" class="logo"><img src="/dpanyard/assets/logos/dpanyard-logo-new.png" alt="PanYard" style="height: 32px;"></a>
+        
+        <div>
+            <div class="nav-label">Navigation</div>
+            <div class="nav-list">
+                <div class="nav-item active" onclick="showSection('discovery', this)"><i data-lucide="layout-dashboard" size="18"></i> Dashboard</div>
+                <div class="nav-item" onclick="showSection('discovery', this, 'map-focus')"><i data-lucide="map-pin" size="18"></i> My Neighborhood</div>
+                <div class="nav-item" onclick="showSection('appointments', this)"><i data-lucide="calendar-days" size="18"></i> My Appointments</div>
+                <div class="nav-item" onclick="showSection('messages', this)"><i data-lucide="message-square" size="18"></i> Messages</div>
+                <div class="nav-item" onclick="showSection('profile', this)"><i data-lucide="user" size="18"></i> My Profile</div>
+            </div>
+        </div>
+
+        <div style="margin-top: auto;">
+            <div class="nav-label">System</div>
+            <div class="nav-list">
+                <div class="nav-item" onclick="showSection('settings', this)"><i data-lucide="settings" size="18"></i> Settings</div>
+                <div class="nav-item" onclick="signOut()"><i data-lucide="log-out" size="18"></i> Log Out</div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <h2 id="header-title" style="font-family: var(--font-display);">Dashboard</h2>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="position: relative; cursor: pointer;" onclick="toggleNotifPanel()">
+                    <i data-lucide="bell" style="width: 20px; height: 20px; color: var(--text-muted);"></i>
+                    <span id="notif-badge" style="display: none; position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; border: 2px solid var(--white);">0</span>
+                </div>
+                <div id="user-display" style="display: flex; align-items: center; gap: 12px; font-weight: 800; background: var(--grey-light); padding: 8px 16px; border-radius: 30px; border: 1px solid var(--border);">
+                    <div id="user-avatar" style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 14px;">U</div>
+                    <span id="user-name" style="font-size: 14px;">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Notifications Panel -->
+            <div id="notif-panel" style="display: none; position: absolute; top: 70px; right: 40px; width: 320px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 1100; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="font-size: 14px; font-weight: 800;">Notifications</h3>
+                    <button onclick="markAllRead()" style="border: none; background: none; color: var(--primary); font-size: 11px; font-weight: 700; cursor: pointer;">Mark all as read</button>
+                </div>
+                <div id="notif-list" style="max-height: 300px; overflow-y: auto;">
+                    <p style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">No new alerts.</p>
+                </div>
+            </div>
+        </div>
+
+        <section id="discovery" class="section active" style="padding: 0;">
+            <div class="discovery-grid">
+                <div class="list-view">
+                    <div style="margin-bottom: 24px;">
+                        <div style="position: relative; margin-bottom: 12px;">
+                            <input type="text" id="biz-search" placeholder="Search by niche or name..." style="padding-left: 45px;" oninput="handleSearch(this.value)">
+                            <i data-lucide="search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);" size="18"></i>
+                        </div>
+                        <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;">
+                            <button onclick="toggleOpenNow()" id="filter-open" class="btn-main" style="flex: none; font-size: 11px; padding: 8px 12px; height: auto; background: var(--grey-light); color: var(--text); border: 1px solid var(--border);">Open Now</button>
+                            <button onclick="toggleProximity()" id="filter-near" class="btn-main" style="flex: none; font-size: 11px; padding: 8px 12px; height: auto; background: var(--grey-light); color: var(--text); border: 1px solid var(--border);">Nearby First</button>
+                        </div>
+                    </div>
+                    <div id="biz-list"></div>
+                </div>
+                <div class="map-view"><div id="map"></div></div>
+            </div>
+        </section>
+
+        <section id="appointments" class="section">
+            <h1 style="font-family: var(--font-display); font-size: 36px; margin-bottom: 30px;">Your Schedule</h1>
+            <div id="apt-list">
+                <div class="card" style="text-align: center; padding: 60px;">
+                    <i data-lucide="calendar-x" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                    <p style="color: var(--text-muted); font-weight: 600;">No upcoming appointments yet.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages Section -->
+        <section id="messages" class="section">
+            <h1 class="page-title">Messages</h1>
+            <div class="messages-grid" style="height: calc(100vh - 250px);">
+                <div class="contact-list" id="contact-list">
+                    <!-- Contacts will be loaded here -->
+                </div>
+                <div class="chat-area" id="chat-area" style="display: none;">
+                    <div class="chat-header">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="avatar" id="active-chat-avatar" style="width: 40px; height: 40px;"></div>
+                            <div>
+                                <div class="contact-name" id="active-chat-name">Select a contact</div>
+                                <div style="font-size: 11px; color: var(--primary); font-weight: 800;">ENCRYPTED CHANNEL</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <form class="chat-input" onsubmit="handleSendMessage(event)">
+                        <input type="text" id="msg-input" placeholder="Type a message..." class="input-main">
+                        <button type="submit" class="btn-main"><i data-lucide="send"></i></button>
+                    </form>
+                </div>
+                <div id="no-chat-selected" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.5;">
+                    <i data-lucide="message-square" style="width: 64px; height: 64px; margin-bottom: 16px;"></i>
+                    <p style="font-weight: 700;">Select a business to start messaging</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="profile" class="section">
+            <h1 style="font-family: var(--font-display); font-size: 36px; margin-bottom: 30px;">Account Settings</h1>
+            <div class="card">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="p-name" placeholder="Enter your name">
+                </div>
+                <div class="input-group">
+                    <label>WhatsApp Number</label>
+                    <input type="text" id="p-phone" placeholder="+1 868 ...">
+                </div>
+                <div class="input-group">
+                    <label>Profile Picture</label>
+                    <input type="file" id="p-avatar-file" style="background: none; border: none; padding: 0;" onchange="uploadAvatar(this)">
+                </div>
+                <button class="btn-main btn-primary" onclick="saveProfile(event)"><i data-lucide="save"></i> Save Profile Details</button>
+            </div>
+        </section>
+
+        <section id="settings" class="section">
+            <h1 style="font-family: var(--font-display); font-size: 36px; margin-bottom: 30px;">System Preferences</h1>
+            <div class="card">
+                <h3 style="margin-bottom: 24px; font-family: var(--font-display); font-size: 20px;">UI Theme</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: var(--grey-light); border-radius: var(--radius-lg);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i data-lucide="palette"></i>
+                        <span>Dark Mode Integration</span>
+                    </div>
+                    <button class="btn-main btn-secondary" id="dark-toggle" onclick="toggleDark()"><i data-lucide="moon"></i> Enable</button>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 30px 0;">
+                <h3 style="margin-bottom: 24px; font-family: var(--font-display); font-size: 20px;">Device Permissions</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--grey-light); border-radius: var(--radius-lg);">
+                        <span>Location Access</span>
+                        <button class="btn-main btn-secondary" onclick="requestPermission('location', event)">Grant Access</button>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--grey-light); border-radius: var(--radius-lg);">
+                        <span>Camera Access</span>
+                        <button class="btn-main btn-secondary" onclick="requestPermission('camera', event)">Grant Access</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="detail-overlay">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+            <div style="background: var(--primary-soft); color: var(--primary); padding: 8px 16px; border-radius: 30px; font-size: 12px; font-weight: 800; text-transform: uppercase;">Professional Node</div>
+            <button onclick="closeDetail()" style="border:none; background:var(--grey-light); width: 40px; height: 40px; border-radius: 50%; cursor:pointer; color: var(--text-dark); display: flex; align-items: center; justify-content: center;"><i data-lucide="x"></i></button>
+        </div>
+        <div id="detail-content"></div>
+    </div>
+
+    <div id="review-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="card" style="width: 90%; max-width: 500px; padding: 40px; background: var(--white); border-radius: 32px; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <button onclick="closeReview()" style="position: absolute; top: 24px; right: 24px; border:none; background:var(--grey-light); width: 32px; height: 32px; border-radius: 50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i data-lucide="x" style="width:16px;"></i></button>
+            
+            <div style="text-align: center; margin-bottom: 32px;">
+                <h2 style="font-family: var(--font-display); font-size: 24px; margin-bottom: 8px;">Rate Your Experience</h2>
+                <p style="color: var(--text-muted); font-size: 14px;">Your feedback helps build a trusted network.</p>
+            </div>
+            
+            <div style="margin-bottom: 32px; text-align: center;">
+                <div id="star-rating" style="font-size: 40px; color: #cbd5e1; cursor: pointer; letter-spacing: 8px; display: inline-block;">
+                    <span onclick="setRating(1)" class="star"><i data-lucide="star" size="18"></i></span><span onclick="setRating(2)" class="star"><i data-lucide="star" size="18"></i></span><span onclick="setRating(3)" class="star"><i data-lucide="star" size="18"></i></span><span onclick="setRating(4)" class="star"><i data-lucide="star" size="18"></i></span><span onclick="setRating(5)" class="star"><i data-lucide="star" size="18"></i></span>
+                </div>
+                <input type="hidden" id="review-rating" value="0">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Communication</label>
+                    <select id="rate-comm" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size: 13px; background: var(--bg-light);">
+                        <option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Punctuality</label>
+                    <select id="rate-punc" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size: 13px; background: var(--bg-light);">
+                        <option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Quality</label>
+                    <select id="rate-qual" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size: 13px; background: var(--bg-light);">
+                        <option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">Value</label>
+                    <select id="rate-val" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:12px; font-size: 13px; background: var(--bg-light);">
+                        <option value="5">5 - Excellent</option><option value="4">4 - Good</option><option value="3">3 - Average</option><option value="2">2 - Poor</option><option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label>Review Title</label>
+                <input type="text" id="review-title" placeholder="Summary of your experience" style="background: var(--bg-light);">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 32px;">
+                <label>Detailed Feedback</label>
+                <textarea id="review-text" style="height: 100px; background: var(--bg-light);" placeholder="Tell others what you liked or what could be improved..."></textarea>
+            </div>
+
+            <button id="submit-review-btn" class="btn-main btn-primary" style="width: 100%; height: 60px; font-size: 16px; font-weight: 700; border-radius: 16px;" onclick="submitReview()">Submit Review</button>
+        </div>
+    </div>
+
+    <div id="reschedule-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="card" style="width: 90%; max-width: 400px; padding: 32px; background: var(--white); border-radius: 24px;">
+            <h2 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 20px;">Request Reschedule</h2>
+            <div class="input-group">
+                <label>New Date</label>
+                <input type="date" id="resched-date">
+            </div>
+            <div class="input-group">
+                <label>Start Time</label>
+                <input type="time" id="resched-start">
+            </div>
+            <div class="input-group">
+                <label>End Time</label>
+                <input type="time" id="resched-end">
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="btn-main btn-secondary" style="flex: 1;" onclick="closeReschedule()">Cancel</button>
+                <button class="btn-main btn-primary" style="flex: 1;" onclick="submitReschedule()">Submit Request</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key={{credential:google-maps-api-key}}&callback=initMap" async defer></script>
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="checkout-modal">
+        <div class="checkout-card">
+            <button onclick="closeCheckout()" style="position: absolute; top: 24px; right: 24px; border:none; background:var(--grey-light); width: 40px; height: 40px; border-radius: 50%; cursor:pointer; display:flex; align-items:center; justify-content:center; color: var(--text);"><i data-lucide="x"></i></button>
+            
+            <div id="checkout-step-1">
+                <h2 style="font-family: var(--font-display); font-size: 28px; margin-bottom: 8px; color: var(--text);">Checkout</h2>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Select your preferred payment method to secure your booking.</p>
+                
+                <div class="payment-method-grid">
+                    <div class="payment-method-btn" id="method-stripe" onclick="selectPaymentMethod('stripe')">
+                        <i data-lucide="credit-card" style="margin-bottom: 8px;"></i>
+                        <div style="font-weight: 600;">Stripe</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Card</div>
+                    </div>
+                    <div class="payment-method-btn" id="method-crypto" onclick="selectPaymentMethod('crypto')">
+                        <i data-lucide="bitcoin" style="margin-bottom: 8px;"></i>
+                        <div style="font-weight: 600;">Crypto</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">USDT/BTC</div>
+                    </div>
+                </div>
+
+                <!-- Stripe Form -->
+                <div id="stripe-form-container" class="stripe-form">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="color: var(--text); display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600;">Card Number</label>
+                        <input type="text" placeholder="xxxx xxxx xxxx xxxx" id="stripe-card" style="width:100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text);">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group">
+                            <label style="color: var(--text); display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600;">Expiry Date</label>
+                            <input type="text" placeholder="MM/YY" id="stripe-expiry" style="width:100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text);">
+                        </div>
+                        <div class="form-group">
+                            <label style="color: var(--text); display: block; margin-bottom: 8px; font-size: 12px; font-weight: 600;">CVC</label>
+                            <input type="text" placeholder="123" id="stripe-cvc" style="width:100%; padding: 14px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--bg); color: var(--text);">
+                        </div>
+                    </div>
+                    <button onclick="processStripePayment()" class="btn-main btn-primary" id="stripe-pay-btn" style="margin-top: 24px; width: 100%; height: 56px; border-radius: 16px;">Pay & Confirm Booking</button>
+                </div>
+
+                <!-- Crypto Info -->
+                <div id="crypto-info-container" class="crypto-info">
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Amount to Send</label>
+                        <div style="font-size: 24px; font-weight: 800; color: var(--primary);" id="crypto-amount">$0.00 USD</div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Wallet Address (USDT - TRC20)</label>
+                        <div class="crypto-address-box">T9yD9sP7N3A6H2n6G1H5M4S3L2V1B0C9X8</div>
+                    </div>
+                    <div style="margin-bottom: 24px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Reference ID</label>
+                        <div style="font-family: monospace; font-weight: 700; color: var(--text);" id="crypto-ref-id">REF-000000</div>
+                    </div>
+                    <button onclick="processCryptoPayment()" class="btn-main btn-primary" id="crypto-confirm-btn" style="width: 100%; height: 56px; border-radius: 16px;">I've sent the payment</button>
+                </div>
+            </div>
+
+            <!-- Processing / Success State -->
+            <div id="checkout-status" style="display: none; text-align: center; padding: 20px 0;">
+                <div id="status-loader" style="margin-bottom: 24px;">
+                    <i data-lucide="loader" class="animate-spin" style="width: 48px; height: 48px; color: var(--primary); margin: 0 auto;"></i>
+                </div>
+                <div id="status-icon-success" style="display: none; margin-bottom: 24px;">
+                    <i data-lucide="check-circle" style="width: 48px; height: 48px; color: #10B981; margin: 0 auto;"></i>
+                </div>
+                <h3 id="status-title" style="font-family: var(--font-display); font-size: 24px; margin-bottom: 12px; color: var(--text);">Processing payment...</h3>
+                <p id="status-desc" style="color: var(--text-muted);">Please wait while we secure your transaction.</p>
+                <button onclick="closeCheckout()" id="status-close-btn" class="btn-main" style="display: none; margin-top: 24px; width: 100%; background: var(--grey-light); color: var(--text); border-radius: 16px; padding: 16px;">Back to Hub</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logError(msg) {
+            const el = document.getElementById('error-log');
+            el.innerText = msg;
+            el.style.display = 'block';
+            console.error(msg);
+        }
+
+        let sb, map, user, businesses = [], markers = [], selectedSlotTime = null, userMarker = null;
+        let notifications = [], currentReschedId = null;
+        let filterOpenNow = false, filterProximity = false;
+
+        try {
+            sb = supabase.createClient('https://sktpjacowqaedddtrhuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs');
+        } catch(e) { logError("Supabase Connection Failed"); }
+
+        async function init() {
+            try {
+                const { data, error } = await sb.auth.getUser();
+                if(error || !data.user) return window.location.href = '../login/';
+                user = data.user;
+                document.getElementById('user-name').innerText = user.email.split('@')[0];
+                document.getElementById('user-avatar').innerText = user.email[0].toUpperCase();
+                loadProfile();
+                loadAppointments();
+                loadBusinesses();
+                loadContacts();
+                fetchNotifications();
+                
+                // Subscriptions
+                sb.channel('public:appointments')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
+                        loadAppointments();
+                        fetchNotifications();
+                    })
+                    .subscribe();
+
+                sb.channel('public:notifications')
+                    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, () => {
+                        fetchNotifications();
+                    })
+                    .subscribe();
+
+                lucide.createIcons();
+            } catch(e) { logError("System Initialization Error"); }
+        }
+
+        async function initMap() {
+            try {
+                const mapStyles = [
+                    { "featureType": "all", "elementType": "labels.text.fill", "stylers": [{ "color": "#7c93a3" }] },
+                    { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "color": "#f8fafc" }] },
+                    { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }] },
+                    { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#e2e8f0" }] }
+                ];
+                map = new google.maps.Map(document.getElementById("map"), { 
+                    zoom: 13, 
+                    center: { lat: 10.65, lng: -61.51 }, 
+                    disableDefaultUI: true,
+                    styles: mapStyles
+                });
+                
+                // Get User Location
+                navigator.geolocation.getCurrentPosition(async pos => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    
+                    if (userMarker) userMarker.setMap(null);
+                    userMarker = new google.maps.Marker({
+                        position: { lat, lng },
+                        map,
+                        title: "You are here",
+                        icon: {
+                            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                            scale: 6,
+                            fillColor: '#3B82F6',
+                            fillOpacity: 1,
+                            strokeWeight: 2,
+                            strokeColor: 'white'
+                        }
+                    });
+                    map.setCenter({ lat, lng });
+                    
+                    // Sync location to Supabase
+                    if (user) {
+                        await sb.from('profiles').update({ location_lat: lat, location_lng: lng }).eq('id', user.id);
+                    }
+                }, () => console.log("Location access denied"));
+
+                loadBusinesses();
+            } catch(e) { logError("Map Interface Error"); }
+        }
+
+        function showSection(id, el, mode) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
+            if(el) el.classList.add('active');
+            document.getElementById('header-title').innerText = el ? el.innerText.trim() : id;
+            
+            if(id === 'discovery' && map) {
+                setTimeout(() => {
+                    google.maps.event.trigger(map, 'resize');
+                    if(mode === 'map-focus') {
+                        navigator.geolocation.getCurrentPosition(pos => {
+                            map.setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+                            map.setZoom(15);
+                        });
+                    }
+                }, 300);
+            }
+            lucide.createIcons();
+        }
+
+        async function loadProfile() {
+            try {
+                const { data } = await sb.from('profiles').select('*').eq('id', user.id).single();
+                if(data) {
+                    document.getElementById('p-name').value = data.full_name || '';
+                    document.getElementById('p-phone').value = data.bio?.split('WA:')[1] || '';
+                    if(data.avatar_url) {
+                        document.getElementById('user-avatar').innerHTML = `<img src="${data.avatar_url}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        async function saveProfile(e) {
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Saving...';
+            lucide.createIcons();
+            
+            const name = document.getElementById('p-name').value;
+            const wa = document.getElementById('p-phone').value;
+            
+            const { error } = await sb.from('profiles').upsert({ id: user.id, full_name: name, bio: `WA:${wa}` });
+            
+            if(!error) {
+                btn.innerHTML = '<i data-lucide="check"></i> Changes Saved';
+                setTimeout(() => { btn.innerHTML = originalText; lucide.createIcons(); }, 2000);
+            } else {
+                btn.innerHTML = '<i data-lucide="alert-circle" size="24"></i> Error Saving';
+                setTimeout(() => { btn.innerHTML = originalText; lucide.createIcons(); }, 2000);
+            }
+            lucide.createIcons();
+        }
+
+        async function handleSearch(val) {
+            const query = (val || '').trim().toLowerCase();
+            let filtered = [...businesses];
+            
+            if (query) {
+                const terms = query.split(/\s+/).filter(t => t.length > 0);
+                filtered = filtered.filter(b => {
+                    const name = (b.full_name || '').toLowerCase();
+                    const niche = (b.niche || '').toLowerCase();
+                    return terms.every(term => name.includes(term) || niche.includes(term));
+                });
+            }
+
+            if (filterOpenNow) {
+                const now = new Date();
+                const day = now.getDay().toString();
+                const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                const { data: openBiz } = await sb.from('availability')
+                    .select('business_id')
+                    .eq('day_of_week', day)
+                    .lte('start_time', time)
+                    .gte('end_time', time)
+                    .eq('is_available', true);
+                
+                const openIds = (openBiz || []).map(o => o.business_id);
+                filtered = filtered.filter(b => openIds.includes(b.id));
+            }
+
+            if (filterProximity) {
+                await new Promise(resolve => {
+                    navigator.geolocation.getCurrentPosition(pos => {
+                        const { latitude: lat1, longitude: lon1 } = pos.coords;
+                        filtered.forEach(b => {
+                            if (b.location_lat && b.location_lng) {
+                                const R = 6371; // km
+                                const dLat = (b.location_lat - lat1) * Math.PI / 180;
+                                const dLon = (b.location_lng - lon1) * Math.PI / 180;
+                                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                                          Math.cos(lat1 * Math.PI / 180) * Math.cos(b.location_lat * Math.PI / 180) * 
+                                          Math.sin(dLon/2) * Math.sin(dLon/2);
+                                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                                b.distance = R * c;
+                            } else {
+                                b.distance = 9999;
+                            }
+                        });
+                        // Sort primarily by distance when Nearby First is active
+                        filtered.sort((a, b) => a.distance - b.distance);
+                        resolve();
+                    }, resolve);
+                });
+            } else {
+                // Default sort: featured first
+                filtered.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+            }
+
+            renderList(filtered);
+        }
+
+        async function requestPermission(type, e) {
+            const btn = e.currentTarget;
+            btn.innerHTML = '<i data-lucide="loader" size="24" class="animate-spin"></i> Pending...';
+            lucide.createIcons();
+            try {
+                if(type === 'location') {
+                    navigator.geolocation.getCurrentPosition(() => {
+                        btn.innerHTML = '<i data-lucide="check" size="24"></i> Enabled';
+                        btn.classList.add('btn-success');
+                    }, () => {
+                        btn.innerHTML = '<i data-lucide="x"></i> Blocked';
+                    });
+                } else if(type === 'camera') {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    stream.getTracks().forEach(track => track.stop());
+                    btn.innerHTML = '<i data-lucide="check"></i> Enabled';
+                }
+            } catch(err) { btn.innerHTML = '<i data-lucide="x"></i> Failed'; }
+            lucide.createIcons();
+        }
+
+        async function uploadAvatar(el) {
+            const file = el.files[0];
+            if(!file) return;
+            const path = `avatars/${user.id}_${Date.now()}.jpg`;
+            const { error } = await sb.storage.from('avatars').upload(path, file);
+            if(!error) {
+                const { data: { publicUrl } } = sb.storage.from('avatars').getPublicUrl(path);
+                await sb.from('profiles').update({ avatar_url: publicUrl }).eq('id', user.id);
+                document.getElementById('user-avatar').innerHTML = `<img src="${publicUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            }
+        }
+
+        async function loadBusinesses() {
+            try {
+                const { data } = await sb.from('profiles').select('*').not('niche', 'is', null);
+                const { data: ratings } = await sb.from('ratings').select('ratee_id, rating');
+                
+                businesses = (data || []).map(b => {
+                    const bRatings = (ratings || []).filter(r => r.ratee_id === b.id);
+                    const avg = bRatings.length ? bRatings.reduce((acc, r) => acc + r.rating, 0) / bRatings.length : 0;
+                    return { ...b, avgRating: avg.toFixed(1), totalReviews: bRatings.length };
+                });
+
+                renderList(businesses);
+            } catch(e) {}
+        }
+
+        function renderList(list) {
+            const container = document.getElementById('biz-list');
+            
+            if (!list || list.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i data-lucide="search-x" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p style="font-weight: 700;">No results found</p>
+                        <p style="font-size: 13px;">Try adjusting your search terms</p>
+                    </div>
+                `;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                markers.forEach(m => m.setMap(null));
+                markers = [];
+                return;
+            }
+
+            container.innerHTML = list.map(b => {
+                const isHighRated = parseFloat(b.avgRating) >= 4.5 || b.is_featured;
+                const ratingDisplay = b.totalReviews > 0 ? `<span style="font-size: 12px; color: ${isHighRated ? '#f59e0b' : 'var(--text-muted)'}; font-weight: 700; margin-left: 8px; display: flex; align-items: center; gap: 4px;"><i data-lucide="star" size="12" style="fill: currentColor;"></i> ${b.avgRating} (${b.totalReviews})</span>` : '';
+                const featuredBadge = b.is_featured ? `<span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; margin-left: 8px;">FEATURED</span>` : '';
+                const verificationIcon = b.is_verified ? `<i data-lucide="check-circle" style="width:14px; height:14px; color:var(--primary); margin-left:4px;"></i>` : '';
+                const distanceDisplay = b.distance && b.distance < 9999 ? `<span style="font-size: 10px; color: var(--text-muted); margin-left: auto;">${b.distance.toFixed(1)} km</span>` : '';
+
+                return `
+                    <div class="biz-card" onclick="openDetail('${b.id}')" style="${b.is_featured ? 'border: 2px solid var(--primary); background: rgba(224, 27, 36, 0.03);' : (isHighRated ? 'border: 2px solid #FFD700; background: rgba(255, 215, 0, 0.03);' : '')}">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center;">
+                                <div style="font-weight: 800; font-family: var(--font-display); font-size: 18px;">${b.full_name}</div>
+                                ${verificationIcon}
+                                ${featuredBadge}
+                            </div>
+                            ${ratingDisplay}
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+                            <div style="font-size: 13px; color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">${b.niche || 'Professional Node'}</div>
+                            ${distanceDisplay}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            markers.forEach(m => m.setMap(null));
+            markers = list.map(b => {
+                const lat = parseFloat(b.location_lat);
+                const lng = parseFloat(b.location_lng);
+                if (isNaN(lat) || isNaN(lng)) return null;
+
+                const m = new google.maps.Marker({ 
+                    position: { lat, lng }, 
+                    map,
+                    icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#E87722', fillOpacity: 1, strokeWeight: 4, strokeColor: 'white' }
+                });
+                m.addListener('click', () => openDetail(b.id));
+                return m;
+            }).filter(m => m !== null);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        let currentReviewApt = null;
+        let currentReviewBusiness = null;
+
+        function setRating(n) {
+            document.getElementById('review-rating').value = n;
+            const stars = document.querySelectorAll('#star-rating .star');
+            stars.forEach((s, i) => {
+                s.style.color = i < n ? '#f59e0b' : '#cbd5e1';
+            });
+        }
+
+        function openReviewModal(aptId, bizId) {
+            currentReviewApt = aptId;
+            currentReviewBusiness = bizId;
+            document.getElementById('review-overlay').style.display = 'flex';
+            setRating(0);
+            document.getElementById('review-title').value = '';
+            document.getElementById('review-text').value = '';
+        }
+
+        function closeReview() {
+            document.getElementById('review-overlay').style.display = 'none';
+        }
+
+        async function submitReview() {
+            const rating = parseInt(document.getElementById('review-rating').value);
+            if (rating === 0) return alert('Please select a star rating');
+            
+            const btn = document.getElementById('submit-review-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Submitting...';
+            lucide.createIcons();
+            
+            const categories = {
+                communication: parseInt(document.getElementById('rate-comm').value),
+                punctuality: parseInt(document.getElementById('rate-punc').value),
+                quality: parseInt(document.getElementById('rate-qual').value),
+                value: parseInt(document.getElementById('rate-val').value)
+            };
+
+            const { data: { session } } = await sb.auth.getSession();
+            
+            const { error } = await sb.from('ratings').insert({
+                appointment_id: currentReviewApt,
+                rater_id: session.user.id,
+                ratee_id: currentReviewBusiness,
+                rating: rating,
+                categories: categories,
+                title: document.getElementById('review-title').value,
+                comment: document.getElementById('review-text').value,
+                is_verified_transaction: true
+            });
+
+            if (error) {
+                alert('Error submitting review: ' + error.message);
+                btn.innerHTML = originalText;
+            } else {
+                alert('Thank you for your feedback!');
+                closeReview();
+                loadAppointments();
+            }
+            lucide.createIcons();
+        }
+
+        async function getBusinessRating(bizId) {
+            const { data, error } = await sb.from('ratings').select('rating, categories').eq('ratee_id', bizId);
+            if (error || !data || !data.length) return null;
+            
+            const avg = data.reduce((acc, curr) => acc + curr.rating, 0) / data.length;
+            const total = data.length;
+            
+            const cats = { communication: 0, punctuality: 0, quality: 0, value: 0 };
+            data.forEach(r => {
+                cats.communication += (r.categories?.communication || 5);
+                cats.punctuality += (r.categories?.punctuality || 5);
+                cats.quality += (r.categories?.quality || 5);
+                cats.value += (r.categories?.value || 5);
+            });
+            
+            Object.keys(cats).forEach(k => cats[k] = (cats[k] / total).toFixed(1));
+            
+            return { avg: avg.toFixed(1), total, cats };
+        }
+
+        async function openDetail(id) {
+            const b = businesses.find(item => item.id === id);
+            selectedSlotTime = null;
+
+            // Load Rating Data
+            const ratingData = await getBusinessRating(id);
+            const ratingHtml = ratingData ? `
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+                    <div style="font-size:32px; font-weight:900; font-family:var(--font-display); color:var(--primary-dark);">${ratingData.avg}</div>
+                    <div>
+                        <div style="display: flex; gap: 2px; color:#f59e0b;">
+                            ${Array.from({length: 5}, (_, i) => `<i data-lucide="star" size="18" style="fill: ${i < Math.round(ratingData.avg) ? 'currentColor' : 'transparent'}"></i>`).join('')}
+                        </div>
+                        <div style="font-size:12px; color:var(--text-muted); font-weight:600;">FROM ${ratingData.total} REVIEWS</div>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px;">
+                    <div style="font-size:11px; background:var(--grey-light); padding:8px 12px; border-radius:8px;">COMM: <b>${ratingData.cats.communication}</b></div>
+                    <div style="font-size:11px; background:var(--grey-light); padding:8px 12px; border-radius:8px;">PUNC: <b>${ratingData.cats.punctuality}</b></div>
+                    <div style="font-size:11px; background:var(--grey-light); padding:8px 12px; border-radius:8px;">QUAL: <b>${ratingData.cats.quality}</b></div>
+                    <div style="font-size:11px; background:var(--grey-light); padding:8px 12px; border-radius:8px;">VALUE: <b>${ratingData.cats.value}</b></div>
+                </div>
+            ` : `<p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">No reviews yet.</p>`;
+
+            document.getElementById('detail-content').innerHTML = `
+                <h2 style="font-family: var(--font-display); font-size: 32px; margin-bottom: 8px;">${b.full_name}</h2>
+                <p style="color: var(--primary); font-weight: 800; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1px;">${b.niche || 'Professional Node'}</p>
+                
+                ${ratingHtml}
+
+                <div style="padding: 24px; background: var(--grey-light); border-radius: var(--radius-lg); margin-bottom: 32px; line-height: 1.6;">
+                    ${b.bio || 'This professional has not provided a bio yet.'}
+                </div>
+
+                <div id="booking-section" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+                    <h3 style="font-family: var(--font-display); margin-bottom: 15px; font-size: 20px;">Book an Appointment</h3>
+                    
+                    <div class="input-group">
+                        <label>Select Date</label>
+                        <input type="date" id="book-date" min="${new Date().toISOString().split('T')[0]}" onchange="loadSlots('${id}', this.value)">
+                    </div>
+                    
+                    <div id="slots-label" style="display:none; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Available Time Slots</div>
+                    <div id="slots-container" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:20px;">
+                        <!-- Slots will appear here -->
+                    </div>
+
+                    <div class="input-group">
+                        <label>Duration</label>
+                        <select id="book-duration">
+                            <option value="30">30 Minutes</option>
+                            <option value="60">1 Hour</option>
+                            <option value="90">1.5 Hours</option>
+                            <option value="120">2 Hours</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Message/Notes</label>
+                        <textarea id="book-message" placeholder="What's this appointment about?"></textarea>
+                    </div>
+
+                    <button class="btn-main btn-primary" style="width: 100%; height: 60px; font-size: 16px;" onclick="submitBooking('${id}')">
+                        <i data-lucide="calendar"></i> Send Booking Request
+                    </button>
+                    <button class="btn-main" style="width: 100%; height: 60px; font-size: 16px; margin-top: 10px; background: var(--primary-dark); color: white;" onclick="startChat('${id}')">
+                        <i data-lucide="message-square"></i> Message Business
+                    </button>
+                </div>
+            `;
+            document.getElementById('detail-overlay').classList.add('active');
+            lucide.createIcons();
+        }
+
+        async function loadSlots(businessId, date) {
+            const container = document.getElementById('slots-container');
+            const label = document.getElementById('slots-label');
+            label.style.display = 'block';
+            container.innerHTML = '<p style="grid-column: span 3; font-size:12px; color: var(--text-muted);">Syncing availability...</p>';
+            
+            const { data, error } = await sb.from('availability').select('*').eq('business_id', businessId);
+            if (error) {
+                container.innerHTML = '<p style="grid-column: span 3; font-size:12px; color:var(--primary);">Error fetching availability.</p>';
+                return;
+            }
+            
+            const dayOfWeek = new Date(date).getUTCDay().toString();
+            const avail = data.find(a => a.day_of_week === date) || data.find(a => a.day_of_week === dayOfWeek);
+            
+            if (!avail || !avail.is_available) {
+                container.innerHTML = '<p style="grid-column: span 3; font-size:12px; color:var(--text-muted);">No availability on this date.</p>';
+                return;
+            }
+
+            const slots = [];
+            let [h, m] = avail.start_time.split(':').map(Number);
+            let [eh, em] = avail.end_time.split(':').map(Number);
+            
+            let current = h * 60 + m;
+            let end = eh * 60 + em;
+            
+            while(current < end) {
+                let hour = Math.floor(current / 60);
+                let min = current % 60;
+                slots.push(`${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`);
+                current += 30;
+            }
+            
+            container.innerHTML = slots.map(s => `
+                <div class="slot-btn" onclick="selectSlot(this, '${s}')">${s}</div>
+            `).join('');
+        }
+
+        function selectSlot(el, time) {
+            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedSlotTime = time;
+        }
+
+        let currentBookingData = null;
+
+        async function submitBooking(businessId) {
+            const date = document.getElementById('book-date').value;
+            const duration = parseInt(document.getElementById('book-duration').value);
+            const message = document.getElementById('book-message').value;
+            
+            if (!date || !selectedSlotTime) {
+                return alert("Please select a date and time slot.");
+            }
+
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return alert("Please login first.");
+
+            let [h, m] = selectedSlotTime.split(':').map(Number);
+            let totalMin = h * 60 + m + duration;
+            let endHour = Math.floor(totalMin / 60);
+            let endMin = totalMin % 60;
+            const endTime = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`;
+
+            const booking = {
+                personal_id: session.user.id,
+                business_id: businessId,
+                date: date,
+                time_start: selectedSlotTime,
+                time_end: endTime,
+                status: 'pending',
+                message: message,
+                amount: 49.00
+            };
+
+            showCheckout(booking);
+        }
+
+        function showCheckout(booking) {
+            currentBookingData = booking;
+            document.getElementById('checkout-modal').style.display = 'flex';
+            document.getElementById('checkout-step-1').style.display = 'block';
+            document.getElementById('checkout-status').style.display = 'none';
+            
+            // Reset forms
+            document.getElementById('stripe-form-container').classList.remove('active');
+            document.getElementById('crypto-info-container').classList.remove('active');
+            document.getElementById('method-stripe').classList.remove('active');
+            document.getElementById('method-crypto').classList.remove('active');
+            
+            // Set crypto details
+            const refId = 'REF-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            document.getElementById('crypto-ref-id').innerText = refId;
+            document.getElementById('crypto-amount').innerText = `$${booking.amount.toFixed(2)} USD`;
+            
+            lucide.createIcons();
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').style.display = 'none';
+            loadAppointments();
+        }
+
+        function selectPaymentMethod(method) {
+            document.getElementById('method-stripe').classList.remove('active');
+            document.getElementById('method-crypto').classList.remove('active');
+            document.getElementById('stripe-form-container').classList.remove('active');
+            document.getElementById('crypto-info-container').classList.remove('active');
+            
+            if (method === 'stripe') {
+                document.getElementById('method-stripe').classList.add('active');
+                document.getElementById('stripe-form-container').classList.add('active');
+            } else {
+                document.getElementById('method-crypto').classList.add('active');
+                document.getElementById('crypto-info-container').classList.add('active');
+            }
+        }
+
+        async function processStripePayment() {
+            const card = document.getElementById('stripe-card').value;
+            if (!card) return alert('Please enter card details');
+            
+            document.getElementById('checkout-step-1').style.display = 'none';
+            document.getElementById('checkout-status').style.display = 'block';
+            document.getElementById('status-title').innerText = 'Processing payment...';
+            document.getElementById('status-desc').innerText = 'Please wait while we secure your transaction.';
+            document.getElementById('status-loader').style.display = 'block';
+            document.getElementById('status-icon-success').style.display = 'none';
+            document.getElementById('status-close-btn').style.display = 'none';
+            
+            // Simulate processing
+            await new Promise(r => setTimeout(r, 2500));
+            
+            const { error } = await sb.from('appointments').insert([{
+                ...currentBookingData,
+                status: 'escrow_held',
+                payment_method: 'stripe',
+                payment_status: 'ESCROW HELD',
+                escrow_id: 'ESC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            }]);
+            
+            if (!error) {
+                document.getElementById('status-loader').style.display = 'none';
+                document.getElementById('status-icon-success').style.display = 'block';
+                document.getElementById('status-title').innerText = 'Payment Secured';
+                document.getElementById('status-desc').innerText = 'Payment secured in escrow. Business notified.';
+                document.getElementById('status-close-btn').style.display = 'block';
+            } else {
+                alert('Error processing payment. Please try again.');
+                document.getElementById('checkout-step-1').style.display = 'block';
+                document.getElementById('checkout-status').style.display = 'none';
+            }
+            lucide.createIcons();
+        }
+
+        async function processCryptoPayment() {
+            document.getElementById('checkout-step-1').style.display = 'none';
+            document.getElementById('checkout-status').style.display = 'block';
+            document.getElementById('status-title').innerText = 'Verifying Transaction...';
+            document.getElementById('status-desc').innerText = 'Awaiting payment verification from the blockchain.';
+            document.getElementById('status-loader').style.display = 'block';
+            document.getElementById('status-icon-success').style.display = 'none';
+            document.getElementById('status-close-btn').style.display = 'none';
+            
+            const { error } = await sb.from('appointments').insert([{
+                ...currentBookingData,
+                status: 'pending_verification',
+                payment_method: 'crypto',
+                payment_status: 'PENDING CRYPTO',
+                reference_id: document.getElementById('crypto-ref-id').innerText,
+                escrow_id: 'ESC-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+            }]);
+            
+            if (!error) {
+                setTimeout(() => {
+                    document.getElementById('status-loader').style.display = 'none';
+                    document.getElementById('status-icon-success').style.display = 'block';
+                    document.getElementById('status-title').innerText = 'Payment Initiated';
+                    document.getElementById('status-desc').innerText = 'We are now verifying your transfer. This usually takes 5-10 minutes.';
+                    document.getElementById('status-close-btn').style.display = 'block';
+                    lucide.createIcons();
+                }, 2000);
+            } else {
+                alert('Error: ' + error.message);
+                document.getElementById('checkout-step-1').style.display = 'block';
+                document.getElementById('checkout-status').style.display = 'none';
+            }
+        }
+
+        async function loadAppointments() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return;
+
+            const { data, error } = await sb.from('appointments')
+                .select('*, profiles:business_id(full_name)')
+                .eq('personal_id', session.user.id)
+                .order('date', { ascending: false });
+
+            if (data) {
+                renderAppointments(data);
+                checkReminders(data);
+            }
+        }
+
+        function checkReminders(apts) {
+            const now = new Date();
+            const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            
+            const upcoming = apts.filter(a => {
+                if (a.status === 'cancelled' || a.status === 'disputed') return false;
+                const aptDate = new Date(`${a.date}T${a.time_start}`);
+                return aptDate > now && aptDate <= tomorrow;
+            });
+
+            if (upcoming.length > 0) {
+                const aptBtn = document.querySelector('.nav-item[onclick*="appointments"]');
+                if (aptBtn) {
+                    const existingBadge = aptBtn.querySelector('.reminder-badge');
+                    if (!existingBadge) {
+                        const badge = document.createElement('span');
+                        badge.className = 'reminder-badge';
+                        badge.style = "background:var(--primary); color:white; border-radius:50%; width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; font-size:9px; margin-left:8px;";
+                        badge.innerText = upcoming.length;
+                        aptBtn.appendChild(badge);
+                    } else {
+                        existingBadge.innerText = upcoming.length;
+                    }
+                }
+                
+                if ("Notification" in window) {
+                    if (Notification.permission === "granted") {
+                        new Notification("Panyard Reminder", {
+                            body: `You have ${upcoming.length} upcoming appointment(s) within 24 hours.`,
+                            icon: "/dpanyard/favicon.ico"
+                        });
+                    } else if (Notification.permission !== "denied") {
+                        Notification.requestPermission();
+                    }
+                }
+            }
+        }
+
+        function renderAppointments(list) {
+            const container = document.getElementById('apt-list');
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 60px;">
+                        <i data-lucide="calendar-x" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <p style="color: var(--text-muted); font-weight: 600;">No upcoming appointments yet.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = list.map(a => {
+                let paymentBadge = '';
+                let actions = '';
+
+                if (a.payment_status === 'ESCROW HELD') {
+                    paymentBadge = `<span class="status-badge status-escrow">Escrow Held</span>`;
+                    actions = `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'completed', 'FUNDS RELEASED')" style="height: 35px; font-size: 12px; background: #10B981; color: white; border: none; margin-top: 10px; width: 100%;">Release Payment</button>`;
+                } else if (a.payment_status === 'PENDING CRYPTO') {
+                    paymentBadge = `<span class="status-badge status-pending-crypto">Pending Crypto</span>`;
+                } else if (a.payment_status === 'FUNDS RELEASED') {
+                    paymentBadge = `<span class="status-badge status-released">Released</span>`;
+                    actions = `<button class="btn-main" onclick="openReviewModal('${a.id}', '${a.business_id}')" style="height: 35px; font-size: 12px; background: var(--grey-light); color: var(--text); border: 1px solid var(--border); margin-top: 10px; width: 100%;">Leave Review</button>`;
+                } else if (a.payment_status === 'DISPUTED') {
+                    paymentBadge = `<span class="status-badge" style="background: #FEE2E2; color: #991B1B;">Disputed</span>`;
+                }
+
+                if (a.payment_status === 'ESCROW HELD') {
+                    actions += `<button class="btn-main" onclick="updateAptStatus('${a.id}', 'disputed', 'DISPUTED')" style="height: 35px; font-size: 12px; background: #FEE2E2; color: #991B1B; border: none; margin-top: 5px; width: 100%;">Report Issue</button>`;
+                }
+
+                // Add Reschedule button for non-completed/cancelled/released appointments
+                if (!['completed', 'cancelled', 'disputed'].includes(a.status) && a.payment_status !== 'FUNDS RELEASED') {
+                    actions += `<button class="btn-main" onclick="openRescheduleModal('${a.id}', '${a.date}', '${a.time_start}', '${a.time_end}')" style="height: 35px; font-size: 12px; background: var(--grey-light); color: var(--text); border: 1px solid var(--border); margin-top: 5px; width: 100%;">Reschedule</button>`;
+                }
+
+                let rescheduleRequestInfo = '';
+                if (a.status === 'reschedule_requested') {
+                    const req = a.reschedule_request;
+                    rescheduleRequestInfo = `
+                        <div style="margin-top: 10px; padding: 10px; background: #FFF7ED; border-radius: 8px; border: 1px solid #FFEDD5;">
+                            <p style="font-size: 11px; font-weight: 800; color: #9A3412;">Reschedule Pending</p>
+                            <p style="font-size: 11px; color: #9A3412;">Requested: ${req.new_date} @ ${req.new_start}</p>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="card" style="margin-bottom: 15px; padding: 24px; border: 1px solid var(--border); background: var(--white);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1;">
+                                <h4 style="font-family: var(--font-display); font-size: 20px; margin-bottom: 4px; color: var(--text);">${a.profiles?.full_name || 'Professional'}</h4>
+                                <p style="font-size: 14px; color: var(--text-muted); font-weight: 500;">
+                                    <i data-lucide="calendar" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> ${a.date} 
+                                    &nbsp;&bull;&nbsp; 
+                                    <i data-lucide="clock" style="width:14px; height:14px; display:inline; vertical-align:middle; margin-right:4px;"></i> ${a.time_start} - ${a.time_end}
+                                </p>
+                                <div style="margin-top: 12px; display: flex; gap: 8px; align-items: center;">
+                                    <span class="status-badge status-${a.status}">${a.status.replace('_', ' ')}</span>
+                                    ${paymentBadge}
+                                </div>
+                                ${rescheduleRequestInfo}
+                            </div>
+                            <div style="width: 150px; display: flex; flex-direction: column; gap: 5px;">
+                                ${actions}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        async function updateAptStatus(id, newStatus, newPaymentStatus) {
+            if(newStatus === 'completed' && !confirm('Release funds to business? This action cannot be undone.')) return;
+            
+            const updates = { status: newStatus };
+            if (newPaymentStatus) updates.payment_status = newPaymentStatus;
+
+            const { error } = await sb.from('appointments').update(updates).eq('id', id);
+            if (error) alert("Update Error: " + error.message);
+            else {
+                loadAppointments();
+            }
+        }
+
+        // --- Messaging System ---
+        let activeChatId = null;
+        let messageSubscription = null;
+
+        async function startChat(businessId) {
+            closeDetail();
+            showSection('messages', document.querySelector('[onclick*="messages"]'));
+            await openChat(businessId);
+        }
+
+        async function openChat(businessId) {
+            activeChatId = businessId;
+            document.getElementById('no-chat-selected').style.display = 'none';
+            document.getElementById('chat-area').style.display = 'flex';
+            
+            const b = businesses.find(x => x.id === businessId) || await fetchProfile(businessId);
+            document.getElementById('active-chat-name').innerText = b?.full_name || 'Business';
+            document.getElementById('active-chat-avatar').innerText = (b?.full_name || 'B')[0];
+            
+            loadMessages(businessId);
+            subscribeToMessages(businessId);
+            loadContacts(); // Refresh contact list
+        }
+
+        async function fetchProfile(id) {
+            const { data } = await sb.from('profiles').select('*').eq('id', id).single();
+            return data;
+        }
+
+        async function loadContacts() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return;
+
+            // Get unique contacts from messages
+            const { data: msgs } = await sb.from('messages')
+                .select('sender_id, receiver_id, text, created_at')
+                .or(`sender_id.eq.${session.user.id},receiver_id.eq.${session.user.id}`)
+                .order('created_at', { ascending: false });
+
+            const contactIds = new Set();
+            const contacts = [];
+            
+            for (const m of msgs) {
+                const otherId = m.sender_id === session.user.id ? m.receiver_id : m.sender_id;
+                if (!contactIds.has(otherId)) {
+                    contactIds.add(otherId);
+                    // Fetch profile for this contact
+                    const { data: profile } = await sb.from('profiles').select('*').eq('id', otherId).single();
+                    if (profile) {
+                        contacts.push({ ...profile, last_msg: m.text });
+                    }
+                }
+            }
+
+            renderContacts(contacts);
+        }
+
+        function renderContacts(contacts) {
+            const container = document.getElementById('contact-list');
+            container.innerHTML = contacts.map(c => `
+                <div class="contact-item ${c.id === activeChatId ? 'active' : ''}" onclick="openChat('${c.id}')">
+                    <div class="avatar" style="width: 40px; height: 40px; font-size: 14px;">${c.full_name[0]}</div>
+                    <div class="contact-info">
+                        <div class="contact-name">${c.full_name}</div>
+                        <div class="contact-last-msg">${c.last_msg}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadMessages(otherId) {
+            const { data: { session } } = await sb.auth.getSession();
+            const { data: msgs } = await sb.from('messages')
+                .select('*')
+                .or(`and(sender_id.eq.${session.user.id},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${session.user.id})`)
+                .order('created_at', { ascending: true });
+
+            renderMessages(msgs, session.user.id);
+        }
+
+        function renderMessages(msgs, userId) {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = msgs.map(m => `
+                <div class="msg ${m.sender_id === userId ? 'msg-sent' : 'msg-received'}">
+                    ${m.text}
+                    <div class="msg-time">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function handleSendMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('msg-input');
+            const text = input.value.trim();
+            if (!text || !activeChatId) return;
+
+            const { data: { session } } = await sb.auth.getSession();
+            const { error } = await sb.from('messages').insert({
+                sender_id: session.user.id,
+                receiver_id: activeChatId,
+                text: text
+            });
+
+            if (!error) {
+                input.value = '';
+                loadMessages(activeChatId);
+                loadContacts();
+            }
+        }
+
+        function subscribeToMessages(otherId) {
+            if (messageSubscription) sb.removeChannel(messageSubscription);
+            
+            messageSubscription = sb.channel('public:messages')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+                    const m = payload.new;
+                    if ((m.sender_id === otherId) || (m.receiver_id === otherId)) {
+                        loadMessages(otherId);
+                    }
+                    loadContacts();
+                })
+                .subscribe();
+        }
+
+        function closeDetail() { document.getElementById('detail-overlay').classList.remove('active'); }
+
+        function toggleDark() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('dark-toggle').innerHTML = isDark ? '<i data-lucide="moon"></i> Enable' : '<i data-lucide="sun"></i> Disable';
+            lucide.createIcons();
+        }
+
+        async function fetchNotifications() {
+            const { data: { session } } = await sb.auth.getSession();
+            const { data } = await sb.from('notifications')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .order('created_at', { ascending: false });
+            notifications = data || [];
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notif-list');
+            const unread = notifications.filter(n => !n.is_read).length;
+            const badge = document.getElementById('notif-badge');
+            
+            badge.innerText = unread;
+            badge.style.display = unread > 0 ? 'flex' : 'none';
+
+            if (notifications.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">No new alerts.</p>';
+                return;
+            }
+
+            list.innerHTML = notifications.map(n => `
+                <div style="padding: 12px; border-bottom: 1px solid var(--border); ${!n.is_read ? 'background: var(--primary-soft);' : ''} border-radius: 8px; margin-bottom: 5px;">
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text);">${n.message}</div>
+                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">${new Date(n.created_at).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notif-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function markAllRead() {
+            const { data: { session } } = await sb.auth.getSession();
+            await sb.from('notifications')
+                .update({ is_read: true })
+                .eq('user_id', session.user.id);
+            fetchNotifications();
+        }
+
+        function toggleOpenNow() {
+            filterOpenNow = !filterOpenNow;
+            document.getElementById('filter-open').style.background = filterOpenNow ? 'var(--primary)' : 'var(--grey-light)';
+            document.getElementById('filter-open').style.color = filterOpenNow ? 'white' : 'var(--text)';
+            handleSearch(document.getElementById('biz-search').value);
+        }
+
+        function toggleProximity() {
+            filterProximity = !filterProximity;
+            document.getElementById('filter-near').style.background = filterProximity ? 'var(--primary)' : 'var(--grey-light)';
+            document.getElementById('filter-near').style.color = filterProximity ? 'white' : 'var(--text)';
+            handleSearch(document.getElementById('biz-search').value);
+        }
+
+        function openRescheduleModal(id, date, start, end) {
+            currentReschedId = id;
+            document.getElementById('resched-date').value = date;
+            document.getElementById('resched-start').value = start;
+            document.getElementById('resched-end').value = end;
+            document.getElementById('reschedule-modal').style.display = 'flex';
+        }
+
+        function closeReschedule() {
+            document.getElementById('reschedule-modal').style.display = 'none';
+        }
+
+        async function submitReschedule() {
+            const date = document.getElementById('resched-date').value;
+            const start = document.getElementById('resched-start').value;
+            const end = document.getElementById('resched-end').value;
+
+            const { data: { session } } = await sb.auth.getSession();
+            const { error } = await sb.from('appointments').update({
+                reschedule_request: {
+                    new_date: date,
+                    new_start: start,
+                    new_end: end,
+                    requested_by: session.user.id,
+                    requested_at: new Date().toISOString()
+                },
+                status: 'reschedule_requested'
+            }).eq('id', currentReschedId);
+
+            if (!error) {
+                alert('Reschedule request sent to business.');
+                closeReschedule();
+                loadAppointments();
+            }
+        }
+
+        function signOut() { sb.auth.signOut(); window.location.href = '../login/'; }
+
+        init();
+    </script>
+</body>
+</html>

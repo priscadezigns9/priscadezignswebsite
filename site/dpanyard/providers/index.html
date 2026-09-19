@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Browse Providers — D' PanYard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="/dpanyard/manifest.json">
+<meta name="theme-color" content="#1A3C8F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="D' PanYard">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--primary:#1A3C8F;--primary-light:#2B5CE6;--accent:#F59E0B;--dark:#0A0F1E;--mid:#3D4F7C;--light:#7B8EC8;--card:#111827;--border:rgba(255,255,255,0.1);--white:#fff}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--white);line-height:1.6;min-height:100vh}
+
+/* NAV */
+nav{background:rgba(10,15,30,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:68px;position:sticky;top:0;z-index:100}
+.nav-brand{text-decoration:none;font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:var(--white)}
+.nav-brand .dp{color:var(--accent)}
+.nav-links{display:flex;align-items:center;gap:20px}
+.nav-links a{text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:var(--white)!important;padding:9px 20px;border-radius:50px;font-weight:600!important}
+
+/* PAGE HEADER */
+.page-header{background:linear-gradient(160deg,#0F2257 0%,#1A3C8F 50%,#0A0F1E 100%);padding:60px 5% 50px;text-align:center;position:relative;overflow:hidden}
+.page-header::before{content:'';position:absolute;top:-50%;left:-20%;width:140%;height:200%;background:radial-gradient(ellipse at 60% 40%,rgba(43,92,230,0.25) 0%,transparent 70%);pointer-events:none}
+.page-header-inner{max-width:700px;margin:0 auto;position:relative;z-index:1}
+.page-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:50px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--accent);margin-bottom:20px;letter-spacing:1px;text-transform:uppercase}
+.page-header h1{font-family:'Sora',sans-serif;font-size:44px;font-weight:800;line-height:1.15;letter-spacing:-1px;margin-bottom:14px}
+.page-header p{font-size:17px;color:rgba(255,255,255,0.7);margin-bottom:0}
+
+/* SEARCH & FILTER */
+.search-section{background:rgba(17,24,39,0.8);border-bottom:1px solid var(--border);padding:24px 5%;position:sticky;top:68px;z-index:90;backdrop-filter:blur(12px)}
+.search-filter-inner{max-width:1200px;margin:0 auto}
+.search-row{display:flex;gap:12px;margin-bottom:16px}
+.search-input-wrap{flex:1;position:relative}
+.search-input-wrap svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:rgba(255,255,255,0.4)}
+.search-input{width:100%;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:50px;padding:12px 18px 12px 48px;font-size:15px;color:var(--white);outline:none;transition:border-color .2s;font-family:'Inter',sans-serif}
+.search-input::placeholder{color:rgba(255,255,255,0.4)}
+.search-input:focus{border-color:var(--primary-light);background:rgba(43,92,230,0.1)}
+.filter-pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:50px;padding:7px 16px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);cursor:pointer;transition:all .2s;white-space:nowrap}
+.pill:hover{background:rgba(43,92,230,0.2);border-color:rgba(43,92,230,0.5);color:var(--white)}
+.pill.active{background:linear-gradient(135deg,var(--primary),var(--primary-light));border-color:transparent;color:var(--white)}
+
+/* PROVIDERS GRID */
+.providers-section{padding:40px 5%;max-width:1280px;margin:0 auto}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.results-count{font-size:15px;color:rgba(255,255,255,0.6)}
+.results-count strong{color:var(--white)}
+.provider-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+
+/* PROVIDER CARD */
+.provider-card{background:linear-gradient(145deg,rgba(26,60,143,0.15),rgba(17,24,39,0.8));border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px 24px;transition:transform .25s,box-shadow .25s,border-color .25s;position:relative;overflow:hidden}
+.provider-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--primary-light));opacity:0;transition:opacity .25s}
+.provider-card:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,0.4);border-color:rgba(43,92,230,0.3)}
+.provider-card:hover::before{opacity:1}
+.prov-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.prov-avatar{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:white;flex-shrink:0}
+.prov-info{flex:1;min-width:0}
+.prov-name{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:2px}
+.prov-service{font-size:13px;color:rgba(255,255,255,0.55);font-weight:500}
+.verified-badge{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10B981;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;white-space:nowrap;flex-shrink:0}
+.stars-row{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.star-icons{color:#F59E0B;font-size:14px;letter-spacing:1px}
+.rating-text{font-size:13px;color:rgba(255,255,255,0.6);font-weight:500}
+.prov-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.prov-tag{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:50px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,0.7)}
+.prov-bio{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.65;margin-bottom:18px}
+.prov-cta{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;text-decoration:none;padding:11px 18px;border-radius:12px;font-weight:700;font-size:14px;font-family:'Sora',sans-serif;transition:transform .2s,box-shadow .2s}
+.prov-cta:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,211,102,0.35)}
+.prov-cta svg{width:18px;height:18px;fill:white;flex-shrink:0}
+
+/* NO RESULTS */
+.no-results{text-align:center;padding:80px 20px;display:none}
+.no-results-icon{font-size:48px;margin-bottom:16px}
+.no-results h3{font-family:'Sora',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px}
+.no-results p{color:rgba(255,255,255,0.5);font-size:15px}
+
+/* FLOAT STACK */
+.sfw-wa{position:fixed;bottom:24px;right:24px;z-index:999;width:56px;height:56px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform .2s}
+.sfw-wa:hover{transform:scale(1.1)}
+.sfw-wa svg{width:28px;height:28px;fill:white}
+.sfw-tr{position:fixed;bottom:88px;right:24px;z-index:999}
+.sfw-bt{position:fixed;bottom:152px;right:24px;z-index:999;width:44px;height:44px;background:rgba(26,60,143,0.9);border:1px solid rgba(255,255,255,0.2);border-radius:50%;color:white;font-size:22px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(8px)}
+.sfw-bt.vis{display:flex}
+.sfw-bt:hover{background:var(--primary)}
+
+/* FOOTER */
+footer{background:rgba(5,8,20,0.9);border-top:1px solid var(--border);padding:30px 5%;text-align:center;margin-top:60px}
+footer p{color:rgba(255,255,255,0.4);font-size:13px}
+footer a{color:rgba(255,255,255,0.6);text-decoration:none}
+footer a:hover{color:var(--white)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){.provider-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){
+  .provider-grid{grid-template-columns:1fr}
+  .page-header h1{font-size:30px}
+  .search-row{flex-direction:column}
+  .nav-links .hide-mobile{display:none}
+  .results-header{flex-direction:column;align-items:flex-start;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/dpanyard/" class="nav-brand"><span class="dp">D'</span> PanYard</a>
+  <div class="nav-links">
+    <a class="hide-mobile" href="/dpanyard/#hiw">How It Works</a>
+    <a class="hide-mobile" href="/dpanyard/#categories">Categories</a>
+    <a class="nav-cta" href="/dpanyard/list/">List Your Business</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div class="page-tag">📋 All Service Providers</div>
+    <h1>Find the right pro<br>in your area</h1>
+    <p>Browse verified service providers across Trinidad &amp; Tobago. Real reviews, real people, direct contact.</p>
+  </div>
+</div>
+
+<!-- SEARCH & FILTER -->
+<div class="search-section">
+  <div class="search-filter-inner">
+    <div class="search-row">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by name or service...">
+      </div>
+    </div>
+    <div class="filter-pills" id="filterPills">
+      <div class="pill active" data-cat="all">All</div>
+      <div class="pill" data-cat="plumbing">🔧 Plumbing</div>
+      <div class="pill" data-cat="beauty">💇 Beauty</div>
+      <div class="pill" data-cat="tutoring">📚 Tutoring</div>
+      <div class="pill" data-cat="electrical">⚡ Electrical</div>
+      <div class="pill" data-cat="cleaning">🧹 Cleaning</div>
+      <div class="pill" data-cat="construction">🏗️ Construction</div>
+      <div class="pill" data-cat="food">🍳 Food</div>
+      <div class="pill" data-cat="fitness">🏋️ Fitness</div>
+      <div class="pill" data-cat="photography">📸 Photography</div>
+      <div class="pill" data-cat="events">🎉 Events</div>
+      <div class="pill" data-cat="tech">💻 Tech</div>
+      <div class="pill" data-cat="pets">🐾 Pets</div>
+      <div class="pill" data-cat="transport">🚗 Transport</div>
+      <div class="pill" data-cat="garden">🌿 Garden</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROVIDERS GRID -->
+<div class="providers-section">
+  <div class="results-header">
+    <p class="results-count">Showing <strong id="resultCount">12</strong> providers</p>
+  </div>
+
+  <div class="provider-grid" id="providerGrid">
+
+    <!-- 1. Marcus Williams -->
+    <div class="provider-card" data-cat="plumbing" data-name="Marcus Williams Plumber">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#1A3C8F,#2B5CE6)">MW</div>
+        <div class="prov-info">
+          <div class="prov-name">Marcus Williams</div>
+          <div class="prov-service">🔧 Plumber</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">4.9 · 87 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Chaguanas</span>
+        <span class="prov-tag">💰 From $150</span>
+        <span class="prov-tag">🕐 Mon–Sat</span>
+      </div>
+      <p class="prov-bio">Expert plumber with 12+ years serving Central Trinidad. Specialises in pipe repair, fixture installation, water heater servicing, and emergency leak response.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 2. Kezia Baptiste -->
+    <div class="provider-card" data-cat="beauty" data-name="Kezia Baptiste Natural Hair Stylist">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7)">KB</div>
+        <div class="prov-info">
+          <div class="prov-name">Kezia Baptiste</div>
+          <div class="prov-service">💇 Natural Hair Stylist</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">4.8 · 134 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Port of Spain</span>
+        <span class="prov-tag">💰 From $80</span>
+        <span class="prov-tag">🕐 Tue–Sun</span>
+      </div>
+      <p class="prov-bio">Award-winning natural hair specialist. Locs, braids, twists, and protective styles. Studio-based with mobile appointments for bridal &amp; special occasions.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 3. Raj Maharaj -->
+    <div class="provider-card" data-cat="electrical" data-name="Raj Maharaj Electrician">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">RM</div>
+        <div class="prov-info">
+          <div class="prov-name">Raj Maharaj</div>
+          <div class="prov-service">⚡ Electrician</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">5.0 · 62 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 San Fernando</span>
+        <span class="prov-tag">💰 From $120</span>
+        <span class="prov-tag">🕐 Mon–Sat</span>
+      </div>
+      <p class="prov-bio">Licensed electrician serving South Trinidad. Residential wiring, panel upgrades, safety inspections, solar installations and commercial projects.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 4. Simone Charles -->
+    <div class="provider-card" data-cat="tutoring" data-name="Simone Charles Private Tutor Maths Science">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#0891B2,#06B6D4)">SC</div>
+        <div class="prov-info">
+          <div class="prov-name">Simone Charles</div>
+          <div class="prov-service">📚 Private Tutor (Maths/Science)</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★☆</span>
+        <span class="rating-text">4.7 · 201 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Arima</span>
+        <span class="prov-tag">💰 From $60/hr</span>
+        <span class="prov-tag">🕐 Weekdays</span>
+      </div>
+      <p class="prov-bio">BSc Mathematics. 8 years tutoring SEA, CSEC and CAPE students. Online &amp; in-person sessions. 95% pass rate with distinction-level results.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 5. Devon Joseph -->
+    <div class="provider-card" data-cat="tech" data-name="Devon Joseph AC Appliance Repair">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#059669,#10B981)">DJ</div>
+        <div class="prov-info">
+          <div class="prov-name">Devon Joseph</div>
+          <div class="prov-service">🛠️ AC &amp; Appliance Repair</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">4.9 · 45 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Maraval</span>
+        <span class="prov-tag">💰 From $180</span>
+        <span class="prov-tag">🕐 Mon–Sat</span>
+      </div>
+      <p class="prov-bio">Certified HVAC technician specialising in AC installation, servicing and repair. Also handles washing machines, fridges, stoves and small appliances.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 6. Alicia Ramsaran -->
+    <div class="provider-card" data-cat="events" data-name="Alicia Ramsaran Event Decorator">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#BE185D,#EC4899)">AR</div>
+        <div class="prov-info">
+          <div class="prov-name">Alicia Ramsaran</div>
+          <div class="prov-service">🎉 Event Decorator</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">4.8 · 118 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Couva</span>
+        <span class="prov-tag">💰 From $400</span>
+        <span class="prov-tag">🕐 By Appointment</span>
+      </div>
+      <p class="prov-bio">Creative event stylist with a flair for Caribbean elegance. Weddings, birthdays, corporate events and baby showers. Full setup and teardown included.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 7. Troy Phillip -->
+    <div class="provider-card" data-cat="garden" data-name="Troy Phillip Landscaper Gardener">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#15803D,#22C55E)">TP</div>
+        <div class="prov-info">
+          <div class="prov-name">Troy Phillip</div>
+          <div class="prov-service">🌿 Landscaper &amp; Gardener</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★☆</span>
+        <span class="rating-text">4.6 · 73 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Diego Martin</span>
+        <span class="prov-tag">💰 From $200</span>
+        <span class="prov-tag">🕐 Mon–Sat</span>
+      </div>
+      <p class="prov-bio">Full landscaping services for residential &amp; commercial properties. Lawn maintenance, hedge trimming, garden design, irrigation systems and tree removal.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 8. Nadine Ali -->
+    <div class="provider-card" data-cat="food" data-name="Nadine Ali Personal Chef Meal Prep">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#D97706,#F59E0B)">NA</div>
+        <div class="prov-info">
+          <div class="prov-name">Nadine Ali</div>
+          <div class="prov-service">🍳 Personal Chef &amp; Meal Prep</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">4.9 · 39 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Princes Town</span>
+        <span class="prov-tag">💰 From $250</span>
+        <span class="prov-tag">🕐 Mon–Sun</span>
+      </div>
+      <p class="prov-bio">Culinary Arts graduate offering weekly meal prep, private dinner parties and catering for small events. Specialises in Caribbean fusion and healthy meal plans.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 9. Curtis Blake -->
+    <div class="provider-card" data-cat="construction" data-name="Curtis Blake Carpenter Furniture Repair">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#92400E,#B45309)">CB</div>
+        <div class="prov-info">
+          <div class="prov-name">Curtis Blake</div>
+          <div class="prov-service">🪚 Carpenter &amp; Furniture Repair</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★☆</span>
+        <span class="rating-text">4.7 · 56 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 San Juan</span>
+        <span class="prov-tag">💰 From $200</span>
+        <span class="prov-tag">🕐 Mon–Fri</span>
+      </div>
+      <p class="prov-bio">Master carpenter with 15 years experience. Custom furniture, cabinet making, wood flooring, doors, windows and restoration of antique pieces.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 10. Priya Seunath -->
+    <div class="provider-card" data-cat="fitness" data-name="Priya Seunath Yoga Fitness Coach">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#6D28D9,#8B5CF6)">PS</div>
+        <div class="prov-info">
+          <div class="prov-name">Priya Seunath</div>
+          <div class="prov-service">🏋️ Yoga &amp; Fitness Coach</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">5.0 · 28 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Westmoorings</span>
+        <span class="prov-tag">💰 From $100/hr</span>
+        <span class="prov-tag">🕐 Daily</span>
+      </div>
+      <p class="prov-bio">Certified yoga instructor and personal trainer. Group classes, private sessions and corporate wellness programs. Specialises in stress reduction and weight management.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 11. Andre Noel -->
+    <div class="provider-card" data-cat="photography" data-name="Andre Noel Photographer Videographer">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#1A3C8F,#F59E0B)">AN</div>
+        <div class="prov-info">
+          <div class="prov-name">Andre Noel</div>
+          <div class="prov-service">📸 Photographer &amp; Videographer</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">4.8 · 167 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Port of Spain</span>
+        <span class="prov-tag">💰 From $500</span>
+        <span class="prov-tag">🕐 By Appointment</span>
+      </div>
+      <p class="prov-bio">Award-winning photographer covering weddings, corporate events, portraits, product shoots and music videos. Full editing and same-day delivery available.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+    <!-- 12. Tamara Gopaul -->
+    <div class="provider-card" data-cat="cleaning" data-name="Tamara Gopaul House Cleaner Organizer">
+      <div class="prov-top">
+        <div class="prov-avatar" style="background:linear-gradient(135deg,#0E7490,#06B6D4)">TG</div>
+        <div class="prov-info">
+          <div class="prov-name">Tamara Gopaul</div>
+          <div class="prov-service">🧹 House Cleaner &amp; Organizer</div>
+        </div>
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="stars-row">
+        <span class="star-icons">★★★★★</span>
+        <span class="rating-text">4.9 · 94 reviews</span>
+      </div>
+      <div class="prov-tags">
+        <span class="prov-tag">📍 Chaguanas</span>
+        <span class="prov-tag">💰 From $180</span>
+        <span class="prov-tag">🕐 Mon–Sat</span>
+      </div>
+      <p class="prov-bio">Professional house cleaner and home organiser. Deep cleaning, regular maintenance, move-in/move-out cleans and eco-friendly products used on request.</p>
+      <a href="https://wa.me/447576505652" class="prov-cta">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contact on WhatsApp
+      </a>
+    </div>
+
+  </div><!-- /provider-grid -->
+
+  <div class="no-results" id="noResults">
+    <div class="no-results-icon">🔍</div>
+    <h3>No providers found</h3>
+    <p>Try a different search term or category filter</p>
+  </div>
+
+</div><!-- /providers-section -->
+
+<!-- FOOTER -->
+<footer>
+  <p><a href="/dpanyard/">← Back to D' PanYard</a> &nbsp;·&nbsp; © 2025 D' PanYard · All Rights Reserved · <a href="https://priscadezigns.org">Built by Prisca Dezigns</a></p>
+</footer>
+
+<!-- FLOAT STACK -->
+<a href="https://wa.me/447576505652" class="sfw-wa" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+<div class="sfw-tr"><div id="gte_dpanyard_prov"></div></div>
+<script>function gteInit_dpanyard_prov(){new google.translate.TranslateElement({pageLanguage:'en',autoDisplay:false},'gte_dpanyard_prov');}</script>
+<script src="//translate.google.com/translate_a/element.js?cb=gteInit_dpanyard_prov"></script>
+<button class="sfw-bt" id="sbt_prov" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+<script>window.addEventListener('scroll',function(){var b=document.getElementById('sbt_prov');if(b)b.classList.toggle('vis',window.scrollY>400);});</script>
+
+<!-- SEARCH & FILTER JS -->
+<script>
+var cards = document.querySelectorAll('.provider-card');
+var searchInput = document.getElementById('searchInput');
+var pills = document.querySelectorAll('.pill');
+var resultCount = document.getElementById('resultCount');
+var noResults = document.getElementById('noResults');
+var activeCat = 'all';
+
+function filterProviders() {
+  var query = searchInput.value.toLowerCase().trim();
+  var visible = 0;
+  cards.forEach(function(card) {
+    var name = (card.getAttribute('data-name') || '').toLowerCase();
+    var cat = card.getAttribute('data-cat') || '';
+    var matchSearch = !query || name.includes(query);
+    var matchCat = activeCat === 'all' || cat === activeCat;
+    if (matchSearch && matchCat) {
+      card.style.display = '';
+      visible++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+  resultCount.textContent = visible;
+  noResults.style.display = visible === 0 ? 'block' : 'none';
+}
+
+searchInput.addEventListener('input', filterProviders);
+
+pills.forEach(function(pill) {
+  pill.addEventListener('click', function() {
+    pills.forEach(function(p){ p.classList.remove('active'); });
+    pill.classList.add('active');
+    activeCat = pill.getAttribute('data-cat');
+    filterProviders();
+  });
+});
+</script>
+
+</body>
+</html>

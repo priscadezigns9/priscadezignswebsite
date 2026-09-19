@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ListCraft Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="bg-black text-white font-inter">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 border-r border-gray-800 p-8 flex flex-col">
+            <div class="text-2xl font-black mb-12">LIST<span class="text-violet-500">CRAFT</span></div>
+            <nav class="space-y-6 flex-1">
+                <a href="#" class="flex items-center space-x-3 text-violet-400 bg-violet-400/10 p-3 rounded-xl">
+                    <span>🏠</span><span>My Listings</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 text-gray-500 hover:text-white p-3 rounded-xl transition">
+                    <span>🖼️</span><span>Media Assets</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 text-gray-500 hover:text-white p-3 rounded-xl transition">
+                    <span>📅</span><span>Marketing Cal</span>
+                </a>
+            </nav>
+            <div class="mt-auto border-t border-gray-800 pt-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-violet-500 rounded-full"></div>
+                    <div class="text-sm font-bold">Prisca Dezigns</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main -->
+        <main class="flex-1 overflow-y-auto p-12">
+            <div class="flex justify-between items-center mb-12">
+                <h1 class="text-4xl font-extrabold">Property Builder</h1>
+                <div class="flex space-x-4">
+                    <select id="toneSelector" class="bg-gray-900 border border-gray-800 p-3 rounded-xl text-sm font-bold outline-none focus:border-violet-500">
+                        <option>Luxury</option>
+                        <option selected>Family Home</option>
+                        <option>Investment</option>
+                        <option>Modern Starter</option>
+                        <option>Affordable</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Input Form -->
+                <div class="bg-gray-900 border border-gray-800 rounded-3xl p-8">
+                    <h3 class="text-xl font-bold mb-6">Property Details</h3>
+                    <div class="space-y-6">
+                        <input type="text" id="address" placeholder="Property Address" class="w-full bg-black border border-gray-700 p-4 rounded-xl focus:border-violet-500 outline-none">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" id="beds" placeholder="Beds" class="bg-black border border-gray-700 p-4 rounded-xl focus:border-violet-500 outline-none">
+                            <input type="number" id="baths" placeholder="Baths" class="bg-black border border-gray-700 p-4 rounded-xl focus:border-violet-500 outline-none">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" id="sqft" placeholder="Sq Ft" class="bg-black border border-gray-700 p-4 rounded-xl focus:border-violet-500 outline-none">
+                            <input type="text" id="price" placeholder="Price ($)" class="bg-black border border-gray-700 p-4 rounded-xl focus:border-violet-500 outline-none">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="flex items-center space-x-2 text-xs text-gray-400 p-3 border border-gray-800 rounded-lg cursor-pointer hover:border-violet-500"><input type="checkbox" class="accent-violet-500"><span>Pool</span></label>
+                            <label class="flex items-center space-x-2 text-xs text-gray-400 p-3 border border-gray-800 rounded-lg cursor-pointer hover:border-violet-500"><input type="checkbox" class="accent-violet-500"><span>Garage</span></label>
+                            <label class="flex items-center space-x-2 text-xs text-gray-400 p-3 border border-gray-800 rounded-lg cursor-pointer hover:border-violet-500"><input type="checkbox" class="accent-violet-500"><span>Garden</span></label>
+                        </div>
+                        <div class="border-2 border-dashed border-gray-800 p-8 rounded-2xl text-center text-gray-500 hover:border-violet-500/50 transition">
+                            Upload Property Photos
+                        </div>
+                        <button onclick="generateListing()" class="w-full bg-violet-500 text-white font-black py-5 rounded-2xl shadow-xl shadow-violet-500/20">Generate Listing Package</button>
+                    </div>
+                </div>
+
+                <!-- Output Tabs -->
+                <div id="outputArea" class="hidden bg-gray-900 border border-gray-800 rounded-3xl p-8">
+                    <div class="flex border-b border-gray-800 mb-6 space-x-6 text-sm font-bold text-gray-500">
+                        <button onclick="switchTab('mls')" class="pb-4 border-b-2 border-violet-500 text-white">MLS</button>
+                        <button onclick="switchTab('social')" class="pb-4">Social</button>
+                        <button onclick="switchTab('email')" class="pb-4">Email</button>
+                        <button onclick="switchTab('script')" class="pb-4">Script</button>
+                    </div>
+                    <div id="tabContent" class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-violet-400">MLS Description</h4>
+                            <button class="text-xs bg-gray-800 px-3 py-1 rounded">Copy</button>
+                        </div>
+                        <div id="displayText" class="bg-black p-6 rounded-2xl text-sm text-gray-300 leading-relaxed max-h-96 overflow-y-auto">
+                            <!-- Dynamic content -->
+                        </div>
+                        <button class="w-full mt-4 py-3 border border-gray-700 rounded-xl font-bold text-sm">Download as PDF</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History -->
+            <div class="mt-12 bg-gray-900 border border-gray-800 rounded-3xl p-8">
+                <h3 class="text-xl font-bold mb-6">Recent Properties</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center p-4 bg-black rounded-xl border border-gray-800 group hover:border-violet-500 transition">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-gray-800 rounded-lg"></div>
+                            <div>
+                                <div class="font-bold">124 Maple Street, NY</div>
+                                <div class="text-xs text-gray-500">3 Bed • 2 Bath • $540,000</div>
+                            </div>
+                        </div>
+                        <button class="text-violet-400 font-bold text-sm">Regenerate</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+</html>

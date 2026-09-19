@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Skin Intelligence Quiz | Glow Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --pink: #FF4D8D; --bg: #FFFAF9; --text: #2d1b2e; --border: rgba(255,77,141,0.1); }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        nav { padding: 30px 6%; display: flex; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid var(--border); }
+        .logo-group { display: flex; align-items: center; text-decoration: none; color: inherit; }
+        .logo-group img { height: 40px; width: 40px; border-radius: 50%; border: 2px solid var(--pink); margin-right: 12px; }
+        .logo-text { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.2rem; }
+        
+        .quiz-container { max-width: 600px; margin: 100px auto; padding: 0 6%; text-align: center; }
+        .quiz-step { display: none; }
+        .quiz-step.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-style: italic; margin-bottom: 20px; color: var(--pink); }
+        p { font-size: 1.1rem; color: #666; margin-bottom: 40px; }
+        .btn { display: inline-block; width: 100%; padding: 20px; background: var(--pink); color: #fff; text-decoration: none; border-radius: 50px; font-weight: 700; border: none; cursor: pointer; transition: 0.3s; margin-bottom: 15px; }
+        .btn:hover { background: #e0437a; }
+        .btn-choice { background:#f5f5f5; color:#000; }
+        
+        #analyzing .loader-bar { width: 100%; height: 6px; background: #eee; border-radius: 10px; overflow: hidden; margin: 30px 0; }
+        #analyzing .loader-fill { width: 0%; height: 100%; background: var(--pink); transition: width 3s linear; }
+        
+        .result-card { background: #fff; padding: 40px; border-radius: 20px; border: 1px solid var(--border); text-align: left; }
+        .result-card h2 { font-family: 'Playfair Display', serif; font-style: italic; color: var(--pink); margin-bottom: 15px; }
+        
+        footer { padding: 60px 6%; text-align: center; border-top: 1px solid var(--border); font-size: 0.85rem; opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="../" class="logo-group">
+            <img src="https://raw.githubusercontent.com/priscadezigns9/priscadezignswebsite/main/logos/glow-protocol.jpg" alt="Glow Protocol">
+            <span class="logo-text">Glow Protocol</span>
+        </a>
+    </nav>
+    <div class="quiz-container">
+        <div id="intro" class="quiz-step active">
+            <h1>Calibrate Your Glow</h1>
+            <p>Our neural network will analyze your skin profile across multiple data points to suggest the optimal protocol.</p>
+            <button class="btn" onclick="goToStep('q1')">Begin Calibration</button>
+        </div>
+        
+        <div id="q1" class="quiz-step">
+            <h1>Step 1 of 4</h1>
+            <p>How would you describe your skin's natural baseline?</p>
+            <button class="btn btn-choice" onclick="goToStep('q2')">Dry / Dehydrated</button>
+            <button class="btn btn-choice" onclick="goToStep('q2')">Oily / Congested</button>
+            <button class="btn btn-choice" onclick="goToStep('q2')">Combination</button>
+            <button class="btn btn-choice" onclick="goToStep('q2')">Sensitive / Reactive</button>
+        </div>
+
+        <div id="q2" class="quiz-step">
+            <h1>Step 2 of 4</h1>
+            <p>What is your primary high-fidelity target?</p>
+            <button class="btn btn-choice" onclick="goToStep('q3')">Hydration & Glow</button>
+            <button class="btn btn-choice" onclick="goToStep('q3')">Clarity & Texture</button>
+            <button class="btn btn-choice" onclick="goToStep('q3')">Fine Lines & Age Correction</button>
+        </div>
+
+        <div id="q3" class="quiz-step">
+            <h1>Step 3 of 4</h1>
+            <p>What is your primary environment exposure?</p>
+            <button class="btn btn-choice" onclick="goToStep('q4')">Urban (Pollution / Blue Light)</button>
+            <button class="btn btn-choice" onclick="goToStep('q4')">Outdoor (High UV Exposure)</button>
+            <button class="btn btn-choice" onclick="goToStep('q4')">Controlled (Indoor / Air-con)</button>
+        </div>
+
+        <div id="q4" class="quiz-step">
+            <h1>Step 4 of 4</h1>
+            <p>Select your sensitivity threshold:</p>
+            <button class="btn btn-choice" onclick="startAnalysis()">Low (Resilient)</button>
+            <button class="btn btn-choice" onclick="startAnalysis()">Moderate</button>
+            <button class="btn btn-choice" onclick="startAnalysis()">High (Reactive)</button>
+        </div>
+        
+        <div id="analyzing" class="quiz-step">
+            <h1>Analyzing...</h1>
+            <p>Cross-referencing dermal datasets for optimal protocol calibration.</p>
+            <div class="loader-bar"><div class="loader-fill" id="fill"></div></div>
+        </div>
+
+        <div id="result" class="quiz-step">
+            <div class="result-card">
+                <h2>Your Protocol is Calibrated</h2>
+                <p>Based on your multi-point analysis, the AI suggests the <strong>High-Fidelity Luminosity Protocol</strong>.</p>
+                <p style="font-size:0.9rem; color:#888; margin-top:20px;">Optimal restock cycle: 45 days.</p>
+                <a href="../shop/" class="btn" style="margin-top:30px; text-align:center;">Acquire Suggested Items</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToStep(stepId) {
+            document.querySelectorAll('.quiz-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(stepId).classList.add('active');
+        }
+
+        function startAnalysis() {
+            goToStep('analyzing');
+            setTimeout(() => {
+                document.getElementById('fill').style.width = '100%';
+            }, 100);
+            setTimeout(() => {
+                goToStep('result');
+            }, 3500);
+        }
+    </script>
+    <footer>© 2026 GLOW PROTOCOL // PRISCA DEZIGNS EMPIRE</footer>
+</body>
+</html>

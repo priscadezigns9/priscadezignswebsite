@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poly-Morphing Core | Prisca Dezigns</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root { --purple: #1d0e21; --accent: #7c3aed; --ivory: #f5f2ed; --lilac: #c8a2c8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--ivory); color: var(--purple); font-family: sans-serif; overflow-x: hidden; }
+        
+        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; pointer-events: none; }
+        #mercury-canvas { width: 100%; height: 100%; }
+
+        .scroll-container { position: relative; z-index: 2; }
+        section { height: 100vh; display: flex; align-items: center; padding: 0 10%; pointer-events: none; }
+        .content-box { max-width: 500px; background: rgba(245, 242, 237, 0.8); backdrop-filter: blur(10px); padding: 40px; border-radius: 2px; border-left: 4px solid var(--accent); pointer-events: auto; }
+        h2 { font-size: 3rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: -1px; }
+        p { font-size: 1.1rem; line-height: 1.6; color: #4a4a4a; }
+
+        .nav-dots { position: fixed; right: 40px; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 20px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--accent); transition: 0.3s; cursor: pointer; }
+        .dot.active { background: var(--accent); transform: scale(1.5); }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="mercury-canvas"></canvas>
+    </div>
+
+    <div class="nav-dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+
+    <div class="scroll-container">
+        <section id="section-core">
+            <div class="content-box">
+                <h2>The Neural Core</h2>
+                <p>Digital mercury in its purest state. A fluid, sentient intelligence capable of infinite adaptation.</p>
+            </div>
+        </section>
+
+        <section id="section-fashion">
+            <div class="content-box">
+                <h2>High-Fidelity Style</h2>
+                <p>NehNeh. Anatomical DNA mapping. Morphing into the structural couture silhouette.</p>
+            </div>
+        </section>
+
+        <section id="section-automotive">
+            <div class="content-box">
+                <h2>Aerodynamic Logic</h2>
+                <p>The Autodrome. High-performance luxury sedan chassis engineering.</p>
+            </div>
+        </section>
+
+        <section id="section-laptop">
+            <div class="content-box">
+                <h2>Technical Infrastructure</h2>
+                <p>The Productivity Core. Optimized architecture for strategic AI deployment.</p>
+            </div>
+        </section>
+
+        <section id="section-anime">
+            <div class="content-box">
+                <h2>Dreaming Anime</h2>
+                <p>The Media Hub. High-fidelity signals from the world of animation.</p>
+            </div>
+        </section>
+
+        <section id="section-whatsapp">
+            <div class="content-box">
+                <h2>Global Connectivity</h2>
+                <p>The structural squircle. Seamless communication geometry.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#mercury-canvas'), antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const geometry = new THREE.SphereBufferGeometry(1.5, 128, 128);
+        const positionAttribute = geometry.attributes.position;
+        const originalPositions = positionAttribute.array.slice();
+
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x1d0e21,
+            metalness: 1,
+            roughness: 0.1,
+            emissive: 0x7c3aed,
+            emissiveIntensity: 0.2
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0x7c3aed, 2);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
+
+        camera.position.z = 5;
+
+        let morphState = {
+            dress: 0,
+            car: 0,
+            laptop: 0,
+            anime: 0,
+            whatsapp: 0,
+            noise: 0.35
+        };
+
+        function updateGeometry() {
+            const positions = positionAttribute.array;
+            const time = Date.now() * 0.0015;
+
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = originalPositions[i];
+                const y = originalPositions[i+1];
+                const z = originalPositions[i+2];
+
+                // 1. DRESS: Distinct Geometric A-Line (Triangle)
+                const dX = x * (y < -0.2 ? 3.5 : 0.4);
+                const dY = y;
+                const dZ = z * (y < -0.2 ? 3.5 : 0.4);
+
+                // 2. CAR: Long Rectangular Block (Automotive Chassis)
+                const cX = x * 3.5;
+                const cY = y * 0.3;
+                const cZ = z * 6.5;
+
+                // 3. LAPTOP: Wide Flat Rect (Technical Infrastructure)
+                const lX = x * 5.5;
+                const lY = y * 0.1;
+                const lZ = z * 4.0;
+
+                // 4. ANIME: High-Density Spikes (Ripples)
+                const spike = 1.0 + 1.2 * Math.abs(Math.sin(x * 20) * Math.sin(y * 20));
+                const aX = x * spike;
+                const aY = y * spike;
+                const aZ = z * spike;
+
+                // 5. WHATSAPP: Structural Squircle (Rounded Square)
+                const p = 12; // High power for extreme squareness
+                const wX = Math.sign(x) * Math.pow(Math.abs(x), 1/p) * 2.8;
+                const wY = Math.sign(y) * Math.pow(Math.abs(y), 1/p) * 2.8;
+                const wZ = z * 0.1;
+
+                // --- MIXING ---
+                const s = morphState;
+                const total = s.dress + s.car + s.laptop + s.anime + s.whatsapp;
+                const b = Math.max(0, 1 - total);
+
+                let fx = x * b + dX * s.dress + cX * s.car + lX * s.laptop + aX * s.anime + wX * s.whatsapp;
+                let fy = y * b + dY * s.dress + cY * s.car + lY * s.laptop + aY * s.anime + wY * s.whatsapp;
+                let fz = z * b + dZ * s.dress + cZ * s.car + lZ * s.laptop + aZ * s.anime + wZ * s.whatsapp;
+
+                // Noise
+                const noise = (Math.sin(x * 4 + time) * Math.cos(y * 4 + time)) * s.noise;
+                positions[i] = fx + noise;
+                positions[i+1] = fy + noise;
+                positions[i+2] = fz + noise;
+            }
+            positionAttribute.needsUpdate = true;
+        }
+
+        gsap.to(morphState, { dress: 1, noise: 0.1, scrollTrigger: { trigger: "#section-fashion", scrub: 0.5 } });
+        gsap.to(morphState, { car: 1, dress: 0, noise: 0.05, scrollTrigger: { trigger: "#section-automotive", scrub: 0.5 } });
+        gsap.to(morphState, { laptop: 1, car: 0, noise: 0.05, scrollTrigger: { trigger: "#section-laptop", scrub: 0.5 } });
+        gsap.to(morphState, { anime: 1, laptop: 0, noise: 0.1, scrollTrigger: { trigger: "#section-anime", scrub: 0.5 } });
+        gsap.to(morphState, { whatsapp: 1, anime: 0, noise: 0.05, scrollTrigger: { trigger: "#section-whatsapp", scrub: 0.5 } });
+
+        const sections = ["#section-core", "#section-fashion", "#section-automotive", "#section-laptop", "#section-anime", "#section-whatsapp"];
+        sections.forEach((id, i) => {
+            ScrollTrigger.create({
+                trigger: id, start: "top center", end: "bottom center",
+                onToggle: self => { if(self.isActive) updateDots(i); }
+            });
+        });
+
+        function updateDots(index) {
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === index));
+        }
+
+        function animate() {
+            updateGeometry();
+            mesh.rotation.y += 0.005;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

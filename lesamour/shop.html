@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Shop | LESAMOUR</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #FFFFFF; --text: #1A0D1A; --muted: #6B4F6B; --gold: #9E1B32; --border: rgba(158,27,50,0.08); --btn-text: #FFFFFF; --header-bg: #FFFFFF; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.6; }
+        header { padding: 25px 6%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); background: var(--header-bg); position: sticky; top: 0; z-index: 100; }
+        .logo img { height: 50px; width: auto; object-fit: contain; mix-blend-mode: multiply; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { text-decoration: none; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text); transition: 0.3s; }
+        nav a:hover { color: var(--gold); }
+        .hero { padding: 60px 6% 40px; text-align: center; max-width: 900px; margin: 0 auto; }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 15px; }
+        .hero p { color: var(--muted); font-size: 1.1rem; }
+        .categories-nav { display: flex; justify-content: center; gap: 20px; padding: 20px 6%; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 40px; position: sticky; top: 101px; background: white; z-index: 90; }
+        .cat-btn { background: none; border: 1px solid var(--border); padding: 8px 20px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; cursor: pointer; transition: 0.3s; color: var(--muted); }
+        .cat-btn.active, .cat-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(158,27,50,0.02); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; padding: 0 6% 60px; }
+        .card { border: 1px solid var(--border); padding: 20px; transition: 0.4s; background: var(--header-bg); display: flex; flex-direction: column; justify-content: space-between; }
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(158,27,50,0.05); }
+        .p-img { aspect-ratio: 1/1; margin-bottom: 15px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; }
+        .p-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .p-info h3 { font-family: 'Playfair Display', serif; font-size: 0.85rem; margin-bottom: 8px; min-height: 2.4em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--text); }
+        .p-info .category { font-size: 0.6rem; text-transform: uppercase; color: var(--gold); letter-spacing: 1px; margin-bottom: 5px; display: block; }
+        .p-info .price { color: var(--text); font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 15px; }
+        .btn { display: inline-block; background: var(--gold); color: var(--btn-text); padding: 10px 15px; text-decoration: none; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; border-radius: 2px; transition: 0.3s; width: 100%; text-align: center; }
+        .btn:hover { opacity: 0.9; }
+        footer { padding: 60px 6%; text-align: center; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--muted); letter-spacing: 2px; margin-top: 40px; }
+        footer img { height: 40px; margin-bottom: 15px; mix-blend-mode: multiply; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo"><a href="index.html"><img src="../logos/LES_AMOUR_NEW_2026.png" alt="lesamour"></a></div>
+        <nav><ul><li><a href="index.html">Home</a></li><li><a href="shop.html" style="color: var(--gold);">Shop</a></li></ul></nav>
+    </header>
+    <section class="hero">
+        <h1>The Intimate Collection</h1>
+        <p>A curated catalog of premium essentials for marriage enrichment and deep connection. Live Neural Sync Active.</p>
+    </section>
+    <div class="categories-nav">
+        <button class="cat-btn active" onclick="filter('All')">All Items</button>
+        <button class="cat-btn" onclick="filter('Marriage Enrichment')">Marriage Enrichment</button>
+        <button class="cat-btn" onclick="filter('Relationship Essentials')">Relationship Essentials</button>
+    </div>
+    <div id="shop-grid" class="grid"></div>
+    <script>
+        const SB_URL = 'https://sktpjacowqaedddtrhuz.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNrdHBqYWNvd3FhZWRkZHRyaHV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDk5MzEsImV4cCI6MjA5NDIyNTkzMX0.FK4N_ATFTaUuGXrYu_7OBn3qCdlo0rOzxk-E6TxJxqs';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+        let allProducts = [];
+
+        async function loadProducts() {
+            try {
+                const { data, error } = await sb.from('lesamour_products').select('*');
+                if (error) throw error;
+                allProducts = data;
+                render(allProducts);
+            } catch (err) {
+                console.error("Neural Sync Error:", err);
+            }
+        }
+
+        function render(products) {
+            const grid = document.getElementById('shop-grid');
+            grid.innerHTML = products.map(p => `
+                <div class="card" data-cat="${p.category}">
+                    <div class="p-img"><img src="${p.image}" alt="${p.name}" loading="lazy"></div>
+                    <div class="p-info">
+                        <span class="category">${p.category}</span>
+                        <h3>${p.name}</h3>
+                        <span class="price">${p.price}</span>
+                        <a href="${p.link}" target="_blank" class="btn">Buy on Amazon</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filter(cat) {
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.classList.toggle('active', b.innerText === cat || (cat === 'All' && b.innerText === 'All Items'));
+            });
+            const filtered = cat === 'All' ? allProducts : allProducts.filter(p => p.category === cat);
+            render(filtered);
+        }
+
+        loadProducts();
+    </script>
+    <footer>
+        <img src="../logos/LES_AMOUR_NEW_2026.png"><br>
+        © 2026 LESAMOUR · QUALITY INTIMACY
+    </footer>
+</body>
+</html>
+<!-- Force Refresh v1.1 -->

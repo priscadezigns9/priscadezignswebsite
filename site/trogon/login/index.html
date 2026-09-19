@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trogon — Sign In</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',sans-serif;background:#0a0a0f;color:#e8eaf6;min-height:100vh;display:flex;align-items:center;justify-content:center}
+  .box{background:#13131a;border:1px solid #1e1e2e;border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center}
+  .logo{margin-bottom:20px}
+  .logo img{height:64px;width:64px;border-radius:50%}
+  .title{font-size:1.4rem;font-weight:700;margin-bottom:6px}
+  .sub{color:#8b8fa8;font-size:0.85rem;margin-bottom:32px}
+  input{width:100%;padding:14px 16px;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:10px;color:#e8eaf6;font-size:0.95rem;margin-bottom:12px;outline:none}
+  input:focus{border-color:#e63946}
+  .btn{width:100%;padding:14px;background:#e63946;border:none;border-radius:10px;color:#fff;font-size:0.95rem;font-weight:600;cursor:pointer;margin-top:8px}
+  .btn:hover{background:#c1121f}
+  .btn:disabled{opacity:0.6;cursor:not-allowed}
+  .error{color:#e63946;font-size:0.8rem;margin-top:10px;display:none}
+  .success{color:#4ade80;font-size:0.8rem;margin-top:10px;display:none}
+  .divider{border:none;border-top:1px solid #1e1e2e;margin:24px 0}
+  .forgot{color:#8b8fa8;font-size:0.8rem;cursor:pointer;text-decoration:underline;background:none;border:none;margin-top:12px;display:inline-block}
+  .forgot:hover{color:#e8eaf6}
+  .back{display:block;margin-top:20px;color:#8b8fa8;font-size:0.8rem;text-decoration:none}
+  .back:hover{color:#e8eaf6}
+  .tab-row{display:flex;gap:8px;margin-bottom:24px}
+  .tab{flex:1;padding:10px;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;color:#8b8fa8;font-size:0.85rem;cursor:pointer}
+  .tab.active{background:#1e1e2e;color:#e8eaf6;border-color:#e63946}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo"><img src="/trogon/trogon_logo.png" alt="Trogon"></div>
+  <div class="title" id="page-title">Welcome to Trogon</div>
+  <div class="sub" id="page-sub">Sign in to your account</div>
+
+  <!-- TAB ROW — hidden during password update -->
+  <div class="tab-row" id="tab-row">
+    <button class="tab active" onclick="showTab('signin')" id="tab-signin">Sign In</button>
+    <button class="tab" onclick="showTab('reset')" id="tab-reset">Forgot Password</button>
+  </div>
+
+  <!-- SIGN IN -->
+  <div id="form-signin">
+    <input type="email" id="email" placeholder="Your email address" autocomplete="username"/>
+    <input type="password" id="password" placeholder="Password" autocomplete="current-password"/>
+    <button class="btn" id="signin-btn" onclick="doSignIn()">Sign In</button>
+    <div class="error" id="signin-error"></div>
+  </div>
+
+  <!-- FORGOT PASSWORD -->
+  <div id="form-reset" style="display:none">
+    <input type="email" id="reset-email" placeholder="Your email address"/>
+    <button class="btn" onclick="doReset()">Send Reset Link</button>
+    <div class="error" id="reset-error"></div>
+    <div class="success" id="reset-success">Check your email for a reset link!</div>
+  </div>
+
+  <!-- SET NEW PASSWORD (recovery flow) -->
+  <div id="form-newpass" style="display:none">
+    <input type="password" id="new-password" placeholder="New password" autocomplete="new-password"/>
+    <input type="password" id="confirm-password" placeholder="Confirm new password" autocomplete="new-password"/>
+    <button class="btn" id="newpass-btn" onclick="doUpdatePassword()">Set New Password</button>
+    <div class="error" id="newpass-error"></div>
+    <div class="success" id="newpass-success">Password updated! Redirecting...</div>
+  </div>
+
+  <a href="/trogon/" class="back">← Back to Trogon</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb = supabase.createClient(
+  'https://sazhdnqzaqpqcralmthh.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNhemhkbnF6YXFwcWNyYWxtdGhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzE5NjYsImV4cCI6MjA5Mzc0Nzk2Nn0.uTyw31uWTNOTV5-HzNpm46vpAJABAsHLMzW-sYOkRhc'
+);
+
+// ── On load: check URL hash for recovery token ──
+window.addEventListener('load', async () => {
+  const hash = window.location.hash;
+
+  // Password recovery flow — token in hash
+  if (hash.includes('type=recovery') || hash.includes('type=email_change')) {
+    // Let Supabase process the hash token
+    const { data, error } = await sb.auth.getSession();
+    if (data.session) {
+      showNewPasswordForm();
+      return;
+    }
+  }
+
+  // Already logged in — go straight to dashboard
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    window.location.href = '/trogon/dashboard/';
+  }
+});
+
+// Listen for auth state changes (catches token exchange from hash)
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    showNewPasswordForm();
+  } else if (event === 'SIGNED_IN' && session) {
+    // Only redirect if we're NOT in recovery mode
+    if (!document.getElementById('form-newpass').style.display || document.getElementById('form-newpass').style.display === 'none') {
+      window.location.href = '/trogon/dashboard/';
+    }
+  }
+});
+
+function showNewPasswordForm() {
+  document.getElementById('form-signin').style.display = 'none';
+  document.getElementById('form-reset').style.display = 'none';
+  document.getElementById('form-newpass').style.display = 'block';
+  document.getElementById('tab-row').style.display = 'none';
+  document.getElementById('page-title').textContent = 'Set New Password';
+  document.getElementById('page-sub').textContent = 'Choose a secure password for your account';
+}
+
+function showTab(tab) {
+  document.getElementById('form-signin').style.display = tab === 'signin' ? 'block' : 'none';
+  document.getElementById('form-reset').style.display = tab === 'reset' ? 'block' : 'none';
+  document.getElementById('tab-signin').className = 'tab' + (tab === 'signin' ? ' active' : '');
+  document.getElementById('tab-reset').className = 'tab' + (tab === 'reset' ? ' active' : '');
+}
+
+async function doSignIn() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn = document.getElementById('signin-btn');
+  const errEl = document.getElementById('signin-error');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+    return;
+  }
+  window.location.href = '/trogon/dashboard/';
+}
+
+async function doReset() {
+  const email = document.getElementById('reset-email').value.trim();
+  const errEl = document.getElementById('reset-error');
+  const sucEl = document.getElementById('reset-success');
+  errEl.style.display = 'none';
+  sucEl.style.display = 'none';
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/trogon/login/'
+  });
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+  } else {
+    sucEl.style.display = 'block';
+  }
+}
+
+async function doUpdatePassword() {
+  const newPass = document.getElementById('new-password').value;
+  const confirmPass = document.getElementById('confirm-password').value;
+  const btn = document.getElementById('newpass-btn');
+  const errEl = document.getElementById('newpass-error');
+  const sucEl = document.getElementById('newpass-success');
+
+  errEl.style.display = 'none';
+
+  if (newPass.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (newPass !== confirmPass) {
+    errEl.textContent = 'Passwords do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  const { error } = await sb.auth.updateUser({ password: newPass });
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Set New Password';
+    return;
+  }
+
+  sucEl.style.display = 'block';
+  setTimeout(() => { window.location.href = '/trogon/dashboard/'; }, 1500);
+}
+
+// Allow Enter key on sign in
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('form-signin').style.display !== 'none') doSignIn();
+    if (document.getElementById('form-newpass').style.display !== 'none') doUpdatePassword();
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your Cart — Prisca Dezigns</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#6600CC;--lilac:#9B4DFF;--ivory:#FAFAF8;
+    --font-h:'Syne',system-ui,sans-serif;
+    --font-b:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--purple);min-height:100vh;font-family:var(--font-b);display:flex;flex-direction:column;color:#fff;}
+
+  /* ── Header ── */
+  .cp-header{display:flex;align-items:center;padding:20px 20px 0;position:relative;}
+  .cp-back{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,0.75);font-size:13px;font-weight:600;text-decoration:none;font-family:var(--font-h);}
+  .cp-title{position:absolute;left:50%;transform:translateX(-50%);font-family:var(--font-h);font-size:20px;font-weight:800;}
+
+  /* ── Body ── */
+  .cp-body{flex:1;padding:24px 20px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;padding-bottom:40px;}
+
+  /* ── Empty state ── */
+  .cp-empty{display:flex;flex-direction:column;align-items:center;gap:16px;padding:80px 20px;text-align:center;}
+  .cp-empty strong{font-size:16px;font-weight:700;color:rgba(255,255,255,1);}
+  .cp-empty span{font-size:14px;color:rgba(255,255,255,0.6);max-width:240px;line-height:1.4;}
+  .cp-empty a{margin-top:8px;display:inline-flex;padding:12px 24px;background:#fff;color:var(--purple);border-radius:100px;text-decoration:none;font-weight:700;font-size:14px;}
+
+  /* ── Cards ── */
+  .sec-label{font-family:var(--font-h);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:rgba(255,255,255,0.4);margin-bottom:12px;}
+  
+  .tpl-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;position:relative;}
+  .tpl-info{flex:1;}
+  .tpl-name{font-family:var(--font-h);font-size:18px;font-weight:800;margin-bottom:4px;}
+  .tpl-sub{font-size:12px;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase;letter-spacing:0.02em;}
+  .tpl-price{text-align:right;}
+  .tpl-price-setup{font-family:var(--font-h);font-size:18px;font-weight:800;}
+  .tpl-price-mo{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;}
+  .tpl-remove{position:absolute;top:-8px;right:-8px;width:24px;height:24px;background:#ff4d4d;color:#fff;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+
+  /* ── Addons ── */
+  .addon-row{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all 0.2s;}
+  .addon-row:hover{background:rgba(255,255,255,0.08);}
+  .addon-row.active{background:rgba(255,255,255,1);color:var(--purple);border-color:transparent;}
+  
+  .addon-check{width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+  .addon-row.active .addon-check{background:var(--purple);border-color:var(--purple);}
+  .addon-row.active .addon-check svg{display:block;}
+  .addon-check svg{display:none;}
+  
+  .addon-info{flex:1;}
+  .addon-name{font-family:var(--font-h);font-size:15px;font-weight:800;margin-bottom:2px;}
+  .addon-desc{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.3;}
+  .addon-row.active .addon-desc{color:rgba(102,0,204,0.6);}
+  .addon-price{text-align:right;}
+  .addon-price-setup{font-family:var(--font-h);font-size:15px;font-weight:800;}
+  .addon-price-mo{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;}
+  .addon-row.active .addon-price-mo{color:rgba(102,0,204,0.4);}
+
+  /* ── Footer ── */
+  .cp-footer{background:#fff;color:var(--purple);padding:24px 20px calc(24px + env(safe-area-inset-bottom));border-radius:32px 32px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,0.2);display:flex;flex-direction:column;gap:16px;}
+  .tot-row{display:flex;justify-content:space-between;align-items:baseline;}
+  .tot-label{font-family:var(--font-h);font-size:13px;font-weight:800;text-transform:uppercase;color:rgba(102,0,204,0.4);}
+  .tot-val{font-family:var(--font-h);font-size:28px;font-weight:800;}
+  .tot-sub{font-size:13px;font-weight:600;color:rgba(102,0,204,0.6);}
+  
+  .cp-actions{display:flex;flex-direction:column;gap:10px;}
+  .btn-pay{display:flex;align-items:center;justify-content:center;gap:12px;height:56px;border-radius:16px;text-decoration:none;font-weight:700;font-size:15px;transition:all 0.2s;}
+  .btn-paypal{background:#0070ba;color:#fff;}
+  .btn-bank{background:#f4f4f4;color:var(--purple);}
+  .btn-pay:active{transform:scale(0.98);}
+  
+  .safe-note{font-size:11px;text-align:center;color:rgba(102,0,204,0.4);line-height:1.4;}
+</style>
+</head>
+<body>
+
+<header class="cp-header">
+  <a href="/templates/" class="cp-back">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12,19 5,12 12,5"/></svg>
+    Back
+  </a>
+  <div class="cp-title">Cart</div>
+</header>
+
+<div class="cp-body" id="cp-body">
+  <!-- Rendered via JS -->
+</div>
+
+<footer class="cp-footer" id="cp-footer">
+  <div class="tot-row">
+    <div>
+      <div class="tot-label">Setup Total</div>
+      <div class="tot-val" id="tot-setup">$0.00</div>
+    </div>
+    <div style="text-align:right">
+      <div class="tot-label">Monthly</div>
+      <div class="tot-sub" id="tot-mo">$0.00/mo</div>
+    </div>
+  </div>
+
+  <div class="cp-actions">
+    <a href="#" class="btn-pay btn-paypal" id="cart-paypal">
+      Checkout with PayPal
+    </a>
+    <a href="#" class="btn-pay btn-bank" id="cart-bank">
+      Bank Transfer (T&T)
+    </a>
+  </div>
+  <p class="safe-note">After payment, you'll receive an intake form to send us your logo and content. We go live within 24–72 hours.</p>
+</footer>
+
+<script>
+(function(){
+  var PRICES = {
+    website: { setup: 149.99, mo: 19.99, label: 'Standard Template' },
+    premium: { setup: 299.99, mo: 19.99, label: 'Premium 3D Template' },
+    store:   { setup: 249.99, mo: 34.99, label: 'Micro Store' }
+  };
+
+  var state = {
+    name: null,
+    type: 'website',
+    copy: false,
+    chatbot: false
+  };
+
+  /* ── Load ── */
+  var saved = sessionStorage.getItem('pd_cart');
+  if (saved) {
+    try {
+      var d = JSON.parse(saved);
+      if (d.base) {
+        state.name = d.base.name;
+        state.type = d.base.type || 'website';
+      }
+      if (d.addons) {
+        state.copy = d.addons.copy || false;
+        state.chatbot = d.addons.chatbot || false;
+      }
+    } catch(e){}
+  }
+
+  /* ── Render ── */
+  function render() {
+    var body = document.getElementById('cp-body');
+    if (!state.name) {
+      body.innerHTML = '<div class="cp-empty">'
+        + '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>'
+        + '<strong>No template selected</strong>'
+        + '<span>Go back and pick a template to get started.</span>'
+        + '<a href="/templates/">Browse Templates</a></div>';
+      document.getElementById('cp-footer').style.display = 'none';
+      return;
+    }
+
+    var pr = PRICES[state.type] || PRICES.website;
+    var html = '';
+
+    /* Template card */
+    html += '<div>';
+    html += '<p class="sec-label">Selected Template</p>';
+    html += '<div class="tpl-card">';
+    html += '<div class="tpl-info"><div class="tpl-name">' + esc(state.name) + '</div>';
+    html += '<div class="tpl-sub">' + esc(pr.label) + '</div></div>';
+    html += '<div class="tpl-price"><div class="tpl-price-setup">$' + pr.setup.toFixed(2) + '</div>';
+    html += '<div class="tpl-price-mo">$' + pr.mo.toFixed(2) + '/mo</div></div>';
+    html += '<button class="tpl-remove" onclick="removeTemplate()" title="Remove"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+    html += '</div></div>';
+
+    /* Add-ons */
+    html += '<div>';
+    html += '<p class="sec-label">Enhance Your Package</p>';
+
+    /* Copy addon */
+    html += '<div class="addon-row ' + (state.copy ? 'active' : '') + '" onclick="toggleAddon(\'copy\')" style="margin-bottom:10px;">';
+    html += '<div class="addon-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    html += '<div class="addon-info"><div class="addon-name">Copywriting</div><div class="addon-desc">Professional copy — headers, descriptions &amp; CTAs written for you.</div></div>';
+    html += '<div class="addon-price"><div class="addon-price-setup">+$49.99</div><div class="addon-price-mo">one-time</div></div>';
+    html += '</div>';
+
+    /* Chatbot addon */
+    html += '<div class="addon-row ' + (state.chatbot ? 'active' : '') + '" onclick="toggleAddon(\'chatbot\')">';
+    html += '<div class="addon-check"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#6600CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    html += '<div class="addon-info"><div class="addon-name">AI Chatbot</div><div class="addon-desc">Custom AI trained on your brand — captures leads &amp; answers questions 24/7.</div></div>';
+    html += '<div class="addon-price"><div class="addon-price-setup">+$349.99</div><div class="addon-price-mo">+$49.99/mo</div></div>';
+    html += '</div>';
+
+    html += '</div>'; /* end addons div */
+    
+    body.innerHTML = html;
+    document.getElementById('cp-footer').style.display = 'flex';
+    updateTotals();
+  }
+
+  /* ── Totals ── */
+  function updateTotals() {
+    var pr = PRICES[state.type] || PRICES.website;
+    var setup = pr.setup;
+    var mo = pr.mo;
+
+    if (state.copy) setup += 49.99;
+    if (state.chatbot) {
+      setup += 349.99;
+      mo += 49.99;
+    }
+
+    document.getElementById('tot-setup').textContent = '$' + setup.toFixed(2);
+    document.getElementById('tot-mo').textContent = '$' + mo.toFixed(2) + '/mo';
+
+    /* Update PayPal link */
+    var pp = document.getElementById('cart-paypal');
+    var bk = document.getElementById('cart-bank');
+    
+    /* Pre-fill for WhatsApp / Bank */
+    var orderMsg = 'Template: ' + state.name + ' (' + pr.label + ')';
+    if (state.copy) orderMsg += ' + Copywriting';
+    if (state.chatbot) orderMsg += ' + AI Chatbot';
+    orderMsg += ' | Setup: $' + setup.toFixed(2) + ' | Monthly: $' + mo.toFixed(2) + '/mo';
+    
+    var waUrl = 'https://wa.me/18683424101?text=' + encodeURIComponent('I would like to pay via Bank Transfer for: ' + orderMsg);
+    if (bk) bk.href = waUrl;
+
+    /* Simplified PayPal amount (just setup for now) */
+    if (setup > 0) {
+      var ppUrl = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=priscadezigns9@gmail.com&item_name=' + encodeURIComponent(orderMsg) + '&amount=' + setup.toFixed(2) + '&currency_code=USD';
+      if (pp) { pp.classList.remove('disabled'); pp.href = ppUrl; }
+      if (bk) { bk.classList.remove('disabled'); }
+    } else {
+      if (pp) { pp.classList.add('disabled'); pp.href = '#'; }
+      if (bk) { bk.classList.add('disabled'); bk.href = '#'; }
+    }
+  }
+
+  /* ── Add-on toggle ── */
+  window.toggleAddon = function(which) {
+    state[which] = !state[which];
+    updateTotals();
+    /* re-render just the add-on rows without full re-render */
+    var copyRow    = document.querySelectorAll('.addon-row')[0];
+    var chatbotRow = document.querySelectorAll('.addon-row')[1];
+    if (copyRow)    copyRow.classList.toggle('active', state.copy);
+    if (chatbotRow) chatbotRow.classList.toggle('active', state.chatbot);
+    persist();
+  };
+
+  /* ── Remove ── */
+  window.removeTemplate = function() {
+    state.name = null; state.type = null;
+    state.copy = false; state.chatbot = false;
+    sessionStorage.removeItem('pd_cart');
+    render();
+    /* go back after short delay so user sees the empty state */
+    setTimeout(function(){ window.location.href = '/templates/'; }, 800);
+  };
+
+  /* ── Persist to sessionStorage ── */
+  function persist() {
+    sessionStorage.setItem('pd_cart', JSON.stringify({
+      base: state.name ? { name: state.name, type: state.type } : null,
+      addons: { copy: state.copy, chatbot: state.chatbot }
+    }));
+  }
+
+  /* ── Util ── */
+  function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  /* ── Boot ── */
+  render();
+})();
+</script>
+</body>
+</html>

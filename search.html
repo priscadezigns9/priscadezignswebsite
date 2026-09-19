@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Neural Search | Sovereign Ledger</title>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Space+Mono:wght@700&display=swap'>
+    <style>
+        :root { --accent: #7B35D4; --bg: #050505; --card: #0A0A0A; --green: #00FF88; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
+        header { padding: 15px 5%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid #111; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 1000; }
+        .logo-img { width: 32px; height: 32px; cursor: pointer; }
+        .search-input { width: 100%; background: #0D0D0D; border: 1px solid #222; border-radius: 100px; padding: 12px 25px 12px 50px; color: white; font-size: 0.9rem; outline: none; transition: 0.3s; box-sizing: border-box; }
+        .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #444; font-size: 0.8rem; }
+        .stats-bar { background: #000; padding: 6px 20px; font-size: 0.5rem; font-family: 'Space Mono'; font-weight: 800; color: #444; border-bottom: 1px solid #111; display: flex; justify-content: space-between; }
+        .active-sig { color: var(--green); }
+        .results-container { padding: 30px 5%; flex: 1; max-width: 900px; margin: 0 auto; width: 95%; }
+        .result-card { background: var(--card); border: 1px solid #111; border-radius: 16px; padding: 25px; margin-bottom: 20px; transition: 0.3s; display: block; text-decoration: none; color: white; position: relative; overflow: hidden; }
+        .result-card:hover { border-color: var(--accent); background: #0D0D0D; transform: translateY(-3px); }
+        .res-type { font-family: 'Space Mono'; font-size: 0.5rem; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; display: flex; justify-content: space-between; }
+        .res-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .res-handle { font-size: 0.7rem; color: var(--green); margin-bottom: 10px; font-family: 'Space Mono'; font-weight: 900; }
+        .res-desc { font-size: 0.85rem; color: #888; line-height: 1.6; }
+        .v-badge { padding: 4px 10px; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.2); color: var(--green); border-radius: 4px; font-size: 0.5rem; font-weight: 900; }
+        .ai-summary { background: linear-gradient(135deg, #111 0%, #050505 100%); border: 1px solid #222; border-left: 4px solid var(--accent); padding: 25px; border-radius: 12px; margin-bottom: 40px; position: relative; }
+        .ai-summary::before { content: 'AI SYNTHESIS'; position: absolute; top: -10px; left: 20px; background: var(--accent); color: white; padding: 2px 10px; font-size: 0.5rem; font-weight: 900; border-radius: 4px; font-family: 'Space Mono'; }
+        .ai-text { font-size: 0.9rem; color: #aaa; line-height: 1.7; }
+        .empty-view { text-align: center; padding: 150px 20px; color: #222; font-weight: 900; letter-spacing: 5px; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div class='stats-bar'>
+        <div><span class='active-sig'>●</span> SOVEREIGN HANDLE RESOLVER ACTIVE</div>
+        <div>LEDGER: PRISCION-MAINNET | REWARDS: +0.01 PRN</div>
+    </div>
+    <header>
+        <a href='/leggo.html'><img src='/assets/leggo-logo.png' class='logo-img' alt='LEGGO'></a>
+        <div style='flex:1; position:relative;'>
+            <span class='search-icon'>⚡</span>
+            <input type='text' id='q' class='search-input' onkeyup='handleNewSearch(event)' placeholder='Resolve Handle...'>
+        </div>
+    </header>
+    <div class='results-container' id='results-view'>
+        <div class='empty-view'>AWAITING NEURAL COMMAND...</div>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const query = (params.get('q') || '').toLowerCase();
+        const input = document.getElementById('q');
+        const resultsView = document.getElementById('results-view');
+
+        if(query) {
+            input.value = query;
+            runHandleSearch(query);
+        }
+
+        
+        async function runHandleSearch(q) {
+            try {
+                const res = await fetch('vault_manifest.json');
+                const data = await res.json();
+                const nodes = data.filter(i => i.type === 'Empire/Node');
+                const matches = nodes.filter(n => n.name.toLowerCase().includes(q.toLowerCase()) || n.handle.toLowerCase().includes(q.toLowerCase()));
+                if(matches.length > 0) {
+                    let h = '<div class="ai-summary"><div class="ai-text">Sovereign Handles detected. Resolving results to LEGGO Explorer nodes.</div></div>';
+                    matches.forEach(m => {
+                        h += '<a href="javascript:void(0)" onclick="navigateToNode(' + "'" + m.handle + "'" + ')" class="result-card"><div class="res-type"><span>' + m.category + '</span><span class="v-badge">LEDGER VERIFIED</span></div><div class="res-title">' + m.name + '</div><div class="res-handle">' + m.handle + '</div><div class="res-desc">Sovereign Node hosted on the Priscion Ledger.</div></a>';
+                    });
+                    resultsView.innerHTML = h;
+                } else { resultsView.innerHTML = '<div class="empty-view">NO SOVEREIGN HANDLES FOUND FOR "' + q + '"</div>'; }
+            } catch(e) { resultsView.innerHTML = '<div class="empty-view">LEDGER OFFLINE</div>'; }
+        }
+        function navigateToNode(handle) { if(typeof recordSearch === 'function') recordSearch(); window.location.href = 'leggo.html?node=' + handle; }
+,
+                { name: 'The Way Made Known', handle: '.prn', path: 'thewaymadeknown', desc: 'Biblical Apologetics and Gospel Mission.', category: 'Foundation Node' },
+                { name: 'Atelia Gaming', handle: '.prn', path: 'ateliagaming', desc: 'High-fidelity PC gaming and hardware engineering.', category: 'Engineering' },
+                { name: 'Riddiim', handle: '.prn', path: 'riddiim', desc: 'Digital music super-app and audio engineering.', category: 'Media Node' },
+                { name: 'D Panyard', handle: '.prn', path: 'dpanyard', desc: 'Caribbean cultural gateway and business platform.', category: 'Cultural Node' },
+                { name: 'Nurasen', handle: '.prn', path: 'nurasen', desc: 'Neural cybersecurity and digital defense.', category: 'Security Node' }
+            ];
+
+            const matches = brands.filter(b => b.name.toLowerCase().includes(q) || b.handle.toLowerCase().includes(q));
+            
+            if(matches.length > 0) {
+                let h = '<div class='ai-summary'><div class='ai-text'>Sovereign Handles detected. Resolving results to LEGGO Explorer nodes. All traffic funneled through the Priscion Ledger.</div></div>';
+                matches.forEach(m => {
+                    h += '<a href="/leggo.html?node=' + m.handle + '" class='result-card'><div class='res-type'><span>' + m.category + '</span><span class='v-badge'>LEDGER VERIFIED</span></div><div class='res-title'>' + m.name + '</div><div class='res-handle'>' + m.handle + '</div><div class='res-desc'>' + m.desc + '</div></a>';
+                });
+                resultsView.innerHTML = h;
+            } else {
+                resultsView.innerHTML = '<div class='empty-view'>NO SOVEREIGN HANDLES FOUND FOR "' + q + '"</div>';
+            }
+        }
+
+        function handleNewSearch(e) { if(e.key === 'Enter') { window.location.href = 'search.html?q=' + encodeURIComponent(e.target.value); } }
+    </script>
+</body>
+</html>
